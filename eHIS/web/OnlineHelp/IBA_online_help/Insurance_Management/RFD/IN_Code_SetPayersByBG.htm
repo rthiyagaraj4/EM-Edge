@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>IN_Code_SetPayersByBG</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to associate Payers to a Billing Group:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The logged-in facility is displayed, by default. You can select a Facility from the list to set up the payers by Billing Group. The Facilities associated to the logged-in user get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Group</span> - Select a Billing Group from the list. The listed Billing Groups are populated only if the Settlement Indicator is set as ‘Sponsored Patient’ and the Payer Settlement Type is set to ‘Insurance Company’ in the Patient Billing Manager module. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Class</span> – The Patient Class values are system defined. Click on the relevant Patient Class to associate patient class to the Billing Group and the Payers.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the Patient Class is displayed in the adjacent text field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Group</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Customer Group. The listed Customer Groups are populated only if it is defined in the Patient Billing Manager or Accounts Receivable module. The selected Billing Group is valid to the Customer Group and the Patient Class selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the relevant Customer Group is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a valid Customer. The value is set to ‘**’, by default. The Billing Group selected is applicable to all the Payers associated to the Customer Group on selecting **. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Name</span> – The Payer Name is set to All Payers, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Policy Code. The respective Policy is valid for all the Payers under the Customer Group associated to the Billing Group. The Description for the selected Policy Code gets displayed. This is a mandatory field .</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> – Enter the Priority for the Customer Group and the associated Policy Code in numeric format of two digits maximum length. This is a mandatory field .</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adj Rule</span> – Select an Adjustment Rule from the list. The system defined values are ‘Automatic’ and ‘Not Applicable’. ‘Automatic’ is displayed, by default. This indicates if the adjustment is applicable for the policy coverage amount or not. You can update the details associated to the Policy in the billing transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%age/Amt Ind</span> - Select a value from the list. The values are system defined – ‘Percentage’ and ‘Amount’. ‘Percentage’ is displayed, by default. This indicates that the adjustment value is calculated on the basis of percentage or the specific amount set in Adj Value field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adj Value</span> – Enter the Adjustment Value in numeric format. If ‘Percentage’ is selected, the Adjustment Value has to be in a range between 1 to 100. The adjustment value is calculated based on the amount defined for the Policy Code, Customer, Customer Group and the associated Billing Group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adj Interface Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a valid Adjustment Interface Code. The Description for the selected Adjustment Interface Code is displayed. The interface codes defined in the Patient Billing Manager module get listed to associate the payer details to the selected GL Interface Codes.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DRG Adj Interface Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Adjustment Interface Code for the Diagnosis Related Group. The Description for the selected DRG Adjustment Interface Code is displayed. The interface codes defined in the Patient Billing Manager module get listed .</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Spl Service Adj Interface Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Adjustment Interface Code for the Special Services. The Description for the selected Special Service Adjustment Interface Code is displayed to associate the payer details for special services to the GL Interface Codes.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

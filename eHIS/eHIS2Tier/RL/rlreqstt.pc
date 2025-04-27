@@ -1,0 +1,1265 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File	: rlreqstt.pc
+   Author : S.Sheelvant 
+   Date Created  : 20/08/1998
+   Last Modified : 22/08/1998
+   Last Modified : 04/09/2003 (Shruti for ordered_facility_id)
+
+   Modified by   : Hameed
+
+*  Ver 1.10.01
+   
+*  Purpose : To generate a report for Request Statistics of Test Codes
+
+*  Input Parameters : 
+              Command line inputs
+	
+		      1. Usr_id/Password
+              2. Session id
+		      3. Program Date
+                 Parameters from SY_PROG_PARAM table 
+              4. Preferred range of Section Codes.
+  
+*  Table Accessed : RL_REQUEST_HEADER,RL_REQUEST_DETAIL,
+					RL_SECTION_CODE, RL_TEST_CODE,
+					OP_CLINIC, IP_WARD, RL_REFERRAL
+		    
+
+*  Output File : rlreqstt.lis
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <gl.h>
+
+#define MAX_LINES 45
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+#define ESC 0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+/* INPUT PARAMETERS TO MAIN */
+
+	VARCHAR  
+	    nd_operating_facility_id   [3],
+	    uid_pwd		               [91],
+		nd_user_id                 [21],
+		nd_session_id              [16],
+		nd_pgm_date	               [20], 
+		nd_user	                   [15],
+        nd_file_no                 [15],
+		nd_file_name			   [150],
+		d_version_no			   [20],
+		d_version  			       [20];
+
+/****************************/
+/* FIELDS from CURSOR SECTION CURSOR */
+	varchar d_section_code	[2] , 
+		    d_section_name  [41] ;
+
+	int specimen_prefix = 0;
+
+/* FIELDS from CURSOR TEST CURSOR */
+	varchar d_test_code [11] ,
+			rl_ordered_facility_id	[3],
+		    d_test_name [41] ;
+
+
+/* FIELDS for FETCHING SOURCE CURSOR */
+	varchar d_source_code [11] ,
+			d_source_name [100], /*Modified By Manoj S for ML-MMOH-CRF-0752.6*/
+			d_source_type  [2] ;
+
+/* FIELDS for GET TEST_GROUP DETAILS */
+	long count_test ;
+	long total_records;
+	
+/* Fields from table RL_SECTION_CODE */
+	 varchar      d_printer_name            [16];
+
+/* Fields from table SY_ACC_ENTITY*/
+	varchar 	//d_acc_entity_name        [61],
+				d_acc_entity_name        [300],
+				d_user                   [21],
+				d_sysdate                [17],
+				d_sysdate1               [17];
+
+	varchar	    l_translated_value		[500], // added for globalisation
+			    language_id				[5];  // added for globalisation
+
+	 int        i;                            // added for globalisation
+	 int        rec_len;                     //added for globalisation
+
+		 
+
+/**********************************************/
+ /*INPUT PARAMETERS FROM SY_PROG_PARAM TABLE */
+	varchar nd_fm_section_code			[2],
+			nd_to_section_code			[2],
+			nd_type						[2],
+			nd_fm_source_type			[5],
+			nd_to_source_type			[5],
+			nd_print_yn					[6];
+			
+
+	int 	nd_fm_month ,
+			nd_fm_year ,
+			nd_to_month ,
+			nd_to_year ;
+
+	int		m_month,
+			m_year,
+			a_month,
+			a_year,
+			t_month,
+			t_year;
+
+/* FIELDS from DECLARING VARIABLES(COLUMN HEADINGS) IN DCLR_MONTH_VARIABLES()*/
+	varchar x_date		[11] ,
+			v_date		[11],
+			w_date		[11],
+			q_date		[11];
+
+	varchar h_head		[8];
+
+	varchar d_spec_date [8];
+
+	int month[14];
+	int year[14];
+    long mnth_yr[14]; 
+	int j_month, j_year;
+
+	int  l_tab_exists ;
+
+	
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+ 
+char string_var[100] ;
+
+
+/************************************************/
+char string_var[100] ;
+int line_no = 0;
+int page_no = 0 ;
+long total_count = 0;
+long g_total_count = 0;
+int mon_incr = 0;
+int tot_incr = 0;
+
+FILE *f1;
+
+char local_legend[40][600]; // added for globalisation
+
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+   void get_params();
+   void get_header_dtls();
+   void gen_file_name();
+   void do_report();
+   void do_footer();     // 26.04.2003
+   
+   if(argc < 4) {
+     disp_message(ORA_MESG,"Usage rlreqstt uid/passwd session_id pgm_date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+   strcpy(OUTPUT_FILE_NAME, argv[5]);
+  
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+
+   if(OERROR)
+      disp_message(ORA_MESG,"Failed to connect using : \n");
+
+#ifdef DEBUG
+    printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+#endif
+    
+	set_meduser_role();
+
+	/******* from here added for globalisation ********/
+	strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+	/******* upto here added for globalisation ********/
+
+	get_params();
+
+	get_legend_value(28);  //added for globalisation
+
+	get_header_dtls();
+	gen_file_name(); 
+	initialize_array();
+	do_report();
+	do_footer();  // 26.04.2003 for jordan scf 57
+    fprintf(f1,"%cE",ESC);	
+	fclose(f1);
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();	
+	
+}
+
+/******** added for globalisation start ******************/
+
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND(:nd_operating_facility_id,:language_id,'RLREQSTT.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+		l_translated_value.arr[0]		= '\0';
+
+
+		EXEC SQL EXECUTE
+		BEGIN
+               :l_translated_value := GET_LEGEND(LTRIM(RTRIM('RLREQSTT.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+		END;
+		END-EXEC;
+	
+		l_translated_value.arr[l_translated_value.len] = '\0';
+
+		//sp_message(ERR_MESG,l_translated_value.arr);
+
+		strcpy(local_legend[i],l_translated_value.arr);
+
+	}
+ }
+/******** added for globalisation end ******************/
+	
+
+void do_report()
+{
+    int fetch_section_cur();
+	void dclr_source_cur();
+	void close_test_cur();
+	void chk_break(int lin_no);
+	void dclr_test_cur();
+	void get_source_name();
+	void get_section_name();
+	void get_test_name();
+	void print_dtl_record();
+	void print_rep_header();
+	void print_page_header();
+	void print_dept_col_heading();
+	void print_source_col_heading();
+	
+	char temp_source_name[11];
+	char temp_section_name[2];
+	char temp_test_name[11];
+	char flag_1 = 'N';
+	char flag_2 = 'N';
+	char flag_3 = 'N';
+	char f_section = 'N';
+	char f_source = 'N';
+	char first_time = 'Y';
+
+	int i =0;
+
+	strcpy(temp_source_name, " ");
+	strcpy(temp_section_name, " ");
+	strcpy(temp_test_name, " ");
+
+	line_no = 0;
+    page_no = 0;
+
+    dclr_test_cur();
+    while(fetch_test_cur())
+	{
+	  get_source_name();
+	  get_test_name();
+	  get_section_name();
+
+	  if (flag_3 == 'N')
+		flag_3 = 'Y';
+
+	  if (strcmp(temp_section_name, d_section_code.arr) != 0)
+	  {
+		  strcpy(temp_section_name, d_section_code.arr);
+		  strcpy(temp_source_name, d_source_code.arr);
+		  strcpy(temp_test_name, " ");
+		  if (flag_1 == 'N')
+		  {
+			 flag_1 = 'Y';
+			 print_rep_header();
+			 print_page_header();
+			 print_month_col_heading();
+		  }
+
+		  f_section = 'Y';
+	  
+	  }
+	    
+	  if (strcmp(temp_source_name, d_source_code.arr) != 0)
+	  {
+		  strcpy(temp_source_name, d_source_code.arr);
+		  strcpy(temp_test_name, " ");
+		
+		  f_source = 'Y';
+	  }
+
+	  if (strcmp(temp_test_name, d_test_code.arr) != 0)
+	  {
+		 
+		 strcpy(temp_test_name, d_test_code.arr);
+
+ 		  if (flag_2 == 'Y')
+		  {
+			 for(i = mon_incr; i < tot_incr; i++)
+				fprintf(f1, "        ");	
+
+			 fprintf(f1, "%6d", total_count);			 
+				 fprintf(f1, "\n");
+			 line_no++;
+
+			 total_count = 0;
+			 mon_incr = 0;
+
+		  }
+		  else
+		  	 flag_2 = 'Y';
+		 
+		 if ( f_source != 'Y' && f_section != 'Y')
+		 {
+		 
+    	   first_time = 'N';
+		   chk_break(3);
+		   
+		   fprintf(f1,"%-11.11s",d_test_code.arr);
+		   fprintf(f1, " ");
+		
+		   fprintf(f1,"%-15.15s",d_test_name.arr) ;  
+		   fprintf(f1, " ");
+		 }
+
+	  }
+
+	  if (f_section == 'Y')
+	  {
+		  f_section = 'N';
+		  first_time = 'Y';
+		  chk_break(3);
+		  print_dept_col_heading();
+		  chk_break(3);
+		  print_source_col_heading();
+
+	  }
+	  else if (f_source == 'Y')
+	  {
+		 f_source = 'N';
+		 first_time = 'Y';
+		 chk_break(3);
+		  print_source_col_heading();
+
+	  }
+  
+		 if (f_source == 'Y' || f_section == 'Y' || first_time == 'Y')
+		 {
+		   first_time = 'N';
+		   chk_break(3);
+		   
+		   fprintf(f1,"%-11.11s",d_test_code.arr);
+		   fprintf(f1, " ");
+		
+		   fprintf(f1,"%-15.15s",d_test_name.arr) ;  
+		   fprintf(f1, " ");
+		 }    
+
+	  print_dtl_record();
+    
+	  
+	}
+	
+	for(i = mon_incr; i < tot_incr; i++)
+	fprintf(f1, "        ");	
+	fprintf(f1, "%6d", total_count);			 
+    fprintf(f1, "\n");
+	line_no += 1;
+    chk_break(3);
+
+	if (flag_3 == 'N')
+	{
+		 print_rep_header();
+		 print_page_header();
+		 print_month_col_heading();
+    }
+
+	close_test_cur();
+
+}
+
+/********* DECLARE TEST_CURSOR **********/
+void dclr_test_cur()
+ {
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE TEST_CURSOR CURSOR FOR
+			SELECT A.section_code, A.source_type, 
+				   A.source_code,  B.test_code, 
+				   TO_CHAR(A.spec_regd_date_time, 'MM/YYYY'), count(*)
+			FROM RL_REQUEST_HEADER A, RL_REQUEST_DETAIL B
+			WHERE A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+			AND B.OPERATING_FACILITY_ID = :nd_operating_facility_id
+			AND A.source_type = DECODE(:nd_type, 'A', A.source_type, 'R', 'E', :nd_type)
+			AND A.source_code BETWEEN :nd_fm_source_type
+			AND :nd_to_source_type
+			AND A.spec_regd_date_time > TO_DATE(:v_date,'DD/MM/YYYY')
+			AND A.spec_regd_date_time < TO_DATE(:w_date,'DD/MM/YYYY') + 1
+			AND A.specimen_no = B.specimen_no 
+			AND A.section_code BETWEEN :nd_fm_section_code 
+			AND :nd_to_section_code   
+			AND NVL(A.cancelled_yn,'N') != 'Y' 
+			GROUP BY A.section_code, A.source_type, 
+					 A.source_code, B.test_code,
+					 TO_CHAR(A.spec_regd_date_time, 'MM/YYYY')
+			ORDER BY A.section_code, A.source_type, 
+					 A.source_code, B.test_code,
+					 TO_CHAR(A.spec_regd_date_time, 'MM/YYYY');
+	
+	 EXEC SQL OPEN test_cursor;
+#ifdef DEBUG
+    printf("leaving dclr_test_cur()\n");
+    fflush(stdout);
+#endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_test_cur() occured....\n");
+   proc_exit();	
+ }
+
+void close_test_cur()
+ {
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL CLOSE test_cursor;
+#ifdef DEBUG
+    printf("leaving close_test_cur()\n");
+    fflush(stdout);
+#endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at close_test_cur() occured....\n");
+   proc_exit();	
+ }
+
+ /*************** FETCH TEST CURSOR ***************/
+int fetch_test_cur()
+{
+  d_test_code.arr[0]                = '\0';
+  d_section_code.arr[0]				= '\0';
+  d_source_type.arr[0]				= '\0';
+  d_source_code.arr[0]				= '\0';
+  d_spec_date.arr[0]				= '\0';
+ 
+  d_test_code.len                   = 0;
+  d_section_code.len				= 0;
+  d_source_type.len					= 0;
+  d_source_code.len					= 0;
+  d_spec_date.len					= 0;
+
+  count_test = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH TEST_CURSOR INTO
+	    :d_section_code, :d_source_type, 
+		:d_source_code, :d_test_code, :d_spec_date, :count_test;
+
+				
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+  if (NODATAFOUND)
+    return 0;
+
+
+  d_test_code.arr[d_test_code .len]			= '\0';
+  d_section_code.arr[d_section_code.len]	= '\0';
+  d_source_code.arr[d_source_code.len]		= '\0';
+  d_source_type.arr[d_source_type.len]		= '\0';
+  d_spec_date.arr[d_spec_date.len]			= '\0';
+
+#ifdef DEBUG
+   printf("********* Details from RL_WORKLIST_FMT_DTL**************\n");
+   printf(" d_test_code= %s\n", d_test_code.arr);
+   printf(" d_test_name= %s\n", d_test_name.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_test_cursor() occured....\n");
+   proc_exit();
+
+}
+
+/********* GET SOURCE_NAME  **********/
+  void get_source_name()
+  {
+    d_source_name.arr[0]	= '\0';
+	d_source_name.len		= 0;
+
+ 	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	if (strcmp(d_source_type.arr,"C") == 0)
+	{
+   				EXEC SQL SELECT LONG_DESC 
+				INTO :d_source_name
+				FROM OP_CLINIC_lang_vw // chaged table name to lang_vw and added where condtion for globalisation
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND clinic_code = :d_source_code
+				AND language_id = :language_id;
+	}
+	else
+	{
+		if (strcmp(d_source_type.arr,"W") == 0) 
+		{
+		
+				/*EXEC SQL SELECT LONG_DESC
+				INTO :d_source_name
+				FROM IP_WARD 
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND ward_code = :d_source_code;*/  //commednted and added for globalisation
+				EXEC SQL SELECT LONG_DESC
+				INTO :d_source_name
+				FROM ip_nursing_unit_lang_vw 
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND nursing_unit_code = :d_source_code
+				AND language_id = :language_id;
+		}
+		else
+		{
+			if ( (strcmp(d_source_type.arr,"R") == 0 ) || (strcmp(d_source_type.arr,"E") == 0 ) )
+			{
+					EXEC SQL SELECT LONG_DESC
+					INTO :d_source_name
+					FROM RL_REFERRAL_lang_vw // chaged table name to lang_vw and added where condtion for globalisation
+					WHERE referral_code = :d_source_code
+					AND language_id = :language_id;
+			}
+		}
+	}
+
+#ifdef DEBUG
+    printf("leaving dclr_source_cur()\n");
+    fflush(stdout);
+#endif
+
+	d_source_name.arr[d_source_name.len]	= '\0';
+
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_source_cur() occured....\n");
+   proc_exit();	
+  }
+
+
+/********* GET SECTION_NAME  **********/
+  void get_section_name()
+  {
+    d_section_name.arr[0]	= '\0';
+	d_section_name.len		= 0;
+
+ 	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL SELECT long_name
+	INTO :d_section_name
+	FROM RL_SECTION_CODE_lang_vw
+	WHERE section_code = :d_section_code
+	AND language_id = :language_id;
+
+#ifdef DEBUG
+    printf("leaving dclr_section_cur()\n");
+    fflush(stdout);
+#endif
+
+	d_section_name.arr[d_section_name.len]	= '\0';
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_section_name() occured....\n");
+   proc_exit();	
+  }
+
+
+/********* GET TEST_NAME  **********/
+  void get_test_name()
+  {
+    d_test_name.arr[0]	= '\0';
+	d_test_name.len		= 0;
+
+ 	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+//	EXEC SQL SELECT LONG_DESC
+	EXEC SQL SELECT short_desc
+	INTO :d_test_name
+	FROM RL_TEST_CODE_lang_vw // changed table name to lang_vw and added where condition for globalisation
+	WHERE test_code = :d_test_code
+	AND language_id = :language_id;
+
+#ifdef DEBUG
+    printf("leaving dclr_source_cur()\n");
+    fflush(stdout);
+#endif
+
+	d_test_name.arr[d_test_name.len]	= '\0';
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_test_name() occured....\n");
+   proc_exit();	
+  }
+
+print_month_col_heading()
+{
+
+    m_month = 0;
+	m_year = 0;
+	a_month = 0;
+	a_year = 0;
+
+	h_head.arr[0]		= '\0';
+	h_head.len			= 0;
+
+
+	strcpy(x_date.arr, v_date.arr);
+	x_date.len = strlen(x_date.arr);
+
+	//fprintf(f1, "Description     ");
+	fprintf(f1, "Test        Description     ");
+
+	fprintf(f1,"%4.4s        %11.11s      ", local_legend[7],local_legend[8]);
+
+   	   EXEC SQL SELECT TO_DATE(:q_date, 'DD/MM/YYYY') - 
+			TO_DATE(:x_date, 'DD/MM/YYYY') 
+	   INTO :m_month
+	   FROM DUAL;
+
+	while(m_month >= 0)
+	{
+	   
+	  EXEC SQL SELECT TO_CHAR(TO_DATE(:x_date, 'DD/MM/YYYY'), 'MM/YYYY')
+			INTO :h_head FROM DUAL;
+		
+  	   h_head.arr[h_head.len]		= '\0';
+
+	   fprintf(f1,"%-7s", h_head.arr);
+	   fprintf(f1, " ");
+
+	   EXEC SQL SELECT TO_CHAR(ADD_MONTHS(TO_DATE(:x_date, 'DD/MM/YYYY'), 1), 'DD/MM/YYYY')
+			INTO :x_date FROM DUAL;
+	
+	   x_date.arr[x_date.len]		= '\0';
+
+	   EXEC SQL SELECT TO_DATE(:q_date, 'DD/MM/YYYY') - 
+			TO_DATE(:x_date, 'DD/MM/YYYY') 
+	   INTO :m_month
+	   FROM DUAL;
+
+	}
+
+	//fprintf(f1, "Total");
+	fprintf(f1,"%5.5s",local_legend[12]);
+
+	fprintf(f1,"\n-------------------------------------------------------------------------------");
+	fprintf(f1,"----------------------------------------------------") ;
+	fprintf(f1,"\n") ;
+
+	line_no += 2;
+
+}
+
+/************** PRINT DEPARTMENT COLUMN HEADING ***************/
+void print_dept_col_heading()
+{
+ fprintf(f1, "\n");
+
+ //fprintf(f1,"Dept : %s",d_section_name.arr);
+  fprintf(f1,"%4.4s : %s",local_legend[9],d_section_name.arr);
+
+ fprintf(f1,"\n-----------------------------------");
+ line_no += 2;
+ total_records++ ;
+}
+
+/***************PRINT SOURCE COLUMN HEADING *************/
+void print_source_col_heading()
+{
+ fprintf(f1, "\n");
+ 
+ //fprintf(f1,"Source : %s",d_source_name.arr );
+ fprintf(f1,"%6.6s : %s",local_legend[10],d_source_name.arr);
+
+ fprintf(f1,"\n");
+ fprintf(f1,"-----------------------------------");
+ fprintf(f1,"\n");
+ line_no +=3 ;
+}
+
+
+void chk_break(int lin)
+{
+   if ((line_no + lin) >= MAX_LINES)
+   {
+     fprintf(f1,"");
+	 print_page_header();
+	 print_month_col_heading();
+	 line_no += 1;
+   }
+}
+
+/***************PRINT TEST DETAILS OF THE REPORT *************/
+void print_dtl_record()
+{	
+    
+   EXEC SQL SELECT TO_NUMBER(SUBSTR(:d_spec_date, 1, 2)),
+			TO_NUMBER(SUBSTR(:d_spec_date, 4, 4)) 
+		INTO :j_month, :j_year
+		FROM DUAL;
+
+/**********/   
+ while(TRUE)
+ {
+   if (month[mon_incr] == j_month && year[mon_incr] == j_year )
+   {
+      break;
+   }
+   fprintf(f1, "        ");	
+   mon_incr++;
+
+ }
+/**********/   
+	
+   if (month[mon_incr] == j_month && year[mon_incr] == j_year)
+   {
+      fprintf(f1, "%7d", count_test);
+      fprintf(f1, " ");
+	  mnth_yr[mon_incr] = mnth_yr[mon_incr] + count_test;  // 26.04.2003
+   }
+   else
+   {
+	  fprintf(f1, "        ");	
+   }
+
+   mon_incr++;
+
+   total_count = total_count + count_test;
+   g_total_count = g_total_count + count_test;   // 26.04.2003
+}
+
+/************* get_params ***************/
+void get_params()
+{
+	nd_fm_section_code.arr[0] 		= '\0';
+	nd_fm_section_code.len			= 0 ;
+	nd_to_section_code.arr[0]		= '\0' ;
+	nd_to_section_code.len			= 0;
+	nd_type.arr[0]					= '\0'	;
+	nd_type.len				 		= 0;
+	nd_fm_source_type.arr[0]		= '\0' ;
+	nd_fm_source_type.len 			= 0;
+	nd_to_source_type.arr[0]		= '\0' ;
+	nd_to_source_type.len 			= 0;
+	v_date.arr[0]					= '\0';
+	v_date.len						= 0;
+	w_date.arr[0]					= '\0';
+	w_date.len						= 0;
+	q_date.arr[0]					= '\0';
+	q_date.len						= 0;
+
+   if(OERROR)
+      disp_message(ORA_MESG,"get parameter function using : \n");
+
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+            PARAM1,
+		    PARAM2,
+		    LTRIM(RTRIM(PARAM3)),
+		    PARAM4,
+		    PARAM5,
+		    TO_NUMBER(SUBSTR(LTRIM(RTRIM(NVL(PARAM6,'0000000'))),1,2)),
+		    TO_NUMBER(SUBSTR(NVL(PARAM6,'0000000'),4,4)),
+		    TO_NUMBER(SUBSTR(LTRIM(RTRIM(NVL(PARAM7,'0000000'))),1,2)),
+		    TO_NUMBER(SUBSTR(NVL(PARAM7,'0000000'),4,4))
+		    INTO 
+		    :nd_operating_facility_id,
+		    :nd_fm_section_code ,  
+		    :nd_to_section_code ,
+		    :nd_type ,
+		    :nd_fm_source_type ,
+		    :nd_to_source_type ,
+		    :nd_fm_month ,
+		    :nd_fm_year ,
+		    :nd_to_month ,
+		    :nd_to_year 
+		
+            FROM SY_PROG_PARAM
+	        WHERE   UPPER(PGM_ID) = 'RLREQSTT'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+	
+	EXEC SQL SELECT '01'||'/'||LPAD(TO_CHAR(:nd_fm_month),2,'0')||'/'||
+		TO_CHAR(:nd_fm_year) INTO :v_date FROM DUAL ;
+
+	EXEC SQL SELECT '01'||'/'||LPAD(TO_CHAR(:nd_to_month),2,'0')||'/'||
+		TO_CHAR(:nd_to_year) INTO :q_date FROM DUAL ;
+
+    EXEC SQL SELECT TO_CHAR(LAST_DAY(TO_DATE('01'||'/'||LPAD(TO_CHAR(:nd_to_month),2,'0')||'/'||
+		TO_CHAR(:nd_to_year), 'DD/MM/YYYY')), 'DD/MM/YYYY') INTO :w_date FROM DUAL ;
+
+
+   if(OERROR)
+      disp_message(ORA_MESG,"get_parameter_function2 : \n");
+   
+  nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+  nd_fm_section_code.arr[nd_fm_section_code.len] 		= '\0';
+  nd_to_section_code.arr[nd_to_section_code.len]		= '\0';
+  nd_type.arr[nd_type.len]                              = '\0';
+  nd_fm_source_type.arr[nd_fm_source_type.len] 			= '\0';
+  nd_to_source_type.arr[nd_fm_source_type.len] 			= '\0';
+  v_date.arr[v_date.len]								= '\0';
+  w_date.arr[w_date.len]								= '\0';
+  q_date.arr[q_date.len]								= '\0';
+
+  #ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf(" nd_fm_section_code = %s\n",nd_fm_section_code.arr);
+   printf(" nd_to_section_code = %s\n",nd_to_section_code.arr);
+   printf(" nd_type = %d\n",nd_type);
+   printf(" nd_fm_source_type = %s\n",nd_fm_source_type.arr);
+   printf(" nd_to_source_type = %s\n",nd_to_source_type.arr);
+   printf(" v_date = %s\n",v_date.arr);
+   printf(" w_date = %s\n",w_date.arr);
+   getchar();  
+#endif
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE FROM SY_PROG_PARAM
+	        WHERE UPPER(PGM_ID) = 'RLREQSTT'
+	        AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+     return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit();
+}
+
+/************ GET_HEADER_DETAILS****************/
+void get_header_dtls()
+{
+     d_acc_entity_name.arr[0]   = '\0';
+	 d_acc_entity_name.len		= 0;
+	 d_user.arr[0]				= '\0';
+	 d_user.len                 = 0;
+	 d_sysdate.arr[0]			= '\0';
+	 d_sysdate.len              = 0;
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   /*
+   EXEC SQL SELECT SUBSTR(LPAD(ACC_ENTITY_NAME,
+		       TRUNC(15 + 0.5*LENGTH(ACC_ENTITY_NAME))),1,30),
+		    USER,
+		   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+	    INTO :d_acc_entity_name,
+		 :d_user,
+		 :d_sysdate
+            FROM SY_ACC_ENTITY
+			WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+*/
+
+   EXEC SQL SELECT ACC_ENTITY_NAME,
+		   USER,
+		   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+	       INTO :d_acc_entity_name,
+		   :d_user,
+		   :d_sysdate
+            FROM SY_ACC_ENTITY_lang_vw   //changed table name to lang_vw and added language_id column in where clause
+			WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			AND language_id = :language_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+#ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+
+
+/*************** GENERATE FILE NAME ***************/
+void gen_file_name()
+{
+
+  	 /* For a constant file name (4 lines) */
+  	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+     nd_file_name.len = strlen(nd_file_name.arr);
+	 //strcat(nd_file_name.arr,"rlreqstt.lis");
+	 strcat(nd_file_name.arr,OUTPUT_FILE_NAME);
+	 nd_file_name.len = strlen(nd_file_name.arr);
+
+	 if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit();
+     }
+    
+
+}
+
+/*********** PRINT REPORT HEADER **************/
+
+void print_rep_header()
+{
+  char nd_fm_section_desc[10],
+       nd_to_section_desc[10];
+
+  if(strcmp(nd_fm_section_code.arr, "!") == 0)
+
+    //strcpy(nd_fm_section_desc, "LOWEST");
+	strcpy(nd_fm_section_desc, local_legend[13]); // added for globalisation
+
+  else strcpy(nd_fm_section_desc, nd_fm_section_code.arr);
+
+  if(strcmp(nd_to_section_code.arr, "~") == 0)
+    
+	//strcpy(nd_to_section_desc, "HIGHEST");
+	strcpy(nd_to_section_desc, local_legend[14]); // added for globalisation
+
+  else strcpy(nd_to_section_desc, nd_to_section_code.arr);
+
+  #ifdef DEBUG
+      printf("before report header()\n");
+  #endif
+  print_page_header();
+
+  #ifdef DEBUG
+      printf("after page header()\n");   
+  #endif
+  
+  get_version_no();   ///// added 01.07.2003
+
+////////// 01.07.2003  fprintf(f1,VER);
+
+  fprintf(f1,"%s\n",d_version.arr);
+
+  fprintf(f1,"\n\n\n\n");
+  
+  //fprintf(f1,"        ");
+  //fprintf(f1,"INPUT PARAMETERS :\n");
+  
+  rec_len = strlen(local_legend[3]);//added for globalisation
+  print_space(25, rec_len,1);//added for globalisation
+  fprintf(f1,"%s:\n", local_legend[3]); 
+
+  //fprintf(f1,"        ");
+  //fprintf(f1,"------------------\n\n");
+
+  print_space(25, rec_len,1);//added for globalisation
+  print_space(25, rec_len,0);//added for globalisation
+  fprintf(f1,"\n\n");
+
+  //fprintf(f1,"                ");
+  //fprintf(f1,"DEPARTMENT   FROM : %s\n", nd_fm_section_desc);
+
+  rec_len = strlen(local_legend[4]);//added for globalisation
+  rec_len = rec_len + strlen(local_legend[5]) + 6;
+  print_space(35, rec_len,1);//added for globalisation
+  fprintf(f1,"%s      %s : %s\n", local_legend[4], local_legend[5], nd_fm_section_desc); // added for globalisation
+
+  //fprintf(f1,"                ");
+  //fprintf(f1,"               TO : %s\n", nd_to_section_desc);
+
+  rec_len = strlen(local_legend[6]);//added for globalisation
+  print_space(35, rec_len,1);//added for globalisation
+  fprintf(f1,"%s : %s\n", local_legend[6],nd_to_section_desc);
+
+  fprintf(f1,"\n");
+  fprintf(f1,"");
+}
+
+
+/************ PRINT PAGE HEADER ****************/
+void print_page_header()
+{
+ register int i;
+ char nd_fm_section_desc[10],
+       nd_to_section_desc[10];
+ int spc_len;
+
+  if(strcmp(nd_fm_section_code.arr, "!") == 0)
+    strcpy(nd_fm_section_desc, "LOWEST");
+    else strcpy(nd_fm_section_desc, nd_fm_section_code.arr);
+
+  if(strcmp(nd_to_section_code.arr, "~") == 0)
+    strcpy(nd_to_section_desc, "HIGHEST");
+    else strcpy(nd_to_section_desc,nd_to_section_code.arr);
+
+ line_no = 0;
+ page_no++;
+
+ fprintf(f1,"%c&l1O",ESC);
+ fprintf(f1,"%c&k4S",ESC);
+ fprintf(f1,"\n") ;	
+ /*
+ fprintf(f1,"MDL : RL                              ");
+ fprintf(f1,"%30.30s", d_acc_entity_name.arr);
+ fprintf(f1,"                                  %s", d_sysdate.arr);
+ fprintf(f1,"\n");
+ */
+
+  fprintf(f1,"MDL : RL");
+  spc_len = (94 - (strlen(d_acc_entity_name.arr)))/2;
+  for(i=1;i<=spc_len;i++)
+  fprintf(f1," ");
+  fprintf(f1,"%-60.60s", d_acc_entity_name.arr);
+  for(i=1;i<=spc_len;i++)
+  fprintf(f1," ");
+  
+  //fprintf(f1,"%s", d_sysdate.arr);  
+  /*************************added for globalisation start************/
+  EXEC SQL EXECUTE
+	DECLARE
+		t_date   date;
+	BEGIN
+		t_date := GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+		:d_sysdate1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+	END;
+  END-EXEC;
+  /*************************added for globalisation end************/
+
+  fprintf(f1,"%s", d_sysdate1.arr);  
+  fprintf(f1,"\n");
+
+ fprintf(f1,"OPR : %s", d_user.arr);
+ fprintf(f1,"                    ") ;
+ fprintf(f1,"                  REQUEST STATISTICS                              ");
+ fprintf(f1,"        Page : %4d", page_no);
+ fprintf(f1,"\n");
+ fprintf(f1,"REP : RLREQSTT");
+ fprintf(f1,"\n");
+ fprintf(f1,"-------------------------------------------------------------------------------");
+ fprintf(f1,"---------------------------------------------------") ;
+ fprintf(f1,"\n");
+ line_no = line_no + 6;
+}
+
+initialize_array()
+{
+
+    int i = 0;
+	int k = 0;
+
+	m_month = 0;
+	m_year = 0;
+	a_month = 0;
+	a_year = 0;
+
+	tot_incr = 0;
+
+	strcpy(x_date.arr, v_date.arr);
+	x_date.len = strlen(x_date.arr);
+
+	for(k=0;k<13;k++)
+	{
+		month[k] = 0;
+		year[k]	= 0;
+	}
+
+
+	EXEC SQL SELECT TO_NUMBER(TO_CHAR(TO_DATE(:x_date, 'DD/MM/YYYY'), 'MM'))
+	INTO :t_month FROM DUAL;
+    
+	EXEC SQL SELECT TO_NUMBER(TO_CHAR(TO_DATE(:x_date, 'DD/MM/YYYY'), 'YYYY')) 
+	INTO :t_year FROM DUAL;
+	
+	   EXEC SQL SELECT TO_DATE(:q_date, 'DD/MM/YYYY') - 
+			TO_DATE(:x_date, 'DD/MM/YYYY') 
+	   INTO :m_month
+	   FROM DUAL;
+
+   month[i] = t_month;
+   year[i]	= t_year;
+
+	while(m_month >= 0)
+	{
+
+	   tot_incr++;
+
+
+	   EXEC SQL SELECT TO_CHAR(ADD_MONTHS(TO_DATE(:x_date, 'DD/MM/YYYY'), 1), 'DD/MM/YYYY')
+			INTO :x_date FROM DUAL;
+
+	   x_date.arr[x_date.len]		= '\0';
+
+	   	EXEC SQL SELECT TO_NUMBER(TO_CHAR(TO_DATE(:x_date, 'DD/MM/YYYY'), 'MM'))
+		INTO :t_month FROM DUAL;
+
+		EXEC SQL SELECT TO_NUMBER(TO_CHAR(TO_DATE(:x_date, 'DD/MM/YYYY'), 'YYYY'))
+		INTO :t_year FROM DUAL;
+
+
+   	   EXEC SQL SELECT TO_DATE(:q_date, 'DD/MM/YYYY') - 
+			TO_DATE(:x_date, 'DD/MM/YYYY') 
+	   INTO :m_month
+	   FROM DUAL;
+
+	   i++;
+	   month[i] = t_month;
+	   year[i]	= t_year;
+
+
+	}
+
+}
+/* ************* added the following function on  26.04.2003 *************/
+void do_footer()
+{
+ int i =0;
+
+ fprintf(f1,"\n");
+ fprintf(f1,"-------------------------------------------------------------------------------");
+ fprintf(f1,"---------------------------------------------------") ;
+ fprintf(f1,"\n");
+
+ //fprintf(f1,"Report Totals:              "); 
+ fprintf(f1,"%s :",local_legend[11]);
+
+ for(i = 0; i < tot_incr; i++)
+ {  
+    fprintf(f1,"%7d",mnth_yr[i]);	
+	fprintf(f1," ");
+	mnth_yr[i] = 0;
+ }
+
+ fprintf(f1,"%6d\n",g_total_count); 
+ g_total_count = 0;
+ fprintf(f1,"-------------------------------------------------------------------------------");
+ fprintf(f1,"---------------------------------------------------") ;
+ fprintf(f1,"\n");
+}
+
+////////////////// 
+
+get_version_no()
+{
+
+////////    This function is used to get the version number of the product.
+///////      Added by Srinivas on 1 July 2003
+
+     d_version_no.arr[0] = '\0';
+     d_version_no.len    =  0;
+
+     strcpy(d_version.arr,"VER : ");
+
+	 EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC;
+
+
+    if (l_tab_exists) 
+    {
+	    EXEC SQL SELECT VERSION_NO INTO :d_version_no 
+                 FROM   SM_INSTALLATION; 
+        d_version_no.arr[d_version_no.len] = '\0';
+    }
+    else
+	    strcpy(d_version_no.arr,"2.1");
+
+	    strcat(d_version.arr,d_version_no.arr);
+
+
+    if (OERROR)
+	{
+	    strcpy(d_version_no.arr,"2.1");
+	    strcat(d_version.arr,d_version_no.arr);
+    }
+
+}
+
+/*** added for globalisation ******/
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(f1,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(f1,"%s","-");
+		}	
+	}
+}
+/*** added for globalisation ******/
+
+//////////// UPTO HERE   
+

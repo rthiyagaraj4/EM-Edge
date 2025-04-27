@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OR_PCM_MedicationOrdering_Oncology</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Oncology Orders</h1>
+<p class="Text">The clinician prescribes Cyto-toxic drugs meant for use in the oncology clinics/wards using this function. This tab displays only for patients who are registered against the service to which ‘Oncology’ is applicable in Regimen Service master of PH code setup. Regimen typically consists of three to four drugs (all cyto toxic drugs) grouped as an order set along with dosage details. This grouping of drugs to form an Order Set is achieved using the order set features available in Order Entry and Results Reporting module. Dosage for cyto-toxic drugs are calculated based on the Body Surface Area/Weight thus the clinician has to compulsorily enter the height and weight value for a patient before placing an Oncology order. On prescribing the required oncology orders, the prescription is released. Oncology Orders can be placed only after capturing the height and weight values of the selected patient. On entering the height and weight values, the BSA and BMI are calculated. Enter the required header level details as explained under ‘Rx’ tab before prescribing oncology medications.</p>
+<p class="Text">&#160;</p>
+<p class="From">Placing Oncology Orders</p>
+<p class="From">&#160;</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Regimen details</a> in the mandatory (<span class="Asterisk">*</span>) fields.</p>
+<div class="droptext" id="POPUP1004955277" style="display: none;">
+<p class="BoldRFD">Enter the following details to prescribe oncology medication(s) for the selected patient:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Stage</span> – Select the stage of the problem from the list. All the values defined in ‘Problem Stage’ master in PH code setup are listed in the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Intention</span> – Select the intention of the medication from the list. All the values defined in ‘Order Intention’ master in PH code setup are listed in the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Regimen</span> – Select the required regimen from the list provided. The regimens listing is based on the following conditions, Service registered against patient encounter must have regimen applicability defined.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">Regimens defined using Order Set functionality under Pharmacy category in the Order Entry and Results Entry module are associated to the service registered against patient encounter.</span></p>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">On entering the Regimen details, the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Drug Details/Unit Dose</a>, <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Fluid Details</a> and <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Admin Details</a> are displayed.</p>
+<div class="droptext" id="POPUP1004943826" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Infusion Rate</span> – The infusion rate is calculated by dividing the Fluid volume with Infuse over value. The displayed value can be modified. This field is mandatory. Infusion rate is specified in terms of volume against a time period that could be in minutes, hours or days.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admixture</span> – This field is applicable for drug defined as IV Ingredients. The pharmacist has to prepare an admixture of the selected drug and fluid while dispensing. Select the check box to inform the pharmacist to prepare admixture.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Build MAR</span> - Medication Administration is applicable for all patient classes depending on the Parameter settings. For inpatients, Build MAR is default checked and enabled. For remaining patient classes based upon parameter settings it will be checked and enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Infuse Over</span> – The ‘Infuse Over’ specified for the selected IV Fluid (in Drug Master Function) is displayed in hours and minutes format, by default. The Practitioner can specify the required period in numeric format of two digits. Based on the modified Infuse over value, the Infusion rate is calculated. The Unit of Measurement displayed corresponds to the time component value selected for Infusion Rate (Hours. Minutes or Days).</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The Infusion rate, admixture and infuse over displays only for drugs that are IV fluids or IV ingredients. For drugs that are normal drug, the following details are displayed.</p>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Frequency</span> –The frequency specified for the selected drug in the drug master is displayed. Select the required value from the list. The listed values are Scheduled frequencies associated to the Order Category ‘Pharmacy’. If the selected frequency is scheduled, then [Schedule] is enabled. The button will be disabled for frequency as ‘PRN’ and ‘Once’. Click [Schedule] to view the schedule for the selected Frequency.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Duration</span> – Duration specified for the selected frequency while setting up the selected drug is displayed by default. The duration can be changed only in certain cases. If the selected frequency is of the nature ‘One Time’, then the duration is made default as ‘one’ as read only text. For frequency of nature ‘PRN’, the duration defaults as one day. This value can be changed to the required number of days. The practitioner can enter a value up to 999 days. For frequency of type ‘Frequency’, the drug setting value is displayed. This value can be changed to the required period. If the entered duration exceeds the duration limit defined in Order catalog setup, then the system displays message specified by you and depending on the setting of the order catalog appropriate action to warn or reject or authorization required is performed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start Date</span> - The current system start date/time are displayed, by default. The practitioner can modify, that is pre-date or post-date the medication starting date/time based on the setting in OR Parameter. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End Date</span> – The end date/time is calculated by the system by adding the specified duration with the start date/time. The end date and time cannot be modified.</p>
+</li>
+</ol>
+</div>
+<div class="droptext" id="POPUP1004938882" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">Based on the selected Drug, the fluid details are recorded. The table below explains fluid details listing.</span></p>
+<table style="vertical-align: top;" cellspacing="0" width="100%">
+<col style="width: 25%;" />
+<col style="width: 25%;" />
+<col style="width: 25%;" />
+<col style="width: 25%;" />
+<tr style="vertical-align: top;">
+<td rowspan="5" style="border: Solid 1px #000000;width: 25%; padding-right: 10px; padding-left: 10px; vertical-align: center;">
+<p class="BoldRFD">Selected Drug</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">IV Ingredient</span></p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">IV Fluid</span></p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">Fluid Details</span></p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">If the selected drug is an IV ingredient, then it is mandatory to enter fluid details. Enter the fluid details under ‘Fluid Details’ part.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Fluid details are not shown.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Fluid details are not shown.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 25%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Fluid details are not shown.</p>
+</td>
+</tr>
+</table>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following fluid details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fluid</span> – The fluid specified for the selected drug in ‘Drug’ master function is displayed, by default. The practitioner can select other fluid either by enter the fluid name in alphanumeric format of 40 character maximum length or select it using <span class="BoldNumberRFD">[?]</span> function. This field is mandatory. The search function list IV fluids that are to be used for cyto-toxic drug preparation. Select the required fluid. Only one fluid can be selected for administration with a drug.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Volume</span> - The fluid volume is made default based on the drug master setup for the selected fluid. The displayed value cannot be modified. This field is mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">On entering the fluid details, the practitioner has to record the ‘Administration details’ in ‘Admin Details’ part.</span></p>
+</div>
+<div class="droptext" id="POPUP1004936832" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Drugs that constitute the regimen are displayed. Clinician can place Oncology Orders only for orderable set as ‘Order Set’ for the order category ‘Pharmacy’. All the Drugs associated to the selected Order Set are listed in the result set. Drugs(s) associated to the selected order set are displayed in the prescription pad. Appearance of color-coded indicators against certain drugs denoted the following:</p>
+<table style="vertical-align: top;" cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000;width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Indicator</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Description</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Allergic – <img src="../../Allergy.jpg" style="border: none;" alt="Allergy.jpg" width="17" height="44" border="0" /></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">The icon indicates the drug as allergic. If the patient is allergic to the selected drug, then this icon displays. The practitioner can prescribe the drug after entering a valid overriding reason.</p>
+<p class="BoldRFD" style="font-weight: normal;">On clicking the ‘Allergic’ icon, the ‘Allergy Indications’ window displays. The allergic description is displayed.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Beyond Drug Dosage Limit - <img src="../../Exceed_Dosage.jpg" style="border: none;" alt="Exceed_Dosage.jpg" width="16" height="44" border="0" /></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">This icon indicates exceeding of drug dosage limit of the selected drug. Dosage limit of each drug can be set optionally. The set limit can be specific to age group and gender. Unit and daily dosage limits can be set for the drug. If the prescribed drug exceeds the set limit, then this icon displays against the drug. But, the practitioner can override the same by specifying valid reason.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Duplicate Drug - &#160;<img src="../../Duplicate_Dose.jpg" style="border: none;" alt="Duplicate_Dose.jpg" width="15" height="44" border="0" /></p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">This icon displays on the extreme right side of the prescription pad. It indicates drug duplication. Duplication of drug is checked based on generic name. If the selected drug is already a part of patient’s active drug profile, then the prescribing practitioner can override the same by specifying valid reason. If the selected drug falls beyond the active drug profile period, then drug can be prescribed without specifying the reason.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click on ‘Duplicate Drug’ hyperlink to view the duplicate medication details.</p>
+</td>
+</tr>
+</table>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Override reason has to be entered for outpatient to prescribe a duplicate drug. But for inpatients and emergency patients, duplicate drug can be prescribed only for STAT frequency.</p>
+<p class="Note">&#160;</p>
+<p class="BoldRFD">Calculate By</p>
+<p class="BoldRFD" style="font-weight: normal;">The Dosage option is selected, by default. Select the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5"><span class="RFDhyperlinkBackground">Dosage</span></a> or <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a6"><span class="RFDhyperlinkBackground">Body wt/BSA option</span></a>.</p>
+<div class="droptext" id="POPUP1004961808" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Body wt/BSA</span> - Select the option to define the additive by Strength and by Quantity.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dose</span> - Enter the Dose in numeric format of four digits maximum length and select the UOM from the list. The Strength UOM of the Drug is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">/KG or M2</span> - Based on the Drug Master setup KG or M2 is displayed, by default. If Standard Unit Dose for the selected Item is defined in the Drug Dosage Limit function, where Calculate Dosage By field is selected as 'BSA'; the system automatically displays the value as BSA.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">The Total Dose per Administration is displayed. The system displays the dose based on the setup made in Drug Dosage Limit function. The Standard Dose is multiplied with BSA or the weight based on the Calculate Dosage By setup.</p>
+</div>
+<div class="droptext" id="POPUP1004955184" style="display: none;">
+<p class="Text"><span class="BoldNumberRFD">Enter the following details:</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dosage By</span> - Based on the Drug Setup, if ‘Dosage By’ is ‘Strength’, the list contains Strength and Quantity. The practitioner can define dosage details either as Strength or Quantity. If ‘Dosage By’ is ‘Quantity’, the displayed value cannot be changed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Dosage By: Strength</p>
+</li>
+</ol>
+<p class="BoldRFD" style="margin-left: 40px;"><span style="font-weight: normal;">This value is displayed provided base strength is defined for the selected drug. The ‘Strength’ field displays the base strength value and unit of measurement. The practitioner can change only the strength value.</span></p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Dosage By: Quantity</p>
+</li>
+</ul>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">The base quantity and unit of measurement set for the selected drug are displayed for ‘Dose’ field. The practitioner can change both quantity and unit of measurement. The unit of measurement values is listed based on the following conditions:</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">The unit of measurement defined with nature as ‘quantity’ and belonging to the list used for defining prescription base unit.</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">The unit of measurement defined with nature as ‘Strength’ and having an equivalent value, which is a quantity.</p>
+<p class="BoldRFD" style="margin-left: 40px;"><span style="font-weight: normal;">The unit of measurement defined as ‘Quantity’ and having an equivalent to a value that is of nature ‘Strength’ and belonging to the list used for defining prescription base unit.</span></p>
+</div>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Add New Drug]</span> to add new order for the selected regimen while placing oncology medication orders. This button gets enabled on selecting the regimen from the list. The line level details of the new drug will be displayed under ‘Drug Details/Unit Dose’.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Confirm]</span> to add the details to the prescription pad, <span class="BoldButton">[Cancel]</span> to cancel a Drug from the prescription before releasing an oncology prescription, <span class="BoldButton">[Reset]</span> to refresh the Drug Details section and bring back the original data, <span class="BoldButton">[Clear]</span> to clear the Drug details section to allow you to select another Drug of the regimen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On confirming a Drug, it is displayed in the prescription pad as shown below with a unique color-code.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Review Rx]</span> to preview the Oncology prescription details.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Release Rx]</span>.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Release Rx]</span> to release the Oncology prescription.</p>
+</li>
+<li class="p-Number">
+<p class="Number">You are prompted with a message to print the Oncology prescription details on releasing. Click <span class="BoldButton">[OK]</span> to print the prescription or <span class="BoldButton">[Cancel]</span> to cancel the printing.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On releasing the prescription, a unique Order ID is generated. Order details can be viewed under ‘Existing Orders’ function.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004955277');
+	TextPopupInit('a2','POPUP1004936832');
+	TextPopupInit('a3','POPUP1004938882');
+	TextPopupInit('a4','POPUP1004943826');
+	TextPopupInit('a5','POPUP1004955184');
+	TextPopupInit('a6','POPUP1004961808');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

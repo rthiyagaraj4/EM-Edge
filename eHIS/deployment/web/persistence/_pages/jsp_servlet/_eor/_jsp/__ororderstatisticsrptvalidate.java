@@ -1,0 +1,174 @@
+package jsp_servlet._eor._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.util.*;
+import eOR.*;
+import eOR.Common.*;
+import eCommon.Common.*;
+
+public final class __ororderstatisticsrptvalidate extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eor/jsp/OROrderStatisticsRptValidate.jsp", 1721236890000L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+/*
+--------------------------------------------------------------------------------------------------------
+Date		Edit History	Name			Rev.Date		Rev.Name			Description
+--------------------------------------------------------------------------------------------------------
+15/03/2016	IN055027		Raja S			Ramesh G		06/04/2016			MMS-QH-CRF-0216
+--------------------------------------------------------------------------------------------------------
+*/
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            eOR.PatOrderByPrivRelQueryBean beanObj= null;{
+                beanObj=(eOR.PatOrderByPrivRelQueryBean)pageContext.getAttribute("beanObj");
+                if(beanObj==null){
+                    beanObj=new eOR.PatOrderByPrivRelQueryBean();
+                    pageContext.setAttribute("beanObj",beanObj);
+
+                }
+            }
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            webbeans.eCommon.XMLStringParser XMLobj= null;{
+                XMLobj=(webbeans.eCommon.XMLStringParser)pageContext.getAttribute("XMLobj");
+                if(XMLobj==null){
+                    XMLobj=new webbeans.eCommon.XMLStringParser();
+                    pageContext.setAttribute("XMLobj",XMLobj);
+
+                }
+            }
+            _bw.write(_wl_block1Bytes, _wl_block1);
+		request.setCharacterEncoding("UTF-8");
+
+		Hashtable hash = (Hashtable)XMLobj.parseXMLString( request ) ;
+		hash = (Hashtable)hash.get( "SEARCH" ) ;
+		String callFrom =(String) hash.get("callFrom");
+		String localeName =(String) hash.get("tmplocale");
+		
+		if(callFrom.equals("GETDATES"))
+		{
+			String fromDate =(String) hash.get("fromDate");
+			String chkFucn =(String) hash.get("callFrom1");			
+			String toDate =(String) hash.get("toDate");
+			String from_date = "";
+			String to_date = "";
+
+			if(chkFucn.equals("TODATE"))
+			{
+				from_date = com.ehis.util.DateUtils.minusDate(toDate,"DMYHM",localeName,1,"d");
+				to_date = toDate;
+			}
+			else
+			{
+				to_date	= com.ehis.util.DateUtils.plusDate(fromDate,"DMYHM",localeName,1,"d");
+				from_date = fromDate;
+			}
+			
+			out.println( "displayDate(\"" + from_date + "\",\"" + to_date + "\") ; " ) ;
+		}else if(callFrom.equals("ORDERCAT"))
+		{	
+                beanObj.setLanguageId(localeName);
+
+				Properties properties		= (Properties) session.getValue( "jdbc" ); 
+
+					String ordercatvalue = (String)hash.get("ordercatvalue") ;
+
+					if ( ordercatvalue.equals(null) || ordercatvalue.equals( "" ) )
+						ordercatvalue="";
+
+					out.println( "clearList1('document') ; " ) ;
+					
+					ArrayList OrderTypeData = beanObj.getOrderTypeSpecimen(properties, ordercatvalue) ;
+					for( int i=0 ; i< OrderTypeData.size() ; i++ ) {
+						String[] record = (String[])OrderTypeData.get(i);
+						out.println( "addLocationList1(\"" + record[0] + "\",\"" + record[1] + "\") ; " ) ;
+					
+					}
+		}
+		
+
+            _bw.write(_wl_block0Bytes, _wl_block0);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

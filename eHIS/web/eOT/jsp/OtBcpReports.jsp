@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+ <%@ page contentType="text/html;charset=UTF-8" %>          
+<% String locale = (String)session.getAttribute("LOCALE");
+locale=locale.toLowerCase();
+%>
+<% request.setCharacterEncoding("UTF-8");%>
+<%@ page import ="java.sql.Connection,java.sql.PreparedStatement,java.sql.ResultSet,webbeans.eCommon.ConnectionManager,eOT.*,eOT.Common.*" %>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%>
+<script language="JavaScript" src="../../eCommon/js/common.js"></script>
+<script language="Javascript" src="../../eCommon/js/DateUtils.js"></script>
+<%
+	String operationRoom_title = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eOT.OperationRoom.Label","ot_labels");
+	String facility_id = (String)session.getValue("facility_id");
+	String user_id = (String)session.getValue("login_user");
+	String fromNoticeDate = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eOT.NoticeDate.Label","ot_labels")+" "+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.from.label","common_labels");
+	String toNoticeDate = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eOT.NoticeDate.Label","ot_labels")+" "+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.to.label","common_labels");
+	String StrVal = "";
+	String date_range_week = "";
+	if(facility_id == null) facility_id="";
+	Connection con = null;
+	PreparedStatement pstmt = null;
+	ResultSet rst = null;
+	try{
+		con = ConnectionManager.getConnection(request);
+		pstmt = con.prepareStatement("Select TO_CHAR(SYSDATE,'DD/MM/rrrr') ,TO_CHAR(SYSDATE+6,'DD/MM/rrrr') From DUAL ") ;
+		rst = pstmt.executeQuery();
+		while(rst.next()){
+			StrVal = com.ehis.util.DateUtils.convertDate(rst.getString(1),"DMY","en",locale);
+			date_range_week = com.ehis.util.DateUtils.convertDate(rst.getString(2),"DMY","en",locale);
+
+		}
+		pstmt.close();
+		rst.close();
+		}catch(Exception e){
+			System.err.println("Err Msg OTBCPReports.jsp "+e.getMessage());
+		}finally{
+			if(rst!=null)rst.close();
+			if(pstmt!=null)pstmt.close();
+			if(con!=null)
+			ConnectionManager.returnConnection(con,request); 
+	}
+%>
+<html>
+<head><title></title>
+	<%
+String sStyle =
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+
+<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css'/>
+	<script src="../../eCommon/js/CommonLookup.js"></script>
+	<script src="../../eOT/js/OtReports.js" ></script>
+	<script language="JavaScript" src="../../eOT/js/OTReportsLkupSQL.js" ></script>
+	<link rel="stylesheet" type="text/css" href="../../eCommon/html/CommonCalendar.css" />
+	<script type="text/javascript" src="../../eCommon/js/CommonCalendar.js"></script>
+	<script src="../../eCommon/js/ValidateControl.js" language="javascript"></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+</head>
+<body OnMouseDown='CodeArrest()' onKeyDown = 'lockKey()'>
+<!-- <form name='OtReportOptionsForm' id='OtReportOptionsForm' action="../../eCommon/jsp/report_options.jsp" target="messageFrame"> -->
+<form name='OtReportOptionsForm' id='OtReportOptionsForm' action="../../eOT/jsp/OTReportsIntermediate.jsp"  target="messageFrame">
+<table border='0' cellpadding='3' cellspacing='0' width='100%' align="center" > 
+	<!--57886 starts-->
+	<tr> 
+	  <td class='label' width='25%'>
+		<fmt:message key="eOT.NoticeDate.Label" bundle="${ot_labels}"/> <fmt:message key="Common.from.label" bundle="${common_labels}"/>
+	  </td>
+	 <td class='fields' width='25%'>
+		  <input type='text' name='param1_disp' id='param1_disp' size='8'  value='<%=StrVal%>' onkeypress="return checkForSpecCharsforID(event);" onBlur="isValidDate(this);">  
+		  <img src='../../eCommon/images/CommonCalendar.gif'onClick="return showCalendar('param1_disp');">
+		<img src='../../eCommon/images/mandatory.gif'></img>
+		<input type='hidden' name='param1' id='param1' value='<%=DateUtils.convertDate(StrVal,"DMY",locale,"en")%>'>
+	 </td>
+	  <td class='label' width='25%'>
+		<fmt:message key="eOT.NoticeDate.Label" bundle="${ot_labels}"/> <fmt:message key="Common.to.label" bundle="${common_labels}"/>
+	  </td>
+	  <td class='fields' width='25%'>
+		  <input type='text' name='param2_disp' id='param2_disp' size='8'  value='<%=date_range_week%>' onkeypress="return checkForSpecCharsforID(event);" onBlur="isValidDate(this);">  
+		  <img src='../../eCommon/images/CommonCalendar.gif'onClick="return showCalendar('param2_disp');">
+			<img src='../../eCommon/images/mandatory.gif'></img>
+			<input type='hidden' name='param2' id='param2' value='<%=DateUtils.convertDate(StrVal,"DMY",locale,"en")%>'>
+	 </td>
+	 <!--57886 ends-->
+</tr>
+
+<tr>
+	<td class='label' width='25%'>
+		<fmt:message key="Common.OperatingRoom.label" bundle="${common_labels}"/> <fmt:message key="Common.from.label" bundle="${common_labels}"/>
+</td>
+    <td class='fields' width='25%'>
+		<input type='hidden' name='param4' id='param4'> 
+		<input type='hidden' name='param3' id='param3'> 
+		<input type='text' name='from_oper_room_desc' id='from_oper_room_desc' size='20' title='<%=operationRoom_title%>' param1 = 'param3'  param2 = 'param4' key ='OPER_ROOM' onBlur="if(this.value!='')callCommonLookup(this); else callClearParam(param3,param4); "> 
+		<input type='button' class='button' value='?' name='OperRoomLookUp' id='OperRoomLookUp' onClick="callCommonLookup(from_oper_room_desc);" >
+	</td>
+	<td class='label' width='25%'>
+		<fmt:message key="Common.OperatingRoom.label" bundle="${common_labels}"/> <fmt:message key="Common.to.label" bundle="${common_labels}"/>
+</td>
+    <td class='fields' width='25%'>
+		<input type='hidden' name='param6' id='param6'> 
+		<input type='hidden' name='param5' id='param5'> 
+		<input type='text' name='to_oper_room_desc' id='to_oper_room_desc' size='20' title='<%=operationRoom_title%>' param1 = 'param5'  param2 = 'param6' key ='OPER_ROOM' onBlur="if(this.value!='')callCommonLookup(this); else callClearParam(param6,param5); "> 
+		<input type='button' class='button' value='?' name='OperRoomLookUp' id='OperRoomLookUp' onClick="callCommonLookup(to_oper_room_desc);" >
+	</td>
+</tr>
+	<input type="hidden" name="facility_id" id="facility_id"	value="<%=facility_id%>">
+	<input type="hidden" name="P_facility_id" id="P_facility_id"	value="<%=facility_id%>">
+	<input type="hidden" name="p_user_id" id="p_user_id"	value="<%=user_id%>">
+	<input type="hidden" name="p_user_name" id="p_user_name"	value="<%=user_id%>">
+	<input type="hidden" name="p_module_id" id="p_module_id"  value="OT">
+	<input type="hidden" name="p_report_id" id="p_report_id" value="OTRBCPOT">
+	<input type="hidden" name="p_language_id" id="p_language_id"	value="<%=locale%>" >
+	<input type="hidden" name="pgm_id" id="pgm_id" value="OTRBCPOT">
+	<input type="hidden" name="user_id" id="user_id"	value="<%=user_id%>">
+	<input type="hidden" name="no_of_mandatory_fields" id="no_of_mandatory_fields" value="2" disabled>
+	<input type="hidden" name="mandatory_fm_1" id="mandatory_fm_1" value="param1##<%=fromNoticeDate%>" disabled>
+    <input type="hidden" name="mandatory_fm_2" id="mandatory_fm_2" value="param2##<%=toNoticeDate%>" disabled>
+	<input type='hidden' name='locale' id='locale' value="<%=locale%>">
+<!-- 	<input type="hidden" name="no_of_comparison_fields" id="no_of_comparison_fields" value="1" disabled>
+	<input type="hidden" name="compare_fm_1" id="compare_fm_1" value="param3##Operation Room" disabled>
+    <input type="hidden" name="compare_to_1" id="compare_to_1" value="param4" disabled> -->
+	  <input type='hidden' name='reportParams' id='reportParams' value="param1#param2#param3#param4#param5#param6#P_facility_id#p_user_id#p_user_name#p_module_id#p_report_id#pgm_id#user_id#p_language_id">
+
+</form>
+</body>
+</html>
+

@@ -1,0 +1,2453 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.6                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : RLIWDRES                                     */
+/* DESCRIPTION		     : Test Results report                          */
+/* AUTHOR                : S. SHEELVANT                                 */
+/* DATE WRITTEN          : 05-JUN-1998                                  */
+/*                                                                      */
+/* CALLED FROM           : rlispcmn.frm                                 */
+/*                                                                      */
+/* FUNCTION              :                                              */
+/*                                                                      */
+/* TABLE DETAILS	 	 : RL_REQUEST_HEADER,RL_REQUEST_DETAIL,         */
+/*                         RL_TEST_RESULT,RL_PRINT_CONTROL_HDR	        */
+/*                                                                      */
+/* MODIFIED BY           : HAMEED                                       */
+/* MODIFIED ON		     : 29-MAY-2003                                  */
+/* MODIFIED BY           : SHRUTI [ordered_facility_id)                                       */
+/* MODIFIED ON		     : 04-SEPT-2003                                  */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include "gl.h"
+#define NODATAFOUND              	(sqlca.sqlcode == 1403)
+#define OERROR 				(sqlca.sqlcode < 0)
+#define LAST_ROW 				(sqlca.sqlcode == 1403)
+#define NOT_FOUND 			(sqlca.sqlerrd[2] == 0)
+#define TABLE_ALREADY_EXISTS 		(sqlca.sqlcode == -955)
+#define RESOURCE_BUSY        		(sqlca.sqlcode == -54)
+#define INIT_MESG "Fetching Results..."
+#define ONLINE_PRINTING
+/*
+#define DEBUG 				0
+*/
+#define SPOOL_DIR			""	
+
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+
+   VARCHAR 	nd_operating_facility_id		[3],
+	   	    uid_pwd					        [132],
+           	d_curr_pgm_name                 [15],
+           	nd_file_name                    [151],
+	   	    today		    			    [20],
+           	nd_user	                    	[21],
+           	nd_file_no                      [15];
+
+   VARCHAR 	nd_hosp_no                       	[21],	 /* Patient ID */
+           	nd_spec_no                       	[20],
+           	nd_cntrl_rowid                   	[31],
+
+           	c_req_dtl_test_code              	[6],/* Used in */ 
+           	c_group_test_yn                  	[2],/* Update_rl_request_detail*/
+           	c_count                          	[3],/*-----*/
+           	c_spec_no                        	[10],
+           	sql_stmt                         	[200],
+
+           	p_print_name_yn                  	[2],
+	   	    p_test_desc                      	[41],
+           	p_grp_status                     	[2],
+
+		   rl_ordered_facility_id				[3],
+           rl_hdr_source_code               	[11],
+           rl_hdr_consultant_code           	[16],
+           rl_hdr_spec_regd_date_time       	[17],
+           rl_hdr_current_date_time         	[17],
+           rl_hdr_section_code              	[2],
+           rl_hdr_request_comment_code1     	[5],
+           rl_hdr_request_comment_code2     	[5],
+           rl_hdr_request_comment_code3     	[5],
+           rl_hdr_request_comment_desc1     	[41],
+           rl_hdr_request_comment_desc2     	[41],
+           rl_hdr_request_comment_desc3     	[41],
+           rl_hdr_extra_copies_to           	[16],
+           rl_hdr_specimen_type_code        	[5],
+           rl_hdr_added_by_id               	[31],
+           rl_hdr_added_date                	[16],
+           rl_hdr_modified_by_id            	[31],
+           rl_hdr_modified_date             	[16],
+ 	       rl_hdr_episode_type		    	    [2],
+ 	       rl_hdr_urgent_indicator	    		[2],
+
+           rl_dtl_test_code_reqd	    		[6],
+           rl_dtl_test_code                 [7][6],
+           rl_dtl_result_status             [7][2],
+           rl_dtl_group_test_flag           [7][2],
+
+           rl_tst_group_test_code           [6],
+           rl_tst_test_code                 [6],
+           rl_tst_numeric_prefix            [2],
+           rl_tst_numeric_result            [6],
+           rl_tst_result_comment_desc1      [41],
+           rl_tst_result_comment_desc2      [41],
+           rl_tst_result_comment_desc3      [41],
+           rl_tst_result_comment_desc4      [41],
+	       rl_tst_status                [2],
+  	       rl_tst_tech_status		    [2],
+  	       rl_tst_delta_status		    [2],
+  	       rl_tst_qlty_status		    [2],
+  	       rl_tst_cmnt_status		    [2],
+  	       rl_tst_path_status		    [2],
+           rl_tst_rowid                     [31],
+
+           rl_loc_test_code                 [6],
+           rl_loc_long_desc                 [41],
+
+           rl_pat_long_name                 [61],
+           rl_pat_short_name                [61],
+           rl_pat_sex                       [2],
+           rl_pat_nationality               [4],
+           rl_pat_dob_no_of_days            [10],
+           rl_pat_date_of_birth             [16],
+           rl_pat_blood_group               [3],
+           rl_pat_g6pd                      [6],
+           rl_pat_sicc                      [6],
+           rl_pat_hbl4_1                    [6],
+           rl_pat_hbl4_2                    [6],
+
+           rl_spc_specimen_desc             [41],
+
+           rl_source_short_name             [41],    	 /* long name */
+           rl_consultant_short_name         [41], 	 /* long name */
+           rl_section_short_name            [41],  
+
+           rl_tst_cd_short_desc             [41],
+           rl_tst_cd_numeric_result_yn      [2],
+           rl_tst_cd_age_sex_range_yn       [2],
+           rl_tst_cd_function_yn            [2],
+           rl_tst_cd_print_report_yn        [2],
+           rl_tst_cd_low_value_normal       [16],
+           rl_tst_cd_high_value_normal      [16],
+           rl_tst_cd_result_name_text       [11],
+           rl_tst_cd_group_test_yn          [2],
+           rl_tst_cd_text_block_yn          [2],
+           rl_tst_cd_culture_test_yn        [2],
+           rl_tst_cd_snomed_yn              [2],
+           rl_tst_cd_test_units             [11],
+		   rl_tst_cd_test_units_desc        [41],
+		   rl_test_units			        [41],
+           rl_tst_cd_range_cmt              [41],
+           rl_tst_cd_inhibit_yn             [2],
+
+           rl_tst_range_low_val_nml    		[16],
+           rl_tst_range_high_val_nml   		[16],
+
+           rl_comm_for_test_comm_text    	[41],
+
+           rl_res_result_text1              [71],
+           rl_res_result_text2              [71],
+           rl_res_result_text3              [71],
+           rl_res_result_text4              [71],
+           rl_res_result_text5              [71],
+           rl_res_result_text6              [71],
+           rl_res_result_text7              [71],
+           rl_res_result_text8              [71],
+           rl_res_result_text9              [71],
+           rl_res_result_text10             [71],
+
+           rl_func_operand_1                [6],
+           rl_func_operand_1_type           [2],
+           rl_func_operator_1               [2],
+           rl_func_operand_2                [6],
+           rl_func_operand_2_type           [2],
+           rl_func_operator_2               [2],
+  
+           rl_func_value                    [6],
+
+           rl_calc_str                      [400],
+           rl_func_str                      [400],
+
+           rl_res_organism_code             [5],
+           rl_res_comment_desc              [41],
+
+           rl_res_organism_code_desc        [41],
+
+           rl_res_dtl_antibiotic_code       [5],
+           rl_res_dtl_antibiotic_desc       [41],
+           rl_res_dtl_sensitivity_ind       [2],
+           rl_res_dtl_report_yn             [2],
+	   
+	       sy_acc_entity_name 		        [81],
+           rl_res_snomed_code               [11],
+	       rl_param_print_start		        [2],
+	       op_clinic_lab_print_reqd_yn	    [2],
+
+           rl_snomed_desc1                  [41],
+           rl_snomed_desc2                  [41],
+           rl_snomed_desc3                  [41],
+           rl_snomed_desc4                  [41],
+           rl_snomed_desc5                  [41],
+           rl_snomed_print_yn               [2],
+
+	   result_line                      [100],
+	   result_status                    [2],
+	   result_tech_status               [2],
+	   result_delta_status              [2],
+	   result_qlty_status               [2],
+	   result_cmnt_status               [2],
+	   result_path_status               [2],
+
+        p_function_yn                 [2],
+	    p_test_units                  [11],
+  	    d_loc_str 			          [20], 
+  	    d_l_str 			    	  [20], 
+  	    d_dec_part			          [20],
+  	    d_int_part			          [20],
+  	    d_sig_part			          [20];
+
+   int	no_of_dtl_recs = 0,
+        rl_tst_cd_no_of_decimals = 0,
+	   	sy_ref_no_of_copies = 0,
+        rl_tst_cd_significant_digit = 0,
+	   	result_line_no = 0,
+		d_dec_pos = 0,
+	   	d_after_sig_digit = 0,
+	   	p_significant_digit = 0,
+	   	p_no_of_decimals = 0;
+
+   int l_count = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *rad_fp;
+FILE *fp;
+int  status_prn   = 0, pgm_flg  = 0,tst_cd_ind = 1;
+int copy = 0;
+int numeric_value_flag = FALSE;
+int  MAX_LINES = 27;
+char file_name[150];
+char extra_file_name[151];
+char lab_file_name[151];
+char prev_group_test [6],
+     rl_curr_status  [4];
+
+int i = 0,rec_ctr = 0,lctr = 0,pctr = 0;
+int spc_first = 0,    ind_test_prn   = 0;
+int sleep_sec = 0;
+int group_printed = 0;
+int group = 0;
+int test_printed = 0;
+int test_result_found = 0;
+char text_line[100];
+char test_description[41];
+//char g_facility_id[50];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+   if (argc < 4)
+   {
+    int i = 0;
+      disp_message(ERR_MESG,"Not enough Parameters for running this program\n");
+      disp_message(ERR_MESG,"Exiting...\n\007\007\007");
+      disp_message(ERR_MESG,"rliwdres : uid/password <patient_id> <spec.no> \n");
+      proc_exit();
+   }
+   strcpy(nd_spec_no.arr,argv[3]);
+   nd_spec_no.len = strlen(argv[3]);
+   strcpy(nd_hosp_no.arr,argv[2]);
+   nd_hosp_no.len = strlen(argv[2]);
+   strcpy(nd_operating_facility_id.arr,argv[4]);
+   nd_operating_facility_id.len = strlen(argv[4]);
+
+   //strcpy(g_facility_id, nd_operating_facility_id.arr);
+
+   /* strcpy(g_facility_id, nd_operating_facility_id.arr); */
+
+   if(sql_connect(argv[1]) == -1)
+   {
+      disp_message(ERR_MESG,"Error in connecting to Oracle\n");
+      proc_exit();
+   }
+
+   set_meduser_role();
+
+   declare_curs();
+   gen_file_name();
+
+   process_rec();
+
+   EXEC SQL COMMIT WORK RELEASE;
+   if (OERROR)
+     err_mesg("ROLLBACK WORK RELEASE failed",0,"");
+   return;
+}
+
+/*----------------------------------------------------------*/
+process_rec()
+{  int i = 0;
+   int j = 0,corr_stat = 0;
+   char test[6],group_test[6];
+       lctr = 0;
+       pctr = 0;
+       rec_ctr = 0;
+       copy = 0;
+       open_hdr();
+       if(fetch_hdr())
+       {
+           fetch_other_dtls();
+           fetch_dtl();
+           copy++;
+           open_tst_result();
+           strcpy(prev_group_test,"");
+           rec_ctr = 0;
+           fflush(fp);
+	       i = fetch_tst_result();
+           while (i)
+           {
+	          group_printed = 0;
+	          group = 0;
+              strcpy(group_test, rl_tst_group_test_code.arr);
+              strcpy(test,rl_tst_test_code.arr);
+	          if(strcmp(group_test,test) !=0)
+		         group = 1;
+              while(i && strcmp(group_test,rl_tst_group_test_code.arr)==0)
+	          {  test_printed = 0;
+                 rec_ctr ++;
+                 print_dtls();
+	             i = fetch_tst_result();
+              }
+           }
+   	       fclose(fp);
+	       if(rec_ctr)
+	          insert_rl_result_line();
+       } 
+}
+/*------------------------------------------------------------*/
+insert_rl_result_line()
+{  
+   if ((fp = fopen(nd_file_name.arr,"r")) == NULL)
+   {
+       disp_message(ERR_MESG,"Error while opening file \n");
+       proc_exit();
+   }
+   result_line_no = 0;
+   while(fgets(result_line.arr,90,fp))
+     {
+       result_line.len = strlen(result_line.arr) ;
+
+       if((result_line.len) && (result_line.arr[0] != '\n'))
+       {
+       result_status.arr[0] = result_line.arr[strlen(result_line.arr)-7];
+       result_tech_status.arr[0]  = result_line.arr[strlen(result_line.arr)-6];
+       result_delta_status.arr[0] = result_line.arr[strlen(result_line.arr)-5];
+       result_qlty_status.arr[0]  = result_line.arr[strlen(result_line.arr)-4];
+       result_cmnt_status.arr[0]  = result_line.arr[strlen(result_line.arr)-3];
+       result_path_status.arr[0]  = result_line.arr[strlen(result_line.arr)-2];
+       result_status.len          = 1;
+       result_tech_status.len     = 1;
+       result_delta_status.len    = 1;
+       result_qlty_status.len     = 1;
+       result_cmnt_status.len     = 1;
+       result_path_status.len     = 1;
+       result_line_no++;
+       
+       EXEC SQL INSERT INTO RL_RESULT_LINE
+		       (OPERATING_FACILITY_ID,USER_ID,SPECIMEN_NO,LINE_NO,
+			   TEXT,STATUS,TECH_STATUS,DELTA_STATUS,QLTY_STATUS,
+			   CMNT_STATUS,PATH_STATUS)
+		VALUES (:nd_operating_facility_id,USER,
+	            to_number(:nd_spec_no),
+		        :result_line_no,
+		        substr(:result_line,1,length(:result_line) - 7),
+	            :result_status, :result_tech_status, 
+			    :result_delta_status, :result_qlty_status, 
+			    :result_cmnt_status, :result_path_status);
+
+       result_line.arr[0]          = '\0';
+       result_line.len             = 0;
+       result_status.arr[0]        ='\0';
+       result_status.len           = 0;
+       result_tech_status.arr[0]   ='\0';
+       result_tech_status.len      = 0;
+       result_delta_status.arr[0]  ='\0';
+       result_delta_status.len     = 0;
+       result_qlty_status.arr[0]   ='\0';
+       result_qlty_status.len      = 0;
+       result_cmnt_status.arr[0]   ='\0';
+       result_cmnt_status.len      = 0;
+       result_path_status.arr[0]   ='\0';
+       result_path_status.len      = 0;
+       if (OERROR)
+         err_mesg("INSERT failed on table RL_RESULT_LINE",0,"");
+       }
+     }       
+   if (result_line_no)
+     {
+     EXEC SQL COMMIT WORK;
+     if (OERROR)
+         err_mesg("COMMIT failed on table RL_RESULT_LINE",0,"");
+     }
+   fclose(fp);
+}
+/*---------------------------------------------------------------------*/
+print_group_test_desc()
+{
+   char group_result[10];
+   p_print_name_yn.arr[0] = '\0';
+   p_test_desc.arr[0]     = '\0';
+   p_function_yn.arr[0]   = '\0';
+   p_test_units.arr[0]    = '\0';
+   p_test_desc.len        = 0;
+   p_print_name_yn.len    = 0;
+   p_function_yn.len      = 0;
+   p_test_units.len       = 0;
+   p_significant_digit    = 0;
+   p_no_of_decimals       = 0;
+
+   EXEC SQL SELECT LONG_DESC,NVL(PRINT_NAME_YN,'N'),NVL(FUNCTION_YN,'N'),
+		           SIGNIFICANT_DIGIT,NO_OF_DECIMALS,TEST_UNITS
+	        INTO   :p_test_desc,:p_print_name_yn,:p_function_yn,
+		           :p_significant_digit,:p_no_of_decimals,:p_test_units
+	        FROM   RL_TEST_CODE 
+	        WHERE  TEST_CODE = :rl_tst_group_test_code;
+   if (OERROR)
+      err_mesg("Select failed on table RL_TEST_CODE in print_group_test_desc",
+	            0,"");
+
+   p_test_desc.arr[p_test_desc.len]         = '\0';
+   p_print_name_yn.arr[p_print_name_yn.len] = '\0';
+   p_function_yn.arr[p_function_yn.len]     = '\0';
+   p_test_units.arr[p_test_units.len]       = '\0';
+
+   if(p_function_yn.arr[0] == 'Y')
+   {
+      group_result[0] = '\0';
+      calc_func_and_prn(rl_tst_group_test_code.arr,group_result);
+   } 
+   
+   if(strlen(p_test_desc.arr) > 35)
+      p_test_desc.arr[35] = '\0';
+
+   p_print_name_yn.arr[p_print_name_yn.len]='\0';
+   
+   p_grp_status.arr[0]     = '\0';
+   EXEC SQL SELECT NVL(RESULT_STATUS,'O') 
+	    INTO   :p_grp_status
+	    FROM   RL_REQUEST_DETAIL
+	    WHERE  PATIENT_ID  = :nd_hosp_no 
+	    AND    SPECIMEN_NO = :nd_spec_no 
+	    AND    TEST_CODE = :rl_tst_group_test_code
+		AND    OPERATING_FACILITY_ID = :nd_operating_facility_id;
+   if (OERROR)
+      err_mesg(
+	  "Select failed on RL_REQUEST_DETAIL in print_group_test_desc", 0,"");
+
+   p_grp_status.arr[p_grp_status.len] ='\0';
+
+   if(strcmp(p_print_name_yn.arr,"Y")==0)
+      fprintf(fp,"%-37s",p_test_desc.arr);
+
+   if(p_function_yn.arr[0] == 'Y' && test_result_found == 1)
+      if(strlen(group_result))
+      {
+		fprintf(fp,"%-10s",group_result);
+		if(p_test_units.len)
+		{
+			get_test_units_desc_from_sy_uom(p_test_units.arr); //// 19.02.2006
+////////19.02.2006	fprintf(fp,"%-10s",p_test_units.arr);
+		    fprintf(fp,"%-10s",rl_tst_cd_test_units_desc.arr);  /// 19.02.2006
+		}
+      }
+
+   if(p_print_name_yn.arr[0] == 'Y' || strlen(group_result))
+   {
+      fprintf(fp,"%c     \n",p_grp_status.arr[0]);
+      page_break(1);
+   }
+
+   if(strcmp(p_print_name_yn.arr,"Y")==0)
+   {
+      fprintf(fp,"-----------------------------------      \n");
+      page_break(1);
+   } 
+}
+/*------------------------------------------------------------*/
+calc_func_and_prn(l_str,l_str2)
+char l_str[],l_str2[];
+{
+   int func_ctr = 0;
+
+   strcpy(rl_loc_test_code.arr,l_str);
+   rl_loc_test_code.len = strlen(rl_loc_test_code.arr);
+   open_function_cur();
+   strcpy(rl_func_str.arr,"");
+   while (fetch_function_cur())
+   {
+        func_ctr ++;
+        strcpy(rl_func_value.arr,rl_func_operand_1.arr);
+        test_result_found = 1;
+        if (rl_func_operand_1_type.arr[0] == 'T')
+             get_rl_test_result(rl_func_operand_1.arr);
+
+	if(test_result_found == 0)
+	{
+	   l_str2[0] = '\0'; 
+	   break;
+        }
+        strcat(rl_func_str.arr,rl_func_value.arr);
+        strcat(rl_func_str.arr," ");
+
+        if (func_ctr != 1)
+             calculate_value();
+
+        if (rl_func_operator_1.len == 0)
+             break;
+
+        strcat(rl_func_str.arr,rl_func_operator_1.arr);
+        strcat(rl_func_str.arr," ");
+        strcpy(rl_func_value.arr,rl_func_operand_2.arr);
+
+        test_result_found = 1;
+
+        if (rl_func_operand_2_type.arr[0] == 'T')
+             get_rl_test_result(rl_func_operand_2.arr);
+
+	if(test_result_found == 0)
+	{
+	   l_str2[0] = '\0'; 
+	   break;
+        }
+
+        strcat(rl_func_str.arr,rl_func_value.arr);
+        strcat(rl_func_str.arr," ");
+        calculate_value();
+
+        if (rl_func_operator_2.len == 0)
+             break;
+
+        strcat(rl_func_str.arr,rl_func_operator_2.arr);
+        strcat(rl_func_str.arr," ");
+   }
+   ltrim(rl_func_str.arr); 
+   rtrim(rl_func_str.arr); 
+   
+   rl_func_str.arr[9] = '\0';
+   if (rl_tst_cd_no_of_decimals != 0 ||
+             rl_tst_cd_significant_digit != 0)
+      get_deci_sig_dig(rl_func_str.arr, p_no_of_decimals, p_significant_digit);
+   rl_func_str.arr[5] = '\0';
+   sprintf(l_str2,"%-10s",rl_func_str.arr);
+}
+/*--------------------------------------------------------------------*/
+calculate_value()
+{
+    sprintf(rl_calc_str.arr,"SELECT %s FROM DUAL",rl_func_str.arr);
+    rl_calc_str.len = strlen(rl_calc_str.arr);
+    EXEC SQL PREPARE STR1 FROM :rl_calc_str;
+    if (OERROR)
+         err_mesg("PREPARE failed on table DUAL");
+
+    EXEC SQL DECLARE CUR1 CURSOR FOR STR1;
+
+    EXEC SQL OPEN CUR1;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor CUR1");
+
+    rl_func_str.arr[0] = '\0';
+    rl_func_str.len    = 0;
+
+    EXEC SQL FETCH CUR1
+              INTO :rl_func_str;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor CUR1");
+
+    rl_func_str.arr[rl_func_str.len] = '\0';
+    strcat(rl_func_str.arr," ");
+}
+/*------------------------------------------------------------*/
+get_deci_sig_dig(loc_str,no_of_dec,signif)
+                 char *loc_str;
+                 int no_of_dec,signif;
+{
+  char significant_digits_applied_yn = 'N';
+  d_dec_pos = 0;
+  d_after_sig_digit = 0;  
+
+  d_loc_str.arr[0] = '\0';
+  d_dec_part.arr[0] = '\0';
+  d_int_part.arr[0] = '\0';
+  d_sig_part.arr[0] = '\0';
+
+  d_loc_str.len     = 0;
+  d_dec_part.len    = 0;
+  d_int_part.len    = 0;
+  d_sig_part.len    = 0;
+
+  strcpy(d_loc_str.arr,loc_str);
+  d_loc_str.len = strlen(d_loc_str.arr);
+/*--- The following IF splits the result into two parts : INTEGER & DECIMAL ---*/
+  EXEC SQL SELECT INSTR(:d_loc_str,'.') INTO :d_dec_pos FROM DUAL;
+  if(d_dec_pos > 0)
+  {
+      EXEC SQL SELECT SUBSTR(:d_loc_str,1,:d_dec_pos - 1) 
+		 INTO :d_int_part
+		 FROM DUAL;
+      d_int_part.arr[d_int_part.len] = '\0';
+
+      if(strlen(d_loc_str.arr) > d_dec_pos )
+      {
+         EXEC SQL SELECT SUBSTR(:d_loc_str,:d_dec_pos + 1,LENGTH(:d_loc_str)) 
+	  	    INTO :d_dec_part
+		    FROM DUAL;
+         d_dec_part.arr[d_dec_part.len] = '\0';
+      }
+  }
+  else
+  {
+     strcpy(d_int_part.arr,d_loc_str.arr);
+     d_int_part.len = strlen(d_int_part.arr);
+  }
+/*--- This IF is to take care of the INTEGER part of the Result ---*/
+  if(strlen(d_int_part.arr))
+  {
+    if(signif > 0)
+    {
+       if(strlen(d_int_part.arr) <= signif)
+       {
+          strcpy(d_l_str.arr,d_int_part.arr);
+       }
+       else
+       {
+	  significant_digits_applied_yn = 'Y';
+	  EXEC SQL SELECT SUBSTR(:d_int_part,1,:p_significant_digit)
+		     INTO :d_sig_part
+		     FROM DUAL;
+          d_sig_part.arr[d_sig_part.len] = '\0';
+	  EXEC SQL SELECT SUBSTR(:d_int_part,:p_significant_digit + 1,1) 
+		     INTO :d_after_sig_digit FROM DUAL;
+	  if(d_after_sig_digit >= 5)
+	  {
+	     EXEC SQL SELECT TO_CHAR(TO_NUMBER(:d_sig_part) + 1)
+			INTO :d_sig_part FROM DUAL;
+             d_sig_part.arr[d_sig_part.len] = '\0'; 
+          }
+	  if(d_after_sig_digit == 9)
+	  {
+             EXEC SQL SELECT RPAD(:d_sig_part,LENGTH(:d_int_part)+1,'0')
+	   	        INTO :d_l_str FROM DUAL;
+             d_l_str.arr[d_l_str.len] = '\0'; 
+	     if(d_l_str.len > 5)
+	     {
+		strcpy(d_l_str.arr,loc_str);
+		d_l_str.len = strlen(d_l_str.arr);
+             }
+          }
+	  else
+	  {
+             EXEC SQL SELECT RPAD(:d_sig_part,LENGTH(:d_int_part),'0')
+	   	        INTO :d_l_str FROM DUAL;
+          }
+          d_l_str.arr[d_l_str.len] = '\0'; 
+       }
+    }
+    else
+    {
+       strcpy(d_l_str.arr,d_int_part.arr);
+    }
+  }         
+/*--- This IF is to take care of the DECIMAL part of the Result ---*/
+
+if(strlen(d_dec_part.arr) && significant_digits_applied_yn == 'N')
+{
+  if(no_of_dec > 0)
+  {
+     strcpy(d_l_str.arr,strcat(d_l_str.arr,"."));
+     d_l_str.len = strlen(d_l_str.arr);
+     if(strlen(d_dec_part.arr) <= no_of_dec) 
+     {
+        strcpy(d_l_str.arr,strcat(d_l_str.arr,d_dec_part.arr));
+	d_l_str.len = strlen(d_l_str.arr);
+     }
+     else
+     {
+        EXEC SQL SELECT :d_l_str || SUBSTR(:d_dec_part,1,:p_no_of_decimals)
+                   INTO :d_l_str FROM DUAL;
+        d_l_str.arr[d_l_str.len] = '\0';
+     }
+  }
+}
+  strcpy(loc_str,d_l_str.arr);
+}
+/*-----------------------------------------------------*/
+sql_connect(l_nd_ap_uid_pwd)
+char l_nd_ap_uid_pwd[];
+{
+  strcpy(uid_pwd.arr,l_nd_ap_uid_pwd);
+  uid_pwd.len = strlen(uid_pwd.arr);
+
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+/*-----------------------------------------------------*/
+declare_curs()
+{
+    EXEC SQL DECLARE RL_REQ_HDR_CUR CURSOR FOR
+              SELECT SOURCE_CODE,
+                     CONSULTANT_CODE,
+                     TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM/YYYY HH24:MI'),
+                     TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                     SECTION_CODE,
+                     REQUEST_COMMENT_CODE1,
+                     REQUEST_COMMENT_CODE2,
+                     REQUEST_COMMENT_CODE3,
+                     REQUEST_COMMENT_DESC1,
+                     REQUEST_COMMENT_DESC2,
+                     REQUEST_COMMENT_DESC3,
+                     EXTRA_COPIES_TO,
+                     SPECIMEN_TYPE_CODE,					 
+                     ADDED_BY_ID,
+                     TO_CHAR(ADDED_DATE,'DD/MM/YYYY HH24:MI'),
+                     MODIFIED_BY_ID,
+                     TO_CHAR(MODIFIED_DATE,'DD/MM/YYYY HH24:MI'),
+		     URGENT_INDICATOR,
+		     EPISODE_TYPE,
+			 ORDERED_FACILITY_ID
+                FROM RL_REQUEST_HEADER
+               WHERE PATIENT_ID = :nd_hosp_no
+                 AND SPECIMEN_NO = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				 AND NVL(CANCELLED_YN,'N') != 'Y';
+
+    EXEC SQL DECLARE RL_REQ_DTL_CUR CURSOR FOR
+              SELECT TEST_CODE,
+                     NVL(RESULT_STATUS,'O'),
+                     DECODE(GROUP_TEST_YN,'Y','G','I')
+                FROM RL_REQUEST_DETAIL
+               WHERE PATIENT_ID = :nd_hosp_no
+                 AND SPECIMEN_NO = :nd_spec_no 
+		         AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				 AND NVL(RESULT_STATUS,' ') = 'R'
+		         AND NVL(CANCELLED_YN,'N') != 'Y';
+
+    EXEC SQL DECLARE RL_TEST_RESULT_CUR CURSOR FOR
+              SELECT GROUP_TEST_CODE,
+                     TEST_CODE,
+                     NVL(NUMERIC_PREFIX,'+'),
+                     NUMERIC_RESULT,
+                     RESULT_COMMENT_DESC1,
+                     RESULT_COMMENT_DESC2,
+                     RESULT_COMMENT_DESC3,
+                     RESULT_COMMENT_DESC4,
+		             NVL(STATUS,'O'),
+		             NVL(TECH_STATUS,'*'),
+		             NVL(DELTA_STATUS,'*'),
+		             NVL(QLTY_STATUS,'*'),
+		             NVL(CMNT_STATUS,'*'),
+		             NVL(PATH_STATUS,'*'),
+                     ROWID
+                FROM RL_TEST_RESULT
+               WHERE PATIENT_ID = :nd_hosp_no
+                 AND SPECIMEN_NO = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				 AND NVL(CANCELLED_YN,'N') != 'Y'
+		         AND GROUP_TEST_CODE IN
+		              (SELECT TEST_CODE
+                       FROM RL_REQUEST_DETAIL
+                       WHERE PATIENT_ID = :nd_hosp_no
+                       AND SPECIMEN_NO = :nd_spec_no
+					   AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		               AND NVL(RESULT_STATUS,'O') IN ('P','R')
+		               AND NVL(CANCELLED_YN,'N') != 'Y' )
+               ORDER BY GROUP_SEQ_NO,TEST_SEQ_NO;
+
+    EXEC SQL DECLARE RL_FUNCTION_CUR CURSOR FOR
+              SELECT OPERAND_1,
+                     OPERAND_1_TYPE,
+                     OPERATOR_1,
+                     OPERAND_2,
+                     OPERAND_2_TYPE,
+                     OPERATOR_2
+                FROM RL_FUNCTION
+               WHERE TEST_CODE = :rl_loc_test_code
+               ORDER BY SEQ_NUMBER;
+
+    EXEC SQL DECLARE RL_PAT_MAST_CUR CURSOR FOR
+              SELECT SHORT_NAME,
+                     SEX,
+                     NATIONALITY_CODE,
+                     ROUND(TO_DATE(:rl_hdr_spec_regd_date_time,'DD/MM/YYYY HH24:MI') - DATE_OF_BIRTH),
+                     TO_CHAR(DATE_OF_BIRTH,'DD/MM/YY') 
+                FROM MP_PATIENT_MAST
+               WHERE PATIENT_ID = :nd_hosp_no;
+    
+    EXEC SQL DECLARE RL_PAT_MAST3_CUR CURSOR FOR
+              SELECT SHORT_NAME,
+                     SEX,
+                     NATIONALITY_CODE,
+				     ROUND(TO_DATE(:rl_hdr_spec_regd_date_time,'DD/MM/YYYY HH24:MI') - DATE_OF_BIRTH),
+                     TO_CHAR(DATE_OF_BIRTH,'DD/MM/YY') 
+                FROM RL_PATIENT_MAST
+               WHERE PATIENT_ID = :nd_hosp_no;
+			   /* AND OPERATING_FACILITY_ID = :nd_operating_facility_id; */
+
+    EXEC SQL DECLARE RL_SPECIMEN_TYPE_CODE_CUR CURSOR FOR
+              SELECT SPECIMEN_DESC
+                FROM RL_SPECIMEN_TYPE_CODE
+               WHERE SPECIMEN_TYPE_CODE = :rl_hdr_specimen_type_code;
+
+    EXEC SQL DECLARE RL_SECTION_CUR CURSOR FOR
+              SELECT LONG_NAME
+                FROM RL_SECTION_CODE
+               WHERE SECTION_CODE = :rl_hdr_section_code;
+
+    EXEC SQL DECLARE RL_TEST_CODE_CUR CURSOR FOR
+              SELECT LONG_DESC,
+                     NUMERIC_RESULT_YN,
+                     AGE_SEX_RANGE_YN,
+                     FUNCTION_YN,
+                     PRINT_NAME_YN,
+                     LOW_VALUE_NORMAL,
+                     HIGH_VALUE_NORMAL,
+                     GROUP_TEST_YN,
+                     TEXT_BLOCK_YN,
+                     CULTURE_TEST_YN,
+                     SNOMED_YN,
+                     TEST_UNITS,
+                     NVL(NO_OF_DECIMALS,0),
+                     NVL(SIGNIFICANT_DIGIT,0),
+                     REF_RANGE_COMMENT,
+					 NVL(INHIBIT_REPORT_YN,'N')
+                FROM RL_TEST_CODE
+               WHERE TEST_CODE = :rl_loc_test_code;
+                 
+
+    EXEC SQL DECLARE RL_AGE_SEX_RANGE_CUR CURSOR FOR
+              SELECT LOW_VALUE_NORMAL,
+                     HIGH_VALUE_NORMAL
+                FROM RL_AGE_SEX_RANGE
+               WHERE TEST_CODE = :rl_tst_test_code
+                 AND SEX       = :rl_pat_sex
+                 AND :rl_pat_dob_no_of_days
+                       BETWEEN CALC_MIN_AGE_IN_DAYS  AND 
+                          CALC_MAX_AGE_IN_DAYS;
+
+    EXEC SQL DECLARE RL_COMM_FOR_TEST_CUR CURSOR FOR
+             SELECT COMMENT_TEXT
+             FROM RL_COMMENTS_FOR_TEST
+             WHERE TEST_CODE = :rl_tst_test_code
+	       ORDER BY SEQ_NO;
+
+    EXEC SQL DECLARE RL_RESULT_TEXT_CUR CURSOR FOR
+             SELECT  RESULT_TEXT RESULT_TEXT_LINE1,
+                     RESULT_TEXT RESULT_TEXT_LINE2,
+                     RESULT_TEXT RESULT_TEXT_LINE3,
+                     RESULT_TEXT RESULT_TEXT_LINE4,
+                     RESULT_TEXT RESULT_TEXT_LINE5,
+                     RESULT_TEXT RESULT_TEXT_LINE6,
+                     RESULT_TEXT RESULT_TEXT_LINE7,
+                     RESULT_TEXT RESULT_TEXT_LINE8,
+                     RESULT_TEXT RESULT_TEXT_LINE9,
+                     RESULT_TEXT RESULT_TEXT_LINE10
+                FROM RL_RESULT_TEXT
+               WHERE PATIENT_ID      = :nd_hosp_no
+                 AND SPECIMEN_NO     = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                 AND GROUP_TEST_CODE = :rl_tst_group_test_code
+                 AND TEST_CODE       = :rl_tst_test_code
+            ORDER BY SERIAL_NO;
+
+    EXEC SQL DECLARE RL_TEST_RESULT_CUR2 CURSOR FOR
+              SELECT NUMERIC_RESULT
+                FROM RL_TEST_RESULT
+               WHERE PATIENT_ID     = :nd_hosp_no
+                 AND SPECIMEN_NO    = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                 AND TEST_CODE      = :rl_loc_test_code;
+
+    EXEC SQL DECLARE RL_RESULT_SNOMED_CUR CURSOR FOR
+              SELECT SNOMED_CODE
+                FROM RL_RESULT_SNOMED
+               WHERE PATIENT_ID     = :nd_hosp_no
+                 AND SPECIMEN_NO     = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                 AND GROUP_TEST_CODE = :rl_tst_group_test_code
+                 AND TEST_CODE       = :rl_tst_test_code
+	       ORDER BY SNOMED_CODE;
+
+    EXEC SQL DECLARE RL_SNOMED_CODE_CUR CURSOR FOR
+              SELECT DESCRIPTION_1,
+                     DESCRIPTION_2,
+                     DESCRIPTION_3,
+                     DESCRIPTION_4,
+                     DESCRIPTION_5,
+		     PRINT_YN
+                FROM RL_SNOMED_CODE
+               WHERE SNOMED_MARKER_CODE= :rl_res_snomed_code;
+//			     AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+    EXEC SQL DECLARE RL_RESULT_ORGANISM_CUR CURSOR FOR
+              SELECT ORGANISM_CODE,
+                     RESULT_COMMENT_DESC
+                FROM RL_RESULT_ORGANISM
+               WHERE PATIENT_ID      = :nd_hosp_no
+                 AND SPECIMEN_NO     = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                 AND GROUP_TEST_CODE = :rl_tst_group_test_code
+                 AND TEST_CODE       = :rl_tst_test_code;
+
+    EXEC SQL DECLARE RL_RESULT_ORGANISM_DTL_CUR CURSOR FOR
+              SELECT ANTIBIOTIC_CODE,
+                     SENSITIVITY_IND,
+		             REPORT_YN
+                FROM RL_RESULT_ORGANISM_DTL
+               WHERE PATIENT_ID     = :nd_hosp_no
+                 AND SPECIMEN_NO     = :nd_spec_no
+				 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                 AND GROUP_TEST_CODE = :rl_tst_group_test_code
+                 AND TEST_CODE       = :rl_tst_test_code
+                 AND ORGANISM_CODE   = :rl_res_organism_code
+		 AND SENSITIVITY_IND IN ('S','R','I')
+		 AND REPORT_YN = 'Y'
+               ORDER BY REPORT_YN DESC, SENSITIVITY_IND DESC;
+		 
+
+    EXEC SQL DECLARE RL_ORGANISM_CODE_CUR CURSOR FOR
+              SELECT LONG_DESC
+                FROM RL_ORGANISM_CODE
+               WHERE ORGANISM_CODE = :rl_res_organism_code;
+
+    EXEC SQL DECLARE RL_ANTIBIOTIC_CODE_CUR CURSOR FOR
+              SELECT LONG_DESC
+                FROM RL_ANTIBIOTIC_CODE
+               WHERE ANTIBIOTIC_CODE = :rl_res_dtl_antibiotic_code;
+}
+
+/*-----------------------------------------------------*/
+gen_file_name()
+{
+     nd_file_name.arr[0]   = '\0';
+     nd_file_name.len      = 0;
+     sprintf(nd_file_name.arr,"rlilbres.lis");
+     nd_file_name.len = strlen(nd_file_name.arr);
+     strcpy(file_name,nd_file_name.arr);
+   if ((fp = fopen(nd_file_name.arr,"w")) == NULL)
+   {
+       disp_message(ERR_MESG,"Error while opening file \n");
+       proc_exit();
+   }
+
+}
+/*-----------------------------------------------------*/
+close_hdr()
+{
+    EXEC SQL CLOSE RL_REQ_HDR_CUR;
+
+    if (OERROR)
+         err_mesg("CLOSE failed on cursor RL_REQ_HDR_CUR",0,"");
+}
+
+/*-----------------------------------------------------*/
+open_hdr()
+{
+    EXEC SQL OPEN RL_REQ_HDR_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_REQ_HDR_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_hdr()
+{
+  rl_hdr_source_code.arr[0]            = '\0';
+  rl_hdr_consultant_code.arr[0]        = '\0';
+  rl_hdr_spec_regd_date_time.arr[0]    = '\0';
+  rl_hdr_current_date_time.arr[0]      = '\0';
+  rl_hdr_section_code.arr[0]           = '\0';
+  rl_hdr_request_comment_code1.arr[0]  = '\0';
+  rl_hdr_request_comment_code2.arr[0]  = '\0';
+  rl_hdr_request_comment_code3.arr[0]  = '\0';
+  rl_hdr_request_comment_desc1.arr[0]  = '\0';
+  rl_hdr_request_comment_desc2.arr[0]  = '\0';
+  rl_hdr_request_comment_desc3.arr[0]  = '\0';
+  rl_hdr_extra_copies_to.arr[0]        = '\0';
+  rl_hdr_specimen_type_code.arr[0]     = '\0';
+  rl_hdr_added_by_id.arr[0]            = '\0';
+  rl_hdr_added_date.arr[0]             = '\0';
+  rl_hdr_modified_by_id.arr[0]         = '\0';
+  rl_hdr_modified_date.arr[0]          = '\0';
+  rl_hdr_episode_type.arr[0]           = '\0';
+  rl_hdr_urgent_indicator.arr[0]       = '\0';
+  rl_ordered_facility_id.arr[0]		   = '\0';
+
+  rl_hdr_source_code.len               = 0;
+  rl_hdr_consultant_code.len           = 0;
+  rl_hdr_spec_regd_date_time.len       = 0;
+  rl_hdr_current_date_time.len         = 0;
+  rl_hdr_section_code.len              = 0;
+  rl_hdr_request_comment_code1.len     = 0;
+  rl_hdr_request_comment_code2.len     = 0;
+  rl_hdr_request_comment_code3.len     = 0;
+  rl_hdr_request_comment_desc1.len     = 0;
+  rl_hdr_request_comment_desc2.len     = 0;
+  rl_hdr_request_comment_desc3.len     = 0;
+  rl_hdr_extra_copies_to.len           = 0;
+  rl_hdr_specimen_type_code.len        = 0;
+  rl_hdr_added_by_id.len               = 0;
+  rl_hdr_added_date.len                = 0;
+  rl_hdr_modified_by_id.len            = 0;
+  rl_hdr_modified_date.len             = 0;
+  rl_hdr_episode_type.len			   = 0;
+  rl_hdr_urgent_indicator.len	       = 0;
+  rl_ordered_facility_id.len		   = 0;
+
+    EXEC SQL FETCH RL_REQ_HDR_CUR
+              INTO :rl_hdr_source_code,
+                   :rl_hdr_consultant_code,
+                   :rl_hdr_spec_regd_date_time,
+                   :rl_hdr_current_date_time,
+                   :rl_hdr_section_code,
+                   :rl_hdr_request_comment_code1,
+                   :rl_hdr_request_comment_code2,
+                   :rl_hdr_request_comment_code3,
+                   :rl_hdr_request_comment_desc1,
+                   :rl_hdr_request_comment_desc2,
+                   :rl_hdr_request_comment_desc3,
+                   :rl_hdr_extra_copies_to,
+                   :rl_hdr_specimen_type_code,
+                   :rl_hdr_added_by_id,
+                   :rl_hdr_added_date,
+                   :rl_hdr_modified_by_id,
+                   :rl_hdr_modified_date,
+  		   :rl_hdr_urgent_indicator,
+  		   :rl_hdr_episode_type,
+		   :rl_ordered_facility_id;
+
+    if (OERROR)
+        err_mesg("FETCH failed on cursor RL_REQ_HDR_CUR",0,"");
+
+    rl_hdr_source_code.arr[rl_hdr_source_code.len]		 	= '\0';
+    rl_hdr_consultant_code.arr[rl_hdr_consultant_code.len]		= '\0';
+    rl_hdr_spec_regd_date_time.arr[rl_hdr_spec_regd_date_time.len] 	= '\0';
+    rl_hdr_current_date_time.arr[rl_hdr_current_date_time.len] 		= '\0';
+    rl_hdr_section_code.arr[rl_hdr_section_code.len] 			= '\0';
+    rl_hdr_request_comment_code1.arr[rl_hdr_request_comment_code1.len] = '\0';
+    rl_hdr_request_comment_code2.arr[rl_hdr_request_comment_code2.len] = '\0';
+    rl_hdr_request_comment_code3.arr[rl_hdr_request_comment_code3.len] = '\0';
+    rl_hdr_request_comment_desc1.arr[rl_hdr_request_comment_desc1.len] = '\0';
+    rl_hdr_request_comment_desc2.arr[rl_hdr_request_comment_desc2.len] = '\0';
+    rl_hdr_request_comment_desc3.arr[rl_hdr_request_comment_desc3.len] = '\0';
+    rl_hdr_extra_copies_to.arr[rl_hdr_extra_copies_to.len]             = '\0';
+    rl_hdr_specimen_type_code.arr[rl_hdr_specimen_type_code.len]       = '\0';
+    rl_hdr_added_by_id.arr[rl_hdr_added_by_id.len]                     = '\0';
+    rl_hdr_added_date.arr[rl_hdr_added_date.len]                       = '\0';
+    rl_hdr_modified_by_id.arr[rl_hdr_modified_by_id.len]               = '\0';
+    rl_hdr_modified_date.arr[rl_hdr_modified_date.len]                 = '\0';
+    rl_hdr_episode_type.arr[rl_hdr_episode_type.len]		           = '\0';
+    rl_hdr_urgent_indicator.arr[rl_hdr_urgent_indicator.len]	       = '\0';
+	rl_ordered_facility_id.arr[rl_ordered_facility_id.len]			   = '\0';
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+
+fetch_dtl()
+{
+    EXEC SQL OPEN RL_REQ_DTL_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_REQ_DTL_CUR",0,"");
+
+    for (i=0;i<6;i++)
+    {
+        rl_dtl_test_code[i].arr[0]         = '\0';
+        rl_dtl_result_status[i].arr[0]     = '\0';
+        rl_dtl_group_test_flag[i].arr[0]   = '\0';
+
+        rl_dtl_test_code[i].len            = 0;
+        rl_dtl_result_status[i].len        = 0;
+        rl_dtl_group_test_flag[i].len      = 0;
+    }
+
+    EXEC SQL FETCH RL_REQ_DTL_CUR
+              INTO :rl_dtl_test_code,
+                   :rl_dtl_result_status,
+                   :rl_dtl_group_test_flag;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_REQ_DTL_CUR",0,"");
+
+    no_of_dtl_recs = sqlca.sqlerrd[2];
+
+    for (i=0;i<sqlca.sqlerrd[2];i++)
+    {
+        rl_dtl_test_code[i].arr[rl_dtl_test_code[i].len]         = '\0';
+        rl_dtl_result_status[i].arr[rl_dtl_result_status[i].len] = '\0';
+        rl_dtl_group_test_flag[i].arr[rl_dtl_group_test_flag[i].len]  = '\0';
+    }
+}
+/*-----------------------------------------------------*/
+
+open_tst_result()
+{
+    EXEC SQL OPEN RL_TEST_RESULT_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_TEST_RESULT_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_tst_result()
+{
+
+  rl_tst_group_test_code.arr[0]      	  = '\0';
+  rl_tst_test_code.arr[0]     	 	  = '\0';
+  rl_tst_numeric_prefix.arr[0] 	          = '\0';
+  rl_tst_numeric_result.arr[0]            = '\0';
+  rl_tst_result_comment_desc1.arr[0]      = '\0';
+  rl_tst_result_comment_desc2.arr[0]      = '\0';
+  rl_tst_result_comment_desc3.arr[0]      = '\0';
+  rl_tst_result_comment_desc4.arr[0]      = '\0';
+  rl_tst_status.arr[0] 			  = '\0';
+  rl_tst_tech_status.arr[0] 	 	  = '\0';
+  rl_tst_delta_status.arr[0] 		  = '\0';
+  rl_tst_qlty_status.arr[0] 		  = '\0';
+  rl_tst_cmnt_status.arr[0] 		  = '\0';
+  rl_tst_path_status.arr[0] 		  = '\0';
+  rl_tst_rowid.arr[0]                     = '\0';
+
+  rl_tst_group_test_code.len              = 0;
+  rl_tst_test_code.len         		  = 0;
+  rl_tst_numeric_prefix.len         	  = 0;
+  rl_tst_numeric_result.len 	          = 0;
+  rl_tst_result_comment_desc1.len         = 0;
+  rl_tst_result_comment_desc2.len         = 0;
+  rl_tst_result_comment_desc3.len         = 0;
+  rl_tst_result_comment_desc4.len         = 0;
+  rl_tst_status.len 			  = 0;
+  rl_tst_tech_status.len 	 	  = 0;
+  rl_tst_delta_status.len 		  = 0;
+  rl_tst_qlty_status.len 		  = 0;
+  rl_tst_cmnt_status.len 		  = 0;
+  rl_tst_path_status.len 		  = 0;
+  rl_tst_rowid.len                        = 0;
+
+    EXEC SQL FETCH RL_TEST_RESULT_CUR
+              INTO :rl_tst_group_test_code,
+                   :rl_tst_test_code,
+                   :rl_tst_numeric_prefix,
+                   :rl_tst_numeric_result,
+                   :rl_tst_result_comment_desc1,
+                   :rl_tst_result_comment_desc2,
+                   :rl_tst_result_comment_desc3,
+                   :rl_tst_result_comment_desc4,
+		   :rl_tst_status,
+		   :rl_tst_tech_status,
+		   :rl_tst_delta_status,
+		   :rl_tst_qlty_status,
+		   :rl_tst_cmnt_status,
+		   :rl_tst_path_status,
+                   :rl_tst_rowid;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_TEST_RESULT_CUR",0,"");
+
+    rl_tst_group_test_code.arr[rl_tst_group_test_code.len] = '\0';
+    rl_tst_test_code.arr[rl_tst_test_code.len] = '\0';
+    rl_tst_numeric_prefix.arr[rl_tst_numeric_prefix.len] = '\0';
+    rl_tst_numeric_result.arr[rl_tst_numeric_result.len] = '\0';
+    rl_tst_result_comment_desc1.arr[rl_tst_result_comment_desc1.len] = '\0';
+    rl_tst_result_comment_desc2.arr[rl_tst_result_comment_desc2.len] = '\0';
+    rl_tst_result_comment_desc3.arr[rl_tst_result_comment_desc3.len] = '\0';
+    rl_tst_result_comment_desc4.arr[rl_tst_result_comment_desc4.len] = '\0';
+    rl_tst_rowid.arr[rl_tst_rowid.len] = '\0';
+    rl_tst_status.arr[rl_tst_status.len]= '\0';
+
+    rl_tst_tech_status.arr[rl_tst_tech_status.len] = '\0'; 
+    rl_tst_delta_status.arr[rl_tst_delta_status.len] = '\0'; 
+    rl_tst_qlty_status.arr[rl_tst_qlty_status.len] = '\0'; 
+    rl_tst_cmnt_status.arr[rl_tst_cmnt_status.len] = '\0'; 
+    rl_tst_path_status.arr[rl_tst_path_status.len] = '\0'; 
+
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+
+print_dtls()
+{
+    int next_line = 0;
+    char range_cmnt_print_flag = 'N';
+    char l_str [100],l_str1[100];
+    int agesex_range_flag = FALSE;
+    int path_review_flag = FALSE;
+    numeric_value_flag = FALSE;
+    strcpy(l_str,"");
+    page_break(0);
+    fetch_test_code(rl_tst_test_code.arr);
+	if(rl_tst_cd_inhibit_yn.arr[0] == 'N')
+	{
+    spc_first = 1;
+    fflush(fp);
+    ind_test_prn = 0;
+    if(rl_tst_cd_print_report_yn.arr[0] == 'Y')
+        sprintf(l_str,"%-37.37s",rl_tst_cd_short_desc.arr);
+    else
+        sprintf(l_str,"%-37s"," ");
+    strcpy(text_line,l_str);
+    strcpy(test_description,l_str);
+    if (rl_tst_cd_numeric_result_yn.arr[0] == 'Y')
+    {
+	if (rl_tst_numeric_result.len)
+	{
+	  numeric_value_flag = TRUE;
+	  if(rl_tst_numeric_prefix.arr[0] == '+')
+	  {
+             sprintf(l_str,"%s%-10s",l_str,rl_tst_numeric_result.arr);
+          }
+	  else
+	  {
+             sprintf(l_str,"%s%c%-10s",l_str,rl_tst_numeric_prefix.arr[0],
+					     rl_tst_numeric_result.arr);
+          }
+          strcpy(l_str1,l_str);
+          ltrim(l_str1);
+          rtrim(l_str1); 
+
+   		  get_test_units_desc_from_sy_uom(rl_tst_cd_test_units.arr); //// 19.02.2006
+
+/// 19.02.2006          sprintf(l_str,"%s%-10s",l_str,rl_tst_cd_test_units.arr);
+
+          sprintf(l_str,"%s%-10s",l_str,rl_tst_cd_test_units_desc.arr); /// 19.02.2006
+
+          if (rl_tst_cd_age_sex_range_yn.arr[0] == 'Y')
+          {
+	     if(rl_pat_sex.arr[0] == 'M' || rl_pat_sex.arr[0] == 'F')
+                fetch_age_sex_range();
+             if (rl_tst_range_low_val_nml.len  ||
+                 rl_tst_range_high_val_nml.len )
+	       {
+                  sprintf(l_str,"%s( %-4s - %-4s )",l_str,
+                    rl_tst_range_low_val_nml.arr,
+                    rl_tst_range_high_val_nml.arr);
+		  agesex_range_flag = TRUE;
+               }
+	     else
+	     {
+	  	    if(rl_tst_cd_range_cmt.len)
+		    {
+               range_cmnt_print_flag = 'Y';
+             }
+		 }
+       }
+	 else
+	   {
+	      if(rl_tst_cd_range_cmt.len)
+	      {
+                 range_cmnt_print_flag = 'Y';
+          }
+       }
+        strcpy(l_str1,l_str);
+        ltrim(l_str1);
+        rtrim(l_str1);
+	if(group && !group_printed)
+	{
+	   print_group_test_desc();
+	   group_printed = 1;
+        }
+	next_line = 0;
+	if(range_cmnt_print_flag == 'Y')
+	{
+	   if(strlen(rl_tst_cd_range_cmt.arr) <= ( 77 - strlen(l_str)))
+	   {
+	      sprintf(l_str,"%s%s",l_str,rl_tst_cd_range_cmt.arr);
+           }
+	   else
+	      next_line = 1;
+        }
+        print_line(l_str);
+	test_printed  = 1;
+	if(next_line == 1)
+	{
+	   sprintf(l_str,"%-37.37s%-40s"," ",rl_tst_cd_range_cmt.arr);
+           print_line(l_str);
+        }
+      }
+    }
+     print_comment_desc1234();
+     print_test_comments();
+     if(rl_tst_cd_culture_test_yn.arr[0] == 'Y')
+	print_culture();
+     if (rl_tst_cd_text_block_yn.arr[0] == 'Y') /* optional result text */
+     {
+        open_result_text();
+        while(fetch_result_text())
+	  print_result_text();
+     }
+     if (rl_tst_cd_snomed_yn.arr[0] == 'Y') 	/*  optional snomed text */
+          print_snomed();
+     fflush(fp);
+   }/* endif for inhibit_yn */
+}
+/*-----------------------------------------------------*/
+print_range_comment(int agesex_range_flag,int path_review_flag)
+{
+  if (rl_tst_cd_range_cmt.len) 	 /* optional Range comment */
+    {
+     if (agesex_range_flag == TRUE ||
+	 path_review_flag == TRUE )
+	 ;
+     else
+     {
+       if(group && !group_printed)
+       {
+	  print_group_test_desc();
+	  group_printed = 1;
+       }
+       if(test_printed)
+       {  numeric_value_flag = TRUE;
+          print_line_check(rl_tst_cd_range_cmt.arr);
+       }
+       else
+       {
+	  numeric_value_flag = FALSE;
+	  sprintf(text_line,"%-37.37s%-40s",test_description,
+				rl_tst_cd_range_cmt.arr);
+	  print_line_check(text_line);
+	  test_printed = 1;
+       }
+     }
+    }
+}
+/*-----------------------------------------------------*/
+print_test_comments()
+{
+open_comments();
+while(fetch_comments())
+  {
+  if (rl_comm_for_test_comm_text.len)
+     {
+       if(group && !group_printed)
+       {
+	  print_group_test_desc();
+	  group_printed = 1;
+       }
+       if(test_printed)
+       {  numeric_value_flag = TRUE;
+          print_line_check(rl_comm_for_test_comm_text.arr);
+       }
+       else
+       {
+	  numeric_value_flag = FALSE;
+	  sprintf(text_line,"%-37.37s%s",test_description,
+			   rl_comm_for_test_comm_text.arr);
+	  print_line_check(text_line);
+	  test_printed = 1;
+       }
+     }
+  }
+}
+/*-----------------------------------------------------*/
+
+print_result_text()
+{
+   if(rl_res_result_text1.len || rl_res_result_text2.len || 
+      rl_res_result_text3.len || rl_res_result_text4.len || 
+      rl_res_result_text5.len || rl_res_result_text6.len || 
+      rl_res_result_text7.len || rl_res_result_text8.len || 
+      rl_res_result_text9.len || rl_res_result_text10.len )
+   {
+      if(group && !group_printed)
+      {   print_group_test_desc();
+	  group_printed = 1;
+      }
+      if(!test_printed  && strlen(test_description))
+      {     numeric_value_flag = FALSE;  
+	    sprintf(text_line,"%37.37s%-40s",test_description," ");
+            print_line_check(text_line);
+	    test_printed = 1;
+      }
+   
+    		if (rl_res_result_text1.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		  	print_line(rl_res_result_text1.arr);
+		  }
+    		if (rl_res_result_text2.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		        print_line(rl_res_result_text2.arr);
+		  }
+    		if (rl_res_result_text3.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		  	 print_line(rl_res_result_text3.arr);
+		  }
+    		if (rl_res_result_text4.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text4.arr);
+		  }
+    		if (rl_res_result_text5.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text5.arr);
+		  }
+    		if (rl_res_result_text6.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text6.arr);
+		  }
+    		if (rl_res_result_text7.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text7.arr);
+		  }
+    		if (rl_res_result_text8.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text8.arr);
+		  }
+    		if (rl_res_result_text9.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		   	print_line(rl_res_result_text9.arr);
+		  }
+    		if (rl_res_result_text10.len)
+		  {
+		  	fprint_repeat(fp,' ',8);		   
+		  	print_line(rl_res_result_text10.arr);
+		  }
+            	fflush(fp);
+   }
+}
+/*-----------------------------------------------------*/
+print_line(char *t_str)
+{
+         fprintf(fp,"%s%c%c%c%c%c%c\n",t_str,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+}
+/*-----------------------------------------------------*/
+print_line_check(char *t_str)
+{
+       if (numeric_value_flag == TRUE)
+	  {
+	  fprint_repeat(fp,' ',37);
+	  print_line(t_str);
+	  numeric_value_flag = TRUE;
+	  }
+       else  
+         {
+	   print_line(t_str);
+	   numeric_value_flag = TRUE;
+	 }
+}
+/*-----------------------------------------------------*/
+
+print_snomed()
+{
+int ctr = 0;
+char prev_snomed_print_yn = 'N';
+    open_result_snomed();
+    while (fetch_rl_result_snomed())
+    {
+        if (fetch_snomed_desc12345())
+        {
+	    if (rl_snomed_print_yn.arr[0] == 'Y')
+            {   
+		print_snomed_desc12345();
+	    }
+	    else
+	    {
+	      if(group && !group_printed)
+	      {   print_group_test_desc();
+		  group_printed = 1;
+              }
+	      if(!test_printed)
+	      {
+		fprintf(fp,"%-37.37s%c%c%c%c%c%c\n",test_description,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+		test_printed = 1;
+              }
+	      print_line(rl_res_snomed_code.arr);
+           }
+	ctr++;
+        }
+    }
+}
+/*-----------------------------------------------------*/
+
+open_result_snomed()
+{
+    EXEC SQL OPEN RL_RESULT_SNOMED_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_RESULT_SNOMED_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_rl_result_snomed()
+{
+    rl_res_snomed_code.arr[0]     = '\0';
+    rl_res_snomed_code.len        = 0;
+
+    EXEC SQL FETCH RL_RESULT_SNOMED_CUR
+              INTO :rl_res_snomed_code;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_RESULT_SNOMED_CUR",0,"");
+
+    rl_res_snomed_code.arr[rl_res_snomed_code.len] = '\0';
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+
+print_culture()
+{
+    char temp_sens_ind;
+    char temp_line[81];
+    char temp_report_yn;
+    int still_org_dtl_left;
+    int print_anti_flag = 0;
+    int change_flag = 0;
+
+    open_result_organism();
+    while(fetch_result_org())
+    {
+       if (rl_res_comment_desc.len)
+       {  
+	  if(group && !group_printed)
+          {
+	     print_group_test_desc();
+	     group_printed = 1;
+          }
+          if(test_printed)
+          {  numeric_value_flag = TRUE;
+             print_line_check(rl_res_comment_desc.arr);
+          }
+          else
+          {
+	     numeric_value_flag = FALSE;
+	     sprintf(text_line,"%-37.37s%-40s",test_description,
+	   		    rl_res_comment_desc.arr);
+	     print_line_check(text_line);
+	     test_printed = 1;
+          }
+       }
+       fetch_org_desc();
+       if (rl_res_organism_code_desc.len)
+       {
+	  if(group && !group_printed)
+          {
+	     print_group_test_desc();
+	     group_printed = 1;
+          }
+          if(test_printed)
+          {  
+	     numeric_value_flag = TRUE;
+             print_line_check(rl_res_organism_code_desc.arr);
+          }
+          else
+          {
+	     numeric_value_flag = FALSE;
+	     sprintf(text_line,"%-37.37s%-40s",test_description,
+	   		    rl_res_organism_code_desc.arr);
+	     print_line_check(text_line);
+	     test_printed = 1;
+          }
+       }
+       temp_sens_ind = '\0';
+       open_result_organism_dtl();
+       temp_line[0] = '\0';
+       still_org_dtl_left = fetch_result_org_dtl(); 
+       while(still_org_dtl_left)
+       {
+	  strcpy(temp_line,"");
+	  temp_sens_ind = rl_res_dtl_sensitivity_ind.arr[0];
+	  if(temp_sens_ind == 'S')
+	     sprintf(temp_line,"%-37.37s","Sensitive To :-");
+          else
+	     if(temp_sens_ind == 'R')
+	        sprintf(temp_line,"%-37.37s","Resistant To :-");
+             else
+	        if(temp_sens_ind == 'I')
+	           sprintf(temp_line,"%-37.37s","Intermediate :-");
+
+	  print_anti_flag = 0;
+	  change_flag = 0;
+          while(still_org_dtl_left && temp_sens_ind == 
+					    rl_res_dtl_sensitivity_ind.arr[0])
+          {
+	       temp_report_yn = rl_res_dtl_report_yn.arr[0];
+               if(temp_sens_ind == 'R' && temp_report_yn == 'N')
+		    sprintf(temp_line,"%-37.37s","Resistant To :- (Held)");
+               else
+		 if(temp_sens_ind == 'S' && temp_report_yn == 'N')
+		    sprintf(temp_line,"%-37.37s","Sensitive To :- (Held)");
+                 else
+		    if(temp_sens_ind == 'I' && temp_report_yn == 'N')
+		       sprintf(temp_line,"%-37.37s","Intermediate :- (Held)");
+             while(still_org_dtl_left && temp_sens_ind == 
+					    rl_res_dtl_sensitivity_ind.arr[0]
+		   && temp_report_yn == rl_res_dtl_report_yn.arr[0]) 
+             {
+               fetch_antibiotic_desc();
+	       change_flag = 0;
+               if((77 - strlen(temp_line)) > 
+				  (strlen(rl_res_dtl_antibiotic_desc.arr) + 1))
+               {
+		   strcat(temp_line,rl_res_dtl_antibiotic_desc.arr);
+		   strcat(temp_line,",");
+		   print_anti_flag = 0;
+               }
+	       else
+	       {
+		   print_line(temp_line);
+		   strcpy(temp_line,"");
+		   sprintf(temp_line,"%-37.37s"," ");
+		   strcat(temp_line,rl_res_dtl_antibiotic_desc.arr);
+		   strcat(temp_line,",");
+		   print_anti_flag = 1;
+               }
+               still_org_dtl_left = fetch_result_org_dtl();
+	       if(temp_sens_ind != rl_res_dtl_sensitivity_ind.arr[0] ||
+		  temp_report_yn != rl_res_dtl_report_yn.arr[0])
+		 if(print_anti_flag == 1)
+		    change_flag = 1;
+             }
+	     if(print_anti_flag == 0 || change_flag == 1)
+	     {
+	        temp_line[strlen(temp_line) - 1] = '\0';
+	        print_line(temp_line);
+             }
+          }
+       }
+    }
+}
+/*-----------------------------------------------------*/
+
+scan_and_prnt(l_str)
+char *l_str;
+{
+   for(;*l_str != '\0';l_str++)
+   {
+     fprintf(fp,"%c",*l_str);
+     if (*l_str == '\n')
+        page_break(1);
+   }
+   fprintf(fp,"\n");
+   page_break(1);
+}
+/*-----------------------------------------------------*/
+
+open_result_organism()
+{
+    EXEC SQL OPEN RL_RESULT_ORGANISM_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_RESULT_ORGANISM_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_result_org()
+{
+    rl_res_organism_code.arr[0]   = '\0';
+    rl_res_comment_desc.arr[0]    = '\0';
+
+    rl_res_organism_code.len      = 0;
+    rl_res_comment_desc.len       = 0;
+
+    EXEC SQL FETCH RL_RESULT_ORGANISM_CUR
+              INTO :rl_res_organism_code,
+                   :rl_res_comment_desc;
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_RESULT_ORGANISM_CUR",0,"");
+
+    rl_res_organism_code.arr[rl_res_organism_code.len] = '\0';
+    rl_res_comment_desc.arr[rl_res_comment_desc.len] = '\0';
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+
+fetch_org_desc()
+{
+    EXEC SQL OPEN RL_ORGANISM_CODE_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_ORGANISM_CODE_CUR",0,"");
+
+    rl_res_organism_code_desc.arr[0] = '\0';
+    rl_res_organism_code_desc.len    = 0;
+
+    EXEC SQL FETCH RL_ORGANISM_CODE_CUR
+              INTO :rl_res_organism_code_desc;
+
+    rl_res_organism_code_desc.arr[rl_res_organism_code_desc.len] = '\0';
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_ORGANISM_CODE_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_antibiotic_desc()
+{
+    EXEC SQL OPEN RL_ANTIBIOTIC_CODE_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_ANTIBIOTIC_CODE_CUR",0,"");
+
+    rl_res_dtl_antibiotic_desc.arr[0] = '\0';
+    rl_res_dtl_antibiotic_desc.len    = 0;
+
+    EXEC SQL FETCH RL_ANTIBIOTIC_CODE_CUR
+              INTO :rl_res_dtl_antibiotic_desc;
+
+    rl_res_dtl_antibiotic_desc.arr[rl_res_dtl_antibiotic_desc.len] = '\0';
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_ANTIBIOTIC_CODE_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+open_result_organism_dtl()
+{
+    EXEC SQL OPEN RL_RESULT_ORGANISM_DTL_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_RESULT_ORGANISM_DTL_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_result_org_dtl()
+{
+    rl_res_dtl_antibiotic_code.arr[0]   = '\0';
+    rl_res_dtl_sensitivity_ind.arr[0]   = '\0';
+
+    rl_res_dtl_antibiotic_code.len      = 0;
+    rl_res_dtl_sensitivity_ind.len      = 0;
+
+    EXEC SQL FETCH RL_RESULT_ORGANISM_DTL_CUR
+              INTO :rl_res_dtl_antibiotic_code,
+                   :rl_res_dtl_sensitivity_ind,
+		   :rl_res_dtl_report_yn;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_RESULT_ORGANISM_DTL_CUR",0,"");
+
+    rl_res_dtl_antibiotic_code.arr[rl_res_dtl_antibiotic_code.len] = '\0';
+    rl_res_dtl_sensitivity_ind.arr[rl_res_dtl_sensitivity_ind.len] = '\0';
+    rl_res_dtl_report_yn.arr[rl_res_dtl_report_yn.len]             = '\0';
+
+    return (LAST_ROW?0:1);
+}
+
+/*-----------------------------------------------------*/
+fetch_other_dtls()
+{
+   fetch_pat_name();
+   fetch_spec_desc();
+   fetch_consultant();
+   fetch_section();
+}
+/*-----------------------------------------------------*/
+fetch_pat_name()
+{
+    EXEC SQL OPEN RL_PAT_MAST_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_PAT_MAST_CUR",0,"");
+
+    rl_pat_long_name.arr[0]     = '\0';
+    rl_pat_short_name.arr[0]     = '\0';
+    rl_pat_sex.arr[0]           = '\0';
+    rl_pat_nationality.arr[0]           = '\0';
+    rl_pat_dob_no_of_days.arr[0]           = '\0';
+    rl_pat_date_of_birth.arr[0]            = '\0';
+    rl_pat_blood_group.arr[0]              = '\0';
+    rl_pat_g6pd.arr[0]              = '\0';
+    rl_pat_sicc.arr[0]              = '\0';
+    rl_pat_hbl4_1.arr[0]              = '\0';
+    rl_pat_hbl4_2.arr[0]              = '\0';
+
+    rl_pat_long_name.len         = 0;
+    rl_pat_short_name.len         = 0;
+    rl_pat_sex.len         = 0;
+    rl_pat_nationality.len         = 0;
+    rl_pat_dob_no_of_days.len         = 0;
+    rl_pat_date_of_birth.len          = 0;
+    rl_pat_g6pd.len                   = 0;
+    rl_pat_sicc.len                   = 0;
+    rl_pat_hbl4_1.len                   = 0;
+    rl_pat_hbl4_2.len                   = 0;
+
+    EXEC SQL FETCH RL_PAT_MAST_CUR
+              INTO :rl_pat_short_name,
+                   :rl_pat_sex,
+                   :rl_pat_nationality,
+                   :rl_pat_dob_no_of_days,
+                   :rl_pat_date_of_birth;
+
+    if (OERROR)
+       err_mesg("Error with MP_PATIENT_MAST fetch",0,"");
+    else
+	   if(NODATAFOUND)
+	   {
+                EXEC SQL OPEN RL_PAT_MAST3_CUR;
+    		EXEC SQL FETCH RL_PAT_MAST3_CUR
+              	         INTO   :rl_pat_short_name,
+                   		:rl_pat_sex,
+                   		:rl_pat_nationality,
+                   		:rl_pat_dob_no_of_days,
+                   		:rl_pat_date_of_birth;
+               if (OERROR)
+                  err_mesg("Error with RL_PATIENT_MAST fetch",0,"");	
+               else
+	          if(NODATAFOUND)
+                        ;
+       }
+    rl_pat_long_name.arr[rl_pat_long_name.len] = '\0';
+    rl_pat_short_name.arr[rl_pat_short_name.len] = '\0';
+    rl_pat_long_name.arr[rl_pat_long_name.len] = '\0';
+    rl_pat_short_name.arr[rl_pat_short_name.len] = '\0';
+    rl_pat_sex.arr[rl_pat_sex.len] = '\0';
+    rl_pat_nationality.arr[rl_pat_nationality.len] = '\0';
+    rl_pat_dob_no_of_days.arr[rl_pat_dob_no_of_days.len] = '\0';
+    rl_pat_date_of_birth.arr[rl_pat_date_of_birth.len]   = '\0';
+
+}
+
+/*-----------------------------------------------------*/
+fetch_spec_desc()
+{
+    EXEC SQL OPEN RL_SPECIMEN_TYPE_CODE_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_SPECIMEN_TYPE_CODE_CUR",0,"");
+
+    rl_spc_specimen_desc.arr[0] = '\0';
+    rl_spc_specimen_desc.len    = 0;
+
+    EXEC SQL FETCH RL_SPECIMEN_TYPE_CODE_CUR
+              INTO :rl_spc_specimen_desc;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_SPECIMEN_TYPE_CODE_CUR",0,"");
+
+    rl_spc_specimen_desc.arr[rl_spc_specimen_desc.len] = '\0';
+
+}
+/*-----------------------------------------------------*/
+
+fetch_test_code(loc_tst_code)
+char loc_tst_code[];
+{
+    strcpy(rl_loc_test_code.arr,loc_tst_code);
+    rl_loc_test_code.len  =  strlen(rl_loc_test_code.arr);
+
+    EXEC SQL OPEN RL_TEST_CODE_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_TEST_CODE_CUR",0,"");
+
+    rl_tst_cd_short_desc.arr[0]         = '\0';
+    rl_tst_cd_numeric_result_yn.arr[0]  = '\0';
+    rl_tst_cd_age_sex_range_yn.arr[0]   = '\0';
+    rl_tst_cd_function_yn.arr[0]        = '\0';
+    rl_tst_cd_print_report_yn.arr[0]    = '\0';
+    rl_tst_cd_low_value_normal.arr[0]   = '\0';
+    rl_tst_cd_high_value_normal.arr[0]  = '\0';
+    rl_tst_cd_test_units.arr[0]   = '\0';
+    rl_tst_cd_group_test_yn.arr[0]      = '\0';
+    rl_tst_cd_text_block_yn.arr[0]      = '\0';
+    rl_tst_cd_culture_test_yn.arr[0]    = '\0';
+    rl_tst_cd_snomed_yn.arr[0]          = '\0';
+    rl_tst_cd_range_cmt.arr[0]          = '\0';
+    rl_tst_cd_inhibit_yn.arr[0]         = '\0';
+
+    rl_tst_cd_short_desc.len            = 0;
+    rl_tst_cd_numeric_result_yn.len     = 0;
+    rl_tst_cd_age_sex_range_yn.len      = 0;
+    rl_tst_cd_function_yn.len           = 0;
+    rl_tst_cd_print_report_yn.len       = 0;
+    rl_tst_cd_low_value_normal.len      = 0;
+    rl_tst_cd_high_value_normal.len     = 0;
+    rl_tst_cd_test_units.len      = 0;
+    rl_tst_cd_group_test_yn.len         = 0;
+    rl_tst_cd_text_block_yn.len         = 0;
+    rl_tst_cd_culture_test_yn.len       = 0;
+    rl_tst_cd_snomed_yn.len             = 0;
+    rl_tst_cd_range_cmt.len             = 0;
+    rl_tst_cd_inhibit_yn.len            = 0;
+
+    rl_tst_cd_no_of_decimals = 0;
+    rl_tst_cd_significant_digit = 0;
+
+    EXEC SQL FETCH RL_TEST_CODE_CUR
+              INTO :rl_tst_cd_short_desc,
+                   :rl_tst_cd_numeric_result_yn,
+                   :rl_tst_cd_age_sex_range_yn,
+                   :rl_tst_cd_function_yn,
+                   :rl_tst_cd_print_report_yn,
+                   :rl_tst_cd_low_value_normal,
+                   :rl_tst_cd_high_value_normal,
+                   :rl_tst_cd_group_test_yn,
+                   :rl_tst_cd_text_block_yn,
+                   :rl_tst_cd_culture_test_yn,
+                   :rl_tst_cd_snomed_yn,
+                   :rl_tst_cd_test_units,
+                   :rl_tst_cd_no_of_decimals,
+                   :rl_tst_cd_significant_digit,
+                   :rl_tst_cd_range_cmt,
+				   :rl_tst_cd_inhibit_yn;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_TEST_CODE_CUR",0,"");
+
+    rl_tst_cd_short_desc.arr[rl_tst_cd_short_desc.len] = '\0';
+    if(strlen(rl_tst_cd_short_desc.arr) > 35)
+	rl_tst_cd_short_desc.arr[35]='\0';
+
+    rl_tst_cd_numeric_result_yn.arr[rl_tst_cd_numeric_result_yn.len] = '\0';
+    rl_tst_cd_age_sex_range_yn.arr[rl_tst_cd_age_sex_range_yn.len] = '\0';
+    rl_tst_cd_function_yn.arr[rl_tst_cd_function_yn.len] = '\0';
+    rl_tst_cd_print_report_yn.arr[rl_tst_cd_print_report_yn.len] = '\0';
+    rl_tst_cd_low_value_normal.arr[rl_tst_cd_low_value_normal.len] = '\0';
+    rl_tst_cd_high_value_normal.arr[rl_tst_cd_high_value_normal.len] = '\0';
+    rl_tst_cd_test_units.arr[rl_tst_cd_test_units.len] = '\0';
+    rl_tst_cd_group_test_yn.arr[rl_tst_cd_group_test_yn.len] = '\0';
+    rl_tst_cd_text_block_yn.arr[rl_tst_cd_text_block_yn.len] = '\0';
+    rl_tst_cd_culture_test_yn.arr[rl_tst_cd_culture_test_yn.len] = '\0';
+    rl_tst_cd_snomed_yn.arr[rl_tst_cd_snomed_yn.len] = '\0';
+    rl_tst_cd_range_cmt.arr[rl_tst_cd_range_cmt.len] = '\0';
+    rl_tst_cd_inhibit_yn.arr[rl_tst_cd_inhibit_yn.len] = '\0';
+
+    rl_tst_cd_no_of_decimals = rl_tst_cd_no_of_decimals>4?4:
+                         rl_tst_cd_no_of_decimals;
+    rl_tst_cd_significant_digit = rl_tst_cd_no_of_decimals>5?5:
+                         rl_tst_cd_significant_digit;
+
+    if (sqlca.sqlerrd[2]) tst_cd_ind = 1;
+    return (sqlca.sqlerrd[2]);
+}
+/*-----------------------------------------------------*/
+fetch_consultant()
+{
+    if (rl_hdr_episode_type.arr[0] == 'I') 
+      {
+      EXEC SQL  SELECT FULL_NAME
+		  INTO :rl_consultant_short_name
+                  FROM SY_PHYSICIAN_MAST
+                 WHERE FACILITY_ID = NVL(:rl_ordered_facility_id, :nd_operating_facility_id)
+				 AND PHYSICIAN_ID = :rl_hdr_consultant_code;
+      }
+    else if (rl_hdr_episode_type.arr[0] == 'R' || rl_hdr_episode_type.arr[0] == 'H') 
+      {
+      EXEC SQL  SELECT LONG_NAME
+		  INTO :rl_consultant_short_name
+                  FROM RL_CONSULTANTS
+                 WHERE REF_CONSULTANT_ID = :rl_hdr_consultant_code;
+      }
+    else if (rl_hdr_episode_type.arr[0] == 'O') 
+      {
+      EXEC SQL  SELECT FULL_NAME
+		  INTO :rl_consultant_short_name
+                  FROM SY_PHYSICIAN_MAST
+                  WHERE FACILITY_ID = NVL(:rl_ordered_facility_id, :nd_operating_facility_id)
+				  AND PHYSICIAN_ID = :rl_hdr_consultant_code;
+      }
+    else
+       err_mesg("Invalid Episode type in Request Header",0,"");
+	      
+    if (OERROR)
+         err_mesg("FETCH failed on CONSULTANT Master ",0,"");
+
+    rl_consultant_short_name.arr[rl_consultant_short_name.len] = '\0';
+}
+/*-----------------------------------------------------*/
+fetch_section()
+{
+    EXEC SQL OPEN RL_SECTION_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_SECTION_CUR",0,"");
+
+    rl_section_short_name.arr[0] 	= '\0';
+    rl_section_short_name.len		= 0;
+
+    EXEC SQL FETCH RL_SECTION_CUR
+              INTO :rl_section_short_name;
+
+    rl_section_short_name.arr[rl_section_short_name.len] = '\0';
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_SECTION_CUR",0,"");
+
+}
+/*-----------------------------------------------------*/
+
+fetch_age_sex_range()
+{
+
+    EXEC SQL OPEN RL_AGE_SEX_RANGE_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_AGE_SEX_RANGE_CUR",0,"");
+
+   rl_tst_range_low_val_nml.arr[0]      = '\0';
+   rl_tst_range_high_val_nml.arr[0]      = '\0';
+
+   rl_tst_range_low_val_nml.len         = 0;
+   rl_tst_range_high_val_nml.len         = 0;
+
+    EXEC SQL FETCH RL_AGE_SEX_RANGE_CUR
+              INTO :rl_tst_range_low_val_nml,
+                   :rl_tst_range_high_val_nml;
+ 
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_AGE_SEX_RANGE_CUR",0,"");
+
+   rl_tst_range_low_val_nml.arr[rl_tst_range_low_val_nml.len] = '\0';
+    rl_tst_range_high_val_nml.arr[rl_tst_range_high_val_nml.len] = '\0';
+}
+/*-----------------------------------------------------*/
+
+open_comments()
+{
+    EXEC SQL OPEN RL_COMM_FOR_TEST_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_COMM_FOR_TEST_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+fetch_comments()
+{
+
+   rl_comm_for_test_comm_text.arr[0]     = '\0';
+   rl_comm_for_test_comm_text.len        = 0;
+
+    EXEC SQL FETCH RL_COMM_FOR_TEST_CUR
+              INTO :rl_comm_for_test_comm_text;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_COMM_FOR_TEST_CUR",0,"");
+
+   rl_comm_for_test_comm_text.arr[rl_comm_for_test_comm_text.len] = '\0';
+
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+print_comment_desc1234()
+{
+  if (rl_tst_result_comment_desc1.len || rl_tst_result_comment_desc2.len ||
+     rl_tst_result_comment_desc3.len || rl_tst_result_comment_desc4.len)
+  {  
+     if(group && !group_printed)
+     {   print_group_test_desc();
+	 group_printed = 1;
+     }
+     if(test_printed)
+	 numeric_value_flag = TRUE;
+     else
+	{
+	 numeric_value_flag = FALSE;
+         fprintf(fp,"%-37.37s",test_description);
+	 test_printed = 1;
+        }
+    if (rl_tst_result_comment_desc1.len != 0)
+         print_line_check(rl_tst_result_comment_desc1.arr);
+    if (rl_tst_result_comment_desc2.len != 0)
+         print_line_check(rl_tst_result_comment_desc2.arr);
+    if (rl_tst_result_comment_desc3.len != 0)
+         print_line_check(rl_tst_result_comment_desc3.arr);
+    if (rl_tst_result_comment_desc4.len != 0)
+         print_line_check(rl_tst_result_comment_desc4.arr);
+  }
+}
+/*-----------------------------------------------------*/
+
+fetch_snomed_desc12345()
+{
+    EXEC SQL OPEN RL_SNOMED_CODE_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_SNOMED_CODE_CUR",0,"");
+
+    rl_snomed_desc1.arr[0]          = '\0';
+    rl_snomed_desc2.arr[0]          = '\0';
+    rl_snomed_desc3.arr[0]          = '\0';
+    rl_snomed_desc4.arr[0]          = '\0';
+    rl_snomed_desc5.arr[0]          = '\0';
+    rl_snomed_print_yn.arr[0]       = '\0';
+
+    rl_snomed_desc1.len             = 0;
+    rl_snomed_desc2.len             = 0;
+    rl_snomed_desc3.len             = 0;
+    rl_snomed_desc4.len             = 0;
+    rl_snomed_desc5.len             = 0;
+    rl_snomed_print_yn.len	    = 0;
+
+    EXEC SQL FETCH RL_SNOMED_CODE_CUR
+              INTO :rl_snomed_desc1,
+                   :rl_snomed_desc2,
+                   :rl_snomed_desc3,
+                   :rl_snomed_desc4,
+                   :rl_snomed_desc5,
+    		   :rl_snomed_print_yn;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_SNOMED_CODE_CUR",0,"");
+
+    rl_snomed_desc1.arr[rl_snomed_desc1.len] = '\0';
+    rl_snomed_desc2.arr[rl_snomed_desc2.len] = '\0';
+    rl_snomed_desc3.arr[rl_snomed_desc3.len] = '\0';
+    rl_snomed_desc4.arr[rl_snomed_desc4.len] = '\0';
+    rl_snomed_desc5.arr[rl_snomed_desc5.len] = '\0';
+    rl_snomed_print_yn.arr[rl_snomed_print_yn.len] = '\0';
+
+   return (sqlca.sqlerrd[2]);
+}
+/*-----------------------------------------------------*/
+print_snomed_desc12345()
+{
+  if(rl_snomed_desc1.len || rl_snomed_desc2.len||
+     rl_snomed_desc3.len || rl_snomed_desc4.len|| 
+     rl_snomed_desc5.len)
+  {
+    if(group && !group_printed)
+    {   print_group_test_desc();
+	group_printed = 1;
+    }
+    if(!test_printed)
+    {
+       fprintf(fp,"%-37.37s%c%c%c%c%c%c\n",test_description,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+       test_printed = 1;
+    }
+    if (rl_snomed_desc1.len != 0)
+    {
+         fprint_repeat(fp,' ',37);
+         fprintf(fp,"%s%c%c%c%c%c%c\n",rl_snomed_desc1.arr,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+    }
+    if (rl_snomed_desc2.len != 0)
+    {
+         fprint_repeat(fp,' ',37);
+         fprintf(fp,"%s%c%c%c%c%c%c\n",rl_snomed_desc2.arr,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+    }
+    if (rl_snomed_desc3.len != 0)
+    {
+         fprint_repeat(fp,' ',37);
+         fprintf(fp,"%s%c%c%c%c%c%c\n",rl_snomed_desc3.arr,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+    }
+    if (rl_snomed_desc4.len != 0)
+    {
+         fprint_repeat(fp,' ',37);
+         fprintf(fp,"%s%c%c%c%c%c%c\n",rl_snomed_desc4.arr,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+    }
+    if (rl_snomed_desc5.len != 0)
+    {
+         fprint_repeat(fp,' ',37);
+         fprintf(fp,"%s%c%c%c%c%c%c\n",rl_snomed_desc5.arr,
+				       rl_tst_status.arr[0],
+				       rl_tst_tech_status.arr[0],
+				       rl_tst_delta_status.arr[0],
+				       rl_tst_qlty_status.arr[0],
+				       rl_tst_cmnt_status.arr[0],
+				       rl_tst_path_status.arr[0]);
+         page_break(1);
+    }
+  }
+}
+/*-----------------------------------------------------*/
+
+fprint_repeat(l_fp,l_prn_chr,l_no)
+FILE *l_fp;
+char l_prn_chr;
+int  l_no;
+{
+   int l_i = 0;
+
+   for (l_i = 0;l_i < l_no;l_i++)
+        fputc(l_prn_chr,l_fp);
+}
+/*-----------------------------------------------------*/
+
+page_break(l_skip)
+int l_skip;
+{
+    lctr+= l_skip;
+}
+/*-----------------------------------------------------*/
+open_result_text()
+{
+    EXEC SQL OPEN RL_RESULT_TEXT_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_RESULT_TEXT_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_result_text()
+{
+    rl_res_result_text1.arr[0]  = '\0';
+    rl_res_result_text1.len     = 0;
+    rl_res_result_text2.arr[0]  = '\0';
+    rl_res_result_text2.len     = 0;
+    rl_res_result_text3.arr[0]  = '\0';
+    rl_res_result_text3.len     = 0;
+    rl_res_result_text4.arr[0]  = '\0';
+    rl_res_result_text4.len     = 0;
+    rl_res_result_text5.arr[0]  = '\0';
+    rl_res_result_text5.len     = 0;
+    rl_res_result_text6.arr[0]  = '\0';
+    rl_res_result_text6.len     = 0;
+    rl_res_result_text7.arr[0]  = '\0';
+    rl_res_result_text7.len     = 0;
+    rl_res_result_text8.arr[0]  = '\0';
+    rl_res_result_text8.len     = 0;
+    rl_res_result_text9.arr[0]  = '\0';
+    rl_res_result_text9.len     = 0;
+    rl_res_result_text10.arr[0]  = '\0';
+    rl_res_result_text10.len     = 0;
+
+    EXEC SQL FETCH RL_RESULT_TEXT_CUR
+              INTO :rl_res_result_text1,
+                   :rl_res_result_text2,
+                   :rl_res_result_text3,
+                   :rl_res_result_text4,
+                   :rl_res_result_text5,
+                   :rl_res_result_text6,
+                   :rl_res_result_text7,
+                   :rl_res_result_text8,
+                   :rl_res_result_text9,
+                   :rl_res_result_text10
+	      ;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_RESULT_TEXT_CUR",0,"");
+
+    rl_res_result_text1.arr[rl_res_result_text1.len] = '\0';
+    rl_res_result_text2.arr[rl_res_result_text2.len] = '\0';
+    rl_res_result_text3.arr[rl_res_result_text3.len] = '\0';
+    rl_res_result_text4.arr[rl_res_result_text4.len] = '\0';
+    rl_res_result_text5.arr[rl_res_result_text5.len] = '\0';
+    rl_res_result_text6.arr[rl_res_result_text6.len] = '\0';
+    rl_res_result_text7.arr[rl_res_result_text7.len] = '\0';
+    rl_res_result_text8.arr[rl_res_result_text8.len] = '\0';
+    rl_res_result_text9.arr[rl_res_result_text9.len] = '\0';
+    rl_res_result_text10.arr[rl_res_result_text10.len] = '\0';
+
+    return (LAST_ROW?0:1);
+}
+/*-----------------------------------------------------*/
+get_rl_test_result(l_test_code)
+char l_test_code[];
+{
+    test_result_found = 1;
+    strcpy(rl_loc_test_code.arr,l_test_code);
+    rl_loc_test_code.len = strlen(rl_loc_test_code.arr);
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    rl_func_value.arr[0] = '\0';
+    rl_func_value.len    = 0;
+
+    EXEC SQL SELECT NUMERIC_RESULT INTO :rl_func_value
+               FROM RL_TEST_RESULT
+              WHERE PATIENT_ID      = :nd_hosp_no
+                AND SPECIMEN_NO     = :nd_spec_no
+				AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+                AND TEST_CODE       = :rl_loc_test_code;
+
+    if(NODATAFOUND)
+    {
+       disp_message(ERR_MESG,"Error occurred at get_rl_test_result() no_data_found");
+       proc_exit();
+    }
+
+    rl_func_value.arr[rl_func_value.len] = '\0';
+
+    if(strlen(rl_func_value.arr) == 0)
+       test_result_found = 0;
+return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   disp_message(ERR_MESG,"Error occurred at get_rl_test_result()");
+   return;
+
+}
+/*-----------------------------------------------------*/
+ltrim(l_str)
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+/*-----------------------------------------------------*/
+
+rtrim(l_str)
+char *l_str;
+{
+  while (*l_str != '\0') *l_str++;
+  l_str--;
+  while (*l_str == ' ') *l_str--;
+  *(l_str+1) = '\0';
+}
+/*-----------------------------------------------------*/
+open_function_cur()
+{
+    EXEC SQL OPEN RL_FUNCTION_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor RL_FUNCTION_CUR",0,"");
+}
+/*-----------------------------------------------------*/
+
+fetch_function_cur()
+{
+    rl_func_operand_1.arr[0]          = '\0';
+    rl_func_operand_1_type.arr[0]     = '\0';
+    rl_func_operator_1.arr[0]         = '\0';
+    rl_func_operand_2.arr[0]          = '\0';
+    rl_func_operand_2_type.arr[0]     = '\0';
+    rl_func_operator_2.arr[0]         = '\0';
+
+    rl_func_operand_1.len             = 0;
+    rl_func_operand_1_type.len        = 0;
+    rl_func_operator_1.len            = 0;
+    rl_func_operand_2.len             = 0;
+    rl_func_operand_2_type.len        = 0;
+    rl_func_operator_2.len            = 0;
+
+    EXEC SQL FETCH RL_FUNCTION_CUR
+              INTO :rl_func_operand_1,
+                   :rl_func_operand_1_type,
+                   :rl_func_operator_1,
+                   :rl_func_operand_2,
+                   :rl_func_operand_2_type,
+                   :rl_func_operator_2;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor RL_FUNCTION_CUR",0,"");
+
+    rl_func_operand_1.arr[rl_func_operand_1.len]           = '\0';
+    rl_func_operand_1_type.arr[rl_func_operand_1_type.len] = '\0';
+    rl_func_operator_1.arr[rl_func_operator_1.len]         = '\0';
+    rl_func_operand_2.arr[rl_func_operand_2.len]           = '\0';
+    rl_func_operand_2_type.arr[rl_func_operand_2_type.len] = '\0';
+    rl_func_operator_2.arr[rl_func_operator_2.len]         = '\0';
+    return (LAST_ROW?0:1);
+}
+/*--------------------------------------------------------------------*/
+close_all_cur()
+{
+    EXEC SQL CLOSE RL_REQ_HDR_CUR;
+    EXEC SQL CLOSE RL_REQ_DTL_CUR;
+    EXEC SQL CLOSE RL_TEST_RESULT_CUR;
+    EXEC SQL CLOSE RL_PAT_MAST_CUR;
+    EXEC SQL CLOSE RL_SPECIMEN_TYPE_CODE_CUR;
+    EXEC SQL CLOSE RL_SECTION_CUR;
+    EXEC SQL CLOSE RL_TEST_CODE_CUR;
+    EXEC SQL CLOSE RL_AGE_SEX_RANGE_CUR;
+    EXEC SQL CLOSE RL_COMM_FOR_TEST_CUR;
+    EXEC SQL CLOSE RL_RESULT_TEXT_CUR;
+    EXEC SQL CLOSE RL_TEST_RESULT_CUR2;
+    EXEC SQL CLOSE RL_RESULT_SNOMED_CUR;
+    EXEC SQL CLOSE RL_SNOMED_CODE_CUR;
+    EXEC SQL CLOSE RL_RESULT_ORGANISM_CUR;
+    EXEC SQL CLOSE RL_RESULT_ORGANISM_DTL_CUR;
+    EXEC SQL CLOSE RL_ORGANISM_CODE_CUR;
+    EXEC SQL CLOSE RL_ANTIBIOTIC_CODE_CUR;
+    EXEC SQL CLOSE RL_PAT_MAST3_CUR;
+
+}
+/*--------- added the below on 19.02.2006 -------------------------------------*/
+get_test_units_desc_from_sy_uom(l_test_units)
+char l_test_units[];
+{
+
+   rl_tst_cd_test_units_desc.arr[0]		= '\0';      
+   rl_tst_cd_test_units_desc.len		= 0;
+
+   strcpy(rl_test_units.arr,l_test_units);
+   rl_test_units.len = strlen(rl_test_units.arr);
+
+   EXEC SQL SELECT  short_desc
+			  INTO :rl_tst_cd_test_units_desc
+		  	  FROM SY_UOM
+			 WHERE uom_code = :rl_test_units;
+
+	if (NODATAFOUND)
+	{
+		strcpy(rl_tst_cd_test_units_desc.arr,rl_test_units.arr);    
+		rl_tst_cd_test_units_desc.len = strlen(rl_tst_cd_test_units_desc.arr);
+//		rl_tst_cd_test_units_desc.arr[rl_tst_cd_test_units_desc.len]	= '\0';
+
+	}
+
+    if (OERROR)
+	{
+		strcpy(rl_tst_cd_test_units_desc.arr,rl_test_units.arr);    
+		rl_tst_cd_test_units_desc.len = strlen(rl_tst_cd_test_units_desc.arr);
+	}
+
+	rl_tst_cd_test_units_desc.arr[rl_tst_cd_test_units_desc.len]	= '\0';
+
+}
+/*------------------------------------------------------------*/

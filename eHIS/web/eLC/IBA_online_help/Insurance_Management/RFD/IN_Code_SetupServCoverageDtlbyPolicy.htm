@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>IN_Code_SetupServCoverageDtlbyPolicy</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following to set up Service and material item Coverage Detail by Policy:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The Facilities associated to the logged in user are listed. Select a Facility from the list. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a Payer Group. The description for the selected Payer Group code gets displayed. The values defined using the function Customer Groups in the Patient Billing Manager or Accounts Receivable module get listed. The Coverage percentage is applicable for the selected Payer Group. The patients associated to the selected Payer Group avail the defined percentage of coverage amount. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Payer code. The description for the selected Payer gets displayed. The values defined using the function Customer in the Patient Billing Manager or Accounts Receivable module get listed. The Payers associated to the selected Payer Group get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Policy Type. The values defined using the ‘Policy Type’ function get listed. The coverage percentage is valid for the selected Policy Type, the associated Payer Group and the Payer in the Facility. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Coverage %</span> - Enter the Coverage Percentage in numeric format of three digits maximum length. The coverage percentage indicates the percentage of Insured amount on the total bill amount which is covered by the Insurance Company for the selected Policy Type. The percentage value cannot be greater than 100.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Policy Start Date</span> – Select the check box to default the ‘Policy Start Date’ and ‘Policy Expiry Date’ for a Payer Group, Payer and Policy Type combination. The ‘Policy Start Date’ is defaulted to the system date and the ‘Policy Expiry Date’ is calculated based on the number of days mentioned in ‘Default Policy Expiry Days’. The ‘Policy Start Date’ and ‘Policy Expiry Date’ fields are defaulted when the corresponding Payer Group, Payer and Policy Type is selected while recording financial details in the following functions in respective modules. The ‘Policy Effective From’ and ‘Policy Effective To’ date is defaulted to ‘Policy Start Date’ and ‘Policy Expiry Date’ respectively.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Policy Expiry Days</span> – Enter the expiry days in numeric format of four digits maximum length. The default expiry days for a Payer Group, Payer and Policy Type combination is based on the number of days recorded from the ‘Policy Start Date’. This field is mandatory, if the check box ‘Default Policy Start Date’ is selected. You can record the number of days only if the check box ‘Default Policy Start Date’ is selected. The ‘Policy Expiry Date’ is calculated and displayed by default in the following functions when you record the Payer details. You can click the Calendar function to update the Policy Expiry Date. The ‘Policy Effective To’ date is also defaulted to the ‘Policy Expiry Date’.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<div align="center" >
+<table cellspacing="0" width="100%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr valign="top">
+<td style="border: Solid 1px #000000;width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Module</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Functions</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Outpatient Management</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Register Visit</p>
+</td>
+</tr>
+<tr valign="top">
+<td rowspan="3" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Master Patient Index</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Register Patient</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Change Patient Details</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Rapid Registration</p>
+</td>
+</tr>
+<tr valign="top">
+<td rowspan="2" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Inpatient Management</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Admit Patient</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Change Admission Details</p>
+</td>
+</tr>
+<tr valign="top">
+<td rowspan="7" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Patient Billing Manager</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details - Visit</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details – Patient</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details – Admission</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details – Patient</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Post Discharge Modify Financial Details</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Classification Excl / Future Encounters</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Re-classify / Approve Past Encounter</p>
+</td>
+</tr>
+<tr valign="top">
+<td rowspan="3" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Insurance Management</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details – Visit</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Financial Details – Admission</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Modify Admission Financial Details – Post Discharge</p>
+</td>
+</tr>
+</table>
+</div>
+<p>&#160;</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Coverage Basis</span> – Select a value from the list. The system defined values are ‘Patient’ and ‘Payer’. ‘Payer’ is displayed, by default.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Patient – Select Patient to indicate that the Patient is settling the bill amount. The patient clears the coverage percentage defined and the payer clears the remaining amount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Payer - Select Payer to indicate that the Payer is settling the bill amount. The payer clears the coverage percentage defined and the patient clears the remaining amount.</p>
+</li>
+</ol>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Coverage Rule</span> - Select a value from the list. The system defined values are ‘Sole Coverage By Payer’ and ‘Shared Coverage with other Payers’. ‘Shared Coverage with Other Payers’ is displayed, by default.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Sole Coverage by Payer – Select Sole Coverage by Payer and the selected payer clears the whole coverage percentage Insured amount on behalf of the patient.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Shared Coverage with other Payers - Select Shared Coverage with other Payers and the selected payer along with other payers clears the whole coverage Insured amount on behalf of the patient.</p>
+</li>
+</ol>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Coverage includes other Payer</span> - Select the check box to define an additional payer for the specific Policy, Payer and Payer Group. Clear the check box, if an additional payer is not required for the selected combination.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

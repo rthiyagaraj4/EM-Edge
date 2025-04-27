@@ -1,0 +1,210 @@
+package jsp_servlet._emp._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import webbeans.eCommon.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __repprintpatientlabel extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/emp/jsp/repPrintPatientLabel.jsp", 1733836738275L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n\n<html>\n<head>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../eCommon/html/";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\">\n\t<script src=\"../../eCommon/js/ValidateControl.js\" language=\"javascript\"></script>\n\t<Script language=\'javascript\' src=\'../../eCommon/js/common.js\'></Script>\n\t<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n\t\n\t<script>\n\t\tfunction query()\n\t\t{\n\t\t\tframes[1].location.href=\'../../eMP/jsp/blank.jsp?step_1=11&module_id=MP\';\n\t\t}\n\t\tfunction reset()\n\t\t{\t\t\t\n\t\t\tframes[1].location.href =\"../../eCommon/html/blank.html\" ;\n\t\t}\n\t</script>\n</head>\n";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\n</html>\n";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+	
+	private String checkForNull(String inputString)
+	{
+		return (inputString==null)	?	""	:	inputString;
+	}	
+	public static String checkForNull(String inputString, String defaultValue)
+	{
+		return(((inputString == null) || (inputString.equals("null"))) ? defaultValue : inputString);
+	}
+
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+ 
+	String sStyle = checkForNull((String)session.getAttribute("PREFERRED_STYLE"), "IeStyle.css"); 
+	request.setCharacterEncoding("UTF-8");
+	
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block6Bytes, _wl_block6);
+
+	if(request.getParameter("step").equals("1") )
+	{	
+		out.println("<html><head>");
+		String url = "../../eCommon/jsp/commonToolbar.jsp?" ;
+		String params = request.getQueryString() ;
+		String source = url + params ;		
+		out.println("</head><iframe name='commontoolbarFrame' id='commontoolbarFrame'	src='"+source+"' frameborder=0 scrolling='no' noresize style='height:8vh;width:100vw'></iframe><iframe name='f_query_add_mod' id='f_query_add_mod' src='../../eMP/jsp/blank.jsp?step_1=11' frameborder=0 scrolling='auto' style='height:83vh;width:100vw'></iframe><iframe name='messageFrame' id='messageFrame' src='../../eCommon/jsp/error.jsp' frameborder=0 noresize scrolling='auto' style='height:9vh;width:100vw'></iframe></html>");
+	}
+	else if(request.getParameter("step").equals("2"))
+	{		
+		String patient_id	=  request.getParameter("patient_ID");
+		String module_id	= request.getParameter("module_id");
+		String facility_id	= (String)session.getValue("facility_id");
+		String pat_ser_grp_code		= "";		
+		String sqlString			= "";		
+		Connection con			= null;
+		java.sql.Statement stmt	= null;
+		ResultSet rset			= null;	
+		try
+		{
+			con		= ConnectionManager.getConnection(request);
+			stmt	= con.createStatement();
+			rset	= stmt.executeQuery("SELECT pat_ser_grp_code FROM MP_PATIENT where patient_id = '"+patient_id+"'") ;			
+			if (rset.next())
+			{
+				pat_ser_grp_code = rset.getString(1);				
+			}
+			if(rset!=null) rset.close();
+			if(stmt!=null) stmt.close();					
+			
+			sqlString ="SELECT DISTINCT a.report_id, b.report_desc, 1 no_of_copies, b.module_id FROM mp_online_reports a, sm_report_lang_vw b,sm_print_routing c WHERE a.pat_ser_grp_code = '"+pat_ser_grp_code+"' AND b.report_id = a.report_id AND a.report_id =c.report_id (+) AND c.facility_id(+) ='"+facility_id+"' AND a.report_id = 'MPBPTLBL'";			
+		
+			String reportParamNames		= "p_patient_id";
+			String reportParamValues	= ""+patient_id+"";
+			StringBuffer htmlFor = null;			
+			htmlFor = new StringBuffer();
+			htmlFor.append(" <html><head> <link rel='stylesheet' type ='text/css' href='../../eCommon/html/"+sStyle+"'></link>");
+			htmlFor.append(" </head><body class='message' onKeyDown='lockKey()'>");
+			htmlFor.append(" <script language = 'JavaScript'>");
+			htmlFor.append("async function showInternalReports() { ");
+			htmlFor.append(" var dialogHeight = '450px' ;");
+			htmlFor.append(" var dialogWidth = '800px' ;");
+			htmlFor.append(" var dialogTop = '65' ;");
+			htmlFor.append(" var arguments = ''; ");
+			// modified the below line by Abirami - Bru-HIMS-CRF-313 / Passing function id in the below Query String.
+			htmlFor.append(" var getUrl =  '../../eCommon/jsp/InternalReportsPrint.jsp?P_function_id=MPBPTLBL&step=1&sqlString="+java.net.URLEncoder.encode(sqlString)+"&Patient_ID="+patient_id+"&reportParamNames="+reportParamNames+"&reportParamValues="+reportParamValues+"';");
+			htmlFor.append(" var features = 'dialogTop:'+ dialogTop +'; dialogHeight:' + dialogHeight + '; dialogWidth:' + dialogWidth +'; status=no;' ;");
+			htmlFor.append(" var retVal = await window.showModalDialog(getUrl,arguments,features); ");
+			htmlFor.append(" window.location.href='../../eMP/jsp/blank.jsp?step_1=11&module_id="+module_id+"'; ");
+			htmlFor.append(" } showInternalReports(); </script>");
+			out.println(htmlFor.toString());
+		
+			if(htmlFor != null && htmlFor.length() > 0)
+			{
+				htmlFor.delete(0,htmlFor.length());
+			}
+			// commented by marwan and inserted in the showInternalReports function 
+			// to allow the two pop-ups to open sequentially not at the same time
+			//out.println("<script>window.location.href='../../eMP/jsp/blank.jsp?step_1=11&module_id="+module_id+"';</script></body></html>");	
+		}
+		catch(Exception e) 
+		{
+			out.println("Error here");
+		}
+		finally
+		{
+			if(con!=null) ConnectionManager.returnConnection(con,request);
+		}
+	}
+
+            _bw.write(_wl_block7Bytes, _wl_block7);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

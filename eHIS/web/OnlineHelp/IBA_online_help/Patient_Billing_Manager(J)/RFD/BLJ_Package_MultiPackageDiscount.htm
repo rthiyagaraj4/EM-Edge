@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BLJ_Package_MultiPackageDiscount</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Facility</u></span> – Select the Facility from drop down. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Billing Group</u></span> – Select the Billing Group using lookup function. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Payer Group</u></span> - Select the Payer Group using lookup function. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Payer</u></span> - Select the Payer using lookup function. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Policy</u></span> - Select the Policy using lookup function. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Valid [From-To]</u></span> – Select the date range using calendar function. The valid from date is greater than current date. Valid To date is equal or greater than current date / Valid from date. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Applicable for</u></span> – Select the Applicable for from drop down. The listed values are Only High Cost Package, Only Low Cost Package and All Packages except high cost.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If you select Only High Cost Package value, the system consider the discount for high cost package only. The system calculates discount based on the value defined in multi package discount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the value ‘Only low cost package’ is selected, the system considers the discount for low cost package only . The system calculates discount the low cost package based on the value defined in multi package discount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If ‘All packages except high cost package’ is selected, the system considers discount for all packages except the high cost package. The system calculates discount for low cost packages based on the value defined in multi package discount.</p>
+</li>
+</ol>
+<p class="BoldRFD">Allow</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Allow Multi Package Discount</u></span> – Select this checkbox to calculate multi package discount as per the setup enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Allow package discount</u></span> – Select this checkbox to calculate the package discount as per the setup enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Allow adhoc discount</u></span> – Select this checkbox to calculate the adhoc discount as per the setup enabled.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />New setup multiple package discount is applicable only for the current encounter. The Post multi package discount, discount amount are displayed in Bill cum receipt / Discharge bill cum receipt / Intermediate draft report/ Bills. Gross, Discount and Net amount are displayed correctly. Multi package discount are displayed across BL functions similar to base package discount / customer discount / Package adhoc discount.</p>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <windows.h>
+//#include "sqlproto.h"
+
+EXEC SQL BEGIN DECLARE SECTION;
+     VARCHAR    ora_role_password[201];			  
+     VARCHAR  msg_id[9];
+	 VARCHAR  msg_text[100];
+	 int      ora_role_pwd_len=0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+    
+void set_meduser_role();
+
+void set_meduser_role()
+{
+  ora_role_password.arr[0] = '\0';  
+  ora_role_password.len = 0;    
+
+  
+  EXEC SQL SELECT ORA_ROLE_PASSWORD, NVL(length(ORA_ROLE_PASSWORD),0) INTO :ora_role_password,:ora_role_pwd_len 
+		FROM SM_ORA_ROLE 
+		Where ORA_ROLE_ID = 'MEDUSERS';
+
+  if (ora_role_pwd_len > 0)
+  {
+	EXEC SQL EXECUTE   
+	BEGIN    
+		SELECT APP_PASSWORD.DECRYPT(:ora_role_password) 
+		INTO :ora_role_password
+		FROM DUAL;
+		
+		DBMS_SESSION.SET_ROLE('MEDUSERS' || ' IDENTIFIED BY ' || :ora_role_password) ;
+	END;
+	END-EXEC;
+  }
+  else
+  {
+	EXEC SQL EXECUTE   
+	BEGIN    
+		DBMS_SESSION.SET_ROLE('MEDUSERS') ;
+	END;
+	END-EXEC;
+  } 
+}
+
+
+

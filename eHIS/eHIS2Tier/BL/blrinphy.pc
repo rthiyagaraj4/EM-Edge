@@ -1,0 +1,848 @@
+/*****************************************************************************/
+/* PROGRAM      : 	 BLRINPHY.PC                 			                 */
+/*	                                                                         */
+/* MODIFIED 	 :   PVSS Prasad/21-JUL-97			                         */
+/*****************************************************************************/
+  
+#define REP_WIDTH 80
+                         
+#include <stdio.h>
+#include <string.h>
+#include <bl.h>
+         
+EXEC SQL BEGIN DECLARE SECTION; 
+
+    VARCHAR uid_pwd						[91],
+		    d_session_id				[16],
+		    d_pgm_date					[14],
+            rep_date					[20],
+            comp_name					[50],
+            oper_id						[21],
+		    d_pgm_id					[10],
+			l_pk_value					[100],
+			l_translated_value			[201],
+			p_language_id				[3],
+			nd_facility_id				[3];
+
+    VARCHAR nd_fm_trans_date           [11],
+            nd_to_trans_date           [11],
+            
+            nd_fm_phy_id	           [16],
+            nd_to_phy_id 	           [16],
+            
+            nd_fm_prt_grp_hdr          [3],
+            nd_to_prt_grp_hdr          [3],
+
+            nd_fm_prt_grp_hdr_1        [3],
+            nd_to_prt_grp_hdr_1        [3],
+            
+            nd_fm_prt_grp_line         [3],
+            nd_to_prt_grp_line         [3],
+            nd_fm_income               [2],
+            nd_to_income               [2],
+            nd_report_type             [2],
+			nd_operating_facility_id   [3],
+			d_operating_facility_id    [3],
+			nd_fr_facility             [3],
+			nd_to_facility             [3];
+            
+    VARCHAR d_short_name               [16],  
+            d_phy_id                   [16],
+            d_episode_type             [2],
+            d_prt_grp_hdr_code         [3],
+            d_prt_grp_hdr_line_code    [6];
+
+    VARCHAR d_prev_phy_id	           [16],
+            d_prev_grp_hdr_code        [3],
+            d_prev_grp_hdr_line_code   [7];
+
+    VARCHAR d_prt_grp_line_desc        [16];
+
+   double   d_net_charge_amt;
+
+   int i;
+	
+	char g_facility_id[3];
+
+    char filename[150];
+	char x_msg[200];
+	char loc_legend[999][201];
+	char l_mesg[200];
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+int page_no = 0,
+    line_no,
+    first_line,
+    g_count;
+
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1];
+
+double inpatient_line_tot =0,
+       outpatient_line_tot =0,
+       combined_line_tot =0,
+       inpatient_tot,
+       outpatient_tot,
+       combined_tot,
+       g_inpatient_tot =0,
+       g_outpatient_tot=0,
+       g_combined_tot  =0;
+       
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+    if(argc < 5) {
+        disp_message(ERR_MESG,"BLRTRSUM : Usage BLRTRSUM userid/password session_id pgm_date facility_id \n");
+        proc_exit();
+    }
+
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+	strcpy(nd_facility_id.arr,argv[4]);
+    nd_facility_id.len = strlen(nd_facility_id.arr);
+    strcpy(g_facility_id,nd_facility_id.arr);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+		disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		proc_exit();
+    }
+
+
+    set_meduser_role();
+
+	strcpy(p_language_id.arr,l_language_id.arr);
+
+    nd_fm_trans_date.arr[0]    = '\0';
+    nd_to_trans_date.arr[0]    = '\0';
+
+    nd_fm_phy_id.arr[0]   	   = '\0';
+    nd_to_phy_id.arr[0]    	   = '\0';
+                               
+    nd_fm_prt_grp_hdr.arr[0]   = '\0';
+    nd_to_prt_grp_hdr.arr[0]   = '\0';
+                              
+    nd_fm_prt_grp_hdr_1.arr[0] = '\0';
+    nd_to_prt_grp_hdr_1.arr[0] = '\0';
+    
+    nd_fm_prt_grp_line.arr[0]  = '\0';
+    nd_to_prt_grp_line.arr[0]  = '\0';     
+    
+    nd_fm_income.arr[0]        = '\0';
+    nd_to_income.arr[0]        = '\0';
+    
+    nd_report_type.arr[0]      = '\0';
+    
+ 	EXEC SQL SELECT OPERATING_FACILITY_ID,
+					PARAM1,
+					PARAM2,
+					PARAM3,
+					PARAM4,
+					PARAM5,
+					PARAM6,
+					PARAM7,
+					PARAM8,
+					PARAM9,
+					PARAM10,
+					PARAM11,
+					PARAM12,
+					PARAM13,
+					PARAM14,
+					PARAM15
+			 INTO   :nd_operating_facility_id,
+			        :nd_fm_trans_date,
+	                :nd_to_trans_date,
+	                :nd_fm_phy_id,
+	                :nd_to_phy_id,
+	                :nd_fm_prt_grp_hdr,
+                    :nd_to_prt_grp_hdr,
+                    :nd_fm_prt_grp_hdr_1,
+    		        :nd_to_prt_grp_hdr_1,
+		            :nd_fm_prt_grp_line,
+            		:nd_to_prt_grp_line,
+            		:nd_report_type,
+            		:nd_fm_income,
+            		:nd_to_income,
+					:nd_fr_facility,
+					:nd_to_facility
+     		 FROM   SY_PROG_PARAM
+			 WHERE  PGM_ID     = 'BLRINPHY'
+			 AND    PGM_DATE   = :d_pgm_date
+			 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    nd_fm_trans_date.arr[nd_fm_trans_date.len]       = '\0';
+    nd_to_trans_date.arr[nd_to_trans_date.len]       = '\0';
+    
+    nd_fm_income.arr[nd_fm_income.len]				 = '\0';
+    nd_to_income.arr[nd_to_income.len]				 = '\0';
+    
+    nd_fm_phy_id.arr[nd_fm_phy_id.len] 		         = '\0';
+    nd_to_phy_id.arr[nd_to_phy_id.len]		         = '\0';
+                               
+    nd_fm_prt_grp_hdr.arr[nd_fm_prt_grp_hdr.len]     = '\0';
+    nd_to_prt_grp_hdr.arr[nd_to_prt_grp_hdr.len]     = '\0';
+                              
+    nd_fm_prt_grp_hdr_1.arr[nd_fm_prt_grp_hdr_1.len] = '\0';
+    nd_to_prt_grp_hdr_1.arr[nd_to_prt_grp_hdr_1.len] = '\0';
+    
+    nd_fm_prt_grp_line.arr[nd_fm_prt_grp_line.len]   = '\0';
+    nd_to_prt_grp_line.arr[nd_to_prt_grp_line.len]   = '\0';
+
+    nd_report_type.arr[nd_report_type.len] 	         = '\0';
+
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrinphy.lis");
+	strcpy(g_facility_id, nd_operating_facility_id.arr);
+
+    if((f1=fopen(filename,"w")) == NULL) 
+      {
+       disp_message(ERR_MESG,"Error in opening output file...\n");
+       proc_exit();
+      }
+
+    EXEC SQL SELECT ACCOUNTING_NAME,
+				    TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+		     INTO   :comp_name,
+				    :rep_date,
+				    :oper_id
+		     FROM   SY_ACC_ENTITY
+			 WHERE  ACC_ENTITY_ID = :nd_operating_facility_id;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len]   = '\0';
+    oper_id.arr[oper_id.len]     = '\0';
+
+    line_no=1;
+
+    decl_curs();
+
+	fetch_legend_value();
+
+    do_report();
+
+    fclose(f1);
+
+    del_parm();
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+}
+
+/*****************************************************************/
+del_parm()
+{
+
+    EXEC SQL DELETE SY_PROG_PARAM
+	         WHERE  PGM_ID     = 'BLRINPHY' 
+	         AND    PGM_DATE   = :d_pgm_date
+	         AND    SESSION_ID = :d_session_id;
+
+    if(OERROR) 
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+}
+/*****************************************************************/
+decl_curs()  
+{
+    EXEC SQL DECLARE TRANS_LIST_CUR CURSOR FOR
+          SELECT A.OPERATING_FACILITY_ID,
+		         A.EPISODE_TYPE, 
+                 D.SHORT_NAME,	    
+                 D.PHYSICIAN_ID,
+			     A.PRT_GRP_HDR_CODE, 
+			     A.PRT_GRP_HDR_CODE || ' ' || A.PRT_GRP_LINE_CODE,
+			     SUM(NVL(A.ORG_NET_CHARGE_AMT,0)) 
+	      FROM   BL_PATIENT_CHARGES_FOLIO A,BL_BLNG_PRT_GRP_HDR C, 
+	             SY_PHYSICIAN_MAST D
+		WHERE   (NVL(A.PACKAGE_IND,'X') = 'S' 
+				         OR 
+				( AVAILED_IND IN('U','Y') )
+				 //( NVL(PACKAGE_TRX_IND,'X')  = 'N' AND 
+		           //NVL(PACKAGE_IND,'X')      = 'P' AND 
+			       //NVL(INS_PKG_PAT_IND,'X')  = 'K')
+				)           
+          AND    A.TRX_FINALIZE_IND 	= 'Y'       
+          AND    A.PHYSICIAN_ID         = D.PHYSICIAN_ID 
+          AND    A.PRT_GRP_HDR_CODE     = C.PRT_GRP_HDR_CODE
+          AND    TRUNC(A.TRX_DATE)  BETWEEN
+	             TO_DATE(NVL(:nd_fm_trans_date,'01/01/1000'),'DD/MM/YYYY')
+		  AND    TO_DATE(NVL(:nd_to_trans_date,'01/01/3000'),'DD/MM/YYYY')
+	      AND    A.PHYSICIAN_ID     BETWEEN
+	             NVL(:nd_fm_phy_id,'!!!!!!')
+		  AND    NVL(:nd_to_phy_id,'~~~~~~')
+	      AND    A.PRT_GRP_HDR_CODE BETWEEN
+	             NVL(:nd_fm_prt_grp_hdr,'!!')
+		  AND    NVL(:nd_to_prt_grp_hdr,'~~')
+	      AND    A.PRT_GRP_HDR_CODE BETWEEN
+	             NVL(:nd_fm_prt_grp_hdr_1,'!!')
+		  AND    NVL(:nd_to_prt_grp_hdr_1,'~~')
+	      AND    A.PRT_GRP_LINE_CODE BETWEEN
+	             NVL(:nd_fm_prt_grp_line,'!!')
+    	  AND    NVL(:nd_to_prt_grp_line,'~~') 
+	      AND    NVL(C.INCOME_YN,'N')
+          BETWEEN  :nd_fm_income 
+          AND      :nd_to_income
+		  AND    A.OPERATING_FACILITY_ID BETWEEN NVL(:nd_fr_facility, A.OPERATING_FACILITY_ID)
+		                               AND     NVL(:nd_to_facility, A.OPERATING_FACILITY_ID)
+          GROUP BY A.OPERATING_FACILITY_ID, D.SHORT_NAME,D.PHYSICIAN_ID,A.PRT_GRP_HDR_CODE,A.PRT_GRP_LINE_CODE,A.EPISODE_TYPE 
+          ORDER BY D.SHORT_NAME,D.PHYSICIAN_ID,A.PRT_GRP_HDR_CODE,A.PRT_GRP_LINE_CODE,A.EPISODE_TYPE ;
+    
+    
+    EXEC SQL DECLARE PRT_GRP_LINE_CUR CURSOR FOR
+		     SELECT  SHORT_DESC 
+		     FROM    BL_BLNG_PRT_GRP_HDR
+		     WHERE   PRT_GRP_HDR_CODE  = :d_prev_grp_hdr_code;
+
+    EXEC SQL DECLARE PRT_GRP_HDR_LINE_CUR CURSOR FOR
+		     SELECT  SHORT_DESC 
+		     FROM    BL_BLNG_PRT_GRP_LINE
+		     WHERE   PRT_GRP_HDR_CODE  =
+		             substr(:d_prev_grp_hdr_line_code,1,instr(:d_prev_grp_hdr_line_code,' ',1) -1)
+		     AND     PRT_GRP_LINE_CODE = substr(:d_prev_grp_hdr_line_code,instr(:d_prev_grp_hdr_line_code,' ',1)+1);       
+		     
+   EXEC SQL OPEN TRANS_LIST_CUR;
+
+   if(OERROR)
+	err_mesg("OPEN failed on cursor TRANS_LIST_CUR",0,"");
+}
+
+/*****************************************************************/
+
+do_report()
+{
+    int cnt,hdr_cnt,first;
+    hdr_cnt = 0;
+    line_no = 1;
+    g_count = 1;
+    init_prev_values();
+    init_phy_totals();
+    first = 1;
+    form_hdr();
+    while(fetch_trans_list())
+     {
+   	  if(phy_brk()) { 
+	    if(!first) {
+          print_rec();
+          print_phy_totals(); 
+          calculate_g_phy_tot();
+          init_phy_totals();
+          init_line_amt();
+          fprintf(f1,"");
+          form_hdr();
+          put_col_heading();
+          init_grp_values();
+          first = 1;
+          //++page_no;
+	      }
+	     else
+           put_col_heading();
+	    } 
+
+	  /*** Print Based on the group type ***/
+	  if(strcmp(nd_report_type.arr,"G") == 0) {    
+	     if(prt_grp_brk()) {
+	        if (!first) {
+               print_rec();
+               init_grp_values();
+               init_line_amt();
+             } 
+          }       
+       }    
+      else
+       if(prt_grp_brk()) {
+          if (!first) {
+             print_rec();
+             init_grp_values();
+             init_line_amt();
+           } 
+         }  
+
+      calculate_amt();         
+      calculate_phy_tot();
+         
+      copy_val();
+      copy_grp_val();
+      first = 0;
+	  hdr_cnt = 1;
+	  chk_break(9);
+    }                 /* end of while fetch trans list */
+
+    if(hdr_cnt) {
+    print_rec();
+	print_phy_totals();  
+	calculate_g_phy_tot();
+	print_grand_totals();
+    print_end_of_rep();
+    }
+}
+/*****************************************************************/
+calculate_amt()
+{                                                            
+ if(strcmp(d_episode_type.arr,"I") == 0 || strcmp(d_episode_type.arr,"D") == 0  )
+   inpatient_line_tot = inpatient_line_tot  + d_net_charge_amt;
+ else if(strcmp(d_episode_type.arr,"O") == 0 || strcmp(d_episode_type.arr,"E") == 0 )
+   outpatient_line_tot = outpatient_line_tot  + d_net_charge_amt;
+ combined_line_tot     = inpatient_line_tot + outpatient_line_tot;
+}
+/*****************************************************************/
+calculate_phy_tot()
+{                                                            
+ if(strcmp(d_episode_type.arr,"I") == 0 || strcmp(d_episode_type.arr,"D") == 0 )
+   inpatient_tot = inpatient_tot  + d_net_charge_amt;
+ else if(strcmp(d_episode_type.arr,"O") == 0 || strcmp(d_episode_type.arr,"E") == 0 ) 
+   outpatient_tot = outpatient_tot  + d_net_charge_amt;
+ combined_tot   = inpatient_tot + outpatient_tot;
+}
+/******************************************************************/
+calculate_g_phy_tot()
+{                                                            
+   g_inpatient_tot   = g_inpatient_tot    + inpatient_tot;
+   g_outpatient_tot  = g_outpatient_tot  + outpatient_tot;
+   g_combined_tot    = g_inpatient_tot + g_outpatient_tot;
+}
+/*****************************************************************/
+print_rec()
+{
+   char s_net_amt[20], s_gross_amt[20], s_disc_amt[20];
+
+   print_formated(s_net_amt,     inpatient_line_tot);
+   print_formated(s_gross_amt,   outpatient_line_tot);
+   print_formated(s_disc_amt,    combined_line_tot);
+   
+   chk_break(1);
+
+   if(strcmp(nd_report_type.arr,"G") == 0){     
+      fetch_prt_line_desc();
+      fprintf(f1,"%-2s %-2s  %-15s            %14s  %14s %14s\n",
+        		d_operating_facility_id.arr,d_prev_grp_hdr_code.arr,d_prt_grp_line_desc.arr,
+		        s_net_amt,s_gross_amt,s_disc_amt);
+     }		        
+   else  
+     {                   
+      fetch_prt_hdr_line_desc(); 
+      fprintf(f1,"%-2s %-5s  %-15s         %14s  %14s %14s\n",
+        		d_operating_facility_id.arr,d_prev_grp_hdr_line_code.arr,d_prt_grp_line_desc.arr,
+		        s_net_amt,s_gross_amt,s_disc_amt);
+	 }	        
+   		        
+   line_no ++;
+}
+/*****************************************************************/
+print_phy_totals()
+{
+ char  s_net_amt[20], s_gross_amt[20], s_disc_amt[20];
+
+ print_formated(s_net_amt,   inpatient_tot);
+ print_formated(s_gross_amt, outpatient_tot);
+ print_formated(s_disc_amt,  combined_tot);
+ chk_break(3);                         
+ fprintf(f1,"                              --------------------------------------------------\n");
+ fprintf(f1,"                                  %14s  %14s %14s\n",s_net_amt,s_gross_amt,s_disc_amt);
+ fprintf(f1,"                              ==================================================\n\n\n");
+
+ line_no += 6;
+}
+
+/*****************************************************************/
+print_grand_totals()
+{
+ char s_net_amt[20], s_gross_amt[20], s_disc_amt[20];
+
+ print_formated(s_net_amt,   g_inpatient_tot);
+ print_formated(s_gross_amt, g_outpatient_tot);
+ print_formated(s_disc_amt,  g_combined_tot);
+
+ fprintf(f1,"");
+ line_no = 1;
+ form_hdr();
+
+ fprintf(f1,"\n\n\n\n\n"); 
+ fprintf(f1,"                                      %3s %s %3s       %3s %s %3s          %5s\n",loc_legend[220],"&",loc_legend[230],loc_legend[240],"&",loc_legend[250],loc_legend[260]);
+ fprintf(f1,"                              --------------------------------------------------\n");
+ fprintf(f1,"      %11s                 %14s  %14s %14s\n",loc_legend[270],s_net_amt,s_gross_amt,s_disc_amt);
+ fprintf(f1,"                              ==================================================\n\n\n");
+ 
+ line_no += 4;
+}
+/*****************************************************************/
+fetch_trans_list()
+{ 
+    d_episode_type.arr[0]  		    = '\0';
+    d_prt_grp_hdr_code.arr[0]       = '\0';
+    d_prt_grp_hdr_line_code.arr[0]  = '\0';
+    d_short_name.arr[0]		        = '\0';
+    d_phy_id.arr[0]                 = '\0';
+    
+    d_episode_type.len     			= 0;
+    d_prt_grp_hdr_code.len      	= 0;
+    d_prt_grp_hdr_line_code.len     = 0;
+    d_short_name.len                = 0;
+    d_phy_id.len				    = 0;
+    
+    d_net_charge_amt 	      		= 0;
+    
+
+    EXEC SQL FETCH TRANS_LIST_CUR INTO
+                   :d_operating_facility_id,
+				   :d_episode_type,
+                   :d_short_name, 
+                   :d_phy_id,
+                   :d_prt_grp_hdr_code,
+                   :d_prt_grp_hdr_line_code,
+				   :d_net_charge_amt;
+
+    
+    if(OERROR)
+	err_mesg("FETCH failed on cursor TRANS_LIST_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+
+    d_episode_type.arr[d_episode_type.len]                    = '\0';
+    d_short_name.arr[d_short_name.len]						  = '\0';
+    d_phy_id.arr[d_phy_id.len]								  = '\0';
+    d_prt_grp_hdr_code.arr[d_prt_grp_hdr_code.len]            = '\0';
+    d_prt_grp_hdr_line_code.arr[d_prt_grp_hdr_line_code.len]  = '\0';
+    return 1;
+
+}
+/*****************************************************************/
+fetch_prt_line_desc()
+{
+    d_prt_grp_line_desc.arr[0]  = '\0';
+    d_prt_grp_line_desc.len     = 0;
+
+    EXEC SQL OPEN PRT_GRP_LINE_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor PRT_GRP_LINE_CUR",0,"");
+
+    EXEC SQL FETCH PRT_GRP_LINE_CUR
+    	     INTO  :d_prt_grp_line_desc;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor PRT_GRP_LINE_CUR",0,"");
+
+    d_prt_grp_line_desc.arr[d_prt_grp_line_desc.len]  = '\0';
+}
+/*****************************************************************/
+fetch_prt_hdr_line_desc()
+{
+    d_prt_grp_line_desc.arr[0]  = '\0';
+    d_prt_grp_line_desc.len     = 0;
+
+    EXEC SQL OPEN PRT_GRP_HDR_LINE_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor PRT_GRP_LINE_CUR",0,"");
+
+    EXEC SQL FETCH PRT_GRP_HDR_LINE_CUR
+    	     INTO  :d_prt_grp_line_desc;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor PRT_GRP_LINE_CUR",0,"");
+
+    d_prt_grp_line_desc.arr[d_prt_grp_line_desc.len]  = '\0';
+}
+/*****************************************************************/
+put_col_heading()
+{
+    fprintf(f1,"\n\n%6s : %-15s    %-6s",loc_legend[280], d_short_name.arr,d_phy_id.arr);
+    fprintf(f1,"\n\n");
+    fprintf(f1,"%5s  %15s                %3s %s %3s       %3s %s %3s          %s\n\n",loc_legend[200],loc_legend[210],loc_legend[220],"&",loc_legend[230],loc_legend[240],"&",loc_legend[250],loc_legend[260]);
+    
+    line_no=9;
+} 
+/*****************************************************************/
+chk_break(nol)
+int nol;
+{
+	if(line_no+nol >= 55) {
+      fprintf(f1,"");
+      line_no = 1;
+      g_count = 1;
+	  form_hdr();
+	  put_col_heading();
+     }
+}
+/*****************************************************************/
+print_end_of_rep()
+{
+    fprintf(f1,"\n\n                       ** END OF REPORT **\n");
+}
+/*****************************************************************/
+init_prev_values()
+{
+  d_prev_phy_id.arr[0]  = '\0';
+  d_prev_phy_id.len     = 0;
+}
+/*****************************************************************/
+copy_val()
+{
+  strcpy(d_prev_phy_id.arr,d_phy_id.arr);
+  d_prev_phy_id.len = strlen(d_prev_phy_id.arr);
+}
+
+/*****************************************************************/
+copy_grp_val()
+{ 
+if (strcmp(nd_report_type.arr,"G") ==  0) {
+  strcpy(d_prev_grp_hdr_code.arr,d_prt_grp_hdr_code.arr);
+  d_prev_grp_hdr_code.len = strlen(d_prt_grp_hdr_code.arr);  
+  }
+else 
+  {
+  strcpy(d_prev_grp_hdr_line_code.arr,d_prt_grp_hdr_line_code.arr);
+  d_prev_grp_hdr_line_code.len = strlen(d_prt_grp_hdr_line_code.arr);
+  } 
+}
+/*****************************************************************/
+prt_grp_brk()
+{ 
+ if(strcmp(nd_report_type.arr,"G") == 0)     
+   return (strcmp(d_prev_grp_hdr_code.arr,d_prt_grp_hdr_code.arr));
+ else
+   return (strcmp(d_prev_grp_hdr_line_code.arr,d_prt_grp_hdr_line_code.arr));
+}
+/*****************************************************************/
+init_grp_values()
+{
+  d_prev_grp_hdr_code.arr[0]       = '\0';
+  d_prev_grp_hdr_code.len          = 0;
+  d_prev_grp_hdr_line_code.arr[0]  = '\0';
+  d_prev_grp_hdr_line_code.len    = 0;
+}
+/*****************************************************************/
+phy_brk()
+{
+  return (strcmp(d_prev_phy_id.arr,d_phy_id.arr));
+}
+/*****************************************************************/
+init_line_amt()
+{
+  inpatient_line_tot    = 0;
+  outpatient_line_tot   = 0;
+  combined_line_tot     = 0;
+}
+/*****************************************************************/
+
+init_phy_totals()
+{
+  inpatient_tot    = 0;
+  outpatient_tot   = 0;
+  combined_tot     = 0;
+}
+/*****************************************************************/
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+  if(l_amt < 0){
+     put_val(s_amt,-l_amt);
+     format_amt(s_amt);
+     strcat(s_amt,"-");
+   }
+ else {
+       put_val(s_amt,l_amt);
+       format_amt(s_amt);
+       strcat(s_amt," ");
+    }
+}
+/*****************************************************************/
+form_hdr()
+{
+
+    static int first = 1;
+    char buf[17];
+    char ctmp[50];
+    int col;
+    char fm_phy_id     [20];
+    char to_phy_id     [20];
+    char fm_prt_hdr    [20];
+    char to_prt_hdr    [20];
+    char fm_prt_hdr_1  [20];
+    char to_prt_hdr_1  [20];
+    char fm_prt_line   [20];
+    char to_prt_line   [20];
+    char income_type   [20];
+
+  if(strcmp(nd_fm_phy_id.arr,"!!!!!!") == 0)
+    strcpy(fm_phy_id,loc_legend[190]);
+  else 
+    strcpy(fm_phy_id, nd_fm_phy_id.arr);      
+      
+  if(strcmp(nd_to_phy_id.arr,"~~~~~~") == 0)
+    strcpy(to_phy_id,loc_legend[180]);
+  else 
+    strcpy(to_phy_id, nd_to_phy_id.arr);
+          
+
+  if(strcmp(nd_fm_prt_grp_hdr.arr,"!!") == 0)
+    strcpy(fm_prt_hdr,loc_legend[190]);
+  else 
+    strcpy(fm_prt_hdr, nd_fm_prt_grp_hdr.arr); 
+    
+  if(strcmp(nd_to_prt_grp_hdr.arr,"~~") == 0)
+    strcpy(to_prt_hdr,loc_legend[180]);
+  else 
+    strcpy(to_prt_hdr, nd_to_prt_grp_hdr.arr);
+    
+
+  if(strcmp(nd_fm_prt_grp_hdr_1.arr,"!!") == 0)
+    strcpy(fm_prt_hdr_1, "");
+  else 
+    strcpy(fm_prt_hdr_1, nd_fm_prt_grp_hdr_1.arr); 
+    
+  if(strcmp(nd_to_prt_grp_hdr_1.arr,"~~") == 0)
+    strcpy(to_prt_hdr_1, "");
+  else 
+    strcpy(to_prt_hdr_1, nd_to_prt_grp_hdr_1.arr);
+    
+    
+  if(strcmp(nd_fm_prt_grp_line.arr,"!!") == 0)
+    strcpy(fm_prt_line, "");
+  else 
+    strcpy(fm_prt_line, nd_fm_prt_grp_line.arr); 
+    
+  if(strcmp(nd_to_prt_grp_line.arr,"~~") == 0)
+    strcpy(to_prt_line, "");
+  else 
+    strcpy(to_prt_line, nd_to_prt_grp_line.arr);
+    
+  if(strcmp(nd_fm_income.arr,"!") == 0)
+    strcpy(income_type,loc_legend[140]);
+  else if (strcmp(nd_fm_income.arr,"Y") == 0)
+    strcpy(income_type,loc_legend[160]);
+  else  
+    strcpy(income_type,loc_legend[170]);
+    
+                 
+   ++page_no;
+   if(first) {
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+
+        strcpy(hdr_line1,"MDL : ");
+		strcat(hdr_line1,loc_legend[150]);
+        col = (int)(REP_WIDTH-strlen(comp_name.arr))/2;
+        strncpy(hdr_line1+col,comp_name.arr,strlen(comp_name.arr));
+        col = (REP_WIDTH-strlen(rep_date.arr));
+        strcpy(hdr_line1+col,rep_date.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,oper_id.arr);
+
+	first = 0;
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strcpy(hdr_line3,"REP : ");
+	strcat(hdr_line3,loc_legend[40]);
+    col = (int)(REP_WIDTH-strlen(loc_legend[50]))/2;
+    strncpy(hdr_line3+col,loc_legend[50],strlen(loc_legend[50]));
+    sprintf(buf,"%4s :      %4d",loc_legend[30],page_no);
+    strcpy(hdr_line3+(REP_WIDTH-16),buf);
+
+    fprintf(f1,"\n\n\n\n\n%s\n",hdr_line1);
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3); 
+ 
+    memset(hdr_line4,' ',REP_WIDTH+1);
+    sprintf(ctmp,"%14s : %s %2s %s",loc_legend[80],nd_fm_trans_date.arr,loc_legend[70],
+                  nd_to_trans_date.arr);
+    col = (int)(REP_WIDTH-strlen(ctmp))/2;
+    strncpy(hdr_line4+col,ctmp,strlen(ctmp));
+    fprintf(f1,"%s\n",hdr_line4);    
+      
+ 
+    fprintf(f1,"                        %12s %4s %s %2s %s\n",loc_legend[90],loc_legend[60],fm_phy_id,loc_legend[70],
+                                                                      to_phy_id);  
+
+    fprintf(f1,"                              %11s %4s %s %2s %s\n",loc_legend[100],loc_legend[60],nd_fr_facility.arr,loc_legend[70],
+                                                                      nd_to_facility.arr);  
+                                                              
+    if(strcmp(nd_report_type.arr,"G") == 0)
+       fprintf(f1,"                           %11s %4s %s %2s %s\n",loc_legend[110],loc_legend[60],fm_prt_hdr,loc_legend[70],
+                                                                  to_prt_hdr);  
+    else
+    {
+    if((strcmp(nd_fm_prt_grp_hdr_1.arr,"!!") == 0) &&
+      (strcmp(nd_fm_prt_grp_line.arr,"!!") == 0))
+       fprintf(f1,"                        %10s %4s  %6s",loc_legend[120],loc_legend[60],loc_legend[190]);
+    else                                                                                        
+       fprintf(f1,"                        %10s %4s  %s-%s",loc_legend[120],loc_legend[60],fm_prt_hdr_1, fm_prt_line);               
+    
+    if((strcmp(nd_to_prt_grp_hdr_1.arr,"~~") == 0) &&
+      (strcmp(nd_to_prt_grp_line.arr,"~~") == 0))
+       fprintf(f1," %2s %7s\n",loc_legend[70],loc_legend[180]);       
+	else
+       fprintf(f1," %2s %s-%s\n",loc_legend[70],to_prt_hdr_1,to_prt_line);               
+    }                                                                                        
+    fprintf(f1,"                                  %11s %-19s\n",loc_legend[130],income_type);               
+    
+    fprintf(f1,"--------------------------------------------------------------------------------\n");    
+    
+}                    
+
+fetch_legend_value()
+{
+	for(i=1;i<=900;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLRINPHY.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+
+/*****************************************************************/

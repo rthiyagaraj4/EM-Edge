@@ -1,0 +1,1222 @@
+/*************************************************************
+
+Author    :  Harish A   24/12/2002
+Name      :  Audit Trail of Financial Details.
+Project   :  HMC
+
+*************************************************************/
+#include <stdio.h> 
+#include <string.h>
+#include <math.h>
+#include <bl.h>                   
+        
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403  
+#define VER  "VER : 4.1\n"     
+                          
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR uid_pwd							[91],
+			nd_session_id        			[16],
+			nd_pgm_date	    				[20],
+
+			//input parameters through from SY_PROG_PARAM 
+			l_fm_trx_date					[30],
+			l_to_trx_date					[30],
+			l_fm_patient_id					[21],
+			l_to_patient_id					[21],
+			l_report_option					[30],
+			d_facility_id					[10],
+
+			//for audit trail cursor
+			l_adt_module_id                 [5],
+			l_adt_function_id               [31],
+			l_adt_patient_id                [21],
+			l_adt_episode_type              [10],
+			l_adt_prv_blng_grp_id           [5],
+			l_adt_chg_blng_grp_id           [5],
+			l_adt_prv_settlement_ind        [5],
+			l_adt_chg_settlement_ind        [5],
+			l_adt_prv_cust_code             [10],
+			l_adt_chg_cust_code             [10],
+			l_adt_prv_credit_doc_ref_desc   [32],
+			l_adt_chg_credit_doc_ref_desc   [32],
+			l_adt_prv_credit_doc_ref_date   [30],
+			l_adt_chg_credit_doc_ref_date   [30],
+			l_adt_prv_modified_by_id        [32],
+			l_adt_chg_modified_by_id        [32],
+			l_adt_prv_modified_date         [30],
+			l_adt_chg_modified_date         [30],
+			l_adt_trn_type					[3],
+			l_adt_added_facility_id			[20],
+			l_charge_adj_trx_dt_fr          [11],
+			l_charge_adj_trx_dt_to          [11],
+			l_serv_date_fr                  [11],
+			l_serv_date_to                  [11],
+			l_adt_audit_trail_no            [20],	
+     		
+
+			l_before_blng_grp_desc          [16],
+			l_after_blng_grp_desc			[16], 
+            l_before_stlmt_ind_desc         [10],
+			l_after_stlmt_ind_desc			[10],
+			l_before_cust_name              [16],
+			l_after_cust_name				[16],
+
+			//for folio record
+			l_folio_trx_date				[32],
+			l_folio_blng_serv_code			[11],
+			l_folio_physician_id			[16],
+			l_folio_trx_doc_ref				[25],
+			l_folio_source_doc_ref			[25],
+
+			//for previous folio
+			l_prev_trx_date					[32],
+			l_prev_blng_serv_code			[11],
+			l_prev_physician_id				[16],
+			l_prev_trx_doc_ref				[25],
+
+
+			//Temp variables used in the program
+			l_folio_physician_name			[20],
+			l_blng_serv_desc				[20],
+                  d_short_name_full                         [60],
+                  mp_pat_short_name                         [61],
+			l_patient_name					[61],
+			l_patient_name1 				[61],
+			l_sex							[10],
+			l_function_name					[35],
+			l_fin_dtl_added_by_id			[35],
+			l_fin_dtl_added_date            [20],
+			l_blng_grp_desc                 [31],
+
+			//for header routine
+			d_acc_entity_name				[41],
+			d_user							[21],
+			d_sysdate						[17];
+
+	double	l_folio_trx_doc_ref_line_num	,
+			l_folio_upd_net_charge_amt		,
+ 			l_folio_serv_qty				,
+			l_folio_source_doc_ref_line_num	,
+			l_prev_trx_doc_ref_line_num		,
+			l_prev_upd_net_charge_amt		,
+			g_prev_upd_net_charge_amt       ,
+			g_folio_upd_net_charge_amt      ,
+			g_diff_upd_net_amt				,
+			l_prev_serv_qty					,
+			l_total_org_amt					,
+			l_total_new_amt					,
+			l_total_diff_amt				,
+			l_diff_upd_net_amt				,
+			l_diff_serv_qty					;
+
+	char	filename[10];
+	char    aMesg[300];
+	int     l_flag=0,
+			l_adt_episode_id                ,
+			l_adt_visit_id                  ,
+	        l_patient_age;
+	
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+int  line_no=0, 
+	 page_no=0;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+	void	get_params(),
+  			get_header_dtls(),
+  			do_report();
+ 
+	if(argc != 5)
+	{
+		disp_message(ERR_MESG,"Usage BLRAUDTR uid/passwd session_id pgm_date");
+		proc_exit();
+	}
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+    
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+    strcpy(g_pgm_id,"BLRAUDTR");
+    strcpy(g_pgm_date,argv[3]);
+
+	strcpy(filename,WORKING_DIR);
+	strcat(filename,"blraudtr.lis");
+
+	if((f1 = fopen(filename, "w")) == NULL) 
+	{
+		disp_message(ERR_MESG,".... Error opening output file ....");
+		proc_exit();
+	} 
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL CONNECT :uid_pwd;  
+
+	set_meduser_role();
+
+	get_params();
+	get_header_dtls();
+	declare_cursor();
+	do_report();
+	end_prog_msg();
+	fclose(f1);
+
+	EXEC SQL COMMIT WORK RELEASE;
+
+	return;
+   
+	err_exit:
+	   EXEC SQL WHENEVER SQLERROR CONTINUE;
+	   EXEC SQL ROLLBACK WORK RELEASE;
+	   disp_message(ERR_MESG,"Oracle error at main() occured....");
+	   disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+	   proc_exit();
+}
+
+
+// get the parameters from the SY_PROG_PARM table and
+// delete the record after reading it.
+void get_params()
+{
+  
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	l_fm_trx_date.arr[0]		='\0';		
+	l_to_trx_date.arr[0]		='\0';
+	l_fm_patient_id.arr[0]		='\0';
+	l_to_patient_id.arr[0]		='\0';
+	l_report_option.arr[0]		='\0';
+	d_facility_id.arr[0]		='\0';
+
+	EXEC SQL SELECT PARAM1,
+			 	    PARAM2,
+				    PARAM3,
+				    PARAM4,
+				    PARAM5,
+				    operating_facility_id
+            INTO    :l_fm_trx_date,
+					:l_to_trx_date,
+					:l_fm_patient_id,
+					:l_to_patient_id,
+					:l_report_option,
+					:d_facility_id
+			   FROM SY_PROG_PARAM
+			  WHERE PGM_ID		= 'BLRAUDTR'
+		        AND	SESSION_ID	=  TO_NUMBER(:nd_session_id)
+		        AND PGM_DATE	=  :nd_pgm_date;
+
+	l_fm_trx_date.arr[l_fm_trx_date.len]		='\0';		
+	l_to_trx_date.arr[l_to_trx_date.len]		='\0';
+	l_fm_patient_id.arr[l_fm_patient_id.len]	='\0';
+	l_to_patient_id.arr[l_to_patient_id.len]	='\0';
+	l_report_option.arr[l_report_option.len]	='\0';
+	d_facility_id.arr[d_facility_id.len]		='\0';
+
+	strcpy(g_facility_id, d_facility_id.arr);
+
+    
+    //delete the parameter record
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DELETE SY_PROG_PARAM
+	 		  WHERE PGM_ID		= 'BLRAUDTR'
+	            AND SESSION_ID	= :nd_session_id
+		        AND PGM_DATE	= :nd_pgm_date;
+	return;
+
+  err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ERR_MESG,"Oracle error at get_params() occured....");
+	disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+	proc_exit();
+}
+ 
+//get the header details
+void get_header_dtls()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT ACCOUNTING_NAME,
+				    USER,
+				    TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+		      INTO :d_acc_entity_name,
+			  	   :d_user,
+				   :d_sysdate
+              FROM SY_ACC_ENTITY
+			 WHERE acc_entity_id = :d_facility_id;
+
+	d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+	d_user.arr[d_user.len]                       = '\0';
+	d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+	return;
+
+	err_exit:
+	   EXEC SQL WHENEVER SQLERROR CONTINUE;
+	   EXEC SQL ROLLBACK WORK RELEASE;
+	   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....");
+	   disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+	   proc_exit();
+}
+ 
+declare_cursor()
+{
+/*	sprintf(aMesg,"Fm PatID  %s  To PatID  %s  ",l_fm_patient_id.arr,l_to_patient_id.arr);
+	disp_message(ERR_MESG,aMesg);
+*/
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	
+	EXEC SQL DECLARE	audit_trail_cur
+	          CURSOR	
+			     FOR	
+			  SELECT	audit_trail_no                 ,
+						module_id                      ,
+						added_facility_id			   ,	
+						function_id                    ,
+						patient_id                     ,
+						episode_type                   ,
+						trunc(episode_id)              ,
+						trunc(visit_id)                ,
+						prv_blng_grp_id                ,
+						chg_blng_grp_id                ,
+						prv_settlement_ind             ,
+						chg_settlement_ind             ,
+						prv_cust_code                  ,
+						chg_cust_code                  ,
+						prv_credit_doc_ref_desc        ,
+						chg_credit_doc_ref_desc        ,
+						prv_credit_doc_ref_date        ,
+						chg_credit_doc_ref_date        ,
+						prv_modified_by_id             ,
+						chg_modified_by_id             ,
+						prv_modified_date              ,
+						chg_modified_date              ,
+						trn_type                       ,
+						charge_adj_trx_dt_fr           ,
+						charge_adj_trx_dt_to           ,
+						serv_date_fr                   ,
+						serv_date_to                   
+				FROM	bl_fin_dtls_audit_trail
+			   WHERE	patient_id 
+			 BETWEEN	NVL(:l_fm_patient_id,'!!!!!!!!!!!!!!!!!!!!')
+			     AND	NVL(:l_to_patient_id,'~~~~~~~~~~~~~~~~~~~~')
+				 AND	added_date 
+			 BETWEEN	TO_DATE(NVL(:l_fm_trx_date,'01/01/1000 00:00'),'DD/MM/YYYY HH24:MI')
+			     AND	TO_DATE(NVL(:l_to_trx_date,'01/01/4713 23:59'),'DD/MM/YYYY HH24:MI')
+				 AND    trn_type  = DECODE(:l_report_option,'L',trn_type,:l_report_option)
+				 AND	module_id = 'BL';   
+ 
+
+	EXEC SQL OPEN audit_trail_cur;  
+	
+
+	EXEC SQL DECLARE	patient_charges_folio_cur
+	          CURSOR	
+			     FOR	
+			  SELECT	blng_serv_code,
+						physician_id,
+						serv_qty,
+						trx_doc_ref,
+						trunc(trx_doc_ref_line_num),
+						source_doc_ref,
+						source_doc_ref_line_num,
+						sum(upd_net_charge_amt)
+			    FROM	bl_patient_charges_folio
+			   WHERE	episode_type			= :l_adt_episode_type
+				 AND	patient_id				= :l_adt_patient_id
+				 AND	episode_id				= :l_adt_episode_id
+				 AND	audit_trail_no			= :l_adt_audit_trail_no
+				 AND    audit_trail_no			IS NOT NULL
+				 AND    added_facility_id       = :l_adt_added_facility_id
+			   GROUP    
+			      BY	blng_serv_code,
+						physician_id,
+						serv_qty,
+						trx_doc_ref,
+						trx_doc_ref_line_num,
+						source_doc_ref,
+						source_doc_ref_line_num;
+
+	return;
+
+  
+	err_exit:
+	
+		   EXEC SQL WHENEVER SQLERROR CONTINUE;
+		   EXEC SQL ROLLBACK WORK RELEASE;
+		   disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+		   disp_message(ERR_MESG,"Oracle error at declare_cursor() occured....");
+		   proc_exit();
+}
+
+int fetch_audit_trail_cur()
+{
+/*	
+	sprintf(aMesg,"Fm Dt  %s  To Dt  %s  Rep Opt  %s",l_fm_trx_date.arr,l_to_trx_date.arr,l_report_option.arr);
+	disp_message(ERR_MESG,aMesg);
+*/
+
+    
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	l_adt_module_id.arr[0]                      ='\0';
+	l_adt_function_id.arr[0]                    ='\0';
+	l_adt_patient_id.arr[0]                     ='\0';
+	l_adt_episode_type.arr[0]                   ='\0';
+	l_adt_prv_blng_grp_id.arr[0]                ='\0';
+	l_adt_chg_blng_grp_id.arr[0]                ='\0';
+	l_adt_prv_settlement_ind.arr[0]             ='\0';
+	l_adt_chg_settlement_ind.arr[0]             ='\0';
+	l_adt_prv_cust_code.arr[0]                  ='\0';
+	l_adt_chg_cust_code.arr[0]                  ='\0';
+	l_adt_prv_credit_doc_ref_desc.arr[0]        ='\0';	
+	l_adt_chg_credit_doc_ref_desc.arr[0]        ='\0';
+	l_adt_prv_credit_doc_ref_date.arr[0]        ='\0';
+	l_adt_chg_credit_doc_ref_date.arr[0]        ='\0';
+	l_adt_prv_modified_by_id.arr[0]             ='\0';
+	l_adt_chg_modified_by_id.arr[0]             ='\0';
+	l_adt_prv_modified_date.arr[0]              ='\0';
+	l_adt_chg_modified_date.arr[0]              ='\0';
+	l_adt_added_facility_id.arr[0]				='\0';
+	l_adt_trn_type.arr[0]						='\0';
+	l_charge_adj_trx_dt_fr.arr[0]               ='\0';
+	l_charge_adj_trx_dt_to.arr[0]               ='\0';
+	l_serv_date_fr.arr[0]						='\0';
+	l_serv_date_to.arr[0]						='\0';
+	l_adt_audit_trail_no.arr[0]					='\0';
+
+	EXEC SQL FETCH	audit_trail_cur
+			  INTO	l_adt_audit_trail_no                 ,
+					l_adt_module_id                      ,
+					l_adt_added_facility_id				 ,
+					l_adt_function_id                    ,
+					l_adt_patient_id                     ,
+					l_adt_episode_type                   ,
+					l_adt_episode_id                     ,
+					l_adt_visit_id                       ,
+					l_adt_prv_blng_grp_id                ,
+					l_adt_chg_blng_grp_id                ,
+					l_adt_prv_settlement_ind             ,
+					l_adt_chg_settlement_ind             ,
+					l_adt_prv_cust_code                  ,
+					l_adt_chg_cust_code                  ,
+					l_adt_prv_credit_doc_ref_desc        ,
+					l_adt_chg_credit_doc_ref_desc        ,
+					l_adt_prv_credit_doc_ref_date        ,
+					l_adt_chg_credit_doc_ref_date        ,
+					l_adt_prv_modified_by_id             ,
+					l_adt_chg_modified_by_id             ,
+					l_adt_prv_modified_date              ,
+					l_adt_chg_modified_date              ,
+					l_adt_trn_type						 ,
+					l_charge_adj_trx_dt_fr               ,
+					l_charge_adj_trx_dt_to               ,
+					l_serv_date_fr						 ,
+					l_serv_date_to			;
+
+	
+	if (NODATAFOUND)
+		return 0;
+
+	l_adt_module_id.arr[l_adt_module_id.len]								='\0';
+	l_adt_function_id.arr[l_adt_function_id.len]							='\0';
+	l_adt_added_facility_id.arr[l_adt_added_facility_id.len]				='\0';
+	l_adt_patient_id.arr[l_adt_patient_id.len]								='\0';
+	l_adt_episode_type.arr[l_adt_episode_type.len]							='\0';
+	l_adt_prv_blng_grp_id.arr[l_adt_prv_blng_grp_id.len]					='\0';
+	l_adt_chg_blng_grp_id.arr[l_adt_chg_blng_grp_id.len]					='\0';
+	l_adt_prv_settlement_ind.arr[l_adt_prv_settlement_ind.len]				='\0';
+	l_adt_chg_settlement_ind.arr[l_adt_chg_settlement_ind.len]				='\0';
+	l_adt_prv_cust_code.arr[l_adt_prv_cust_code.len]						='\0';
+	l_adt_chg_cust_code.arr[l_adt_chg_cust_code.len]						='\0';
+	l_adt_prv_credit_doc_ref_desc.arr[l_adt_prv_credit_doc_ref_desc.len]    ='\0';	
+	l_adt_chg_credit_doc_ref_desc.arr[l_adt_chg_credit_doc_ref_desc.len]    ='\0';
+	l_adt_prv_credit_doc_ref_date.arr[l_adt_prv_credit_doc_ref_date.len]    ='\0';
+	l_adt_chg_credit_doc_ref_date.arr[l_adt_chg_credit_doc_ref_date.len]    ='\0';
+	l_adt_prv_modified_by_id.arr[l_adt_prv_modified_by_id.len]				='\0';
+	l_adt_chg_modified_by_id.arr[l_adt_chg_modified_by_id.len]				='\0';
+	l_adt_prv_modified_date.arr[l_adt_prv_modified_date.len]				='\0';
+	l_adt_chg_modified_date.arr[l_adt_chg_modified_date.len]				='\0';
+	l_adt_trn_type.arr[l_adt_trn_type.len]									='\0';
+	l_charge_adj_trx_dt_fr.arr[l_charge_adj_trx_dt_fr.len]					='\0';
+	l_charge_adj_trx_dt_to.arr[l_charge_adj_trx_dt_to.len]					='\0';
+	l_serv_date_fr.arr[l_serv_date_fr.len]									='\0';
+	l_serv_date_to.arr[l_serv_date_to.len]									='\0';
+	l_adt_audit_trail_no.arr[l_adt_audit_trail_no.len]						='\0';
+    return 1;
+
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at fetch_audit_trail_cur() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+
+int fetch_pat_charges_folio_cur()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	l_folio_trx_date.arr[0]					='\0';	
+	l_folio_blng_serv_code.arr[0]			='\0';
+	l_folio_physician_id.arr[0]				='\0';
+	l_folio_trx_doc_ref.arr[0]				='\0';
+	l_folio_source_doc_ref.arr[0]			='\0';
+
+	/*	sprintf(aMesg,"ET %s  EId   %f  PId   %s   AN  %f",
+			   l_adt_episode_type.arr,l_adt_episode_id,l_adt_patient_id.arr,l_adt_audit_trail_no);
+		disp_message(ERR_MESG,aMesg);
+	*/
+
+	EXEC SQL FETCH	patient_charges_folio_cur
+			  INTO	:l_folio_blng_serv_code			,
+					:l_folio_physician_id			,
+					:l_folio_serv_qty				,
+					:l_folio_trx_doc_ref			,
+					:l_folio_trx_doc_ref_line_num	,
+					:l_folio_source_doc_ref			,
+					:l_folio_source_doc_ref_line_num,
+					:l_folio_upd_net_charge_amt		;
+	
+	if (NODATAFOUND)
+	{	
+		return 0;
+		l_flag = 0;
+	}
+    else
+	    l_flag =1;
+	
+	l_folio_blng_serv_code.arr[l_folio_blng_serv_code.len]					='\0';
+	l_folio_physician_id.arr[l_folio_physician_id.len]						='\0';
+	l_folio_trx_doc_ref.arr[l_folio_trx_doc_ref.len]						='\0';
+	l_folio_source_doc_ref.arr[l_folio_source_doc_ref.len]					='\0';
+    
+	EXEC SQL SELECT TO_CHAR(MIN(finalized_date),'DD/MM/RRRR HH24:MI:SS')
+	           INTO :l_folio_trx_date
+			   FROM bl_patient_charges_folio
+			  WHERE trx_doc_ref				= :l_folio_trx_doc_ref
+				AND	trx_doc_ref_line_num	= :l_folio_trx_doc_ref_line_num;
+	
+	l_folio_trx_date.arr[l_folio_trx_date.len]								='\0';	
+  
+    return 1;
+	
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at fetch_pat_charges_folio_cur() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+void do_report()
+{
+
+	/*	print_page_title();*/
+	while(fetch_audit_trail_cur())
+	{
+
+		EXEC SQL OPEN patient_charges_folio_cur;
+		
+		print_page_title();
+			
+		print_fin_detail_page();
+
+		check_page_end(5);
+
+		print_rec_hdr();
+
+		while(fetch_pat_charges_folio_cur())
+		{
+			/*	
+			sprintf(aMesg,"Tdr  %s   Tdrl  %f",l_folio_trx_doc_ref.arr,l_folio_trx_doc_ref_line_num);
+			disp_message(ERR_MESG,aMesg);
+			*/
+        
+			get_source_folio_det();
+			get_desc_diff();
+			check_page_end(3);
+			print_rec();
+			check_page_end(4);
+		}
+        if(l_flag)
+		  print_total();
+
+        l_flag = 1;		
+		EXEC SQL CLOSE patient_charges_folio_cur;
+	}
+	EXEC SQL CLOSE audit_trail_cur;
+	 print_end_of_rep();	    
+}  
+
+get_source_folio_det()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	
+	l_prev_trx_date.arr[0]			='\0';			
+	l_prev_blng_serv_code.arr[0]	='\0';
+	l_prev_physician_id.arr[0]		='\0';	
+	l_prev_trx_doc_ref.arr[0]		='\0';
+	
+	/*	sprintf(aMesg,"Sdr   %s    Sdln  %f",l_folio_source_doc_ref.arr,l_folio_source_doc_ref_line_num);
+		disp_message(ERR_MESG,aMesg);
+	*/
+	EXEC SQL SELECT blng_serv_code,
+					physician_id,
+					serv_qty,
+					trx_doc_ref,
+					trx_doc_ref_line_num,
+					sum(upd_net_charge_amt)
+			  INTO  :l_prev_blng_serv_code,
+					:l_prev_physician_id,
+					:l_prev_serv_qty,
+					:l_prev_trx_doc_ref,
+					:l_prev_trx_doc_ref_line_num,
+					:l_prev_upd_net_charge_amt
+			  FROM	bl_patient_charges_folio
+			 WHERE	trx_doc_ref 		 = ltrim(rtrim(:l_folio_source_doc_ref))
+			   AND  trx_doc_ref_line_num = ROUND(:l_folio_source_doc_ref_line_num)
+			   AND	operating_facility_id= :l_adt_added_facility_id
+			 GROUP
+				BY  blng_serv_code,
+					physician_id,
+					serv_qty,
+					trx_doc_ref,
+					trx_doc_ref_line_num;
+
+	l_prev_trx_date.arr[l_prev_trx_date.len]			='\0';			
+	l_prev_blng_serv_code.arr[l_prev_blng_serv_code.len]='\0';
+	l_prev_physician_id.arr[l_prev_physician_id.len]	='\0';	
+	l_prev_trx_doc_ref.arr[l_prev_trx_doc_ref.len]		='\0';
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at get_source_folio_det() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+      
+get_patient_details()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+	
+	l_patient_name.arr[0]='\0';
+    l_patient_name1.arr[0]='\0';
+	l_patient_age= 0;
+	l_sex.arr[0]='\0';
+
+	EXEC SQL SELECT substr(short_name,1,30),
+					decode(substr(short_name,31,60),NULL,' ',substr(short_name,31,60)) shortname1,
+					round(((sysdate - date_of_birth)/365),0),
+					decode(sex,'M','Male','F','Female','Both'),short_name
+			   INTO :l_patient_name,
+					:l_patient_name1,
+					:l_patient_age,
+					:l_sex,
+					:d_short_name_full
+			   FROM mp_patient_mast 
+			  WHERE patient_id = :l_adt_patient_id;
+
+	l_patient_name1.arr[l_patient_name1.len] = '\0';
+	l_patient_name.arr[l_patient_name.len] = '\0';
+    d_short_name_full.arr[d_short_name_full.len]  ='\0';
+
+EXEC SQL EXECUTE
+ BEGIN
+ declare
+      str1   varchar2(100);
+     str2   varchar2(60);
+     
+    
+   BEGIN
+     blcommon.split_words(:d_short_name_full,30,'*',1,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :l_patient_name   :=str2;
+       END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',2,str1,str2);
+       IF str2 IS NOT NULL THEN
+         :l_patient_name1  := str2;
+      END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',3,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :l_patient_name1    := :l_patient_name1 || str2;
+       end if;
+
+	 
+     
+ END;
+  END;
+       
+   END-EXEC;
+       l_patient_name.arr[l_patient_name.len]  = '\0';
+       l_patient_name1.arr[l_patient_name1.len]  = '\0';
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at get_patient_details() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+     
+get_desc_diff()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	l_folio_physician_name.arr[0] = '\0' ;
+
+	EXEC SQL SELECT short_name
+	           INTO :l_folio_physician_name
+			   FROM sy_physician_mast
+			  WHERE physician_id = :l_folio_physician_id
+			    AND facility_id  = :d_facility_id;
+
+	l_folio_physician_name.arr[l_folio_physician_name.len] = '\0';
+
+	l_blng_serv_desc.arr[0] = '\0';
+
+	EXEC SQL SELECT short_desc
+	           INTO :l_blng_serv_desc
+	           FROM bl_blng_serv
+              WHERE blng_serv_code = :l_folio_blng_serv_code;
+
+	l_blng_serv_desc.arr[l_blng_serv_desc.len] = '\0';
+
+	l_diff_upd_net_amt=(l_folio_upd_net_charge_amt-l_prev_upd_net_charge_amt);
+	l_diff_serv_qty=(l_folio_serv_qty-l_prev_serv_qty);
+
+	return;
+	
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at get_desc_diff() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+
+get_function_name()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+
+	l_function_name.arr[0]='\0';
+	
+	EXEC SQL SELECT function_name
+			   INTO :l_function_name
+			   FROM sm_function
+			  WHERE function_id = :l_adt_function_id
+			    AND module_id   = :l_adt_module_id;
+
+	l_function_name.arr[l_function_name.len]='\0';
+
+	return;
+	
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at get_function_name() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+get_fin_dtls_added_by() 
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+
+	l_fin_dtl_added_by_id.arr[0] = '\0';
+	l_fin_dtl_added_date.arr[0] = '\0';
+
+	if(strcmp(l_adt_trn_type.arr,"P")==0)
+	{
+		EXEC SQL SELECT added_by_id,
+		                added_date
+			       INTO :l_fin_dtl_added_by_id,
+				        :l_fin_dtl_added_date
+				   FROM bl_patient_fin_dtls
+				  WHERE patient_id = :l_adt_patient_id;
+	}
+	else if(strcmp(l_adt_trn_type.arr,"O")==0 || strcmp(l_adt_trn_type.arr,"E")==0 ) 
+	{
+		EXEC SQL SELECT added_by_id,
+		                added_date
+			       INTO :l_fin_dtl_added_by_id,
+				        :l_fin_dtl_added_date
+				   FROM bl_visit_fin_dtls
+				  WHERE operating_facility_id = :l_adt_added_facility_id
+				    AND episode_type = :l_adt_episode_type
+					AND	episode_id = :l_adt_episode_id
+					AND visit_id   = :l_adt_visit_id
+				    AND patient_id = :l_adt_patient_id;
+	}
+	else if(strcmp(l_adt_trn_type.arr,"I")==0 || strcmp(l_adt_trn_type.arr,"D")==0 ) 
+	{
+		EXEC SQL SELECT added_by_id,
+						added_date
+			       INTO :l_fin_dtl_added_by_id,
+						:l_fin_dtl_added_date
+				   FROM bl_episode_fin_dtls
+				  WHERE operating_facility_id = :l_adt_added_facility_id
+				    AND episode_type = :l_adt_episode_type
+					AND	episode_id = :l_adt_episode_id
+				    AND patient_id = :l_adt_patient_id;
+	}
+
+	l_fin_dtl_added_by_id.arr[l_fin_dtl_added_by_id.len]	= '\0';
+	l_fin_dtl_added_date.arr[l_fin_dtl_added_date.len]		= '\0';
+
+	return;
+	
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at get_function_name() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+int get_blng_grp_desc()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+	
+	l_before_blng_grp_desc.arr[0]='\0';
+	l_after_blng_grp_desc.arr[0]='\0';
+
+	EXEC SQL SELECT SHORT_DESC 
+			 INTO   :l_before_blng_grp_desc
+			 FROM BL_BLNG_GRP
+			 WHERE BLNG_GRP_ID = :l_adt_prv_blng_grp_id ;
+
+    if (NODATAFOUND)
+		return 0;
+
+
+	EXEC SQL SELECT SHORT_DESC 
+			 INTO   :l_after_blng_grp_desc
+			 FROM BL_BLNG_GRP
+			 WHERE BLNG_GRP_ID = :l_adt_chg_blng_grp_id;
+
+	if (NODATAFOUND)
+		return 0;
+
+
+	l_before_blng_grp_desc.arr[l_before_blng_grp_desc.len]='\0';
+	l_after_blng_grp_desc.arr[l_after_blng_grp_desc.len]='\0';
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at blng_grp_desc() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+
+get_stlmnt_ind_desc()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+	
+	l_before_stlmt_ind_desc.arr[0] = '\0'; 
+	l_after_stlmt_ind_desc.arr[0]='\0';
+
+	if (strcmp(l_adt_prv_settlement_ind.arr,"R") == 0)
+	   strcpy(l_before_stlmt_ind_desc.arr, "Credit");
+    else
+	   strcpy(l_before_stlmt_ind_desc.arr, "Cash");
+
+	if (strcmp(l_adt_chg_settlement_ind.arr,"R") == 0)
+	   strcpy(l_after_stlmt_ind_desc.arr, "Credit");
+    else
+	   strcpy(l_after_stlmt_ind_desc.arr, "Cash");
+
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at stlmnt_ind_desc() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+
+int get_customer_name()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+	
+	l_before_cust_name.arr[0] = '\0'; 
+
+	EXEC SQL SELECT SHORT_NAME
+			 INTO   :l_before_cust_name
+			 FROM   AR_CUSTOMER
+			 WHERE  CUST_CODE =:l_adt_prv_cust_code;     
+
+	if(NODATAFOUND)
+	   return 0;
+
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at customer_name() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+int get_customer_name1()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;	
+	
+	l_after_cust_name.arr[0]='\0';
+
+
+	EXEC SQL SELECT SHORT_NAME
+			 INTO   :l_after_cust_name
+			 FROM    AR_CUSTOMER
+			 WHERE   CUST_CODE = :l_adt_chg_cust_code;
+
+	if(NODATAFOUND)
+	   return 0;
+
+	return;
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at customer_name() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		proc_exit();
+}
+
+print_fin_detail_page()   
+{
+	fprintf(f1,"\n");
+	line_no=line_no+1;
+	check_page_end(5);
+	get_patient_details();
+	fprintf(f1,"SERIAL NO : %-10s     PATIENT NO : %-20s/-%-30.30s     AGE : %d     SEX : %-6s\n",l_adt_audit_trail_no.arr,l_adt_patient_id.arr,l_patient_name.arr,l_patient_age,l_sex.arr);
+	if (strlen(l_patient_name1.arr) > 2)
+	{
+	  fprintf(f1,"%60s %s\n"," ",l_patient_name1.arr);
+	  line_no++;
+	}
+	line_no=line_no+2;
+	check_page_end(5);    
+	get_function_name();
+	fprintf(f1,"FUNCTION  : %-30s                                   EPISODE DETAILS                : %-10d/%-4d\n",l_function_name.arr,l_adt_episode_id,l_adt_visit_id);
+	line_no=line_no+2;
+	check_page_end(5);
+	get_fin_dtls_added_by();
+	fprintf(f1,"ENTERED BY                      : %-25s                    ENTERED DATE                   : %11s\n",l_fin_dtl_added_by_id.arr,l_fin_dtl_added_date.arr);
+	fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n");
+	line_no=line_no+5;
+	check_page_end(5);
+
+	if (get_blng_grp_desc())   
+	   {	
+	        fprintf(f1,"BILLING GROUP(BEFORE)           : %-15s                              BILLING GROUP(AFTER)           :   %-15s\n",l_before_blng_grp_desc.arr,l_after_blng_grp_desc.arr);
+		    line_no=line_no+2;
+		    check_page_end(5);
+        }
+	else
+	   {	fprintf(f1,"BILLING GROUP(BEFORE)           : LOWEST                                 BILLING GROUP(AFTER)           :   HIGHEST \n");
+		    line_no=line_no+2;
+		    check_page_end(5);
+        }
+
+     
+	get_stlmnt_ind_desc();  
+ 
+		fprintf(f1,"SETTLEMENT INDICATOR (BEFORE)   : %-15s                              SETTLEMENT INDICATOR (AFTER)   :   %-15s\n",l_before_stlmt_ind_desc.arr, l_after_stlmt_ind_desc.arr);
+    line_no=line_no+2;
+	check_page_end(5);
+
+	get_customer_name();
+	if (l_before_cust_name.arr[0]=='\0')
+		 strcpy(l_before_cust_name.arr,"NA");
+ 
+	get_customer_name1();
+	if (l_after_cust_name.arr[0]=='\0')
+		 strcpy(l_after_cust_name.arr,"NA");
+ 
+	fprintf(f1,"CUSTOMER (BEFORE)               : %-8s/%-15s                     CUSTOMER (AFTER)               : %-8s/%-15s\n",l_adt_prv_cust_code.arr,l_before_cust_name.arr,
+					l_adt_chg_cust_code.arr, l_after_cust_name.arr);
+		line_no=line_no+2;
+		check_page_end(5);
+     
+
+	/*    
+	if (l_after_cust_name.arr[0]=='\0')
+		 strcpy(l_after_cust_name.arr,"NA");
+
+	if (l_before_cust_name.arr[0]=='\0')
+		 strcpy(l_before_cust_name.arr,"NA");
+
+	if (get_customer_name())
+	{
+
+		fprintf(f1,"CUSTOMER (BEFORE)               : %-8s/%-15s                     CUSTOMER (AFTER)               : %-8s/%-15s\n",l_adt_prv_cust_code.arr,l_before_cust_name.arr,
+					l_adt_chg_cust_code.arr, l_after_cust_name.arr);
+		line_no=line_no+2;
+		check_page_end(5);
+	 }
+	 else
+	{
+		fprintf(f1,"CUSTOMER (BEFORE)               : %-8s/%-15s                     CUSTOMER (AFTER)               : %-8s/%-15s\n","NA", "NA", "NA", "NA");
+		line_no=line_no+2;
+		check_page_end(5);
+	 }
+	 */
+	fprintf(f1,"CREDIT DOC REF (BEFORE)         : %-30s               CREDIT DOC REF (AFTER)         : %-30s\n",
+			l_adt_prv_credit_doc_ref_desc.arr,l_adt_chg_credit_doc_ref_desc.arr);
+	line_no=line_no+2;
+	check_page_end(5);
+
+	fprintf(f1,"CREDIT DOC REF DATE (BEFORE)    : %-10s                                   CREDIT DOC REF DATE (AFTER)    : %-10s\n",
+				l_adt_prv_credit_doc_ref_date.arr,
+			    l_adt_chg_credit_doc_ref_date.arr);
+	line_no=line_no+2;
+	check_page_end(5);
+
+
+	fprintf(f1,"MODIFIED BY (BEFORE)            : %-30s               MODIFIED BY (AFTER)            : %-30s\n",
+				l_adt_prv_modified_by_id.arr,
+				l_adt_chg_modified_by_id.arr);
+	line_no=line_no+2;
+	check_page_end(5);
+
+	fprintf(f1,"MODIFIED DATE (BEFORE)          : %-17s                            ENTERED DATE (AFTER)           : %-17s\n",
+				l_adt_prv_modified_date.arr,
+			l_adt_chg_modified_date.arr);
+	line_no=line_no+2;
+	check_page_end(5);
+
+	fprintf(f1,"CHARGE ADJUSTMENT - TRANSACTION DATES    :  %11s - %11s          SERVICES   : %11s - %11s\n",
+						l_charge_adj_trx_dt_fr.arr,
+					    l_charge_adj_trx_dt_to.arr,
+						l_serv_date_fr.arr, l_serv_date_to.arr	);
+	line_no=line_no+2;
+	check_page_end(5);
+
+
+}
+
+print_rec_hdr()
+{
+	fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+	fprintf(f1,"                                                                                ---------ORIGINAL-------  -----------NEW----------  -------DIFFERENCE-------\n");
+	fprintf(f1,"TRX DATE               BILLING SERVICE         DOCTOR                              QUANTITY    NET CHARGE     QUANTITY     NET CHARGE  QUANTITY     NET CHARGE  TRX REFERENCE\n");
+	fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+	line_no=line_no+4;
+}
+
+print_rec()
+{
+	char	f_folio_upd_net_charge_amt[14],
+			f_prev_upd_net_charge_amt[14],
+			f_diff_upd_net_amt[14];
+
+	print_formated(f_folio_upd_net_charge_amt,l_folio_upd_net_charge_amt);
+	print_formated(f_prev_upd_net_charge_amt,l_prev_upd_net_charge_amt);
+	print_formated(f_diff_upd_net_amt,l_diff_upd_net_amt);
+
+    
+	fprintf(f1,"%-21s  %-10s/%-15s  %-15s/%-15s  %7.2f %14s     %7.2f  %14s  %7.2f  %14s  %20s\n",
+	            l_folio_trx_date.arr,l_folio_blng_serv_code.arr,l_blng_serv_desc.arr,l_folio_physician_id.arr,
+				l_folio_physician_name.arr,l_prev_serv_qty, f_prev_upd_net_charge_amt,
+				l_folio_serv_qty,f_folio_upd_net_charge_amt,l_diff_serv_qty ,f_diff_upd_net_amt,l_folio_trx_doc_ref.arr);
+    
+	line_no=line_no+1;
+	g_prev_upd_net_charge_amt  += l_prev_upd_net_charge_amt; 
+	g_folio_upd_net_charge_amt += l_folio_upd_net_charge_amt;
+	g_diff_upd_net_amt         += l_diff_upd_net_amt;
+}
+
+    
+print_total()     
+{
+	char	gf_folio_upd_net_charge_amt[14],
+			gf_prev_upd_net_charge_amt[14],
+			gf_diff_upd_net_amt[14];
+
+	print_formated(gf_folio_upd_net_charge_amt,g_folio_upd_net_charge_amt);
+	print_formated(gf_prev_upd_net_charge_amt,g_prev_upd_net_charge_amt);
+	print_formated(gf_diff_upd_net_amt,g_diff_upd_net_amt);
+	fprintf(f1,"\n      TOTAL : %-77s%15s             %15s         %16s ", " ",
+			 gf_prev_upd_net_charge_amt,
+	         gf_folio_upd_net_charge_amt,
+			 gf_diff_upd_net_amt);
+		line_no=line_no+2;
+		g_folio_upd_net_charge_amt = 0;
+		g_prev_upd_net_charge_amt  = 0;
+		g_diff_upd_net_amt         = 0;
+
+    
+
+}
+print_page_title()
+{
+	double l_report_width;
+	double l_acc_entity_length;
+	double l_start_point;
+	double l_comp_name_end_point;
+
+	fprintf(f1,"\f");
+	page_no=page_no+1;
+
+	line_no= 0;
+	l_report_width=178;
+	l_acc_entity_length = strlen(d_acc_entity_name.arr);
+
+	//Code for Line 1
+	l_start_point=ceill((l_report_width/2)-(l_acc_entity_length/2));
+	fprintf(f1,"MDL : BL");
+	l_start_point=l_start_point-8;
+	print_spaces(l_start_point);
+	fprintf(f1,"%s",d_acc_entity_name.arr);
+	l_comp_name_end_point=l_start_point+8+l_acc_entity_length;
+	l_start_point=((l_report_width-17)-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(f1,"%s\n",d_sysdate.arr);
+
+	//Code for Line 2
+	l_start_point=0;
+	fprintf(f1,"OPR : %-15s",d_user.arr);
+	l_start_point=ceill((l_report_width/2)-22);
+	l_start_point=l_start_point-30;
+	print_spaces(l_start_point);
+	fprintf(f1,"AUDIT TRAIL OF CHANGES MADE IN FINANCIAL DETAILS OF PATIENTS\n");
+
+
+	//Code for Line 3
+	l_start_point=0;
+	fprintf(f1,"REP : BLRAUDTR");
+	l_start_point=ceill((l_report_width/2)-29);
+	l_start_point=l_start_point-14;
+	print_spaces(l_start_point);
+	fprintf(f1,"TRANSACTION DATE FROM %s TO %s",l_fm_trx_date.arr,l_to_trx_date.arr);
+	l_comp_name_end_point=l_start_point+14+58;
+	l_start_point=((l_report_width-17)-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(f1,"PAGE : %d\n",page_no);
+	line_no=3;
+
+	//Code for Line 4
+	l_start_point=0;
+	l_start_point=ceill((l_report_width/2)-26);
+	print_spaces(l_start_point);
+	if(l_fm_patient_id.arr[0] =='\0')
+	  strcpy(l_fm_patient_id.arr,"LOWEST");
+	if(l_to_patient_id.arr[0] =='\0')
+	  strcpy(l_to_patient_id.arr,"HIGHEST");
+	fprintf(f1,"PATIENT NO FROM %16s TO %16s",l_fm_patient_id.arr,l_to_patient_id.arr);
+	fprintf(f1,"\n");
+
+	//Code for Line 5
+	l_start_point=0;
+	l_start_point=ceill((l_report_width/2)-11);
+	print_spaces(l_start_point);
+	fprintf(f1,"FUNCTION SELECTED :  %s",l_report_option.arr);
+	fprintf(f1,"\n");
+	fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+	line_no=6;
+}
+
+print_spaces(l_length)
+double l_length;
+{
+	int i;
+
+	for(i=0;i<l_length;i++)
+	{
+		fprintf(f1," ");
+	}
+}
+
+check_page_end()
+{
+	if ((line_no + 5) >= MAX_LINES)
+	{
+		line_no=0;
+	    print_page_title();
+	}	
+	return;
+}
+
+end_report()
+{
+	fprintf(f1,"\n\n");
+	fprintf(f1,"                                                         ");
+	fprintf(f1,"** End of Report **");
+	fprintf(f1,"");
+}
+
+print_formated(l_char_digit, l_double_digit)
+double	l_double_digit;
+char	l_char_digit[15];
+{
+	if(l_double_digit<0)
+	{
+		put_val(l_char_digit,-l_double_digit);
+		format_amt(l_char_digit);
+		strcat(l_char_digit,"-");
+	}
+	else
+	{
+		put_val(l_char_digit,l_double_digit);
+		format_amt(l_char_digit);
+		strcat(l_char_digit," ");
+	}
+	return l_char_digit;
+}
+
+print_end_of_rep()
+{
+    fprintf(f1,"\n\n                                                    ** END OF REPORT **                                                             \n");
+}
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

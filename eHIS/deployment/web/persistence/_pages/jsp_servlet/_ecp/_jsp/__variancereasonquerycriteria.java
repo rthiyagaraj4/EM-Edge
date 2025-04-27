@@ -1,0 +1,215 @@
+package jsp_servlet._ecp._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import java.util.*;
+import webbeans.eCommon.*;
+import eCP.*;
+import eCommon.Common.*;
+import com.ehis.eslp.*;
+
+public final class __variancereasonquerycriteria extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/ecp/jsp/VarianceReasonQueryCriteria.jsp", 1709116534294L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n<!--\n*\tCopyright © MEDICOM Solutions (P) Ltd. ALL RIGHTS RESERVED\n*\tApplication\t\t:\teCP\n*\tPurpose \t\t:\tto get the query criteria\n*\tCreated By\t\t:\t\n*\tCreated On\t\t:\t18 July 2005\n-->\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n<!-- <link rel=\'stylesheet\' type=\'text/css\' href=\'../../eCommon/html/IeStyle.css\'></link> -->\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<link rel=\'stylesheet\' type=\'text/css\'href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\'></link>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+	public static String checkForNull(String inputString)
+	{
+		return((inputString == null) ? "" : inputString);
+	}
+
+	public static String checkForNull(String inputString, String defaultValue)
+	{
+		return((inputString == null) ? defaultValue : inputString);
+	}
+
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+ String sStyle =checkForNull((String)session.getAttribute("PREFERRED_STYLE"),"IeStyle.css"); 
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+
+//ecis.utils.CommonQueryPage qrypg = new ecis.utils.CommonQueryPage();
+	ecis.utils.CommonQueryPage qrypg = new ecis.utils.CommonQueryPage();
+
+StringBuffer strbuff;
+
+try{
+	   //This file is saved on 18/10/2005.
+	ArrayList final_arr = new ArrayList();
+	String var_cause_code=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCP.VarianceCauseCode.label","cp_labels");
+	String var_cause_desc=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCP.VarianceCauseDescription.label","cp_labels");
+	String var_reason_code=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCP.VarianceReasonCode.label","cp_labels");
+	String var_reason_desc=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCP.VarianceReasonDescription.label","cp_labels");
+	String Nature = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.Nature.label","common_labels");
+	String Both_legend = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.Both.label","common_labels");
+	String Enabled_legend = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.enabled.label","common_labels");
+	String Disabled_legend = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.Disabled.label","common_labels");
+    String Nature_List="%,"+Both_legend+",E,"+Enabled_legend+",D,"+Disabled_legend;
+	String Sort_order = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.SortOrder.label","common_labels");
+	String defaultSelect = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.defaultSelect.label","common_labels");
+	String orderBy=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.orderBy.label","common_labels");
+	String QueryCriteria=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.QueryCriteria.label","common_labels");
+	String ExecuteQuery=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.ExecuteQuery.label","common_labels");
+	String find_reason=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCP.FindReason.label","cp_labels");
+//	conn = (Connection) session.getValue( "connection" );
+	
+	ArrayList firstItem = new ArrayList();
+
+	firstItem.add("Text");//Type of item
+	firstItem.add(var_reason_code);// label
+	firstItem.add("VAR_REASON_CODE");//name of field
+	firstItem.add("4");//size
+	firstItem.add("4");//maxlength
+	final_arr.add(firstItem);//add to ArrayList obj finAr
+	
+	ArrayList secondItem = new ArrayList();
+	secondItem.add("Text");//Type of item
+	secondItem.add(var_reason_desc);//label
+	secondItem.add("VAR_REASON_DESC");//name
+	secondItem.add("30");//size
+	secondItem.add("30");//maxlength
+	final_arr.add(secondItem);//add to ArrayList obj finAr
+
+	ArrayList fourthItem = new ArrayList();
+	fourthItem.add("Text");//Type of item
+	fourthItem.add(var_cause_code);// label
+	fourthItem.add("VAR_CAUSE_CODE");//name of field
+	fourthItem.add("4");//size
+	fourthItem.add("4");//maxlength
+	final_arr.add(fourthItem);//add to ArrayList obj finAr
+	
+	ArrayList fifthItem = new ArrayList();
+	fifthItem.add("Text");//Type of item
+	fifthItem.add(var_cause_desc);//label
+	fifthItem.add("VAR_CAUSE_DESC");//name
+	fifthItem.add("30");//size
+	fifthItem.add("30");//maxlength
+	final_arr.add(fifthItem);//add to ArrayList obj finAr
+
+	ArrayList sixthItem = new ArrayList();
+	sixthItem.add("List");//Type of item
+	sixthItem.add(Nature);//label
+	sixthItem.add("eff_status");//name
+	sixthItem.add(Nature_List);//static values that need to be displayed as option.
+	final_arr.add(sixthItem);//add to ArrayList obj finAr
+	
+	String orderByCols[] = new String[4];
+	String orderByColVals[] = new String[4];
+
+	orderByCols[0] = var_reason_code;
+	orderByCols[1] = var_reason_desc;
+	orderByCols[2] = var_cause_desc;
+	orderByCols[3] = var_cause_desc;
+
+	
+	orderByColVals[0] = "VAR_REASON_CODE";
+	orderByColVals[1] = "VAR_REASON_DESC";
+	orderByColVals[2] = "VAR_CAUSE_CODE";
+	orderByColVals[3] = "VAR_CAUSE_DESC";
+
+	
+	strbuff = qrypg.getQueryPage(null,final_arr,find_reason,"../jsp/VarianceReasonQueryResult.jsp",Sort_order,QueryCriteria,defaultSelect ,orderBy,orderByCols, orderByColVals,ExecuteQuery);
+
+	out.println(strbuff.toString());
+
+	}
+	catch (Exception e) 
+	{
+		//out.println(e.toString());//common-icn-0181
+		e.printStackTrace();//COMMON-ICN-0181
+	}	
+
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            _bw.write(_wl_block6Bytes, _wl_block6);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

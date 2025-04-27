@@ -1,0 +1,533 @@
+/*
+#define DEBUG 
+*/ 
+  
+#define DUPLICATE (sqlca.sqlcode == -1)
+
+/***********************************************************************/
+/*               FUNCTION : process_posting_acc                        */ 
+/***********************************************************************/
+/*  This function is used to create monthly records in                 */ 
+/*  GL_PERIOD_ACC_BAL_LOCAL. The input parameters for the function     */
+/*  are :-                                                             */
+/*                                                                     */ 
+/*  1.  Posting Account                                                */ 
+/*  2.  Flag ('Y') to indicate if it is a summary account.             */
+/*  3.  No. of months in an accounting period.                         */
+/*  4.  The year for which the records are to be created.              */ 
+/*                                                                     */
+/*  Processing Logic :-                                                */
+/*  -------------------                                                */
+/*  If the posting account is a normal posting account (non summary)   */
+/*  then the monthly records are created directly in GL_PERIOD_ACC_    */
+/*  BAL_LOCAL                                                          */
+/*                                                                     */
+/*  If posting account is a summary account then check is made to      */
+/*  to see if it is existing in GL_POSTING_ACC. If it does not         */
+/*  exist then a record is inserted in GL_POSTING_ACC. Then monthly    */
+/*  records are created in GL_PERIOD_ACC_BAL_LOCAL after checking      */
+/*  that no records exist for the posting account for the current      */
+/*  year.                                                              */
+/*                                                                     */
+/***********************************************************************/
+
+#include <math.h>
+#include <string.h>
+#include <stdio.h>
+
+/*---------------------------------*/  
+#define PC_START		1
+#define PC_END			2
+#define	INFO_MESG		3
+#define ERR_MESG		4
+#define ORA_MESG		5  
+
+void proc_main (int, char **);
+void disp_message ( int, char *);
+void open_log_file();
+void proc_exit();
+/*-----------------------------------*/ 
+
+EXEC SQL BEGIN DECLARE SECTION;
+	VARCHAR		t_main_acc1_code[8],
+			t_main_acc2_code[6],
+			t_dept_code[11],
+			t_product_group_code[4],
+			t_product_line_code[6],
+			t_subledger_group_code[4],
+			t_subledger_line_code[10],
+			t_summary_acc_flag[2],
+			t_status[2],
+			t_dummy[2],
+			t_main_desc[16],
+			nd_acc_entity[4],
+			t_dept_desc[46],
+			t_prod_desc[46],
+			t_sleg_desc[46],
+		        t_default_dept_code[11],
+                        t_default_prod_group_code[4],
+                        t_default_prod_line_code[6],
+                        t_default_sleg_group_code[4],
+                        t_default_sleg_line_code[10],
+                        t_default_dept_desc[46],
+                        t_default_prod_desc[46],
+                        t_default_sleg_desc[46],
+                        t_concat_main_code[12],
+                        t_concat_prod_code[8],
+                        t_concat_sleg_code[12],
+                        t_concat_post_acc_code[42],
+						t_concat_post_acc_desc[65];
+
+	int		t_month,
+			t_year,
+			t_cnt;
+
+	char            t_default_delimiter,
+			t_bank_recon_flag;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA;     
+ 
+/* #include "winproc.h" */
+                       
+char string_var[100]; /* for disp_message() */                       
+int g_num_of_acc_periods;
+
+process_posting_acc  ( l_main_acc1_code,
+		       l_main_acc2_code,
+		       l_dept_code,
+		       l_product_group_code,
+		       l_product_line_code,
+		       l_subledger_group_code,
+		       l_subledger_line_code,
+		       l_summary_acc_flag,
+		       l_num_of_acc_periods,
+		       l_year)
+
+char l_main_acc1_code[],
+     l_main_acc2_code[],
+     l_dept_code[],
+     l_product_group_code[],
+     l_product_line_code[],
+     l_subledger_group_code[],
+     l_subledger_line_code[],
+     l_summary_acc_flag;
+
+int l_num_of_acc_periods,
+    l_year;
+
+{
+
+    t_year = l_year;
+    g_num_of_acc_periods = l_num_of_acc_periods;
+
+    strcpy(t_main_acc1_code.arr,        l_main_acc1_code);
+    strcpy(t_main_acc2_code.arr,        l_main_acc2_code);
+    strcpy(t_dept_code.arr,             l_dept_code);
+    strcpy(t_product_group_code.arr,    l_product_group_code);
+    strcpy(t_product_line_code.arr,     l_product_line_code);
+    strcpy(t_subledger_group_code.arr,  l_subledger_group_code);
+    strcpy(t_subledger_line_code.arr,   l_subledger_line_code);
+
+    t_main_acc1_code.len       = strlen(t_main_acc1_code.arr);
+    t_main_acc2_code.len       = strlen(t_main_acc2_code.arr);
+    t_dept_code.len            = strlen(t_dept_code.arr);
+    t_product_group_code.len   = strlen(t_product_group_code.arr);
+    t_product_line_code.len    = strlen(t_product_line_code.arr);
+    t_subledger_group_code.len = strlen(t_subledger_group_code.arr);
+    t_subledger_line_code.len  = strlen(t_subledger_line_code.arr);
+
+#ifdef DEBUG
+    sprintf(string_var,"Main_acc1_code        = %s\n",t_main_acc1_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Main_acc2_code        = %s\n",t_main_acc2_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Dept_code             = %s\n",t_dept_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_group_code    = %s\n",t_product_group_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_line_code     = %s\n",t_product_line_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger group code  = %s\n",t_subledger_group_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger line code   = %s\n",t_subledger_line_code.arr);
+    disp_message(INFO_MESG,string_var);
+
+    sprintf(string_var,"Main_acc1_code        = %d\n",t_main_acc1_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Main_acc2_code        = %d\n",t_main_acc2_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Dept_code             = %d\n",t_dept_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_group_code    = %d\n",t_product_group_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_line_code     = %d\n",t_product_line_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger group code  = %d\n",t_subledger_group_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger line code   = %d\n",t_subledger_line_code.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+    if(l_summary_acc_flag == 'Y')
+	    chk_summary();
+    else
+        ins_period_bal();
+
+}
+
+
+chk_summary()
+{
+
+static int first = 1;
+
+#ifdef DEBUG
+    disp_message(INFO_MESG,"Checking if SUMMARY account exists in GL_POSTING_ACC\n");
+#endif
+
+    EXEC SQL SELECT 'X'
+	     INTO   :t_dummy
+	     FROM   GL_POSTING_ACC
+    	     WHERE  MAIN_ACC1_CODE       = :t_main_acc1_code
+    	     AND    MAIN_ACC2_CODE       = :t_main_acc2_code
+    	     AND    DEPT_CODE            = :t_dept_code
+    	     AND    PRODUCT_GROUP_CODE   = :t_product_group_code
+    	     AND    PRODUCT_LINE_CODE    = :t_product_line_code
+    	     AND    SUBLEDGER_GROUP_CODE = :t_subledger_group_code
+    	     AND    SUBLEDGER_LINE_CODE  = :t_subledger_line_code;
+
+    if(sqlca.sqlcode < 0)  
+        err_mesg("SELECT failed on table  GL_POSTING_ACC",0,"");
+
+    if(sqlca.sqlcode == 1403) {
+
+        if(first) {
+
+#ifdef DEBUG
+    disp_message(INFO_MESG,"Selecting Default descriptions ...\n");
+#endif
+
+            EXEC SQL SELECT DEFAULT_DEPT_CODE,
+                            DEFAULT_PROD_GROUP_CODE,
+                            DEFAULT_PROD_LINE_CODE,
+                            DEFAULT_SLEG_GROUP_CODE,
+                            DEFAULT_SLEG_LINE_CODE,
+                            DEFAULT_DEPT_DESC,
+                            DEFAULT_PROD_DESC,
+                            DEFAULT_SLEG_DESC,
+                            DEFAULT_DELIMITER
+		     INTO   :t_default_dept_code,
+                            :t_default_prod_group_code,
+                            :t_default_prod_line_code,
+                            :t_default_sleg_group_code,
+                            :t_default_sleg_line_code,
+                            :t_default_dept_desc,
+                            :t_default_prod_desc,
+                            :t_default_sleg_desc,
+                            :t_default_delimiter
+		     FROM   GL_PARAMETER;
+             
+	    if(sqlca.sqlcode < 0)
+	        err_mesg("SELECT failed on table GL_PARAMETER",0,"");
+    
+
+	    t_default_dept_code.arr[t_default_dept_code.len]             = '\0';
+            t_default_prod_group_code.arr[t_default_prod_group_code.len] = '\0';
+            t_default_prod_line_code.arr[t_default_prod_line_code.len]   = '\0';
+            t_default_sleg_group_code.arr[t_default_sleg_group_code.len] = '\0';
+            t_default_sleg_line_code.arr[t_default_sleg_line_code.len]   = '\0';
+            t_default_dept_desc.arr[t_default_dept_desc.len]             = '\0';
+            t_default_prod_desc.arr[t_default_prod_desc.len]             = '\0';
+            t_default_sleg_desc.arr[t_default_sleg_desc.len]             = '\0';
+
+	    first = 0;
+
+	} /* end of if first */ 
+    
+        EXEC SQL SELECT ACC_ENTITY_CODE,
+		                SHORT_DESC,
+		                BANK_RECONCILE_FLAG
+	         INTO   :nd_acc_entity,
+			        :t_main_desc,
+		            :t_bank_recon_flag
+	         FROM   GL_ACC_CHART 
+	         WHERE  MAIN_ACC1_CODE = :t_main_acc1_code
+	         AND    MAIN_ACC2_CODE = :t_main_acc2_code
+			 AND    ROWNUM =1;
+    
+        if(sqlca.sqlcode < 0)
+	     err_mesg("SELECT failed on table GL_ACC_CHART",0,"");
+    
+	    nd_acc_entity.arr[nd_acc_entity.len] = '\0' ;
+        t_main_desc.arr[t_main_desc.len] = '\0';
+
+#ifdef DEBUG
+    sprintf(string_var,"main_desc = <%s>    length = <%d>\n",t_main_desc.arr,t_main_desc.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+    
+    
+        EXEC SQL SELECT SHORT_DESC INTO :t_dept_desc
+	         FROM   SY_DEPT
+	         WHERE  DEPT_CODE = :t_dept_code 
+			 AND ROWNUM=1; 
+    
+        if(sqlca.sqlcode < 0)
+	     err_mesg("SELECT failed on table SY_DEPT",0,"");
+    
+        if(sqlca.sqlcode == 1403 || t_dept_desc.len == 0)  {
+	    strcpy(t_dept_desc.arr,t_default_dept_desc.arr);
+	    t_dept_desc.len = strlen(t_dept_desc.arr);
+	}
+        else
+	    t_dept_desc.arr[t_dept_desc.len] = '\0';
+
+#ifdef DEBUG
+    sprintf(string_var,"dept_desc = <%s>    length = <%d>\n",t_dept_desc.arr,t_dept_desc.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+    
+        EXEC SQL SELECT SHORT_DESC INTO :t_prod_desc
+	         FROM   GL_PRODUCT_LINE
+	         WHERE  PRODUCT_GROUP_CODE = :t_product_group_code
+	         AND    PRODUCT_LINE_CODE  = :t_product_line_code;
+    
+        if(sqlca.sqlcode < 0)
+	     err_mesg("SELECT failed on table GL_PRODUCT_LINE",0,"");
+    
+        if(sqlca.sqlcode == 1403 || t_prod_desc.len == 0) {
+	    strcpy(t_prod_desc.arr,t_default_prod_desc.arr);
+	    t_prod_desc.len = strlen(t_prod_desc.arr);
+	}
+        else
+	    t_prod_desc.arr[t_prod_desc.len] = '\0';
+    
+#ifdef DEBUG
+    sprintf("prod_desc = <%s>    length = <%d>\n",t_prod_desc.arr,t_prod_desc.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+        EXEC SQL SELECT SHORT_DESC INTO :t_sleg_desc
+	         FROM   GL_SUBLEDGER_LINE
+	         WHERE  SUBLEDGER_GROUP_CODE = :t_subledger_group_code
+	         AND    SUBLEDGER_LINE_CODE  = :t_subledger_line_code;
+    
+        if(sqlca.sqlcode < 0)
+	     err_mesg("SELECT failed on table GL_SUBLEDGER_LINE",0,"");
+    
+        if(sqlca.sqlcode == 1403 || t_sleg_desc.len == 0) {
+	    strcpy(t_sleg_desc.arr,t_default_sleg_desc.arr);
+	    t_sleg_desc.len = strlen(t_sleg_desc.arr);
+	}
+        else
+	    t_sleg_desc.arr[t_sleg_desc.len] = '\0';
+
+#ifdef DEBUG
+    sprintf("sleg_desc = <%s>    length = <%d>\n",t_sleg_desc.arr,t_sleg_desc.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+    
+        sprintf(t_concat_main_code.arr,"%s%s",t_main_acc1_code.arr,t_main_acc2_code.arr);
+	t_concat_main_code.len = strlen(t_concat_main_code.arr);
+    
+        sprintf(t_concat_prod_code.arr,"%s%s",t_product_group_code.arr,t_product_line_code.arr);
+
+	t_concat_prod_code.len = strlen(t_concat_prod_code.arr);
+    
+        sprintf(t_concat_sleg_code.arr,"%s%s",t_subledger_group_code.arr,t_subledger_line_code.arr);
+
+	t_concat_sleg_code.len = strlen(t_concat_sleg_code.arr);
+
+        sprintf(t_concat_post_acc_code.arr, "%s-%s %s %s-%s %s-%s",
+	       t_main_acc1_code.arr,t_main_acc2_code.arr, t_dept_code.arr,
+	       t_product_group_code.arr,t_product_line_code.arr,
+	       t_subledger_group_code.arr,t_subledger_line_code.arr);
+    
+	t_concat_post_acc_code.len = strlen(t_concat_post_acc_code.arr);
+
+        sprintf(t_concat_post_acc_desc.arr,"%s%c%s%c%s%c%s",
+	       t_main_desc.arr,t_default_delimiter,
+	       t_dept_desc.arr,t_default_delimiter,
+	       t_prod_desc.arr,t_default_delimiter,
+	       t_sleg_desc.arr);
+
+	t_concat_post_acc_desc.len=strlen(t_concat_post_acc_desc.arr);
+
+#ifdef DEBUG
+    sprintf(string_var,"concat main code = <%s>  length = <%d> \n",t_concat_main_code.arr,t_concat_main_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"concat prod code = <%s>  length = <%d> \n",t_concat_prod_code.arr,t_concat_prod_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"concat sleg code = <%s>  length = <%d> \n",t_concat_sleg_code.arr,t_concat_sleg_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"concat acct code = <%s>  length = <%d> \n",t_concat_post_acc_code.arr,t_concat_post_acc_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"concat acct desc = <%s> \n",t_concat_post_acc_desc.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Length           = <%d> \n",t_concat_post_acc_desc.len);
+    disp_message(INFO_MESG,string_var);
+
+    disp_message(INFO_MESG,"Creating record in GL_POSTING_ACC\n");
+#endif
+   
+        EXEC SQL INSERT INTO GL_POSTING_ACC (
+                             ACC_ENTITY_CODE,
+                             MAIN_ACC1_CODE,
+                             MAIN_ACC2_CODE,
+                             DEPT_CODE,
+                             PRODUCT_GROUP_CODE,
+                             PRODUCT_LINE_CODE,
+                             SUBLEDGER_GROUP_CODE,
+                             SUBLEDGER_LINE_CODE,
+                             CONCAT_MAIN_CODE,
+                             CONCAT_PROD_CODE,
+                             CONCAT_SLEG_CODE,
+                             CONCAT_POST_ACC_CODE,
+                             MAIN_DESC,
+                             DEPT_DESC,
+                             PROD_DESC,
+                             SLEG_DESC,
+                             CONCAT_POST_ACC_DESC,
+                             SUMMARY_ACC_FLAG,
+                             BANK_RECONCILE_FLAG,
+                             STATUS,
+							 ADDED_BY_ID,
+							 ADDED_DATE )
+    
+	         VALUES   (  :nd_acc_entity,
+    	                     :t_main_acc1_code,
+    	                     :t_main_acc2_code,
+    	                     :t_dept_code,
+    	                     :t_product_group_code,
+    	                     :t_product_line_code,
+    	                     :t_subledger_group_code,
+    	                     :t_subledger_line_code,
+                             :t_concat_main_code,
+                             :t_concat_prod_code ,
+			     :t_concat_sleg_code,
+                             :t_concat_post_acc_code,
+                             :t_main_desc,
+                             :t_dept_desc,
+                             :t_prod_desc,
+                             :t_sleg_desc,
+                             :t_concat_post_acc_desc,
+			     'Y',
+                             :t_bank_recon_flag,
+							 '',
+							 USER,
+							 SYSDATE
+
+		           );
+
+    
+        if(sqlca.sqlcode < 0 && !DUPLICATE)
+	     err_mesg("INSERT failed on table GL_POSTING_ACC",0,"");
+
+    } /* end of if posting_acc not exists */
+
+    t_cnt = 0;
+
+    EXEC SQL SELECT COUNT(*)
+	     INTO   :t_cnt
+	     FROM   GL_PERIOD_ACC_BAL_LOCAL
+    	     WHERE  MAIN_ACC1_CODE       = :t_main_acc1_code
+    	     AND    MAIN_ACC2_CODE       = :t_main_acc2_code
+    	     AND    DEPT_CODE            = :t_dept_code
+    	     AND    PRODUCT_GROUP_CODE   = :t_product_group_code
+    	     AND    PRODUCT_LINE_CODE    = :t_product_line_code
+    	     AND    SUBLEDGER_GROUP_CODE = :t_subledger_group_code
+    	     AND    SUBLEDGER_LINE_CODE  = :t_subledger_line_code
+	     AND    POST_YEAR            = :t_year;
+
+    if(sqlca.sqlcode < 0)
+       err_mesg("SELECT failed on table GL_PERIOD_ACC_BAL_LOCAL",0,"");
+
+#ifdef DEBUG
+    sprintf(string_var,"t_cnt = %d\n",t_cnt);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+    if(!t_cnt)
+	ins_period_bal();
+
+}
+
+
+ins_period_bal()
+{
+
+
+        EXEC SQL SELECT ACC_ENTITY_CODE
+		          INTO   :nd_acc_entity
+			 FROM   GL_ACC_CHART 
+	         WHERE  MAIN_ACC1_CODE = :t_main_acc1_code
+	         AND    MAIN_ACC2_CODE = :t_main_acc2_code
+			 AND    ROWNUM = 1;  
+
+     if(sqlca.sqlcode < 0)
+	     err_mesg("SELECT failed on table GL_ACC_CHART",0,"");
+
+
+	 nd_acc_entity.arr[nd_acc_entity.len] = '\0';
+
+	    
+	
+	
+	for(t_month = 0; t_month <= g_num_of_acc_periods; t_month++) {
+
+#ifdef DEBUG
+    sprintf(string_var,"Creating a record in GL_PERIOD_ACC_BAL_LOCAL FOR MONTH %d\n",t_month);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+
+
+	EXEC SQL INSERT INTO GL_PERIOD_ACC_BAL_LOCAL (
+	                 ACC_ENTITY_CODE,
+	    	         MAIN_ACC1_CODE ,
+		    	     MAIN_ACC2_CODE ,
+		    	     DEPT_CODE ,
+		    	     PRODUCT_GROUP_CODE ,
+		    	     PRODUCT_LINE_CODE ,
+		    	     SUBLEDGER_GROUP_CODE ,
+		    	     SUBLEDGER_LINE_CODE ,
+		    	     POST_MONTH ,
+		    	     POST_YEAR ,
+		    	     MONTH_BAL_CR ,
+		    	     MONTH_BAL_DR ,
+		    	     YEAR_BAL_CR ,
+		    	     YEAR_BAL_DR ,
+					 MONTH_BAL_CR_FC,
+				     MONTH_BAL_DR_FC,
+					 YEAR_BAL_CR_FC ,
+					 YEAR_BAL_DR_FC )
+           	     VALUES (:nd_acc_entity,
+				      :t_main_acc1_code,
+		    	     :t_main_acc2_code,
+		    	     :t_dept_code,
+		    	     :t_product_group_code,
+		    	     :t_product_line_code,
+		    	     :t_subledger_group_code,
+		    	     :t_subledger_line_code,
+		    	     :t_month,
+		    	     :t_year,
+		    	     0,
+		    	     0,
+		    	     0,
+		    	     0,
+					 0,
+					 0,
+					 0,
+					 0 );
+
+	    if(DUPLICATE)
+		break;
+
+	    if(sqlca.sqlcode < 0)
+		err_mesg("INSERT failed on table GL_PERIOD_ACC_BAL_LOCAL",0,"");
+
+    }
+
+}

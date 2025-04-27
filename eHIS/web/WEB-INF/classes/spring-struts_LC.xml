@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+
+			<!-- Start of LC Reports beans-->
+
+		<!--	REPORT LATE DELIVERIES	 -->
+			
+	<bean name="/RepLateDeliveriesAction" 
+		class="com.iba.ehis.lc.replatedeliveries.pojo.web.RepLateDeliveriesAction"/>
+		
+	<!--REPORT FOR WRITTEN OFF LINEN -->	
+         
+    <bean name="/RepWrittenoffLinenAction" 
+		class="com.iba.ehis.lc.repwrittenofflinen.pojo.web.RepWrittenoffLinenAction"/>
+         		
+	<!--REPORT FOR QUALITY FAILURES -->	
+        
+      <bean name="/RepQualityFailuresAction" 
+		class="com.iba.ehis.lc.repqualityfailures.pojo.web.RepQualityFailuresAction"/>
+		
+	<!--REPORT FOR INFECTED LINEN -->
+	
+	<bean name="/RepInfectedLinenAction" 
+		class="com.iba.ehis.lc.repinfectedlinen.pojo.web.RepInfectedLinenAction"/>	
+              
+	 <!--REPORT FOR LINEN DELIVERY -->	
+         
+     <bean name="/RepLinenDeliveryAction" 
+		class="com.iba.ehis.lc.replinendelivery.pojo.web.RepLinenDeliveryAction"/>	
+        
+	<!--REPORT FOR SHORTAGE OF LINEN SUPPLY -->	
+         
+	 <bean name="/RepShortageofLinenSupplyAction" 
+		class="com.iba.ehis.lc.repshortageoflinensupply.pojo.web.RepShortageofLinenSupplyAction"/>
+
+	<!--	REPORT FOR LC MASTER CODES 	-->
+         
+		 <bean name="/RepLinenMasterCodesAction" 
+		class="com.iba.ehis.lc.replinenmastercodes.pojo.web.RepLinenMasterCodesAction"/>
+
+	<!-- END of LC Reports beans-->
+
+	<!-- Start of LC beans-->
+	<bean name="/LodgeComplaintAction"
+		class="com.iba.ehis.lc.lodgeComplaint.pojo.web.LodgeComplaintAction">
+		<property name="delegateId" value="lodgeComplaintDelegator" />
+	</bean>
+
+	<bean name="/LinenTypeAction"
+		class="com.iba.ehis.lc.linenType.pojo.web.LinenTypeAction">
+		<property name="delegateId" value="linenTypeDelegator" />
+	</bean>
+	<bean name="/LinenItemAction"
+		class="com.iba.ehis.lc.linenItem.pojo.web.LinenItemAction">
+		<property name="delegateId" value="linenItemDelegator" />
+	</bean>
+	<bean name="/AgencyCodeAction"
+		class="com.iba.ehis.lc.agencyCode.pojo.web.AgencyCodeAction">
+		<property name="delegateId" value="agencyCodeDelegator" />
+	</bean>
+	<bean name="/SetupParameterAction"
+		class="com.iba.ehis.lc.setupParameter.pojo.web.SetupParameterAction">
+		<property name="delegateId" value="setupParameterDelegator" />
+	</bean>
+	<bean name="/ReasonAction"
+		class="com.iba.ehis.lc.reason.pojo.web.ReasonAction">
+		<property name="delegateId" value="reasonDelegator" />
+	</bean>
+	<bean name="/LaundryUserAction"
+		class="com.iba.ehis.lc.laundryUser.pojo.web.LaundryUserAction">
+		<property name="delegateId" value="laundryUserDelegator" />
+	</bean>
+	<bean name="/StandardStockAction"
+		class="com.iba.ehis.lc.standardStock.pojo.web.StandardStockAction">
+		<property name="delegateId" value="standardStockDelegator" />
+	</bean>
+	<bean name="/RequestForLinenAction"
+		class="com.iba.ehis.lc.requestForLinen.pojo.web.RequestForLinenAction">
+		<property name="delegateId" value="requestForLinenDelegator" />
+	</bean>
+	<bean name="/RequestForLinenViewAction"
+		class="com.iba.ehis.lc.requestForLinen.pojo.web.RequestForLinenAction">
+		<property name="delegateId" value="requestForLinenViewDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenAction"
+		class="com.iba.ehis.lc.issueOfLinen.pojo.web.IssueOfLinenAction">
+		<property name="delegateId" value="issueOfLinenDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenViewAction"
+		class="com.iba.ehis.lc.issueOfLinen.pojo.web.IssueOfLinenAction">
+		<property name="delegateId" value="issueOfLinenViewDelegator" />
+	</bean>
+	
+	<bean name="/RequestForCleaningLinenAction"
+		class="com.iba.ehis.lc.requestForCleaningLinen.pojo.web.RequestForCleaningLinenAction">
+		<property name="delegateId" value="requestForCleaningLinenDelegator" />
+	</bean>
+	<bean name="/RequestForCleaningLinenViewAction"
+		class="com.iba.ehis.lc.requestForCleaningLinen.pojo.web.RequestForCleaningLinenAction">
+		<property name="delegateId" value="requestForCleaningLinenViewDelegator" />
+	</bean>
+	<bean name="/DeliverCleanedLinenAction"
+		class="com.iba.ehis.lc.deliverCleanedLinen.pojo.web.DeliverCleanedLinenAction">
+		<property name="delegateId" value="deliverCleanedLinenDelegator" />
+	</bean>
+	<bean name="/DeliverCleanedLinenViewAction"
+		class="com.iba.ehis.lc.deliverCleanedLinen.pojo.web.DeliverCleanedLinenAction">
+		<property name="delegateId" value="deliverCleanedLinenViewDelegator" />
+	</bean>
+	<bean name="/EnterCleanedLinenAction"
+		class="com.iba.ehis.lc.enterCleanedLinen.pojo.web.EnterCleanedLinenAction">
+		<property name="delegateId" value="enterCleanedLinenDelegator" />
+	</bean>
+	<bean name="/QueryStockStatusAction"
+		class="com.iba.ehis.lc.queryStockStatus.pojo.web.QueryStockStatusAction">
+	</bean>
+	<bean name="/QueryStockStatusLinenAction"
+		class="com.iba.ehis.lc.queryStockStatus.pojo.web.QueryStockStatusAction">
+		<property name="delegateId" value="stockLinenDelegator" />
+	</bean>
+	<bean name="/SendLinenForMendingAction"
+		class="com.iba.ehis.lc.sendLinenForMending.pojo.web.SendLinenForMendingAction">
+		<property name="delegateId" value="sendLinenForMendingDelegator" />
+	</bean>
+	<bean name="/SendLinenForMendingViewAction"
+		class="com.iba.ehis.lc.sendLinenForMending.pojo.web.SendLinenForMendingAction">
+		<property name="delegateId" value="sendLinenForMendingViewDelegator" />
+	</bean>
+	<bean name="/IssueLinenAfterMendingAction"
+		class="com.iba.ehis.lc.issueLinenAfterMending.pojo.web.IssueLinenAfterMendingAction">
+		<property name="delegateId" value="issueLinenAfterMendingDelegator" />
+	</bean>
+	<bean name="/IssueLinenAfterMendingViewAction"
+		class="com.iba.ehis.lc.issueLinenAfterMending.pojo.web.IssueLinenAfterMendingAction">
+		<property name="delegateId" value="issueLinenAfterMendingViewDelegator" />
+	</bean>
+	<bean name="/LoanLinenAction"
+		class="com.iba.ehis.lc.loanLinen.pojo.web.LoanLinenAction">
+		<property name="delegateId" value="loanLinenDelegator" />
+	</bean>
+	<bean name="/LoanLinenViewAction"
+		class="com.iba.ehis.lc.loanLinen.pojo.web.LoanLinenAction">
+		<property name="delegateId" value="loanLinenViewDelegator" />
+	</bean>
+	<bean name="/ReceiveLoanedLinenAction" class="com.iba.ehis.lc.receiveLoanedLinen.pojo.web.ReceiveLoanedLinenAction">
+		<property name="delegateId" value="receiveLoanedLinenDelegator" />
+	</bean>
+	<bean name="/ReceiveLoanedLinenViewAction"
+		class="com.iba.ehis.lc.receiveLoanedLinen.pojo.web.ReceiveLoanedLinenAction" >
+		<property name="delegateId" value="receiveLoanedLinenViewDelegator" />
+	</bean>
+	<!--	PAGE ACTIONS -->
+	
+	<bean name="/AgencyCodePageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="agencyCodeDelegator" />
+	</bean>
+	<bean name="/LinenItemPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="linenItemDelegator" />
+	</bean>
+		
+	<bean name="/LinenTypePageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="linenTypeDelegator" />
+	</bean>
+	<bean name="/LaundryUserPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="laundryUserDelegator" />
+	</bean>
+	
+	<bean name="/SetupParameterPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="setupParameterDelegator" />
+	</bean>
+	<bean name="/ReasonPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="reasonDelegator" />
+	</bean>
+	<bean name="/StandardStockPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="standardStockDelegator" />
+	</bean>
+	<bean name="/RequestForLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="requestForLinenDelegator" />
+	</bean>
+	<bean name="/RequestForLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="requestForLinenViewDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="issueOfLinenDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="issueOfLinenDelegator" />
+	</bean>
+	<bean name="/RequestForCleaningLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="requestForCleaningLinenDelegator" />
+	</bean>
+	<bean name="/RequestForCleaningLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="requestForCleaningLinenViewDelegator" />
+	</bean>
+	<bean name="/PendingCountPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="requestForCleaningLinenDelegator" />
+	</bean>
+	<bean name="/DeliverCleanedLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="deliverCleanedLinenDelegator" />
+	</bean>
+	<bean name="/DeliverCleanedLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="deliverCleanedLinenDelegator" />
+	</bean>
+	<bean name="/EnterCleanedLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="enterCleanedLinenDelegator" />
+	</bean>
+
+	<bean name="/QueryStockStatusPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="stockDelegator" />	
+	</bean>
+	<bean name="/QueryStockStatusLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="stockLinenDelegator" />	
+	</bean>
+	<bean name="/WriteOffLinenAction"
+		class="com.iba.ehis.lc.writeOffLinen.pojo.web.WriteOffLinenAction">
+		<property name="delegateId" value="writeOffLinenDelegator" />
+	</bean>
+	<bean name="/SendLinenForMendingPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="sendLinenForMendingDelegator" />
+	</bean>
+	<bean name="/SendLinenForMendingViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="sendLinenForMendingViewDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenAfterMendingPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="issueLinenAfterMendingDelegator" />
+	</bean>
+	<bean name="/IssueOfLinenAfterMendingViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="issueLinenAfterMendingViewDelegator" />
+	</bean>
+
+	<bean name="/ReceiveLinenAtLaundryAction"
+		class="com.iba.ehis.lc.receiveLinenAtLaundry.pojo.web.ReceiveLinenAtLaundryAction">
+		<property name="delegateId" value="receiveLinenAtLaundryDelegator" />
+	</bean>
+
+	<!-- ADDED ON 28/11/2007 -->
+
+	<bean name="/ReturnofLinentoLaundryAction" class="com.iba.ehis.lc.returnofLinentoLaundry.pojo.web.ReturnofLinentoLaundryAction">
+		<property name="delegateId" value="returnofLinentoLaundryDelegator" />
+	</bean>
+	<bean name="/LoanLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="loanLinenDelegator" />
+	</bean>
+	<bean name="/LoanLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="loanLinenViewDelegator" />
+	</bean>
+	<bean name="/ReceiveLoanedLinenPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="receiveLoanedLinenDelegator" />	
+	</bean>
+	<bean name="/ReceiveLoanedLinenViewPageAction"
+		class="com.iba.ehis.core.pojo.web.PageAction">
+		<property name="delegateId" value="receiveLoanedLinenDelegator" />	
+	</bean>
+	<!-- End of LC beans -->
+</beans>

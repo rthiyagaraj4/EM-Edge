@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>PH Parameter</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Pharmacy Management\nAdminSetup\nPH Parameter");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>PH Parameter</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Define</span> business logics or rules that influence the functioning of transactions in the module and the behavior of master codes that depend on the defined values.</p>
+<p class="Text">Some of the values set in the PH Parameter function depend on installation of ‘Inventory Management’ module.</p>
+<p class="Text">Parameters are to be defined before beginning usage of the module and are specific to each facility, where they are defined.</p>
+<p class="Text">The following parameter values are defined in PH Parameter:</p>
+<p class="Text" style="margin-left: 40px;">• Default Route for IV Administration</p>
+<p class="Text" style="margin-left: 40px;">• Default Frequency for TPN Order</p>
+<p class="Text" style="margin-left: 40px;">• Refill Applicability</p>
+<p class="Text" style="margin-left: 40px;">• Prescription Rules for Outpatient/Inpatient</p>
+<p class="Text" style="margin-left: 40px;">• Dispensing Rules</p>
+<p class="Text" style="margin-left: 40px;">• Interfacing of PH module with an external drug database</p>
+<p class="Text" style="margin-left: 40px;">• Default prompts for Dispense Stages.</p>
+<h2>Defining PH Parameter</h2>
+<p class="From">From the PH Admin Setup, select the PH Parameter function.</p>
+<p class="Text">The PH Parameter screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. <span class="RFDhyperlink">
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/PH_AdminSetup_PH_Parameter_RFD.htm',600,400);return false;">&lt;Related Field Description&gt;</a></span></p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields of the tab pages.</p>
+</li>
+</ol>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Prescription Rules Tab</a></p>
+<div class="droptext" id="POPUP351547828" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The Prescription Rules applicable for various Patient Classes are specified in the tab. The Practitioner cannot violate the maximum prescription duration specified as prescription rules. These values are inherited by the logged in facility and altered to suit its need. The facilities cannot exceed the specified values.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outpatient Encounters</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Prescription Duration for Outpatients</span> - Enter the Maximum Prescription Duration for Outpatients (in days) in numeric format of three digits maximum length. The Maximum Prescription Duration for Outpatients defined cannot be exceeded for Outpatients and discharged Inpatients (take home medication). This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Discharge Medications</p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Prescription Duration for Discharge Medications</span> - Enter the Maximum Prescription Duration for Discharge Medications in numeric format of three digits maximum length. The maximum prescription duration cannot be exceeded for Discharge Medications. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Inpatient/Other Encounters</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Prescription Duration for Inpatients () days</span> – Enter the Maximum Prescription Duration for Inpatients in numeric format of three digits maximum length. The maximum prescription duration defined cannot be exceeded for Inpatients. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">First Trimester</span> – Select the First Trimester from the drop-down list. The listed values are 1 to 44.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Second Trimester</span> - Select the Second Trimester from the drop-down list. The listed values are 1 to 44.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Third Trimester</span> - Select the Third Trimester from the drop-down list. The listed values are 1 to 44.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Display of no pregnancy record details in Pharmacy Orders</span> - &#160;Select this check box if you want to display the pregnancy indicator in the Pharmacy Orders screen</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Infuse Over Calculate by</span> – Select ‘Duration’ or ‘Quantity’ from the drop-down list. By default, the value ‘Duration’ is selected. If the default value is selected, the existing functionality of IV Order will be continued. If the value ‘Quantity is selected, the text fields Order Quantity and Total Volume are displayed within the Pharmacy Orders screen for IV Rx.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the ‘To’ weeks drop-down list value is less than the ‘From’ weeks drop-down list value, the system will prompt a message ‘The ‘To’ week cannot be less than the ‘From’ week’.</p>
+<p class="Note">&#160;</p>
+<p class="Note">If the same week range that is already selected for other trimester is selected, the system prompts a message ‘The same week range is selected for Trimester. Please select different week range’</p>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Dispensing Rules Tab</a></p>
+<div class="droptext" id="POPUP353410923" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">The Dispensing Rules applicable to the enterprise are defined in this tab. The rules defined pertain to dispense alternate forms of drug, dispensing of multi-strength, Outpatient Pharmacy rules for advance and past orders.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dispense By Alternate Form</span> – Select the check box to allow Dispensing Alternate Form of the prescribed drug. All other forms of the prescribed drug, but belonging to same route can be dispensed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">By Multi-Strength</span> – Select the check box to allow multi-strength dispensing of the prescribed drug(s). This check box is selected and disabled, if ‘By Alternate Form’ is applicable. Dispensing of multi-strength of prescribed drug but belonging to the same form is allowed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Alternate Generic Name</span> – Select the check box to allow dispensing of alternate generics of the prescribed Drug.</p>
+</li>
+</ol>
+<p class="BoldRFD">Outpatient Pharmacy</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Dispensing in Advance</span> – Select the check box to allow dispensing of drugs in advance of prescription start date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Days Ahead</span> – Specify the number of days in advance the drugs is dispensed from the prescription start date. Enter the period in numeric format of three digits maximum length. This field is enabled only when ‘Allow Dispensing in Advance’ is selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Dispensing past Orders</span> - Select the check box to allow dispensing of past orders (prescriptions) that have exceeded the medication end date and time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Up to No. of Days</span> - Specify the number of days in numeric format of two digits maximum length up to which an expired prescription order can be dispensed. The system validates expired prescriptions for dispensing based on the end date and time of the prescription. This field is enabled only when ‘Allow Dispensing past Orders’ is selected. This is a mandatory field.</p>
+</li>
+</ol>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Drug Database Interface Tab</a></p>
+<div class="droptext" id="POPUP350560548" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Pharmacy Module can be interfaced with External Drug Database. The database name is specified in the tab.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Drug Database Interface Required</span> – Select the check box to indicate, if the Drug Database Interface is required.</p>
+</li>
+</ol>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Process Name Tab</a></p>
+<div class="droptext" id="POPUP353327399" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">Prompts for various dispensing stages are specified in this tab. These prompts displays in ‘PH Parameter for Facility’ function. The dispensing process stages applicable to the enterprise are specified as prompts.</span></p>
+<p class="BoldRFD">Prompts for Dispensing Stage</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Registration</span> – Enter the prompt text for ‘Registration’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Verification</span> - Enter the prompt text for ‘Verification’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fill</span> - Enter the prompt text for ‘Fill’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allocate</span> - Enter the prompt text for ‘Allocate’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill/Receipt</span> - Enter the prompt text for ‘Bill/Receipt’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deliver</span> - Enter the prompt text for ‘Deliver’ in alphanumeric format of 15 characters maximum length. The entered prompt is displayed in ‘PH Parameter for Facility’ function.</p>
+</li>
+</ol>
+<p class="BoldRFD">IV Order Type Legends</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IV With Additives</span> – Enter the alternate name for IV with Additives. The described name appears in Order Type list in under ‘IV Rx’ tab in Prescription writer.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IV Intermittent</span> - Enter the alternate name for IV Intermittent. The described name appears in Order Type list box in under ‘IV Rx’ tab in Prescription writer.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IV Without Additives</span> - Enter the alternate name for IV without Additives. The described name appears in Order Type list in under ‘IV Rx’ tab in Prescription writer.</p>
+</li>
+</ol>
+</div>
+<ol start="3" type="1">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to save the PH Parameter rules or <span class="BoldButton">[Reset]</span> to clear the entered data.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Only one record of PH Parameter is maintained, hence [Create] is not provided in the function.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Admin Route','../CodeSetup/Admin_Route.htm','Frequency','../../Application_Masters/CodeSetup/Frequency.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP351547828');
+	TextPopupInit('a3','POPUP353410923');
+	TextPopupInit('a4','POPUP350560548');
+	TextPopupInit('a5','POPUP353327399');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

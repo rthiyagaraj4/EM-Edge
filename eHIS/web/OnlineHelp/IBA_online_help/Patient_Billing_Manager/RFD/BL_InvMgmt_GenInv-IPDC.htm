@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_InvMgmt_GenInv-IPDC</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<p class="BoldRFD">Enter the following details to generate invoice:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the Facility from the list. The facilities associated to the logged in user gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Trx Type</span> – The Transaction Type is displayed as Invoice, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer. The outstanding bill details associated to the selected Customer gets listed under the ‘Outstanding Bills’. You can select the required bills to generate an invoice for the respective bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Policy Type. The outstanding bill details associated to the selected Customer gets listed under the ‘Outstanding Bills’. You can select the required bills to generate an invoice for the respective bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Patient ID. An invoice is generated for the outstanding bills of the selected patient who is linked to the selected Customer. The age, gender, name and National ID of the patient gets displayed in the respective text boxes on selecting the Patient ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Encounter ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Encounter ID. An invoice is generated for the outstanding bills of the selected patient for a specific Encounter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> – Select an Episode Type to search for the respective Episode Types with the outstanding bill details. You can select from the list of outstanding bills of an Episode Type associated to the Customer to generate the invoices for the selected Episode Type.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Inpatient – Select ‘Inpatient’ to search for the Inpatient records with the outstanding bills that are associated to the selected Customer.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Daycare – Select ‘Daycare’ to search for the Daycare patient records with the outstanding bills that are associated to the selected Customer.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Range of Bills</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit/Adm Date [From – To]</span> – Click Calendar function to select the date range. The patient records with the visit registration or admission date matching the selected date range are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discharge Adv Date</span> <span class="UnderlineRFD">[From – To]</span> – Click Calendar function to select the discharge advice date range. The patient records with the discharge advice generated during the selected date range are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Refresh]</span> – Click <span class="BoldNumberRFD">[Refresh]</span> to view the outstanding bill and the encounter details to generate the invoice.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> – Enter the narration in alphanumeric format of 200 characters maximum length.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Encounter Details for Pending Invoice</p>
+<ol start="12">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – The Patient ID selected gets displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> – The Episode Type of the patient gets displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode ID</span> – The Episode ID of the patient gets listed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit ID</span> – The Visit ID of the patient gets displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Spl Clinic</span> - The check box is selected if the encounter is related to special clinic.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Acct Seq No</span> – The Account Sequence Number gets displayed. For each patient encounter, when the Policy details are modified, the account sequence number gets updated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> - The Payer Group associated to the respective patient encounter is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> - The Payer associated to the respective Payer Group is displayed. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy/Group Code</span> - The Policies associated to the respective Payer and Payer Group are displayed. The Policy Group code is displayed, if multiple Policy Types are grouped under the corresponding Policy Group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Acct Seq No</span> – The Account Sequence Number gets displayed. For each patient encounter, when the Policy details are modified, the account sequence number gets updated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> – The Priority assigned to the respective Episode while recording the financial details for the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust Code</span> – The Customer Code associated to the selected Episode while recording the financial details for the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type Code</span> – The Policy associated to the patient while recording the financial details gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admission &#160;Date</span> – The date when the patient was admitted to the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discharge Date</span> - The date when the patient was discharged from the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Additional Dtls Reqd</span> – The check box is selected based on the settings defined for the Policy Type in ‘Setup invoice Additional Info’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Captured</span> – The check box is selected, if additional information is recorded for the Policy Type and the selected Customer Code. The check box is cleared, if the details are not captured for the selected record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[C]</span> – Click <span class="BoldNumberRFD">[C]</span> to capture <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">additional details</a> for the selected record. You cannot generate the invoice for the selected records, if the additional details are not captured. The patient details are recorded during patient registration are displayed. The Account Sequence Number, Priority, Customer Details, Policy Type and Number are displayed along with the patient details.</p>
+<div class="droptext" id="POPUP1004713643" style="display: none;">
+<p><span class="BoldButton">Enter the following details:</span></p>
+<ol>
+<li class="p-Number">
+<p class="Number"><span class="BoldButton">[Populate Additional Info]</span> – Click <span class="BoldButton">[Populate Additional Info]</span> to populate the additional details setup for the Payer Group, Payer and the Policy Type combination defined using the ‘Setup Additional Info by Payer/Policy’ tab in the ‘Setup Invoice Additional Info’ function. You can associate additional data which is not associated to the Payer Group, Payer and the Policy Type combination by selecting the values from the list.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">SL No</span> – Enter the Serial Number in numeric format in four digits of maximum length. This identifies the order in which the additional information has to appear.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Info ID</span> - Click <span class="BoldButton">[List of Values]</span> to select an Information ID. The Info ID’s created using the ‘Setup Data for Additional Info Identifiers’ tab using the ‘Setup Invoice Additional Info’ function gets listed.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Code</span> – Click <span class="BoldButton">[List of Values]</span> to select a Code. The Codes defined for the selected Info ID gets listed.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Description</span> – The description for the selected Code gets displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Data</span> – The data set while defining the Info ID using the ‘Additional Info Identifiers’ tab in the ‘Setup Invoice Additional Info’ with the ‘Data Set Available’ check box as cleared gets displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Mandatory</span> – Select the check box, if the additional invoice detail is mandatory while generating the invoice. The additional details are not mandatory, if the check box is cleared.</p>
+</li>
+</ol>
+<p class="Text">The button <span class="BoldButton">[C]</span> is replaced by <span class="BoldButton">[V]</span> adjacent to the record for which the additional details are captured successfully. <span class="BoldButton">[V]</span> indicates Victory, which specifies that the additional details have been successfully captured. <span class="BoldButton">&#160;</span></p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> - The name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> - The description of the Customer is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Name</span> - The description of the associated Policy Type is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outstanding Bills</p>
+<ol start="33" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference Original Invoice</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the original invoice number. The Original Invoice Number indicates that the invoice generated is in reference to the invoice number, which is already generated and dispatched to the Customer.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Service Dtls]</span> – Click <span class="BoldNumberRFD">[Service Dtls]</span> to view the service details for the selected record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select All</span> – Select the check box to generate invoice for all the outstanding bills of the patient. Clear the check box, if the invoice has to be generated for selected bills only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> – Select the outstanding bills against which the invoices are to be generated. You can select to print a consolidated invoice by selecting a group of outstanding bills or select individual bills to generate separate invoice for each outstanding bill.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type</span> – The Document Type selected while generating the bill for an Outpatient or Emergency or an External patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Number</span> - The Document Number generated for the outstanding bill gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – The date when the bill was generated for the services utilized by the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> – The Policy Type associated to the patient gets displayed. Separate bill is generated for each Policy Type that is associated to the Payer Group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pending Amount</span> – The pending amount, which has to be settled, gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – The ID of the selected patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> – The Episode Type of the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode ID</span> – The Episode ID for the respective patient in the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit ID</span> – The Visit ID during which the bill was not settled, gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> – The total outstanding bill amount gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Generate]</span> – Click <span class="BoldNumberRFD">[Generate]</span> to generate the invoice for the selected outstanding bills. The Document Type has to be defined for the Invoice records. A reference number is generated on clicking <span class="BoldNumberRFD">[Generate]</span>. If the diagnosis is recorded for the selected Policy Type and the diagnosis details are not recorded, the indication is displayed with <img src="../../image120.gif" style="border: none;" alt="image120.gif" height="12" width="15" border="0" /> &#160;color. You cannot generate the bills, if the diagnosis is not recorded.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004713643');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

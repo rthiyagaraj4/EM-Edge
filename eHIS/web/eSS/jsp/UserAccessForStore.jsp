@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<%--
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+--%>
+<%@page contentType="text/html;charset=UTF-8"%>
+<html>
+<head>
+<%
+request.setCharacterEncoding("UTF-8");
+String sStyle =
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css' ></link> 
+	<script language="JavaScript" src="../../eSS/js/UserAccessForStore.js"></script>
+	<script language="JavaScript" src="../../eSS/js/SsCommon.js"></script>
+	<script language="javascript" src="../../eCommon/js/common.js"></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+</head>
+<%
+	String url = "../../eCommon/jsp/commonToolbar.jsp?";
+	String params =request.getQueryString() ;
+	String source = url + params ;
+%>
+<iframe name = "commontoolbarFrame" frameborder = "0" scrolling = "no" noresize src="<%= source %>" style='height:6vh;width:100vw'></iframe>
+<iframe name = "f_query_add_mod" frameborder = "0" scrolling = "auto" noresize src="../../eCommon/html/blank.html" style='height:86vh;width:100vw'></iframe>
+<iframe name = "messageFrame" src="../../eCommon/jsp/error.jsp" frameborder = "0" noresize scrolling = "auto" style='height:8vh;width:100vw'></iframe>
+</html>
+
+
+
+

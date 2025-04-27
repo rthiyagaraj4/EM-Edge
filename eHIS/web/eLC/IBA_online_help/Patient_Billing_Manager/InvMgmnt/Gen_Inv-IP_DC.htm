@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Gen Inv-IP/DC</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nInvMgmnt\nGen Inv-IP/DC");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Generate Invoice - IP/DC</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Generate</span> the invoice for Inpatients or the Daycare patients in the facility.</p>
+<p class="Text">The Generate Invoice – IP/DC function enables you to generate an invoice for the outstanding bills of the Inpatients or the Daycare patients who are associated to the selected Customer. You can the select the Customer Specific and Facility Specific parameters to dispatch the invoices to the Customers. A bill is printed during invoice generation listing the outstanding payment, if the check box ‘Bill Printing Required’ is selected in ‘Invoice Process Parameters’ function. Invoice posting is mandatory, if the check box ‘GL Interface Distribution Required for IP from Acct Month &amp; Year’ is selected under the 'Inpatient/Daycare' tab in ‘BL Parameters’ function. Invoice is posted to respective GL accounts to process month end. Bills, Receipts and Refund documents are posted only if the Cash Control receipts are generated for the Cashier transactions. A Billing Clerk or Cashier can record Diagnosis Code in the preferred language, if the details are recorded in the local language through the 'Translation Manager' function in System Manager module. The report printed after invoice generation will print the Diagnosis Code and description in the preferred language. You can generate invoice for the patients' who are yet to be discharged from the facility. You can generate invoice for the Inpatients, Outpatients and Emergency patients’ who are discharged, if the parameter is selected in ‘Invoice Generation Rule by Payer’ function. Several color indicators are used to highlight the statuses of 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Pending Invoice</a> and 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Outstanding bills</a>. A single invoice is generated for multiple bills that are grouped under the same Policy Group and associated to a Payer. The DRG Policy is considered to be the primary policy for Inpatient encounters. The policies that are associated to the same Payer will have a single invoice. You have to capture additional information for the Primary Policy.</p>
+<div class="droptext" id="POPUP349767199" style="display: none;">
+<p class="Text"><img src="../../image507.gif" style="border: none;" alt="image507.gif" width="12" height="14" border="0" /> - Indicates that the respective bill is for a Special Service Item</p>
+<p class="Text"><img src="../../image508.gif" style="border: none;" alt="image508.gif" width="14" height="14" border="0" /> - Indicates that the bills are not printed</p>
+<p class="Text"><img src="../../image509.gif" style="border: none;" alt="image509.gif" width="10" height="15" border="0" /> - Indicates that the bills are not posted</p>
+</div>
+<div class="droptext" id="POPUP349038987" style="display: none;">
+<p class="Text"><img src="../../image501.gif" style="border: none;" alt="image501.gif" width="11" height="14" border="0" /> - Indicates the invoice generation rule is not defined for the selected Payer Group, Payer and Policy Type combination</p>
+<p class="Text"><img src="../../image502.gif" style="border: none;" alt="image502.gif" width="11" height="14" border="0" /> - Indicates that the diagnosis is not recorded/recoded for the respective patient record</p>
+<p class="Text"><img src="../../image503.gif" style="border: none;" alt="image503.gif" width="12" height="15" border="0" /> - Indicates that the invoice is not generated for the previous Payers</p>
+<p class="Text"><img src="../../image504.gif" style="border: none;" alt="image504.gif" width="14" height="16" border="0" /> - Indicates that the patient has to be discharged</p>
+<p class="Text"><img src="../../image505.gif" style="border: none;" alt="image505.gif" width="13" height="14" border="0" /> - Indicates that the bill has to be printed for invoice generation</p>
+<p class="Text">&#160;<img src="../../image506.gif" style="border: none;" alt="image506.gif" width="15" height="15" border="0" />- Indicates that the bill has to be posted</p>
+</div>
+<p class="Text">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The accounts which are credited and debited during bill posting are mentioned below.</p>
+<p class="Note">Bill Posting</p>
+<p class="Note">The billing receivable account for the respective bill type is debited.</p>
+<p class="Note">Income accounts for a Billing Service code is credited with the gross amount.</p>
+<p class="Note">Discount accounts for a Billing Group is debited with the discount amount.</p>
+<p class="Note">&#160;</p>
+<p class="Note">Receipt Posting</p>
+<p class="Note">The billing receivable account for the respective bill type is credited when a receipt raised against a bill is posted.</p>
+<p class="Note">The account defined for the cash counter and the settlement type is debited.</p>
+<p class="Note">&#160;</p>
+<p class="Note">Refund Posting</p>
+<p class="Note">The billing receivable account for the respective bill type is debited when a refund raised against a bill is posted.</p>
+<p class="Note">The account defined for the cash counter and the settlement type is credited.</p>
+<p class="Note">&#160;</p>
+<p class="Note">Other Receipt Posting</p>
+<p class="Note">The account defined for the cash counter and the settlement type is debited.</p>
+<p class="Note">The &#160;account defined against the receipt type is credited.</p>
+<p class="Note">&#160;</p>
+<p class="Note">Other Refund Posting</p>
+<p class="Note">The account defined for the cash counter and the settlement type is credited.</p>
+<p class="Note">The &#160;account defined against the receipt type is debited.</p>
+<p class="Note">&#160;</p>
+<p class="Note">Cash Counter Receipt</p>
+<p class="Note">The account defined in the billing parameters will be debited when cash counter receipt transaction is posted.</p>
+<p class="Note">The account defined for the cash counter and settlement type is credited.</p>
+<p class="Note">&#160;</p>
+<p class="Note">An error message is displayed, if the outstanding amount exceeds the agreed amount recorded through the ‘Agreed Invoice Amt by Payer/Policy’ function.</p>
+<h2>Generating Invoice for Inpatients or Daycare patients</h2>
+<p class="From">From the Invoice Management &gt; Transaction, double-click on Generate Invoice – IP/DC function.</p>
+<p class="Text">The Generate Invoice – IP/DC screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory fields. 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/BL_InvMgmt_GenInv-IPDC.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> to save the records or <span class="BoldButton">[Clear Record]</span> to delete the data entered.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Customer','../../Accounts_Receivable/Code_Setup/Customer.htm','Policy Types','../../Insurance_Management/Code_Setup/Policy_Types.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP349038987');
+	TextPopupInit('a3','POPUP349767199');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

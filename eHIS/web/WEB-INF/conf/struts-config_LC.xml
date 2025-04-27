@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+	<display-name />
+	<description />
+	<data-sources />
+	<form-beans>
+	
+		<form-bean name="QueryCriteriaForm"
+			type="com.iba.ehis.core.pojo.web.QueryCriteriaForm"/>
+		
+		<form-bean name="LodgeComplaintForm"
+			type="com.iba.ehis.lc.lodgeComplaint.pojo.web.LodgeComplaintForm">
+		</form-bean>
+		<form-bean name="AgencyCodeForm"
+			type="com.iba.ehis.lc.agencyCode.pojo.web.AgencyCodeForm"/>
+		
+		<form-bean name="LinenItemForm"
+			type="com.iba.ehis.lc.linenItem.pojo.web.LinenItemForm"/>
+		
+		<form-bean name="LinenTypeForm"
+			type="com.iba.ehis.lc.linenType.pojo.web.LinenTypeForm"/>
+		
+		<form-bean name="SetupParameterForm"
+			type="com.iba.ehis.lc.setupParameter.pojo.web.SetupParameterForm"/>
+		
+		<form-bean name="ReasonForm"
+			type="com.iba.ehis.lc.reason.pojo.web.ReasonForm"/>
+		
+		<form-bean name="LaundryUserForm"
+			type="com.iba.ehis.lc.laundryUser.pojo.web.LaundryUserForm"/>
+		
+		<form-bean name="StandardStockForm"
+			type="com.iba.ehis.lc.standardStock.pojo.web.StandardStockForm"/>
+		
+		<form-bean name="RequestForCleaningLinenForm"
+			type="com.iba.ehis.lc.requestForCleaningLinen.pojo.web.RequestForCleaningLinenForm"/>
+		
+		<form-bean name="RequestForLinenForm"
+			type="com.iba.ehis.lc.requestForLinen.pojo.web.RequestForLinenForm"/>
+		
+		<form-bean name="RequestForLinenViewForm"
+			type="com.iba.ehis.lc.requestForLinen.pojo.web.RequestForLinenViewForm"/>
+		
+		<form-bean name="IssueOfLinenForm"
+			type="com.iba.ehis.lc.issueOfLinen.pojo.web.IssueOfLinenForm"/>
+		
+		<form-bean name="DeliverCleanedLinenForm"
+			type="com.iba.ehis.lc.deliverCleanedLinen.pojo.web.DeliverCleanedLinenForm"/>
+		<form-bean name="EnterCleanedLinenForm"
+			type="com.iba.ehis.lc.enterCleanedLinen.pojo.web.EnterCleanedLinenForm"/>
+		
+		<form-bean name="QueryStockStatusForm"
+			type="com.iba.ehis.lc.queryStockStatus.pojo.web.QueryStockStatusForm"/>
+
+		<form-bean name="WriteOffLinenForm"
+			type="com.iba.ehis.lc.writeOffLinen.pojo.web.WriteOffLinenForm">
+		</form-bean>
+		<form-bean name="SendLinenForMendingForm"
+			type="com.iba.ehis.lc.sendLinenForMending.pojo.web.SendLinenForMendingForm">
+		</form-bean>
+		<form-bean name="IssueLinenAfterMendingForm"
+			type="com.iba.ehis.lc.issueLinenAfterMending.pojo.web.IssueLinenAfterMendingForm">
+		</form-bean>
+	
+		<!-- ReturnofLinentoLaundryForm ADDED ON 28/11/2007 -->
+
+		<form-bean name="ReturnofLinentoLaundryForm"
+			type="com.iba.ehis.lc.returnofLinentoLaundry.pojo.web.ReturnofLinentoLaundryForm">
+		</form-bean>
+		<form-bean name="LoanLinenForm"
+			type="com.iba.ehis.lc.loanLinen.pojo.web.LoanLinenForm">
+		</form-bean>
+		<form-bean name="LoanLinenViewForm"
+			type="com.iba.ehis.lc.loanLinen.pojo.web.LoanLinenViewForm">
+		</form-bean>
+		<form-bean name="ReceiveLoanedLinenForm"
+			type="com.iba.ehis.lc.receiveLoanedLinen.pojo.web.ReceiveLoanedLinenForm">
+		</form-bean>
+		
+
+<!--		REPORT FOR LATE DELIVERIES 	-->
+
+		<form-bean name="RepLateDeliveriesForm"
+			type="com.iba.ehis.lc.replatedeliveries.pojo.web.RepLateDeliveriesForm" />
+			
+<!--		REPORT FOR LINEN DELIVERY 	-->
+
+		<form-bean name="RepLinenDeliveryForm"
+			type="com.iba.ehis.lc.replinendelivery.pojo.web.RepLinenDeliveryForm" />
+
+<!--		REPORT FOR WRITTEN OFF LINEN 	-->
+
+		<form-bean name="RepWrittenoffLinenForm"
+			type="com.iba.ehis.lc.repwrittenofflinen.pojo.web.RepWrittenoffLinenForm" />
+			
+<!--			REPORT FOR QUALITY FALURIES 	-->
+
+		<form-bean name="RepQualityFailuresForm"
+			type="com.iba.ehis.lc.repqualityfailures.pojo.web.RepQualityFailuresForm" />
+			
+<!--			REPORT FOR INFECTED LINEN 	-->
+
+		<form-bean name="RepInfectedLinenForm"
+			type="com.iba.ehis.lc.repinfectedlinen.pojo.web.RepInfectedLinenForm" />
+			
+<!--			REPORT FOR SHORTAGE OF LINEN SUPPLY 	-->
+
+		<form-bean name="RepShortageofLinenSupplyForm"
+			type="com.iba.ehis.lc.repshortageoflinensupply.pojo.web.RepShortageofLinenSupplyForm" />
+
+<!--		LC MASTER REPORT		-->
+
+		<form-bean name="RepLinenMasterCodesForm"
+			type="com.iba.ehis.lc.replinenmastercodes.pojo.web.RepLinenMasterCodesForm" />
+	
+		<form-bean name="ReceiveLinenAtLaundryForm"
+			type="com.iba.ehis.lc.receiveLinenAtLaundry.pojo.web.ReceiveLinenAtLaundryForm">
+		</form-bean>
+
+		</form-beans>
+
+		
+	<global-exceptions />
+	<global-forwards>
+	
+		<forward name="requestForLinenCriteriaPage"
+			path="/eLC/RequestForLinen/jsp/RequestsListCUD.jsp" />
+		<forward name="issueOfLinenCriteriaPage"
+			path="/eLC/IssueOfLinen/jsp/RequestsListCUD.jsp" />
+		<forward name="requestForCleaningLinenCriteriaPage"
+			path="/eLC/RequestForCleaningLinen/jsp/CleaningRequestsListCUD.jsp" />
+		<forward name="pendingCountCriteriaPage"
+			path="/eLC/RequestForCleaningLinen/jsp/PendingCountCriteria.jsp" />
+		<forward name="deliverCleanedLinenCriteriaPage"
+			path="/eLC/DeliverCleanedLinen/jsp/DeliverCleanedLinenCUD.jsp" />
+		<forward name="mendingRequestCriteriaPage"
+			path="/eLC/SendLinenForMending/jsp/MendingListCUD.jsp" />
+		<forward name="issueOfLinenAfterMendingCriteriaPage"
+			path="/eLC/IssueLinenAfterMending/jsp/MendingListCUD.jsp" />
+			<forward name="loanLinenCriteriaPage"
+			path="/eLC/LoanLinen/jsp/LoanListCUD.jsp" />
+	</global-forwards>
+
+	<action-mappings>
+
+	<!-- Start of LC Reports Actions-->
+
+	  <!-- REPORT FOR LATE DELIVERIES -->
+         
+         <action name="RepLateDeliveriesForm" 
+			path="/RepLateDeliveriesAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPage" path="/eLC/RepLateDeliveries/jsp/LateDeliveries.jsp" />
+		</action>
+		
+		<!--REPORT FOR WRITTEN OFF LINEN -->	
+         
+         <action name="RepWrittenoffLinenForm" 
+			path="/RepWrittenoffLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPage" path="/eLC/RepWrittenoffLinen/jsp/WrittenoffLinen.jsp" />
+		</action>
+		
+		<!--REPORT FOR QUALITY FALURIES -->	
+         
+         <action name="RepQualityFailuresForm" 
+			path="/RepQualityFailuresAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPage" path="/eLC/RepQualityFailures/jsp/QualityFailures.jsp" />
+		</action>
+		
+		<!--REPORT FOR INFECTED LINEN -->	
+         
+         <action name="RepInfectedLinenForm" 
+			path="/RepInfectedLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPage" path="/eLC/RepInfectedLinen/jsp/InfectedLinen.jsp" />
+		</action>
+		
+		 <!--REPORT FOR LINEN DELIVERY -->	
+         
+         <action name="RepLinenDeliveryForm" 
+			path="/RepLinenDeliveryAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy" >
+			<forward name="createPage" path="/eLC/RepLinenDelivery/jsp/LinenDelivery.jsp" />
+		</action>
+		
+		<!--REPORT FOR SHORTAGE OF LINEN SUPPLY -->	
+         
+         <action name="RepShortageofLinenSupplyForm" 
+			path="/RepShortageofLinenSupplyAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPage" path="/eLC/RepShortageofLinenSupply/jsp/ShortageofLinenSupply.jsp" />
+		</action>
+
+	<action name="RepLinenMasterCodesForm" 
+			path="/RepLinenMasterCodesAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="createPage" path="/eLC/RepLCMasterCodes/jsp/LinenMasterCodes.jsp" />
+			<forward name="createPage1" path="/eLC/RepLCMasterCodes/jsp/LinenItems.jsp" />
+			<forward name="createPage2" path="/eLC/RepLCMasterCodes/jsp/LinenTypes.jsp" />
+			<forward name="createPage3" path="/eLC/RepLCMasterCodes/jsp/AgencyCode.jsp" />
+			<forward name="createPage4" path="/eLC/RepLCMasterCodes/jsp/ReasonComplCodes.jsp" />
+			<forward name="createPage5" path="/eLC/RepLCMasterCodes/jsp/StandardStockforWCD.jsp" />
+			<forward name="createPage6" path="/eLC/RepLCMasterCodes/jsp/LaundryUsers.jsp" />
+		</action>
+
+	<!-- END of LC Reports Actions-->
+	<!-- LodgeComplaint Action -->
+		<action name="LodgeComplaintForm" path="/LodgeComplaintAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageLodgeComplaint"
+			path="/eLC/LodgeComplaint/jsp/LodgeComplaintCud.jsp" />
+		</action>
+
+		<!-- LinenItem Action -->
+		<action name="LinenItemForm" path="/LinenItemAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageLinenItem"
+			path="/eLC/LinenItem/jsp/LinenItemCud.jsp" />
+		</action>
+	
+		<!-- LinenType Action -->
+		<action name="LinenTypeForm" path="/LinenTypeAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageLinenType"
+			path="/eLC/LinenType/jsp/LinenTypeCud.jsp" />
+		</action>
+		<!-- AgencyCode Action -->
+		<action name="AgencyCodeForm" path="/AgencyCodeAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageAgencyCode"
+			path="/eLC/AgencyCode/jsp/AgencyCodeCud.jsp" />
+		</action>
+		<!-- SetupParameter Action -->
+		<action name="SetupParameterForm" path="/SetupParameterAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageSetupParameter"
+			path="/eLC/SetupParameter/jsp/SetupParameterCud.jsp" />
+		</action>
+		<!-- Reason Action -->
+		<action name="ReasonForm" path="/ReasonAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageReason"
+			path="/eLC/Reason/jsp/ReasonCud.jsp" />
+		</action>
+		<!-- LaundryUser Action -->
+		<action name="LaundryUserForm" path="/LaundryUserAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageLaundryUser"
+			path="/eLC/LaundryUser/jsp/LaundryUserCud.jsp" />
+		</action>
+		<!-- StandardStock Action -->
+		<action name="StandardStockForm" path="/StandardStockAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageStandardStock"
+			path="/eLC/StandardStock/jsp/StandardStockCud.jsp" />
+		</action>
+		
+		<!-- Request For Linen Action -->
+		
+		<action name="RequestForLinenForm" path="/RequestForLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		 	<forward name="placeLinenRequest"
+			path="/eLC/RequestForLinen/jsp/PlaceLinenRequestCUD.jsp" />
+			<forward name="requestsList"
+			path="/eLC/RequestForLinen/jsp/RequestsListCUD.jsp" />
+		</action> 
+		<action name="RequestForLinenForm" path="/RequestForLinenViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="viewRequest"
+			path="/eLC/RequestForLinen/jsp/View.jsp" />
+		</action>
+		
+		<!-- Issue Of Linen Action -->
+		
+		<action name="IssueOfLinenForm" path="/IssueOfLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="requestsList"
+			path="/eLC/IssueOfLinen/jsp/RequestsListCUD.jsp" />
+			<forward name="issueoflinen" path="/eLC/IssueOfLinen/jsp/IssueOfLinenCUD.jsp" />
+		</action>
+		<action name="IssueOfLinenForm" path="/IssueOfLinenViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="issueViewRequest"
+			path="/eLC/IssueOfLinen/jsp/View.jsp" />
+			<forward name="issueRequest"
+			path="/eLC/IssueOfLinen/jsp/IssueOfLinenCUD.jsp" />
+		</action>
+		
+		<!-- Request For Cleaning Linen Action -->
+		
+		<action name="RequestForCleaningLinenForm" path="/RequestForCleaningLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		 	<forward name="placeCleaningLinenRequest"
+			path="/eLC/RequestForCleaningLinen/jsp/PlaceCleaningLinenRequestCUD.jsp" />
+			<forward name="cleaningRequestsList"
+			path="/eLC/RequestForCleaningLinen/jsp/CleaningRequestsListCUD.jsp" />
+			<forward name="pendingCountConfirm"
+			path="/eLC/RequestForCleaningLinen/jsp/PlaceCountCriteria.jsp" />
+		</action> 
+		<action name="RequestForCleaningLinenForm" path="/RequestForCleaningLinenViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="ViewCleaningRequest"
+			path="/eLC/RequestForCleaningLinen/jsp/View.jsp" />
+		</action>
+		
+		<!-- Deliver Cleaned Linen Action -->
+		
+		<action name="DeliverCleanedLinenForm" path="/DeliverCleanedLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="deliverList"
+			path="/eLC/DeliverCleanedLinen/jsp/DeliverListCUD.jsp" />
+			<forward name="deliverCleanedLinen" path="/eLC/DeliverCleanedLinen/jsp/DeliverCleanedLinenCUD.jsp" />
+		</action>
+		<action name="DeliverCleanedLinenForm" path="/DeliverCleanedLinenViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="deliverViewRequest"
+			path="/eLC/DeliverCleanedLinen/jsp/View.jsp" />
+			<forward name="deliverRequest"
+			path="/eLC/DeliverCleanedLinen/jsp/DeliverLinenCUD.jsp" />
+		</action>
+		<!-- Enter Cleaned Linen Action -->
+		
+		<action name="EnterCleanedLinenForm" path="/EnterCleanedLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="enterCleanedLinen" path="/eLC/EnterCleanedLinen/jsp/EnterCleanedLinenCUD.jsp" />
+		</action>
+		
+		<!-- Query Stock Status  -->
+		<action name="QueryStockStatusForm" path="/QueryStockStatusAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="querySourceQueryCriteria" path="/eLC/QueryStockStatus/jsp/QuerySourceQueryCriteria.jsp" />
+			<forward name="queryLinenItemQueryCriteria" path="/eLC/QueryStockStatus/jsp/QueryLinenItemQueryCriteria.jsp" />
+		</action>
+		<!-- Query Stock Linen Status  -->
+		<action name="QueryStockStatusForm" path="/QueryStockStatusLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		</action>
+		<!-- WriteOffLinen Action -->
+		<action name="WriteOffLinenForm" path="/WriteOffLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createPageWriteOffLinen"
+			path="/eLC/WriteOffLinen/jsp/WriteOffLinenCUD.jsp" />
+		</action>
+		<!-- Send Linen For Mending Action -->
+		
+		<action name="SendLinenForMendingForm" path="/SendLinenForMendingAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		 	<forward name="placeLinenRequest"
+			path="/eLC/SendLinenForMending/jsp/PlaceLinenRequestForMendingCUD.jsp" />
+			<forward name="requestsList"
+			path="/eLC/SendLinenForMending/jsp/MendingListCUD.jsp" />
+		</action> 
+		<action name="SendLinenForMendingForm" path="/SendLinenForMendingViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="viewMending"
+			path="/eLC/SendLinenForMending/jsp/View.jsp" />
+		</action>
+	<!-- Issue Of Linen After Action -->
+		
+		<action name="IssueLinenAfterMendingForm" path="/IssueLinenAfterMendingAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="requestsList"
+			path="/eLC/IssueLinenAfterMending/jsp/MendingListCUD.jsp" />
+			<forward name="issueoflinen" path="/eLC/IssueLinenAfterMending/jsp/IssueOfLinenAfterMendingCUD.jsp" />
+		</action>
+		<action name="IssueLinenAfterMendingForm" path="/IssueLinenAfterMendingViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="issueViewRequest"
+			path="/eLC/IssueLinenAfterMending/jsp/View.jsp" />
+			<forward name="issueRequest"
+			path="/eLC/IssueLinenAfterMending/jsp/IssueOfLinenAfterMendingCUD.jsp" />
+		</action>
+
+		
+	<!-- ADDED ON 28/11/2007 -->
+
+		<action name="ReturnofLinentoLaundryForm" path="/ReturnofLinentoLaundryAction"
+		scope="request"
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="returnofLinentoLaundry" path="/eLC/ReturnofLinentoLaundry/jsp/ReturnofLinentoLaundryCUD.jsp" />
+		</action>
+	<!-- Loan Linen Action -->
+
+		<action name="LoanLinenForm" path="/LoanLinenAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="loanLinen"
+				path="/eLC/LoanLinen/jsp/LoanLinenCUD.jsp" />
+			<forward name="loanList"
+				path="/eLC/LoanLinen/jsp/LoanListCUD.jsp" />
+		</action>
+		<action name="LoanLinenForm" path="/LoanLinenViewAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="ViewLoan" path="/eLC/LoanLinen/jsp/View.jsp" />
+		</action>
+
+		<!-- ReceiveLinenAtLaundry Action -->
+		<action name="ReceiveLinenAtLaundryForm" path="/ReceiveLinenAtLaundryAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="createReceiveLinenAtLaundry"
+			path="/eLC/ReceiveLinenAtLaundry/jsp/ReceiveLinenAtLaundryCud.jsp" />
+		</action>
+
+	<!-- Receive Loan Linen Action -->
+		<action name="ReceiveLoanedLinenForm" path="/ReceiveLoanedLinenAction"
+		scope="request"
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="receiveLoanedLinen" 
+		path="/eLC/ReceiveLoanedLinen/jsp/ReceiveLoanedLinenQueryCriteria.jsp" />
+		</action>
+		<action name="ReceiveLoanedLinenForm" path="/ReceiveLoanedLinenViewAction"
+		scope="request" 
+		type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="receiveLoanedLinenViewRequest" 
+		path="/eLC/ReceiveLoanedLinen/jsp/View.jsp" />
+		<forward name="receiveLoanedLinenRequest"
+		path="/eLC/ReceiveLoanedLinen/jsp/ReceiveLoanedLinenCUD.jsp" />
+	</action>
+		<!-- Query Action -->
+		<!-- Page Action -->
+		<action name="PageForm" path="/LinenItemPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="LinenItemQueryResultPage" path="/eLC/LinenItem/jsp/LinenItemQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/LinenTypePageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="LinenTypeQueryResultPage" path="/eLC/LinenType/jsp/LinenTypeQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/AgencyCodePageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="AgencyCodeQueryResultPage" path="/eLC/AgencyCode/jsp/AgencyCodeQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/SetupParameterPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="SetupParameterQueryResultPage" path="/eLC/SetupParameter/jsp/SetupParameterQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/ReasonPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="ReasonQueryResultPage" path="/eLC/Reason/jsp/ReasonQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/StandardStockPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="StandardStockQueryResultPage" path="/eLC/StandardStock/jsp/StandardStockQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/LaundryUserPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="LaundryUserQueryResultPage" path="/eLC/LaundryUser/jsp/LaundryUserQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/RequestForLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="RequestForLinenQueryResultPage" path="/eLC/RequestForLinen/jsp/RequestForLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/RequestForLinenViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="RequestForLinenViewQueryResultPage" path="/eLC/RequestForLinen/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/IssueOfLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="IssueOfLinenQueryResultPage" path="/eLC/IssueOfLinen/jsp/IssueOfLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/IssueOfLinenViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="IssueOfLinenViewQueryResultPage" path="/eLC/IssueOfLinen/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/RequestForCleaningLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="RequestForCleaningLinenQueryResultPage" path="/eLC/RequestForCleaningLinen/jsp/RequestForCleaningLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/RequestForCleaningLinenViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="RequestForCleaningLinenViewQueryResultPage" path="/eLC/RequestForCleaningLinen/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/PendingCountPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="PendingCountQueryResultPage" path="/eLC/RequestForCleaningLinen/jsp/PendingCountQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/DeliverCleanedLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="DeliverCleanedLinenQueryResultPage" path="/eLC/DeliverCleanedLinen/jsp/DeliverCleanedLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/DeliverCleanedLinenViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="DeliverCleanedLinenViewQueryResultPage" path="/eLC/DeliverCleanedLinen/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/EnterCleanedLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="EnterCleanedLinenQueryResultPage" path="/eLC/EnterCleanedLinen/jsp/EnterCleanedLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/SendLinenForMendingPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="SendLinenForMendingQueryResultPage" path="/eLC/SendLinenForMending/jsp/RequestForMendingQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/SendLinenForMendingViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="SendLinenForMendingViewQueryResultPage" path="/eLC/SendLinenForMending/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/QueryStockStatusPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="QuerySourceQueryResult" path="/eLC/QueryStockStatus/jsp/QuerySourceQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/QueryStockStatusLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="QueryLinenItemQueryResult" path="/eLC/QueryStockStatus/jsp/QueryLinenItemQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/IssueOfLinenAfterMendingPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="IssueOfLinenAfterMendingQueryResultPage" path="/eLC/IssueLinenAfterMending/jsp/IssueOfLinenAfterMendingQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/IssueOfLinenAfterMendingViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+		<forward name="IssueOfLinenAfterMendingViewQueryResultPage" path="/eLC/IssueLinenAfterMending/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/LoanLinenPageAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="LoanLinenQueryResultPage"
+				path="/eLC/LoanLinen/jsp/LoanLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/LoanLinenViewPageAction"
+			scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="LoanLinenViewQueryResultPage"
+				path="/eLC/LoanLinen/jsp/View.jsp" />
+		</action>
+		<action name="PageForm" path="/ReceiveLoanedLinenPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="ReceiveLoanedLinenQueryResultPage" path="/eLC/ReceiveLoanedLinen/jsp/ReceiveLoanedLinenQueryResult.jsp" />
+		</action>
+		<action name="PageForm" path="/ReceiveLoanedLinenViewPageAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="ReceiveLoanedLinenViewQueryResultPage" path="/eLC/ReceiveLoanedLinen/jsp/view.jsp" />
+		</action>
+		<action name="LookupForm" path="/LookupAction" scope="request"
+			type="org.springframework.web.struts.DelegatingActionProxy">
+			<forward name="lookupQueryResultPage"
+				path="/core/lookup/jsp/LookupResult.jsp" />
+		</action>
+				
+	</action-mappings>
+
+	<!-- Message Resources -->
+	<message-resources	parameter="com.iba.ehis.lc.core.resources.LCLabels" key="lcLabels" />
+	<message-resources	parameter="com.iba.ehis.lc.core.resources.LCMessages" key="lcMesages" />
+
+</struts-config>

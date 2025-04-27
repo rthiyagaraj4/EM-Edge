@@ -1,0 +1,141 @@
+package jsp_servlet._eds._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __placemealorderopframes extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eds/jsp/PlaceMealOrderOPFrames.jsp", 1734165888000L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n<!--\nFile Name\t\t: PlaceMealOrderOPFrames.jsp\nFile Description: Main/Outer Frame : This file is for Placing OP Meal Order.\nCRF#\t\t\t: Bru-HIMS-CRF-230\nAuthor\t\t\t: Abirami\nDate\t\t\t: Aug-2013\n-->\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n\n<html>\n<head>\n<script language=\"javascript\" src=\"../../eCommon/js/common.js\"></script>\n<script type=\"text/javascript\">\n\t//alert(\'OPFrames..\');\n\tvar jsonOPObj=window.dialogArguments;\n\tvar warnOnClose = false;\n\tvar warnMsg = \"\";\n\tfunction OPclose()\n\t{ \n\t\tparent.window.returnValue=false;      \n\t\tif(placeMealOrderOPMain.gRecordUpdated.length > 0)\n\t\t{\n\t\t\twarnOnClose = true;\n\t\t\twarnMsg = getMessage(\"DS_CONFIRM_TO_CONT\",\"DS\");\n\t\t\t\n\t\t\tif(window.confirm(warnMsg))\n\t\t\t\ttop.close();\n\t\t\telse\n\t\t\t\twarnOnClose = false;\n\t\t\t\t\n\t\t\t/*var sMsg = \"The Changes will not be Saved. Are you sure you wish to continue?\";\n\t\t\tvar dialogUrl1 = \"../../eDS/jsp/CommonDialogBox.jsp?dialogMessage=\"+sMsg;\n\t\t\tvar dialogFeatures = \"dialogHeight:5;dialogWidth:30;status:no;scroll:no\";\n\t\t\tvar returnValue = window.showModalDialog(dialogUrl1, dialogArguments,dialogFeatures);\n\n\t\t\tif(returnValue)\n\t\t\t\ttop.close();\n\t\t\telse\n\t\t\t\twarnOnClose = false;*/\n\t\t\t\n\t\t}else\n\t\t{\n\t\t\twarnOnClose = true;\n\t\t\ttop.close();\n\t\t}\n\t\t\n\t}\n\t\n\twindow.onbeforeunload  = function OPautoClose() {\n\t\tif(!warnOnClose)\n\t\t\treturn \"\";\n\t};\n\t\n\tfunction reset(){\n\t\tplaceMealOrderOPMain.location.href=\'../../eDS/jsp/PlaceMealOrderOPMain.jsp\';\n\t\tparent.messageFrame.location.href=\'../../eCommon/jsp/MstCodeError.jsp?\';\n\t}\n\t\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<link rel=\'stylesheet\' type=\'text/css\' href=\'";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="/eCommon/html/";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="\'></link>\n<title>Place Meal Order for Outpatients</title>\n\n</head>\n\n\t<iframe name=\'toolbarFrame\' id=\'toolbarFrame\'  src=\"../../eDS/jsp/PlaceMealOrderOPSubmit.jsp\"\t frameborder=0 scrolling=\'no\' noresize style=\'height:10vh;width:100vw;border:1\'></iframe>\n\t<iframe name=\"placeMealOrderOPMain\" id=\"placeMealOrderOPMain\" src=\"../../eDS/jsp/PlaceMealOrderOPMain.jsp?";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\" scrolling=\"no\" frameborder=\"0\" noresize=\"noresize\"/ style=\'height:80vh;width:100vw;border:1\'></iframe>\n\t<!--ML-MMOH-CRF-0596-->\n\t<iframe name=\"messageFrame\" id=\"messageFrame\"\tsrc=\"../../eCommon/jsp/MstCodeError.jsp\" frameborder=1 noresize scrolling=\'auto\' style=\'height:10vh;width:100vw;border:1\'></iframe>\n</html>\n\n";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+ request.setCharacterEncoding("UTF-8");
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block5Bytes, _wl_block5);
+
+	String sStyle = ((session.getAttribute("PREFERRED_STYLE") != null) || (session.getAttribute("PREFERRED_STYLE") != "")) ? "IeStyle.css" : (String) session.getAttribute("PREFERRED_STYLE");
+	String url = "../../eCommon/jsp/MstCodeToolbar.jsp?" ;
+	String params = request.getQueryString() ;
+	String speciality=request.getParameter("splility"); //ML-MMOH-CRF-0596
+	String jsonData = request.getParameter("jsonData");		
+	String source = url + params ;
+
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(request.getQueryString()));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

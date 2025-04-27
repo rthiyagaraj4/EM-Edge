@@ -1,0 +1,613 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>AE_Trans_RegisterAttendance_DetailsUnknown_RFD2</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Visit Detail Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Details</p>
+<ol>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>My 
+	 Kad/Kid</u></span> – The compulsory identity document number of the registered 
+	 patient is displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>My 
+	 PR</u></span> – The Permanent Resident status and the expiry date of the 
+	 registered patient is displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Citizen 
+	 ID</span> – The default Citizen ID in numeric format is displayed 
+	 while registration. The ‘Prompt’ specified for the Citizen ID in MP 
+	 Parameter appears as the field legend. The length and format as specified 
+	 in MP Parameter has to be adhered to.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Nationality</span> 
+	 – The default Nationality set in MP Parameter is displayed. Select 
+	 the required value using the <span class="BoldNumberRFD">[?]</span> 
+	 function. This field is mandatory. If National ID is entered, the 
+	 default Nationality set in MP Parameter is displayed and disabled. 
+	 &#160;&#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Residency</span> 
+	 – The selected residency in Emergency Registration is displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Status</span> 
+	 – The selected status in Emergency Registration is displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Blood 
+	 Group</u></span> – The blood group of the patient registered through emergency 
+	 registration is displayed.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The above field 
+ names are displayed based on the legends for Alternate ID defined in the 
+ MP Parameter.</p>
+<p class="BoldRFD">Visit Detail</p>
+<ol start="8" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Visit 
+	 Date Time</span> – Enter the Visit Date and Time. The visit date has 
+	 to be entered in dd/mm/yyyy format for the visit. This field is mandatory. 
+	 Based on the number of hours set in ‘Allow backdating of Visit Date/Time’ 
+	 in AE Parameter the visit time and date can be calculated or, select 
+	 the Calendar icon to select the appropriate date.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Location</span> 
+	 - Select the Location from the valid list of values. This field represents 
+	 the Location to which the Patient has to be registered. All the locations 
+	 associated to the logged in users operator station with Level of Care 
+	 as ‘Emergency’ are displayed. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Registration 
+	 Type</span> - Select the Registration Type from the valid list of 
+	 values. This field represents the Visit Type of Patient for the visit. 
+	 The displayed list is limited to the Visit Types based on the selected 
+	 Location. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Service</span> 
+	 - The Service associated to a Location is displayed. Select the appropriate 
+	 service that is to be rendered to the patient. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Sub-Service</span> 
+	 - The Sub-Service associated to the selected service is displayed, 
+	 if any.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Mode 
+	 of Arrival</span> – This function is used to record the Mode of Arrival 
+	 of the patient, which is provided in two list values. The first list 
+	 value is used to select the Transport Mode and the second is used 
+	 to select the Mode of Arrival as set in Application Masters module, 
+	 which is filtered based on the Transport Mode selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Brought 
+	 Dead</span> – Select the check box to indicate that the patient being 
+	 registered is deceased and has been brought dead to the facility.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">MLC</span> 
+	 – Select the check box to indicate that the patient is registered 
+	 under Medico Legal Case (MLC), or clear the check box.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Motor 
+	 Vehicle Accident</span> – Select the check box to indicate if the 
+	 patient registered had been subjected to motor vehicle accident, or 
+	 clear the check box. By default, this check box is cleared.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Date/Time 
+	 of Accident</u></span> – Select the Date and Time of the Accident using 
+	 calendar function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Place 
+	 of Accident</u></span> – Enter the Place of Accident in alphanumeric format 
+	 of 30 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Vehicles 
+	 Involved</u></span> – This is used to record the vehicles involved (if 
+	 any) for the case of trauma. The list box displays all the values 
+	 set in ‘Transport Mode’ of Application Masters module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Position 
+	 During Incident</u></span> – Select the Patient Position during the Incident 
+	 from the list.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">MLC Detials</p>
+<p class="BoldRFD" style="font-weight: normal;">The 'MLC Details' section 
+ is visible only for users in Medicity.</p>
+<ol start="21" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>MLC 
+	 check box</u></span> - By default, the check box is enabled. Select the 
+	 check box to enable the “MLC Death”, “Police Report no and Police 
+	 station details”, “Outside MLC no./Details”,” Date of MLC capture”,” 
+	 Remarks” fields. </p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>MLC 
+	 Death check box</u></span> – By default, the check box is disabled. This 
+	 check box gets enabled only if the MLC check box is selected. User 
+	 can select the check box if required.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">• If ‘Brought Dead’ check 
+ box is selected and MLC checkbox is also selected, then automatically 
+ MLC Death checkbox gets selected. User can clear the check box if required. 
+ </p>
+<ol start="23" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Police 
+	 Report No</u></span> – Enter the police report number in alphanumeric 
+	 format up to 100 characters. Special characters are allowed. By default, 
+	 it will be disabled. &#160;Only when the MLC check box is selected, 
+	 this field gets enabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Police 
+	 Station Details</u></span> – Enter the police station details in alphanumeric 
+	 format up to 100 characters. Special characters are allowed. By default, 
+	 it will be disabled. &#160;Only when the MLC check box is selected, 
+	 this field gets enabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Outside 
+	 MLC No./Details</u></span> – Enter the details in alphanumeric format 
+	 up to 100 characters in length. Special characters are allowed. By 
+	 default, it will be disabled. Only when the MLC check box is selected, 
+	 this field gets enabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Date 
+	 of MLC Capture</u></span> - By default, this field is disabled. When the 
+	 MLC check box is selected, this field gets enabled. By default, it 
+	 will be system date and time. User can edit the date only be between 
+	 the visit date time and system date time.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Remarks</u></span>- 
+	 Enter the remarks in alphanumeric format up to 500 characters in length. 
+	 By default, it will be disabled. Only when the MLC check box is selected, 
+	 this field gets enabled.</p></li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;"><span style="font-weight: bold;"><b>Note</b></span>: 
+ If MLC check Box is selected and all the details are entered in MLC Details 
+ section, on clearing the MLC check box then system will clear the entered 
+ details and disable all the fields. Again, if user selects the MLC check 
+ box, then fields will get enabled with blank value.</p>
+<p class="BoldRFD" style="font-weight: normal;">If MLC check box is selected 
+ in AE Register Attendance, and all details are entered in MLC Details 
+ section then the entered details get auto populated in ‘Secondary Triage’ 
+ and ‘Marking of MLC/OSCC’. User can edit the MLC Details data if required.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Primary Triage Details</p>
+<ol start="28" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Priority 
+	 Zone</span> – Select any one of the Priority Zone by clicking on the 
+	 required check box. The colors indicate the following conditions:</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">Red - Critical</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">Yellow – Semi Critical</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">Green – Non- Critical</p></li>
+</ol>
+<ol start="29" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Priority</span> 
+	 – Select the Priority from the valid list of values. The values corresponding 
+	 to the selected ‘Priority Zone’ are displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Practitioner</u></span> 
+	 - This field is enabled and mandatory only if the Priority Zone and 
+	 Treatment Area are selected. The Practitioner lookup lists the practitioners 
+	 that are associated with the Priority Zone and Treatment Area. Select 
+	 the required practitioner using <span style="font-weight: bold;"><b>[?]</b></span> 
+	 function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Treatment 
+	 Area</span> – Select the required Treatment Area from the valid list 
+	 of values. All Treatment Areas corresponding to the selected ‘Priority 
+	 Zone’ are displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Bed/Bay 
+	 No</span> – This field is enabled on selecting a Treatment Area. Enter 
+	 the required Bed/Bay Number in alphanumeric format of eight characters 
+	 or click <span class="BoldNumberRFD">[?]</span> to search for the 
+	 required Bed/Bay Number. All the bed/bay associated to the selected 
+	 Treatment Area in the master function ‘Assign bed/bays for Treatment 
+	 Area’ gets displayed. &#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Disaster</span> 
+	 – Select the check box to indicate the patient as a victim of disaster, 
+	 or clear the check box.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Disaster 
+	 Area</span> – This field is enabled on selecting the disaster check 
+	 box. Enter the area of occurrence of the disaster in alphanumeric 
+	 format or click <span class="BoldNumberRFD">[?]</span> to search for 
+	 the required area. The areas defined in the function ‘Area’ of Master 
+	 Patient Index module are displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Disaster 
+	 Type</span> – Select the Disaster Type from the valid list of values. 
+	 This field is enabled when the disaster check box is selected. The 
+	 values defined in the ‘Disaster Type’ in AE code setup are displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Disaster 
+	 Registration Reference</span> - This field is enabled on selecting 
+	 the Disaster check box. Enter the Disaster Registration Reference 
+	 Number in alphanumeric format of 15 characters maximum length. This 
+	 is a mandatory field. The Disaster Registration Reference Number entered 
+	 is displayed in 'Current Emergency Patients' function when disaster 
+	 patients are listed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Presenting 
+	 Problem</span> - Enter the Presenting Problem of the patient or select 
+	 using <span class="BoldNumberRFD">[?]</span> function. The Presenting 
+	 problems are defined in 'Reason for Admission' function in Application 
+	 Masters module.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Arrival Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Escort Detail</p>
+<ol start="1" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Accompanied 
+	 By</span> - This field is used to record the person accompanying the 
+	 patient who is being registered. The list displays all the values 
+	 set in ‘Escort Type’ under Other Master Setup of Application Masters 
+	 module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Relationship</span> 
+	 – Select a valid Relationship of the person accompanying the registered 
+	 patient.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Other 
+	 Alt ID</span> – Select the required Alternate ID from the list. The 
+	 listed values are defined in the function ‘Alternate ID Type’. On 
+	 selecting the required Alternate ID type, enter the ID in alphanumeric 
+	 format of 20 characters maximum length. The field ‘Other Alt ID’ is 
+	 displayed provided ‘Accept Other Alt ID’ is set in MP Parameter (Alt 
+	 ID checks tab).</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The above field 
+ names are displayed based on the legends for Alternate ID defined in MP 
+ Parameter.</p>
+<ol start="4" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Address 
+	 Line (1 to 4)</span> – Enter the address details in alphanumeric format 
+	 of 30 characters maximum length in each line. The legends are set 
+	 in ‘System Manager’ module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Town</span> 
+	 - Enter the name of the Town in alphanumeric format of 30 characters 
+	 maximum length. The entered name is listed under the selected area. 
+	 If the selected area has more towns attached to it, select the required 
+	 town using the <span class="BoldNumberRFD">[?]</span> function. The 
+	 field legend is set in System Manager module.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The Area and Region 
+ associated to the selected Town is displayed by default.</p>
+<ol start="6" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Area</span> 
+	 - Enter the Area in alphanumeric format of 30 characters maximum length 
+	 or select it using the <span class="BoldNumberRFD">[?]</span> function. 
+	 The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Region</span> 
+	 – Enter the name of the Region in alphanumeric format of 30 characters 
+	 maximum length or select it using the <span class="BoldNumberRFD">[?]</span> 
+	 function. The area must correspond to the entered Region. The field 
+	 legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Postal 
+	 Code</span> - Enter the Postal Code in alphanumeric format of eight 
+	 characters maximum length. The entered value must correspond to the 
+	 selected Town. Select the required code using the <span class="BoldNumberRFD">[?]</span> 
+	 function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Country</span> 
+	 - The Country name gets automatically populated when the Region is 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> 
+	 – Enter the Remarks, if any, for the arrival details in alphanumeric 
+	 format.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Ambulance Details</p>
+<ol start="11" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Name 
+	 of Escort/Ambulance Service</span> - Enter the Name of Escort/Ambulance 
+	 Service in alphanumeric format of maximum 30 characters. This is used 
+	 to record the name of the escort service or ambulance service if any.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Escort/Ambulance 
+	 Contact No.</span> - Enter the Contact Number of the escort service 
+	 in alphanumeric format of 10 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Motor 
+	 Vehicle Registration No.</span> - Enter the Registration Number of 
+	 the vehicle that takes the patient to the facility in alphanumeric 
+	 format of 10 characters maximum length.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Related Contacts Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Next of Kin</p>
+<ol start="1" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Name</span> 
+	 - Enter the Name of the person to be contacted in alphanumeric format 
+	 of 80 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Relationship</span> 
+	 - Select the Relationship the patient shares with the Next of the 
+	 Kin from the list.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Citizen 
+	 ID</span> – Enter the Citizen ID of the Next of Kin in the required 
+	 format as specified in MP Parameter.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Birth 
+	 Date</span> - Enter the Date of Birth in date format of dd/mm/yyyy, 
+	 or use the Calendar function to select for the relevant date.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Occupation</span> 
+	 - Enter the Occupation of the person in alphanumeric format of 30 
+	 characters maximum length.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The field names 
+ are displayed based on the legends for Alternate ID defined in the MP 
+ Parameter.</p>
+<ol start="6" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Address 
+	 Line (1 to 4)</span> – Enter the Address Details in alphanumeric format 
+	 of 30 characters maximum length in each line. The legends are set 
+	 in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Town</span> 
+	 - Enter the name of the Town in alphanumeric format of 30 characters 
+	 maximum length. The entered name must be listed under the selected 
+	 area. If the selected area has more Towns attached to it, select the 
+	 required town using the <span class="BoldNumberRFD">[?]</span> function. 
+	 The field legend is set in System Manager module.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The Area and Region 
+ associated to the selected Town is displayed by default.</p>
+<ol start="8" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Area</span> 
+	 - Enter the Area in alphanumeric format of 30 characters maximum length 
+	 or select it using the <span style="font-weight: bold;"><b>[?]</b></span> 
+	 function. The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Region</span> 
+	 – Enter the name of the Region in alphanumeric format of 30 characters 
+	 maximum length or select it using the <span style="font-weight: bold;"><b>[?]</b></span> 
+	 function. The area must correspond to the entered Region. The field 
+	 legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Postal 
+	 Code</span> - Enter the Postal Code in alphanumeric format of eight 
+	 characters maximum length. The entered value must correspond to the 
+	 selected Town. &#160;Select the required code using the <span style="font-weight: bold;"><b>[?]</b></span> 
+	 function. The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Country</span> 
+	 - The Country name gets automatically populated when the Region is 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Home 
+	 Phone No</span> – Enter the Residence Telephone Number of Next of 
+	 Kin in alphanumeric format of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Mobile 
+	 Phone No</span> - Enter the Mobile Number of Next of Kin in alphanumeric 
+	 format of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Office 
+	 Phone No</span> - Enter the Office TelePhone Number of Next of Kin 
+	 in alphanumeric format of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Email</span> 
+	 – Enter the Email ID of the person in alphanumeric format of 50 characters 
+	 maximum length.</p></li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">First To Notify Tab</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="16" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Name</span> 
+	 - Enter the Name of the person in alphanumeric format of 30 characters 
+	 maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Relationship</span> 
+	 - Select the Relationship the patient shares with the person from 
+	 the list.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Citizen 
+	 ID</span> – Enter the Citizen ID of the person in the required format 
+	 as specified in MP Parameter.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Occupation</span> 
+	 - Enter the Occupation of the person in alphanumeric format of 30 
+	 characters maximum length.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The above field 
+ names are displayed based on the legends for Alternate ID defined in the 
+ MP Parameter.</p>
+<ol start="20" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Address 
+	 Line (1 to 4)</span> – Enter the Address Details in alphanumeric format 
+	 of 30 characters maximum length in each line. The legends are set 
+	 in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Town</span> 
+	 - Enter the Town in alphanumeric format of 30 characters maximum length. 
+	 The entered Town has to be listed under the selected Area. If the 
+	 selected Area has more towns attached to it, select the required Town 
+	 using the <span class="BoldNumberRFD">[?]</span> function. The field 
+	 legend is set in System Manager Module.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />The Area and Region 
+ associated to the selected Town is displayed by default.</p>
+<ol start="22" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Area</span> 
+	 - Enter the Area in alphanumeric format of 30 characters maximum length 
+	 or select it using the <span class="BoldNumberRFD">[?]</span> function. 
+	 The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Region</span> 
+	 – Enter the Region in alphanumeric format of 30 characters maximum 
+	 length or select it using the <span class="BoldNumberRFD">[?]</span> 
+	 function. The area must correspond to the entered Region. The field 
+	 legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Postal 
+	 Code</span> - Enter the Postal Code in alphanumeric format of eight 
+	 characters maximum length. The entered value must correspond to the 
+	 selected Town. Select the required code using the [?] function. The 
+	 field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Country</span> 
+	 - The Country name gets automatically populated when the Region is 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Home 
+	 Phone No</span> – Enter Residence Telephone Number of the person in 
+	 alphanumeric format of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Mobile 
+	 No</span> - Enter Mobile Number of the person in alphanumeric format 
+	 of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Office 
+	 Phone No</span> - Enter the Office Telephone Number of the person 
+	 in alphanumeric format of 20 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Email</span> 
+	 – Enter the Email ID of the person in alphanumeric format of 50 characters 
+	 maximum length.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Employment Details Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Employer Details</p>
+<ol start="30" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Organization 
+	 Name</span> - Enter the Organization Name in alphanumeric format of 
+	 30 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Contact 
+	 Person Name</span> - Enter the name of the Contact Person in the organization 
+	 in alphanumeric format of 30 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Address 
+	 Line (1 to 4)</span> – Enter the Address Details in alphanumeric format 
+	 of 30 characters maximum length in each line. The legends are set 
+	 in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Town</span> 
+	 - Enter the Town in alphanumeric format of 30 characters maximum length. 
+	 The entered Town gets listed under the selected area. If the selected 
+	 area has more towns attached to it, select the required town using 
+	 the <span class="BoldNumberRFD">[?]</span> function. The field legend 
+	 is set in System Manager Module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Area</span> 
+	 - Enter the Area in alphanumeric format of 30 characters maximum length 
+	 or select it using the <span class="BoldNumberRFD">[?]</span> function. 
+	 The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Region</span> 
+	 – Enter the Region in alphanumeric format of 30 characters maximum 
+	 length or select it using the <span class="BoldNumberRFD">[?]</span> 
+	 function. The area must correspond to the entered Region. The field 
+	 legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Postal 
+	 Code</span> - Enter the Postal Code in alphanumeric format of eight 
+	 characters maximum length. The entered value must correspond to the 
+	 selected Town. Select the required code using the <span class="BoldNumberRFD">[?]</span> 
+	 function. The field legend is set in System Manager module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Country</span> 
+	 - The Country name gets automatically populated when the Region is 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Home 
+	 Phone No</span> – Enter Residence Telephone Number of the contact 
+	 person (in the organization) in alphanumeric format of 20 characters 
+	 maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Office 
+	 Phone No</span> - Enter Office Telephone Number in alphanumeric format 
+	 of 20 characters maximum length.</p></li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Employee Details</p>
+<ol start="40" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Employment 
+	 ID</span> - Enter the Employment ID of the Patient in alphanumeric 
+	 format of 15 characters maximum length.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Occupation 
+	 Class</span> – Select the Occupation Class from the valid list of 
+	 values. The listed values are defined in the function 'Occupation 
+	 Class’ of Master Patient Index &#160;Code Setup.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Occupation 
+	 of the Person</span> - Select the Occupation from the valid list of 
+	 values. The listed values correspond to the selected occupation class. 
+	 If the required occupation is not available, enter the same in alphanumeric 
+	 format of 15 characters maximum length in the text box provided.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Status</span> 
+	 - Select the Employment Status of the Patient from the valid list 
+	 of values. The listed values are pre-defined. &#160;</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Financial Details Tab</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="1" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Billing 
+	 Group</span> – Select the Billing Group from the lookup provided. 
+	 The Billing Group listed is based on all Billing Groups applicable 
+	 for the selected Location and Visit Type in the Patient Billing Manager 
+	 module. The legend is a hyperlink, which shows the explanatory note 
+	 for the selected billing group, if defined.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">No. 
+	 of Dependants</span> – Enter the number of dependants for the selected 
+	 patient. This field is enabled based on the type of billing group 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Responsible 
+	 for Payment</span> – Enter the name of the person who is responsible 
+	 for payment of charges for the current encounter. This field is enabled 
+	 based on the type of Billing Group selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Patient 
+	 Reln with Responsible Person</span> – Select the relationship that 
+	 the patient shares with the responsible person. This field is enabled 
+	 and is mandatory based on the type of Billing Group selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Update 
+	 Patient Financial Details</span> - Select the check box, if the patient 
+	 financial details are to be updated each time the patient visits the 
+	 location, or clear the check box.</p></li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Settlement Details / Document References</p>
+<ol start="6" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Settlement 
+	 Type</span> – The fields that appear under this section are dependant 
+	 on the type of billing group selected. For cash billing group, the 
+	 field Cash Settlement Type appears from which you can select the appropriate 
+	 settlement type.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Document 
+	 Reference</span> – Enter the Document Reference Details in alphanumeric 
+	 format. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Document 
+	 Start Date</span> – Click the Calendar icon to select a date. The 
+	 documents are considered valid from the date specified.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Document 
+	 End Date</span> – Click the Calendar icon to select a date. The documents 
+	 are considered valid until the date specified.</p></li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

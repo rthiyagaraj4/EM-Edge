@@ -1,0 +1,1079 @@
+#include <stdio.h>         
+#include <string.h> 
+#include <bl.h>        
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define ONLINE_PRINTING 1
+
+#define ESC 0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR  
+			 d_doc_type_code  [7],
+			 d_doc_number     [9],
+			 l_to_doc_type_code	[10],
+		     l_to_doc_type_num	[10],
+			 l_fr_date			[30],
+			 l_to_date			[30],
+			 lv_user_id       [91],
+			 lv_pword 	      [91],
+
+			 uid			[91], //added for PE CORRECTION
+			 lv_session_id    [16],
+	         lv_pgm_date      [25],
+			 lv_pgm_id		  [10],
+			 lv_facility_id	   [3],
+			 lc_facility_id		[3],
+			 lv_report_desc   [61],
+
+			 lv_hosp_name     [31],
+			 lv_hosp_addr1    [31],
+			 lv_hosp_addr2    [31],
+			 lv_hosp_addr3    [31],
+			 lv_hosp_tel_num  [21],
+			 lv_sysdate		  [31],
+
+			 lv_payer_name	  [41],
+			 lv_mail_addr1    [31],
+			 lv_mail_addr2    [31],
+			 lv_mail_addr3    [31],
+			 lv_mail_po_code  [10],
+
+			 lv_doc_date	  [31],
+			 lv_slmt_type	  [16],
+			 lv_base_currency [10],
+			 lv_ref_desc	  [21],
+			 lv_ref_date	  [31],
+			 
+			 lv_patient_id    [21],
+			 lv_doc_srno	  [3],
+			 lv_episode_type   [2],
+
+			 lv_lang_id        [5],
+			 lv_lgnd_id        [5],
+			 lv_lgnd_val      [51],
+
+			 P_START_TIME			[60],  //added for pe correction
+
+			 d_err_code[30],
+
+			 
+				nd_add_ln1	 [31],  
+				nd_add_ln2   [31],  
+				nd_add_ln3   [31],  
+				nd_add_ln4   [31],  
+				d_postal_code   [9],
+				d_res_area_code  [7],
+				d_res_town_code  [7],
+				d_region_code    [7],
+                nd_region		[31],
+                nd_res_town		[31],
+				nd_res_area		[31],
+				l_amt   [50],
+				deci_val [2],
+
+			 p_doc_type_code  [10];
+	
+	int		 p_doc_num,
+			 l_no_of_decimal;
+
+	char	 lc_filename	 [150],
+			 lc_actl_amt      [30],
+			 lc_char_amt      [30],
+			 lc_doc_num        [9],
+			 lc_lgnd_id        [5];
+
+	double   ld_doc_amt,
+			 ld_outst_amt;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *fp;
+
+void proc_main(argc,argv)
+	char *argv[];
+	int	 argc;
+{
+     
+    if (argc < 5)
+    {
+		disp_message(ERR_MESG, "Not enough Parameters to run this program.");
+		proc_exit();
+    }
+
+		
+
+    strcpy(g_pgm_id, "BLR00009");
+	
+    strcpy(lv_pword.arr, argv[1]);
+
+   lv_pword.len = strlen(lv_pword.arr);
+   EXEC SQL CONNECT :lv_pword;
+
+
+	
+    set_meduser_role(); 
+
+	EXEC SQL select GET_TRACE_TIMESTAMP into :P_START_TIME from dual; // added for pe correctiom
+
+		uid.arr[0] = '\0'; // added for pe correctiom
+		uid.len	   =	0; // added for pe correctiom
+	
+		EXEC SQL select substr(:lv_pword,0,instr(:lv_pword,'/')-1) into :uid from dual; // added for pe correctiom
+
+		 uid.arr[uid.len] = '\0'; // added for pe correctiom
+	
+	  
+    if (sqlca.sqlcode < 0 )
+	{
+        disp_message(ORA_MESG, "Error in connecting to Oracle.");
+        proc_exit();
+    }
+
+    strcpy(lv_pgm_id.arr, g_pgm_id); 
+    lv_pgm_id.len = strlen(lv_pgm_id.arr); 
+
+    strcpy(lv_session_id.arr, argv[2]);
+    lv_session_id.len = strlen(lv_session_id.arr);
+    strcpy(g_session_id, lv_session_id.arr);
+
+    strcpy(lv_pgm_date.arr, argv[3]);
+    lv_pgm_date.len = strlen(lv_pgm_date.arr);
+    strcpy(g_pgm_date, lv_pgm_date.arr);
+
+    strcpy(lv_facility_id.arr, argv[0]);
+    lv_facility_id.len = strlen(lv_facility_id.arr);
+    strcpy(g_facility_id, lv_facility_id.arr);
+
+/*	strcpy(d_doc_type_code.arr, argv[4]);
+	d_doc_type_code.len	= strlen(d_doc_type_code.arr);
+
+	strcpy(d_doc_number.arr, argv[5]);
+	d_doc_number.len = strlen(d_doc_number.arr);
+
+	strcpy(l_to_doc_type_code.arr,argv[6]);
+	l_to_doc_type_code.len = strlen(l_to_doc_type_code.arr);
+
+	strcpy(l_to_doc_type_num.arr,argv[7]);
+	l_to_doc_type_num.len = strlen(l_to_doc_type_num.arr);
+
+	strcpy(l_fr_date.arr,argv[8]);
+	l_fr_date.len = strlen(l_fr_date.arr);
+
+	strcpy(l_to_date.arr,argv[9]);
+	l_to_date.len = strlen(l_to_date.arr);
+
+	strcpy(lv_episode_type.arr,argv[10]);
+	lv_episode_type.len	= strlen(lv_episode_type.arr);
+
+	strcpy(lv_lang_id.arr,argv[11]);
+	lv_lang_id.len	=	strlen(lv_lang_id.arr); */
+					
+
+     fn_fetch_parameters();
+     fn_fetch_hosp_name();
+	 fn_fetch_hosp_address();
+	 fn_fetch_region_code();
+	 fn_fetch_town_code();
+     fn_fetch_area_code();
+
+	 fn_open_file();
+
+	 
+
+	fn_declare_receipt_dtls();
+
+	while (fn_fetch_receipt_dtls()) 
+	 {
+	//disp_message(ERR_MESG,"enter while");		
+	 fn_fetch_patient_dtls();
+
+	 fn_fetch_outst_amt();
+
+	fn_print_settings();
+	
+   	fn_print_header();
+	
+	fn_print_body();
+
+   	fn_print_footer();
+	
+	fprintf(fp,"%cE",ESC);		// To reset the printer
+	
+  }
+
+  fclose(fp);
+
+
+//added for PE CORRECTION
+	EXEC SQL EXECUTE
+	BEGIN	
+	TRACE_DURATION_BL(
+	:lv_pgm_id ,
+	'Acknowledgement Letter for Receipt Generation' ,
+	:P_START_TIME ,
+	:uid );
+	END;
+	END-EXEC;
+//added for PE CORRECTION
+
+  fn_print_online();
+
+  close_receipt_cursor();
+
+    EXEC SQL COMMIT WORK RELEASE;
+    if (OERROR)
+		err_mesg("COMMIT WORK RELEASE failed.",0,"");
+}
+
+fn_fetch_parameters()
+{
+	lv_report_desc.arr[0] = '\0';
+	lv_report_desc.len    = 0;
+
+	EXEC SQL SELECT report_desc 
+			 INTO   lv_report_desc
+			 FROM   sm_report 
+			 WHERE  report_id = :lv_pgm_id;
+
+	if (OERROR)
+		err_mesg("SELECT failed on table SM_REPORT.", 0, "");
+
+	lv_report_desc.arr[lv_report_desc.len] = '\0';
+
+	d_doc_type_code.arr[0]		= '\0';
+	d_doc_number.arr[0]			= '\0';
+	l_to_doc_type_code.arr[0]	= '\0';
+	l_to_doc_type_num.arr[0]	= '\0';
+	l_fr_date.arr[0]			= '\0';
+	l_to_date.arr[0]			= '\0';
+	lv_facility_id.arr[0]		= '\0';
+
+	lv_episode_type.arr[0]		= '\0';
+	lv_lang_id.arr[0]			= '\0';
+	
+	d_doc_type_code.len		= 0;
+	d_doc_number.len		=0;
+	l_to_doc_type_code.len	=0;
+	l_to_doc_type_num.len	=0;
+	l_fr_date.len			=0;
+	l_to_date.len			=0;
+	lv_facility_id.len		=0;
+	lv_episode_type.len = 0;
+	lv_lang_id.len      = 0;
+
+ 	
+	EXEC SQL /*SELECT param1,
+					TO_NUMBER(param2),
+					param3,
+					param4
+			 INTO   :p_doc_type_code,
+				    :p_doc_num,
+					:lv_episode_type,
+					:lv_lang_id
+			 FROM   sy_prog_param
+             WHERE  pgm_id     = :lv_pgm_id
+             AND	session_id = :lv_session_id
+             AND	pgm_date   = :lv_pgm_date;*/
+
+		
+			 SELECT	operating_facility_id,
+					PARAM1,
+					PARAM2,
+					PARAM3,
+					PARAM4,
+					PARAM5,
+					PARAM6,
+					PARAM7,
+					PARAM8
+			   INTO	:lv_facility_id,
+					:d_doc_type_code,
+					:d_doc_number ,
+					:l_to_doc_type_code,
+					:l_to_doc_type_num,
+					:l_fr_date,
+					:l_to_date,
+					:lv_episode_type,
+					:lv_lang_id
+			   FROM sy_prog_param
+			  WHERE pgm_id     = :lv_pgm_id
+	            AND PGM_DATE   = :lv_pgm_date
+	            AND SESSION_ID = :lv_session_id;
+
+
+	strcpy(g_facility_id, lv_facility_id.arr);
+
+	if (OERROR)
+		err_mesg("SELECT failed on table SY_PROG_PARAM.", 0, "");
+
+	if (NOT_FOUND)
+        err_mesg("No record found in SY_PROG_PARAM.", 0, "");
+
+	d_doc_type_code.arr[d_doc_type_code.len] = '\0';
+	d_doc_number.arr[d_doc_number.len]		 = '\0';
+	l_to_doc_type_code.arr[l_to_doc_type_code.len] ='\0';
+	l_to_doc_type_num.arr[l_to_doc_type_num.len]	='\0';
+	l_fr_date.arr[l_fr_date.len]		= '\0';
+	l_to_date.arr[l_to_date.len]		= '\0';
+	lv_episode_type.arr[lv_episode_type.len] = '\0';
+	lv_lang_id.arr[lv_lang_id.len]           = '\0'; 
+	lv_facility_id.arr[lv_facility_id.len]	 = '\0';
+
+	
+
+/*	EXEC SQL DELETE sy_prog_param
+             WHERE  pgm_id     = :lv_pgm_id
+             AND	session_id = :lv_session_id
+             AND	pgm_date   = :lv_pgm_date;*/
+
+	if (OERROR)
+		err_mesg("DELETE failed on table SY_PROG_PARAM.", 0, "");
+}
+
+fn_fetch_hosp_name()
+{
+	lv_hosp_name.arr[0] = '\0';		
+	lv_hosp_name.len    = 0;
+
+	
+	if (strcmp(lv_lang_id.arr, "en") == 0) 
+	{
+		EXEC SQL SELECT acc_entity_name
+				 INTO   :lv_hosp_name
+				 FROM   sy_acc_entity
+				 WHERE  acc_entity_id = :lv_facility_id;
+
+				
+	}
+	else
+	{
+		EXEC SQL SELECT acc_entity_name_loc_lang
+				 INTO   :lv_hosp_name
+				 FROM   sy_acc_entity
+				 WHERE  acc_entity_id = :lv_facility_id;
+
+	}
+
+	if (OERROR)
+		err_mesg("SELECT failed while fetching hospital name.", 0, "");
+
+	lv_hosp_name.arr[lv_hosp_name.len] = '\0';	
+}
+
+
+fn_fetch_hosp_address()
+{
+
+  nd_add_ln1.arr[0] = '\0';
+  nd_add_ln2.arr[0] = '\0';
+  nd_add_ln3.arr[0] = '\0';
+  nd_add_ln4.arr[0] = '\0';
+  d_postal_code.arr[0] = '\0';
+  d_res_area_code.arr[0] = '\0';
+  d_res_town_code.arr[0] = '\0';
+  d_region_code.arr[0] = '\0';
+
+ nd_add_ln1.len=0;
+ nd_add_ln2.len=0;
+ nd_add_ln3.len=0;
+ nd_add_ln4.len=0;
+ d_postal_code.len=0;
+ d_res_area_code.len=0;
+ d_res_town_code.len=0;
+ d_region_code.len=0;
+
+
+exec sql SELECT
+  upper(ADDR_LINE1),             
+  UPPER(ADDR_LINE2),             
+  UPPER(ADDR_LINE3),             
+	UPPER(ADDR_LINE4),             
+	UPPER(ADDR_POSTAL_CODE),       
+	RES_AREA_CODE,          
+	RES_TOWN_CODE,          
+	REGION_CODE INTO 
+	    :nd_add_ln1,
+	    :nd_add_ln2,
+	    :nd_add_ln3,
+	    :nd_add_ln4,
+	    :d_postal_code,
+	    :d_res_area_code,
+	    :d_res_town_code,
+	    :d_region_code
+	 FROM  SM_FACILITY_PARAM
+   Where FACILITY_ID = :lv_facility_id;
+
+	if (OERROR)
+		err_mesg("SELECT failed while fetching hospital Address.", 0, "");
+
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+  nd_add_ln1.arr[nd_add_ln1.len] ='\0';
+
+  
+
+}
+
+fn_fetch_region_code()
+{
+  nd_region.arr[0] ='\0';
+  nd_region.len =0;
+	EXEC SQL SELECT  	UPPER(LONG_DESC)  INTO :nd_region
+	    FROM MP_REGION WHERE REGION_CODE=:d_region_code;
+
+if (OERROR)
+		err_mesg("SELECT failed while fetching hospital region.", 0, "");
+nd_region.arr[nd_region.len] = '\0';
+
+
+}
+
+fn_fetch_town_code()
+{
+  nd_res_town.arr[0] ='\0';
+  nd_res_town.len =0;
+	EXEC SQL	SELECT  	UPPER(LONG_DESC)  INTO :nd_res_town FROM MP_RES_TOWN  WHERE
+  RES_TOWN_CODE=:d_res_town_code;
+
+if (OERROR)
+		err_mesg("SELECT failed while fetching hospital Town.", 0, "");
+nd_res_town.arr[nd_res_town.len] = '\0';
+
+
+
+}
+
+
+fn_fetch_area_code()
+{
+  nd_res_area.arr[0] ='\0';
+  nd_res_area.len =0;
+	EXEC SQL	SELECT  	UPPER(LONG_DESC)  INTO :nd_res_area FROM MP_RES_AREA  WHERE 
+  RES_AREA_CODE=:d_res_area_code;
+
+
+if (OERROR)
+		err_mesg("SELECT failed while fetching hospital Area.", 0, "");
+nd_res_area.arr[nd_res_area.len] = '\0';
+
+
+}
+
+
+fn_declare_receipt_dtls()
+{
+		fn_init_receipt_dtls_var();
+
+		
+		
+	EXEC SQL DECLARE receipt_cursor CURSOR FOR 
+				SELECT	b.ln1_add,
+					b.ln2_add,
+					b.ln3_add,
+					b.tel_num,
+					TO_CHAR(sysdate, 'dd/mm/yyyy'),
+					a.payer_name,
+					TO_CHAR(a.doc_date, 'dd/mm/yyyy'),
+					c.short_desc,
+					b.base_currency,
+					a.doc_type_code,
+					a.doc_number,
+					a.doc_amt,
+					a.slmt_doc_ref_desc,
+					TO_CHAR(a.slmt_doc_ref_date, 'dd/mm/yyyy'),
+					a.patient_id,
+					a.doc_srno
+			 FROM   bl_receipt_refund_HDRdtl_VW a,
+					sy_acc_entity		  b,
+					bl_slmt_type		  c
+             WHERE  a.operating_facility_id = b.acc_entity_id
+			 AND	b.acc_entity_code       = c.acc_entity_code
+			 AND	b.acc_entity_id         = :lv_facility_id
+			 AND	a.slmt_type_code        = c.slmt_type_code
+			 AND    a.episode_type          = :lv_episode_type
+			 AND    a.DOC_TYPE_CODE		
+			BETWEEN :d_doc_type_code
+		      AND NVL(:l_to_doc_type_code,:d_doc_type_code)
+			  AND a.DOC_NUMBER    	
+	      BETWEEN :d_doc_number 
+		      AND NVL(:l_to_doc_type_num, :d_doc_number)
+			  AND trunc(doc_date)
+		  BETWEEN NVL(TO_DATE(:l_fr_date,'DD/MM/YYYYHH24:MI:SS'),TO_DATE('01/01/100000:00:00','DD/MM/YYYYHH24:MI:SS'))
+		      AND NVL(TO_DATE(:l_to_date,'DD/MM/YYYYHH24:MI:SS'),TO_DATE('01/01/400023:59:59','DD/MM/YYYYHH24:MI:SS'))
+			  ORDER BY 10; 
+
+	if(sqlca.sqlcode == -54) 
+	{
+		/*sprintf(d_err_code,"%5d",sqlca.sqlerrd[2]);
+		disp_message(ERR_MESG,d_err_code);*/
+        EXEC SQL ROLLBACK WORK RELEASE;
+		proc_exit();
+	}    
+
+    if (OERROR)
+    {
+         err_mesg("DECLARE failed on cursor receipt_cursor",0,"");
+    }
+
+
+	fn_fix_receipt_dtls_var();	
+	
+	EXEC SQL OPEN receipt_cursor; 
+
+    if (OERROR)
+    {
+         err_mesg("OPEN failed on cursor receipt_cursor",0,"");
+
+    }	 
+}
+
+fn_fetch_receipt_dtls()
+{
+
+		fn_init_receipt_dtls_var();
+
+		EXEC SQL fetch receipt_cursor into :lv_hosp_addr1,
+									:lv_hosp_addr2,
+									:lv_hosp_addr3,
+									:lv_hosp_tel_num,
+									:lv_sysdate,
+									:lv_payer_name,
+									:lv_doc_date,
+									:lv_slmt_type,
+									:lv_base_currency,
+									:d_doc_type_code,
+									:d_doc_number,
+									:ld_doc_amt,
+									:lv_ref_desc,
+									:lv_ref_date,
+									:lv_patient_id,
+									:lv_doc_srno;
+	if(sqlca.sqlcode == -54) 
+	{
+		/*sprintf(d_err_code,"%5d",sqlca.sqlerrd[2]);
+		disp_message(ERR_MESG,d_err_code);*/
+        EXEC SQL ROLLBACK WORK RELEASE;
+		proc_exit();
+	}   
+
+    if (OERROR)
+    {
+         err_mesg("FETCH failed on cursor receipt_cursor",0,"");
+    }
+
+
+	fn_fix_receipt_dtls_var();		
+	
+	return(LAST_ROW?0:1); 
+ 
+  }
+
+close_receipt_cursor()
+{
+	EXEC SQL CLOSE receipt_cursor;
+}
+
+
+fn_fetch_patient_dtls()
+{
+	fn_init_patient_dtls_var();
+
+	EXEC SQL SELECT ln1_mail_add,
+					ln2_mail_add,
+					ln3_mail_add,
+					mail_postal_code
+			 INTO	:lv_mail_addr1,
+					:lv_mail_addr2,
+					:lv_mail_addr3,
+					:lv_mail_po_code
+			 FROM   mp_pat_other_dtls
+			 WHERE  patient_id = :lv_patient_id;
+
+			
+
+	if (OERROR)
+		err_mesg("SELECT failed on table MP_PAT_OTHER_DTLS.", 0, "");
+
+	fn_fix_patient_dtls_var();
+
+	
+}
+
+
+
+fn_fetch_outst_amt()
+{
+	
+	/*
+	EXEC SQL SELECT SUM(bill_tot_outst_amt)
+			 INTO   :ld_outst_amt
+			 FROM	bl_bill_hdr
+			 WHERE  operating_facility_id = :lv_facility_id
+			 AND    episode_type          = :lv_episode_type
+			 AND	(doc_type_code, doc_num) 
+					IN (SELECT all_doc_type_code, all_doc_num
+						FROM   bl_patient_ledger
+						WHERE  operating_facility_id = :lv_facility_id
+						AND    episode_type          = :lv_episode_type
+						AND	   org_doc_type_code     = :d_doc_type_code
+						AND	   org_doc_num			 = :d_doc_number); 
+      commented for PE CORRECTION	*/
+
+	  EXEC SQL SELECT SUM(bill_tot_outst_amt)
+			 INTO   :ld_outst_amt
+			 FROM	bl_bill_hdr
+			 WHERE  operating_facility_id = :lv_facility_id
+			 AND    episode_type          = :lv_episode_type
+			 AND PATIENT_ID=:lv_patient_id //ADDED PATIENT ID FOR PE CORRECTION
+			 AND	(doc_type_code, doc_num) 
+					IN (SELECT all_doc_type_code, all_doc_num
+						FROM   bl_patient_ledger
+						WHERE  operating_facility_id = :lv_facility_id
+						AND    episode_type          = :lv_episode_type
+						AND	   org_doc_type_code     = :d_doc_type_code
+						AND	   org_doc_num			 = :d_doc_number); 
+	
+	if (OERROR)
+		err_mesg("SELECT failed while fetching Outstanding Amount.", 0, "");
+
+			
+}
+
+fn_open_file()
+{
+    strcpy(lc_filename, WORKING_DIR);
+	strcat(lc_filename, "BLR00009.lis");
+
+    if ((fp = fopen(lc_filename, "w")) == NULL)
+    {
+		disp_message(ERR_MESG, "Error in opening file BLR00009.lis");
+		proc_exit();
+    }
+}
+
+fn_print_header()
+{
+	fprintf(fp,"%c(s3B",ESC); 	// To set bold style
+	strcpy(lc_lgnd_id, "0010"); //Report desc
+	fn_get_legend();
+	fprintf(fp, "\n %26s%s \n", "", lv_lgnd_val.arr); 
+	fprintf(fp,"%c(s-3B",ESC);	// To release bold style
+
+	
+	fprintf(fp, "\n\n\n\n %s \n", lv_hosp_name.arr);
+	fprintf(fp, " %s \n", nd_add_ln1.arr);
+	fprintf(fp, " %s \n", nd_add_ln2.arr);
+	fprintf(fp, " %s \n", nd_add_ln3.arr);
+	   if(strcmp(nd_add_ln4.arr,"\0")!=0)
+		  fprintf(fp, " %s \n", nd_add_ln4.arr);
+	   if(strcmp(d_postal_code.arr,"\0")!=0)
+		  fprintf(fp, " %s \n", d_postal_code.arr);
+	   if(strcmp(d_res_area_code.arr,"\0")!=0)
+		  fprintf(fp, " %s \n", d_res_area_code.arr);
+	   if(strcmp(d_res_town_code.arr,"\0")!=0)
+		  fprintf(fp, " %s \n", d_res_town_code.arr);
+	   if(strcmp(d_region_code.arr,"\0")!=0)
+		  fprintf(fp, " %s \n", d_region_code.arr);
+
+
+	strcpy(lc_lgnd_id, "0020"); //Tel
+	fn_get_legend();
+	fprintf(fp, " %s: %s \n", lv_lgnd_val.arr, lv_hosp_tel_num.arr); 
+   
+   	strcpy(lc_lgnd_id, "0055"); //ref
+    fn_get_legend();
+    fprintf(fp, " %70s    %s:  \n", "", lv_lgnd_val.arr);
+
+	strcpy(lc_lgnd_id, "0021"); //Date
+	fn_get_legend();
+	fprintf(fp, " %70s %s: %s \n\n\n", "", lv_lgnd_val.arr, lv_sysdate.arr);
+	
+	fprintf(fp, " %s \n", lv_payer_name.arr);
+	fprintf(fp, " %s \n", lv_mail_addr1.arr);
+	fprintf(fp, " %s \n", lv_mail_addr2.arr);
+	fprintf(fp, " %s \n", lv_mail_addr3.arr);
+	fprintf(fp, " %s \n", lv_mail_po_code.arr);
+}
+
+fn_print_body()
+{		
+	
+
+	
+	fn_format_amt_str(ld_doc_amt);
+
+	strcpy(lc_lgnd_id, "0030"); //Sir/Madam
+	fn_get_legend();
+	
+	fprintf(fp, "\n\n\n %s \n", lv_lgnd_val.arr);
+	
+	fn_format_doc_num(); 
+	
+
+	strcpy(lc_lgnd_id, "0031"); //Original Receipt No.
+	fn_get_legend(); 
+
+	
+	fprintf(fp, "\n %s: %s/%s/%s\n", lv_lgnd_val.arr, d_doc_type_code.arr, d_doc_number.arr,lv_doc_srno.arr);
+	
+	strcpy(lc_lgnd_id, "0032"); //Dated
+	fn_get_legend();
+	fprintf(fp, "\n %s: %s \n", lv_lgnd_val.arr, lv_doc_date.arr);
+	
+	strcpy(lc_lgnd_id, "0033"); //With reference to the payment made through
+	fn_get_legend();
+	fprintf(fp, "\n\n\n %s %s \n", lv_lgnd_val.arr, lv_slmt_type.arr);
+
+	strcpy(lc_lgnd_id, "0034"); //amounting to
+	fn_get_legend();
+	fprintf(fp, " %s %s %s", lv_lgnd_val.arr, lv_base_currency.arr, lc_char_amt);
+
+	strcpy(lc_lgnd_id, "0035"); //received on
+	fn_get_legend();
+	fprintf(fp, " %s %s \n", lv_lgnd_val.arr, lv_doc_date.arr);
+
+	strcpy(lc_lgnd_id, "0036"); //through reference
+	fn_get_legend();
+	fprintf(fp, " %s %s/%s \n", lv_lgnd_val.arr, lv_ref_desc.arr, lv_ref_date.arr); 
+	
+	fn_format_amt_str(ld_outst_amt);
+
+	strcpy(lc_lgnd_id, "0037"); //1. Enclosed herewith the receipt for your keeping.
+	fn_get_legend();
+	fprintf(fp,"\n %s \n", lv_lgnd_val.arr);
+	
+	strcpy(lc_lgnd_id, "0038"); //2. Please pay the balance of
+	fn_get_legend();
+	fprintf(fp,"\n %s %s %s \n", lv_lgnd_val.arr, lv_base_currency.arr, lc_char_amt);
+	
+	strcpy(lc_lgnd_id, "0039"); //Thank You
+	fn_get_legend();
+	fprintf(fp,"\n\n\n %s. \n", lv_lgnd_val.arr);
+
+	strcpy(lc_lgnd_id, "0040"); //Yours Sincerely
+	fn_get_legend();
+	fprintf(fp,"\n\n %s, \n", lv_lgnd_val.arr);
+
+//	fprintf(fp,"\n\n\n\n (---------------------------------------) \n");
+	fprintf(fp,"\n\n\n\n\n");
+	strcpy(lc_lgnd_id, "0041"); //Administrative Division
+	fn_get_legend();
+	fprintf(fp," %s, \n", lv_lgnd_val.arr);
+
+	strcpy(lc_lgnd_id, "0042"); //Revenue Unit
+	fn_get_legend();
+	fprintf(fp," (%s) \n", lv_lgnd_val.arr);
+
+	strcpy(lc_lgnd_id, "0043"); //For
+	fn_get_legend();
+	fprintf(fp," %s, \n", lv_lgnd_val.arr);
+
+	strcpy(lc_lgnd_id, "0044"); //Director
+	fn_get_legend();
+	fprintf(fp," %s, \n", lv_lgnd_val.arr);
+
+	fprintf(fp," %s \n", lv_hosp_name.arr);
+}
+
+fn_print_footer()
+{
+	strcpy(lc_lgnd_id, "0045"); //Note
+	fn_get_legend();
+	fprintf(fp, "\n\n\n\n %s:", lv_lgnd_val.arr);
+	
+	strcpy(lc_lgnd_id, "0046"); //This notice is computer generated
+	fn_get_legend();
+	fprintf(fp, " %s.", lv_lgnd_val.arr);
+	
+	strcpy(lc_lgnd_id, "0047"); //No signature is required
+	fn_get_legend();
+	fprintf(fp, " %s.\n", lv_lgnd_val.arr);
+}
+
+fn_init_receipt_dtls_var()
+{
+	lv_hosp_addr1.arr[0]    = '\0';
+	lv_hosp_addr2.arr[0]    = '\0';
+	lv_hosp_addr3.arr[0]    = '\0';
+	lv_hosp_tel_num.arr[0]  = '\0';
+	lv_sysdate.arr[0]       = '\0';
+	lv_payer_name.arr[0]    = '\0';
+	lv_doc_date.arr[0]      = '\0';
+	lv_slmt_type.arr[0]     = '\0';
+	lv_base_currency.arr[0] = '\0';
+	lv_ref_desc.arr[0]      = '\0';
+	lv_ref_date.arr[0]      = '\0';
+	lv_patient_id.arr[0]    = '\0'; 
+	lv_doc_srno.arr[0]		= '\0';
+
+
+	lv_hosp_addr1.len    = 0;
+	lv_hosp_addr2.len    = 0;
+	lv_hosp_addr3.len    = 0;
+	lv_hosp_tel_num.len  = 0;
+	lv_sysdate.len       = 0;
+	lv_payer_name.len    = 0;
+	lv_doc_date.len      = 0;
+	lv_slmt_type.len     = 0;
+	lv_base_currency.len = 0;
+	lv_ref_desc.len      = 0;
+	lv_ref_date.len      = 0;
+	lv_patient_id.len    = 0; 
+	lv_doc_srno.len		 = 0;
+	
+}	
+
+fn_fix_receipt_dtls_var()
+{
+	lv_hosp_addr1.arr[lv_hosp_addr1.len]       = '\0';
+	lv_hosp_addr2.arr[lv_hosp_addr2.len]       = '\0';
+	lv_hosp_addr3.arr[lv_hosp_addr3.len]       = '\0';
+	lv_hosp_tel_num.arr[lv_hosp_tel_num.len]   = '\0';
+	lv_sysdate.arr[lv_sysdate.len]             = '\0';
+	lv_payer_name.arr[lv_payer_name.len]       = '\0';
+	lv_doc_date.arr[lv_doc_date.len]           = '\0';
+	lv_slmt_type.arr[lv_slmt_type.len]         = '\0';
+	lv_base_currency.arr[lv_base_currency.len] = '\0';
+	lv_ref_desc.arr[lv_ref_desc.len]           = '\0';
+	lv_ref_date.arr[lv_ref_date.len]           = '\0';
+	lv_patient_id.arr[lv_patient_id.len]       = '\0'; 
+	lv_doc_srno.arr[lv_doc_srno.len]		   = '\0';
+	d_doc_type_code.arr[d_doc_type_code.len]   = '\0';
+	d_doc_number.arr[d_doc_number.len]		   = '\0';
+
+}
+
+fn_init_patient_dtls_var()
+{
+	lv_mail_addr1.arr[0]   = '\0';
+	lv_mail_addr2.arr[0]   = '\0';
+	lv_mail_addr3.arr[0]   = '\0';
+	lv_mail_po_code.arr[0] = '\0'; 
+	
+	lv_mail_addr1.len   = 0;
+	lv_mail_addr2.len   = 0;
+	lv_mail_addr3.len   = 0;
+	lv_mail_po_code.len = 0;
+}
+
+fn_fix_patient_dtls_var()
+{
+	lv_mail_addr1.arr[lv_mail_addr1.len]     = '\0';
+	lv_mail_addr2.arr[lv_mail_addr2.len]     = '\0';
+	lv_mail_addr3.arr[lv_mail_addr3.len]     = '\0';
+	lv_mail_po_code.arr[lv_mail_po_code.len] = '\0'; 
+}
+
+fn_format_amt_str(ld_get_amt)
+	double ld_get_amt;
+
+{
+	char lc_actl_amt[15];
+		
+	puts_val(lc_actl_amt,ld_get_amt );
+	
+    formats_amt(lc_actl_amt);
+
+	sprintf(lc_char_amt,"%10s",lc_actl_amt);
+											 
+}
+
+fn_format_doc_num()
+{
+	EXEC SQL SELECT LPAD(:d_doc_number, 8, '0')
+			 INTO   :lc_doc_num
+			 FROM   DUAL;
+}
+
+fn_get_legend()
+{
+	lv_lgnd_val.arr[0] = '\0';		
+	lv_lgnd_val.len    = 0;
+	
+	if (strcmp(lv_lang_id.arr, "en") == 0) 
+	{
+		EXEC SQL SELECT RTRIM(SUBSTR(dflt_legend_value, 1, 50))
+				 INTO   :lv_lgnd_val
+				 FROM   sm_lang_legend
+				 WHERE  legend_id LIKE 'MLBLR00009.LEGEND_'||:lc_lgnd_id;
+	}
+	else
+	{
+		EXEC SQL SELECT RTRIM(SUBSTR(column_value, 1, 50))
+				 INTO   :lv_lgnd_val
+				 FROM   sm_record_trans_data, sm_lang_legend
+				 WHERE  module_id    = 'SM' 
+				 AND	table_id     = 'SM_LANG_LEGEND'
+				 AND    column_id    = 'DFLT_LEGEND_VALUE'
+				 AND    pk_value     = legend_id
+				 AND    legend_id LIKE 'MLBLR00009.LEGEND_'||:lc_lgnd_id
+				 AND    language_id  = :lv_lang_id;
+	}
+
+	if (OERROR)
+		err_mesg("SELECT failed while fetching legend values.", 0, "");
+
+	lv_lgnd_val.arr[lv_lgnd_val.len] = '\0';	
+}
+
+fn_print_online()
+{
+
+	 EXEC SQL  select GET_TRACE_TIMESTAMP into :P_START_TIME from dual; //ADDED FOR PE CORRECTION
+
+	PrintDocument(
+				  lv_pword.arr,				//char	*PUidPwd;
+				  lv_session_id.arr,		//char	*PSessionID;
+				  lv_facility_id.arr,		//char	*PFacilityID;
+				  "BL",						//char	*PModuleID;
+				  lv_pgm_id.arr,			//char	*PDocumentID;
+				  lc_filename,				//char	*POnlinePrintFileNames;
+				  "O",						//char	*PLocationTypes;
+				  " ",						//char	*PLocationCodes;
+				  1,						//int	PNumOfCopies;
+				  1,						//int	PPageFrom;
+				  9999						//int	PPageTo;
+				 );
+
+	EXEC SQL EXECUTE
+			BEGIN	
+				TRACE_DURATION_BL(
+				:lv_pgm_id ,
+				'Acknowledgement Letter for Receipt Printing' ,
+				:P_START_TIME ,
+				:uid );
+			END;
+			END-EXEC;
+
+}
+
+fn_print_settings()
+{
+	fprintf(fp,"%c(s0P",ESC);		// To fix the primary spacing
+	fprintf(fp,"%c&l0O",ESC); 		// To print in portait mode
+	fprintf(fp,"%c(s4099T",ESC);	// To set the font name	
+	fprintf(fp,"%c&l8D",ESC); 		// To set vertical lines per inch
+	fprintf(fp,"%c&a2L",ESC); 		// To set the left margin
+	fprintf(fp,"%c&l6E",ESC); 		// To set the top margin
+	fprintf(fp,"%c(s12H",ESC); 		// To set the font
+	
+	//fprintf(fp,"%c&l0H",ESC);		// To eject page
+	//fprintf(fp,"%cE",ESC);		// To reset the printer
+	//fprintf(fp,"%c&d0D",ESC);		// To set underline mode
+	//fprintf(fp,"%c&d@",ESC);		// To release underline mode
+	//fprintf(fp,"%c(s3B",ESC); 	// To set bold style
+	//fprintf(fp,"%c(s-3B",ESC);	// To release bold style
+
+	
+}
+
+
+
+puts_val(str,num)
+char *str;
+double num;
+{
+	
+				 
+
+	strcpy(lc_facility_id.arr,lv_facility_id.arr);
+	lc_facility_id.len = strlen(lc_facility_id.arr);
+	
+	
+	EXEC SQL SELECT no_of_decimal
+               INTO :l_no_of_decimal
+	  		   FROM sm_acc_entity_param
+              WHERE acc_entity_id = (SELECT acc_entity_code 
+									   FROM sy_acc_entity
+									  WHERE acc_entity_id = :lc_facility_id);
+
+	//EXEC SQL SELECT to_char(:l_no_of_decimal) into :deci_val from dual;
+	 
+
+   	if (sqlca.sqlcode < 0) 
+	{
+        disp_message(ORA_MESG,"ERR_MESG: Select failed in sm_acc_entity_param");
+      	EXEC SQL ROLLBACK WORK;
+   	}
+
+	if(l_no_of_decimal==3)
+	{
+		sprintf(str,"%14.3f",num);
+	}
+	else
+	{
+		sprintf(str,"%15.2f",num);
+	}
+
+	return str;
+
+}
+
+
+
+formats_amt(str)
+char	*str;
+{
+
+		
+	strcpy(lc_facility_id.arr,lv_facility_id.arr);
+	lc_facility_id.len = strlen(lc_facility_id.arr);
+	
+
+	EXEC SQL SELECT no_of_decimal
+               INTO :l_no_of_decimal
+	  		   FROM sm_acc_entity_param
+              WHERE acc_entity_id = (SELECT acc_entity_code 
+									   FROM sy_acc_entity
+									  WHERE acc_entity_id = :lc_facility_id);
+      
+      //EXEC SQL SELECT to_char(:l_no_of_decimal) into :deci_val from dual;
+	   
+
+ 
+   	if (sqlca.sqlcode < 0) 
+	{
+        disp_message(ORA_MESG,"ERR_MESG: Select failed in sm_acc_entity_param");
+      	EXEC SQL ROLLBACK WORK;
+   	}
+
+	if(strlen(str) == 0)
+	{
+		if(l_no_of_decimal == 2)
+
+		{
+		
+			strcpy(str, "0.00");
+		}
+		else if(l_no_of_decimal == 3)
+		{
+
+		
+			strcpy(str, "0.000");
+		}
+	}
+	else 
+	{    
+		
+		u_ltrim(str);
+		str = check_decimal(str,l_no_of_decimal);
+		str = put_comma(str,l_no_of_decimal);
+    }
+	
+	return str;
+}
+  

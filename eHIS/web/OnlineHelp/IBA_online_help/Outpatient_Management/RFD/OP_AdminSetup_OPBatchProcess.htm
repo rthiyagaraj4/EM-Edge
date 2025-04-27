@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_AdminSetup_OPBatchProcess</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to perform the required batch process:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Process</span> - Select the process from the list. The listed values are ‘Auto- Complete Visit’ and ‘Auto-Close Episode’. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">If ‘Auto-Complete Visit’ is selected, the system displays the cut-off date for Auto-Complete Visits:</p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cut-off Date</span> – The cut-off date is displayed in the format dd/mm/yyyy. The field displays the computed value based on the defined value in OP Parameter, by default. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">If Auto-Close Episode’ is selected, the system displays the cut-off date for Auto-Close Episodes:</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> – Select the required service for which the process is to be defined form the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cut-off Date with Follow-up</span> – The cut-off date with follow-up is displayed in the format dd/mm/yyyy. The field displays the computed value based on the defined value in OP Parameter, by default. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cut-off Date without Follow-up</span> – The cut-off date without follow up is displayed in the format dd/mm/yyyy. The field displays the computed value based on the defined value in OP Parameter, by default.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="NumberRFD">The configuration in “Parameter for Facility” for “No Show” will be defined as default and disabled in “OP Batch Process” function. You can only perform the services of your logged-in facility as batch process.</p>
+<p class="NumberRFD">&#160;</p>
+<p class="NumberRFD">If the Episode closure by value is selected as “No Shows” in the OP Parameter screen, the following fields will be displayed here:</p>
+<p class="NumberRFD">&#160;</p>
+<ol type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Number of Consecutive No shows &#160;&#160;- Define the number of no shows to be elapsed after which you &#160;can consider a patient’s episode for closure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">No Visits in Last X Months – Define the minimum number of past months within which if a patient has not made a visit, their episode can be considered for closure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">No Appointments for next X Months - Define the maximum number of future months within which if a patient’s next appointment is not scheduled, their episode can be considered for closure.</p>
+</li>
+</ol>
+<p class="NumberRFD"><span style="font-weight: bold;"><b>Note:</b></span> Only when all the above mentioned three conditions are met, the system will consider the patient record for batch process to conclude the episode; else the record will not be considered.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

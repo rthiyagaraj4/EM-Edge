@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>View Debug Information</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("EM Interface Engine\nAdministration\nView Debug Information");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>View Debug Information</h1>
+<p class="Italic">From this function you can <span class="RedItalic">View</span> debug information.</p>
+<p class="Text">View Debug Information function is used for viewing debug information which is generated while creating events (based on EM HIS events), constructing the HL7 messages or processing the query messages that are received from the interfaced applications.</p>
+<p class="Text">Information in this function helps the user in identifying the reason for any failure. There are two tabs in this function – ‘Triggers’ and ‘Procedures’. The Triggers tab describes the debug information associated with the various triggers. The Procedures tab describes the debug information associated with the various stored procedures.</p>
+<h2>Viewing Debug Information</h2>
+<p class="From">From EM Interface Engine &gt; Administration &gt; select View Debug Information function.</p>
+<p class="Text">The View Debug Information screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">required details</a>.</p>
+<div class="droptext" id="POPUP1005099175" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Application</span> – Select the required application from the list. The listed values are defined in the ‘Applications’ function of EM Interface Engine module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the required facility from the list. &#160;The listed values are defined in the Facility function of System Manager module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Message ID</span> – Enter the Message ID for which the debug information has to be displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Event Type</span> – Select the suitable event type from the list. The listed values are defined in the Event Type function of EM Interface Engine module.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">The screen displays two tabs.</p>
+</li>
+</ol>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Triggers Tab</a></p>
+<div class="droptext" id="POPUP1005081113" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operated Date</span> - The date on which the trigger has fired for inserting control log for HL7 communication is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operated By</span> - The name of the Oracle user, who has done the transaction is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Product Name</span> - The product (SQL*Plus, Forms, etc.), which actually fired the trigger is displayed. In case of triggers, it is marked as SQL*Plus, because triggers are fired in the back-end (that is, Oracle database)</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Triggering Event</span> - Type of transaction, that is, insert or update.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Triggering Table</span> - Table from which the trigger was fired is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click the hyperlinked ‘Operated Date’ and the View Debug Information screen gets displayed.</p>
+<p class="BoldRFD" style="font-weight: normal;">The Triggering Condition is displayed. Click [Write Log], if you need the system to record the displayed triggering condition. (The file is written into C:EMHISReports in the Application Server).</p>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Procedures Tab</a></p>
+<div class="droptext" id="POPUP1005108504" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operated Date</span> - The date on which the procedure is executed is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operated By</span> - The name of the Oracle user, who executed the procedure is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Product Name</span> - The product (SQL*Plus, Forms, etc.), which actually executed the procedure is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Process ID</span> - The process that executed the procedure is displayed. The backend process that constructs the HL7 message from the control table has no Process ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Procedure Name</span> - Name of the procedure executed is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click the hyperlinked ‘Operated Date’. The View Debug Information screen gets displayed.</p>
+<p class="BoldRFD" style="font-weight: normal;">The Procedure Parameters for the procedure are displayed. Click [Write Log] to record the displayed Procedure Parameters. The file is written into C:EMHISReports in the Application Server.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click [Reset] to reset the selected values.</p>
+</div>
+<ol start="3" type="1">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Reset]</span> to reset the selected values.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1005099175');
+	TextPopupInit('a2','POPUP1005081113');
+	TextPopupInit('a3','POPUP1005108504');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

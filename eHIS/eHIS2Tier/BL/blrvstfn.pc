@@ -1,0 +1,748 @@
+#define ONLINE_PRINTING 1
+#define ESC 0x1B 
+#define bold 0x45
+#define norm 0x46
+#include <stdio.h>    
+#include <string.h>      
+#include "bl.h"
+  
+#define OERROR (sqlca.sqlcode < 0)   
+ 
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd              [91],
+	   d_session_id             [16],
+ 	   hosp_name                [120],
+	   date_time                [20],
+	   user_id                  [20],
+	   nd_facility_id           [3],
+	   d_pgm_date               [14],
+       rep_date                 [20],
+       oper_id                  [21],
+       d_curr_pgm_name          [15];
+
+    VARCHAR nd_hosp_name         [61],
+		h_practice_num			 [31],
+		h_ln1_add				 [31],
+		h_ln2_add				 [31],
+		h_ln3_add				 [31],
+		h_zip_code				 [31],
+		h_tel_num				 [31],
+		h_fax_num			     [31],
+        h_email_id   [31],
+	    nd_patient_id            [21],
+	    nd_audit_trail_no        [21],
+		nd_episode_type 		[2],
+	    nd_episode_id		[9],
+	    nd_visit_id			[5],
+	    nd_patient_name          [101],
+
+		ND_PRV_BLNG_GRP_ID       [5],          
+		ND_PRV_BLNG_CLASS_ID     [3],
+ 	    ND_PRV_CUST_CODE		 [9],       
+   	    ND_PRV_CREDIT_DOC_REF    [31],        
+	    ND_PRV_SLMT_TYPE_CODE     [3],             
+	    ND_CHG_BLNG_GRP_ID        [5],                
+		ND_CHG_BLNG_CLASS_ID      [3],
+	    ND_CHG_CREDIT_DOC_REF_DESC [31],        
+        ND_CHG_CUST_CODE          [9],                  
+        ND_CHG_SLMT_TYPE_CODE     [3],
+	    ND_PRV_MODIFIED_BY_ID     [31],     
+	    ND_CHG_MODIFIED_BY_ID     [31],
+        ND_ADDED_BY_ID            [31],    
+		nd_prv_added_by_id        [31], 
+		nd_prv_blng_grp_desc      [101],
+		ND_CHG_BLNG_GRP_DESC      [101],
+		nd_prv_blng_class_desc    [16],
+		nd_chg_blng_class_desc    [16],
+		nd_prv_cust_name   		  [101], 
+		p_language_id				[3],
+		nd_chg_cust_name    [101],
+		nd_prv_sett_type_desc [16],
+		nd_chg_sett_type_desc [16],
+        ND_PRV_CREDIT_DOC_REF_DT [20],        
+		ND_CHG_CREDIT_DOC_REF_DT [20],        
+		ND_PRV_MODIFIED_DATE [20],
+        ND_CHG_MODIFIED_DATE [20],
+	    ND_ADDED_DATE [20],
+		nd_prv_added_date [20],
+		nd_report_id[10];
+
+VARCHAR     nd_temp_date[20],
+			nd_loc_date	[20],
+			date_convert[20];
+
+VARCHAR     nd_temp_date1 [20],
+			nd_loc_date1  [20],
+			date_convert1 [20];			
+		
+int     nd_hosp_name_len,
+        nd_bill_doc_num;
+
+int d_rfq_line_num,pctr =0,
+    count;
+
+    
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include "winproc.h"
+char string_var[100];
+
+FILE *f1;
+
+int page_no,
+    line_no,
+    first_line,
+    g_count;
+
+char file_name[500];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+    if(argc < 5) {
+	  disp_message(ERR_MESG,"Usage BLRVSTFN userid/password session_id pgm_date facility_id \n");
+	  proc_exit();
+    }
+
+    strcpy(g_pgm_id,"BLRVSTFN");
+
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+	
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) 
+    {
+      disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+      sprintf(string_var, "%s\n",sqlca.sqlerrm.sqlerrmc);
+      disp_message(ORA_MESG,string_var);
+      proc_exit();
+    }
+
+	set_meduser_role();	
+
+    strcpy(p_language_id.arr,l_language_id.arr);
+    p_language_id.len = l_language_id.len;
+	
+	fetch_prog_param();
+
+    strcpy(file_name,WORKING_DIR);		
+    strcat(file_name,"blrvstfn.lis");
+
+    if( (f1=fopen(file_name,"w")) == NULL) 
+    {
+      disp_message(ERR_MESG,"Error in opening output file...\n");
+      proc_exit();
+    }
+    fetch_desc();
+    decl_curs();
+    fetch_recs();    	
+    print_notification();
+
+    fclose(f1);
+
+     /*print_online(uid_pwd.arr, "BLRCRAGR", "O", "", "BLRCRAGR.LIS", "R");*/
+
+   PrintDocument 
+      (
+		uid_pwd.arr,		//char	*PUidPwd;
+		d_session_id.arr,	//char	*PSessionID; 
+		nd_facility_id.arr,	//char	*PFacilityID;  
+		"BL",				//char	*PModuleID;
+		nd_report_id.arr,  //"BLRVSTFN",			//char	*PDocumentID;
+		file_name,			//char	*POnlinePrintFileNames;
+		"O",				//char	*PLocationTypes;
+		" ",				//char	*PLocationCodes;
+		1,					//int		PNumOfCopies;
+		1,					//int		PPageFrom;
+		1					//int		PPageTo;
+	);
+
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+}
+
+fetch_desc()
+{
+   hosp_name.arr[0]      = '\0';
+   date_time.arr[0]      = '\0';
+   user_id.arr[0]        = '\0';
+
+   hosp_name.len      = 0;
+   date_time.len      = 0;
+   user_id.len        = 0;
+
+   EXEC SQL SELECT ACCOUNTING_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+		   USER
+	      INTO :hosp_name, :date_time, :user_id
+	      FROM SY_ACC_ENTITY
+		  WHERE acc_entity_id = :nd_facility_id;
+
+   if (OERROR)
+	 err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+   hosp_name.arr[hosp_name.len]           = '\0';
+   date_time.arr[date_time.len]           = '\0';
+   user_id.arr[user_id.len]               = '\0';
+
+}
+
+
+fetch_prog_param()
+{
+   	nd_facility_id.arr[0]    = '\0';
+    nd_audit_trail_no.arr[0] = '\0';
+	nd_patient_id.arr[0]     = '\0';
+	nd_episode_type.arr[0]   = '\0';
+    nd_episode_id.arr[0]     = '\0';
+    nd_visit_id.arr[0]     = '\0';
+
+	nd_facility_id.len       = 0;
+	nd_patient_id.len        = 0;   
+	nd_audit_trail_no.len    = 0;   
+    nd_episode_type.len      = 0;
+	nd_episode_id.len        = 0;   
+    nd_visit_id.len    = 0;
+
+   
+	EXEC SQL SELECT operating_facility_id,
+			PARAM1, /*  PATIENT_ID           */
+			PARAM2,         /*  EPSODE TYPE   */
+			PARAM3,         /*  EPISODE ID         */
+			PARAM4,         /*  AUDIT TRAIL NO  */
+			param5,
+			NVL(PARAM6,'BLRVSTFN')
+	 INTO   :nd_facility_id,
+	        :nd_patient_id,
+  	        :nd_episode_type,
+		    :nd_episode_id,
+			:nd_visit_id,
+		    :nd_audit_trail_no,
+			:nd_report_id
+	 FROM   SY_PROG_PARAM
+     WHERE  PGM_ID     = :d_curr_pgm_name
+     AND    SESSION_ID = :d_session_id
+     AND    PGM_DATE   = :d_pgm_date;
+  
+   if ( OERROR) 
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NO_DATA_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+	nd_facility_id.arr[nd_facility_id.len] 			= '\0';
+    nd_patient_id.arr[nd_patient_id.len]                  = '\0';
+	nd_episode_type.arr[nd_episode_type.len]  		= '\0';
+	nd_episode_id.arr[nd_episode_id.len]                  = '\0';
+	nd_audit_trail_no.arr[nd_audit_trail_no.len]          = '\0';
+	nd_visit_id.arr[nd_visit_id.len]          = '\0';
+	nd_report_id.arr[nd_report_id.len] = '\0';
+
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR) 
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+}
+
+decl_curs()
+{
+  EXEC SQL DECLARE FIN_DTLS_AUDIT_TRAIL_CUR CURSOR FOR
+  	   SELECT PRV_BLNG_GRP_ID,  
+  	    PRV_BLNG_CLASS_CODE ,
+	    PRV_CUST_CODE,
+   	    PRV_CREDIT_DOC_REF_DESC,        
+	    TO_CHAR(PRV_CREDIT_DOC_REF_DATE, 'DD/MM/YYYY'), 
+		--PRV_CREDIT_DOC_REF_DATE 9450
+	    PRV_SLMT_TYPE_CODE,             
+	    CHG_BLNG_GRP_ID,                
+		CHG_BLNG_CLASS_CODE,
+	    CHG_CREDIT_DOC_REF_DESC,        
+        TO_CHAR(CHG_CREDIT_DOC_REF_DATE ,'DD/MM/YYYY'),   
+        --CHG_CREDIT_DOC_REF_DATE		,9450
+        CHG_CUST_CODE,                  
+        CHG_SLMT_TYPE_CODE,
+	    PRV_MODIFIED_BY_ID,     
+	    TO_CHAR(PRV_MODIFIED_DATE, 'DD/MM/YYYY') ,
+		--PRV_MODIFIED_DATE,9450
+	    CHG_MODIFIED_BY_ID,
+        TO_CHAR(CHG_MODIFIED_DATE , 'DD/MM/YYYY'),
+		--CHG_MODIFIED_DATE,9450
+        ADDED_BY_ID,    
+	    TO_CHAR(ADDED_DATE , 'DD/MM/YYYY')
+		--ADDED_DATE,9450
+   FROM  BL_FIN_DTLS_AUDIT_TRAIL
+   WHERE AUDIT_TRAIL_NO  = to_number(:nd_audit_trail_no);
+   
+	      
+		  /*PATIENT_ID      = :nd_patient_id  AND
+          EPISODE_TYPE    = :nd_episode_type   AND
+          episode_id      = to_number(:nd_episode_id) AND
+          visit_id        = to_number(:nd_visit_id); */
+
+     nd_patient_name.arr[0]     = '\0';
+     nd_patient_name.len       = 0;
+
+     EXEC SQL SELECT  SHORT_NAME INTO :nd_patient_name FROM MP_PATIENT_MAST
+     WHERE   PATIENT_ID = :nd_patient_id;
+	
+	if (OERROR) 
+         err_mesg("SELECT  failed on table MP_PATIENT_MAST",0,"");
+
+     nd_patient_name.arr[nd_patient_name.len] 			= '\0';
+
+	 nd_hosp_name.len    = 0;
+	 h_practice_num.len    = 0; 
+	 h_ln1_add.len		   = 0;
+	 h_ln2_add.len		   = 0;
+	 h_ln3_add.len		   = 0;
+	 h_zip_code.len		   = 0;
+	 h_tel_num.len		   = 0;
+	 h_fax_num.len		   = 0;
+	 h_email_id.len		   = 0;
+ 
+    date_time.arr[0]      = '\0';
+	date_time.len  = 0;
+
+	 nd_hosp_name.arr [ nd_hosp_name.len ]		   = '\0';
+	 h_practice_num.arr [ h_practice_num.len ]		   = '\0';
+	 h_ln1_add.arr [ h_ln1_add.len ]		   = '\0';
+	 h_ln2_add.arr [ h_ln2_add.len ]		   = '\0';
+	 h_ln3_add.arr [ h_ln3_add.len ]		   = '\0';
+	 h_zip_code.arr [ h_zip_code.len ]		   = '\0';
+	 h_tel_num.arr [ h_tel_num.len ]				   = '\0';
+	 h_fax_num.arr [ h_fax_num.len ]				   = '\0';
+	 h_email_id.arr [ h_email_id.len ]				   = '\0';
+
+
+
+EXEC SQL SELECT accounting_name, 
+           TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'), 
+		   PRACTICE_NUM, LN1_ADD, LN2_ADD, LN3_ADD,
+					 TEL_NUM, FAX_NUM, ZIP_CODE, ACC_ENTITY_NAME_LOC_LANG
+		 INTO	:nd_hosp_name, 
+		        :date_time, :h_practice_num, :h_ln1_add, :h_ln2_add, :h_ln3_add,
+				:h_tel_num, :h_fax_num, :h_zip_code, :h_email_id
+		 FROM	SY_ACC_ENTITY
+		 WHERE acc_entity_id = :nd_facility_id;
+
+   if (OERROR) 
+        err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+	 nd_hosp_name.arr [ nd_hosp_name.len ]		   = '\0';
+
+	 date_time.arr [ date_time.len ]		   = '\0';
+
+	 h_practice_num.arr [ h_practice_num.len ]		   = '\0';
+	 h_ln1_add.arr [ h_ln1_add.len ]		   = '\0';
+	 h_ln2_add.arr [ h_ln2_add.len ]		   = '\0';
+	 h_ln3_add.arr [ h_ln3_add.len ]		   = '\0';
+     h_tel_num.arr [ h_tel_num.len ]				   = '\0';
+	 h_fax_num.arr [ h_fax_num.len ]				   = '\0';
+	 h_zip_code.arr [ h_zip_code.len ]		   = '\0';
+	 h_email_id.arr [ h_email_id.len ]		   = '\0';
+	 
+
+EXEC SQL SELECT round((61-length(ACC_ENTITY_NAME))/2) INTO :nd_hosp_name_len 
+FROM SY_ACC_ENTITY
+WHERE acc_entity_id = :nd_facility_id;
+
+
+ if (OERROR)
+		err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+}
+
+
+ fetch_recs()
+{
+
+   	    ND_PRV_BLNG_GRP_ID.arr[0]           = '\0';
+		ND_PRV_BLNG_CLASS_ID.arr[0]         = '\0';
+	    ND_PRV_CUST_CODE.arr[0]             = '\0';
+   	    ND_PRV_CREDIT_DOC_REF.arr[0]        = '\0';
+	    ND_PRV_CREDIT_DOC_REF_DT.arr[0]     = '\0';
+	    ND_PRV_SLMT_TYPE_CODE.arr[0]        = '\0';
+	    ND_CHG_BLNG_GRP_ID.arr[0]           = '\0';
+		ND_CHG_BLNG_CLASS_ID.arr[0]			= '\0';
+	    ND_CHG_CREDIT_DOC_REF_DESC.arr[0]   = '\0';
+        ND_CHG_CREDIT_DOC_REF_DT.arr[0]     = '\0';
+        ND_CHG_CUST_CODE.arr[0]             = '\0';
+        ND_CHG_SLMT_TYPE_CODE.arr[0]        = '\0';
+	    ND_PRV_MODIFIED_BY_ID.arr[0]        = '\0';
+	    ND_PRV_MODIFIED_DATE.arr[0]         = '\0';
+	    ND_CHG_MODIFIED_BY_ID.arr[0]        = '\0';
+        ND_CHG_MODIFIED_DATE.arr[0]         = '\0';
+        ND_ADDED_BY_ID.arr[0]               = '\0';
+	    ND_ADDED_DATE.arr[0]                = '\0';
+
+	    ND_PRV_BLNG_GRP_ID.len = 0;
+		ND_PRV_BLNG_CLASS_ID.len = 0;
+	    ND_PRV_CUST_CODE.len = 0;
+   	    ND_PRV_CREDIT_DOC_REF.len = 0;
+	    ND_PRV_CREDIT_DOC_REF_DT.len = 0;
+	    ND_PRV_SLMT_TYPE_CODE.len = 0;
+	    ND_CHG_BLNG_GRP_ID.len = 0;
+		ND_CHG_BLNG_GRP_ID.len = 0;
+	    ND_CHG_CREDIT_DOC_REF_DESC.len = 0;
+        ND_CHG_CREDIT_DOC_REF_DT.len = 0;
+        ND_CHG_CUST_CODE.len = 0;
+        ND_CHG_SLMT_TYPE_CODE.len = 0;
+	    ND_PRV_MODIFIED_BY_ID.len = 0;
+	    ND_PRV_MODIFIED_DATE.len = 0;
+	    ND_CHG_MODIFIED_BY_ID.len = 0;
+        ND_CHG_MODIFIED_DATE.len = 0;
+        ND_ADDED_BY_ID.len = 0;
+	    ND_ADDED_DATE.len = 0;
+
+	
+   EXEC SQL OPEN FIN_DTLS_AUDIT_TRAIL_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor FIN_DTLS_AUDIT_TRAIL_CUR",0,"");
+
+
+   EXEC SQL FETCH FIN_DTLS_AUDIT_TRAIL_CUR 
+	    INTO  :ND_PRV_BLNG_GRP_ID,          
+		:ND_PRV_BLNG_CLASS_ID,
+	    :ND_PRV_CUST_CODE,                  
+   	    :ND_PRV_CREDIT_DOC_REF,        
+	    :ND_PRV_CREDIT_DOC_REF_DT,        
+	    :ND_PRV_SLMT_TYPE_CODE,             
+	    :ND_CHG_BLNG_GRP_ID,
+		:ND_CHG_BLNG_CLASS_ID,
+	    :ND_CHG_CREDIT_DOC_REF_DESC,        
+        :ND_CHG_CREDIT_DOC_REF_DT,        
+        :ND_CHG_CUST_CODE,                  
+        :ND_CHG_SLMT_TYPE_CODE,
+	    :ND_PRV_MODIFIED_BY_ID,     
+	    :ND_PRV_MODIFIED_DATE ,
+	    :ND_CHG_MODIFIED_BY_ID,
+        :ND_CHG_MODIFIED_DATE ,
+        :ND_ADDED_BY_ID,    
+	    :ND_ADDED_DATE ;
+
+   if (OERROR)
+         err_mesg("FETCH failed on cursor FIN_DTLS_AUDIT_TRAIL_CUR",0,"");
+
+
+
+	    ND_PRV_BLNG_GRP_ID.arr[ND_PRV_BLNG_GRP_ID.len]           = '\0';
+		ND_PRV_BLNG_CLASS_ID.arr[ND_PRV_BLNG_CLASS_ID.len]		 = '\0';
+	    ND_PRV_CUST_CODE.arr[ND_PRV_CUST_CODE.len]           = '\0';
+   	    ND_PRV_CREDIT_DOC_REF.arr[ND_PRV_CREDIT_DOC_REF.len]           = '\0';
+	    ND_PRV_CREDIT_DOC_REF_DT.arr[ND_PRV_CREDIT_DOC_REF_DT.len]           = '\0';
+	    ND_PRV_SLMT_TYPE_CODE.arr[ND_PRV_SLMT_TYPE_CODE.len]           = '\0';
+	    ND_CHG_BLNG_GRP_ID.arr[ND_CHG_BLNG_GRP_ID.len]           = '\0';
+		ND_CHG_BLNG_CLASS_ID.arr[ND_CHG_BLNG_GRP_ID.len]  = '\0';
+	    ND_CHG_CREDIT_DOC_REF_DESC.arr[ND_CHG_CREDIT_DOC_REF_DESC.len]           = '\0';
+        ND_CHG_CREDIT_DOC_REF_DT.arr[ND_CHG_CREDIT_DOC_REF_DT.len]           = '\0';
+        ND_CHG_CUST_CODE.arr[ND_CHG_CUST_CODE.len]           = '\0';
+        ND_CHG_SLMT_TYPE_CODE.arr[ND_CHG_SLMT_TYPE_CODE.len]           = '\0';
+	    ND_PRV_MODIFIED_BY_ID.arr[ND_PRV_MODIFIED_BY_ID.len]           = '\0';
+	    ND_PRV_MODIFIED_DATE.arr[ND_PRV_MODIFIED_DATE.len]           = '\0';
+	    ND_CHG_MODIFIED_BY_ID.arr[ND_CHG_MODIFIED_BY_ID.len]           = '\0';
+        ND_CHG_MODIFIED_DATE.arr[ND_CHG_MODIFIED_DATE.len]           = '\0';
+        ND_ADDED_BY_ID.arr[ND_ADDED_BY_ID.len]           = '\0';
+	    ND_ADDED_DATE.arr[ND_ADDED_DATE.len]           = '\0';
+
+
+	    nd_prv_added_by_id.arr[0]     = '\0';
+	    nd_prv_added_date.arr[0]     = '\0';
+	    nd_prv_blng_grp_desc.arr[0]     = '\0';
+		nd_prv_blng_class_desc.arr[0]   = '\0';
+	    ND_CHG_BLNG_GRP_DESC.arr[0]     = '\0';
+		nd_chg_blng_class_desc.arr[0]     = '\0';
+	    nd_prv_cust_name.arr[0]     = '\0'; 
+	    nd_chg_cust_name.arr[0]     = '\0';
+	    nd_prv_sett_type_desc.arr[0]     = '\0';
+	    nd_chg_sett_type_desc.arr[0]     = '\0';
+
+	    nd_prv_added_by_id.len     = 0;    
+	    nd_prv_added_date.len     = 0;
+	    nd_prv_blng_grp_desc.len= 0;
+	    ND_CHG_BLNG_GRP_DESC.len= 0;
+		nd_chg_blng_class_desc.len =0;
+	    nd_prv_cust_name.len= 0;
+		nd_prv_blng_class_desc.len =0;
+	    nd_chg_cust_name.len= 0;
+	    nd_prv_sett_type_desc.len= 0;
+	    nd_chg_sett_type_desc.len= 0;
+
+   EXEC SQL SELECT added_by_id , to_char(added_date,'DD/MM/YYYY') 
+            INTO :nd_prv_added_by_id , :nd_prv_added_date
+            from bl_visit_fin_dtls 
+		   where operating_facility_id = :nd_facility_id AND
+	   	         PATIENT_ID      = :nd_patient_id  AND
+		         EPISODE_TYPE    = :nd_episode_type   AND
+	             episode_id      = :nd_episode_id  AND
+                 visit_id        = :nd_visit_id;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_VISIT_FIN_DTLS",0,"");
+           
+
+   EXEC SQL select SHORT_DESC into :nd_prv_blng_grp_desc from  bl_blng_grp
+   WHERE blng_grp_id = :ND_PRV_BLNG_GRP_ID ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_BLNG_GRP",0,"");
+
+   EXEC SQL select SHORT_DESC into :ND_CHG_BLNG_GRP_DESC from  bl_blng_grp
+   WHERE blng_grp_id = :ND_CHG_BLNG_GRP_ID ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_BLNG_GRP",0,"");
+
+   EXEC SQL select SHORT_DESC into :nd_prv_blng_class_desc from  bl_blng_class
+   WHERE BLNG_CLASS_CODE = :ND_PRV_BLNG_CLASS_ID ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_BLNG_CLASS",0,"");
+
+   EXEC SQL select SHORT_DESC into :nd_chg_blng_class_desc from  bl_blng_class
+   WHERE BLNG_CLASS_CODE = :ND_CHG_BLNG_CLASS_ID ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_BLNG_CLASS",0,"");
+
+
+
+   EXEC SQL SELECT  SHORT_NAME 
+			INTO :nd_prv_cust_name 
+			FROM AR_CUSTOMER
+			WHERE   CUST_CODE = :ND_PRV_CUST_CODE;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table AR_CUSTOMER",0,"");
+
+   EXEC SQL SELECT  SHORT_NAME 
+			INTO :nd_chg_cust_name 
+			FROM AR_CUSTOMER
+			WHERE   CUST_CODE = :ND_CHG_CUST_CODE;
+   
+   if (OERROR)
+         err_mesg("SELECT failed on table AR_CUSTOMER",0,"");
+
+   EXEC SQL select SHORT_DESC into :nd_prv_sett_type_desc from  bl_slmt_type
+   WHERE SLMT_TYPE_CODE = :ND_PRV_SLMT_TYPE_CODE ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_SLMT_TYPE",0,"");
+
+   EXEC SQL select SHORT_DESC 
+   into :nd_chg_sett_type_desc from  bl_slmt_type
+   WHERE SLMT_TYPE_CODE = :ND_CHG_SLMT_TYPE_CODE ;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_SLMT_TYPE",0,"");
+
+   if (LAST_ROW) return (0);
+   else return (1);
+}
+
+print_notification()
+{
+int spc=0;
+int i=0;
+char s_amt[22];
+char a_amt[22];
+
+  fprintf(f1,"\n%25s %-30s \n", "",hosp_name.arr);
+  fprintf(f1,"%-12s %40s \n","",     "NOTIFICATION ON FINANCIAL DETAILS OF PATIENT/EPISODE ");   
+  if(date_time.arr[0]!='\0')
+	 {
+	   init_date_temp_var1();
+       strcpy(date_convert1.arr,date_time.arr);
+       fun_change_loc_date1();	   
+     } 
+  fprintf(f1,"%-1s %20s %-20s\n","","				 CHANGED ON:",date_convert1.arr);
+  fprintf(f1,"  ----------------------------------------------------------------------\n\n\n");
+
+  fprintf(f1,"FACILITY ID       :  %-3s\n\n", nd_facility_id.arr);
+
+  fprintf(f1,"PATIENT No/NAME   :  %-20s  %-60s\n\n", nd_patient_id.arr,nd_patient_name.arr);
+
+  fprintf(f1,"EPISODE DETAILS	  :  %-2s / %s / %s\n\n", nd_episode_type.arr, nd_episode_id.arr, nd_visit_id.arr);
+
+  fprintf(f1,"FINANCIAL DETAILS BEFORE MODIFICATION \n");
+  fprintf(f1,"------------------------------------- \n");
+
+  fprintf(f1,"BILLING GROUP        :  %-3s %s\n\n", ND_PRV_BLNG_GRP_ID.arr,nd_prv_blng_grp_desc.arr);
+  fprintf(f1,"BILLING CLASS        :  %-3s %s\n\n", ND_PRV_BLNG_CLASS_ID.arr,  nd_prv_blng_class_desc.arr);
+  fprintf(f1,"CUSTOMER             :  %-9s %s\n\n", ND_PRV_CUST_CODE.arr,nd_prv_cust_name.arr);
+  fprintf(f1,"CREDIT DOC REF       :  %-31s\n\n",ND_PRV_CREDIT_DOC_REF.arr);
+    init_date_temp_var();
+	if(ND_PRV_CREDIT_DOC_REF_DT.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,ND_PRV_CREDIT_DOC_REF_DT.arr);
+       fun_change_loc_date(); 
+     } 	 
+  fprintf(f1,"EXPIRY DATE          :  %-31s\n\n",date_convert.arr);
+  fprintf(f1,"SETTLEMENT TYPE      :  %-11s\n\n",ND_PRV_SLMT_TYPE_CODE.arr);
+  fprintf(f1,"ENTERED BY           :  %-30s\n\n",nd_prv_added_by_id.arr);
+    if(nd_prv_added_date.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,nd_prv_added_date.arr);
+       fun_change_loc_date(); 
+     }
+  fprintf(f1,"ENTERED DATE 	     :  %-11s\n\n",date_convert.arr);
+  fprintf(f1,"LAST MODIFIED BY     :  %-31s\n\n",ND_PRV_MODIFIED_BY_ID.arr);
+    if(ND_PRV_MODIFIED_DATE.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,ND_PRV_MODIFIED_DATE.arr);
+       fun_change_loc_date(); 
+     }
+  fprintf(f1,"LAST MODIFIED DATE   :  %-11s\n\n",date_convert.arr);
+
+  fprintf(f1,"FINANCIAL DETAILS AFTER MODIFICATION\n");
+  fprintf(f1,"------------------------------------\n");
+  fprintf(f1,"BILLING GROUP        :  %-3s  %-16s\n\n", ND_CHG_BLNG_GRP_ID.arr,ND_CHG_BLNG_GRP_DESC.arr);
+  fprintf(f1,"BILLING CLASS        :  %-3s %s\n\n", ND_CHG_BLNG_CLASS_ID.arr,  nd_chg_blng_class_desc.arr);
+  fprintf(f1,"CUSTOMER             :  %-9s  %-16s\n\n", ND_CHG_CUST_CODE.arr,nd_chg_cust_name.arr);
+  fprintf(f1,"CREDIT DOC REF       :  %-31s  \n\n",ND_CHG_CREDIT_DOC_REF_DESC.arr);
+	if(ND_CHG_CREDIT_DOC_REF_DT.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,ND_CHG_CREDIT_DOC_REF_DT.arr);
+       fun_change_loc_date(); 
+     }
+  fprintf(f1,"EXPIRY DATE          :  %-31s\n\n",date_convert.arr);
+  fprintf(f1,"SETTLEMENT TYPE      :  %-3s\n\n",ND_CHG_SLMT_TYPE_CODE.arr);
+  fprintf(f1,"ENTERED BY           :  %-30s\n\n",ND_ADDED_BY_ID.arr);
+    if(ND_ADDED_DATE.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,ND_ADDED_DATE.arr);
+       fun_change_loc_date(); 
+     }
+  fprintf(f1,"ENTERED DATE 	     :  %-11s\n\n",date_convert.arr);
+  fprintf(f1,"MODIFIED BY          :  %-31s\n\n",ND_CHG_MODIFIED_BY_ID.arr);
+	if(ND_CHG_MODIFIED_DATE.arr[0]!='\0')
+	 {
+	   init_date_temp_var();
+       strcpy(date_convert.arr,ND_CHG_MODIFIED_DATE.arr);
+       fun_change_loc_date(); 
+     }
+  fprintf(f1,"MODIFIED DATE	     :  %-11s\n\n",date_convert.arr);
+
+} 
+
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+init_date_temp_var1()
+{
+nd_temp_date1.arr[0] = '\0';
+nd_loc_date1.arr[0]  = '\0';
+date_convert1.arr[0] = '\0';
+
+nd_temp_date1.len = 0;
+nd_loc_date1.len  = 0;
+date_convert1.len = 0;
+}
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+nd_temp_date.arr[nd_temp_date.len]='\0';
+
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+
+}
+
+fun_change_loc_date1()
+{
+strcpy(nd_temp_date1.arr,date_convert1.arr);
+nd_temp_date1.len = strlen(nd_temp_date1.arr);
+nd_temp_date1.arr[nd_temp_date1.len]='\0';
+
+get_local_date1();
+
+strcpy(date_convert1.arr,nd_loc_date1.arr); 
+
+} 
+
+get_local_date()
+{
+
+	EXEC SQL EXECUTE
+	
+	DECLARE
+    	
+		t_date varchar2(20);		
+		BEGIN
+		
+		get_locale_date_2t.convert_to_locale_date(to_date(:nd_temp_date,'DD/MM/YYYY'),:p_language_id,t_date,'DD/MM/YYYY');
+    	:nd_loc_date := t_date;		 		
+   	
+
+	    END;
+	END-EXEC;
+
+ 	if (OERROR)
+        err_mesg("SELECTING Date failed",0,"");
+}
+
+/*Leap Year*/
+get_local_date1()
+{
+	
+	EXEC SQL EXECUTE
+
+	DECLARE
+	
+	t_date1 varchar2(20);
+	
+	BEGIN
+		
+		get_locale_date_2t.convert_to_locale_date(to_date(:nd_temp_date1,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date1,'DD/MM/YYYY HH24:MI');
+    	:nd_loc_date1 := t_date1; 
+        
+	END;
+
+	END-EXEC;
+
+		if (OERROR)
+        err_mesg("SELECTING Date failed",0,"");
+
+
+} 

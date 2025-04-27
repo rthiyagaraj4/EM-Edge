@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>INT_InterfaceParameter_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enable Interface</span> – Select the check box to enable the interface. This in turn triggers the CSC events (required to be interfaced) to write the event information in to the control log table.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">General</p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Setup Master Code Mapping</span> – Select the check box to enable the master code mapping. This enables you to define the HL7 interface cross-reference setup between CSC and interfaced application(s). Selecting this check box enables you to define the code mapping in the ‘Data Element Cross Reference’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enable Event Filtering</span> – Select the check box to enable event filtering. Enabling this parameter allows you to configure the export rules based on interfaced applications. If this check box is not selected, the filter rules cannot be defined in the ‘Filtering and Scheduling’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Temporary Purge Interval (days)</span> – Enter the temporary purge interval in days. The records (events, messages, audit logs) are maintained in the main table for the specified number of days, after which the records are moved to the respective backup tables. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Permanent Purge Interval (days)</span> – Enter the permanent purge interval in days. Records (events, messages, audit logs) older than the specified number of days are deleted from the respective back up tables. To avoid any data (history) loss, it is recommended to take a back up of the backup tables respectively. &#160;</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Consider the Temporary Purge interval as 10 days and the Permanent Purge interval as 100 days. The events, messages, audit logs ( if any) are stored in the main table for 10 days and after the 10th day, the records are moved to the respective backup tables. The records are stored in the backup tables for 100 days (permanent purge interval) and records that are older than 100 days are deleted from the backup tables.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Communication Process Settings</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Database IP address</span> – Enter the Database IP address in valid format. Communication process uses this parameter setup for connecting to the database. Value specified in the parameter is similar to the values that are defined for ODBC connection. Valid format for this parameter is as follows: Database IP Address: Database Listener Port:Database SID</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Idle Time (min)</span> – Enter the idle time (in minutes). This parameter indicates as to how long the HL7 interface communication process (outbound or inbound) can be idle, that is, without processing any HL7 interface communication messages. When the idle time of the communication process reaches this specified limit, the background process automatically closes the connection. In such cases, the administrator has to restart the communication process to reestablish the HL7 interface between CSC and interfaced applications.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Facility</p>
+<p class="BoldRFD" style="font-weight: normal;">The current facility is displayed with the log setup.</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Audit</span> – Select the check box to enable the audit log function. Audit log displays the details as to when the various messages were rebuilt, replayed, etc.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Debug</span> – Select the check box to enable the debug log function. The debug log function is also referred to as the trace log. Enabling this log is not recommended because the system creates thousands of lines of log for one transaction and enabling this log would slow down the system.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Outbound</span> – Select the check box to enable the outbound log function. By enabling this parameter, all unsolicited messages are stored in a log file.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Log file is written in the directory as per the definition made for ‘Dir’ entry under ‘Reports’ section in function ‘Workstation Based Parameters’. The file is written using the file naming nomenclature as ‘outbound####.log’; where #### refers the communication Process ID that has processed the message.</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Inbound</span> - Select the check box to enable the inbound log function. By enabling this parameter, all unsolicited messages are stored in a log file.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Log file is written in the directory as per the definition made for “Dir” entry under ‘Reports’ section in function ‘Workstation Based Parameters’. The file is written using the file naming nomenclature as ‘inbound####.log’; where #### refers the communication process ID that has processed the message.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

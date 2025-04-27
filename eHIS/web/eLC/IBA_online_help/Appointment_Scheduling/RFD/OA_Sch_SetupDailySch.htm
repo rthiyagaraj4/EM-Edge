@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OA_Sch_SetupDailySch</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to Setup a Daily Schedule record:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Location/Resource Details</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location Type</span> – Select the Location Type as Clinic, Daycare Unit or Procedure Unit.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – Select the Location based on the selected Location Type using <span class="BoldNumberRFD">[?]</span> function. This field is mandatory. On selecting the required location type, the Locations listed are based on the following conditions:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All the Clinics/Daycare/Procedure units defined under the selected location type that allows appointments (based on the ‘Allow Appointment’ value set in ‘Clinic’, Daycare Unit’ and ‘Procedure Unit’ setup function of EM Outpatient Management module).</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All the defined Clinics/Daycare/Procedure units must be associated to the operator station assigned to the logged in user.</p>
+</li>
+</ol>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Type</span> – This field is enabled on selecting a location. Select the required Resource Type as Practitioner, Equipment, Room or Other. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource</span> – Select the required Resource based on the selected Resource Type using <span class="BoldNumberRFD">[?]</span> function This field becomes mandatory based on the following condition:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If ‘Check in at Identification’ is set to Resource in ‘Clinic’, ‘Day Care’ and ‘Procedure Unit’ setup (OP module), the resource field becomes mandatory while defining the timetable or if ‘Check in at Identification’ is set to Non Identifiable, this field is not mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Day/Time Details</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Enter the Date in date format of dd/mm/yyyy for which the timetable is to be defined or click calendar function to select the required date. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Timetable Type</span> - Select the Timetable type from the valid list of Timetable Types. This field is mandatory.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Slot</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Slab</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Free Format (Applicable for all Resource Class)</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />When you select the Location Type field as ‘Procedure Unit’ created with radiology applicable, the Timetable Type is defaulted as ‘Slot’ and disabled.</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start Time</span> - The operating start time of the selected location as set in ‘Clinic’, ‘Day Care’ or ‘Procedure Unit’ function of Ambulatory Care Management module gets displayed on selecting the required timetable type by default. Enter the Timetable Start Time for the selected Location/Resource/Day combination in hh:mm format. The entered start time must not be less than the location start time and greater than the location end time as set in Outpatient Management module or the system alerts you with a message. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End Time</span> - The operating end time of the selected location as set in ‘Clinic’, ‘Day Care’ or ‘Procedure Unit’ function of Outpatient Management module gets displayed on selecting the required timetable type by default. Enter the Timetable End Time for the selected Location/Resource/Day combination in hh:mm format. The entered end time must not be greater than the location end time as set in Outpatient Management module or the system alerts you with a message. The end time must be greater than the Start Time entered. This field is mandatory.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The entered location time span must be multiple of time per patient/slot or slab.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Slot Details</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Time Per Slot</span> - The base slot/slab time as set in ‘Clinic’, ‘Day Care’ or ‘Procedure Unit’ function of Outpatient Management module gets displayed on selecting the required timetable type, by default. Enter the required time to be allocated to each Patient in hh:mm format. The entered time per slot must be in multiples of the base time set for slot/slab in Outpatient Management module or you are alerted with a message. This field is mandatory only if the Timetable Type selected is ‘Slot’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maximum Slots per Day</span> - Total number of slots planned for the day for the entered Location/Resource/Day combination is calculated automatically after the time per Slot/Patient is specified. This value is computed and displayed based upon the Time per Patient (for Slot) values.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Patients per Day</span> - Total number of appointments planned for the day for the entered Location/Resource/Day combination is calculated automatically after the time per Patient is specified. This has to be entered manually only if the Time Table Type selected is ‘Free Format’. If the Timetable Type selected is ‘Slot’ or ‘Slab’, this value is computed and displayed based upon the Time per Patient (for Slot) or the Time per Slab and Max Patients per Slab (for Slab) values. This field is mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Slab Details</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Time per slab</span> - The base slot/slab time as set in ‘Clinic’, ‘Day Care’ or ‘Procedure Unit’ function of Outpatient Management module gets displayed on selecting the required timetable type, by default. Enter the required time to be allocated to each Patient in hh:mm format. The entered time per slab must be in multiples of the base time set for slot/slab in Outpatient Management module, or you are alerted with a message ‘Time per Slab must be multiples of given duration hh:mm’. This field is mandatory on selection of the Time Table Type as ‘Slab’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Patients per Slab</span> - Enter the total number of appointments planned for a Slab for the entered Location/Resource/Day combination in numeric format of three digits maximum length. This field is mandatory only if the Time Table Type is selected as ‘Slab’.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Visit/Overbooking Details</p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maximum First Visits</span> - Enter the maximum number of appointments to the Visit Type category as ‘First Visit’, which is allowed for the entered Location/Resource/Day combination, in numeric format of three digits maximum length. The entered value is based on Rule for limiting first/other visits. If the ‘Time Table’ type selected is slot, the number of first visit can be based on ‘Patients’ or ‘Slots’ as set in OA Parameter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maximum Other Visits</span> - Enter the maximum number of appointments to the Visit Type category as ‘Others’, which is allowed for the entered Location/Resource/Day combination, in numeric format of three digits maximum length. The entered value is based on Rule for limiting first/other visits. If the ‘Time Table’ type selected is slot, the number of Other visit is based on ‘Patients’ or ‘Slots’ as set in OA Parameter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Max New Patients</u></span> - This field is available only if the 'Schedule Rule Applicable' check box is selected in the OA Parameter. Enter the maximum number of new patients planned for visit. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Max Old Patients</u></span> - This field is available only if the 'Schedule Rule Applicable' check box is selected in the OA Parameter. Enter the maximum number of old patients planned for visit. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maximum Over bookings</span> - Enter the maximum number of overbookings, which is allowed for the entered Location/Resource/Day combination, in numeric format of three digits maximum length. If the ‘Time Table’ type selected is slot, the entered value is based on the OA Parameter setup. The number of over bookings is based on ‘Patients’ or ‘Slots’ as set in OA Parameter.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The value entered facilitates to accommodate additional patients who need to be scheduled due to unforeseen medical reasons. If the value is not entered, overbookings cannot be made.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Other Details</p>
+<ol start="19" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Forced in Bookings allowed</span> – This field is enabled for timetable type ‘Slot’ and ‘Slab’. Select the check box to allow forced bookings for the entered Location/Resource/Day combination, or clear the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Forced in Booking/day</span> – This field is applicable for Time Table of type ‘Slot’ and ‘Slab’ and is enabled on selecting the ‘Forced in Bookings allowed’ check box. You can enter only one forced in booking per slot/slab in numeric format of three digits maximum length, or the system alerts with a message ‘No. of Forced Booking cannot exceed Maximum Patients per Day’ for ‘Slots’ and ‘No. of Forced Booking cannot exceed Maximum Slabs per Day’ for ‘Slabs’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Global booking per Day</span> – Enter the Number Of Global Booking For Referral in numeric format of three digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter the Remarks about the timetable in alphanumeric format of 40 characters maximum length.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Break Timings</p>
+<ol start="23" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Time</span> – Enter the Break Start Time for the entered Location/Resource/Day combination in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">To Time</span> - Enter the Break End Time for the entered Location/Resource/Day combination in hh:mm format.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

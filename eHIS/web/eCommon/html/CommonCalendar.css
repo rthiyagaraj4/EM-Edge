@@ -1,0 +1,209 @@
+/**
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+**/
+/*  Added for Common Calender 07/02/2003 Start  */
+/* The main calendar widget.  DIV containing a table. */
+
+
+DIV.CALENDAR { position: relative; }
+
+.CALENDAR, .CALENDAR TABLE {
+  border: 1px solid #556;
+  font-size: 11px;
+  color: #cde;
+  cursor: default;
+  background: white;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+/* Header part -- contains navigation buttons and day names. */
+
+.CALENDAR .BUTTON { /* "<<", "<", ">", ">>" buttons have this class */
+  text-align: center;    /* They are the navigation buttons */
+  padding: 2px;          /* Make the buttons seem like they're pressing */
+  font-size: 11px;
+  background: #778;
+  color: #fff;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR THEAD .TITLE { /* This holds the current "month, year" */
+  font-weight: bold;      /* Pressing it will take you to the current date */
+  text-align: center;
+  background: #fff;
+  color: #000;
+  padding: 2px;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR THEAD .HEADROW { /* Row <TR> containing navigation buttons */
+  background: #778;
+  color: #fff;
+}
+
+.CALENDAR TR .HEADROW { /* Row <TR> containing navigation buttons */
+  background: #778;
+  color: #fff;
+}
+
+.CALENDAR THEAD .DAYNAMES { /* Row <TR> containing the day names */
+  background: #bdf;
+}
+
+.CALENDAR THEAD .NAME { /* Cells <TD> containing the day names */
+  border-bottom: 1px solid #556;
+  padding: 2px;
+  text-align: center;
+  color: #000;
+  font-size: 11px;
+  background: #e0e0e0;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR THEAD .WEEKEND { /* How a weekend day name shows in header */
+  color: #a66;
+}
+
+.CALENDAR THEAD .HILITE { /* How do the buttons in header appear when hover */
+  background: #aaf;
+  color: #000;
+  border: 1px solid #04f;
+  padding: 1px;
+}
+
+.CALENDAR THEAD .ACTIVE { /* Active (pressed) buttons in header */
+  background: #77c;
+  padding: 2px 0px 0px 2px;
+}
+
+/* The body part -- contains all the days in month. */
+
+.CALENDAR TBODY .DAY { /* Cells <TD> containing month days dates */
+  width: 2em;
+  color: #456;
+  text-align: right;
+  padding: 2px 4px 2px 2px;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR TBODY .HILITE { /* Hovered cells <TD> */
+  background: #def;
+  padding: 1px 3px 1px 1px;
+  border: 1px solid #bbb;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR TBODY .ACTIVE { /* Active (pressed) cells <TD> */
+  background: #cde;
+  padding: 2px 2px 0px 2px;
+}
+
+.CALENDAR TBODY .SELECTED { /* Cell showing today date */
+  font-weight: bold;
+  border: 1px solid #000;
+  padding: 1px 3px 1px 1px;
+  background: #fff;
+  color: #000;
+}
+
+.CALENDAR TBODY .WEEKEND { /* Cells showing weekend days */
+  color: #a66;
+}
+
+.CALENDAR TBODY .TODAY { /* Cell showing selected date */
+  font-weight: bold;
+  color: #00f;
+}
+
+.CALENDAR TBODY .DISABLED {   
+	color: #999; 
+
+}
+
+.CALENDAR TBODY .EMPTYCELL { /* Empty cells (the best is to hide them) */
+	visibility: hidden;
+
+
+}
+
+.CALENDAR TBODY .EMPTYROW { /* Empty row (some months need less than 6 rows) */
+  display: none;
+}
+
+/* The footer part -- status bar and "Close" button */
+
+.CALENDAR TFOOT .FOOTROW { /* The <TR> in footer (only one right now) */
+  text-align: center;
+  background: #556;
+  color: #fff;
+}
+
+.CALENDAR TFOOT .TTIP { /* Tooltip (status bar) cell <TD> */
+  background: #fff;
+  color: #445;
+  border-top: 1px solid #556;
+  padding: 1px;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR TFOOT .HILITE { /* Hover style for buttons in footer */
+  background: #aaf;
+  border: 1px solid #04f;
+  color: #000;
+  padding: 1px;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+.CALENDAR TFOOT .ACTIVE { /* Active (pressed) style for buttons in footer */
+  background: #77c;
+  padding: 2px 0px 0px 2px;
+  font-size: 11px;
+  font-family: tahoma,verdana,sans-serif;
+}
+
+/* Combo boxes (menus that display months/years for direct selection) */
+
+.COMBO {
+  position: absolute;
+  display: none;
+  top: 0px;
+  left: 0px;
+  width: 4em;
+  cursor: default;
+  border: 1px solid #655;
+  background: #def;
+  color: #000;
+  font-size: 11px;
+}
+
+.COMBO .LABEL {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: #000;
+}
+
+.COMBO .HILITE {
+  background: #acf;
+  font-size: 11px;
+}
+
+.COMBO .ACTIVE {
+  border-top: 1px solid #46a;
+  border-bottom: 1px solid #46a;
+  background: #eef;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/*  Added for Common Calender 07/02/2003 End  */

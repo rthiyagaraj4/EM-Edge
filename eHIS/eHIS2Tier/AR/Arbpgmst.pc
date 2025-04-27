@@ -1,0 +1,487 @@
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                         */
+/******************************************************************************/
+/* PROGRAM NAME     : ARBPGMST                                                */
+/* AUTHOR           :                                                         */
+/* DATE WRITTEN     : Tue Dec 01 12:40:08 OMAN 1992                           */
+/*                                                                                              */
+/* CALLED FROM      : form- ARBPGMST                                          */
+/*                                                                             */
+/* INPUT PARAMETERS : SESSION_ID                                              */
+/*                                                                            */
+/* INPUT TAKEN FROM : 1. TABLE_ID                                             */
+/* SY_PROG_PARAM                                                              */
+/*                                                                                */
+/* TABLED ACCESSED/ : AR_CUSTOMER                                             */
+/*        UPDATED     AR_PENDING_DOC_TEMP                                     */
+/*                    AR_PENDING_DOC                                          */
+/*                    AR_CUST_TYPE                                            */
+/*                    AR_CUST_GROUP                                           */
+/*                    AR_PMNT_TERMS                                           */
+/*                    AR_REM_LETTERS                                          */
+/*                    AR_PURGE_MSG                                            */
+/*                                                                            */
+/* FUNCTION         : This program purges (deletes) suspended rows from tables*/
+/*                    AR_CUST_TYPE,AR_CUST_GROUP, AR_PMNT_TERMS,AR_REM_LETTER,*/
+/*                    AR_CUSTOMER                                             */
+/*                    after checking references in corresponding tables.      */
+/*                    Errors are logged (inserted) into table AR_PURGE_MSG.   */
+/*                                                                            */
+/******************************************************************************/
+
+
+#include <stdio.h>
+#include <string.h>
+#include <gl.h>
+
+#define VIEW_LOG_FILE   1  
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+varchar uid_pwd[15],
+        d_session_id[16],
+        d_pgm_date[12];
+
+varchar d_msg_num[9];
+varchar d_msg_desc[71];
+varchar d_table_id[31];
+varchar d_master_code[31];
+varchar d_cust_type_code[3];
+varchar d_cust_group_code[3];
+varchar d_letter_type_code[3];
+varchar d_pmnt_terms_code[3];
+varchar d_cust_code[9];
+varchar d_dummy[2];                               /* for fetching the cursors */
+varchar nd_facility_id[3];
+
+EXEC SQL END DECLARE SECTION;
+
+// EXEC ORACLE OPTION(HOLD_CURSOR = YES);
+// EXEC ORACLE OPTION(REBIND = NO);
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+int can_delete;
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+
+{
+    char mesg1[50];
+    if(argc !=5) {
+        disp_message(ERR_MESG,"ARBPGMST: Usage arbpgmst userid/password session_id pgm_date facility_id");
+        proc_exit();
+    }
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+    strcpy(g_pgm_date,argv[3]);
+
+
+    EXEC SQL CONNECT :uid_pwd;    
+
+    if(OERROR) {
+        disp_message(ERR_MESG,"Unable to connect to oracle.");
+        sprintf(mesg1,"%s\n",sqlca.sqlerrm.sqlerrmc);
+        disp_message(ERR_MESG,mesg1);
+        proc_exit();
+    }
+        
+    /****** COPY THE NAME OF THE PROGRAM HERE *********/
+
+    strcpy(g_pgm_id,"ARBPGMST");
+
+	set_meduser_role();
+	chk_active();
+   
+    EXEC SQL SELECT operating_facility_id,PARAM1
+         INTO   nd_facility_id,:d_table_id
+         FROM   SY_PROG_PARAM
+         WHERE  PGM_ID = 'ARBPGMST'
+         AND    PGM_DATE = :d_pgm_date
+         AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR || NO_DATA_FOUND)
+        err_mesg("Reading parameters from SY_PROG_PARAM",0,"");
+
+    d_table_id.arr[d_table_id.len] = '\0';
+
+    start_prog_control();
+    start_prog_msg();
+
+    /* BASED ON TABLE_ID CALL APPROPRIATE PURGING FUNCTION */
+
+    if     (!strcmp(d_table_id.arr,"AR_CUST_TYPE"))
+        purge_cust_type();
+    else if(!strcmp(d_table_id.arr,"AR_CUST_GROUP"))
+        purge_cust_group();
+    else if(!strcmp(d_table_id.arr,"AR_PMNT_TERMS"))
+        purge_pmnt_terms();
+    else if(!strcmp(d_table_id.arr,"AR_REM_LETTER"))
+        purge_rem_letter();
+    else if(!strcmp(d_table_id.arr,"AR_CUSTOMER"))
+        purge_customer();
+    else 
+        err_mesg("Invalid Table Id",0,"");
+
+    end_prog_msg();
+    end_prog_control();
+    del_param();
+
+    EXEC SQL COMMIT WORK RELEASE;
+    
+} /* end of main */
+
+purge_cust_type()
+{
+
+        EXEC SQL DECLARE AR_CUST_TYPE_CUR CURSOR FOR
+            SELECT CUST_TYPE_CODE 
+            FROM   AR_CUST_TYPE
+            WHERE  NVL(STATUS,'N') = 'S';
+
+        EXEC SQL DECLARE AR_CUSTOMER_CUR1 CURSOR FOR
+             SELECT 'X' 
+             FROM   AR_CUSTOMER
+             WHERE  CUST_TYPE_CODE = :d_cust_type_code;
+
+        EXEC SQL OPEN AR_CUST_TYPE_CUR;
+        if(OERROR)
+            err_mesg("OPEN failed on cursor AR_CUST_TYPE_CUR",0,"");
+
+        while(fetch_cust_type()) {
+            
+            can_delete = TRUE;
+
+            EXEC SQL OPEN AR_CUSTOMER_CUR1;
+            if(OERROR) 
+                err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR1",0,"");
+
+            EXEC SQL FETCH AR_CUSTOMER_CUR1 INTO  :d_dummy;
+            if(OERROR) 
+                err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR1",0,"");
+
+            if(sqlca.sqlcode EQ 0) 
+                log_mesg("AR1500");
+
+            EXEC SQL CLOSE AR_CUSTOMER_CUR1;
+
+            if (can_delete) {
+               EXEC SQL DELETE FROM AR_CUST_TYPE
+                    WHERE  CUST_TYPE_CODE = :d_cust_type_code;
+                if(OERROR)
+                    err_mesg("DELETE failed on table AR_CUST_TYPE",0,"");
+            }
+        } /* end of while */
+        EXEC SQL CLOSE AR_CUST_TYPE_CUR;
+} /* end of purge_cust_type */
+
+fetch_cust_type()
+{
+
+    EXEC SQL FETCH AR_CUST_TYPE_CUR INTO  :d_cust_type_code;
+
+    if(OERROR)
+    err_mesg("FETCH failed on cursor AR_CUST_TYPE_CUR",0,"");
+
+    if(NO_DATA_FOUND) return 0;
+    
+    d_cust_type_code.arr[d_cust_type_code.len] = '\0';
+
+    strcpy(d_master_code.arr,d_cust_type_code.arr);
+    d_master_code.len = strlen(d_master_code.arr);
+
+    return 1;
+}
+
+purge_cust_group()
+{
+
+        EXEC SQL DECLARE AR_CUST_GROUP_CUR CURSOR FOR
+            SELECT CUST_GROUP_CODE 
+            FROM   AR_CUST_GROUP
+            WHERE  NVL(STATUS,'N') = 'S';
+
+        EXEC SQL DECLARE AR_CUSTOMER_CUR2 CURSOR FOR 
+            SELECT 'X' 
+             FROM   AR_CUSTOMER
+             WHERE  CUST_GROUP_CODE = :d_cust_group_code;
+
+        EXEC SQL OPEN AR_CUST_GROUP_CUR;
+        if(OERROR)
+            err_mesg("OPEN failed on cursor AR_CUST_GROUP_CUR",0,"");
+
+        while (fetch_cust_group()) {
+
+            can_delete = TRUE;
+
+            EXEC SQL OPEN AR_CUSTOMER_CUR2;
+            if(OERROR) 
+                err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR2",0,"");
+
+            EXEC SQL FETCH AR_CUSTOMER_CUR2 INTO  :d_dummy;
+            if(OERROR) 
+                err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR2",0,"");
+
+            if(sqlca.sqlcode EQ 0) 
+                log_mesg("AR1510");
+
+            EXEC SQL CLOSE AR_CUSTOMER_CUR2;
+
+            if (can_delete) {
+               EXEC SQL DELETE FROM AR_CUST_GROUP
+                    WHERE  CUST_GROUP_CODE = :d_cust_group_code;
+                if(OERROR)
+                    err_mesg("DELETE failed on table AR_CUST_GROUP",0,"");
+            }
+        } /* end of while */
+        EXEC SQL CLOSE AR_CUST_GROUP_CUR;
+} /* end of purge_cust_group */
+
+fetch_cust_group()
+{
+
+    EXEC SQL FETCH AR_CUST_GROUP_CUR
+         INTO  :d_cust_group_code;
+
+    if(OERROR)
+    err_mesg("FETCH failed on cursor AR_CUST_GROUP_CUR",0,"");
+
+    if(NO_DATA_FOUND) return 0;
+    
+    d_cust_group_code.arr[d_cust_group_code.len] = '\0';
+
+    strcpy(d_master_code.arr,d_cust_group_code.arr);
+    d_master_code.len = strlen(d_master_code.arr);
+
+    return 1;
+} /* end of fetch_cust_group */
+
+purge_pmnt_terms()
+{
+        EXEC SQL DECLARE AR_PMNT_TERMS_CUR CURSOR FOR
+                 SELECT PMNT_TERMS_CODE 
+                 FROM   AR_PMNT_TERMS
+                 WHERE  NVL(STATUS,'N') = 'S';
+
+        EXEC SQL DECLARE AR_CUSTOMER_CUR3 CURSOR FOR 
+                 SELECT 'X' 
+                 FROM   AR_CUSTOMER
+                 WHERE  PMNT_TERMS_CODE = :d_pmnt_terms_code;
+
+        EXEC SQL OPEN AR_PMNT_TERMS_CUR;
+        if(OERROR)
+            err_mesg("OPEN failed on cursor AR_CUST_TYPE_CUR",0,"");
+
+        while (fetch_pmnt_terms()) {
+
+            can_delete = TRUE;
+
+            EXEC SQL OPEN AR_CUSTOMER_CUR3;
+            if(OERROR) 
+                err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR2",0,"");
+
+            EXEC SQL FETCH AR_CUSTOMER_CUR3 INTO  :d_dummy;
+            if(OERROR) 
+                err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR2",0,"");
+
+            if(sqlca.sqlcode EQ 0) 
+                log_mesg("AR1520");
+
+            EXEC SQL CLOSE AR_CUSTOMER_CUR3;
+
+            if (can_delete) {
+                EXEC SQL DELETE FROM AR_PMNT_TERMS
+                        WHERE  PMNT_TERMS_CODE = :d_pmnt_terms_code;
+                if(OERROR) 
+                    err_mesg("DELETE failed on table AR_PMNT_TERMS",0,"");
+            }
+        } /* end of while */
+        EXEC SQL CLOSE AR_PMNT_TERMS_CUR;
+} /* end of purge_pmnt_terms */
+
+fetch_pmnt_terms()
+{
+
+    EXEC SQL FETCH AR_PMNT_TERMS_CUR INTO  :d_pmnt_terms_code;
+
+    if(OERROR)
+    err_mesg("FETCH failed on cursor AR_PMNT_TERMS_CUR",0,"");
+
+    if(NO_DATA_FOUND) return 0;
+    
+    d_pmnt_terms_code.arr[d_pmnt_terms_code.len] = '\0';
+
+    strcpy(d_master_code.arr,d_pmnt_terms_code.arr);
+    d_master_code.len = strlen(d_master_code.arr);
+
+    return 1;
+} /* end of fetch_pmnt_terms */
+
+purge_rem_letter()
+{
+        EXEC SQL DECLARE AR_REM_LETTER_CUR CURSOR FOR
+            SELECT LETTER_TYPE_CODE 
+            FROM   AR_REM_LETTER
+            WHERE  NVL(STATUS,'N') = 'S';
+
+        EXEC SQL DECLARE AR_CUSTOMER_CUR4 CURSOR FOR
+            SELECT 'X' 
+             FROM   AR_CUSTOMER
+             WHERE  REM_LETTER_CODE = :d_letter_type_code;
+
+        EXEC SQL OPEN AR_REM_LETTER_CUR;
+        if(OERROR)
+            err_mesg("OPEN failed on cursor AR_REM_LETTER",0,"");
+
+        while (fetch_rem_letter()) {
+
+            can_delete = TRUE;
+
+            EXEC SQL OPEN AR_CUSTOMER_CUR4;
+            if(OERROR) 
+                err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR4",0,"");
+
+            EXEC SQL FETCH AR_CUSTOMER_CUR4 INTO  :d_dummy;
+            if(OERROR) 
+                err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR4",0,"");
+
+            if(sqlca.sqlcode EQ 0) 
+                log_mesg("AR1550");
+
+            EXEC SQL CLOSE AR_CUSTOMER_CUR4;
+
+            if (can_delete) {
+                EXEC SQL DELETE FROM AR_REM_LETTER
+                        WHERE  LETTER_TYPE_CODE = :d_letter_type_code;
+                if(OERROR) 
+                    err_mesg("DELETE failed on table AR_REM_LETTER",0,"");
+            }
+        } /* end of while */
+        EXEC SQL CLOSE AR_REM_LETTER_CUR;
+} /* end of purge_rem_letter */
+
+fetch_rem_letter()
+{
+
+    EXEC SQL FETCH AR_REM_LETTER_CUR INTO  :d_letter_type_code;
+
+    if(OERROR)
+    err_mesg("FETCH failed on cursor AR_REM_LETTER_CUR",0,"");
+
+    if(NO_DATA_FOUND) return 0;
+    
+    d_letter_type_code.arr[d_letter_type_code.len] = '\0';
+
+    strcpy(d_master_code.arr,d_letter_type_code.arr);
+    d_master_code.len = strlen(d_master_code.arr);
+
+    return 1;
+} /* end of fetch_rem_letter */
+
+purge_customer()
+{ 
+        EXEC SQL DECLARE AR_CUSTOMER_CUR5 CURSOR FOR
+            SELECT CUST_CODE
+            FROM   AR_CUSTOMER
+            WHERE  NVL(STATUS,'N') = 'S';
+
+        EXEC SQL DECLARE AR_PENDING_DOC_CUR2 CURSOR FOR
+             SELECT 'X' 
+             FROM   AR_PENDING_DOC
+             WHERE  CUST_CODE = :d_cust_code;
+
+        EXEC SQL OPEN AR_CUSTOMER_CUR5;
+        if(OERROR)
+            err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR5",0,"");
+
+        while (fetch_customer()) {
+
+            can_delete = TRUE;
+
+            EXEC SQL OPEN AR_PENDING_DOC_CUR2;
+            if(OERROR) 
+                err_mesg("OPEN failed on cursor AR_PENDING_DOC_CUR2",0,"");
+
+            EXEC SQL FETCH AR_PENDING_DOC_CUR2 INTO  :d_dummy;
+            if(OERROR) 
+                err_mesg("FETCH failed on cursor AR_PENDING_DOC_CUR2",0,"");
+
+            if(sqlca.sqlcode EQ 0) 
+                log_mesg("AR1570");
+
+            EXEC SQL CLOSE AR_PENDING_DOC_CUR2;
+
+            if (can_delete) {
+                EXEC SQL DELETE FROM AR_CUSTOMER
+                        WHERE  CUST_CODE = :d_cust_code;
+                if(OERROR)
+                    err_mesg("DELETE failed on table AR_CUSTOMER",0,"");
+            }
+        } /* end of while */
+        EXEC SQL CLOSE AR_CUSTOMER_CUR5;
+} /* end of purge_customer */
+
+fetch_customer()
+{
+
+    EXEC SQL FETCH AR_CUSTOMER_CUR5
+         INTO  :d_cust_code;
+
+    if(OERROR)
+    err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR5",0,"");
+
+    if(NO_DATA_FOUND) return 0;
+    
+    d_cust_code.arr[d_cust_code.len] = '\0';
+
+    strcpy(d_master_code.arr,d_cust_code.arr);
+    d_master_code.len = strlen(d_master_code.arr);
+
+    return 1;
+} /* end of fetch_customer */
+
+
+log_mesg(l_errid)
+char *l_errid;
+{
+    can_delete = FALSE;
+    strcpy(d_msg_num.arr,l_errid);
+
+    get_message(d_msg_num.arr,d_msg_desc.arr);
+
+    d_msg_num.len = strlen(d_msg_num.arr);
+    d_msg_desc.len = strlen(d_msg_desc.arr);
+
+    EXEC SQL INSERT INTO AR_PURGE_MSG
+         VALUES (:d_table_id,
+             :d_master_code,
+             :d_msg_num,
+             :d_msg_desc
+            );
+
+    if(OERROR) 
+    err_mesg("INSERT failed on table AR_PURGE_MSG",0,"");
+} /* end of log_mesg */
+
+del_param()
+{
+    EXEC SQL DELETE SY_PROG_PARAM
+             WHERE  PGM_ID     = 'ARBPGMST' 
+             AND    PGM_DATE = :d_pgm_date
+             AND    SESSION_ID = :d_session_id;
+    if(OERROR) 
+    err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+
+} /* end of log_mesg */

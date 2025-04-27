@@ -1,0 +1,1507 @@
+/************************************************************************/
+/* OCS MEDICOM VER 4.1                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRRSENQ                                     */
+/* DESCRIPTION		 : Printer Server Report 		        */
+/* AUTHOR                : S. Sheelvant                                 */
+/* DATE WRITTEN          : 12-DEC-1998                                  */
+/* MODIFIED BY           : D. GANESH MURTHI 				*/
+/* MODIFIED ON		 : 20-APR-2003		  			*/
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include <bl1.h>
+#include <windows.h>       
+#include <winspool.h>
+#include <malloc.h>
+#include <debug.h>
+
+#define OERROR 		(sqlca.sqlcode < 0)
+#define NOT_FOUND 	(sqlca.sqlerrd[2] == 0)
+#define TABLE_ALREADY_EXISTS (sqlca.sqlcode == -955)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define RESOURCE_BUSY	(sqlca.sqlcode == -54)
+#define max_lines   50
+
+#define RESTART_INTERVAL 2
+#define RESTART_TIME     500
+
+#define ESC 0x1B
+#define SEP 0xFA   
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR	uid_pwd				[132],  
+			d_curr_pgm_name     [15],
+			nd_file_name        [151],
+			today				[20],
+			nd_file_no          [150],
+			d_user_id_pwd       [100],
+ 			d_facility_id       [3],
+			nd_facility_id      [3],
+			er_msg              [71],
+			nd_fm_doc_type  	[31],
+			nd_fm_doc_num		[31],
+			nd_to_doc_type		[31],
+			nd_to_doc_num		[31],
+			nd_fm_doc_date		[31],
+			nd_to_doc_date		[31],
+			trx_type 			[2],
+			row_id				[100],
+			d_cashfacility_id	[3],
+
+    			nd_reprint_yn		[2],
+			discount_print_yn	[2],
+			sett_print_yn		[2];
+
+	int		k  = 0, 
+			l_report_id_len = 0;
+
+	VARCHAR		nd_patient_id        [21],	 
+			nd_rowid		[31],
+			bl_ctl_sp_no	            [10],
+			bl_ctl_source_code	    [5],
+			bl_hdr_urgent_indicator  [2],
+			bl_print_result_sect_yn	[2],
+			d_sleep_secs			[10],
+			d_machine_name   		[40],
+			d_started_by_id			[20],
+			sy_user_id				[30],
+			sy_session_id			[30],
+			sy_req_date				[30],
+			sy_machine_name			[16],
+			sy_ws_no				[15],
+			sy_rowid				[31],
+			sy_acc_entity_name 		[81],
+           
+			p_uid_pwd				[151], 
+			p_print_name			[100], 
+			p_loc_type				[10],
+			p_loc_code				[100],
+			p_rep_file				[151],
+			p_print_mode			[10],
+			   
+			prg_start_date			[30],  
+			d_next_start_date		[30],
+			d_cmd_line				[4000],
+			d_act_cmd_line			[1000],
+			d_exe_name				[10],
+			d_rem_param				[100],
+			d_report_id				[20],
+		    l_seq_num				[10],
+
+		    bl_printer_for_urgent_yn [2];
+	
+   int d_time_interval =0,
+       d_starting_time =0,
+       er_msg_type =0,
+       source_copies =1;
+	   
+
+   int	page_length = 50, 
+	v_lno, 
+	LENGTH_WORDS, 
+	v_pno, 
+	no_of_times;
+   
+   char l_should_print_yn;
+   char nd_f_name[151];
+   char l_mesg[300];
+
+   char l_print_request_yn = 'Y',l_report_tool_ind = 'C',temp[200];
+   
+   VARCHAR l_printer_ids[1000],
+	   l_printer_names[1000],
+	   l_printer_types[1000],
+	   l_queue_names[1000],
+	   l_no_of_copies[1000],
+	   l_errortext[1000],
+	   l_logo_yniflaser[1000],
+	   LOGO_DIR[1000],
+	   l_logo_name[1000],
+	   l_sy_prog_id[10],
+	   l_errorlevel[10],	   
+	   l_sysmessageid[10];
+
+   int	   l_dmp = 0, l_lsr = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include<winproc.h>
+
+FILE *fp;
+int   err_flag = 0;
+int   copy = 0;
+int   MAX_LINES = 27;
+
+char nd_repo_file_name[151];
+
+char val_strng[1000], string_var[1000];     
+
+int i = 0;
+     
+DWORD sleep_sec = 0;
+
+int last_page = 0;
+char LVFunctionName[64];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+	char sep[3]=" ";
+	char *lv_uid_pwd, *lv_session_id, *lv_session_datetime;
+	char *lv_ws_no;
+	int  lv_ret_flag;
+	char tmpbuf[500];
+
+	int rec_found = 0;  
+   
+	if (argc < 3)
+	{ ins_message(ERR_MESG,"Usage : Blrrsenq uid/password start_date facility_id");
+      proc_exit();
+	}
+ 
+	strcpy(d_user_id_pwd.arr,argv[1]);
+
+	strcpy(g_pgm_id,"BLRRSENQ");
+	strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+	d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+	strcpy(prg_start_date.arr,argv[2]);
+   
+	prg_start_date.len = strlen(argv[2]);
+
+	strcpy(sy_session_id.arr,argv[3]);
+	sy_session_id.len = strlen(sy_session_id.arr);
+
+	if(sql_connect(argv[1]) == -1)
+	{ ins_message(ORA_MESG,"Error in connecting to Oracle");
+      proc_exit();
+	}
+
+	set_meduser_role();
+
+    strcpy(GVProgramID, "BLRRSENQ");
+	EnableOrDisableTracing();
+
+	if (IS_TRACING) 
+	{	strcpy(LVFunctionName, "MainProc()");
+		Trace(LVFunctionName, "Begin");
+	}
+  
+	strcpy(d_facility_id.arr,argv[4]); 
+	d_facility_id.len = strlen(d_facility_id.arr);
+	d_facility_id.arr[d_facility_id.len] = '\0';
+
+	strcpy(g_facility_id, d_facility_id.arr);
+	strcpy(g_session_id, sy_session_id.arr);  
+
+	declare_cursor();
+
+	rec_found = get_sleep_secs();
+
+	if(rec_found)
+	{
+		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName," before get_company_name()");
+		}
+	   
+		get_company_name();
+
+   		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName,"after get_company_name ");
+			Trace(LVFunctionName,"before process_rec() ");
+		}
+
+		process_rec();
+	  
+   		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName,"after process_rec() ");
+			Trace(LVFunctionName,"End Main Proc");
+		}
+
+	}
+   
+	// ##To be removed
+	EXEC SQL COMMIT WORK RELEASE;
+	if (OERROR)
+		ins_message(ORA_MESG,"ROLLBACK WORK RELEASE failed");
+	
+	return;
+}
+
+sql_connect(l_nd_ap_uid_pwd)
+char l_nd_ap_uid_pwd[];
+{
+  strcpy(uid_pwd.arr,l_nd_ap_uid_pwd);
+  uid_pwd.len = strlen(uid_pwd.arr);
+
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+declare_cursor()
+{
+   EXEC SQL DECLARE bg_process_cursor
+			 CURSOR 
+				FOR 
+			 SELECT a.operating_facility_id,
+					b.processing_interval ,
+					FLOOR((sysdate-a.started_date)*24*60),
+					a.machine_name,
+					a.started_by_id,
+					TO_CHAR(sysdate,'ddmmyyhh24miss'),
+					TO_NUMBER(to_char(sysdate,'hh24mi'))
+			   FROM	sy_bg_process_control a, 
+					sy_prog_id b
+			  WHERE a.pgm_id = b.pgm_id
+				AND a.started_date IS NOT NULL
+				AND TO_CHAR(a.started_date,'DDMMYYHH24MISS') = :prg_start_date;
+
+   if (OERROR)
+       ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+}
+
+get_sleep_secs()
+{
+	/*
+	
+	According to suggestion by Mr. Kuila, Instead of givng seperate SELECT, INSERT and DELETE,
+	CURSOR is declared in declaration session, with in which the Update Statement will be given.
+
+	Instead of Insertion and deletion, update will be the effective process and hence 
+	changed.
+
+	Modified on 03/02/2004
+    
+	d_sleep_secs.arr[0] 	= '\0';
+	d_machine_name.arr[0] 	= '\0';
+	d_started_by_id.arr[0] 	= '\0';
+	d_next_start_date.arr[0]= '\0';
+
+	d_sleep_secs.len	= 0;
+	d_machine_name.len	= 0;
+	d_started_by_id.len	= 0;
+	d_next_start_date.len	= 0;
+
+	_flushall();
+ 
+	 EXEC SQL SELECT a.operating_facility_id,
+					 b.processing_interval ,
+					 floor((sysdate-a.started_date)*24*60),
+					 a.machine_name,
+					 a.started_by_id,
+					 to_char(sysdate,'ddmmyyhh24miss'),
+					 to_number(to_char(sysdate,'hh24mi'))
+			   INTO	:d_facility_id,
+					:d_sleep_secs,
+					:d_time_interval,
+					:d_machine_name,
+					:d_started_by_id,
+					:d_next_start_date,
+					:d_starting_time
+			   FROM	SY_BG_PROCESS_CONTROL A, sy_prog_id B
+			  WHERE A.PGM_ID = B.PGM_ID	
+				AND a.PGM_ID = 'BLRRSENQ'
+				AND a.STARTED_DATE IS NOT NULL
+				AND TO_CHAR(a.STARTED_DATE,'DDMMYYHH24MISS') = :prg_start_date;
+
+	d_facility_id.arr[d_facility_id.len] = '\0';
+	d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+	d_machine_name.arr[d_machine_name.len] = '\0';
+	d_started_by_id.arr[d_started_by_id.len] = '\0';
+	d_next_start_date.arr[d_next_start_date.len] = '\0';
+
+    sprintf(val_strng,"[%s]-facl [%s]-sleep sec [%s]-machinename [%s]-start_by [%s]-nextstartdt, [%s] prgst_date ",
+	     d_facility_id.arr, d_sleep_secs.arr,  d_machine_name.arr,
+         d_started_by_id.arr, d_next_start_date.arr, prg_start_date.arr);
+  
+   	if (IS_TRACING) 
+	{
+			Trace(LVFunctionName,val_strng);
+	}
+
+	if (d_time_interval > RESTART_INTERVAL)
+	{		 
+		EXEC SQL INSERT INTO SY_BG_PROCESS_CONTROL	 (OPERATING_FACILITY_ID  ,
+													  PGM_ID                 ,
+													  MACHINE_NAME           ,
+													  STARTED_BY_ID          ,
+													  STARTED_DATE           ,
+													  PRIORITY               ,
+													  SERVICED_REQUESTS      )
+					VALUES							 (:d_facility_id,
+													  'BLRRSENQ',
+													  :d_machine_name,
+													  :d_started_by_id,
+													  TO_DATE(:d_next_start_date, 'ddmmyyhh24miss'),
+													  3,
+													  'BLRRSENQ');  
+		if (OERROR)
+			sprintf(val_strng,"[%s]-facl [%s]-machine_name [%s]-started_by [%s]-machinename [%s]-start_by [%s]-nextstartdt",
+								d_facility_id.arr, d_machine_name.arr,
+								d_started_by_id.arr, d_next_start_date.arr);
+
+   		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName,val_strng);
+		}
+
+			  
+		EXEC SQL DELETE 
+		           FROM SY_BG_PROCESS_CONTROL 
+				  WHERE PGM_ID='BLRRSENQ'
+					AND STARTED_DATE IS NOT NULL
+					AND STARTED_DATE <= TO_DATE(:prg_start_date,'DDMMYYHH24MISS');
+
+		sprintf(val_strng," IN delete [%s]-prg_start_date",prg_start_date.arr);
+   		if (IS_TRACING) 
+		{
+				Trace(LVFunctionName,val_strng);
+		}
+
+		d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+		d_machine_name.arr[d_machine_name.len] = '\0';
+		d_started_by_id.arr[d_started_by_id.len] = '\0';
+		d_next_start_date.arr[d_next_start_date.len]='\0';
+
+
+		EXEC SQL COMMIT;
+
+		strcpy(prg_start_date.arr,d_next_start_date.arr);
+		prg_start_date.len = strlen(prg_start_date.arr);
+
+		sprintf(val_strng," new value [%s]-prg_start_date",prg_start_date.arr);
+   		if (IS_TRACING) 
+		{
+				Trace(LVFunctionName,val_strng);
+		}
+	}
+
+	if(NOT_FOUND) 
+	{
+		return FALSE;
+	}
+	else 
+	{
+		d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+        sleep_sec = (DWORD) atol(d_sleep_secs.arr);
+		sleep_sec = atol(d_sleep_secs.arr);
+	    return TRUE;
+	}   
+	*/
+
+   	if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," BEGIN get_sleep_secs() ");
+	}
+
+	EXEC SQL OPEN bg_process_cursor;
+
+	d_facility_id.arr[0]		= '\0';
+	d_sleep_secs.arr[0] 		= '\0';
+	d_machine_name.arr[0] 		= '\0';
+	d_started_by_id.arr[0] 		= '\0';
+	d_next_start_date.arr[0]	= '\0';
+
+	EXEC SQL FETCH bg_process_cursor
+	          INTO :d_facility_id,
+				   :d_sleep_secs,
+				   :d_time_interval,
+				   :d_machine_name,
+				   :d_started_by_id,
+				   :d_next_start_date,
+				   :d_starting_time;
+
+	d_facility_id.arr[d_facility_id.len]		= '\0';
+	d_sleep_secs.arr[d_sleep_secs.len]			= '\0';
+	d_machine_name.arr[d_machine_name.len]		= '\0';
+	d_started_by_id.arr[d_started_by_id.len]	= '\0';
+	d_next_start_date.arr[d_next_start_date.len]= '\0';
+
+	if (d_time_interval > RESTART_INTERVAL)
+	{
+		EXEC SQL UPDATE sy_bg_process_control
+					SET started_date = TO_DATE(:d_next_start_date, 'ddmmyyhh24miss')
+				  WHERE pgm_id = 'BLRRSENQ'					
+				    AND started_date IS NOT NULL
+					AND TO_CHAR(started_date,'DDMMYYHH24MISS') = :prg_start_date;
+
+
+		if (OERROR)
+		{
+			ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+			return 0;
+		}
+
+		strcpy(prg_start_date.arr,d_next_start_date.arr);
+		prg_start_date.len = strlen(prg_start_date.arr);
+
+		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName," END get_sleep_secs() ");
+		}
+
+	}
+
+	EXEC SQL CLOSE bg_process_cursor;
+
+	EXEC SQL COMMIT;
+
+	if (OERROR)
+	{
+		ins_message(ORA_MESG,"ERROR CLOSING bg_process_cursor");
+		return 0;
+	}
+
+	if(NOT_FOUND) 
+	{
+		return FALSE;
+	}
+	else 
+	{
+		d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+        sleep_sec = (DWORD) atol(d_sleep_secs.arr);
+		sleep_sec = atol(d_sleep_secs.arr);
+	    return TRUE;
+	}   
+}
+
+process_rec()
+{  
+	int i = 0;
+	int j = 0,corr_stat = 0;
+	int sy_prg_param_found =0;
+	int record_exist = 0;
+	char test[6],group_test[6];
+	_flushall();
+
+    if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In process_rec() ");
+	}
+
+	 
+	while (get_sleep_secs())
+	{	//-----1
+		_flushall();
+		record_exist = fetch_sy_bg_rep_gen_req_u();
+		if (!record_exist)
+	   		record_exist = fetch_sy_bg_rep_gen_req_s();
+
+		if (!record_exist)
+	   		record_exist = fetch_sy_bg_rep_gen_req();
+
+		while (record_exist)
+		{ //---2
+			if (!get_sleep_secs()) 
+				break;
+              
+			MAX_LINES = (page_length - 5) ; 
+			
+			/*	if (fetch_sy_prog_param())
+			{*/	
+			//---3
+			err_flag = 0;
+		       	      
+			gen_file_name();
+             		 
+			_flushall();
+		
+		    print_report();
+
+		    _flushall();
+
+				print_job();
+
+		    _flushall();
+
+			if(err_flag)
+			{
+				update_sy_bg_rep_gen_req();
+			}
+			else
+			{
+				delete_sy_bg_rep_gen_req();
+				/*delete_sy_prog_param();*/
+            }
+   
+            EXEC SQL COMMIT WORK;
+
+ 			/*} //-----3*/
+
+			/*sprintf(string_var,"after request count increment=%d\n",request_count);
+			disp_message(ORA_MESG,string_var);*/
+
+			record_exist = fetch_sy_bg_rep_gen_req_u();
+			if (!record_exist)
+	   			record_exist = fetch_sy_bg_rep_gen_req_s();
+
+			if (!record_exist)
+	   			record_exist = fetch_sy_bg_rep_gen_req();
+
+        }//---2
+		   
+        if (sleep_sec)  
+           Sleep(sleep_sec);
+    } //---1
+
+    if (IS_TRACING) 
+	{
+		Trace(LVFunctionName,"End In process_rec() ");
+	}
+}
+
+print_report()
+{
+
+    if (IS_TRACING) 
+	{
+		Trace(LVFunctionName,"Begin In print_report() ");
+	}
+
+
+		//sprintf(string_var,"orig cmd line : %s",d_cmd_line.arr);
+		//disp_message(ERR_MESG,string_var);
+		
+		k = strlen(d_cmd_line.arr)- 9;
+		l_report_id_len = strlen(d_cmd_line.arr)- 7;
+		// last 8 chars are report id
+
+		d_act_cmd_line.arr[0]	 = '\0';
+		d_act_cmd_line.len = 0;		
+
+		l_sy_prog_id.arr[0] = '\0';
+		l_sy_prog_id.len = 0;
+		
+		d_exe_name.arr[0]	= '\0';
+		d_exe_name.len = 0;
+
+		d_rem_param.arr[0]	= '\0';
+		d_rem_param.len = 0;
+
+
+		d_report_id.arr[0] = '\0';
+		d_report_id.len = 0;
+
+		
+	
+		/*
+		EXEC SQL SELECT SUBSTR(:d_cmd_line,1,8),
+						SUBSTR(:d_cmd_line,10,8),
+						SUBSTR(:d_cmd_line,19,:k), 
+						rtrim(ltrim(SUBSTR(rtrim(ltrim(:d_cmd_line)),-8)))
+				 into :l_sy_prog_id, :d_exe_name, :d_rem_param, :d_report_id
+				 FROM DUAL;
+	
+		*/
+				
+	    
+		EXEC SQL SELECT SUBSTR(:d_cmd_line,1,8)
+					
+				  into :l_sy_prog_id
+		FROM DUAL;
+
+		EXEC SQL SELECT SUBSTR(:d_cmd_line,10,8)
+					
+				  into :d_exe_name
+		FROM DUAL;
+
+		EXEC SQL SELECT SUBSTR(:d_cmd_line,19,:k) 
+						
+				  into :d_rem_param
+		FROM DUAL;
+
+        EXEC SQL SELECT rtrim(ltrim(SUBSTR(rtrim(ltrim(:d_cmd_line)),-8)))
+					
+				  into :d_report_id
+		FROM DUAL;
+		
+
+	
+
+		/*
+		EXEC SQL SELECT SUBSTR(:d_cmd_line,1,8),
+					SUBSTR(:d_cmd_line,10,:k), 
+					rtrim(ltrim(SUBSTR(rtrim(ltrim(:d_cmd_line)),-8)))
+				  into :d_exe_name, :d_rem_param, :d_report_id
+		FROM DUAL;
+		*/	
+		
+		l_sy_prog_id.arr[l_sy_prog_id.len] = '\0';
+		d_exe_name.arr[strlen(d_exe_name.arr)] = '\0';
+		d_rem_param.arr[strlen(d_rem_param.arr)] = '\0';
+		d_report_id.arr[d_report_id.len] = '\0';
+		
+	
+
+		sprintf(d_act_cmd_line.arr,"%s %s %s %s",d_exe_name.arr,
+						d_user_id_pwd.arr,d_rem_param.arr,nd_file_no.arr);
+
+		d_cmd_line.arr[0]	 = '\0';
+		d_cmd_line.len = 0;		
+										
+		d_act_cmd_line.len = strlen(d_act_cmd_line.arr);
+		d_act_cmd_line.arr[d_act_cmd_line.len] = '\0';
+
+
+    if (IS_TRACING) 
+	{
+		Trace(LVFunctionName,"IN command line");
+	}
+
+		get_report_tool();   // Will decide PROC / REPORT WRITER
+
+		if (l_report_tool_ind == 'R')
+		{
+		      
+			   call_submit_report();
+		}
+
+		else
+		{
+		
+			system(d_act_cmd_line.arr);
+		}
+		
+
+	//	exit(0); 
+  
+
+    if (IS_TRACING) 
+	{
+		Trace(LVFunctionName,"End In print_report() ");
+	}
+        
+		
+}
+
+get_report_tool()
+{
+
+	EXEC SQL EXECUTE
+	DECLARE
+		l_sys_mesg_id VARCHAR2(10);
+		l_err_level VARCHAR2(10);
+		l_err_text VARCHAR2(1000);
+		l_document_value blcommon.rectype_Tab;
+		l_logo_yn VARCHAR2(1) := 'N';		
+	BEGIN
+		blcommon.get_doc_print_format_Tab(
+     			:nd_facility_id,
+			:d_report_id,
+			l_document_value,
+			l_sys_mesg_id,
+			l_err_level,
+			l_err_text);	
+
+		FOR i IN l_document_value.FIRST..l_document_value.LAST LOOP
+			
+			if  l_document_value(i).id = 'LOGO_YN' then 
+				l_logo_yn := l_document_value(i).value;
+			end if;	
+
+			if l_document_value(i).id = 'REPORT_TOOL_IND' then 
+				:l_report_tool_ind := NVL(l_document_value(i).value,'C');
+			end if;		 	
+
+			if l_document_value(i).id = 'LOGO_FILE_NAME' then 
+				:l_logo_name := l_document_value(i).value;
+			end if;		
+		END LOOP;		
+
+		IF NVL(l_logo_yn,'N') = 'N' then 
+			:l_logo_name := NULL;
+		END IF;	
+
+		
+	END;
+	END-EXEC;
+}
+
+call_submit_report()
+{
+
+EXEC SQL EXECUTE	
+DECLARE
+	l_print_status BOOLEAN;
+	p_error_text VARCHAR2(4000);
+BEGIN
+
+	APPPRINT.SUBMIT_ORACLE_REPORT
+			 (:sy_ws_no,
+			  :nd_facility_id,
+			  'BL',
+			  NVL(:d_report_id,'BLRRSENQ'),
+			  'P', --p_report_option
+			  '',  --p_outputfile_format
+			  '',  --p_outputfile_name
+			  'O',
+			  ' ', --p_location_code
+			  NULL, --:l_printer_names,
+			  NULL,
+			  NULL, --p_page_from
+			  NULL, --p_page_to
+			  NULL, --p_print_mode
+			  'P_LOGO_NAME='||:l_logo_name||'+'||'P_PGM_ID='||:l_sy_prog_id||'+'
+			  ||'P_PGM_DATE='||:sy_req_date||'+'||'P_SESSION_ID='||:sy_session_id||'+'||
+			  'P_OPERATING_FACILITY_ID='||:nd_facility_id, 
+			  l_print_status, --OUT BOOLEAN,
+			  p_error_text);							  
+
+
+END;
+END-EXEC;
+}
+
+fetch_sy_bg_rep_gen_req_u()
+{
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In fetch_sy_bg_rep_gen_req_u() ");
+	}
+
+	sy_user_id.arr[0] 		= '\0';
+	sy_session_id.arr[0] 	= '\0';
+	sy_req_date.arr[0]      = '\0';
+	sy_machine_name.arr[0]  = '\0';
+	sy_ws_no.arr[0]			= '\0';
+	sy_rowid.arr[0]			= '\0';
+	d_cmd_line.arr[0]		= '\0';
+	
+	sy_session_id.len		= 0;
+	sy_user_id.len	        = 0;
+	sy_req_date.len         = 0;
+	sy_machine_name.len     = 0;
+	sy_ws_no.len            = 0;
+	sy_rowid.len            = 0;
+	d_cmd_line.len			= 0;
+
+EXEC SQL 
+	SELECT	OPERATING_FACILITY_ID,
+			SESSION_ID,
+			USER_ID,
+			TO_CHAR(REQUEST_DATE,'DDMMYYHH24MISS'),
+			MACHINE_NAME,
+			WS_NO,
+			ROWID,
+			CMD_LINE_ARG
+	INTO	:nd_facility_id,
+			:sy_session_id,
+            :sy_user_id,
+            :sy_req_date,
+			:sy_machine_name,
+			:sy_ws_no,
+			:sy_rowid,
+			:d_cmd_line
+	 FROM	SY_REPORT_GENERATE_REQUEST
+	 WHERE	PGM_ID = 'BLRRSENQ'
+			AND REQUEST_STATUS IS NULL
+			AND NVL(URGENT_INDICATOR,' ') = 'U'
+	 AND 	ROWNUM = 1;
+			
+
+      if(OERROR)
+         ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+
+      if(NOT_FOUND) 
+      	  return FALSE;
+      else 
+	  {
+          	sy_user_id.arr[sy_user_id.len] = '\0';
+          	sy_session_id.arr[sy_session_id.len] = '\0';
+          	sy_rowid.arr[sy_rowid.len] = '\0';
+          	sy_req_date.arr[sy_req_date.len] = '\0';
+		sy_machine_name.arr[sy_machine_name.len] = '\0';
+		sy_ws_no.arr[sy_ws_no.len] = '\0';
+		sy_rowid.arr[sy_rowid.len] = '\0';
+
+		d_cmd_line.len = strlen(d_cmd_line.arr);
+		d_cmd_line.arr[d_cmd_line.len] = '\0';
+
+
+   	      return TRUE;
+	  }
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In fetch_sy_bg_rep_gen_req_u() ");
+	}
+}
+
+/*------------------------*/
+
+fetch_sy_bg_rep_gen_req_s()
+{
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In fetch_sy_bg_rep_gen_req_s() ");
+	}
+
+	sy_user_id.arr[0] 		= '\0';
+	sy_session_id.arr[0] 	= '\0';
+	sy_req_date.arr[0]      = '\0';
+	sy_machine_name.arr[0]  = '\0';
+	sy_ws_no.arr[0]			= '\0';
+	sy_rowid.arr[0]			= '\0';
+	d_cmd_line.arr[0]		= '\0';
+
+	sy_session_id.len		= 0;
+	sy_user_id.len	        = 0;
+	sy_req_date.len         = 0;
+	sy_machine_name.len     = 0;
+	sy_ws_no.len            = 0;
+	sy_rowid.len            = 0;
+	d_cmd_line.len			= 0;
+	
+
+EXEC SQL SELECT SESSION_ID,
+		USER_ID,
+		TO_CHAR(REQUEST_DATE,'DDMMYYHH24MISS'),
+		MACHINE_NAME,
+		WS_NO,
+		ROWID,
+		CMD_LINE_ARG
+	 INTO	:sy_session_id,
+            :sy_user_id,
+            :sy_req_date,
+			:sy_machine_name,
+			:sy_ws_no,
+			:sy_rowid,
+			:d_cmd_line
+	 FROM	SY_REPORT_GENERATE_REQUEST
+	 WHERE	PGM_ID = 'BLRRSENQ'
+	 AND 	REQUEST_STATUS IS NULL
+	 AND 	NVL(URGENT_INDICATOR,' ') = 'S'
+	 AND 	ROWNUM = 1;
+
+	/*sprintf(string_var,"after select SY_REPORT_GENERATE_REQUEST...urgent ind..S..sysessionid=%s",sy_session_id.arr);
+	disp_message(ORA_MESG,string_var);*/
+			
+
+      if(OERROR)
+         ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+
+      if(NOT_FOUND) 
+      	  return FALSE;
+      else 
+	  {
+          	sy_user_id.arr[sy_user_id.len]			= '\0';
+          	sy_session_id.arr[sy_session_id.len]	= '\0';
+          	sy_rowid.arr[sy_rowid.len]				= '\0';
+          	sy_req_date.arr[sy_req_date.len]		= '\0';
+			sy_machine_name.arr[sy_machine_name.len]= '\0';
+			sy_ws_no.arr[sy_ws_no.len]				= '\0';
+			sy_rowid.arr[sy_rowid.len]				= '\0';
+
+			d_cmd_line.len = strlen(d_cmd_line.arr);
+			d_cmd_line.arr[d_cmd_line.len]			= '\0';
+
+		
+
+   	      return TRUE;
+	  }
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In fetch_sy_bg_rep_gen_req_s() ");
+	}
+
+}
+
+/*-------------------------------*/
+
+fetch_sy_bg_rep_gen_req()
+{
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In fetch_sy_bg_rep_gen_req()");
+	}
+
+	sy_user_id.arr[0] 		= '\0';
+	sy_session_id.arr[0] 	= '\0';
+	sy_req_date.arr[0]      = '\0';
+	sy_machine_name.arr[0]  = '\0';
+	sy_ws_no.arr[0]		    = '\0';
+	sy_rowid.arr[0]		    = '\0';
+	d_cmd_line.arr[0]		= '\0';
+
+	sy_session_id.len	    = 0;
+	sy_user_id.len	        = 0;
+	sy_req_date.len         = 0;
+	sy_machine_name.len     = 0;
+	sy_ws_no.len            = 0;
+	sy_rowid.len            = 0;
+	d_cmd_line.len			= 0;
+
+EXEC SQL SELECT
+		SESSION_ID,
+		USER_ID,
+		TO_CHAR(REQUEST_DATE,'DDMMYYHH24MISS'),
+		MACHINE_NAME,
+		WS_NO,
+		ROWID,
+		CMD_LINE_ARG
+	 INTO  :sy_session_id,
+           :sy_user_id,
+           :sy_req_date,
+		   :sy_machine_name,
+		   :sy_ws_no,
+		   :sy_rowid,
+		   :d_cmd_line
+	 FROM	SY_REPORT_GENERATE_REQUEST
+	 WHERE	PGM_ID = 'BLRRSENQ'
+	 AND 	REQUEST_STATUS IS NULL
+	 AND 	NVL(URGENT_INDICATOR,' ') = 'R'
+	 AND 	ROWNUM = 1;
+			
+/*sprintf(string_var,"after select SY_REPORT_GENERATE_REQUEST...urgent ind..R..sysessionid=%s",sy_session_id.arr);
+disp_message(ORA_MESG,string_var);*/
+
+      if(OERROR)
+         ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+
+      if(NOT_FOUND) 
+      	  return FALSE;
+      else 
+	  {
+          	sy_user_id.arr[sy_user_id.len]			= '\0';
+          	sy_session_id.arr[sy_session_id.len]	= '\0';
+          	sy_rowid.arr[sy_rowid.len]				= '\0';
+          	sy_req_date.arr[sy_req_date.len]		= '\0';
+			sy_machine_name.arr[sy_machine_name.len]= '\0';
+			sy_ws_no.arr[sy_ws_no.len]				= '\0';
+			sy_rowid.arr[sy_rowid.len]				= '\0';
+
+			d_cmd_line.len = strlen(d_cmd_line.arr);
+			d_cmd_line.arr[d_cmd_line.len]			= '\0';
+
+   	      return TRUE;
+	  }
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In fetch_sy_bg_rep_gen_req()");
+	}
+}
+/*------------------------------AS PER ENHANCEMENT IT IS COMMENTED------------------------
+fetch_sy_prog_param()
+{
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In fetch_sy_prog_param()");
+	}
+
+   nd_fm_doc_type.arr[0]    = '\0';
+   nd_fm_doc_num.arr[0]     = '\0';
+   nd_fm_doc_date.arr[0]    = '\0';
+   nd_to_doc_type.arr[0]    = '\0';
+   nd_to_doc_num.arr[0]     = '\0';
+   nd_to_doc_date.arr[0]    = '\0';
+   trx_type.arr[0]			= '\0';
+
+   nd_fm_doc_type.len       = 0;
+   nd_fm_doc_num.len        = 0;
+   nd_fm_doc_date.len       = 0;
+   nd_to_doc_type.len       = 0;
+   nd_to_doc_num.len        = 0;
+   nd_to_doc_date.len       = 0;
+   trx_type.len		    = 0;
+   nd_rowid.arr[0]	= '\0';
+   nd_rowid.len = 0;
+
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+                   NVL(PARAM1,'HGBIOP'),
+				   nvl(PARAM2,0),
+				   NVL(PARAM3,'HGBIOP'),
+                   nvl(PARAM4,99999999),
+				   NVL(PARAM5,SYSDATE),
+				   NVL(PARAM6,SYSDATE),
+				   NVL(PARAM7,'O'),
+				   NVL(PARAM8,'Y'),
+				   NVL(PARAM9,'N'), NVL(PARAM10,'N'),
+				   NVL(PARAM22,operating_facility_id),
+				   rowid
+            INTO   :d_facility_id,
+			       :nd_fm_doc_type, 
+				   :nd_fm_doc_num,
+                   :nd_to_doc_type, 
+				   :nd_to_doc_num, 
+   				   :nd_fm_doc_date, :nd_to_doc_date,
+   				   :trx_type, :nd_reprint_yn, 
+				   :discount_print_yn, :sett_print_yn,
+				   :d_cashfacility_id,
+				   	:nd_rowid
+              FROM SY_PROG_PARAM
+              WHERE PGM_ID     = 'BLRRSENQ'
+              AND SESSION_ID = :sy_session_id
+              AND PGM_DATE   = :sy_req_date;
+
+  //disp_message(ERR_MESG,nd_to_doc_num.arr);
+ 
+  
+   d_facility_id.arr[d_facility_id.len]    = '\0';   
+   nd_fm_doc_type.arr[nd_fm_doc_type.len]    = '\0';
+   nd_fm_doc_num.arr[nd_fm_doc_num.len]      = '\0';
+   nd_to_doc_type.arr[nd_to_doc_type.len]    = '\0';
+   nd_to_doc_num.arr[nd_to_doc_num.len]      = '\0';
+   nd_fm_doc_date.arr[nd_fm_doc_date.len]    = '\0';
+   nd_to_doc_date.arr[nd_to_doc_date.len]    = '\0';
+   d_cashfacility_id.arr[d_cashfacility_id.len] = '\0';
+   trx_type.arr[trx_type.len]	  	     = '\0';
+
+
+      if (OERROR)
+	  {
+         ins_message(ORA_MESG,"Select failed on table SY_PROG_PARAM");		 
+		 update_sy_bg_rep_gen_req();
+		 err_flag = 1;
+	   }
+
+      if (NOT_FOUND) 
+	  {	
+		err_flag = 1;
+		update_sy_bg_rep_gen_req();
+		return 0;
+	  }
+	      
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In fetch_sy_prog_param()");
+	}
+
+	return 1;
+}
+
+*/
+/*-----------------------------------------------------------*/
+
+update_sy_bg_rep_gen_req()
+{
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In update_sy_bg_rep_gen_req()");
+	}
+
+   EXEC SQL UPDATE SY_REPORT_GENERATE_REQUEST
+               SET REQUEST_STATUS = 'E'
+			 WHERE ROWID = :sy_rowid;
+   if(OERROR) 
+      ins_message(ERR_MESG,"Failed in upd_sy_bg_rep_gen_req()");       
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In update_sy_bg_rep_gen_req()");
+	}
+
+}
+/*------------------------------------------------------------*/
+delete_sy_bg_rep_gen_req()
+{
+   char test[100];
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In delete_sy_bg_rep_gen_req()");
+	}
+
+
+
+   EXEC SQL DELETE FROM SY_REPORT_GENERATE_REQUEST
+             WHERE ROWID = :sy_rowid;
+   if(OERROR) 
+      ins_message(ERR_MESG,"Failed in delete_sy_bg_rep_gen_req");
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In delete_sy_bg_rep_gen_req()");
+	}
+
+
+}
+/*------------------------------------------------------------*/
+/*
+delete_sy_prog_param()
+{  
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In delete_sy_bg_rep_gen_req()");
+			
+		}
+
+
+  EXEC SQL DELETE FROM SY_PROG_PARAM
+			 WHERE PGM_ID     = 'BLRRSENQ'
+              AND SESSION_ID = :sy_session_id
+              AND PGM_DATE   = :sy_req_date;
+
+   if(OERROR) 
+      ins_message(ERR_MESG,"Failed in delete_sy_prog_param");
+
+ if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In delete_sy_bg_rep_gen_req()");
+			
+		}
+
+
+}
+*/
+/*----------------------------------------------------------*/
+print_job()
+{
+	char er_cd[10];
+	char print_yn = 'Y';
+	int i;   
+
+if (IS_TRACING) 
+	{
+		Trace(LVFunctionName," Start In print_job()");
+	}
+
+	 p_uid_pwd.arr[0] = '\0';
+	 p_print_name.arr[0] = '\0';
+	 p_loc_code.arr[0] = '\0';
+	 p_loc_type.arr[0] = '\0';
+	 
+	 p_rep_file.arr[0] = '\0';
+	 p_print_mode.arr[0] = '\0';
+
+	 p_uid_pwd.len = 0;
+	 p_print_name.len = 0;
+	 p_loc_code.len = 0;
+	 p_loc_type.len = 0;
+	 p_rep_file.len = 0;
+	 p_print_mode.len = 0;
+
+	strcpy(p_uid_pwd.arr,uid_pwd.arr);
+	p_uid_pwd.len = strlen(uid_pwd.arr);
+
+	strcpy(p_print_name.arr,"BLRRSENQ");
+	p_print_name.len = strlen(p_print_name.arr);
+
+   	 strcpy(p_loc_type.arr,trx_type.arr);
+   	 p_loc_type.len = strlen(p_loc_type.arr);
+
+	strcpy(p_rep_file.arr,nd_f_name);
+	p_rep_file.len = strlen(nd_f_name);
+
+	strcpy(p_print_mode.arr,"S");
+	p_print_mode.len = strlen(p_print_mode.arr);
+
+
+	get_print_request();  /* decides whether print request is required or not */
+
+//disp_message(ERR_MESG,"AFTER get_print_request");
+//sprintf(temp,"%c",l_print_request_yn);
+//disp_message(ERR_MESG,temp);
+
+//sprintf(temp,"%c",l_report_tool_ind);
+//disp_message(ERR_MESG,temp);
+
+
+
+	//if (print_yn == 'Y')   
+	//if (l_print_request_yn == 'Y' || l_report_tool_ind != 'R')   	
+
+	if (l_report_tool_ind != 'R' && l_print_request_yn == 'Y')   	
+	{
+	  strcpy(p_loc_type.arr,"O");
+	  p_loc_type.len = strlen(p_loc_type.arr);
+
+		for( i = 0; i < source_copies; i++)
+		{
+
+		 EXEC SQL
+	          INSERT INTO SY_REPORT_PRINT_REQUEST
+			  (OPERATING_FACILITY_ID,
+			   USER_ID,MACHINE_NAME,WS_NO,MODULE_ID,ONLINE_PRINT_NAME,
+			   DEST_LOCN_TYPE,DEST_LOCN_CODE,ONLINE_PRINT_FILE_NAME,
+			   PRINT_MODE,REQUEST_DATE,PROCESS_TYPE,PRINT_IMMEDIATE_YN,
+			   PRINT_PRIORITY,SELECTION_CRITERIA)
+		  VALUES
+			  (:nd_facility_id,
+			   :sy_user_id,:sy_machine_name,:sy_ws_no,'BL',NVL(:d_report_id,'BLRRSENQ'),
+			   :p_loc_type,  NULL ,:p_rep_file,
+			   'S',SYSDATE, 'S', 'Y', 
+			   DECODE(:bl_hdr_urgent_indicator,'U','1','3'),
+			   NULL
+			  );
+
+		if(OERROR)
+		{   
+		    disp_message(ERR_MESG,sqlca.sqlerrm.sqlerrmc);
+		    ins_message(ERR_MESG,"Insert Failed on SY_REPORT_PRINT_REQUEST");
+		}
+       
+     sprintf(val_strng,"[%s]-fac.[%s]usrid[%s]macnam[%s]wsno[%s]loctype,[%s]rpfile ",
+			d_facility_id.arr, sy_user_id.arr,sy_machine_name.arr,sy_ws_no.arr,
+			p_loc_type.arr,p_rep_file.arr);
+	
+		
+	  //disp_message(ERR_MESG,val_strng);				
+	
+			_flushall();		
+	}  
+  }
+	
+
+if (IS_TRACING) 
+	{
+		Trace(LVFunctionName," End In print_job()");
+	}
+
+}			   
+
+/*----------------------------------------------------------*/
+
+
+get_print_request()
+{     
+	l_errortext.arr[0] = '\0';
+	l_errortext.len = 0;
+
+	EXEC SQL EXECUTE
+	BEGIN
+
+	     APPPRINT.GET_ROUTING_PRINTERS(
+		:sy_ws_no,
+		:nd_facility_id,
+		'BL',
+		NVL(:d_report_id,'BLRRSENQ'),
+		'O',
+		' ',
+		:l_printer_ids,
+		:l_printer_names,
+		:l_printer_types ,
+		:l_queue_names,
+		:l_no_of_copies,
+		:l_errortext);		 
+
+		:l_dmp := NVL(instr(:l_printer_types,'D'),0);
+		:l_lsr := NVL(instr(:l_printer_types,'S'),0);			 
+
+		if :l_dmp != 0 and :l_lsr != 0 then 
+		   :l_dmp := 0;
+		   --if there is one laser, then output will be laser
+		end if;	
+
+		if :l_dmp = 0 and :l_lsr = 0 then 
+		   :l_lsr := 1;
+		   --Default is Laser Format
+		end if;	 				
+		
+	END;
+	END-EXEC;	
+
+//disp_message(ERR_MESG,"after APPPRINT");	
+//disp_message(ERR_MESG,l_printer_ids.arr);	
+//disp_message(ERR_MESG,l_printer_names.arr);	
+//disp_message(ERR_MESG,l_printer_types.arr);
+
+
+
+	  if (l_errortext.arr[0] != '\0')
+	  {    	
+		ins_message(ERR_MESG,l_errortext.arr);
+		l_errortext.arr[0] = '\0';
+		l_errortext.len = 0;
+
+	  }
+	
+
+	  l_logo_yniflaser.arr[0] = 'N';
+	  
+	  l_errorlevel.arr[0] = '\0';
+	  l_errorlevel.len = 0;
+
+	  l_sysmessageid.arr[0] = '\0';
+	  l_sysmessageid.len = 0;
+
+	  l_errortext.arr[0] = '\0';
+	  l_errortext.len = 0;
+	
+
+	  if (l_lsr != 0 && l_dmp == 0)
+	  {	   	  
+
+		   EXEC SQL EXECUTE	
+		   BEGIN									
+
+			BLOPIN.GET_PRINT_SETUP_COL_VALUE(
+				:nd_facility_id,
+				:d_exe_name,
+				'PRINT_LOGO_YN_IF_LASER',
+				:l_logo_yniflaser,
+				:l_errorlevel,
+				:l_sysmessageid,
+				:l_errortext) ;			
+				
+			:l_logo_yniflaser := nvl(:l_logo_yniflaser,'N');			
+
+			if :l_logo_yniflaser = 'Y' then 
+				:l_print_request_yn := 'N';
+			else
+				:l_print_request_yn := 'Y';
+			end if;
+			
+
+			if :l_sysmessageid is not null then
+				:l_errorlevel := '10';
+				:l_errortext := blcommon.get_error_text(:l_sysmessageid);
+			end if;			
+		   
+
+		   END;
+		   END-EXEC;
+		   if (strcmp(l_errorlevel.arr,"10") == 0 && l_errortext.arr[0] != '\0')
+		   {
+			ins_message(ERR_MESG,l_errortext.arr);
+			l_errorlevel.arr[0] = '\0';
+			l_errorlevel.len = 0;
+
+			l_sysmessageid.arr[0] = '\0';
+			l_sysmessageid.len = 0;
+
+			l_errortext.arr[0] = '\0';
+			l_errortext.len = 0;
+		   }
+	    }	    
+	  
+}
+
+get_company_name()
+{
+
+	if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In get_company_name()");
+	}
+
+
+    EXEC SQL  SELECT ACC_ENTITY_NAME  
+	      INTO   :sy_acc_entity_name
+	      FROM   SY_ACC_ENTITY
+	      WHERE  ACC_ENTITY_ID = :d_facility_id;	
+
+      if (OERROR)
+         ins_message(ORA_MESG,"Select failed on table SY_ACC_ENTITY");
+
+    sy_acc_entity_name.arr[sy_acc_entity_name.len] = '\0'; 
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In get_company_name()");
+	}
+
+
+}
+/*-----------------------------------------------------*/
+gen_file_name()
+{
+
+if (IS_TRACING) 
+	{
+		Trace(LVFunctionName," Start In ggen_file_name()");
+	}
+
+     nd_file_name.arr[0]   = '\0';
+     nd_file_name.len      = 0;
+	 nd_file_no.arr[0] = '\0';
+	 nd_file_no.len = 0;
+	 l_seq_num.arr[0] = '\0';
+
+     EXEC SQL SELECT LTRIM(RTRIM(TO_CHAR(BL_PRT_SRV_SEQ.NEXTVAL,'00009')))
+				INTO :l_seq_num
+				FROM dual;
+
+	 l_seq_num.arr[l_seq_num.len] = '\0';	
+	
+
+ 	  EXEC SQL SELECT  'BL'||LTRIM(RTRIM(SUBSTR(:sy_machine_name,1,30)))||to_char(sysdate,'yyyymmddsssss')||:l_seq_num||'.lis'
+			  INTO    :nd_file_no
+	          FROM 	DUAL;
+	 
+	 //sprintf(l_mesg,"1  File Name :   %s",nd_file_no.arr);
+	 //disp_message(ERR_MESG,l_mesg);
+	  
+     if (OERROR)  
+         ins_message(ORA_MESG,"Select failed from DUAL");
+      
+     nd_file_no.arr[nd_file_no.len] = '\0';
+
+     sprintf(nd_file_name.arr,"%s%s", WORKING_DIR,nd_file_no.arr);
+
+	 strcpy(nd_f_name,nd_file_name.arr);
+/*
+     if ((fp = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+         ins_message(ERR_MESG,"Error while opening file BL PRINT FILE in gen_file_name");
+         proc_exit();
+     }
+
+*/
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In ggen_file_name()");
+	}
+
+
+}
+
+ins_message(int msg_type,char msg[])
+{
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," Start In ins_message(int msg_type,char msg[])");
+	}
+
+   er_msg.arr[0] = '\0';
+   er_msg.len = 0;
+   er_msg_type = 0;
+   strcpy(er_msg.arr,msg);
+   er_msg.len = strlen(msg);
+   er_msg_type = msg_type;
+
+   EXEC SQL
+   INSERT INTO SY_PROG_MSG
+          (PGM_ID,MSG_TYPE,MSG_NUM,MSG_DESC,MSG_DATE_TIME,SESSION_ID,PGM_DATE)
+   VALUES 
+          ('BLRRSENQ',:er_msg_type,NULL,:er_msg,SYSDATE,:sy_session_id,
+		   :sy_req_date);
+
+
+if (IS_TRACING) 
+	{
+			Trace(LVFunctionName," End In ins_message(int msg_type,char msg[])");
+	}
+
+
+}
+
+
+
+

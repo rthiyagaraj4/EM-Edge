@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_RulesForDetailedBill_MultiPayerBillFormat</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Multipayer Row/Column Format</h1>
+<p class="BoldRFD"><span style="font-weight: normal;">The Multipayer Bill Format tab enables you to define the bill format for multiple payers and patients in a facility. When the Payer Specific Format or a Single Bill Cash Format is not defined, Multipayer Bill Format is taken as the default format for bill print in the facility.</span> <span style="font-weight: normal;">&#160;</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Multipayer Bill Format For Payers</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Line As</span> – Select a value from the list. The values are system defined – 'Gross Amt' and 'Net Amt'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Gross Amt – Select Gross Amt to print the complete bill details along with the discounts.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Net Amt - Select Net Amt to print only the net charges on the bill.</p>
+</li>
+</ol>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Line Discount As</span> – Select a value from the list. The values are system defined – 'Row', 'Column' and 'Not Applicable'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Row – Select Row to print the discount details in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Column – Select Column to print the discount details in a column.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable - Select Not Applicable to exclude the discount details.</p>
+</li>
+</ol>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Adjustment As</span> – Select a value from the list. The values are system defined – 'Summarized Row', 'Separate Row' and 'Donot Print'. The Bill Adjustment details are printed based on the format selected.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Summarized Row – Select Summarized Row to print a summary of the Bill Adjustment details in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row - Select Separate Row to print the Bill Adjustment details in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the Bill Adjustment details are not to be printed on the bill.</p>
+</li>
+</ol>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Discount Columns</span> - Select the check box, if the bill printed for payers has to include discount columns, when the patient has not availed any discount from the facility. On selecting the check box, the discount value is printed as zero in the payer bills. The check box is enabled for selection, if the value for 'Total Payable Service Line Discount As' is selected as 'Column'. Clear the check box, if discount columns are not to be printed when there are no discounts.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Additional Charge Columns</span> - Select the check box to print zero adjustment details in payer bills, if there are no additional charges associated to the patient's bill. Clear the check box if zero adjustments are not to be printed in payer bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Date in Detail Format</span> - Select the check box to print service date in a detailed format in the bill generated for payers. Clear the check box, if service date is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Date with Time</span> - Select the check box to print service date and time in the bill generated for payers. You can select the check box, if 'Print Service Date in Detail Format' check box is selected. Clear the check box, if service date and time is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Rate in Detail Format</span> - Select the check box to print service rates in the payer bills irrespective of the service coverage. You can select the check box, if 'Print Service Date in Detail Format' check box is selected. Clear the check box, if service rate is not required in the bills printed for payers.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Discount as Separate Row</span> – Select ‘Print Bill Discount as Separate Row’ to print the bill discounts in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Adjustment as Separate Row</span> - Select ‘Print Bill Adjustment as Separate Row’ to print the bill adjustment details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Exemption as Separate Row</span> - Select ‘Print Bill Exemption as Separate Row’ to print the bill exemption details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Write-Off as Separate Row</span> - Select ‘Print Bill Write-Off as Separate Row’ to print the bill write-off details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Adjustments</span> - Select the check box, if zero adjustments are to be printed in patient's bill. The legend with the value as '0' gets printed. Clear the check box, if zero adjustments are not to be printed in patient's bill, if there are no adjustments made with respect to the patient's bill.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Other Payer Amount as</span> – Select a bill format from the list. The values are system defined – “Summarized Row”, “Separate Row” and “Donot Print”.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Summarized Row – Select Summarized Row to print a summary of the payer details in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row - Select Separate Row to print a summary of the payer details in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the details are not to be printed.</p>
+</li>
+</ol>
+<ol start="15">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Patient Amount as</span> - Select a bill format from the list. The values are system defined – 'Separate Row' and 'Donot Print'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row – Select Separate Row to print the patient payable amount in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the patient payable amount is not to be printed on the bill.</p>
+</li>
+</ol>
+<ol start="16">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Net Amount as</span> – Select a value from the list. The values are system defined - 'Row', 'Column' and 'Both'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Row – Select Row to print the net amount towards the service in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Column – Select Column to print the net amount towards the service in a column.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Both - Select Both to print the net amount details in a row and column.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Multipayer Bill Format For Patient</p>
+<ol start="17" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Line As</span> – Select a value from the list. The values are system defined – 'Gross Amt' and 'Net Amt'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Gross Amt – Select Gross Amt to print the complete bill details along with the discounts amount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Net Amt – Select Net Amt to print only the net charges in the bill.</p>
+</li>
+</ol>
+<ol start="18" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Line Discount As</span> – Select a value from the list. The values are system defined – 'Row', 'Column' and 'Not Applicable'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Row – Select Row to print the discount details in a Row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Column – Select Column to print the discount details in a Column.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable - Select Not Applicable, if the discount details are not to be printed.</p>
+</li>
+</ol>
+<ol start="19">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Additional Charge Columns</span> - Select the check box to print zero adjustment details in patient bills, if there are no additional charges associated to the patient's bill. Clear the check box if zero adjustments are not to be printed in patient bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Date in Detail Format</span> - Select the check box to print service date in a detailed format in the bill generated for patient. Clear the check box, if service date is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Date with Time</span> - Select the check box to print service date and time in the bill generated for patient. You can select the check box, if 'Print Service Date in Detail Format' check box is selected. Clear the check box, if service date and time is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Rate in Detail Format</span> - Select the check box to print service rates in the payer bills irrespective of the service coverage. You can select the check box, if 'Print Service Date in Detail Format' check box is selected. Clear the check box, if service rate is not required in the bills printed for payers.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Discount Columns</span> - Select the check box, if the bill printed for patients' has to include discount columns, when the patient has not availed any discount from the facility. On selecting the check box, the discount value is printed as zero in the patient bills. The check box is enabled for selection, if the value for 'Total Payable Service Line Discount As' is selected as 'Column'. Clear the check box, if discount columns are not to be printed when there are no discounts.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Adjustments</span> - Select the check box to print zero adjustment details in patient bills. On selecting the check box, the legend is displayed with the value as '0' in the bill. Clear the check box if zero adjustments are not to be printed in patient bills.</p>
+</li>
+</ol>
+<ol start="25" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Adjustment As</span> - Select a value from the list. The values are system defined – 'Summarized Row', 'Separate Row' and 'Donot Print'. The Bill Adjustment details are printed based on the format selected.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Summarized Row – Select Summarized Row to print a summary of the Bill Adjustment details in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row - Select Separate Row to print the Bill Adjustment details in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the Bill Adjustment details are not to be printed on the bill.</p>
+</li>
+</ol>
+<ol start="26" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Discount as Separate Row</span> – Select ‘Print Bill Discount as Separate Row’ to print the bill discounts in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Adjustment as Separate Row</span> - Select ‘Print Bill Adjustment as Separate Row’ to print the bill adjustment details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Exemption as Separate Row</span> - Select ‘Print Bill Exemption as Separate Row’ to print the bill exemption details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill Write-Off as Separate Row</span> - Select ‘Print Bill Write-Off as Separate Row’ to print the bill write-off details in a separate row. The check box is selected automatically when the ‘Print Bill Adjustment As’ is set as Separate Row. The check box is enabled only when ‘Print Bill Adjustment As’ is selected as ‘Summarized Row’ or ‘Separate Row’. The check box is disabled, if the ‘Print Bill Adjustment As’ is selected as ‘Do Not Print’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Other Payer Amount as</span> – Select a bill format from the list. The values are system defined – 'Summarized Row', 'Separate Row' and 'Donot Print'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Summarized Row – Select Summarized Row to print a summary of the payer details in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row - Select Separate Row to print a summary of the payer details in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the details are not to be printed.</p>
+</li>
+</ol>
+<ol start="31" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Subsidized Amount as</span> - &#160;Select a bill format for zero subsidized amount in a patient's bill. The system defined values are - 'Row', 'column', 'Both' and 'Do Not Print'. The subsidized amount with the legend can be either printed as a row, column or both. Select 'Do Not Print', if you do not want the legend with value to be printed when value is zero.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Subsidized Amount as</span> - Select the check box to print zero subsidized amount in patient's bill. This check box is enabled for selection only if the value for 'Subsidized Amount as' is selected as 'Column' or 'Both'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Separate Row – Select Separate Row to print the patient payable amount in a separate row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Donot Print – Select Donot Print, if the patient payable amount is not to be printed on the bill.</p>
+</li>
+</ol>
+<ol start="32" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Net Amount as</span> – Select a value from the list. The values are system defined - 'Row', 'Column' and 'Both'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Row – Select Row to print the net amount towards the service in a row.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Column – Select Column to print the net amount towards the service in a column.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Both - Select Both to print the net amount details in a row and column.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Discount Document Setup</p>
+<p class="BoldRFD">Multipayer Bill Format for Payers</p>
+<ol start="33" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Discount Amount in Detail Format</span> - Select the check box to print a detailed discount document report for multiple payers associated to a patient. Clear the check box to print a summarized discount document report for multiple payers.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Multipayer Bill Format for Patient</p>
+<ol start="34" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Discount Amount in Detail Format</span> - Select the check box to print a detailed discount document report for patients. Clear the check box to print a summarized discount document report for patients.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

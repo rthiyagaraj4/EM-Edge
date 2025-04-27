@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Trans_IPCashier_EnterIPReceipts/Refunds</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to enter inpatient receipts or refund details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Downtime Entry</span> – If the receipt is a manual receipt entered when the system was down, this flag should be made as ‘Y’. By default his flag is ‘N’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Type/No</span> – If Downtime Entry flag is ‘Y’, then the document type is defaulted from billing parameter setup. The document number is to be entered and cannot be system generated. The document number should be unique.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – If Downtime Entry flag is ‘Y’, then the date is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – If Downtime Entry flag is ‘Y’, then the reason is mandatory. The reason description is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> - Enter a valid patient number. If the receipt nature code is “CU” or “MI” then entering a Patient no is optional. For all other receipt nature codes, patient no is mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">If the patient entered is valid, the patient details are displayed are displayed for user verification.</p>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Number</span> - Enter a valid Bed Number. This field is skipped if an valid Patient No is entered. If an invalid Bed Number is entered an error message is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - System displays the episode type as “I”. If a valid patient no is entered this can be changed to “O” for Outpatients and “R” for Referral Patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nature</span> - Enter a valid nature code. Valid nature codes for receipts are as follows:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"AD" - Adjustable Deposits</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">&#160;"PR" - Prepayments</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"RD" - Refundable Deposits</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">“PD” – Patient Deposit Against Package</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"BI" - Against Bills</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"CU" - Customer Receipts</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">&#160;"DC" - Receipts from Deferred Cash Patients</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">&#160;"MI" - Miscellaneous</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Valid nature codes for refunds are as follows:</p>
+<ol start="6">
+<li class="p-BulletRFD">
+<p class="BulletRFD">"RD" - Refundable Deposit Refund</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"BI" - Refund against a bill</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">"MI" - Miscellaneous</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Package Seq. No</span> - The Package Sequence number is displayed automatically based on the package definition and the package subscription for the respective patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipt or Refund</span> - Click on “Receipts” (“R”) or “Refunds” (“F”). If "R", RECEIPTS is displayed for user verification. If "F", then REFUNDS is displayed for user verification. System validates whether the details of the patient and the receipt nature and receipt refund codes are consistent. If the details are not consistent then an error message is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">If the patient details and the receipt nature and the receipt/refund codes are consistent the following details are displayed along with the patient details:</p>
+<ol start="11">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipt Type</span> - This is not enterable for all cases where original document number has been entered. Otherwise, enter a valid receipt type code. If the code is valid, the short description is displayed for user verification. Click the <span class="BoldNumberRFD">[List of Values]</span> to view and to select a valid receipt type code. This is used to determine the General Ledger interface account. On entering the valid Receipt type, its associated External Account Code will be displayed in A/c Code. &#160;&#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deposits</span> – The valid options are “Admission Deposit”, “Transfer Deposit”, “Other Deposit”, “Not Applicable” and “Deposit Against Surgery”. Select the appropriate deposit nature from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Booking Ref No</span>. - &#160;When Nominee details are entered, Booking Ref.number details are to be entered for the reference.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter the Remarks, if any, in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Request ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Request ID. This is valid, if a request is placed for a medical report using the 'Medical Board' function in 'Medical Records' module. The request ID generated in 'Medical Records' module has to be recorded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Settled</span> - Enter the document amount for this transaction. The amount should be positive only. The amount recorded has to &#160;match with the amount recorded under Settlement Details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Through Mail</span> - Select the check box to print the Acknowledgement Letter for medical report.</p>
+</li>
+</ol>
+<p class="BoldRFD">Settlement Details</p>
+<ol start="18">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Settled</span> - Enter the document amount for this transaction. The amount should be positive only. If this document is allocating in nature, then the amount should not be greater than the original document's outstanding amount. For this comparison, the absolute value of the amounts are considered. If this document is not allocating in nature, then there is no comparison at all.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> - Enter a valid settlement type code. Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a valid settlement type code. If the code entered is valid, then the short description is displayed for user verification. &#160;If settlement type is Cash settlement, then the settlement reference and remarks are blanked out and not accepted. If settlement type is not Cash oriented, then settlement reference and remarks are accepted.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Given</span> – Enter the amount of Cash received from the patient as an advance. The amount indicates the deposit amount collected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Returned</span> – Enter the amount returned to the patient or the Customer when the ‘Receipt/Refund’ is selected as ‘Refund’.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <img src="../../image121.gif" style="border: none;" alt="image121.gif" width="11" height="15" border="0" /> &#160;to capture the credit card machine details on swiping, if the credit card machine is interfaced. The connection is established on clicking &#160;<img src="../../image122.gif" style="border: none;" alt="image122.gif" width="11" height="15" border="0" />. An error message gets displayed, if the machine is not interfaced.</p>
+<ol start="22">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque/Card No</span> - Enter the Cheque number, Card number or the Bank Account number if the Settlement Type is Cheque, Card or Bank Transfer respectively. If the Settlement Type is Cash, you cannot record the details. For example, if the settlement is by Credit Card, enter the Credit Card identity and the Credit Card expiry date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Click the Calendar function to set the Date when the amount was settled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank/Card Co. Name/Branch</span> - If settlement type is non Cash, then this is Mandatory. Otherwise, this should be left blanks. For example, if the settlement is by Credit Card, enter the Credit Card company name. If the settlement is by Cheque enter the banks name or banks’ branch name. Click <span class="BoldNumberRFD">[List of Values]</span> to view and select an approved Credit Card company name or an approved bank or branch.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Approval</span> – If the check box is selected, Credit Card entered receipt will be forwarded to the Credit Card Company immediately. If the check box is cleared, Credit Card receipts will be forwarded as batch. &#160;In case of Online Approval, Batch No. information to be filled manually.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Batch No.</span> – If Online approval is selected, then the detail of Batch No. manually maintained for online approval to be entered here to process forwarding the receipt for collecting payment from Credit Card Company.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approval Code</span> – If the settlement is made through Credit Card, Approval code of the Credit Card to be entered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Draft No.</span> – When settlement is made by Credit Card, sale draft number details captured at the time of swiping to be recorded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer’s Name</span> - Enter the payer name. This field is to be entered if the receipt nature code is ‘MI’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer’s Ref Id</span> – When Payer name is captured, is having any reference ID, can be entered as input for this field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Through Mail</span> – The receipts received through post, for the settlement of bill or deposit can be recorded by checking this box. &#160;If &#160;the check box is selected , Medical Report Payment receipt will be printed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter a remark for this document. This remark is recorded as part of General Ledger distribution and also printed as part of the daily Cash collection report.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> -The document type code is displayed from the Billing Parameters depending on whether it is receipt or refund and whether it is inpatients or outpatients or miscellaneous. Referral patients are also considered as Outpatients for this purpose.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">During <span class="BoldNumberRFD">[Commit Form]</span>, the document number will be generated and the system validates that this document number is not duplicated.</p>
+<ol start="34">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Date</span> - System displays the document date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Counter/Shift</span> - The counter and the shift will be displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Post Month/Year</span> - The current processing period is displayed from the Billing parameters.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Narration</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to view bounced Cheque receipt.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Health care Application number</span> - This field will be enabled only when the receipt type is of ‘Miscellaneous nature’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patients deposit</span> - This field will be enabled only when the patient payment for the admission. This is the number field of format 15,2.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Original Doc No</span> - In case of receipts, original document number should be entered if the receipt is against a bill or deferred Cash patients bill. System validates that the original document number is valid and the patient details matches with that of the episode and patient details entered in the receipt document. System also validates that the outstanding amount is greater than 0.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">In case of refunds, original document number should be entered if the receipt is against a bill or a refundable deposit. System validates that the original document number is valid and the patient details matches with that of the episode and patient details entered in the refund document. <span style="font-weight: normal;">The Deposit Dtls button is enabled, if the patient’ receipt nature is of the ‘Deposit Type’.</span></p>
+<ol start="41">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Line number</span> - The line number defaults to the automatic sequence.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Date</span> - The service date will automatically defaulted to the current date and the time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing service</span> - Enter a valid billing service code. Else se;ect a value from &#160;<span class="BoldNumberRFD">[List of Values]</span>.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Quantity</span> - Enter the valid quantity.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Net amount</span> - The net amount will be automatically defaulted.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">When the <span class="BoldNumberRFD">[Close]</span> button is pressed, the system defaults to the current calculated amount.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Process details</p>
+<p class="BoldRFD" style="font-weight: normal;">During <span class="BoldNumberRFD">[Commit Form]</span>, the following checks are carried out on-line. The updates are discussed below based on receipts or refunds.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Receipts Update &#160;</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "AD", then a record is written into the Patients Ledger with this document details. The Financial Details of the patient are updated for the adjustable deposit according to the episode type. If Outpatients, Visit, Episode and Patient Financial Details are updated. If Inpatients, Episode and Patient Financial Details are updated. If Referrals, Patient Financial Details are updated.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "PR", then a record is written into the Patients Ledger with this document details. The Financial Details of the patient are updated for the prepayment amount according to the episode type. If Outpatients, Visit, Episode and Patient Financial Details are updated. If Inpatients, Episode and Patient Financial Details are updated. If Referrals, Patient Financial Details are updated.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "RD", then a record is written into the Patients Ledger with this document details. The Financial Details of the patient are updated for the refundable deposit amount according to the episode type. If Outpatients, Visit, Episode and Patient Financial Details are updated. If Inpatients, Episode and Patient Financial Details are updated. If Referrals, Patient Financial Details are updated.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "MI", then it has no relevance with Patients or Customers or Deferred Cash Patients. General Ledger distributions are created when the receipts are posted.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "BI", then the bill's outstanding amount is reduced by the document amount. As a result, if the amount's sign changes after the update, then it is an error.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "DC", then the deferred Cash patient's bill outstanding amount is reduced by the document amount. As a result, if the amount's sign changes after the update, then it is an error.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "CU", then there is no update at all. When the receipt document is posted, the receipt document is written onto the customer's account in Accounts Receivable module.</p>
+</li>
+</ul>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Refunds Update</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "RD", then the original document is updated. Before updating, system checks if the document amount and the outstanding amounts are the same for the original document. If not the same, it is considered to be an error. If no error, then the outstanding amount is set as zero for the original document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "MI", then it has no relevance with Patients or Customers or Deferred Cash Patients. General Ledger distributions are created when the refunds are posted.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If receipt nature code is "BI", then the bill's outstanding amount is increased by the document amount. As a result, if the amount's sign changes after the update, then it is an error.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">After the <span class="BoldNumberRFD">[Commit Form]</span> operation is successful, press Return to print the document. The document, depending on whether it is receipt or refund, is printed on the preprinted stationery. Users must ensure that the preprinted stationery are always loaded on the printer so that the document can be printed.</p>
+</li>
+</ul>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Once printed, the document cannot be recalled for correction.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

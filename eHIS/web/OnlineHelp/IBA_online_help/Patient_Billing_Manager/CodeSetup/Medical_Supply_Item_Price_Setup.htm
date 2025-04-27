@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Medical Supply Item Price Setup</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nCodeSetup\nMedical Supply Item Price Setup");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Medical Supply Item Price Setup</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Define</span> a charge for a medical item and <span class="RedItalic">Query</span> to view the Billing Details defined for the respective medical item.</p>
+<p class="Text">Medical Supply Item Price Setup function is used to define the price for the medical items defined in the Material Management module. An item code is associated to a Sale Category. The price is set up based on the sale name or the trade name. The prices defined using this function is considered as the base price for the medical item, if the sale category is selected as batch. Items consumed from any store associated to the facility are charged based on the parameters defined for the sale category using the function <a href="Material_Item_Charging_Rule_Setup.htm">Material Item Charging Rule Setup</a>. &#160;</p>
+<h2>Defining Medical Item Price</h2>
+<p class="From">From the Masters &gt; Interfaced Modules Financial Dtls, double-click Medical Supply Item Price Setup function.</p>
+<p class="Text">The Medical Supply Item Price Setup screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[List of Values]</span> to select an Item Code. The items defined in the Inventory Management module get listed. The description for the selected Item Code gets listed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The Item Type gets displayed as 'Medical Supply Item'.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The 'Status' of the Medical Supply Item is displayed based on the value selected during item definition in Inventory Management module.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to shift to the 'Sale Details by Item' or 'Sale Details by Trade Name' tab and define the prices for the medical supply items.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields found in the following tab pages.</p>
+</li>
+</ol>
+<p class="Text"><a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/Bl_Code_MaterialItemBillDtls_SaleDtlsByItem.htm',600,400);return false;">Sale Details by Item</a></p>
+<p class="Text"><a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/Bl_Code_MaterialItemBillDtls_SaleDtlsByTradeName.htm',600,400);return false;">Sale Details by Trade Name</a></p>
+<p class="Text"><a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/Bl_Code_MedicalSupplyItemPrice_IntercompanySetup.htm',400,300);return false;">Intercompany Setup</a></p>
+<ol start="4">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> or press <span class="BoldButton">[F10]</span> to save or <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to search for the existing records within the facility.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Item','../../Materials_Base/CodeSetup/Item.htm','Material Item Charging Rule Setup','Material_Item_Charging_Rule_Setup.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Setup/Amend Charge Factors for Materials Linked Services','Setup_Amend_Charge_Factors_for_Materials_Linked_Services.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div><script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a1');
+        FilePopupInit('a2');
+        FilePopupInit('a3');
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

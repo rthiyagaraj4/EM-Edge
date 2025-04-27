@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false" monitoring="autodetect"
+         dynamicConfig="false">
+         
+         <diskStore path="user.home"/>
+         
+         <cacheManagerEventListenerFactory class="" properties=""/>
+         
+         <!-- Define the mandatory element - default cache -->
+		 <defaultCache
+        	maxElementsInMemory="1000"
+			maxElementsOnDisk="10000"
+            eternal="false"
+			overflowToDisk="true"
+			timeToIdleSeconds="1800"
+            timeToLiveSeconds="7200"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="1800"
+            memoryStoreEvictionPolicy="LRU" />
+
+		<!-- Http SessionCache Definitions -->
+		<cache name="http.session.cache"
+			maxElementsInMemory="500"
+			maxElementsOnDisk="1000"
+        	eternal="false"
+			overflowToDisk="true"
+			timeToIdleSeconds="43200"
+        	timeToLiveSeconds="0"
+        	diskPersistent="false"
+        	diskExpiryThreadIntervalSeconds="7200"
+        	memoryStoreEvictionPolicy="LRU">
+		</cache>
+	
+		<!-- Label Cache Definitions -->
+		<cache name="label.cache"
+			maxElementsInMemory="10000"
+			maxElementsOnDisk="10000"
+        	eternal="false"
+			overflowToDisk="true"
+			timeToIdleSeconds="1800"
+        	timeToLiveSeconds="7200"
+        	diskPersistent="false"
+        	diskExpiryThreadIntervalSeconds="1800"
+        	memoryStoreEvictionPolicy="LRU" >		
+		</cache>	
+
+		<!-- Message Cache Definitions -->
+		<cache name="message.cache"
+			maxElementsInMemory="5000"
+			maxElementsOnDisk="1000"
+        	eternal="false"
+			overflowToDisk="true"
+			timeToIdleSeconds="1800"
+        	timeToLiveSeconds="7200"
+        	diskPersistent="false"
+        	diskExpiryThreadIntervalSeconds="1800"
+        	memoryStoreEvictionPolicy="LRU" >		
+		</cache>
+                  
+         
+</ehcache>

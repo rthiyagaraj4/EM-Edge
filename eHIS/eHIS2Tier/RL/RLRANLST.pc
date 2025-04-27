@@ -1,0 +1,975 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+   File	  : rlranlst.pc
+   Author : S.Sheelvant 
+   Date Created : 20/11/1997
+
+   Date Modified : 29/05/2003
+   Modified by   : HAMEED
+
+   Ver 1.10.01  
+   
+   Purpose : To generate a report for Analyzer Statistics. 
+
+   Input Parameters : 
+            Command line inputs
+             1. Usr_id/Password
+             2. Session id
+             3. Program Date
+            Parameters from SY_PROG_PARAM table 
+             4. Instrument Code. 
+             5. Range of Process Dates 
+  
+   Table Accessed : RL_REQUEST_HEADER,RL_ONLINE_INSTRUMENT,
+		    RL_ONLINE_INSTRUMENT_TEST,RL_TEST_RESULT.
+
+   Output File : rlranlst.lis
+*****************************************************************************/  
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <gl.h>
+
+#define MAX_LINES 56
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+#define REP_WIDTH 80
+
+/*
+#define DEBUG 1 
+*/
+
+#define MAX_TESTS 23
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    /* increased the length all varchar variables by one to take care */
+    /* for null termination */
+	VARCHAR     nd_operating_facility_id   [3],
+	            uid_pwd                    [91],
+                nd_file_name               [151],
+                nd_user	                   [15],
+                nd_file_no                 [15],
+                nd_printer_name            [16],
+				d_version_no			   [20],
+				d_version  			       [20],
+
+
+        /* input parameters to main() */
+        nd_session_id      	            [16],
+		nd_pgm_date	   	                [20],
+
+		/* input parameters through from SY_PROG_PARAM */
+		nd_instr_code           [9],
+ 		nd_fr_process_date    	[11],
+ 		nd_fr_process_date1    	[11],
+		nd_to_process_date    	[11],
+		nd_to_process_date1    	[11],
+        nd_dept                 [2],
+        nd_spec_prfx            [2],
+		nd_fr_specimen_no       [21], 
+ 		nd_to_specimen_no       [21],
+
+ 
+		d_short_desc            [16],
+		d_inst_code             [9],
+
+		/* for header routine */
+	    //d_acc_entity_name        [41],
+		d_acc_entity_name        [300],
+		d_user                   [31],
+		d_sysdate                [11],
+		d_sysdate1                [11],
+		/* For coversion */
+		l_translated_value		 [100],
+		language_id			[5];
+
+
+	 int    d_no_of_requests, d_tests,d_temp;
+     int l_specimen_length = 0;
+     int l_count = 0;
+
+	 int  l_tab_exists ;
+
+	 int i;
+char local_legend[100][100];
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1];
+int col;
+char rep_title1[100] ;
+char rep_title2[60];
+int rec_len;
+
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+int   line_no=0, page_no=0;
+int   first_page_flag=1;
+long  nd_totl_specimens      = 0;
+
+int   l_length = 0;
+int   i;
+
+
+/* summary fields for calculating No. of records */ 
+void print_page_header();
+void print_col_heading();
+FILE *f1;
+char string_var[100] ;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+    void  get_params(),
+/*  get_specimen_prefix(), */
+  	get_header_dtls(),
+  	dclr_statistics_cursor(),
+	dclr_instruments_cursor(),
+  	do_report();
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   strcpy(OUTPUT_FILE_NAME, argv[5]);
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;
+
+   #ifdef DEBUG
+    printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+   #endif  
+
+   set_meduser_role();
+   strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+	
+   get_legend_value(24);
+
+   #ifdef DEBUG
+    printf("I am here main() 0\n");
+    fflush(stdout);
+   #endif  
+
+   get_params();
+   
+   /**
+   EXEC SQL EXECUTE
+   BEGIN
+    SM_SECURITY_POLICY.SET_CTX_FOR_FACILITY_ID(:nd_operating_facility_id);
+   END;
+   END-EXEC;
+   **/
+
+/*   get_specimen_prefix();*/
+
+   #ifdef DEBUG
+    printf("I am here main() 1");
+    fflush(stdout);
+   #endif  
+
+   gen_file_name();
+   
+/*increment_file_no();*/
+
+   get_header_dtls();
+
+   #ifdef DEBUG
+    printf("I am here main() 2");
+    fflush(stdout);
+   #endif  
+
+/*   dclr_statistics_cursor(); */
+   dclr_instruments_cursor();
+
+   #ifdef DEBUG
+    printf("I am here main() 3");
+    fflush(stdout);
+   #endif  
+
+   do_report();
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK;
+
+   fclose(f1);
+   return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Error Occured at main()") ;
+   proc_exit() ;
+}   
+
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT 
+                   OPERATING_FACILITY_ID,
+                   PARAM1,
+		           PARAM2,
+		           PARAM3,
+		           PARAM4
+            INTO  :nd_operating_facility_id,
+		          :nd_instr_code, 
+                  :nd_fr_process_date,
+                  :nd_to_process_date,
+		          :nd_dept 
+		 FROM SY_PROG_PARAM
+	    WHERE PGM_ID = 'RLRANLST'
+		  AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		  AND PGM_DATE = :nd_pgm_date;
+
+   nd_instr_code.arr[nd_instr_code.len]     = '\0';
+   nd_fr_process_date.arr[nd_fr_process_date.len]   = '\0';
+   nd_to_process_date.arr[nd_to_process_date.len]   = '\0';
+   nd_dept.arr[nd_dept.len]                         = '\0';
+   nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+
+  #ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf("nd_instr_code :%s\n", nd_instr_code.arr);
+   printf("nd_fr_process_date :%s\n", nd_fr_process_date.arr);
+   printf("nd_to_process_date : %s\n", nd_to_process_date.arr);
+  #endif
+
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE SY_PROG_PARAM
+	        WHERE PGM_ID = 'RLRANLST'
+	        AND SESSION_ID = :nd_session_id
+		    AND PGM_DATE   = :nd_pgm_date;
+
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit() ;
+}
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL  WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL  SELECT ACC_ENTITY_NAME, /* description of the institution */
+		     USER,
+		     TO_CHAR(SYSDATE, 'DD/MM/YYYY')
+	    INTO :d_acc_entity_name,
+		     :d_user,
+		     :d_sysdate
+            FROM SY_ACC_ENTITY_LANG_VW
+            WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			AND   LANGUAGE_ID = :language_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+  #ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+  #endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit() ;
+}
+
+void dclr_instruments_cursor()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL DECLARE INSTRUMENTS CURSOR FOR
+     SELECT INSTRUMENT_CODE,SHORT_DESC 
+       FROM RL_ONLINE_INSTRUMENT_LANG_VW
+      WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+	   AND INSTRUMENT_CODE BETWEEN NVL(:nd_instr_code,'!!!!!!!!') 
+	   AND NVL(:nd_instr_code,'~~~~~~~~')
+       AND SECTION_CODE = :nd_dept
+	   AND NVL(STATUS,'*') != 'S'
+	   AND LANGUAGE_ID = :language_id;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL OPEN INSTRUMENTS;
+
+  #ifdef DEBUG
+    printf("leaving dclr_instruments_cursor()\n");
+  #endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_instruments_cursor() occured....\n");
+   proc_exit() ;
+}
+
+/* function declares statistics cursor */
+void dclr_statistics_cursor()
+{  
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL SELECT NVL(specimen_length, 15)
+	     INTO :l_specimen_length
+	     FROM RL_PARAM;
+
+  l_length = l_specimen_length -  strlen(nd_spec_prfx.arr);
+
+  
+  if(strlen(nd_fr_specimen_no.arr) == 0)
+  {
+
+/**
+      strcpy(nd_fr_specimen_no.arr,nd_spec_prfx.arr);
+
+	for (i=1; i<= l_length; i++)
+	{
+  	   strcat(nd_fr_specimen_no.arr,"0");
+	}
+**/
+	for (i=1; i<= l_specimen_length; i++)
+	{
+  	   strcat(nd_fr_specimen_no.arr,"0");
+	}
+
+    nd_fr_specimen_no.len = strlen(nd_fr_specimen_no.arr);
+  }
+
+  if(strlen(nd_to_specimen_no.arr) == 0)
+  {
+/**
+     strcpy(nd_to_specimen_no.arr,nd_spec_prfx.arr);
+
+	for (i=1; i<= l_length; i++)
+	{
+  	   strcat(nd_to_specimen_no.arr,"9");
+	}
+**/  
+	for (i=1; i<= l_specimen_length; i++)
+	{
+  	   strcat(nd_to_specimen_no.arr,"9");
+	} 
+    nd_to_specimen_no.len = strlen(nd_to_specimen_no.arr);
+
+  }
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL DECLARE STATISTICS CURSOR FOR
+     SELECT COUNT(*) 
+       FROM RL_TEST_RESULT
+      WHERE NVL(CANCELLED_YN,'N') != 'Y' 
+	             AND SPECIMEN_NO IN (
+						    SELECT SPECIMEN_NO 
+						    FROM RL_REQUEST_HEADER
+/*************** code commented for KN ENHANCEMENT **********
+					          WHERE SPECIMEN_NO BETWEEN
+				    :nd_spec_prfx||'00000000' AND
+				    :nd_spec_prfx||'99999999'
+*************************************************************/
+					        WHERE SPECIMEN_NO BETWEEN
+							:nd_fr_specimen_no AND :nd_to_specimen_no
+				            AND SPEC_REGD_DATE_TIME BETWEEN
+				            TO_DATE(:nd_fr_process_date,
+					        'DD/MM/YYYY') AND
+                            TO_DATE(:nd_to_process_date,'DD/MM/YYYY') + 1
+				            AND SECTION_CODE = :nd_dept
+				            AND NVL(CANCELLED_YN,'N') != 'Y' 
+                            )
+	              AND TEST_CODE IN (
+			                SELECT TEST_CODE 
+			                FROM RL_ONLINE_INSTRUMENT_TEST
+                            WHERE INSTRUMENT_CODE = :d_inst_code
+			                AND SECTION_CODE = :nd_dept)
+
+/** Commented on 18/08/2004 since Test code is made Unique across section
+
+	              AND SECTION_CODE = :nd_dept
+**/
+                  AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				  GROUP BY SPECIMEN_NO
+                  HAVING COUNT(*) = :d_tests;
+
+  #ifdef DEBUG
+    printf("leaving dclr_statistics_cursor()\n");
+  #endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_statistics_cursor() occured....\n");
+   proc_exit() ;
+}
+
+
+/* prints the master-detail record until the cursor is empty */
+void do_report()
+{
+  void prepare_new_page();
+  void print_detl_rec();
+  void end_report();
+  void print_rep_header() ;
+  int fetch_instruments_cursor();
+  int still_instruments_left;
+
+
+  #ifdef DEBUG
+      printf("entered do_report()\n");
+  #endif
+  
+  /* read the first cursor record */
+  
+  still_instruments_left = fetch_instruments_cursor();
+  
+  #ifdef DEBUG
+      printf("entered do_report()\n");
+      fflush(stdout);
+  #endif
+  print_rep_header();
+  while(still_instruments_left)
+  {
+       page_no += 1; /* icrement by 1 as it is moving to second page */
+       line_no = 6;
+       print_page_header();
+       print_col_heading();
+       line_no +=3; /*incr. by 4 as col. headings occupy 4 lines */ 
+       if(line_no >= MAX_LINES)
+       {
+          prepare_new_page();
+          print_detl_rec();
+       }
+       else 
+          print_detl_rec();
+   
+    fprintf(f1,"");
+    still_instruments_left = fetch_instruments_cursor();
+  }
+  
+  #ifdef DEBUG
+      printf("entered do_report outside while()\n");
+      fflush(stdout);
+  #endif
+}
+
+/* prepares for the new page */
+void prepare_new_page()
+{
+   #if DEBUG
+     printf("entered prepare_new_page\n");
+     fflush(stdout);
+   #endif
+
+   page_no += 1; /* incr. by 1 to move to subsequent pages */
+   fprintf(f1,"");
+   print_page_header();
+   print_col_heading(); 
+   line_no = 9;
+}
+
+/* fetches the next record from INSTRUMENTS CURSOR */
+/* returns 0 if the end of cursor is reached else returns 1. */
+int fetch_instruments_cursor()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH INSTRUMENTS INTO
+                 :d_inst_code,:d_short_desc;
+   #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+   #endif
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_inst_code.arr[d_inst_code.len] = '\0';
+  d_short_desc.arr[d_short_desc.len] = '\0';
+
+#ifdef DEBUG
+ printf("d_short_desc = %s\n",d_short_desc.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_instruments_cursor() occured....\n");
+   proc_exit() ;
+}
+
+/* fetches the next record from STATISTICS CURSOR */
+/* returns 0 if the end of cursor is reached else returns 1. */
+int fetch_statistics_cursor()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH STATISTICS INTO :d_temp;
+   #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+   #endif
+
+  if (NODATAFOUND)
+    return 0;
+
+#ifdef DEBUG
+ printf("d_temp = %d\n",d_temp);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_statistics_cursor() occured....\n");
+   proc_exit() ;
+}
+
+/* to print the detailed record */
+void print_detl_rec()
+{
+   int fetch_analyzer_tests();
+   void dclr_analyzer_tests();
+
+   dclr_analyzer_tests();
+
+   while(fetch_analyzer_tests())
+   {
+      fprintf(f1,"%10d%-20.20s%10d\n\n",d_tests," ",d_no_of_requests);
+      line_no += 2;
+   }
+   close_stat_cursor();
+
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_detl_rec() occured....\n");
+   proc_exit() ;
+}
+
+
+/************get_legend_value*******************/
+get_legend_value(int cou)
+ {
+     
+   
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRCRBAT.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+
+ for (i=1; i<=cou; i++)
+	{
+
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRCRBAT.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+
+	
+
+	}
+	
+
+ }
+/****************End****************/
+/**********PRINT SPACE*************/
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(f1,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(f1,"%s","-");
+		}	
+	}
+}
+/**************end***********************/
+void dclr_analyzer_tests()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL DECLARE STAT CURSOR FOR
+      SELECT no_of_tests, no_of_requests
+      FROM RL_ANALYZER_STAT
+      WHERE month BETWEEN
+	  TO_NUMBER(TO_CHAR(TO_DATE(:nd_fr_process_date, 'DD/MM/YYYY'), 'MM'))
+	  AND TO_NUMBER(TO_CHAR(TO_DATE(:nd_to_process_date, 'DD/MM/YYYY'), 'MM'))
+      AND year BETWEEN
+	  TO_NUMBER(TO_CHAR(TO_DATE(:nd_fr_process_date, 'DD/MM/YYYY'), 'YYYY'))
+	  AND TO_NUMBER(TO_CHAR(TO_DATE(:nd_to_process_date, 'DD/MM/YYYY'), 'YYYY'))
+      AND instrument_code = :d_inst_code
+	  AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+      ORDER BY no_of_tests;
+
+ EXEC SQL OPEN stat;
+
+  #ifdef DEBUG
+    printf("leaving dclr_analyzer_test()\n");
+  #endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_analyzer_cursor() occured....\n");
+   proc_exit();
+
+}
+/*-----------------------------------------------------------*/
+
+/*-----------------------------------------------------------*/
+int fetch_analyzer_tests()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH stat INTO :d_tests, :d_no_of_requests;
+
+   #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+   #endif
+
+  if (NODATAFOUND)
+    return 0;
+
+#ifdef DEBUG
+ printf("d_tests = %d\n",d_tests);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_analyzer_tests() occured....\n");
+   proc_exit();
+}
+/*-----------------------------------------------------------*/
+
+close_stat_cursor()
+{
+  EXEC SQL CLOSE stat;
+}
+
+
+/* print the heading */
+void print_col_heading()
+{
+
+ /* line 1 */
+fprintf(f1,"%-17.17s            %-18.18s  \n",local_legend[2],local_legend[3]);
+ /* line 2 */
+fprintf(f1,"-----------------            ------------------\n");
+}
+
+/*--------------------------------------------------------------------------*/
+gen_file_name()
+{
+/*     nd_file_name.arr[0]   = '\0';
+     nd_file_name.len      = 0;
+     EXEC SQL SELECT DECODE(PRINT_FILE_NO,NULL,'0',TO_CHAR(PRINT_FILE_NO)),
+		      LOWER(USER)
+	          INTO :nd_file_no,:nd_user
+	           FROM   RL_PARAM;
+
+     if (OERROR)
+         err_mesg("Fetch failed on table RL_PARAM",0,"");
+      
+     nd_file_no.arr[nd_file_no.len] = '\0';
+     nd_user.arr[nd_user.len] = '\0';
+     sprintf(nd_file_name.arr,"rlranlst_%s.lis",nd_file_no.arr);
+     nd_file_name.len = strlen(nd_file_name.arr);*/
+
+	 /* For a constant file name (4 lines) */
+  	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+     nd_file_name.len = strlen(nd_file_name.arr);
+	 //strcat(nd_file_name.arr,"rlranlst.lis");
+	 strcat(nd_file_name.arr,OUTPUT_FILE_NAME);
+	 nd_file_name.len = strlen(nd_file_name.arr);
+     if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit() ;
+     }
+}
+/*--------------------------------------------------------------------------*/
+
+increment_file_no()
+{
+/*
+EXEC SQL UPDATE RL_PARAM
+		SET PRINT_FILE_NO = NVL(PRINT_FILE_NO,0) + 1;
+*/
+if (OERROR)
+       err_mesg("Update failed on table RL_PARAM",0,"");
+
+EXEC SQL COMMIT WORK;
+      if (OERROR)
+         err_mesg("COMMIT failed",0,"");
+}
+/*--------------------------------------------------------------------------*/
+/***
+void get_specimen_prefix()
+{
+     nd_spec_prfx.arr[0]   = '\0';
+     nd_spec_prfx.len      = 0;
+     EXEC SQL SELECT SPECIMEN_PREFIX
+	        INTO :nd_spec_prfx
+	        FROM RL_SECTION_CODE_LANG_VW
+	       WHERE SECTION_CODE = :nd_dept
+		   AND   LANGUAGE_ID = :language_id;
+     if (OERROR)
+         err_mesg("get_specimen_prefix() Fetch fail on RL_SECTION_CODE",0,"");
+      
+     nd_spec_prfx.arr[nd_spec_prfx.len] = '\0';
+}
+***/
+/*********** PRINT REPORT HEADER **************/
+void print_rep_header()
+{
+  char nd_fr_process_date_desc[11],
+       nd_to_process_date_desc[11];
+
+  if(strcmp(nd_fr_process_date.arr, "01/01/1800") == 0)
+    strcpy(nd_fr_process_date_desc, "LOWEST");
+    else 
+	  //Added by babu---------
+		EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_fr_process_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+				:nd_fr_process_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				END;
+			END-EXEC;
+
+		//End
+
+	strcpy(nd_fr_process_date_desc, nd_fr_process_date1.arr);
+
+  if(strcmp(nd_to_process_date.arr, "31/12/4712") == 0)
+    strcpy(nd_to_process_date_desc, "HIGHEST");
+    else 
+	//Added by babu---------
+		EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_to_process_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+				:nd_to_process_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				END;
+			END-EXEC;
+
+		//End
+
+	
+	strcpy(nd_to_process_date_desc, nd_to_process_date1.arr);
+
+  #ifdef DEBUG
+      printf("before report header()\n");
+  #endif
+  page_no++ ;
+  print_page_header();
+
+  #ifdef DEBUG
+      printf("after page header()\n");
+  #endif
+
+  get_version_no();   ///// added 01.07.2003
+
+///// 01.07.2003  fprintf(f1,VER);
+
+  fprintf(f1,"%s\n",d_version.arr);
+
+  fprintf(f1,"\n\n\n\n");
+ /********commented by babu for globalization 
+  fprintf(f1,"        ");
+  fprintf(f1,"INPUT PARAMETERS :\n");
+  fprintf(f1,"        ");
+  fprintf(f1,"------------------\n\n");
+  fprintf(f1,"                ");
+  fprintf(f1,"ANALYZER          : %s\n", nd_instr_code.arr);
+  fprintf(f1,"\n");
+  fprintf(f1,"                ");
+  fprintf(f1,"PROCESS DATE FROM : %s\n", nd_fr_process_date_desc);
+  fprintf(f1,"                ");
+  fprintf(f1,"               TO : %s\n", nd_to_process_date_desc); 
+  ***************end******************/
+
+  /***********added by babu for globalization*********************/
+
+  rec_len = strlen(local_legend[4]);
+  print_space(40, rec_len,1);
+  fprintf(f1,"%s :\n",local_legend[4]);
+  rec_len = strlen(local_legend[4]);
+  print_space(40, rec_len,1);
+  print_space(40, rec_len,0);
+  fprintf(f1,"\n");
+  rec_len = strlen(local_legend[5]);
+  print_space(40, rec_len,1);
+  fprintf(f1,"%s : %s\n",local_legend[5],nd_instr_code.arr);
+  rec_len = strlen(local_legend[6]);
+  print_space(40, rec_len,1);
+  fprintf(f1,"%s : %s\n",local_legend[6],nd_fr_process_date_desc);
+  rec_len = strlen(local_legend[7]);
+  print_space(40, rec_len,1);
+  fprintf(f1,"%s : %s\n",local_legend[7],nd_to_process_date_desc);
+  
+  fprintf(f1,"\n");
+  
+}
+/********************end**************************.
+  fprintf(f1,"\f");
+}
+
+/************ PRINT PAGE HEADER **************** (ONCE FOR THE REPORT)*/
+void print_page_header()
+{
+ char buf[100];
+ char legend[100];
+ fprintf(f1,"\n") ;	
+ /****************commented by babu for globalization***************
+ fprintf(f1,"MDL : RL                                         ");
+ fprintf(f1,"%-30.30s", d_acc_entity_name.arr);
+ fprintf(f1,"                                     ") ;
+ fprintf(f1,"%s", d_sysdate.arr);
+ fprintf(f1,"\n");
+ fprintf(f1,"OPR : %s", d_user.arr);
+ fprintf(f1,"                ");
+ fprintf(f1,"%-15.15s STATISTICS FOR THE PERIOD %10s - %10s",
+	   d_short_desc.arr,nd_fr_process_date.arr,nd_to_process_date.arr);
+ fprintf(f1,"                        Page : %d", page_no);
+ fprintf(f1,"\n");
+ fprintf(f1,"REP : RLRANLST");
+ ****************end comments**********************************/
+
+
+/****************added by babu for globalization***************/
+
+ 		memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+		
+		strncpy(hdr_line1,"MDL:RL",6);
+        col = (int)(REP_WIDTH - strlen(d_acc_entity_name.arr))/2;
+        strncpy(hdr_line1 + col -1,d_acc_entity_name.arr,strlen(d_acc_entity_name.arr));
+        EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				
+				BEGIN
+				t_date:=GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+				:d_sysdate1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				END;
+			END-EXEC;
+		col = (REP_WIDTH-strlen(d_sysdate1.arr));
+		strcpy(hdr_line1+col,d_sysdate1.arr);
+		
+		strncpy(hdr_line2,"OPR:",4);
+		strncpy(hdr_line2+4,d_user.arr,strlen(d_user.arr));
+		strcpy(rep_title1, local_legend[8] );
+		sprintf(legend,"%s %s",nd_fr_process_date1,nd_to_process_date);
+		strcat(rep_title1,legend);
+		col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+		strncpy(hdr_line2+col,rep_title1,strlen(rep_title1));
+		sprintf(buf,"%s : %4d",local_legend[1],page_no);
+		strcpy(hdr_line2+(REP_WIDTH-strlen(buf)),buf);
+
+		fprintf(f1,"\n");
+		fprintf(f1,"REP : RLRANLST");
+ 
+
+
+ fprintf(f1,"\n");
+ fprintf(f1,"-------------------------------------------------------------------------------");
+ fprintf(f1,"-----------------------------------------------");
+ fprintf(f1,"\n");
+}
+
+//////////////////  01.07.2003
+
+get_version_no()
+{
+
+////////    This function is used to get the version number of the product.
+///////      Added by Srinivas on 1 July 2003
+
+     d_version_no.arr[0] = '\0';
+     d_version_no.len    =  0;
+
+     strcpy(d_version.arr,"VER : ");
+
+	 EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC;
+
+
+    if (l_tab_exists) 
+    {
+	    EXEC SQL SELECT VERSION_NO INTO :d_version_no 
+                 FROM   SM_INSTALLATION; 
+        d_version_no.arr[d_version_no.len] = '\0';
+    }
+    else
+	    strcpy(d_version_no.arr,"2.1");
+
+	    strcat(d_version.arr,d_version_no.arr);
+
+
+    if (OERROR)
+	{
+	    strcpy(d_version_no.arr,"2.1");
+	    strcat(d_version.arr,d_version_no.arr);
+    }
+
+}
+//////////// UPTO HERE   

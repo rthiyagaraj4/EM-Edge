@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Process Referrals/Non-Referrals</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Outpatient Management\nProcess Referrals/Non-Referrals");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Process Referrals/Non Referrals</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Modify 
+ </span>the Visit Referral Status to ‘Referrals’/‘Non-Referrals’ as required. 
+ &#160;.</p>
+<p class="Text">This function allows user to modify the ‘Referral visits’ 
+ to ‘Non-referral’ and ‘Non-referral visits’ to ‘Referral’ post visit registration.</p>
+<p class="Text">On searching, the data will be displayed only if below 
+ conditions are satisfied.</p>
+<ul type="disc">
+	<li><p class="Text">Only OP visit encounters will be displayed.</p></li>
+	<li><p class="Text">Only Primary/Specialized Category visits of both 
+	 Clinic and Procedure unit will be displayed.</p></li>
+	<li><p class="Text">Cash and Insurance specific encounters will be 
+	 displayed. But Cash encounters will be in non-editable field. </p></li>
+	<li><p class="Text">Also, OP Checked Out visits and Insurance bill 
+	 posted visits will will be displayed. But the Insurance bill will 
+	 not be posted from Billing side. If Insurance bill is posted then 
+	 those records will be displayed, and it will be in non-editable mode.</p></li>
+	<li><p class="Text">Only first visit encounters will be displayed.</p></li>
+</ul>
+<h2>Modifying Visit Referral Status</h2>
+<p class="From">From the OP Transactions, select the Process Referrals 
+ / Non-Referrals function.</p>
+<p class="Text">The Process Referrals / Non-Referrals screen gets displayed.</p>
+<ol>
+	<li class="p-Number"><p class="Number">Select the Visit Date [From- 
+	 To] range by clicking the calendar icon. Two weeks date range can 
+	 be selected.</p></li>
+	<li class="p-Number"><p class="Number">Episode ID – Enter the encounter 
+	 ID of the specific visit. </p></li>
+	<li class="p-Number"><p class="Number">Click <span style="font-weight: bold;"><b>[Search]</b></span> 
+	 to view patients records matching the entered search criteria.</p></li>
+	<li class="p-Number"><p class="Number">The search result includes Patient 
+	 ID, Patient Name, Epsiode ID, Clinic, Practitioner, Visit Date Time, 
+	 Customer Group, Customer, Policy, Referral, and Referral Details.</p></li>
+	<li class="p-Number"><p class="Number">Select the ‘Modify’ option against 
+	 the required patient record to change the visit referral status. The 
+	 ‘Modify’ option is disabled for cash patients.</p></li>
+	<li class="p-Number"><p class="Number">On selecting ‘Modify’, the ‘Authorization’ 
+	 dialog gets invoked if the user is a non-privileged user. Enter the 
+	 User ID, Pin and Remarks in the dialog and click [<span style="font-weight: bold;"><b>OK]</b></span>. 
+	 On successful pin verification, user can change the referral status 
+	 of the encounter. While modifying each record, 'Authorization' is 
+	 required. </p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />If user is having 
+ privileges to access the screen, then the Authorization window will not 
+ appear.</p>
+<ol start="7">
+	<li class="p-Number"><p class="Number">Changing ‘Referral’ status to 
+	 ‘Non-referral’ status - If the current Referral status is ‘Yes’ and 
+	 user is trying to change it to ‘No’, then after successful authorization, 
+	 a prompt message will appear to confirm to move status from ‘Referral’ 
+	 to ‘Non-Referral’. Click OK, system will delink the encounter from 
+	 the visit and update the visit as non-referral. The subsequent visits 
+	 of the encounter will also be non-referral.</p></li>
+</ol>
+<ol start="8">
+	<li class="p-Number"><p class="Number">Changing ‘Non-referral’ to ‘Referral’ 
+	 status - If the current referral status is ‘No’ and user tries to 
+	 update it as ‘Yes’, then Referral Search screen will get invoked.</p></li>
+</ol>
+<ul type="disc">
+	<li><p class="Text">In the Referral Search screen, visits details (Specialty, 
+	 Service, Location, Location type, Patient ID) data will get defaulted 
+	 in the filters. Click the <span style="font-weight: bold;"><b>[Search]</b></span> 
+	 button, against the selected data if any referral is already available 
+	 it will get displayed. Select the referral and the referral ID will 
+	 be linked to the encounter. The encounter will be considered as referral 
+	 and the subsequent visits will also be considered as referral.</p></li>
+	<li><p class="Text">Instead of Search button, user can also click the 
+	 <span style="font-weight: bold;"><b>[Register Patient Referral]</b></span> 
+	 button. The Register Patient Referral window gets invoked where user 
+	 can create a new referral and link it to the encounter.</p></li>
+	<li><p class="Text">In the Register Patient Referral window, visit 
+	 details of the encounter (Specialty, Location, Location Type, Service) 
+	 will get auto defaulted in the ‘Referred To’ tab. User can update 
+	 the other details and click <span style="font-weight: bold;"><b>[Apply]</b></span>. 
+	 A new referral ID will be registered and linked to the encounter and 
+	 the encounter’s referral status will be considered as referral.</p></li>
+</ul>
+<hr align="center" />
+<p class="Text">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

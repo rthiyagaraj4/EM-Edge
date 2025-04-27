@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OR_PCM_Orders_MedicationOrdering_Orderable</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<p class="BoldRFD">Enter the following details to record the Orderable Information:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Pregnancy Details – Displays the pregnancy details in red colour based on the set up done for the pregnancy category against each trimester within the Drug screen and based on the selection of ‘Display of no pregnancy record details in Pharmacy Orders’ parameter in the PH Parameter screen.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the patient is not pregnant, the text ‘Pregnant = NO’ will be displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the patient is pregnant, the pregnancy details will be displayed as shown below:</p>
+</li>
+</ol>
+<p class="BulletRFD" style="text-align: left; margin-left: 80px;"><img src="../../image9.jpg" style="border: none;" alt="image9.jpg" width="181" height="69" border="0" /></p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the Practitioner has not recorded the pregnancy details, ‘No Record of Pregnancy’ message is &#160;displayed based on the selection of ‘Display of no pregnancy record details in Pharmacy Orders’ parameter in the PH Parameter screen. This message will be displayed only for the patients who fall in the range of age 12-65 yrs set in the Master Patient Index (MPI) Parameter.</p>
+</li>
+</ul>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Height</span> – The latest height value recorded of the patient using the function ‘Vital Sign’ of Clinician Access module is displayed. If height of the patient is not recorded, then enter the value in numeric value of three digits maximum length. The entered value is validated with the range defined for the order format item that is associated to the pharmacy category at header level in ‘Order Entry Format Item’ master function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Weight</span> - The latest weight value recorded of the patient using the function ‘Vital Sign’ of Clinician Access module is displayed. If weight of the patient is not recorded, then enter the value in numeric value of three digits maximum length. The entered value is validated with the range defined for the order format item that is associated to the pharmacy category at header level in ‘Order Entry Format Item’ master function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">BSA (Body Surface Area)</span> – The body surface area is calculated automatically and displayed by the system on specifying the height and weight values.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">BMI (Body Mass Index)</span> - The body mass index is calculated automatically and displayed by the system on specifying the height and weight values.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> - Select the priority of prescription from the list The listed values are ‘Routine’ and ‘Urgent’. The specified priority is set at header level.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date/Time</span> - The current system date/time is displayed by default. It indicates the prescription date and time. The displayed period can be pre-dated or post-dated based on the rules specified for pre-dating and post-dating orders. These rules are specified in the function ‘OR Parameter’ (Time period for Orders/Results). Specify the required period in date format of dd/mm/yyyy hh:mm. Alternatively, use the calendar function to search for the required period.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discharge Medication</span> - This check box is enabled based on the following conditions:</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<table style="vertical-align: top; left: 0px; top: 455px; margin-left: 40px;" cellspacing="0" width="768">
+<col style="width: 36.172%;" />
+<col style="width: 63.828%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000;width: 36.172%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Patient Class</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 63.828%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Take Discharge Medication</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td colspan="2" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 100%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Outpatient</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 36.172%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Currently an outpatient</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 63.828%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Disabled</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td colspan="2" style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 100%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 36.172%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Inpatient</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 63.828%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">&#160;</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 36.172%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Currently an Inpatient</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 63.828%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Disabled</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 36.172%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Inpatient but discharge advice prepared</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 63.828%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">The check box is checked and enabled by default. The practitioner can release the prescription as Take Home Medication. If the check box is cleared then, the prescription is treated as a regular inpatient prescription.</p>
+</td>
+</tr>
+</table>
+<p class="Text">&#160;</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Home Leave Medication</span> – This check box is visible only if the patient has recorded home leave using Inpatient Management module. This check box is cleared by default.</p>
+</li>
+</ol>
+<ol start="11">
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the patient has recorded for a home leave and if the practitioner places order and the order date falls within the recorded current leave, then a prompt message is displayed to indicate the doctor that the patient has applied for home leave. On clicking OK, the Home Leave Medication check box gets selected. The ordering drugs are considered as Home Leave Medication and as an inpatient order.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the recorded leave date is of future date, then a prompt message is displayed to indicate the doctor that the patient is planned to go on home leave. The starting date of the future leave schedule is defaulted for the order. The order is considered as future home leave medication order.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If there are multiple leaves recorded for the patient and if the order date falls within one of the leaves schedule, the starting date of that leave is defaulted for the order.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If the doctor changes the date manually after the Home Leave Medication check box is selected and that date does not fall within the home leave schedule, then a prompt message is displayed. On clicking OK, the Home Leave Medication check box gets cleared and the order is treated as normal order.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">This functionality is applicable only for normal Rx.</p>
+</li>
+</ol>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Known Case of Allergy</span> – If the patient is allergic to stimulants, then select ‘Yes’. Else, select ‘No’. For patients with drug allergies, you need to record allergy before prescribing drug(s). Only on recording allergy(s), drugs can be prescribed. &#160;If patient is not allergic to any stimulant, then select ‘No’. For non-allergic cases, the practitioner can prescribe drugs without allergy(s) recording. Once you record an Adverse Event, the system displays a pop-up message: “Patient ever had &#160;a drug’s allergy”. If you click ‘No’, the system records and displays the Known case of Allergy in red colour in the Pharmacy Orders screen. If you click ‘Yes’, the system displays the Adverse Event function where you can enter the allergy details.</p>
+</li>
+</ol>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Clinical Comments</span> - On clicking the ‘Clinical command’, the Clinical Comments screen as shown below gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">A</span><span style="text-decoration: underline;"><u>DR</u></span> – Click ‘ADR’ hyperlink to view the adverse drug reaction recorded for the external drug.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pregnancy Remarks</span> - Click <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Pregnancy Remarks</a> to enter the pregnancy details.</p>
+<div class="droptext" id="POPUP233401358" style="display: none;">
+<p class="NumberRFD">Enter the following details:</p>
+<ol start="1" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">LMP</span> - Enter the LMP in the format of dd/mm/yyyy or select the LMP using the <span class="BoldNumberRFD">[?]</span> function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gestation Period</span> - Enter the Gestation period of the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">EDD</span> - Enter the EDD of the patient.</p>
+</li>
+</ol>
+<p>&#160;</p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click on 'Diagnosis' hyperlink to view the associated problems of the patient for the prescription. The ‘Diagnosis Description’ screen gets displayed.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the existing parameter “Allow Medication Order Without Diagnosis” is unchecked in the PH Parameter for Facility screen and patient diagnosis is not already recorded, the following error message is displayed when the user tries to place a new Pharmacy Order for a patient from this screen:</p>
+<p class="Note">Patient Diagnosis is not recorded. Do you want to record Diagnosis now?</p>
+<p class="Note">&#160;</p>
+<p class="Note">You can acknowledge the message by clicking “OK” and capture the patient diagnosis details in the Record Diagnosis &#160;dialog that is displayed.</p>
+<p class="Note">&#160;</p>
+<p class="Note">The system will display the HT, WT, BSA, and BMI details based on pre-captured data on Mouse over. Once you capture the same discrete measure in record charts through vital signs, the system will keep the record and will display during placing of pharmacy Order Screen.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP233401358');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

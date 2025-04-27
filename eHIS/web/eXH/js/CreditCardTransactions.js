@@ -1,0 +1,4 @@
+function processResponse()
+{
+	alert("teste");
+}

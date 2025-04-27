@@ -1,0 +1,63 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script>
+	var userAgent = navigator.userAgent;
+	// Get the browser's name and version.
+	var browserName = userAgent.split(' ')[0];
+	var browserVersion = userAgent.split(' ')[1];
+
+	// Display the browser name and version.
+	alert("document.documentMode1  "+userAgent);
+/* 	alert("document.documentMode2 "+ document.documentMode); */
+	</script>
+	
+    <title>Webcam Photo Capture</title>
+  </head>
+  <body onLoad='startCam()'>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <button id="captureBtn">Capture Photo</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <img id="capturedPhoto" alt="Captured Photo" />
+
+    <script>
+      function startCam(){
+    	  alert('check 1');
+    	  
+          var video = document.getElementById("webcam");
+          alert('check 2')
+          var captureBtn = document.getElementById("captureBtn");
+          var canvas = document.getElementById("canvas");
+          var capturedPhoto = document.getElementById("capturedPhoto");
+    	  alert('check 3');  	  
+    	
+          // Check if the browser supports getUserMedia
+/*           "use strict"; */
+
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({
+    video: true
+  }).then(function (stream) {
+    video.srcObject = stream;
+  })["catch"](function (error) {
+    console.log("Error accessing webcam:", error);
+  });
+  captureBtn.addEventListener("click", function () {
+    // Capture a photo from the webcam
+    var context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Display the captured photo
+    capturedPhoto.src = canvas.toDataURL("image/png");
+  });
+} else {
+  alert("getUserMedia is not supported in this browser");
+}
+    	  
+      }
+    </script>
+  </body>
+</html>

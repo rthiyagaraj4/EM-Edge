@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Enter Recurring Charges</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nTransactions\nIP Direct Charges\nEnter Recurring Charges");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Enter Recurring Charges</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Associate</span> several services or a panel to an Inpatient or a Daycare patient. The services to be served on a daily basis to a patient are associated using this function to avoid redundancy. &#160;</p>
+<p class="Text">Enter Recurring Charges function is used to associate multiple services to an Inpatient or a Daycare patient. A date range is specified for the services to be served on a daily basis. A document reference number is generated on committing the transaction. The charge for the service is computed based on the price recorded for the selected Billing Service/Billing Panel during service definition. The service date selected has to be greater than or equal to the transaction date and the transaction date has to be greater than the admission date of the selected patient. Also, if the service date is within the range for which the recurring charges are already generated, an error message is displayed indicating you to record a service date that is greater than the date for which the recurring charges are computed. The functions associated to the patient through this function are valid for the current encounter only and is closed when the patient is discharged.</p>
+<h2>Enter Recurring Charges</h2>
+<p class="From">From the Transactions &gt; IP Direct Charges, double-click Enter Recurring Charges function.</p>
+<p class="Text">The Enter Recurring Charges screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter an Admission Number to associate the services. This is a mandatory (<span class="Asterisk">*</span>) field.</p>
+</li>
+</ol>
+<p class="Text">OR</p>
+<ol start="2">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">[Admissions]</a></span> or <span class="BoldButton">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">[Transfers]</a></span> to search for and to select a relevant patient. Double-click on the relevant patient record to select it.</p>
+<div class="droptext" id="POPUP240480823" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Transfers]</span> to search for a patient transfer associated to the admission in the facility. The Transfer Details screen gets displayed with the Episode Number, serial number, patient number, ward code, name of the doctor, bed and the ward number. Double-click the selected record to associate services.</p>
+</div>
+<div class="droptext" id="POPUP239633057" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Admission]</span> to view and to select the Inpatient or the Daycare patient admission details. The Admission Details lookup screen gets displayed. The date when the patient was admitted, episode type, episode number, patient ID and name, Billing Group and the Settlement Indicator get listed. Double-click on a record to associate services to the selected admission.</p>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">The patient name, patient ID, episode type, age and gender get displayed in the respective fields on entering the admission number.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click the Calendar function to select the transaction reference date. The date selected has to be equal to or lesser than the admission date of the selected patient. This is a mandatory (<span class="Asterisk">*</span>) field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Associate the Billing Services or Billing Panels to the patient for the selected admission. 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../RFD/BL_Trans_IPDC_EnterRecurringCharges.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> to associate the services or click <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A transaction reference number is generated on committing the services.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You have to select a valid open Admission Number to associate recurring services.</p>
+<hr style="float: aligncenter;" />
+<p class="Note"><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Billing Services','../../CodeSetup/Billing_Services.htm');return false;" title="Related Topics"><img src="../../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Discharge Bill Cum Receipt','../IP_Cashier/Discharge_Bill_Cum_Receipt.htm');return false;" title="See Also"><img src="../../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP239633057');
+	TextPopupInit('a3','POPUP240480823');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,965 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.10                                                 */
+/************************************************************************/
+/* PROGRAM NAME          : BLBALLPS.PC                                  */
+/* AUTHOR                : M.NITIN KUMAR                                */
+/* DATE WRITTEN          : 12-AUG-1993                                  */
+/* Converted To Win      : BGSP                                         */  
+/*                                                                       */
+/* CALLED FROM           :                                              */
+/*                                                                        */
+/*  FUNCTION             : TO POST ORGINATING TRANSACTIONS              */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */ 
+/*                                                                      */
+/************************************************************************/
+      
+	             
+#include <stdio.h>
+#include <string.h>
+#include <bl.h> 
+
+#define RESOURCE_BUSY (sqlca.sqlcode == -54)
+#define NODATAFOUND sqlca.sqlcode == 1403
+/*
+#define DEBUG
+*/
+#define  VIEW_LOG_FILE    1
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd[91],
+	    d_pgm_id[10],
+        d_hdr_rowid[300],
+	    d_session_id[16],
+		nd_ws_no  [31],
+	    d_pgm_date[14],
+		nd_facility_id  [3],
+	    nd_fm_doc_type_code[7],
+	    nd_fm_doc_no[9],
+	    nd_to_doc_type_code[7],
+	    nd_to_doc_no[9],
+	    nd_fm_doc_date[13],
+	    nd_to_doc_date[13],
+        nd_operator_id[21],
+	    d_msg_desc[72];
+
+   VARCHAR d_sel_doc_type_code                         [7],
+           d_sel_doc_number                            [9];
+
+   VARCHAR d_hdr_doc_type_code                         [7],
+           d_hdr_doc_number                            [9],
+           d_hdr_patient_id                            [21],
+           d_hdr_doc_date                              [13],
+           d_hdr_trx_type_code                         [2],
+           d_hdr_pat_doc_reference                     [11],
+           d_hdr_narration                             [51],
+           d_hdr_post_month                            [3],
+           d_hdr_post_year                             [5],
+           d_hdr_max_line_num                          [5];
+
+   VARCHAR d_dtl1_line_num                             [5],
+	       d_dtl1_main_acc1_code                       [7],
+           d_dtl1_main_acc2_code                       [5],
+           d_dtl1_dept_code                            [11],
+           d_dtl1_product_group_code                   [4],
+           d_dtl1_product_line_code                    [5],
+           d_dtl1_subledger_group_code                 [4],
+           d_dtl1_subledger_line_code                  [9],
+           d_dtl1_narration                            [51];
+
+   VARCHAR d_dtl2_all_doc_type_code                    [7],
+           d_dtl2_all_doc_number                       [9];
+
+   VARCHAR d_pend_doc_main_acc1_code                   [7],
+           d_pend_doc_main_acc2_code                   [5],
+           d_pend_doc_dept_code                        [11],
+           d_pend_doc_product_grp_cd                   [4],
+           d_pend_doc_product_line_code                [5],
+           d_pend_doc_subledger_grp_cd                 [4],
+           d_pend_doc_subledger_ln_cd                  [9],
+           d_pend_doc_rowid                            [20];
+
+   int     d_pend_doc_max_line_num;
+
+double      d_hdr_doc_amt,
+            d_dtl1_doc_amt,
+	        d_dtl2_all_doc_amt;
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+
+int g_hdr_cnt,
+    g_hdr_proc,
+    g_err_typ;
+
+char file_name[15],
+     g_acct_code[41],
+     g_err_id[8],
+     g_err_msg[72];
+
+double g_dtl_tot_amt;
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+    char mesg[80];
+
+    if(argc !=5) {
+        disp_message(ERR_MESG,"BLBALLPS : Usage BLBALLPS userid/password session_id pgm_date Facility");
+        proc_exit();
+    }
+
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+
+    strcpy(g_pgm_id,"BLBALLPS");
+    strcpy(d_pgm_id.arr,"BLBALLPS");
+    d_pgm_id.len  = strlen(d_pgm_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    strcpy(g_pgm_date,argv[3]);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(ERROR) {
+        disp_message(ORA_MESG,"Unable to connect ");
+		proc_exit();
+    }
+
+   set_meduser_role();
+   start_prog_msg();
+    nd_fm_doc_type_code.arr[0]  = '\0';
+	nd_fm_doc_no.arr[0]  = '\0';
+	nd_to_doc_type_code.arr[0]  = '\0';
+	nd_to_doc_no.arr[0]  = '\0';
+    nd_fm_doc_date.arr[0]  = '\0';
+	nd_to_doc_date.arr[0]  = '\0';
+	nd_operator_id.arr[0]  = '\0';
+	nd_facility_id.arr[0]  = '\0';
+	nd_ws_no.arr[0]		   = '\0';
+
+    nd_fm_doc_type_code.len  = 0;
+	nd_fm_doc_no.len  = 0;
+	nd_to_doc_type_code.len  = 0;
+	nd_to_doc_no.len  = 0;
+    nd_fm_doc_date.len  = 0;
+	nd_to_doc_date.len  = 0;
+	nd_operator_id.len  = 0;
+	nd_facility_id.len  = 0;
+	nd_ws_no.len		= 0;
+    
+
+	EXEC SQL SELECT 
+			OPERATING_FACILITY_ID,
+			PARAM1,            /* FM_DOC_TYPE_CODE           */
+			PARAM2,            /* FM_DOC_NO                  */
+			PARAM3,            /* TO_DOC_TYPE_CODE           */
+			PARAM4,            /* TO_DOC_NO                  */
+			PARAM5,            /* FM_DOC_DATE                */
+			PARAM6,            /* TO_DOC_DATE                */
+			PARAM7,             /* OPER_IDl                   */     
+			PARAM8
+		 INTO:nd_facility_id, 
+			:nd_fm_doc_type_code,
+			:nd_fm_doc_no,
+			:nd_to_doc_type_code,
+			:nd_to_doc_no,
+		    :nd_fm_doc_date,
+			:nd_to_doc_date,
+			:nd_operator_id,
+			:nd_ws_no 
+		 FROM   SY_PROG_PARAM
+		 WHERE  PGM_ID     = 'BLBALLPS'
+		 AND    PGM_DATE   = :d_pgm_date
+		 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(ERROR || NODATAFOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    nd_fm_doc_type_code.arr[nd_fm_doc_type_code.len]  = '\0';
+	nd_fm_doc_no.arr[nd_fm_doc_no.len]  = '\0';
+	nd_to_doc_type_code.arr[nd_to_doc_type_code.len]  = '\0';
+	nd_to_doc_no.arr[nd_to_doc_no.len]  = '\0';
+    nd_fm_doc_date.arr[nd_fm_doc_date.len]  = '\0';
+	nd_to_doc_date.arr[nd_to_doc_date.len]  = '\0';
+	nd_operator_id.arr[nd_operator_id.len]  = '\0';
+	nd_facility_id.arr[nd_facility_id.len] = '\0';
+	nd_ws_no.arr[nd_ws_no.len]             = '\0';
+
+	strcpy(g_facility_id ,nd_facility_id.arr);
+
+    g_hdr_cnt  = 0;
+    g_hdr_proc = 0;
+
+    
+
+    decl_curs();
+    process_recs();
+
+    sprintf(mesg, "\tTotal Records Read          : %d\n",g_hdr_cnt);
+    disp_message(INFO_MESG,mesg);
+    sprintf(mesg,"\tTotal Records Processed     : %d\n",g_hdr_proc);
+    disp_message(INFO_MESG,mesg);
+    sprintf(mesg,"\tTotal Records Not Processed : %d\n\n",g_hdr_cnt - g_hdr_proc);
+    disp_message(INFO_MESG,mesg);
+
+    del_parm();
+
+    end_prog_msg();
+    EXEC SQL COMMIT RELEASE;
+
+    return;
+
+}
+
+del_parm()
+{
+
+    EXEC SQL DELETE SY_PROG_PARAM
+         WHERE  PGM_ID     = 'BLBALLPS' 
+         AND    PGM_DATE   = :d_pgm_date
+         AND    SESSION_ID = :d_session_id;
+
+    if(ERROR) 
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+
+}
+
+
+
+
+decl_curs()
+{
+	 EXEC SQL DECLARE SEL_HDR_RECS CURSOR FOR
+               SELECT ROWID,
+		      DOC_TYPE_CODE,
+		      DOC_NUMBER
+                 FROM BL_DCP_ALL_TRN_HDR
+		 WHERE operating_facility_id = :nd_facility_id AND
+			   RPAD(DOC_TYPE_CODE,6,' ')||
+		       LTRIM(TO_CHAR(DOC_NUMBER,'00000009')) BETWEEN
+	               RPAD(NVL(:nd_fm_doc_type_code,'      '),6)||
+		       NVL(:nd_fm_doc_no,'00000000') AND
+	               RPAD(NVL(:nd_to_doc_type_code,'~~~~~~'),6)||
+		       NVL(:nd_to_doc_no,'99999999')
+		 AND   DOC_DATE BETWEEN
+			 TO_DATE(NVL(:nd_fm_doc_date,'01/01/1000'),'DD/MM/YYYY')
+			 AND
+			 TO_DATE(NVL(:nd_to_doc_date,'01/01/3000'),'DD/MM/YYYY')
+		 AND   ADDED_BY_ID BETWEEN
+			 NVL(:nd_operator_id,'                    ') AND
+			 NVL(:nd_operator_id,'~~~~~~~~~~~~~~~~~~~~')
+		 AND   NVL(POSTED_FLAG,'N') <> 'Y'
+		 ORDER BY DOC_TYPE_CODE, DOC_NUMBER;
+
+     EXEC SQL DECLARE ALL_TRN_HDR_CUR CURSOR FOR
+               SELECT DOC_TYPE_CODE,
+                      DOC_NUMBER,
+                      PATIENT_ID,
+                      TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                      TRX_TYPE_CODE,
+                      PAT_DOC_REFERENCE,
+                      DOC_AMT,
+                      NARRATION,
+                      POST_MONTH,
+                      POST_YEAR,
+                      MAX_LINE_NUM
+                 FROM BL_DCP_ALL_TRN_HDR
+		WHERE ROWID = :d_hdr_rowid
+		  FOR UPDATE OF POSTED_FLAG NOWAIT;
+
+     EXEC SQL DECLARE ALL_TRN_DTL1_CUR CURSOR FOR
+               SELECT LINE_NUM,
+		      MAIN_ACC1_CODE,
+                      MAIN_ACC2_CODE,
+                      DEPT_CODE,
+                      PRODUCT_GROUP_CODE,
+                      PRODUCT_LINE_CODE,
+                      SUBLEDGER_GROUP_CODE,
+                      SUBLEDGER_LINE_CODE,
+                      DOC_AMT,
+                      NARRATION
+                 FROM BL_DCP_ALL_TRN_DTL1 
+		WHERE operating_facility_id = :nd_facility_id AND
+		DOC_TYPE_CODE = :d_hdr_doc_type_code
+		  AND DOC_NUMBER    = :d_hdr_doc_number;
+
+     EXEC SQL DECLARE ALL_TRN_DTL2_CUR CURSOR FOR
+               SELECT ALL_DOC_TYPE_CODE,
+                      ALL_DOC_NUMBER,
+                      ALL_DOC_AMT
+                 FROM BL_DCP_ALL_TRN_DTL2
+		WHERE operating_facility_id = :nd_facility_id AND
+		DOC_TYPE_CODE = :d_hdr_doc_type_code
+		  AND DOC_NUMBER    = :d_hdr_doc_number;
+
+    EXEC SQL DECLARE PEND_DOC_CUR CURSOR FOR
+	      SELECT ROWID,
+                     MAIN_ACC1_CODE,
+                     MAIN_ACC2_CODE,
+                     DEPT_CODE,
+                     PRODUCT_GROUP_CODE,
+                     PRODUCT_LINE_CODE,
+                     SUBLEDGER_GROUP_CODE,
+                     SUBLEDGER_LINE_CODE,
+		     MAX_LINE_NUM
+		FROM BL_DCP_PENDING_DOC
+	    WHERE operating_facility_id = :nd_facility_id AND
+		 ORG_DOC_TYPE_CODE = :d_dtl2_all_doc_type_code
+		 AND ORG_DOC_NUMBER    = :d_dtl2_all_doc_number
+		 FOR UPDATE OF MAX_LINE_NUM NOWAIT;
+
+    EXEC SQL OPEN SEL_HDR_RECS;
+
+    if(ERROR)
+	err_mesg("OPEN failed on cursor SEL_HDR_RECS",0,"");
+
+}
+
+process_recs()
+{
+
+    while(fetch_recs()) {
+
+	     g_hdr_cnt++;
+
+        if(lock_hdr() EQ -1) {
+            log_messg("Unable to lock record in BL_DCP_ALL_TRN_HDR","HDR");
+            continue;
+        }
+	
+
+	updt_patient_fin_dtls();
+
+	EXEC SQL OPEN ALL_TRN_DTL1_CUR;
+
+	if(ERROR)
+	    err_mesg("OPEN failed on cursor ALL_TRN_DTL1_CUR",0,"");
+
+	if(process_dtl1() EQ -1) {
+	    EXEC SQL ROLLBACK WORK;
+	    continue;
+	}
+
+	EXEC SQL OPEN ALL_TRN_DTL2_CUR;
+
+	if(ERROR)
+	    err_mesg("OPEN failed on cursor ALL_TRN_DTL2_CUR",0,"");
+
+	if(process_dtl2() EQ -1) {
+	    EXEC SQL ROLLBACK WORK;
+	    continue;
+	}
+
+	EXEC SQL UPDATE BL_DCP_ALL_TRN_HDR
+		 SET    POSTED_FLAG = 'Y',
+				POSTED_BY_ID = USER,
+				POSTED_DATE_TIME = SYSDATE,
+				MODIFIED_BY_ID = USER,
+				MODIFIED_DATE = SYSDATE,
+				MODIFIED_AT_WS_NO       = :nd_ws_no
+		 WHERE  CURRENT OF ALL_TRN_HDR_CUR;
+
+	if(ERROR)
+	    err_mesg("UPDATE failed on table BL_DCP_ORG_TRN_HDR",0,"");
+
+	EXEC SQL COMMIT WORK;
+	g_hdr_proc ++;
+
+    } /* end of while fetch recs */
+
+
+}
+
+process_dtl1()
+{
+    g_dtl_tot_amt = 0;
+
+
+	while(fetch_dtl1()) {
+
+
+	if(validate_posting_acct( d_dtl1_main_acc1_code.arr,
+		 		  d_dtl1_main_acc2_code.arr,
+		 		  d_dtl1_dept_code.arr,
+		 		  d_dtl1_product_group_code.arr,
+		 		  d_dtl1_product_line_code.arr,
+		 		  d_dtl1_subledger_group_code.arr,
+		 		  d_dtl1_subledger_line_code.arr,
+				  'N',
+				  "BL",
+				  d_hdr_post_year.arr,
+				  d_hdr_post_month.arr,
+				  &g_err_typ,
+				  g_err_id,
+				  g_err_msg
+		    		  ) ==  -1) {
+		
+
+
+	    if (g_err_typ) {  /* application error */
+		if(!strcmp(g_err_id,"GL1430"))
+		  log_messg("Invalid Posting Account",d_dtl1_line_num.arr);
+		else if(!strcmp(g_err_id,"GL1540"))
+		  log_messg("Posting A/C should be detail account",d_dtl1_line_num.arr);
+		else
+		  log_messg("Posting A/C has been suspended",d_dtl1_line_num.arr);
+		return -1;
+	    }
+
+            else   /* oracle error */
+
+	        err_mesg(g_err_msg,0,"");
+
+	} /* end of if validate_posting_acct */ 
+
+        g_dtl_tot_amt += d_dtl1_doc_amt;
+
+	insrt_bl_gl_dist(1);
+
+
+    }
+
+    if(!equal(d_hdr_doc_amt, g_dtl_tot_amt)) {
+        log_messg("Debits do not match Credits for Detail 1","");
+	return -1;
+    }
+
+    return 1;
+
+}
+
+process_dtl2()
+{
+    g_dtl_tot_amt = 0;
+
+    while(fetch_dtl2()) {
+
+       if(fetch_pend_doc() EQ -1) {
+	   log_messg("Unable to lock record in BL_DCP_PENDING_DOC","");
+	   return -1;
+       }
+       insrt_bl_dcp_trn();
+       updt_pending_doc();
+       insrt_bl_gl_dist(2);
+
+        g_dtl_tot_amt += d_dtl2_all_doc_amt;
+
+    }
+
+    if(!equal(d_hdr_doc_amt, g_dtl_tot_amt)) {
+        log_messg("Debits do not match Credits for Detail 2","");
+	return -1;
+    }
+
+    return 1;
+
+}
+
+updt_pending_doc()
+{
+
+    EXEC SQL UPDATE BL_DCP_PENDING_DOC
+	     SET    DOC_OUTST_AMT  = NVL(DOC_OUTST_AMT,0) + :d_dtl2_all_doc_amt,
+		    MAX_LINE_NUM   = NVL(MAX_LINE_NUM,0) + 1,
+		    TRX_PROCESSED_IND = 'Y'	,		
+				MODIFIED_BY_ID = USER,
+				MODIFIED_DATE = SYSDATE,
+				MODIFIED_AT_WS_NO       = :nd_ws_no
+	     WHERE  CURRENT OF PEND_DOC_CUR;
+
+    if(ERROR)
+	err_mesg("UPDATE failed on table BL_DCP_PENDING_DOC",0,"");
+
+}
+
+
+insrt_bl_dcp_trn()
+{
+
+
+    EXEC SQL INSERT INTO BL_DCP_TRN
+		    (    operating_facility_id,
+					     PATIENT_ID,
+                         ORG_DOC_TYPE_CODE,
+                         ORG_DOC_NUMBER,
+                         LINE_NUM,
+                         DOC_TYPE_CODE,
+                         DOC_NUMBER,
+                         DOC_DATE,
+                         PAT_DOC_REFERENCE,
+                         DOC_NATURE_CODE,
+                         DOC_AMT,
+                         TRX_TYPE_CODE,
+                         NARRATION,
+                         POST_MONTH,
+                         POST_YEAR,
+                         POSTED_DATE,
+                         POSTED_BY_ID,
+				 		 ADDED_BY_ID,
+						 MODIFIED_BY_ID,
+						 ADDED_DATE,	
+						 MODIFIED_DATE,
+						 ADDED_AT_WS_NO,         
+						 ADDED_FACILITY_ID,      
+						 MODIFIED_AT_WS_NO,      
+						 MODIFIED_FACILITY_ID   
+		    )    
+	    VALUES  (    :nd_facility_id,
+						 :d_hdr_patient_id,
+                         :d_dtl2_all_doc_type_code,
+                         :d_dtl2_all_doc_number,
+                         :d_pend_doc_max_line_num + 1,
+                         :d_hdr_doc_type_code,
+                         :d_hdr_doc_number,
+                         TO_DATE(:d_hdr_doc_date,'DD/MM/YYYY'),
+                         :d_hdr_pat_doc_reference,
+                         NULL,
+                         :d_dtl2_all_doc_amt,
+                         :d_hdr_trx_type_code,
+                         :d_hdr_narration,
+                         :d_hdr_post_month,
+                         :d_hdr_post_year,
+                         SYSDATE,
+                         USER,
+						 USER,                             /* ADDED BY ID    */
+						 USER,                             /* MODIFIED BY ID */
+						 SYSDATE,					       /* ADDED DATE     */
+						 sysdate ,                             /* MODIFIED DATE  */
+						:nd_ws_no,	
+						:nd_facility_id,
+						:nd_ws_no,
+						:nd_facility_id
+	            );
+
+    if(ERROR)
+	err_mesg("INSERT failed on table BL_DCP_TRN",0,"");
+
+}
+
+
+updt_patient_fin_dtls()
+{
+
+
+    EXEC SQL UPDATE BL_PATIENT_FIN_DTLS
+	     SET    TOT_DEF_PAT_OUTST_AMT = NVL(TOT_DEF_PAT_OUTST_AMT,0) +
+					    :d_hdr_doc_amt,
+		    TRX_PROCESSED_IND     = 'Y',
+			MODIFIED_BY_ID = USER,
+			MODIFIED_DATE = SYSDATE,
+			MODIFIED_AT_WS_NO       = :nd_ws_no			
+	     WHERE  PATIENT_ID            = :d_hdr_patient_id;
+
+    if(ERROR || NODATAFOUND)
+	err_mesg("UPDATE failed on table BL_PATIENT_FIN_DTLS",0,"");
+
+
+
+}
+
+
+insrt_bl_gl_dist(flg)
+int flg;
+{
+    if(flg EQ 1) {
+
+        EXEC SQL INSERT INTO BL_GL_DISTRIBUTION
+                        (  operating_facility_id,
+							  MAIN_ACC1_CODE,
+                             MAIN_ACC2_CODE,
+                             DEPT_CODE,
+                             PRODUCT_GROUP_CODE,
+                             PRODUCT_LINE_CODE,
+                             SUBLEDGER_GROUP_CODE,
+                             SUBLEDGER_LINE_CODE,
+                             POST_YEAR,
+                             POST_MONTH,
+                             TRX_DATE,
+                             TRX_DOC_REF,
+                             TRX_DOC_REF_LINE_NUM,
+                             TRX_DOC_REF_SEQ_NUM,
+                             EPISODE_TYPE,
+                             PATIENT_ID,
+                             EPISODE_ID,
+                             VISIT_ID,
+                             NARRATION,
+                             TRX_TYPE_CODE,
+                             DISTRIBUTION_AMT,
+                             GL_INTERFACE_FLAG,
+	 				 		 ADDED_BY_ID,
+						 MODIFIED_BY_ID,
+						 ADDED_DATE,	
+						 MODIFIED_DATE,
+						 ADDED_AT_WS_NO,         
+						 ADDED_FACILITY_ID,      
+						 MODIFIED_AT_WS_NO,      
+						 MODIFIED_FACILITY_ID   
+			)
+		VALUES  (  :nd_facility_id,
+							  :d_dtl1_main_acc1_code,
+                             :d_dtl1_main_acc2_code,
+                             :d_dtl1_dept_code,
+                             :d_dtl1_product_group_code,
+                             :d_dtl1_product_line_code,
+                             :d_dtl1_subledger_group_code,
+                             :d_dtl1_subledger_line_code,
+                             :d_hdr_post_year,
+                             :d_hdr_post_month,
+                             TO_DATE(:d_hdr_doc_date,'DD/MM/YYYY'),
+                             RPAD(:d_hdr_doc_type_code,6,' ')||'-'||
+			                LPAD(:d_hdr_doc_number,8,'0'),
+                             :d_dtl1_line_num,
+                             0,
+                             NULL,
+                             :d_hdr_patient_id,
+                             NULL,
+                             NULL,
+                             :d_hdr_narration,
+                             :d_hdr_trx_type_code,
+                             :d_dtl1_doc_amt * -1,
+                             'N',
+	 						 USER,                             /* ADDED BY ID    */
+							 USER,                             /* MODIFIED BY ID */
+							 SYSDATE,					       /* ADDED DATE     */
+							sysdate ,                             /* MODIFIED DATE  */
+							:nd_ws_no,	
+							:nd_facility_id,
+							:nd_ws_no,
+							:nd_facility_id
+			);
+    }
+    else {
+
+        EXEC SQL INSERT INTO BL_GL_DISTRIBUTION
+                        (    operating_facility_id,
+							 MAIN_ACC1_CODE,
+                             MAIN_ACC2_CODE,
+                             DEPT_CODE,
+                             PRODUCT_GROUP_CODE,
+                             PRODUCT_LINE_CODE,
+                             SUBLEDGER_GROUP_CODE,
+                             SUBLEDGER_LINE_CODE,
+                             POST_YEAR,
+                             POST_MONTH,
+                             TRX_DATE,
+                             TRX_DOC_REF,
+                             TRX_DOC_REF_LINE_NUM,
+                             TRX_DOC_REF_SEQ_NUM,
+                             EPISODE_TYPE,
+                             PATIENT_ID,
+                             EPISODE_ID,
+                             VISIT_ID,
+                             NARRATION,
+                             TRX_TYPE_CODE,
+                             DISTRIBUTION_AMT,
+                             GL_INTERFACE_FLAG,
+ 	 				 		 ADDED_BY_ID,
+							 MODIFIED_BY_ID,
+							 ADDED_DATE,	
+							 MODIFIED_DATE,
+							 ADDED_AT_WS_NO,         
+							 ADDED_FACILITY_ID,      
+							 MODIFIED_AT_WS_NO,      
+							 MODIFIED_FACILITY_ID
+			)
+			VALUES  (		 :nd_facility_id,
+							 :d_pend_doc_main_acc1_code,
+                             :d_pend_doc_main_acc2_code,
+                             :d_pend_doc_dept_code,
+                             :d_pend_doc_product_grp_cd,
+                             :d_pend_doc_product_line_code,
+                             :d_pend_doc_subledger_grp_cd,
+                             :d_pend_doc_subledger_ln_cd,
+                             :d_hdr_post_year,
+                             :d_hdr_post_month,
+                             TO_DATE(:d_hdr_doc_date,'DD/MM/YYYY'),
+                             RPAD(:d_hdr_doc_type_code,6,' ')||'-'||
+			                LPAD(:d_hdr_doc_number,8,'0'),
+                             :d_pend_doc_max_line_num + 1,
+                             0,
+                             NULL,
+                             :d_hdr_patient_id,
+                             NULL,
+                             NULL,
+                             :d_hdr_narration,
+                             :d_hdr_trx_type_code,
+                             :d_dtl2_all_doc_amt,
+                             'N',
+		 					 USER,                             /* ADDED BY ID    */
+							 USER,                             /* MODIFIED BY ID */
+							 SYSDATE,					       /* ADDED DATE     */
+							sysdate ,                             /* MODIFIED DATE  */
+							:nd_ws_no,	
+							:nd_facility_id,
+							:nd_ws_no,
+							:nd_facility_id
+			);
+
+    }
+
+}
+
+fetch_recs()
+{
+
+    d_hdr_rowid.arr[0]='\0';
+	d_sel_doc_type_code.arr[0]  = '\0';
+    d_sel_doc_number.arr[0]  = '\0';
+	d_hdr_rowid.len=0;
+    d_sel_doc_type_code.len  = 0;
+    d_sel_doc_number.len  = 0;
+
+    EXEC SQL FETCH SEL_HDR_RECS 
+	     INTO  :d_hdr_rowid,
+		       :d_sel_doc_type_code,
+		       :d_sel_doc_number;
+			   
+
+    if(ERROR)
+	err_mesg("FETCH failed on cursor SEL_HDR_RECS",0,"");
+
+    if(NODATAFOUND)
+	return 0;
+	
+	d_hdr_rowid.arr[d_hdr_rowid.len]        = '\0';
+    d_sel_doc_type_code.arr[d_sel_doc_type_code.len]  = '\0';
+    d_sel_doc_number.arr[d_sel_doc_number.len]        = '\0';
+   return 1;
+	
+
+
+}
+
+lock_hdr()
+{
+    
+	EXEC SQL OPEN ALL_TRN_HDR_CUR;
+
+    if(RESOURCE_BUSY)
+	return -1;
+
+    if(ERROR)
+	err_mesg("OPEN failed on table ALL_TRN_HDR_CUR",0,"");
+    
+    d_hdr_doc_type_code.arr[0]                                        = '\0';
+    d_hdr_doc_number.arr[0]                                           = '\0';
+    d_hdr_patient_id.arr[0]                                           = '\0';
+    d_hdr_doc_date.arr[0]                                             = '\0';
+    d_hdr_trx_type_code.arr[0]                                        = '\0';
+    d_hdr_pat_doc_reference.arr[0]                                    = '\0';
+    d_hdr_narration.arr[0]                                            = '\0';
+    d_hdr_post_month.arr[0]                                           = '\0';
+    d_hdr_post_year.arr[0]                                            = '\0';
+    d_hdr_max_line_num.arr[0]                                         = '\0';
+    
+    d_hdr_doc_type_code.len                                           = 0;
+    d_hdr_doc_number.len                                              = 0;
+    d_hdr_patient_id.len                                              = 0;
+    d_hdr_doc_date.len                                                = 0;
+    d_hdr_trx_type_code.len                                           = 0;
+    d_hdr_pat_doc_reference.len                                       = 0;
+    d_hdr_narration.len                                               = 0;
+    d_hdr_post_month.len                                              = 0;
+    d_hdr_post_year.len                                               = 0;
+    d_hdr_max_line_num.len                                            = 0;
+
+    d_hdr_doc_amt                                                     = 0;
+
+     EXEC SQL FETCH ALL_TRN_HDR_CUR
+               INTO :d_hdr_doc_type_code,
+                    :d_hdr_doc_number,
+                    :d_hdr_patient_id,
+                    :d_hdr_doc_date,
+                    :d_hdr_trx_type_code,
+                    :d_hdr_pat_doc_reference,
+                    :d_hdr_doc_amt,
+                    :d_hdr_narration,
+                    :d_hdr_post_month,
+                    :d_hdr_post_year,
+                    :d_hdr_max_line_num;
+    
+    if(ERROR||NODATAFOUND)
+	err_mesg("FETCH failed on cursor ALL_TRN_HDR_CUR",0,"");
+
+    d_hdr_doc_type_code.arr[d_hdr_doc_type_code.len]                     = '\0';
+    d_hdr_doc_number.arr[d_hdr_doc_number.len]                           = '\0';
+    d_hdr_patient_id.arr[d_hdr_patient_id.len]                           = '\0';
+    d_hdr_doc_date.arr[d_hdr_doc_date.len]                               = '\0';
+    d_hdr_trx_type_code.arr[d_hdr_trx_type_code.len]                     = '\0';
+    d_hdr_pat_doc_reference.arr[d_hdr_pat_doc_reference.len]             = '\0';
+    d_hdr_narration.arr[d_hdr_narration.len]                             = '\0';
+    d_hdr_post_month.arr[d_hdr_post_month.len]                           = '\0';
+    d_hdr_post_year.arr[d_hdr_post_year.len]                             = '\0';
+    d_hdr_max_line_num.arr[d_hdr_max_line_num.len]                       = '\0';
+    return 1;
+
+}
+
+
+fetch_dtl1()
+{
+
+    d_dtl1_main_acc1_code.arr[0]                                      = '\0';
+    d_dtl1_main_acc2_code.arr[0]                                      = '\0';
+    d_dtl1_dept_code.arr[0]                                           = '\0';
+    d_dtl1_product_group_code.arr[0]                                  = '\0';
+    d_dtl1_product_line_code.arr[0]                                   = '\0';
+    d_dtl1_subledger_group_code.arr[0]                                = '\0';
+    d_dtl1_subledger_line_code.arr[0]                                 = '\0';
+    d_dtl1_narration.arr[0]                                           = '\0';
+    d_dtl1_line_num.arr[0]                                            = '\0';
+    
+    d_dtl1_main_acc1_code.len                                         = 0;
+    d_dtl1_main_acc2_code.len                                         = 0;
+    d_dtl1_dept_code.len                                              = 0;
+    d_dtl1_product_group_code.len                                     = 0;
+    d_dtl1_product_line_code.len                                      = 0;
+    d_dtl1_subledger_group_code.len                                   = 0;
+    d_dtl1_subledger_line_code.len                                    = 0;
+    d_dtl1_narration.len                                              = 0;
+    d_dtl1_line_num.len                                               = 0;
+
+    d_dtl1_doc_amt                                                    = 0;
+
+     EXEC SQL FETCH ALL_TRN_DTL1_CUR
+               INTO :d_dtl1_line_num,
+		    :d_dtl1_main_acc1_code,
+                    :d_dtl1_main_acc2_code,
+                    :d_dtl1_dept_code,
+                    :d_dtl1_product_group_code,
+                    :d_dtl1_product_line_code,
+                    :d_dtl1_subledger_group_code,
+                    :d_dtl1_subledger_line_code,
+                    :d_dtl1_doc_amt,
+                    :d_dtl1_narration;
+    
+    if(ERROR)
+	err_mesg("FETCH failed on cursor ALL_TRN_DTL1_CUR",0,"");
+
+    if(NODATAFOUND)
+	return 0;
+
+    d_dtl1_line_num.arr[d_dtl1_line_num.len]                             = '\0';
+    d_dtl1_main_acc1_code.arr[d_dtl1_main_acc1_code.len]                 = '\0';
+    d_dtl1_main_acc2_code.arr[d_dtl1_main_acc2_code.len]                 = '\0';
+    d_dtl1_dept_code.arr[d_dtl1_dept_code.len]                           = '\0';
+    d_dtl1_product_group_code.arr[d_dtl1_product_group_code.len]         = '\0';
+    d_dtl1_product_line_code.arr[d_dtl1_product_line_code.len]           = '\0';
+    d_dtl1_subledger_group_code.arr[d_dtl1_subledger_group_code.len]     = '\0';
+    d_dtl1_subledger_line_code.arr[d_dtl1_subledger_line_code.len]       = '\0';
+    d_dtl1_narration.arr[d_dtl1_narration.len]                           = '\0';
+
+    return 1;
+}
+
+fetch_dtl2()
+{
+
+    d_dtl2_all_doc_type_code.arr[0]                                   = '\0';
+    d_dtl2_all_doc_number.arr[0]                                      = '\0';
+    
+    d_dtl2_all_doc_type_code.len                                      = 0;
+    d_dtl2_all_doc_number.len                                         = 0;
+
+    d_dtl2_all_doc_amt                                                = 0;
+
+     EXEC SQL FETCH ALL_TRN_DTL2_CUR
+               INTO :d_dtl2_all_doc_type_code,
+                    :d_dtl2_all_doc_number,
+                    :d_dtl2_all_doc_amt;
+
+    if(ERROR)
+	err_mesg("FETCH failed on cursor ALL_TRN_DTL2_CUR",0,"");
+
+    if(NODATAFOUND)
+	return 0;
+
+    d_dtl2_all_doc_type_code.arr[d_dtl2_all_doc_type_code.len]           = '\0';
+    d_dtl2_all_doc_number.arr[d_dtl2_all_doc_number.len]                 = '\0';
+
+    return 1;
+}
+
+fetch_pend_doc()
+{
+
+    EXEC SQL OPEN PEND_DOC_CUR;
+
+    if(RESOURCE_BUSY)
+	return -1;
+
+    if(ERROR)
+	err_mesg("OPEN failed on cusor PEND_DOC_CUR",0,"");
+
+    EXEC SQL FETCH PEND_DOC_CUR
+	      INTO :d_pend_doc_rowid,
+                   :d_pend_doc_main_acc1_code,
+                   :d_pend_doc_main_acc2_code,
+                   :d_pend_doc_dept_code,
+                   :d_pend_doc_product_grp_cd,
+                   :d_pend_doc_product_line_code,
+                   :d_pend_doc_subledger_grp_cd,
+                   :d_pend_doc_subledger_ln_cd,
+		   :d_pend_doc_max_line_num;
+
+    if(ERROR)
+	err_mesg("FETCH failed on cursor PEND_DOC_CUR",0,"");
+
+    return 1;
+
+}
+
+
+log_messg(l_msg_desc,l_line_no)
+char l_msg_desc[], l_line_no[];
+{
+
+	
+    sprintf(d_msg_desc.arr,"%s/%s %4s %s",d_sel_doc_type_code.arr, 
+	   d_sel_doc_number.arr,l_line_no,l_msg_desc);
+
+	
+	d_msg_desc.len = strlen(d_msg_desc.arr);
+
+        EXEC SQL INSERT INTO SY_PROG_MSG
+                           ( PGM_ID,
+                             MSG_TYPE,
+                             MSG_NUM,
+                             MSG_DESC,
+                             MSG_DATE_TIME, 
+							 SESSION_ID,
+                             PGM_DATE,
+							 OPERATING_FACILITY_ID)
+	         VALUES    ( :d_pgm_id,
+						  'E',
+						 NULL,
+						:d_msg_desc,
+						SYSDATE,
+						:d_session_id,
+						:d_pgm_date,
+						:nd_facility_id);
+
+    
+        if(ERROR)
+	    err_mesg("INSERT failed on table SY_PROG_MSG",0,"");
+		       
+
+}

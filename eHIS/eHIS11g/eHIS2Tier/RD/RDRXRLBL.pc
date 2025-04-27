@@ -1,0 +1,553 @@
+/*
+#define DEBUG
+*/
+
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+
+// -- 44837 Sandeep K Gujje 20-NOV-2013
+#define NODATAFOUND				(sqlca.sqlcode == 1403)
+#define OERROR 					(sqlca.sqlcode < 0)
+
+/*#define SPACE1 0xA1
+#define SPACE2 0x40*/
+
+#include <stdio.h>  
+#include <string.h>
+#include <gl.h>
+#include <math.h>
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR nd_pgm_id          [9],
+		uid_pwd            [122], /* Length changed from 91 to 122 */
+		nd_session_id      [16],
+        nd_pgm_date        [13],
+		nd_facility_id     [3],
+		
+		d_request_num      [10],
+        d_no_copy          [2],
+		nd_trx_ind		   [2],
+		nd_printer_type    [2],
+
+		d_patient_id       [21],
+		d_request_date     [11],
+		d_pat_pregnant     [11],
+		d_lmp_date         [11],
+
+		d_pat_name         [101],
+		d_date_of_birth    [11],
+		d_national_id_num  [16],
+		d_sex              [2],
+		
+		p_language_id	   [3],
+		date_convert	   [21],
+		nd_temp_date	   [21],
+		nd_loc_date        [21],
+		l_translated_value [200];
+
+// -- 44837 Sandeep K Gujje 20-NOV-2013
+VARCHAR l_customer_id	[10], d_pat_name1[15], d_pat_name2[30];		
+
+		int i=0,
+			time_flag = 0;
+
+
+char   d_chin_name_yn;        
+char string_var [100];
+/*tern  char WORKING_DIR_NAME [75];*/
+
+float       mths,dys; 
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+char filename[150];
+
+char loc_legend[999][200];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+   char  *command;
+   int i;
+   float yrs,days;
+   int   iyrs,imths,idays;
+   char age[5];
+
+	if(argc < 6) {
+		disp_message(ERR_MESG,"rdrxrlbl : Usage - rdrxrlbl uid/pwd request_num\n");
+        proc_exit();
+	}
+	/* strcpy(OUTPUT_FILE_NAME,"normal.lis");*/
+	
+	strcpy(filename,WORKING_DIR);
+	strcat(filename,"rdrxrlbl.lis");
+
+	if ( ( f1 = fopen ( filename, "w" ) ) == NULL ) 
+	{
+		disp_message(ERR_MESG,"Error in opening output file...\n");
+		proc_exit();
+    }
+	
+	strcpy(nd_pgm_id.arr,argv[0]);
+    nd_pgm_id.len = strlen(nd_pgm_id.arr);
+	
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(nd_session_id.arr, argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr); 
+     
+    strcpy(nd_pgm_date.arr, argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+     
+    strcpy(nd_facility_id.arr, argv[4]);
+    nd_facility_id.len = strlen(nd_facility_id.arr); 
+	 
+	strcpy(d_request_num.arr,argv[5]);
+    d_request_num.len = strlen(d_request_num.arr);
+
+    strcpy(nd_trx_ind.arr, argv[6]);
+    nd_trx_ind.len = strlen(nd_trx_ind.arr); 
+
+	//rcpy(nd_printer_type.arr, argv[7]);
+    //_printer_type.len = strlen(nd_printer_type.arr);  
+	
+	strcpy(d_no_copy.arr,argv[7]);
+    d_no_copy.len = strlen(d_no_copy.arr);
+    
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL CONNECT :uid_pwd;
+	
+	set_meduser_role();
+
+	/*Code Included for internationalization*/
+	strcpy(p_language_id.arr,l_language_id.arr);
+	p_language_id.len = l_language_id.len;
+
+	/*Ravi Shankar, 09/02/2012, Leap year changes*/
+	EXEC SQL SELECT NVL(print_language_id,:p_language_id)
+			   INTO :p_language_id
+			   FROM SM_REPORT
+			  WHERE MODULE_ID = 'RD'
+				AND REPORT_ID  = 'RDRXRLBL'
+				AND SYSDATE BETWEEN NVL(eff_from_date,SYSDATE) AND NVL(eff_to_date,SYSDATE);
+
+	    if(NO_DATA_FOUND)
+			disp_message(ERR_MESG,"no data found");
+		
+	    if(OERROR)
+			disp_message(ERR_MESG,"Failed at Select SM_REPORT");
+	////////////
+		
+	fetch_legend_value();
+
+    EXEC SQL SELECT PATIENT_ID, TO_CHAR(REQUEST_DATE,'DD/MM/YYYY'),
+			        PATIENT_PREGNANT_YN, TO_CHAR(LMP_DATE,'DD/MM/YYYY')
+			   INTO :d_patient_id, :d_request_date,
+					:d_pat_pregnant, :d_lmp_date
+			   FROM RD_REQUEST
+			  WHERE OPERATING_FACILITY_ID = :nd_facility_id
+				AND REQUEST_NUM           = :d_request_num;
+
+    if(NO_DATA_FOUND)
+	{
+		disp_message(ERR_MESG,"no data found");
+		proc_exit();
+    }
+
+/*    EXEC SQL SELECT DECODE(SHORT_NAME_LOC_LANG,
+			          //CHIN_CODE_FOR_FOREIGN_PAT, SHORT_NAME,
+			          NULL, SHORT_NAME,
+			          SHORT_NAME_LOC_LANG),
+                      DECODE(SHORT_NAME_LOC_LANG,
+			          //CHIN_CODE_FOR_FOREIGN_PAT, 'N',       
+			          NULL, 'N', Y'),
+					  TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+					  SEX, NATIONAL_ID_NUM 
+				INTO :d_pat_name,
+					 :d_chin_name_yn,
+					 :d_date_of_birth,
+					 :d_sex,
+					 :d_national_id_num   
+				FROM MP_PATIENT_MAST, MP_PARAM
+			   WHERE PATIENT_ID = :d_patient_id; */
+
+	// -- 44837 Sandeep K Gujje 20-NOV-2013
+	// -- Added substr columns to the select list
+    EXEC SQL SELECT SHORT_NAME, TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+					SEX, NATIONAL_ID_NUM,
+					SUBSTR(SHORT_NAME, 1, 12), SUBSTR(SHORT_NAME, 13, 21)
+			   INTO :d_pat_name, :d_date_of_birth,
+					:d_sex, :d_national_id_num, 
+					:d_pat_name1, :d_pat_name2
+			   FROM MP_PATIENT_MAST, MP_PARAM
+			  WHERE PATIENT_ID = :d_patient_id;
+
+			if(NO_DATA_FOUND)
+			{
+				// -- 44837 Sandeep K Gujje 20-NOV-2013
+				// -- Added substr columns to the select list
+				EXEC SQL SELECT PERSON_NAME, TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+					SEX, NATIONAL_ID_NO,
+					SUBSTR(PERSON_NAME, 1, 12), SUBSTR(PERSON_NAME, 13, 21)
+			   INTO :d_pat_name, :d_date_of_birth,
+					:d_sex, :d_national_id_num,
+					:d_pat_name1, :d_pat_name2
+			   FROM MP_EXT_PERSON
+			  WHERE PERSON_ID = :d_patient_id;
+			 }
+
+    d_patient_id.arr[d_patient_id.len]        = '\0';
+    d_request_date.arr[d_request_date.len]    = '\0';
+	d_pat_pregnant.arr[d_pat_pregnant.len]    = '\0';	
+    d_lmp_date.arr[d_lmp_date.len]		      = '\0';	
+    d_pat_name.arr[d_pat_name.len]            = '\0';
+    d_date_of_birth.arr[d_date_of_birth.len]  = '\0';
+    d_sex.arr[d_sex.len]                      = '\0';
+	d_national_id_num.arr[d_national_id_num.len]          = '\0';
+	
+	// -- 44837 Sandeep K Gujje 20-NOV-2013
+	d_pat_name1.arr[d_pat_name1.len]            = '\0';
+	d_pat_name2.arr[d_pat_name2.len]            = '\0';
+
+    /*if(d_chin_name_yn == 'Y')
+   	   centre_name();
+	 */
+    
+  
+	/*
+    yrs= mths= days= imths= iyrs= idays= 0;
+    EXEC SQL SELECT ABS(MONTHS_BETWEEN(SYSDATE,
+                        TO_DATE(:d_date_of_birth,'DD/MM/YYYY')))
+	     INTO   :mths
+	     FROM   DUAL;
+   age[0] = '\0';
+
+   if(mths > 1 && mths <= 24) {
+       imths = mths;
+       sprintf(age,"%dM",imths);
+   }
+   else {
+
+       if(mths > 1) {
+           yrs= days=0;
+           imths = mths;
+        
+           if (imths > 0)
+               yrs = (int)mths/12;
+        
+           iyrs = yrs;
+           imths = imths - (iyrs * 12);
+           
+           days = (mths - (int)mths) * 31;
+           idays = days;
+       }
+       else {
+
+            EXEC SQL SELECT (SYSDATE - TO_DATE(:d_date_of_birth,'DD/MM/YYYY'))
+	             INTO   :dys
+	             FROM   DUAL;
+            idays = dys;
+        }
+    
+        if(iyrs != 0)
+            sprintf(age,"%dY",iyrs);
+        else if(imths != 0)
+            sprintf(age,"%dM",imths);
+        else
+            sprintf(age,"%dD",idays);
+    }*/
+
+	// -- 44837 Sandeep K Gujje 20-NOV-2013 
+	// -- Added get_site_customer_id() and 
+	// -- if and else condition to make this report different from other sites (AMS)
+	
+	get_site_customer_id();
+	
+	if (strcmp(l_customer_id.arr, "AMS") == 0)
+	{
+		fprintf(f1,"%-7s: %-10s  \n",  loc_legend[1],d_patient_id.arr);
+
+		fprintf(f1,"%-7s: %s",  loc_legend[2],d_sex.arr);
+
+		fprintf(f1,"/");
+		
+		init_date_temp_var();
+		strcpy(date_convert.arr, d_date_of_birth.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(d_date_of_birth.arr, date_convert.arr);
+
+		fprintf(f1,"%10s\n", d_date_of_birth.arr);
+
+		fprintf(f1,"Pt Name: %12.12s \n",d_pat_name1.arr);
+		
+		fprintf(f1,"%-21.21s \n",d_pat_name2.arr);
+
+		//-- 44837 Sandeep K Gujje 30-DEC-2013
+		//-- Changed Req Num to Req Date
+		//--fprintf(f1,"%-7s: %s \n",loc_legend[3],d_request_num.arr);
+		fprintf(f1,"%-7s: %s\n",  loc_legend[4],d_request_date.arr);
+
+	}
+	else
+	{
+		//fprintf(f1,"Pt No  : %-10s  \n",  d_patient_id.arr);
+		fprintf(f1,"%-7s: %-10s  \n",  loc_legend[1],d_patient_id.arr);
+		//fprintf(f1,"Sex/DOB: %s",  d_sex.arr);
+		fprintf(f1,"%-7s: %s",  loc_legend[2],d_sex.arr);
+		fprintf(f1,"/");
+		
+		/*Ravi Shankar, 09/02/2012, Leap year changes*/
+		init_date_temp_var();
+		strcpy(date_convert.arr, d_date_of_birth.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(d_date_of_birth.arr, date_convert.arr);
+		///////////////////////////
+
+		fprintf(f1,"%10s\n", d_date_of_birth.arr);
+	/*	fprintf(f1,"ID No: %-15s\n",d_national_id_num.arr); 
+		if (strcmp(d_pat_pregnant.arr,"Y") == 0) 
+		{
+		fprintf(f1,"ID No: %-15s",d_national_id_num.arr);
+		fprintf(f1,"   Pregnant\n");
+		}
+		fprintf(f1,"%s\n",  d_pat_name.arr);
+		if (strcmp(d_pat_pregnant.arr,"Y") == 0) 
+		{
+		fprintf(f1,"                   LMP:%10s\n",d_lmp_date.arr);
+		}
+		print_barcode(f1, d_request_num.arr, 0, 0, 30, 150,atoi(nd_printer_type.arr));
+		fprintf(f1,"\n");
+	*/	
+		// -- 44837 Sandeep K Gujje 07-NOV-2013
+		// fprintf(f1,"Pt Name: %s \n",d_pat_name.arr);
+		fprintf(f1,"Pt Name: %13.13s \n",d_pat_name.arr);
+		
+		//fprintf(f1,"Regn No: %s \n",d_request_num.arr);
+		fprintf(f1,"%-7s: %s \n",loc_legend[3],d_request_num.arr);
+
+
+		init_date_temp_var();
+		strcpy(date_convert.arr, d_request_date.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(d_request_date.arr, date_convert.arr);
+		//fprintf(f1,"Date   :%s\n",  d_request_date.arr);
+		fprintf(f1,"%-7s: %s\n",  loc_legend[4],d_request_date.arr);
+	}
+	
+    fclose(f1);
+	
+	PrintDocument
+	(
+		uid_pwd.arr,
+		nd_session_id.arr,
+		nd_facility_id.arr,
+		"RD",
+		"RDRXRLBL",
+		filename,
+		"O",
+		" ",
+		1,
+		1,
+		99
+	);
+			
+	//If printer Type is equal to 1 or 2 , then send it to Laser.Epsoni.e : Appointment Slip
+    /*
+	if ((atoi(nd_printer_type.arr) == 1) ||
+        (atoi(nd_printer_type.arr) == 2))
+	{
+
+      if (strcmp(nd_trx_ind.arr,"Y") == 0)
+	     //This condition will never come , since Id label is non Txn Based
+	  {
+	  	   disp_message(ERR_MESG,"This is not a Transaction based Report...Can not print...");
+		   proc_exit();
+	  }
+	  else
+	  {
+		//for(i=0;i<atoi(d_no_copy.arr);i++)
+		   	print_online(uid_pwd.arr,"RDRXRLBL","O","","rdrxrlbl.lis","S");
+	  }
+	}
+	else if (strcmp(nd_printer_type.arr,"3")==0)
+	{
+		command = (char*) malloc(300*sizeof(char));
+		if (strcmp(nd_trx_ind.arr,"Y")!=0)
+		{
+     		sprintf(command,"syzebcon %s %s %s %s %s %s",uid_pwd.arr,"RDRXRLBL","rdrxrlbl.lis",d_no_copy.arr,"O","");
+  	        WinExec (command,SW_SHOWNORMAL);
+			
+		}
+	 }
+	*/
+	
+	EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error occured...\n");
+    sprintf(string_var,"%s\n",sqlca.sqlerrm.sqlerrmc);
+    disp_message(ORA_MESG,string_var);
+    proc_exit();
+}
+
+/*centre_name()
+{
+    char t_name[31];
+    int spaces;
+    int i;
+
+    spaces = (31-strlen(d_pat_name.arr))/4;
+	sprintf(string_var,"%d",spaces);
+
+    i = 0;
+    while(spaces--) {
+	t_name[i++] = ' ';
+	t_name[i++] = ' ';
+  }
+
+    strcpy(t_name+i, d_pat_name.arr);
+    strcpy(d_pat_name.arr, t_name);
+
+}*/
+
+
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+nd_temp_date.arr[nd_temp_date.len]='\0';
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}
+
+get_local_date()
+{
+
+
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	//t_date  date;
+	t_date  varchar2(30);
+
+	
+	BEGIN
+	  
+	  /*Ravi Shankar, 09/02/2012, Leap year changes*/
+       	/*get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);
+
+		IF :time_flag = 1 THEN
+		   :nd_loc_date := to_char(t_date,'DD/MM/YYYY HH24:MI');
+		   :time_flag := 0;
+		ELSE
+
+	       :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+
+		END IF;
+	*/
+	
+		IF :time_flag = 1 THEN
+		   get_locale_date_2t.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date,'DD/MM/YYYY HH24:MI');
+		   :nd_loc_date := t_date;
+		   :time_flag := 0;
+		ELSE
+			get_locale_date_2t.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date,'DD/MM/YYYY');
+			:nd_loc_date := t_date;
+		END IF;
+
+	END;
+
+	END-EXEC;
+
+		nd_loc_date.arr[nd_loc_date.len]='\0';		     
+
+		if (OERROR)
+		disp_message(ERR_MESG,"Date conversion failed...\n");
+        //err_mesg("SELECTING Date failed",0,"");
+
+}
+
+fetch_legend_value()
+{
+	
+	int i=0;
+	EXEC SQL EXECUTE
+	BEGIN	      
+  	   sm_populate_report_legend.fetch_legend(:nd_facility_id,:p_language_id,'RDRXRLBL.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+	for (i=1; i<=100; i++)
+	{
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+       :l_translated_value := GET_LEGEND(LTRIM(RTRIM('RDRXRLBL.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//disp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(loc_legend[i],l_translated_value.arr);
+
+	}
+
+}
+
+// --44837 Sandeep K Gujje 20-NOV-2013
+get_site_customer_id()
+{
+	l_customer_id.arr[0]		= '\0';
+	l_customer_id.len		= 0;
+
+	EXEC SQL SELECT NVL(customer_id, '!!')
+		INTO l_customer_id
+		FROM SM_SITE_PARAM;
+
+	l_customer_id.arr[l_customer_id.len]	= '\0';
+
+	if (NODATAFOUND);
+
+	if (OERROR);
+
+}

@@ -1,0 +1,985 @@
+
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                        */
+/******************************************************************************/
+/* PROGRAM NAME     : rdrclexm.pc                                             */
+/* AUTHOR           : VASANT KUMAR	                                      */
+/* DATE WRITTEN     : 10-MAY-1993                                             */
+/*                                                                            */
+/* CALLED FROM      : rdrclexm.inp                                            */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                  : SESSION_ID                                              */
+/*                  : PGM_DATE                                                */
+/*                  : APPOINTMENT FROM AND TO DATE                            */
+/*                  : APPOINTMENT FROM AND TO CLINIC                          */
+/*                                                                            */
+/* TABLES ACCESSED  : SY_PROG_PARAM                                           */
+/*                  : SY_ACC_ENTITY                                           */
+/*                  : RD_APPT_STATS                                           */
+/*                  : SY_PHYSICIAN_MAST                                       */
+/*                  : RD_CLINIC                                               */
+/*                                                                            */
+/* OUTPUT FILE      : rdrclexm.lis                                            */
+/*                                                                            */
+/*                                                                            */
+/* FUNCTION         : This program prints a Appointments statistics by Clinic */
+/*                    for Inpatients and outpatients                          */
+/*                    For a given SY_PROG_PARAM parameters                    */
+/*                                                                            */
+/* VERSION          : 1.10.01                                                 */
+/* MODIFICATIONS    :                                                         */
+/* VERSION          : eHIS 4.1                                                */
+/*                                                                            */
+/* AUTHOR           : Rajanish Nambiar                                        */
+/*                                                                            */
+/* DATE MODIFIED    : 08/Aug/2003                                             */
+/*                                                                            */
+/******************************************************************************/
+
+#include <stdio.h>
+#include <math.h>
+#include "gl.h"
+#include <string.h>
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NO_DATA_FOUND sqlca.sqlcode==1403
+#define MAX_LINES 55
+#define REP_WIDTH 80
+#define REP_TITLE "APPOINTMENTS STATISTICS"
+#define VER  "VER : 10.2\n"
+#define ESC  0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR nd_facility_id		   [3],  --added by rvN 0n 06/Aug/2003
+			nd_pgm_id    		   [9],  --added by rvN 0n 06/Aug/2003
+		//	uid_pwd		           [91], --size increased by rvN 0n 06/Aug/2003
+			uid_pwd		           [122], /* Length increased from 91 to 122 */
+			nd_session_id		   [16],
+			nd_pgm_date			   [13], /* Input Parameters       */
+
+			h_acc_entity_name      [61],  /* SY_ACC_ENTITY header access */
+			h_user                 [31],
+			h_sysdate              [17],
+
+			nd_fr_appt_date        [13],  /* SY_PROG_PARAM Parameters */
+			nd_to_appt_date        [13],
+			nd_fr_clinic_code      [5], 
+			nd_to_clinic_code      [5], 
+			nd_fr_section_code     [5], 
+			nd_to_section_code     [5], 
+			nd_fr_exam_code        [11],
+			nd_to_exam_code        [11],
+			nd_wing_code           [3],
+			h_wing_desc            [91] ,
+
+			o_section_desc         [91],   /* Desc for the Code access */
+			o_clinic_desc          [46],
+			o_exam_desc            [121],
+
+			o_clinic_code          [5],    /* Cursor Field*/
+			o_section_code         [7],
+			o_appt_date            [11],
+			o_exam_code            [11],
+			
+			t_clinic_code          [5];     /* Temperory var for Break */
+
+	VARCHAR	p_language_id		   [3],
+			date_convert		   [21],
+			nd_temp_date		   [21],
+			nd_loc_date            [21],
+			l_translated_value	   [200];
+
+			int line_no=0, page_no=0;
+		
+			int i=0;
+			int time_flag = 0;
+
+			long total_appt_booked,
+				 total_attended,
+				 total_noshow;
+
+			long sec_total_booked    = 0,
+			     sec_total_attended  = 0,
+			     sec_total_noshow    = 0;
+
+			long cl_total_booked     = 0,
+			     cl_total_attended   = 0,
+			     cl_total_noshow     = 0;
+
+			long date_total_booked   = 0,
+			     date_total_attended = 0,
+			     date_total_noshow   = 0,
+				 
+				 gr_total_booked     = 0,
+			     gr_total_attended   = 0,
+			     gr_total_noshow     = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+char string_var[100];
+char filename[150];
+
+char loc_legend[999][200];
+             
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+	void get_params(),
+         get_header_dtls(),
+         dclr_appt_cur(),
+         do_report();
+
+	if(argc != 6) {
+		int i = 0;
+		disp_message(ERR_MESG,"Usage rdrclexm uid/passwd session_id pgm_date\n");
+		disp_message(ERR_MESG,"Exiting due to Mismatch of input parameters\007\007\007");
+		sprintf(string_var,"No of Parameters is <%d>\n",argc);
+		disp_message(ERR_MESG,string_var); 
+		disp_message(ERR_MESG,"The following are the parameters :-\n");
+		for(i=0;i<argc;i++) sprintf(string_var,"argv[ %d ] ---> <%s>\n",i,argv[i]);
+		disp_message(ERR_MESG,string_var);
+		proc_exit();
+	}
+
+	strcpy(nd_pgm_id.arr, argv[0]);
+	nd_pgm_id.len = strlen(nd_pgm_id.arr); 
+
+	strcpy(uid_pwd.arr, argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr); 
+
+	strcpy(nd_session_id.arr, argv[2]);
+	nd_session_id.len = strlen(nd_session_id.arr); 
+
+	strcpy(nd_pgm_date.arr, argv[3]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+	strcpy(nd_facility_id.arr, argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+
+	strcpy(OUTPUT_FILE_NAME, argv[5]);
+	
+	EXEC SQL CONNECT :uid_pwd;  
+
+	if (OERROR) {
+		disp_message(ERR_MESG,"USERID/PASSWORD failed to Connect\n");
+		proc_exit();
+	}
+
+	set_meduser_role();
+
+	/*Code Included for internationalization*/
+	strcpy(p_language_id.arr,l_language_id.arr);
+	p_language_id.len = l_language_id.len;
+	
+	/*printf("RDRCLEXM : Program Started.\n\n");  */
+	strcpy(filename,WORKING_DIR);
+	//strcat(filename,"rdrclexm.lis");
+	strcat(filename,OUTPUT_FILE_NAME);
+
+	if((f1 = fopen(filename, "w")) == NULL) {
+		disp_message(ERR_MESG,".... Error opening output file ....\n");
+		proc_exit();
+	} 
+
+	#ifdef DEBUG
+    disp_message(ORA_MESG,"Connected to ORACLE as user: %s \n", uid_pwd.arr);
+    
+    sprintf(string_var,"nd_session_id = %s\n", nd_session_id.arr);
+    disp_message(ERR_MESG,string_var);
+    sprintf(string_var,"nd_pgm_date = %s\n", nd_pgm_date.arr);
+    disp_message(ERR_MESG,string_var);
+	#endif  
+   
+	fprintf(f1,"%c&k4S",ESC);
+	fprintf(f1,"%c&a7L",ESC);/*for landscape printing by rvNambiar on 26/Aug/2003 */
+
+	get_params();
+
+	fetch_legend_value();
+
+	get_header_dtls();
+
+	dclr_appt_cur();
+	
+	do_report();
+
+	EXEC SQL COMMIT WORK RELEASE;
+
+	/*-------------- Check for any error and No data found ----------------------*/
+	if (OERROR) {
+		disp_message(ERR_MESG,"COMMIT failed\n" );
+		proc_exit();
+	}
+	/*-------------------------- End of Error Check ------------------------------*/
+
+	fclose(f1);
+
+	/*printf("RDRCLEXM : Program Ended.\n\n");*/
+	
+	return;
+
+}   
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+   nd_fr_appt_date.len         = 0;
+   nd_to_appt_date.len         = 0;
+   nd_to_section_code.len      = 0;
+   nd_fr_section_code.len      = 0;
+   nd_to_clinic_code.len       = 0;
+   nd_fr_clinic_code.len       = 0;
+   nd_fr_exam_code.len         = 0;
+   nd_to_exam_code.len         = 0;
+
+   nd_fr_appt_date.arr[nd_fr_appt_date.len]         = '\0';
+   nd_to_appt_date.arr[nd_to_appt_date.len]         = '\0';
+   nd_to_section_code.arr[nd_to_section_code.len]   = '\0';
+   nd_fr_section_code.arr[nd_fr_section_code.len]   = '\0';
+   nd_to_clinic_code.arr[nd_to_clinic_code.len]     = '\0';
+   nd_fr_clinic_code.arr[nd_fr_clinic_code.len]     = '\0';
+   nd_fr_exam_code.arr[nd_fr_exam_code.len]         = '\0';
+   nd_to_exam_code.arr[nd_to_exam_code.len]         = '\0';
+
+   /* read the parameter record */
+   EXEC SQL SELECT PARAM1,
+		   PARAM2,
+		   PARAM3,
+		   PARAM4,
+		   PARAM5,
+		   PARAM6,
+		   PARAM7,
+		   PARAM8
+	 INTO  :nd_wing_code,
+		   :nd_fr_section_code,
+		   :nd_fr_appt_date,
+		   :nd_to_appt_date,
+    	   :nd_fr_clinic_code,
+		   :nd_to_clinic_code,
+		   :nd_fr_exam_code,
+           :nd_to_exam_code
+		   
+     FROM  SY_PROG_PARAM
+	 WHERE OPERATING_FACILITY_ID = :nd_facility_id
+	 AND   PGM_ID                = 'RDRCLEXM'
+	 AND   SESSION_ID            = TO_NUMBER(:nd_session_id)
+	 AND   PGM_DATE              = :nd_pgm_date;
+
+/*-------------- Check for any error and No data found ----------------------*/
+   if (OERROR) {
+      disp_message(ERR_MESG,"SELECT failed on SY_PROG_PARAM\n" );
+      proc_exit();
+      }
+
+   if (NO_DATA_FOUND) {
+      disp_message(ERR_MESG,"No Data Found in the SY_PROG_PARAM\n");
+      proc_exit();
+      }
+/*-------------------------- End of Error Check ------------------------------*/
+   nd_wing_code.arr[nd_wing_code.len]               = '\0';
+   nd_fr_appt_date.arr[nd_fr_appt_date.len]         = '\0';
+   nd_to_appt_date.arr[nd_to_appt_date.len]         = '\0';
+   nd_to_section_code.arr[nd_to_section_code.len]   = '\0';
+   nd_fr_section_code.arr[nd_fr_section_code.len]   = '\0';
+   nd_to_clinic_code.arr[nd_to_clinic_code.len]     = '\0';
+   nd_fr_clinic_code.arr[nd_fr_clinic_code.len]     = '\0';
+   nd_fr_exam_code.arr[nd_fr_exam_code.len]         = '\0';
+   nd_to_exam_code.arr[nd_to_exam_code.len]         = '\0';
+
+  /* delete the parameter record */
+  EXEC SQL DELETE SY_PROG_PARAM
+		   WHERE OPERATING_FACILITY_ID = :nd_facility_id
+		   AND   PGM_ID                = 'RDRCLEXM'
+		   AND   SESSION_ID            = TO_NUMBER(:nd_session_id)
+		   AND   PGM_DATE              = :nd_pgm_date;
+
+/*-------------- Check for any error and No data found ----------------------*/
+
+   if (OERROR) {
+      disp_message(ERR_MESG,"DELETE failed on SY_PROG_PARAM\n");
+      proc_exit();
+      }
+
+   if (NO_DATA_FOUND) {
+      disp_message(ERR_MESG,"No Data Found in the SY_PROG_PARAM\n");
+      proc_exit();
+      }
+
+/*------------------------- End of Error Check -------------------------------*/
+
+  return;
+
+}
+ 
+/*--------------------------- get the header details -------------------------*/
+void get_header_dtls()
+{
+  h_acc_entity_name.len  = 0;
+  h_user.len             = 0;
+  h_sysdate.len          = 0;
+
+  h_acc_entity_name.arr[h_acc_entity_name.len]   = '\0';
+  h_user.arr[h_user.len]                         = '\0';
+  h_sysdate.arr[h_sysdate.len]                   = '\0';
+
+   EXEC SQL SELECT ACC_ENTITY_NAME, USER,
+				   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+			INTO   :h_acc_entity_name, :h_user,
+				   :h_sysdate
+            FROM   SY_ACC_ENTITY_LANG_VW
+			WHERE  acc_entity_id = :nd_facility_id
+			AND    language_id  = :p_language_id;
+
+/*-------------- Check for any error and No data found ----------------------*/
+   if (OERROR) {
+      disp_message(ERR_MESG,"SELECT failed on SY_ACC_ENTITY\n");
+      proc_exit();
+      }
+
+   if (NO_DATA_FOUND) {
+      disp_message(ERR_MESG,"No Data Found in the SY_ACC_ENTITY\n");
+      proc_exit();
+      }
+/*------------------------- End of Error Check -------------------------------*/
+  h_acc_entity_name.arr[h_acc_entity_name.len]   = '\0';
+  h_user.arr[h_user.len]                         = '\0';
+  h_sysdate.arr[h_sysdate.len]                   = '\0';
+
+  return;
+}
+/*------------------------- End of Header access -----------------------------*/
+
+/*------------------------- Appointments Cursor ------------------------------*/
+void dclr_appt_cur()
+{
+  EXEC SQL DECLARE  APPT_CUR CURSOR FOR
+                    SELECT A.CLINIC_CODE,
+			               A.EXAM_CODE,
+			               SUM(A.TOTAL_APPT_BOOKED),
+			               SUM(A.TOTAL_ATTENDED),
+                           SUM(A.TOTAL_NO_SHOW)
+                    FROM   RD_APPT_STATS A , RD_CLINIC B
+                    WHERE  A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+					AND    A.OPERATING_FACILITY_ID = :nd_facility_id
+					AND    A.CLINIC_CODE = B.CLINIC_CODE
+					AND    A.SECTION_CODE = B.SECTION_CODE
+					AND    TRUNC(A.CLINIC_DATE) BETWEEN 
+						   TO_DATE(:nd_fr_appt_date, 'DD/MM/YYYY')
+						   AND 
+						   TO_DATE(:nd_to_appt_date, 'DD/MM/YYYY')
+			        AND    A.CLINIC_CODE = B.CLINIC_CODE
+					AND    A.SECTION_CODE = B.SECTION_CODE
+					AND    B.WING_CODE    = :nd_wing_code
+                    AND    A.CLINIC_CODE BETWEEN
+						   :nd_fr_clinic_code AND :nd_to_clinic_code
+                    AND    A.SECTION_CODE = :nd_fr_section_code
+                    AND    A.EXAM_CODE BETWEEN
+						   :nd_fr_exam_code AND :nd_to_exam_code
+                 GROUP BY A.CLINIC_CODE,
+                             A.EXAM_CODE;
+/*-------------- Check for any error and No data found ----------------------*/
+
+   if (OERROR) {
+      disp_message(ERR_MESG,"SELECT failed on OA_APPT\n");
+      proc_exit();
+      }
+
+/*------------------------- End of Error Check -------------------------------*/
+
+  EXEC SQL OPEN APPT_CUR;
+
+/*-------------- Check for any error and No data found ----------------------*/
+
+   if (OERROR) {
+      disp_message(ERR_MESG,"OPEN failed on APPT_CUR\n");
+      proc_exit();
+      }
+
+/*------------------------- End of Error Check -------------------------------*/
+  return;
+/*------------------------- End of Appt Cursor -------------------------------*/
+}
+
+/*------------------------- Fetching from Appt Cursor ------------------------*/
+void do_report()
+{
+  void  print_page_header(),
+	print_rep_header(),
+	print_hdr(),
+	print_detl_rec(),
+	get_clinic_desc(),
+	get_exam_desc(),
+	get_section_desc();
+
+  int fetch_appt_cur();
+  int first = 1, posted = 0;
+
+  print_rep_header(); /* once for the report */
+
+  /*---------------------- read the first cursor record ----------------------*/
+
+  get_section_desc();
+
+  while(fetch_appt_cur()){
+
+     if (first)
+     {
+        strcpy(t_clinic_code.arr, o_clinic_code.arr);
+        t_clinic_code.len = o_clinic_code.len;
+        print_page_header();
+        print_hdr();
+        first = 0;
+     }
+
+     if (strcmp(t_clinic_code.arr,o_clinic_code.arr) != 0)
+     {
+        if (line_no+3 > MAX_LINES)
+        {
+           fprintf(f1,"");
+           print_page_header();
+           print_hdr();
+        }                  
+        print_clinic_total();
+
+        strcpy(t_clinic_code.arr, o_clinic_code.arr);
+        t_clinic_code.len = o_clinic_code.len;
+
+        if ( line_no > MAX_LINES )
+        {
+           fprintf(f1,"");
+           print_page_header();
+           print_hdr();
+        }
+        else
+        {
+           print_room_hdr();
+        }
+     }
+
+     if(line_no >= MAX_LINES){
+        fprintf(f1,"");
+        print_page_header();
+        print_hdr();
+     }
+
+     print_detl_rec();
+     line_no += 1;
+
+/*------------------------------- Total Room -------------------------------*/
+     cl_total_booked   = total_appt_booked   + cl_total_booked;
+     cl_total_attended = total_attended + cl_total_attended;
+     cl_total_noshow   = total_noshow   + cl_total_noshow;
+
+/*------------------------------- Total Section ----------------------------*/
+     sec_total_booked   = sec_total_booked   + total_appt_booked;
+     sec_total_attended = sec_total_attended + total_attended;
+     sec_total_noshow   = sec_total_noshow   + total_noshow;
+
+  }
+
+  if ( ( line_no + 6 ) > MAX_LINES )
+  {
+     fprintf(f1,"");
+     print_page_header();
+     print_hdr();
+  }
+
+  print_clinic_total();
+  print_section_total();
+  print_end_of_rep();
+}
+/* -------------------------- End of Report function -------------------------*/
+
+/* fetches the next record from APPT_CUR     */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_appt_cur()
+{
+  o_clinic_code.len                  = 0;
+  o_exam_code.len                    = 0;
+
+  o_clinic_code.arr[o_clinic_code.len]                   = '\0';
+  o_exam_code.arr[o_exam_code.len]                       = '\0';
+
+  EXEC SQL FETCH APPT_CUR INTO
+	                  :o_clinic_code,
+			  :o_exam_code,
+			  :total_appt_booked,
+			  :total_attended,
+			  :total_noshow;
+
+   if (OERROR) {
+      disp_message(ERR_MESG,"FETCH failed on cursor APPT_CUR\n");
+      proc_exit();
+      }
+
+  if (NO_DATA_FOUND)
+      return 0;
+
+  o_clinic_code.arr[o_clinic_code.len]                   = '\0';
+  o_exam_code.arr[o_exam_code.len]                       = '\0';
+
+  return 1;
+}
+       
+/* to print the detailed record with to horizontal summeries */
+void print_detl_rec()
+{
+    get_exam_desc ();
+
+    fprintf(f1,"%-11s  %-41s ", o_exam_code.arr, o_exam_desc.arr);
+    fprintf(f1,"%4d  ",total_appt_booked);
+    fprintf(f1,"%5d  ",total_attended);
+    fprintf(f1,"%8d\n",total_noshow);
+}
+
+print_section_total()
+{ 
+    print_line('_',REP_WIDTH);
+	//fprintf(f1,"                                     Section Total : ");
+	fprintf(f1,"%50s : ",loc_legend[21]);
+    fprintf(f1,"%6d      ",sec_total_booked);
+    fprintf(f1,"%1d      ",sec_total_attended);
+    fprintf(f1,"%4d\n",sec_total_noshow);
+	print_line('_',REP_WIDTH); fprintf(f1,"\n");
+}
+
+/*-------------------------------- Clinic Total ------------------------------*/
+print_clinic_total()
+{
+//fprintf(f1,"\n                                        Room Total : ");
+fprintf(f1,"\n%50s : ",loc_legend[22]);
+fprintf(f1,"%6d      ",cl_total_booked);
+fprintf(f1,"%ld      ",cl_total_attended);
+fprintf(f1,"%4d\n\n",cl_total_noshow);
+      cl_total_booked     = 0;
+      cl_total_attended   = 0;
+      cl_total_noshow     = 0;
+}
+
+/*----------------------------- Get Exam Desc --------------------------------*/
+void get_exam_desc ()
+  {
+     o_exam_desc.arr[0]  = '\0';
+     o_exam_desc.len     = 0;
+
+     EXEC SQL SELECT LONG_DESC
+	      INTO   :o_exam_desc
+	      FROM   RD_EXAMINATION
+	      WHERE  EXAM_CODE = :o_exam_code
+		  AND    language_id = :p_language_id;
+
+     o_exam_desc.arr [ o_exam_desc.len ] = '\0';
+  }
+/*----------------------------- End Exam Desc -------------------------------*/
+
+void get_section_desc()
+{
+  o_section_desc.len = 0;
+
+  o_section_desc.arr[o_section_desc.len] = '\0';
+
+   EXEC SQL SELECT 	LONG_DESC
+            INTO        :o_section_desc
+	    FROM        RD_SECTION_lang_vw
+	    WHERE       SECTION_CODE = :nd_fr_section_code
+		AND			language_id = :p_language_id;	
+
+  o_section_desc.arr[o_section_desc.len] = '\0';
+
+  return;
+}
+
+/*------ gets the Clinic desc for the Clinic code ----------------------------*/
+void get_clinic_desc()
+{
+   o_clinic_desc.arr[0] = '\0';
+   o_clinic_desc.len    = 0;
+  
+   EXEC SQL SELECT LONG_DESC
+            INTO   :o_clinic_desc
+			FROM   RD_CLINIC_lang_vw
+			WHERE  OPERATING_FACILITY_ID = :nd_facility_id
+			AND	   CLINIC_CODE = :t_clinic_code
+			AND    language_id = :p_language_id;	
+
+  o_clinic_desc.arr[o_clinic_desc.len] = '\0';
+
+  return;
+}
+/*-------------------- End of clinic Desc ------------------------------------*/
+
+/*------ gets the Wing desc for the Wing code ----------------------------*/
+void get_wing_desc()
+{
+  
+  h_wing_desc.arr [0]   = '\0';
+  h_wing_desc.len     = 0;
+
+   EXEC SQL SELECT LONG_DESC
+			INTO   :h_wing_desc
+			FROM   RD_WINGS_lang_vw
+			WHERE  OPERATING_FACILITY_ID = :nd_facility_id
+			AND	   WING_CODE = :nd_wing_code
+			AND    language_id = :p_language_id;	
+
+  h_wing_desc.arr [ h_wing_desc.len ] = '\0';
+  return;
+}
+
+/*-------------------- End of Wing Desc ------------------------------------*/
+
+
+/*-------------------- to print the header page for the report ---------------*/
+
+void print_rep_header()
+{
+  char fr_appt_date_desc[11], to_appt_date_desc[11];
+  char fr_section_code_desc[8], to_section_code_desc[8];
+  char fr_clinic_code_desc[8], to_clinic_code_desc[8];
+  char fr_exam_code_desc[11], to_exam_code_desc[11];
+
+  if(strcmp(nd_fr_section_code.arr, "!!!!") == 0)
+	/* Legend[5]  -- LOWEST  */
+    strcpy(fr_section_code_desc, loc_legend[5]);
+    else strcpy(fr_section_code_desc, nd_fr_section_code.arr);
+
+  if(strcmp(nd_to_section_code.arr, "~~~~") == 0)
+	/* Legend[6]  -- HIGHEST  */
+    strcpy(to_section_code_desc, loc_legend[6]);
+    else strcpy(to_section_code_desc, nd_to_section_code.arr);
+
+  if(strcmp(nd_fr_clinic_code.arr, "!!!!") == 0)
+	/* Legend[5]  -- LOWEST  */
+    strcpy(fr_clinic_code_desc, loc_legend[5]);
+    else strcpy(fr_clinic_code_desc, nd_fr_clinic_code.arr);
+
+  if(strcmp(nd_to_clinic_code.arr, "~~~~") == 0)
+	/* Legend[6]  -- HIGHEST  */
+    strcpy(to_clinic_code_desc, loc_legend[6]);
+    else strcpy(to_clinic_code_desc, nd_to_clinic_code.arr);
+
+  if(strcmp(nd_fr_exam_code.arr, "!!!!!!!!!!!") == 0)
+	/* Legend[5]  -- LOWEST  */
+    strcpy(fr_exam_code_desc, loc_legend[5]);
+    else strcpy(fr_exam_code_desc, nd_fr_exam_code.arr);
+
+  if(strcmp(nd_to_exam_code.arr, "~~~~~~~~~~~") == 0)
+	/* Legend[6]  -- HIGHEST  */
+    strcpy(to_exam_code_desc, loc_legend[6]);
+    else strcpy(to_exam_code_desc, nd_to_exam_code.arr);
+
+  if(strcmp(nd_fr_appt_date.arr, "01/01/1800") == 0)
+	/* Legend[5]  -- LOWEST  */
+    strcpy(fr_appt_date_desc, loc_legend[5]);
+   else 
+	{
+		//strcpy(fr_appt_date_desc, nd_fr_appt_date.arr);
+		init_date_temp_var();
+		strcpy(date_convert.arr,nd_fr_appt_date.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(fr_appt_date_desc, date_convert.arr);
+    }
+
+  if(strcmp(nd_to_appt_date.arr, "31/12/4712") == 0)
+	/* Legend[6]  -- HIGHEST  */
+    strcpy(to_appt_date_desc, loc_legend[6]);
+    else 
+	{
+		//strcpy(to_appt_date_desc, nd_to_appt_date.arr);
+		init_date_temp_var();
+		strcpy(date_convert.arr,nd_to_appt_date.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(to_appt_date_desc, date_convert.arr);
+	}
+  print_page_header();
+
+  fprintf(f1,VER);
+  fprintf(f1,"\n\n\n\n");
+  fprintf(f1,"        ");
+  /* legend[7]  --  INPUT PARAMETERS  */
+  fprintf(f1,"%s :\n",loc_legend[7]);
+  fprintf(f1,"        ");
+  fprintf(f1 ,"__________________\n\n");
+
+ /* fprintf(f1,"------------------\n\n"); */
+  fprintf(f1,"                ");
+  //fprintf(f1,"APPOINTMENT DATE FROM         : %s\n", fr_appt_date_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n",loc_legend[8],loc_legend[3], fr_appt_date_desc);
+  fprintf(f1,"                ");
+  //fprintf(f1,"                 TO           : %s\n", to_appt_date_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n","",loc_legend[4],to_appt_date_desc);
+  fprintf(f1,"\n");
+  fprintf(f1,"                ");
+  //fprintf(f1,"WING CODE                     : %s\n", nd_wing_code.arr);
+  fprintf(f1,"%-32.32s: %s\n",loc_legend[9], nd_wing_code.arr);
+  fprintf(f1,"\n");
+  fprintf(f1,"                ");
+  //fprintf(f1,"SECTION CODE                  : %s\n", nd_fr_section_code.arr);
+  fprintf(f1,"%-32.32s: %s\n", loc_legend[10],nd_fr_section_code.arr);
+  fprintf(f1,"\n");
+  fprintf(f1,"                ");
+  //fprintf(f1,"ROOM CODE        FROM         : %s\n", fr_clinic_code_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n",loc_legend[11],loc_legend[3], fr_clinic_code_desc);
+  fprintf(f1,"                ");
+  //fprintf(f1,"                 TO           : %s\n", to_clinic_code_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n","",loc_legend[4], to_clinic_code_desc);
+  fprintf(f1,"\n");
+  fprintf(f1,"                ");
+  //fprintf(f1,"EXAM   CODE      FROM         : %s\n", fr_exam_code_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n", loc_legend[12],loc_legend[3],fr_exam_code_desc);
+  fprintf(f1,"                ");
+  //fprintf(f1,"                 TO           : %s\n", to_exam_code_desc);
+  fprintf(f1,"%-23.23s %-8s: %s\n","",loc_legend[4],to_exam_code_desc);
+  fprintf(f1,"");
+ }
+
+/* to print page headers the header details */ 
+void print_page_header()
+{
+	int hosp_nm_len, rep_title_len = 10, s1, s2;
+	char v_rep_title[200];
+	
+	char fr_appt_date_desc[11], to_appt_date_desc[11];
+
+	if(strcmp(nd_fr_appt_date.arr, "01/01/1800") == 0)
+		/*  legend[5]  --  LOWEST  */
+		strcpy(fr_appt_date_desc, loc_legend[5]);
+	else 
+	{
+		//strcpy(fr_appt_date_desc, nd_fr_appt_date.arr);
+		init_date_temp_var();
+		strcpy(date_convert.arr,nd_fr_appt_date.arr);
+		time_flag = 0;
+		fun_change_loc_date();
+		strcpy(fr_appt_date_desc, date_convert.arr);
+	}
+
+	if(strcmp(nd_to_appt_date.arr, "31/12/4712") == 0)
+		/*  legend[6]  -- HIGHEST  */
+		strcpy(to_appt_date_desc, loc_legend[6]);
+	else
+	{
+		//strcpy(to_appt_date_desc, nd_to_appt_date.arr);
+		init_date_temp_var();
+		strcpy(date_convert.arr,nd_to_appt_date.arr);
+		time_flag = 0;
+		fun_change_loc_date(); 
+		strcpy(to_appt_date_desc, date_convert.arr);
+	}
+
+	page_no ++;
+
+	fprintf(f1,"MDL : RD");                                                
+	hosp_nm_len  =  h_acc_entity_name.len;                                 
+	s1 = (REP_WIDTH-hosp_nm_len)/2;                                        
+	horz_skip(s1-8);                                                       
+	fprintf(f1,"%s", h_acc_entity_name.arr);                               
+	s2 = (REP_WIDTH-s1-hosp_nm_len);                                       
+	horz_skip(s2-16); 
+	
+	init_date_temp_var();
+	strcpy(date_convert.arr,h_sysdate.arr);
+	time_flag = 1;
+    fun_change_loc_date();
+	//fprintf(f1,"%s", h_sysdate.arr);                                       
+	fprintf(f1,"%s", date_convert.arr);
+                                                                       
+	fprintf(f1,"\n"); fprintf(f1,"OPR : %s", h_user.arr); fprintf(f1,"\n");
+                                                                       
+	fprintf(f1,"REP : %s",nd_pgm_id.arr); 
+	
+	/* legend[1] --  APPOINTMENTS STATISTICS */
+	strcpy(v_rep_title,loc_legend[1]);                                         
+	rep_title_len = strlen(v_rep_title);                                   
+	s1 = (REP_WIDTH-rep_title_len)/2;                                      
+	horz_skip(s1-14);                                                      
+	//fprintf(f1,"%s",REP_TITLE);     
+	fprintf(f1,"%s",v_rep_title);     
+	                                       
+	s2 = (REP_WIDTH-s1-rep_title_len);                                     
+	horz_skip(s2-10);
+	/*  legend[2]  -- PAGE  */
+	fprintf(f1,"%s :%4d\n",loc_legend[2], ++page_no);                                                      
+	//fprintf(f1,"PAGE :%4d\n",++page_no);
+                                                                       
+	fprintf(f1,"                        ");
+	/*  legend[3]  -- FROM ;  legend[4]  --  TO   */  
+	fprintf(f1,"%s : %-10s", loc_legend[3],fr_appt_date_desc);
+	fprintf(f1," %s : %-10s", loc_legend[4], to_appt_date_desc);
+	fprintf(f1,"\n");
+	
+	print_line('_',REP_WIDTH);
+	
+	line_no = 5;
+}
+
+/*------------------------------ Name Header ---------------------------------*/
+void print_hdr()
+
+{
+	get_wing_desc();
+	/*  legend[13]   -- Wing   */
+	fprintf(f1,"%-17.17s: %-30s\n\n",loc_legend[13],h_wing_desc.arr);
+	/*  legend[14]   -- Section   */
+	fprintf(f1,"%-17.17s: %-4s %-30s\n\n",loc_legend[14],nd_fr_section_code.arr, o_section_desc.arr);
+	//fprintf(f1,"Examination Code & Description                        Booked  Attended  No Show\n");
+	fprintf(f1,"%-53.53s %-7.7s %-9.9s %-s\n",loc_legend[15],loc_legend[16],loc_legend[17],loc_legend[18]);
+	print_line('_',REP_WIDTH); fprintf(f1,"\n");
+	print_room_hdr();
+	line_no += 5;
+}
+/*------------------------------ End Header ----------------------------------*/
+
+print_room_hdr()
+{
+   get_clinic_desc();
+   fprintf(f1,"%-17.17s: %-4s %-30s\n\n",loc_legend[20],t_clinic_code.arr, o_clinic_desc.arr);
+   line_no += 2;
+}
+
+/*---------------------------------------------------------------------------*/
+
+print_end_of_rep()
+{
+    horz_skip(25);
+	/*  legend[19]  -- End of Report  */
+	fprintf(f1,"***** %s *****",loc_legend[19]);
+	fprintf(f1,"%cE",ESC); /*for resetting to default mode by 
+							  rvNambiar on 26/Aug/2003 */
+} 
+
+print_line(ch,n) /* this is to obtain required characters */
+  char ch;
+  int n;
+{
+	int i;
+	for(i=0;i<n;i++)
+	fprintf(f1,"%c",ch);  fprintf(f1,"\n");
+}
+
+horz_skip(num) /* this is to obtain required blank space */
+int num;
+{
+	int i;
+	for(i=0;i<num;i++)fprintf(f1," ");
+}
+
+
+/*   Code is defined for Internatinlization  */
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+nd_temp_date.arr[nd_temp_date.len]='\0';
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}
+
+get_local_date()
+{
+
+
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+
+	
+	BEGIN
+	  
+       	get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);
+
+		IF :time_flag = 1 THEN
+		   :nd_loc_date := to_char(t_date,'DD/MM/YYYY HH24:MI');
+		   :time_flag := 0;
+		ELSE
+	       :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+		END IF;
+	
+
+	END;
+
+	END-EXEC;
+
+		nd_loc_date.arr[nd_loc_date.len]='\0';		     
+
+		if (OERROR)
+		disp_message(ERR_MESG,"Date conversion failed...\n");
+        //err_mesg("SELECTING Date failed",0,"");
+
+}
+
+fetch_legend_value()
+{
+	
+	int i=0;
+	EXEC SQL EXECUTE
+	BEGIN	      
+  	   sm_populate_report_legend.fetch_legend(:nd_facility_id,:p_language_id,'RDRCLEXM.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+	for (i=1; i<=100; i++)
+	{
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+       :l_translated_value := GET_LEGEND(LTRIM(RTRIM('RDRCLEXM.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//disp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(loc_legend[i],l_translated_value.arr);
+
+	}
+
+}
+
+
+/*---------------------------------------------------------------------------*/
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef OERROR
+#undef MAX_LINES
+#undef VER
+#undef REP_WIDTH
+#undef REP_TITLE

@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_SSInvMgmnt_SS Receipt against Invoices</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to record or process invoice payments:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment Reference Doc</span> – Enter the payment reference document number in alphanumeric format of 30 characters maximum length. This indicates the document number using which the details can be viewed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pmnt Ref Date</span> – Click Calendar function to select the date when the payment details are recorded for the selected document reference number. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipt Amount</span> – Enter the Receipt Amount in numeric format. The Receipt Amount indicates the amount dispatched by Social Security to settle outstanding bills against which the invoice is generated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allocated Amount</span> - The Allocated Amount in displayed in numeric format indicating the agreed amount for the Policy and the Payer combination. It is displayed as the sum of the Settled Amount in the 'Invoices for Settlement' tab. You cannot update the Allocated Amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Balance Amount</span> - The Balance Amount is displayed after deducting the allocated amount from the receipt amount. You cannot update the Balance Amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Name</span> – Enter the name of the Payer in alphanumeric format of 100 characters maximum length. You can search and associate the invoices using the ‘Invoices for Settlement' tab.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipt Option</span> – Select a Receipt Option from the list. The values are system defined – ‘Invoice-wise’ and ‘Consolidated by Payer'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoice-wise</span> – Select Invoice-wise to list and to settle the payment against the individual invoices generated for the outstanding bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Consolidated by Payer</span> - Select Consolidated by Customer to list and to settle the payment against the consolidated invoices generated for the outstanding bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[View Details]</span> – Click <span class="BoldNumberRFD">[View Details]</span> to view, print or save the payment reference details of the records matching the search criteria in the local machine.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Finalize</span> - Select the check box to finalize the payment record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Finalize]</span> – Click <span class="BoldNumberRFD">[Finalize]</span> to finalize and settle the received amount on the selected invoices. The Receipt Amount has to match with the allocated amount and the settlement amount to finalize the document.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Un-Finalize]</span> - The legend changes to <span class="BoldNumberRFD">[Un-Finalize]</span> only if the invoice payment records are finalized. An authorization screen pops-up on clicking <span class="BoldNumberRFD">[Un-Finalize]</span>. Enter the Username and PIN number to update the invoice payment details. Click <span class="BoldNumberRFD">[OK]</span> to login and update or <span class="BoldNumberRFD">[CANCEL]</span> to cancel the process. Users with 'Un-Finalize Invoice Payment' check box as selected in 'Users for Services' function in Administration menu are permitted to un-finalize invoice payments.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Invoices for Settlement</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Using the Invoices for Settlement tab, you can select the invoices from the list against which the receipt amount has to be applied. The invoice details generated using the functions ‘Generate Invoice – OP - High Cost’ or ‘ Generate Invoice – IP - High Cost’ functions get listed. The transactions for the selected invoice gets listed. Click</span> <span class="BoldNumberRFD">[Commit Form]</span> <span style="font-weight: normal;">to record the details. An error message 'Settle by Service and Actual Settlement Amount Should be Same, Cannot Proceed' is displayed if the amount does not match. Settled amount should not be greater than the payable amount.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Settle By Services</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The invoice number, patient ID, episode type, encounter ID, service details, net amount, paid and payable amount are displayed.</span></p>
+<ol>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD">Enter the 'Settled Amt' in 'Invoices for Settlement' tab and press [Tab] in your keyboard to enable this tab.</p>
+</li>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD" style="font-weight: normal;"><span class="UnderlineRFD">Select</span> - Select the check box to settle the amount against each service.</p>
+</li>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD" style="font-weight: normal;"><span class="UnderlineRFD">Settlement Amount</span> - Enter the Settlement Amount in numeric format. The settlement amount has to be equal to the actual settlement amount. If the amount does not match, an error message is displayed. Settlement Amount cannot be more than the Net amount. Click <span class="BoldNumberRFD">[Commit Form]</span> to record the details.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Lookup for Search &amp; Invoice Selection</p>
+<p class="BoldRFD">Invoice Search</p>
+<p class="BoldRFD" style="font-weight: normal;">The 'Lookup for Search &amp; Invoice Selection' tab enables you to view and search for the invoices raised. The records are listed based on the search criteria.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD">Enter the following search criteria:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer. The Payer defined using the ‘Customer’ function in the AR Setup menu gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Click <span class="BoldNumberRFD">[List of Values] t</span>o select a Patient ID. The invoice generated for the outstanding bills of the selected patient gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Encounter Type</span> – Select an Encounter Type from the list. The invoices generated for the selected Encounter Type gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Encounter ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> &#160;to select the Encounter ID. The Encounter ID for the selected Encounter Type is listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">SS Invoice Type</span> - Select an Invoice Type from the list. The system-defined values are 'HIV Invoice Type', 'HIV Related' and 'High Cost Invoice Type'. Select an .</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Polic</span>y - Click [List of Values] to query invoices based on the Policy Types.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Support Doc Number</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to query records based on the Support Document Number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoice No. [From - To]</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a range of Invoice Numbers. The Invoice Document Types with the system-generated number are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Search]</span> - Click <span class="BoldNumberRFD">[Search]</span> to view records based on the search criteria specified. The invoice generated gets listed. The payer details are displayed based on the query criteria specified.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> – Select the check box against the records to allocate the records under selected Payment Document Reference indicating that the amount is settled for selected invoice.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Allocate]</span> - Click <span class="BoldNumberRFD">[Allocate]</span> and the invoices are listed in the 'Invoices for Settlement' tab under the respective Payment Document Reference.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Settlement Details</p>
+<p class="BoldRFD" style="font-weight: normal;">The amount posted by the Customer to settle payment for the invoices dispatched are recorded using this tab. This tab is enabled in the Query mode after you <span style="font-weight: normal;">commit or finalize the invoice payments.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Srl No</span> - Enter the serial number in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Settled</span> - Enter the amount settled in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Settlement Type. The settlement type indicates the mode of payment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Given</span> - Enter the Cash amount in numeric format. &#160;The cash amount indicates the payment received against the invoices posted.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Returned</span> - Enter the cash amount returned in numeric format. This indicates the cash amount returned to the Customer after deducting the outstanding amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque/Card No</span> - Enter the Cheque number or card number in alphanumeric format of 20 characters maximum length. If settlement type is non Cash, then these are mandatory. Otherwise, this should be left blanks. Enter the details of the Cheque or a Credit Card. For example, if the settlement is by Credit Card, enter the Credit Card identity and expiry date of the Credit Card. If the settlement type is by Cheque, enter the Cheque details and the date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Click Calendar function to set a valid date. Enter the date of the Cheque, if the settlement type is Cheque or if the settlement type is Credit Card, enter the date of the expiry of the Credit Card.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Bank name.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank/Card Co. Name/Branch</span> – Enter the Bank or Credit Card company name in alphanumeric format of 30 characters maximum length. If settlement type is non Cash, then this is mandatory. Otherwise, this should be left blanks. For example, if the settlement is by Credit Card, enter the Credit Card company name. If the settlement is by Cheque enter the banks name or banks’ branch name. Click <span class="BoldNumberRFD">[List of Values]</span> to view and select an approved Credit Card company name or an approved bank or branch.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Approval</span> – If the check box is selected, Credit Card entered receipt will be forwarded to the Credit Card Company immediately. If the check box is cleared, Credit Card receipts will be forwarded as batch. In case of Online Approval, Batch No. information to be filled manually.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Batch No</span> – Enter the batch number if settlement type is of Credit Card.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approval Code</span> – Enter the Approval Code with a maximum of 30 characters. If the settlement is made through Credit Card, Approval code of the Credit Card to be entered here.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Draft No</span> – Enter the Sale Draft Number with a maximum of 20 characters. When settlement is made by Credit Card, sale draft number details captured at the time of swiping to be recorded here.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer’s Name</span> - Enter the payer name with a maximum of 40 characters. This field is to be entered if the receipt nature code is ‘MI’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer’s Ref ID</span> – Enter the Payer’s Reference ID with a maximum of 30 characters. When Payer name is captured, is having any reference ID, can be entered as input for this field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the narration in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Print Receipt]</span> - Click <span class="BoldNumberRFD">[Print Receipt]</span> to print receipts for payment received to settle the outstanding amount. You can generate the receipts only after recording the settlement details and finalizing the payment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Print Detailed Receipt]</span> - Click <span class="BoldNumberRFD">[Print Detailed Receipt]</span> to print a detailed receipt.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Login Counter]</span> - Click <span class="BoldNumberRFD">[Login Counter]</span> to login to a Cash Counter. The Cash Counter indicates the counter where the amount is settled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Commit Form]</span> to save settlement details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Generate Receipt]</span> - Click <span class="BoldNumberRFD">[Generate Receipt]</span> to generate a receipt. This button is enabled when you save the settlement details. A confirmation message 'Receipt Generated successfully' is displayed. The receipt is printed, if print routing is defined.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

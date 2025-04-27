@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Enc Spec Policy Defn Serv</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Insurance Management\nCode Setup\nEnc Spec Policy Defn Serv");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Encounter Specific Policy Definition - Services</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Include</span> or <span class="RedItalic">Exclude</span> the services for a particular patient encounter associated to a Policy Type and <span class="RedItalic">Query</span> for a desired Encounter Specific Policy Type record.</p>
+<p class="Text">The function Encounter Specific Policy Definition – Services is used to include or exclude the services for a particular patient encounter in the facility. The coverage charge can be recalculated for specific patient encounter. You can associate additional services to the patient encounter. The services associated to the selected Policy Type, Customer Group and the Customer are defined using the function <a href="Setup_Service_Coverage_Detail_by_Policy.htm">Setup Service Coverage Detail by Policy</a>. You can associate additional services to the patient encounter other than the services, which are already associated to the Policy Type, Customer Group and the Customer. You can also delete the services from the patient encounter.</p>
+<h2>Encounter Specific Policy Definition - Services</h2>
+<p class="From">From the Masters, double-click on Encounter Specific Policy Definition function.</p>
+<p class="Text">The Encounter Specific Policy Definition screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Select an Episode Type from the list. The values are system defined - Inpatient, Daycare, Outpatient and Emergency. The policy definition for services is applicable for the selected Episode Type.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[List of Values]</span> to select an Episode ID. The Episode ID applicable for the selected Episode Type gets listed. The patient details get displayed based on the Episode ID selected. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The Policy Type details associated to the patient during the specific encounter registration gets displayed. <a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/IN_Code_EncSpecificPolicyDefnServ.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[View]</span> adjacent to each record to view the <a href="Setup_Service_Coverage_Detail_by_Policy.htm">service coverage detail</a> for a specific policy.</p>
+</li>
+<li class="p-Number">
+<p class="Number">You can include additional services to the specific encounter and define the coverage limit for the specific policy using the tabs:</p>
+</li>
+</ol>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Policy Excluded/Included Service Dtls</a></p>
+<div class="droptext" id="POPUP1004842517" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exclude/Include Criteria</span> – Select a value from the list. The system defined values are ‘Billing Service’, ‘Payer Service Group’ and ‘Payer Service Group/Line’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exclude/Include Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a Billing Service, Payer Service Group or Payer Service Group/Line.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Special Item</span> – Select the check box, if special items are associated to the specific encounter. Clear the check box and you cannot associate special items to the range of policies.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Excl Incl Ind</span> – Select a value from the list. The system defined values are ‘Excluded’ and ‘Included’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override Incl Excl</span> – Select the check box to override the exclude/include indicator selected for the Billing Service associated. The override performs inverse action based on the value selected for ‘Excl/Incl Ind’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Policy Level</span> – Select the check box, if the service exclude/include detail is valid only for the selected policy.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment Indicator</span> - Select a Payment Indicator from the list. The system defined values are ‘%age’, ‘Rate’ and ‘Fixed’. This is applicable for co-pay value calculation. On selecting ‘Percentage’, the symbol % is displayed beside it. On selecting ‘Rate’ or ‘Fixed’, currency name is displayed beside it.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Copay Value</span> – Enter the Copay Value in numeric format. The amount to be settled by the Co-payer is calculated based on the Payment Indicator selected and the value specified for Copay value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Preapproval</span> – Select the check box, if preapproval is necessary to associate the services and the defined co-pay value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Effective Date</span> – Click Calendar function to select the date. The service details are valid for the selected encounter on the date specified.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approved</span> – Select the check box and the parameter defined is approved for the selected encounter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Coverage includes other Payers</span> - Select the check box to define an additional payer for the specific Policy, Payer and Payer Group. Clear the check box, if an additional payer is not required for the selected combination.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Last Payer</span> - Select the check box, if the payer is the last payer. Based on whether the coverage amount is selected and the payer is the last payer or not, the policy coverage amount is distributed as follows:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the check boxes ‘Coverage includes other Payers’ and ‘Last Payer’ are selected, the amount is sent as discount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the check box ‘Coverage includes other Payers’ is selected and the check box ‘Last Payer’ is cleared, the remaining amount has to be paid by the patient.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />An alert message is displayed, if the Discharge Bill is generated for the selected Episode. Press ‘Yes’ to continue with the encounter specific policy definition.</p>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Payer Coverage Limits</a></p>
+<div class="droptext" id="POPUP1004838967" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Serv Coverage Limit Crit</span> – Select a value from the list. The system defined values are ‘Billing Service’, ‘Payer Service Group’ and ‘Payer Service Group/Line’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exclude/Include Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a Billing Service, Payer Service Group or Payer Service Group/Line.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The description for the selected Billing Service code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amt Limit Per Enc</span> – Enter the maximum limit amount covered for the selected billing service associated to the patient encounter in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amt Limit Per Day</span> – Enter the maximum limit amount per day in numeric format. The amount limit is valid for the selected service and is valid for a day and applicable to the selected patient encounter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No Of Days</span> – Enter the number of days until when the coverage amount limit is valid for the selected patient encounter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ovride Limit</span> – Select the check box to override the coverage limit. The override performs inverse action based on the value selected for ‘Amt Limit Per Enc’ or ‘Amt Limit Per Day’.</p>
+</li>
+</ol>
+</div>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Click [Insert Record] to associate or dissociate additional services from the specific encounter associated to a Policy Type.</p>
+<ol start="6" type="1">
+<li class="p-Number">
+<p class="Number">To view the history of the service details with the policy coverage and the payer coverage limits associated to the selected encounter, click on the tabs:</p>
+</li>
+</ol>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Policy Excluded/Included Service Dtls - History</a></p>
+<div class="droptext" id="POPUP1004825400" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Using this tab, you can view the services included/excluded from the policy.</p>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Payer Coverage Limits - History</a></p>
+<div class="droptext" id="POPUP1004854640" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Using this tab, you can view the payer coverage limits recorded for a patient encounter.</p>
+</div>
+<ol start="7" type="1">
+<li class="p-Number">
+<p class="Number">Select the check box 'Recalculate Charges' to re-define the charges for the specific encounter. If the discharge bill has been generated, an alert is displayed. The charges are re-calculated based on the transaction. &#160;</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> or press <span class="BoldButton">[F10]</span> to save or click <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to search for the existing records within the facility.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Billing Services','../../Patient_Billing_Manager/CodeSetup/Billing_Services.htm','Customer','../../Accounts_Receivable/Code_Setup/Customer.htm','Item','../../Materials_Base/CodeSetup/Item.htm','Policy Types','Policy_Types.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Cash Bill Cum Receipt','../../Patient_Billing_Manager/Transactions/OP_Cashier/Cash_Bill_Cum_Receipt.htm','Discharge Bill Cum Receipt','../../Patient_Billing_Manager/Transactions/IP_Cashier/Discharge_Bill_Cum_Receipt.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP1004842517');
+	TextPopupInit('a3','POPUP1004838967');
+	TextPopupInit('a4','POPUP1004825400');
+	TextPopupInit('a5','POPUP1004854640');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

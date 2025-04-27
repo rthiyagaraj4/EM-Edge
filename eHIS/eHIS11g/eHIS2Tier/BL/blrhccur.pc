@@ -1,0 +1,469 @@
+ 
+/* Preprocessor Directives    */
+
+#include <stdio.h>
+#include <string.h>
+#include <process.h> 
+#include <math.h>
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <bl.h>
+#include <winproc.h>
+
+/* Macros */
+
+#define NODATAFOUND sqlca.sqlcode==1403
+#define OERROR (sqlca.sqlcode < 0) 
+#define MAX_LINES 27
+
+/* Declarations */
+
+EXEC SQL BEGIN DECLARE SECTION;	
+
+	VARCHAR uid_pwd 	        [95],	        
+	     	nd_sysdate              [31],		
+		nd_user_id  	        [31],	
+		nd_hospital_name	[61],
+		nd_ward			[16],
+		nd_bed			[9] ,
+		nd_patient_id		[21],
+            d_short_name_full       [61],
+		nd_patient_name		[61],
+        nd_patient_name1		[61],
+		nd_blng_grp		[16],
+		nd_hcard_no		[21],
+		nd_nationality		[5] ,
+		nd_exp_date		[11],
+		nd_adm_date		[20],
+		nd_session_id		[25],
+		nd_pgm_date		[31],
+		nd_pgm_id		[20],
+		nd_p_facility_id	[4],
+		nd_cut_day		[5] ;	
+
+	char    nd_filename	        [100];
+
+	long 	nd_srl_no		,
+		nd_adm_no		,
+		nd_eos_day		,
+
+		nd_cut_off_day		;
+
+
+
+EXEC SQL END DECLARE SECTION;
+
+	FILE 	*f1;
+	int	page = 0;
+	int	line = 0;
+
+void proc_main(argc, argv)
+		int 	argc;
+		char 	*argv[];
+{    
+   void prt_line(int l, char spl_symbol[1]);
+   void prt_hdr_initial();
+   void prt_hdr();    
+   void dec_cursor();
+   void open_cursor();
+   void close_cursor();
+   int  fetch_cursor();  
+   void report_process();
+   void line_check();
+   
+
+/* INPUT ARGUMENT CHECK */
+
+     if(argc != 7) 
+     {
+	     disp_message(ORA_MESG, "Usage BLRLSBIL uid/passwd@db Session Pgm-Date Cut-Off-Days Facility");
+	     proc_exit();
+     }	
+
+     strcpy(nd_pgm_id.arr, argv[0]);
+     nd_pgm_id.len = strlen(nd_pgm_id.arr);      	       
+
+     strcpy(g_pgm_id,argv[0]);
+
+     strcpy(uid_pwd.arr, argv[1]);
+     uid_pwd.len = strlen(uid_pwd.arr);      	     
+
+
+     strcpy(nd_session_id.arr, argv[2]);
+     nd_session_id.len = strlen(nd_session_id.arr);      	 
+
+     strcpy(g_session_id,nd_session_id.arr);
+
+     strcpy(nd_pgm_date.arr, argv[3]);
+     nd_pgm_date.len = strlen(nd_pgm_date.arr);      	 
+
+     strcpy(g_pgm_date,nd_pgm_date.arr);
+
+	
+     strcpy(nd_cut_day.arr,argv[5]);
+     nd_cut_day.len = strlen(nd_cut_day.arr); 
+
+     strcpy(nd_p_facility_id.arr, argv[6]);
+     nd_p_facility_id.len = strlen(nd_p_facility_id.arr);      	 
+
+     strcpy(g_facility_id,nd_p_facility_id.arr);
+
+     nd_cut_off_day = atoi(nd_cut_day.arr);
+
+       
+/* DB LOGIN */
+
+    EXEC SQL CONNECT :uid_pwd;
+    if (OERROR) 
+    {
+    	disp_message (ORA_MESG, "USERID/PASSWORD failed to Connect");
+        proc_exit();  
+    }	  	
+
+    set_meduser_role();
+
+/* OUTPUT FILE */
+
+	strcpy(nd_filename,WORKING_DIR);   
+	strcat(nd_filename,argv[0]);
+	strcat(nd_filename,".lis");
+	if((f1 = fopen(nd_filename, "w")) == NULL) 
+	{
+		 disp_message (ERR_MESG, " Error opening output file ....");
+		 proc_exit();
+        } 
+	
+  nd_sysdate.arr[0]		= '\0';  
+  nd_sysdate.len		= 0;
+
+  EXEC SQL SELECT to_char(SYSDATE,'DD/MM/YYYY HH24:MI') INTO :nd_sysdate FROM dual;
+  nd_sysdate.arr[nd_sysdate.len]       = '\0';  
+
+  nd_user_id.arr[0]		= '\0';  
+  nd_user_id.len		=0;
+  
+  EXEC SQL SELECT USER INTO :nd_user_id FROM dual;
+  nd_user_id.arr[nd_user_id.len]       = '\0';  
+
+  nd_hospital_name.arr[nd_hospital_name.len]	= '\0';        
+  EXEC SQL SELECT accounting_name INTO :nd_hospital_name FROM sy_acc_entity
+           WHERE acc_entity_id = :nd_p_facility_id;
+
+  nd_hospital_name.arr[nd_hospital_name.len]	= '\0';  
+
+
+/* PROCESS */   
+  
+   prt_hdr_initial();  
+   report_process(); 
+  
+/* CLOSE FILE */
+   EXEC SQL COMMIT RELEASE; 
+   fclose(f1);   
+   return;
+   
+}
+
+void line_check()
+{
+   if (line > MAX_LINES)
+   {
+	fprintf(f1,"\f");	
+	prt_hdr();
+   }
+}       
+
+void prt_hdr_initial()
+{     
+   line = 0;    
+   page = page +1;
+   fprintf(f1,"\n");       
+   fprintf(f1,"MDL : BL");
+   prt_line(40," "); 
+   fprintf(f1,"%-31s",nd_hospital_name.arr);
+   prt_line(30," "); 
+   fprintf(f1,"%-20s",nd_sysdate.arr);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"OPR : %-31s",nd_user_id.arr); 
+   prt_line(10," ");    
+   fprintf(f1,"Current Inpatients – Health Card Status");               
+   prt_line(25," "); 
+   fprintf(f1,"Page :%4d",page);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"REP : BLRHCCUR"); 
+   fprintf(f1,"\n"); 
+   prt_line(132,"-");     
+   fprintf(f1,"\n");    
+   fprintf(f1,"VER : 4.1");
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"		INPUT PARAMETERS:");
+   fprintf(f1,"\n");    
+   fprintf(f1,"		-----------------");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+
+   fprintf(f1,"			Cut off Days : %-5d",nd_cut_off_day);
+   fprintf(f1,"\n");    
+
+   line = MAX_LINES + 1; 
+   line_check();	
+}
+
+	
+void prt_hdr()
+{     
+   line = 0;    
+   page = page +1;
+   fprintf(f1,"\n");       
+   fprintf(f1,"MDL : BL");
+   prt_line(40," "); 
+   fprintf(f1,"%-30s",nd_hospital_name.arr);
+   prt_line(30," "); 
+   fprintf(f1,"%-16s",nd_sysdate.arr);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"OPR : %-31s",nd_user_id.arr); 
+   prt_line(10," ");    
+   fprintf(f1,"Current Inpatients – Health Card Status");
+   prt_line(25," "); 
+   fprintf(f1,"Page :%4d",page);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"REP : BLRHCCUR"); 
+   prt_line(25," ");    
+   fprintf(f1,"        ( Expired / Expiring in %-5d day(s) )",nd_cut_off_day);
+   prt_line(35," "); 
+   fprintf(f1,"\n"); 
+   prt_line(132,"-");     
+   fprintf(f1,"\n");    
+   fprintf(f1,"Admission/    Ward            Bed      Patient Id           Name                    Health Card No Expiry Date Admission Date&Time");
+   fprintf(f1, "\n");   
+   fprintf(f1,"Trf No.						   Billing Group 	 	     Nationality    Eos Day(s)");
+	       
+   fprintf(f1, "\n");   
+   prt_line(132,"-");  
+   fprintf(f1, "\n");   
+   line = line + 7;  
+}
+
+void prt_line(int line_length, char spl_symbol[1])
+{  
+ int i;  
+  for(i=1;i<=line_length;i=i+1)
+	 {fprintf(f1,spl_symbol);}
+}
+
+void dec_cursor()
+{ 
+  EXEC SQL DECLARE hcard_cursor CURSOR FOR   
+  SELECT	a.patient_id 		patient_id	,
+		d.episode_id		adm_no		,		
+		a.hcard_num  		hcard_num 	,
+		To_CHAR(a.hcard_expiry_date,'DD/MM/YYYY')
+			   	        expiry_date	,
+		ROUND(a.hcard_expiry_date-SYSDATE)
+					eos_days	,
+		b.short_desc		blng_group	,
+		/*substr(c.short_name,1,23)		Pat_name	,
+		substr(c.short_name,24,60)      Pat_name1 ,
+          */
+		  substr(c.short_name,1,30)		Pat_name	,
+		substr(c.short_name,31,60)      Pat_name1 ,
+		    c.short_name,
+		g.nationality nationality	,
+		to_char(d.admission_date_time,'dd/mm/yyyy hh24:mi')
+					adm_date,
+		f.short_desc		ward		,
+		d.cur_bed_num		bed		 
+  FROM		bl_patient_fin_dtls	a	,
+		bl_blng_grp		b	,	
+		mp_patient_mast	c	,	    
+		ip_episode		d	,   
+		ip_ward			f	,   
+		mp_country_his_vw		g
+  WHERE		a.hcard_num IS NOT NULL  
+  AND           d.facility_id =       :nd_p_facility_id
+  AND           f.facility_id =       d.facility_id  
+  AND		g.country_code		=       c.nationality_code 	
+  AND		a.hcard_expiry_date > TRUNC(SYSDATE)
+  AND	 	b.blng_grp_id		=	a.blng_grp_id
+  AND		c.patient_id		=	a.patient_id
+  AND		nvl(c.STATUS,'~')	<>	'S'	
+  AND		d.patient_id		=	a.patient_id
+  AND		d.episode_status	=	'0'  
+  AND		f.ward_code		=	d.cur_ward_code
+  AND		ROUND(a.hcard_expiry_date-SYSDATE) <= :nd_cut_off_day
+  ORDER BY 	a.hcard_expiry_date;
+  return;
+
+ }
+
+void open_cursor()
+{ 
+ EXEC SQL OPEN hcard_cursor;
+ if (sqlca.sqlcode < 0) 
+ {     disp_message (ORA_MESG, "Open HCard Cursor Failed");
+       proc_exit();
+ } 
+ return;
+ }
+
+int fetch_cursor()
+{ 
+
+    nd_patient_id.arr[0]		= '\0';
+    nd_hcard_no.arr[0]		 	= '\0';
+    nd_exp_date.arr[0]			= '\0';
+    nd_blng_grp.arr[0]			= '\0';
+    nd_patient_name.arr[0]		= '\0';
+	nd_patient_name1.arr[0]		= '\0';
+    nd_nationality.arr[0]		= '\0';
+    nd_adm_date.arr[0]			= '\0';
+    nd_ward.arr[0]		        = '\0';
+    nd_bed.arr[0]		        = '\0';
+
+    nd_patient_id.len		= 0;
+    nd_hcard_no.len	 	= 0;
+    nd_exp_date.len		= 0;
+    nd_blng_grp.len		= 0;
+    nd_patient_name.len		= 0;
+	nd_patient_name1.len		= 0;
+    nd_nationality.len		= 0;
+    nd_adm_date.len		= 0;
+    nd_ward.len		        = 0;
+    nd_bed.len		        = 0;
+
+
+
+  EXEC SQL FETCH hcard_cursor 
+	   INTO :nd_patient_id		,
+		:nd_adm_no		,		
+		:nd_hcard_no		,
+		:nd_exp_date		,
+		:nd_eos_day		,
+		:nd_blng_grp		,
+		:nd_patient_name	,
+		:nd_patient_name1   ,
+            :d_short_name_full,
+		:nd_nationality		,
+		:nd_adm_date		,
+		:nd_ward		,
+		:nd_bed			;
+
+    if (NODATAFOUND)
+    return 0;
+
+    nd_patient_id.arr[nd_patient_id.len]		= '\0';
+    nd_hcard_no.arr[nd_hcard_no.len]		 	= '\0';
+    nd_exp_date.arr[nd_exp_date.len]			= '\0';
+    nd_blng_grp.arr[nd_blng_grp.len]			= '\0';
+    nd_patient_name.arr[nd_patient_name.len]		= '\0';
+	nd_patient_name1.arr[nd_patient_name1.len]		= '\0';
+    nd_nationality.arr[nd_nationality.len]		= '\0';
+    nd_adm_date.arr[nd_adm_date.len]			= '\0';
+    nd_ward.arr[nd_ward.len]			        = '\0';
+    nd_bed.arr[nd_bed.len]			        = '\0';
+    d_short_name_full.arr[d_short_name_full.len]               = '\0';
+ 
+    EXEC SQL EXECUTE
+ BEGIN
+ declare
+      str1   varchar2(100);
+     str2   varchar2(60);
+     
+    
+   BEGIN
+     blcommon.split_words(:d_short_name_full,30,'*',1,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_patient_name   :=str2;
+       END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',2,str1,str2);
+       IF str2 IS NOT NULL THEN
+         :nd_patient_name1  := str2;
+      END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',3,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_patient_name1    := :nd_patient_name1 || str2;
+       end if;
+
+	 
+     
+ END;
+  END;
+       
+   END-EXEC;
+       nd_patient_name.arr[nd_patient_name.len]  = '\0';
+       nd_patient_name1.arr[nd_patient_name1.len]  = '\0';
+
+    nd_srl_no = '\0';    
+
+    EXEC SQL SELECT		trn_srl_num INTO :nd_srl_no
+	     FROM		bl_ip_adt_trn_vw 
+	     WHERE 		patient_id = :nd_patient_id 
+	     AND		episode_id = :nd_adm_no
+	     AND		trn_type = 'T';   	
+
+
+    return 1;	
+
+    
+ }
+
+void close_cursor()
+{ 
+ EXEC SQL CLOSE hcard_cursor;
+ return;
+ }
+	
+
+void report_process()
+{        
+    int fetch_cursor_check;
+
+	line_check();
+
+	dec_cursor();
+	open_cursor();	    	
+
+        fetch_cursor_check = fetch_cursor();   
+         
+  while(fetch_cursor_check)    
+  {
+
+	fprintf(f1,"%-8d",nd_adm_no,nd_srl_no); 		
+        if (nd_srl_no != 0)
+        {fprintf(f1,"/-%4d",nd_srl_no);}
+	else
+        {fprintf(f1,"     ");}   
+	fprintf(f1," %-15s"  ,nd_ward.arr);
+	fprintf(f1," %-8s"   ,nd_bed.arr);
+	fprintf(f1," %-20.20s",nd_patient_id.arr);
+	fprintf(f1," %-23.23s"  ,nd_patient_name.arr);
+	fprintf(f1," %-14.14s"  ,nd_hcard_no.arr);
+	fprintf(f1," %-11s"  ,nd_exp_date.arr);
+	fprintf(f1," %-20s"  ,nd_adm_date.arr);	
+        fprintf(f1, "\n");   	
+
+	if(strlen(nd_patient_name1.arr) > 2)
+	{
+	 fprintf(f1,"%48s %s \n"," ",nd_patient_name1.arr);
+	 line++;
+	}
+	prt_line(49," ");
+	fprintf(f1," %-15s"  ,nd_blng_grp.arr);	
+	prt_line(18," ");
+	fprintf(f1," %-15s"  ,nd_nationality.arr);	
+	prt_line(8," ");
+	fprintf(f1," %-8d"  ,nd_eos_day);		
+        fprintf(f1, "\n");   	
+	line = line + 1;	
+	line_check();
+        fetch_cursor_check = fetch_cursor();      
+  }
+ 	 fprintf(f1,"\n");
+	 fprintf(f1,"\n");
+	 prt_line(58," "); 
+	 fprintf(f1,"*** End Of Report ***");
+         fprintf(f1, "\n");   	 
+	 close_cursor();
+}

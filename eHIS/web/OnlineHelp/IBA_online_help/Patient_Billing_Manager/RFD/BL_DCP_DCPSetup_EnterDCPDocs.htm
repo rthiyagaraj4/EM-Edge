@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_DCP_DCPSetup_EnterDCPDocs</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following to enter the DCP documents:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Typ/No</span> - Enter a Document Type and a unique Document Number for the Document Type. If the Document Type code is valid, the short description of the Document Type code is displayed for user verification along with the transaction type code. The Document Type Code and the Document Number cannot be changed after creation. A transaction type has to be associated to the selected Document Type using the function ‘Document Type’ in the Masters. The entry has to be unique. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> - Enter a Patient Number. If the patient number is valid, the Name of the patient, and the Age in Years, Months and Days gets displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – Click Calendar function to select a Document Date. The date selected has to be equal to or less than the current system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Due Date</span> – The due date is computed by the system, based on the document date and the ‘Normal Credit Days Offered’ for deferred cash patients defined in the BL Parameters. You can override the due date by selecting a Due date using the Calendar function. Due date has to be greater than the Document Date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Nature</span> - Enter the Document Nature in alphanumeric format. The document nature indicates the reason.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Amt</span> - Enter the Document Amount in numeric format. You can enter zero, if the document amount is not applicable. Note that the Document Amount is not the Outstanding Amount. If the transaction type is "Receipts" or "Cash Control Receipts", the amount entered has to be negative only. If the transaction type is "Invoice/Bill", "Adjustments", “Payments” or "Miscellaneous", the amount entered has to be positive. If the transaction type is “Payments”, enter the right sign, since both signs are acceptable. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Posting A/C</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a valid posting account. The description for the respective posting account code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Post mth/yr</span> - Enter the Post month and year in numeric format. The posting month/year cannot be greater than the Billing Parameters post month and year. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the Narration for the Outstanding Document in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amt Ent.</span> - This is the sum of the amounts entered in the detail block (associated transactions). System calculates the amount automatically and you cannot change the amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Ref</span> - Enter the document reference in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Type</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a Bill Type. The description for the selected Bill Type code gets displayed in the adjacent text box. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode</span> – Select an appropriate Episode Type from the list. The values are system defined – “Outpatients”, “Inpatients” and “Referral patients”.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Enter an episode number, if episode type is entered. For referral patients, the episode number field is not valid.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Enter a visit number in case of Outpatients. For Inpatients and Referral patients, the episode number field is not valid.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Details</p>
+<ol start="14">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Document Type. The values get listed from the Financials Base Manager module. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Number</span> - Enter a unique Document Number in numeric format with eight digits maximum length. System checks if the document type and document number in the detailed block against the document type and the document number in the header block. The Document Type and Number mentioned must not be the same as the original document. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – Click Calendar function to select a Document Date. The date selected has to be equal to or lesser than the current system date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">T</span> - The Transaction Type Code for the selected document gets displayed. You cannot update the Transaction Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nat</span> - Enter the Document Nature in alphanumeric format. The narration can be a reason for the transaction with the respective document.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference</span> - Enter a Reference for the selected document.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount</span> - Enter the Document Amount in numeric format. Zero is a valid entry. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the Narration for the associated transaction in alphanumeric format.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

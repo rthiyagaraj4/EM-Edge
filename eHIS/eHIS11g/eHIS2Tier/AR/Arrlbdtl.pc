@@ -1,0 +1,593 @@
+/*  
+#define DEBUG
+*/
+   
+#include <stdio.h>
+#include <string.h>
+#include "gl.h"     
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd[41],
+	    d_session_id[16],
+	    d_pgm_date[14],
+            rep_date[20],
+            comp_name[50],
+            oper_id[21],
+            d_curr_pgm_name[15],
+			p_language_id [3];
+
+    VARCHAR nd_facility_id      [3],
+	    nd_fm_date          [11],
+            nd_to_date          [11],
+            nd_fm_cust          [9],
+            nd_to_cust          [9],
+
+            d_cust_code         [9],
+	    d_lab_date          [11],
+	    d_doc_type_code     [7],
+	    d_doc_num           [9],
+	    d_request_num       [11],
+	    d_patient_name      [61],
+	    d_section_code      [2],
+
+	    d_cust_name         [101],  -- CRF-0120
+	    d_section_name      [16];
+
+   int nd_no_of_decimal;
+
+    double  d_debit_amt,
+	    d_tot_paid_amt = 0;
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+#define REP_WIDTH 132
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1];
+
+char rep_title[]= "OUTSIDE LAB - DEBTOR DETAIL";
+
+FILE *f1;
+
+int page_no,
+    line_no,
+    first_line,
+    g_count;
+
+char prv_cust_code[9],
+     prv_request_num[11];
+
+double g_tot_amt, 
+       g_paid_amt,
+       g_req_tot_amt,
+       g_req_paid_amt,
+       g_cust_tot_amt,
+       g_cust_paid_amt;
+ char filename[150];
+
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];  
+{
+ strcpy(filename,WORKING_DIR);
+ strcpy(OUTPUT_FILE_NAME,argv[5]);
+ strcat(filename,OUTPUT_FILE_NAME);
+
+ //strcat(filename,"arrlbdtl.lis");
+
+    if(argc !=6) {
+        disp_message(ERR_MESG,"ARRLBCHG : Usage ARRLBCHG userid/password session_id pgm_date facility_id\n");
+        proc_exit();
+    }
+
+    strcpy(g_pgm_id,"ARRLBCHG");
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+        disp_message(ERR_MESG,"Unable to connect to oracle.");
+        proc_exit();
+    }
+
+    set_meduser_role();
+
+strcpy(p_language_id.arr,l_language_id.arr);
+p_language_id.len = l_language_id.len;
+
+	fetch_prog_param();
+    fetch_sys_info(); 
+
+
+    if( (f1=fopen(filename,"w")) == NULL) {
+        disp_message(ERR_MESG,"Error in opening output file...");
+		exit(0);
+    }
+
+    page_no=1;
+    line_no=1;
+
+    decl_curs();
+
+    put_inp_parm();
+
+    do_report();
+    print_end_of_rep();
+
+    fclose(f1);
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+}
+
+fetch_prog_param()
+{
+
+   nd_fm_date.arr[0]   = '\0';
+   nd_to_date.arr[0]   = '\0';
+   nd_fm_cust.arr[0]   = '\0';
+   nd_to_cust.arr[0]   = '\0';
+
+   nd_fm_date.len      = 0;
+   nd_to_date.len      = 0;
+   nd_fm_cust.len      = 0;
+   nd_to_cust.len      = 0;
+
+   EXEC SQL SELECT operating_facility_id,
+				   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4
+              INTO :nd_facility_id,
+			       :nd_fm_date,
+                   :nd_to_date,
+                   :nd_fm_cust,
+                   :nd_to_cust
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NO_DATA_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_fm_date.arr[nd_fm_date.len]   = '\0';
+   nd_to_date.arr[nd_to_date.len]   = '\0';
+   nd_fm_cust.arr[nd_fm_cust.len]   = '\0';
+   nd_to_cust.arr[nd_to_cust.len]   = '\0';
+
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+   
+}
+
+
+decl_curs()
+{
+
+     EXEC SQL DECLARE RL_REQ_HDR_CUR CURSOR FOR
+	       SELECT D.CUST_CODE,
+		      TO_CHAR(C.SPEC_REGD_DATE_TIME,'DD/MM/YYYY'),
+		      C.DOC_TYPE_CODE,
+		      C.DOC_NUM,
+		      C.SPECIMEN_NO,
+		      A.SHORT_NAME,
+		      C.SECTION_CODE,
+		      SUM(NVL(B.NET_CHARGE,0))
+		 FROM BL_AM_REFERRAL D, 
+			  RL_PATIENT_MAST A,
+		      RL_REQUEST_DETAIL B,
+		      RL_REQUEST_HEADER C
+		WHERE SPEC_REGD_DATE_TIME >= TO_DATE(:nd_fm_date||'0000',
+						'dd/mm/yyyyhh24mi') 
+		  AND SPEC_REGD_DATE_TIME < TO_DATE(:nd_to_date||'0000',
+						'dd/mm/yyyyhh24mi')+1 
+		  AND D.CUST_CODE BETWEEN
+			   NVL(:nd_fm_cust,'!!!!!!!!') AND
+			   NVL(:nd_to_cust,'~~~~~~~~')
+		  AND NVL(INVOICED_YN,'N') = 'N'
+		  AND NVL(B.CANCELLED_YN,'N') = 'N'
+		  AND A.PATIENT_ID  = C.PATIENT_ID
+		  AND B.SPECIMEN_NO = C.SPECIMEN_NO
+		  AND D.CUST_CODE IS NOT NULL
+		  AND D.REFERRAL_CODE  = C.SOURCE_CODE
+		  AND D.CHARGE_POSTING_MODE = 'A'
+	    GROUP BY D.CUST_CODE,
+		         TO_CHAR(C.SPEC_REGD_DATE_TIME,'DD/MM/YYYY'),
+		         C.DOC_TYPE_CODE,
+		         C.DOC_NUM,
+		         C.SPECIMEN_NO,
+		         A.SHORT_NAME,
+		         C.SECTION_CODE
+		ORDER BY D.CUST_CODE,
+				 C.SPECIMEN_NO;
+
+}
+
+fetch_dtls()
+{
+
+    d_cust_code.arr[0]        = '\0';
+    d_lab_date.arr[0]         = '\0';
+    d_doc_type_code.arr[0]    = '\0';
+    d_doc_num.arr[0]          = '\0';
+    d_request_num.arr[0]      = '\0';
+    d_patient_name.arr[0]     = '\0';
+    d_section_code.arr[0]     = '\0';
+
+    d_cust_code.len           = 0;
+    d_lab_date.len            = 0;
+    d_doc_type_code.len       = 0;
+    d_doc_num.len             = 0;
+    d_request_num.len         = 0;
+    d_patient_name.len        = 0;
+    d_section_code.len        = 0;
+    
+    d_debit_amt    = 0;
+    d_tot_paid_amt = 0;
+
+    EXEC SQL FETCH RL_REQ_HDR_CUR
+	      INTO :d_cust_code,
+                   :d_lab_date,
+                   :d_doc_type_code,
+                   :d_doc_num,
+                   :d_request_num,
+                   :d_patient_name,
+                   :d_section_code,
+                   :d_debit_amt;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor RL_REQ_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+
+    d_cust_code.arr[d_cust_code.len]           = '\0';
+    d_lab_date.arr[d_lab_date.len]             = '\0';
+    d_doc_type_code.arr[d_doc_type_code.len]   = '\0';
+    d_doc_num.arr[d_doc_num.len]               = '\0';
+    d_request_num.arr[d_request_num.len]       = '\0';
+    d_patient_name.arr[d_patient_name.len]     = '\0';
+    d_section_code.arr[d_section_code.len]     = '\0';
+
+    d_section_name.arr[0]   = '\0';
+    d_section_name.len      = 0;
+
+    EXEC SQL SELECT SHORT_NAME
+	       INTO :d_section_name
+	       FROM RL_SECTION_CODE
+	      WHERE SECTION_CODE = :d_section_code;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table RL_SECTION_CODE",0,"");
+
+    d_section_name.arr[d_section_name.len]  = '\0';
+
+    return 1;
+}
+
+fetch_cust_name()
+{
+
+    d_cust_name.arr[0]  = '\0';
+    d_cust_name.len     = 0;
+
+    EXEC SQL SELECT LONG_NAME
+	       INTO :d_cust_name
+	       FROM AR_CUSTOMER
+	      WHERE CUST_CODE = :d_cust_code;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table AR_CUSTOMER",0,"");
+
+    d_cust_name.arr[d_cust_name.len]   = '\0';
+
+}
+
+
+do_report()
+{
+    char s_gross_amt[20], s_paid_amt[20], s_net_amt[20];
+    int first;
+
+    put_hdr();
+
+    EXEC SQL OPEN RL_REQ_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor RL_REQ_HDR_CUR",0,"");
+
+    g_tot_amt             = 0;
+    g_paid_amt            = 0;
+    g_req_tot_amt         = 0;
+    g_req_paid_amt        = 0;
+    g_cust_tot_amt        = 0;
+    g_cust_paid_amt       = 0;
+
+    prv_cust_code[0]   = '\0';
+    prv_request_num[0] = '\0';
+    first = 1;
+
+    while(fetch_dtls()) {
+
+	if(strcmp(prv_cust_code, d_cust_code.arr)) {
+
+	    if(!first)
+		print_cust_totals();
+
+	    chk_break(1);
+	    fetch_cust_name();
+	    fprintf(f1,"Customer : %s %s\n\n", d_cust_code.arr,d_cust_name.arr);
+	    line_no += 2;
+
+            g_req_tot_amt        = 0;
+            g_req_paid_amt       = d_tot_paid_amt;
+
+            g_cust_tot_amt       = 0;
+            g_cust_paid_amt      = 0;
+
+	    strcpy(prv_cust_code, d_cust_code.arr);
+	    strcpy(prv_request_num, d_request_num.arr);
+	}
+
+	if(strcmp(prv_request_num, d_request_num.arr)) {
+	    
+	    print_formated(s_paid_amt, g_req_paid_amt);
+	    print_formated(s_net_amt, g_req_tot_amt-g_req_paid_amt);
+
+	    fprintf(f1," %14s %14s\n", s_paid_amt, s_net_amt);
+	    line_no += 1;
+
+            g_cust_tot_amt  += g_req_tot_amt;
+	    g_cust_paid_amt += g_req_paid_amt;
+
+            g_req_tot_amt        = 0;
+            g_req_paid_amt       = d_tot_paid_amt;
+
+	    strcpy(prv_request_num, d_request_num.arr);
+
+	}
+
+	g_req_tot_amt += d_debit_amt;
+
+	if(!first) {
+	    fprintf(f1,"\n");
+	    line_no ++;
+	}
+
+	chk_break(1);
+	print_formated(s_gross_amt, d_debit_amt);
+	fprintf(f1,"%-10s %-6s/%-8s %-10s %-30s %-15s %14s",
+		    d_lab_date.arr,
+                    d_doc_type_code.arr,
+                    d_doc_num.arr,
+                    d_request_num.arr,
+                    d_patient_name.arr,
+                    d_section_name.arr,
+		    s_gross_amt);
+
+        first = 0;
+    }
+
+    if(!first) {
+	print_cust_totals();
+	print_grand_totals();
+    }
+}
+
+print_cust_totals()
+{
+    char s_gross_amt[20], s_paid_amt[20], s_net_amt[20];
+
+    print_formated(s_paid_amt, g_req_paid_amt);
+    print_formated(s_net_amt, g_req_tot_amt-g_req_paid_amt);
+
+    fprintf(f1," %14s %14s\n", s_paid_amt, s_net_amt);
+    line_no += 1;
+
+    g_cust_tot_amt  += g_req_tot_amt;
+    g_cust_paid_amt += g_req_paid_amt;
+    chk_break(3);
+
+    print_formated(s_gross_amt, g_cust_tot_amt);
+    print_formated(s_paid_amt, g_cust_paid_amt);
+    print_formated(s_net_amt, g_cust_tot_amt-g_cust_paid_amt);
+
+    fprintf(f1,"%85s-------------- -------------- --------------\n", "");
+    fprintf(f1,"%-85s %14s %14s %14s\n", "CUSTOMER TOTAL",s_gross_amt, s_paid_amt, s_net_amt);
+    fprintf(f1,"%85s============== ============== ==============\n\n", "");
+    line_no += 4;
+
+    g_tot_amt            += g_cust_tot_amt;
+    g_paid_amt           += g_cust_paid_amt;
+
+}
+
+print_grand_totals()
+{
+    char s_gross_amt[20], s_paid_amt[20], s_net_amt[20];
+
+    chk_break(4);
+    print_formated(s_gross_amt, g_tot_amt);
+    print_formated(s_paid_amt, g_paid_amt);
+    print_formated(s_net_amt, g_tot_amt-g_paid_amt);
+
+    fprintf(f1,"%85s-------------- -------------- --------------\n", "");
+    fprintf(f1,"%-85s %14s %14s %14s\n", "GRAND TOTAL",s_gross_amt, s_paid_amt, s_net_amt);
+    fprintf(f1,"%85s============== ============== ==============\n\n", "");
+    line_no += 4;
+
+}
+
+chk_break(nol)
+int nol;
+{
+
+	if(line_no+nol >= 55) {
+           line_no = 1;
+	   g_count = 1;
+	   put_hdr();
+	}
+
+}
+
+put_inp_parm()
+{
+ 
+    form_hdr();
+    fprintf(f1,"\n\n\n\n");
+    fprintf(f1,"\tINPUT PARAMETERS\n");
+    fprintf(f1,"\t----------------\n\n");
+    fprintf(f1,"\t\tLAB DATE         FROM : %s\n",nd_fm_date.arr);
+    fprintf(f1,"\t\t                 TO   : %2s\n\n",nd_to_date.arr);
+    fprintf(f1,"\t\tCUSTOMER CODE    FROM : %s\n", nd_fm_cust.arr);
+    fprintf(f1,"\t\t                 TO   : %s\n\n", nd_to_cust.arr);
+
+   // ++page_no;
+}
+
+print_end_of_rep()
+{
+    int col;
+    char buff[REP_WIDTH+1];
+
+    memset(buff,' ',REP_WIDTH+1);
+    col = (int)(REP_WIDTH-19)/2;
+
+//    strcpy(buff+col,"** END OF REPORT **",19);
+    strcpy(buff+col,"** END OF REPORT **");
+    fprintf(f1,"\n%s\n",buff);
+}
+
+put_hdr()
+{
+
+    form_hdr();
+
+    fprintf(f1,"Lab Date   Charge Slip     Reference  Patient Name                   Section           Gross Amount     Pmnt Recd.     Net Amount\n");
+
+/*
+               "dd/mm/yyyy xxxxxx/99999999 xxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxx 999,999,990.99 999,999,990.99 999,999,990.99"
+*/
+
+    fprintf(f1,"%s\n",hdr_line4);
+    fprintf(f1,"\n");
+    line_no=9;
+}
+
+form_hdr()
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+
+    if(first) {
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+	memset(hdr_line4,'-',REP_WIDTH);
+	hdr_line4[REP_WIDTH] = '\0';
+
+        strncpy(hdr_line1,"MDL : OP",8);
+        col = (int)(REP_WIDTH-strlen(comp_name.arr))/2;
+        strncpy(hdr_line1+col,comp_name.arr,strlen(comp_name.arr));
+        col = (REP_WIDTH-strlen(rep_date.arr));
+        strcpy(hdr_line1+col,rep_date.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,oper_id.arr);
+
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP : ARRLBCHG",14);
+    col = (int)(REP_WIDTH-strlen(rep_title))/2;
+    strncpy(hdr_line3+col,rep_title,strlen(rep_title));
+    sprintf(buf,"PAGE : %4d",page_no++);
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+
+    if(first)
+        fprintf(f1,"%s\n",hdr_line1);
+    else
+        fprintf(f1,"\f%s\n",hdr_line1);
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3);
+    fprintf(f1,"%s\n",hdr_line4);
+
+    first = 0;
+}
+
+fetch_sys_info()
+{
+
+    EXEC SQL SELECT ACCOUNTING_NAME,
+		    TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER,NO_OF_DECIMAL
+	     INTO   :comp_name,
+		    :rep_date,
+		    :oper_id,
+		    :nd_no_of_decimal
+	     FROM   SY_ACC_ENTITY
+		WHERE ACC_ENTITY_ID = :nd_facility_id;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len] = '\0';
+    oper_id.arr[oper_id.len] = '\0';
+}
+
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+    if (nd_no_of_decimal==3)
+       sprintf(s_amt,"%11.3f",l_amt);
+    else
+       sprintf(s_amt,"%11.2f",l_amt);
+
+       format_amt(s_amt,nd_no_of_decimal);
+    
+    if(l_amt < 0){
+        //put_val(s_amt,-l_amt);        
+	//put_comma(s_amt);
+	format_amt(s_amt,nd_no_of_decimal);
+        strcat(s_amt,"-");
+    }
+    else {
+        //put_val(s_amt,l_amt);        
+	//put_comma(s_amt);
+	format_amt(s_amt,nd_no_of_decimal);
+        strcat(s_amt," ");
+    }
+}

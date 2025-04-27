@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_CodeSetup_VisitTypeForLocation</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to create a Visit Type for Location record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – The Location has two components where you have to select a value from list and <span class="BoldNumberRFD">[?]</span> function to identify the care location. The list is the Location Type and <span class="BoldNumberRFD">[?]</span> function is used to select the location that come under the selected Location Type. The Location Type values listed are 'Clinic', 'Procedure Unit' and 'Daycare Unit'. &#160;On selecting the required Location Type, the Locations listed are based on the following condition:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All locations that are created for the logged in facility under the selected Location Type and have effective status as enabled.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All the defined Locations must be associated to the Operator Station assigned to the logged in User.</p>
+</li>
+</ol>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable Visit Type Indicator</span> - Select the Visit Type Indicator from the valid list of values. This field represents the Visit Type Indicator of the Visit Type, to be associated to the Location. The values displayed are based on ‘Applicable Visit Type’ set up at the time of creating the selected Location. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Type</span> – Select the Visit Type from the list. This field represents the Visit Type, which has to be associated to the Location. The values displayed are based on Visit Types of the logged in Facility, pertaining to the selected ‘Visit Type Indicator’ as set in ‘Visit Type’ function. This field is mandatory.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />When you select the Location as ‘Procedure Unit’ created as specific to Radiology then the Visit Type field displays only the Visit Type created as Applicable to Radiology.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Vital Signs Battery</span> – Select the Vital Signs Battery from the list. All the Discrete Measure of type ‘Vital Signs Battery’ set up in Application Masters module is displayed in the list. The associated Vital Sign Battery is used to record the Vital Signs of the patient during the outpatient encounter against the Location. This field is optional and if Vital Sign Battery is not defined at the level of Visit Type, the Vital Signs Battery set at either Location Level or OP Parameter Level is taken into consideration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Appt Duration (in minutes)</span> - Enter the maximum appointment duration allowed for the selected Location and Visit Type in numeric format of three digits maximum length. The value set here indicates the maximum appointment time that the patient can be given for the defined Visit Type, when an Appointment Booking is made in the Appointments Scheduling module for time table type ‘Free Format’. This field is not applicable for visit type indicator ‘Emergency’. The system defaults values if the same has been set at Visit Type level in ‘Visit Type’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Appt Slots</span> - Enter the Maximum Appointment Slots allowed for the selected Location and Visit Type in numeric format of three digits maximum length. The value set indicates the maximum appointment slots that the patient can be given when an appointment booking is made for a specific Visit Type in Appointment Scheduling module for time table of type ‘Slot’. This field is not applicable for Visit Type Indicator ‘Emergency’. The system defaults values if the same has been set at Visit Type level in ‘Visit Type’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> - Select the check box to enable the record and clear the check box to disable the record.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,2209 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                    */
+/************************************************************************/
+/* PROGRAM NAME          : ARBINPST.PC                                  */
+/* AUTHOR                : S. SRIRAM                                    */
+/* DATE WRITTEN          : 06-JAN-1993                                   */
+/*                                                                      */
+/* CALLED FROM           :                                               */
+/*                                                                           */
+/*  FUNCTION             :                                                  */
+/*                                                                      */
+/*  TABLE DETAILS                                                        */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                        */
+/*         1.        AR_INV_HDRR              Query/Update              */
+/*         2.        AR_INV_LINE                 Query                  */
+/*         3.        GL_ACC_ENTITY_DOC_TYPE_VW   Lookup                 */
+/*         4.        SY_ACC_ENTITY               Lookup                 */
+/*         5.        AR_CUSTOMER                 Lookup                 */
+/*         6.        AR_PMNT_TERMS               Lookup                 */
+/*         7.        BL_BLNG_GRP                 Lookup                 */
+/*         8.        MP_PATIENT_MAST             Lookup                 */
+/*         9.        AR_PARAMETER                Lookup                 */
+/*        10.        GL_ACC_CHART                Lookup                 */
+/*        11.        SY_DEPT                     Lookup                 */
+/*        12.        GL_PRODUCT_LINE             Lookup                 */
+/*        13.        GL_SUBLEDGER_LINE           Lookup                 */
+/*        14.        GL_ACC_COMBINATION          Lookup                 */
+/*        15.        AR_DOC_ERROR           Query/Insert/Delete         */
+/*        16.        SY_DOC_CONTROL            Insert/Lookup            */
+/*        17.        SY_PROG_CONTROL           Update/Lookup            */
+/*        19.        SY_PROG_MESG                Insert                 */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*         2.        POST                validate_posting_acct          */
+/*         3.        POST_DOC            post_doc (GL posting acc val)  */
+/*         4.        IN_POST             ar_inv_posting (AR inv posting)*/
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+        
+#include <stdio.h>
+#include <math.h>
+#include <string.h>      
+#include "gl.h"
+   
+#define OERROR (sqlca.sqlcode < 0)
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define TABLE_ALREADY_EXISTS (sqlca.sqlcode == -955)
+
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+
+#define VIEW_LOG_FILE 1
+
+#define INIT_MESG "Report Generation in Progress "
+
+#define DEBUG 0
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR uid_pwd[132];
+
+    int process_rep_flg;
+
+   VARCHAR  nd_facility_id   [3],
+			nd_session_id    [16],
+            nd_pgm_date      [25],
+            nd_fm_doc_type   [7],
+            nd_to_doc_type   [7],
+            nd_fm_doc_num    [10],
+            nd_to_doc_num    [10],
+            nd_fm_doc_date   [12],
+            nd_to_doc_date   [12],
+            nd_proc_flag     [2],
+            nd_view_print_flg[2],
+p_language_id [3],
+            chk_doc_type_code    [7], 
+
+            doc_type_code    [7], 
+            doc_num          [9],
+			d_consolidated_inv [2],
+			d_module_id		 [3],
+            doc_date         [12],
+            doc_date_chking  [12],
+            cust_code        [9],
+            pmnt_terms_code  [3],
+            billing_group    [5],  -- CRF-0120
+            patient_id       [21],
+            patient_flag     [2],
+            nd_error_flag    [2],
+            rowid_hdr        [31],
+            line_num         [5],
+            print_flag       [3],
+
+
+            dummy            [10][5],
+
+            d_last_inv_doc_date           [12],
+ 
+            d_sy_acc_bl_instal_flag       [4],
+            d_sy_acc_mp_instal_flag       [4],
+            d_ar_acc_status               [2],
+            d_ar_acc_valid_flag           [2], 
+			d_bl_acc_valid_flag           [2], 
+            d_customer_status             [2],
+            d_customer_patient_flag       [2],
+            d_pmnt_terms_status           [2],
+            d_bl_blng_grp_status          [2],
+            
+			p_operational_modules         [300],
+             
+            d_main_acc1_code              [8],
+            d_main_acc2_code              [8],
+            d_dept_code                   [15],
+            d_product_group_code          [4],
+            d_product_line_code           [8],
+            d_subledger_group_code        [4],
+			d_module_valid_id             [3],
+            d_subledger_line_code         [12],
+            sy_doc_print_flag             [3], 
+            curr_acc_year                 [5],
+            curr_acc_month                [3],
+            gl_summ_pro_flag              [2],
+            d_sy_num_acc_per              [5],
+            prior_post_allow              [3],
+			nd_acc_entity_code            [5],
+            d_chk_amt_local               [19];
+
+   VARCHAR  ar_interface_code[2];
+
+   VARCHAR  d_hdr_main_acc1_code              [8],
+            d_hdr_main_acc2_code              [8],
+            d_hdr_dept_code                   [15],
+            d_hdr_product_group_code          [4],
+            d_hdr_product_line_code           [8],
+            d_hdr_subledger_group_code        [4],
+            d_hdr_subledger_line_code         [12];
+
+   VARCHAR d_hdr_acc_entity_code                [5],
+           d_hdr_last_line_num                  [5],
+           d_hdr_narration                      [51],
+           d_hdr_base_date                      [12],
+           d_chk_base_date                      [12],
+           d_hdr_due_date                       [12],
+           d_chk_due_date                       [12],
+           d_hdr_gross_amt                      [16],
+           d_hdr_discount_amt                   [16],
+		   d_hdr_markup_amt                     [16],
+           d_hdr_currency_code                  [8],
+           d_hdr_exchg_rate                     [16],
+           d_hdr_settlement_date                [12],
+           d_chk_settlement_date                [12],
+           d_hdr_settlement_perc                [6],
+           d_hdr_cust_ref                       [16],
+           d_hdr_bill_doc_type_code             [7],
+           d_hdr_bill_num                       [9],
+           d_hdr_bill_date                      [13],
+           d_chk_bill_date                      [13],
+           d_hdr_doctor_fee_amt                 [16],
+           d_hdr_post_month                     [3],
+           d_hdr_post_year                      [5],
+           d_hdr_misc_cust_long_name            [101],  -- CRF-0120
+           d_hdr_misc_cust_short_name           [101],  -- CRF-0120
+           d_hdr_misc_cust_add1_desc            [61],  -- CRF-0120
+           d_hdr_misc_cust_add2_desc            [61],  -- CRF-0120
+           d_hdr_misc_cust_add3_desc            [61],  -- CRF-0120
+           d_hdr_misc_cust_zip_desc             [31],
+           d_hdr_cust_long_name_locl    [101],  -- CRF-0120
+           d_hdr_cust_short_name_locl   [101],  -- CRF-0120
+           d_hdr_cust_add1_desc_locl    [61],  -- CRF-0120
+           d_hdr_cust_add2_desc_locl    [61],  -- CRF-0120
+           d_hdr_cust_add3_desc_locl    [61],  -- CRF-0120
+           d_hdr_cust_zip_desc_locl     [31],
+           d_hdr_tel_num                        [31],
+           d_hdr_contact_name                   [101],  -- CRF-0120
+           d_hdr_contact_name_title             [61],  -- CRF-0120
+           d_hdr_error_flag                     [2],
+           d_curr_pgm_name                      [15],
+           mast_status                          [2],
+           d_chk_payable_amt                    [17],
+		   d_pb_invoice_yn						[2],
+
+           ar_pat_doc_type_code          [7],
+           ar_pat_doc_num                [9],
+           ar_pat_patient_id             [21],
+           ar_pat_bill_doc_type_code     [7],
+           ar_pat_bill_num               [9],
+           ar_pat_remarks                [16],
+           ar_pat_bill_date              [12],
+           ar_pat_rowid                  [31];
+
+   char    l_sql_stmt                    [3000];   
+
+   double   nd_dtl_tot_amt,
+            nd_dtl_tot_deb_amt,
+            amt_local,
+            payable_amt,
+            ar_pat_amount,
+            ar_pat_tot_amt;
+   
+   int     nd_no_of_decimal,ar_pat_line_num;
+
+   int     bl_instal_flag , mp_instal_flag;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+int g_err_typ;
+
+char g_err_id[10],
+     g_err_msg[80];
+
+
+/* These variables ar used for calling post_doc (Posting acc validation) */
+
+int  d_curr_year;
+int  d_curr_month;
+int  d_num_of_acc_periods;
+char d_summ_flag;
+
+/*                                                                         */
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+   
+   
+   if (argc < 6)
+   {
+    int i = 0;
+      disp_mesg("Not enough Parameters for running this program\n");
+      proc_exit();
+   }
+
+   if (argv[5][0] == 'R')
+      strcpy(g_pgm_id,"ARRINLST");
+   else
+      strcpy(g_pgm_id,"ARBINPST");
+
+   strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+   d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   strcpy(g_facility_id,argv[4]);
+
+   if(sql_connect() == -1)
+   {
+      proc_exit();
+   }
+
+   /***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+   strcpy(g_pgm_date,argv[3]);
+              
+
+   set_meduser_role();
+strcpy(p_language_id.arr,l_language_id.arr);
+p_language_id.len = l_language_id.len;  
+   chk_active();
+
+
+   nd_fm_doc_type.arr[0]    = '\0';
+   nd_fm_doc_num.arr[0]     = '\0';
+   nd_fm_doc_date.arr[0]    = '\0';
+   nd_to_doc_type.arr[0]    = '\0';
+   nd_to_doc_num.arr[0]     = '\0';
+   nd_to_doc_date.arr[0]    = '\0';
+   nd_proc_flag.arr[0]      = '\0';
+   nd_view_print_flg.arr[0] = '\0';
+
+   nd_fm_doc_type.len       = 0;
+   nd_fm_doc_num.len        = 0;
+   nd_fm_doc_date.len       = 0;
+   nd_to_doc_type.len       = 0;
+   nd_to_doc_num.len        = 0;
+   nd_to_doc_date.len       = 0;
+   nd_proc_flag.len         = 0;
+   nd_view_print_flg.len    = 0;
+
+   process_rep_flg          = 0;
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID , PARAM1,PARAM2,PARAM3,PARAM4,PARAM5,PARAM6,PARAM8,
+                   PARAM9,PARAM10
+              INTO :nd_facility_id, :nd_fm_doc_type, :nd_fm_doc_num, :nd_fm_doc_date,
+                   :nd_to_doc_type, :nd_to_doc_num, :nd_to_doc_date,
+                   :nd_proc_flag,
+                   :nd_view_print_flg, :process_rep_flg
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'ARBINPST'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_fm_doc_type.arr[nd_fm_doc_type.len]    = '\0';
+   nd_fm_doc_num.arr[nd_fm_doc_num.len]      = '\0';
+   nd_fm_doc_date.arr[nd_fm_doc_date.len]    = '\0';
+   nd_to_doc_type.arr[nd_to_doc_type.len]    = '\0';
+   nd_to_doc_num.arr[nd_to_doc_num.len]      = '\0';
+   nd_to_doc_date.arr[nd_to_doc_date.len]    = '\0';
+   nd_proc_flag.arr[nd_proc_flag.len]        = '\0';
+   nd_view_print_flg.arr[nd_view_print_flg.len]        = '\0';
+
+   start_prog_control();
+   EXEC SQL COMMIT WORK;
+
+   start_prog_msg();
+   
+   delete_records();
+
+   fetch_acc_entity_flag();
+
+   fetch_ar_parameter();
+  
+   declare_cursor();
+
+   while (fetch_cur())    /* Fetches Hdr recs rowid */
+   {
+     
+	 
+	  strcpy(nd_error_flag.arr,"N");
+      nd_error_flag.len = 1;
+
+      if (!fetch_rec())    /* Fetch all the details & lock Hdr row */
+          continue;
+
+      validate_inv_header();
+
+//      if (d_customer_patient_flag.arr[0] == 'N')
+
+     /*************** Conslidated invoice  of Billing module****************/
+
+   
+	 
+	 if ((strcmp(d_consolidated_inv.arr , "Y") == 0) 
+	     && (strcmp(d_module_id.arr  , "BL") == 0))
+      {
+           ar_pat_tot_amt = 0;
+
+           if (!open_patient_dtls())
+                continue;
+
+           ar_pat_line_num = 1;
+
+           while (fetch_patient_dtls())
+           {
+                validate_patient_dtls();
+                update_pat_dtls();
+           }
+
+           if ((ar_pat_line_num != 1) &&
+              (doubcmp(ar_pat_tot_amt,payable_amt) != 0))
+                 error_insert_null("   0","AR2180","");
+      }
+
+      if (!validate_inv_line()) /* Fetch & validate inv lines         */
+           continue;            /* Returns 1 if Lines are locked      */
+
+      validate_inv_amt();
+
+      update_err_flg();
+      
+	 
+
+      if (nd_proc_flag.arr[0] == 'P') 
+      { 
+      
+       if (nd_error_flag.arr[0] == 'N')
+          {
+			 /* Added on 2/12/2003 to accomodate temporary adhoc function*/
+			 if (strcmp(d_pb_invoice_yn.arr,"Y") == 0)
+			    insert_ar_patient_dtls();
+
+			 if (ar_interface_code.arr[0] != 'O')
+             {
+                 
+               ar_inv_posting(rowid_hdr.arr,ar_interface_code.arr,
+                               d_last_inv_doc_date.arr);
+             }
+             else
+             {
+                  gl_doc_insert();
+                  if (!gl_posting())
+				  {
+
+
+				    ins_gl_distrbn(doc_type_code.arr,doc_num.arr,1);
+     
+				     ar_inv_posting(rowid_hdr.arr,ar_interface_code.arr,
+                              d_last_inv_doc_date.arr);
+                  } 
+/*    Commented on 15-MAR-93 as per request by GL team 
+
+      if (!  (atoi(d_hdr_post_year.arr) > atoi(curr_acc_year.arr)) ||
+            ( atoi(d_hdr_post_year.arr) == atoi(curr_acc_year.arr) && 
+              atoi(d_hdr_post_month.arr) > atoi(curr_acc_month.arr) )  )
+                  delete_gl_recs();
+*/   
+              }
+          } 
+       }
+       EXEC SQL COMMIT WORK;
+
+       if (OERROR)
+         err_mesg("COMMIT failed",0,""); 
+   }
+
+if (process_rep_flg == 3)
+{
+   EXEC SQL COMMIT WORK RELEASE;
+
+   if (OERROR)
+        err_mesg("COMMIT failed",0,""); 
+
+   run_report();
+
+   if(sql_connect() == -1)
+   {
+      proc_exit();
+   }
+}
+
+/*   delete_records();*/
+   end_prog_msg();
+   end_prog_control();
+   EXEC SQL COMMIT WORK RELEASE;
+
+}
+
+declare_cursor()
+{
+
+
+   EXEC SQL DECLARE CUR_INV_HDR CURSOR FOR
+             SELECT DOC_TYPE_CODE, DOC_NUM 
+               FROM AR_INV_HDR
+              WHERE DOC_TYPE_CODE >= NVL(:nd_fm_doc_type,'      ')
+                AND DOC_TYPE_CODE <= NVL(:nd_to_doc_type,'~~~~~~')
+                AND DOC_NUM       >= NVL(:nd_fm_doc_num,0)
+                AND DOC_NUM       <= NVL(:nd_to_doc_num,99999999)
+                AND NVL(DOC_DATE,SYSDATE)      >= 
+                    NVL(TO_DATE(:nd_fm_doc_date,'DD/MM/YYYY'),to_date('00010101','YYYYDDMM'))
+                AND NVL(DOC_DATE,SYSDATE)      <= 
+                    NVL(TO_DATE(:nd_to_doc_date,'DD/MM/YYYY'),to_date('47123112','YYYYDDMM'))
+                AND NVL(POSTED_FLAG,'N') = 'N';
+
+   EXEC SQL OPEN CUR_INV_HDR;
+
+   if (OERROR)
+         err_mesg("OPEN failed on cursor CUR_INV_HDR",0,"");
+
+
+   EXEC SQL DECLARE CUR_INV_REC CURSOR FOR
+             SELECT TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                    TO_CHAR(DOC_DATE,'YYYYMMDD'),
+                    CUST_CODE,        PMNT_TERMS_CODE,
+                    BILLING_GROUP,    PATIENT_ID,
+                    NVL(PAYABLE_AMT,0),
+                    PAYABLE_AMT,
+                    PRINT_FLAG,
+                    MAIN_ACC1_CODE,
+                    MAIN_ACC2_CODE,
+                    DEPT_CODE,
+                    PRODUCT_GROUP_CODE,
+                    PRODUCT_LINE_CODE,
+                    SUBLEDGER_GROUP_CODE,
+                    SUBLEDGER_LINE_CODE,
+                    ROWID,
+                    ACC_ENTITY_CODE,
+                    LAST_LINE_NUM,
+                    NARRATION   ,
+                    BASE_DATE   ,
+                    TO_CHAR(BASE_DATE,'YYYYMMDD'),
+                    DUE_DATE,
+                    TO_CHAR(DUE_DATE,'YYYYMMDD'),
+                    GROSS_AMT,
+                    DISCOUNT_AMT,
+					MARKUP_AMT,
+                    CURRENCY_CODE ,
+                    EXCHG_RATE  ,
+                    SETTLEMENT_DATE  , 
+                    TO_CHAR(SETTLEMENT_DATE,'YYYYMMDD'),
+                    SETTLEMENT_PERC  ,
+                    CUST_REF  ,
+                    BILL_DOC_TYPE_CODE  ,
+                    BILL_NUM  ,
+                    BILL_DATE  ,
+                    TO_CHAR(BILL_DATE,'YYYYMMDD'),
+                    DOCTOR_FEE_AMT   ,
+					POST_MONTH  ,
+                    POST_YEAR  ,
+                    MISC_CUST_LONG_NAME  ,
+                    MISC_CUST_SHORT_NAME    ,
+                    MISC_CUST_ADD1_DESC    ,
+                    MISC_CUST_ADD2_DESC    ,
+                    MISC_CUST_ADD3_DESC    ,
+                    MISC_CUST_ZIP_DESC    ,
+                    MISC_CUST_LONG_NAME_CHINESE    ,
+                    MISC_CUST_SHORT_NAME_CHINESE    ,
+                    MISC_CUST_ADD1_DESC_CHINESE    ,
+                    MISC_CUST_ADD2_DESC_CHINESE    ,
+                    MISC_CUST_ADD3_DESC_CHINESE    ,
+                    MISC_CUST_ZIP_DESC_CHINESE    ,
+                    TEL_NUM    ,
+                    CONTACT_NAME    ,
+                    CONTACT_NAME_TITLE    ,
+                    ERROR_FLAG  ,
+					CONSOLIDATED_INV_YN,
+					MODULE_ID,
+					NVL(PB_INVOICE_YN,'N')
+               FROM AR_INV_HDR
+              WHERE DOC_TYPE_CODE = :doc_type_code
+                AND DOC_NUM       = :doc_num
+                FOR UPDATE OF ERROR_FLAG NOWAIT;
+
+   EXEC SQL DECLARE CUR_INV_LINE CURSOR FOR
+             SELECT NVL(AMT_LOCAL,0), LINE_NUM,
+                    MAIN_ACC1_CODE,
+                    MAIN_ACC2_CODE,
+                    DEPT_CODE,
+                    PRODUCT_GROUP_CODE,
+                    PRODUCT_LINE_CODE,
+                    SUBLEDGER_GROUP_CODE,
+                    SUBLEDGER_LINE_CODE,
+                    AMT_LOCAL
+               FROM AR_INV_LINE
+              WHERE DOC_TYPE_CODE = :doc_type_code
+                AND DOC_NUM       = :doc_num
+                FOR UPDATE OF LINE_NUM NOWAIT;
+
+   EXEC SQL DECLARE AR_TRN_DOC_TYPE_CUR CURSOR FOR
+             SELECT 'X'
+               FROM AR_TRN_DOC_TYPE
+              WHERE DOC_TYPE_CODE = :doc_type_code
+                AND TRN_TYPE_CODE = '1';
+
+   EXEC SQL DECLARE SY_DOC_CONTROL_CUR CURSOR FOR
+             SELECT 'X'
+               FROM SY_DOC_CONTROL
+              WHERE DOC_TYPE_CODE = :doc_type_code
+                AND DOC_NUM       = :doc_num;
+
+   EXEC SQL DECLARE AR_CUSTOMER_CUR CURSOR FOR
+             SELECT NVL(STATUS,'X'),
+                    PATIENT_FLAG,
+                    NVL(TO_CHAR(LAST_INV_DOC_DATE,'YYYYMMDD'),0)
+               FROM AR_CUSTOMER
+              WHERE CUST_CODE        = :cust_code;
+
+   EXEC SQL DECLARE AR_PMNT_TERMS_CUR CURSOR FOR
+             SELECT NVL(STATUS,'X')
+               FROM AR_PMNT_TERMS
+              WHERE PMNT_TERMS_CODE = :pmnt_terms_code;
+
+   EXEC SQL DECLARE SY_ACC_ENTITY_DOC_TYPE_CUR CURSOR FOR
+             SELECT NVL(STATUS,'X'),
+                    NVL(AR_VALID_FLAG,'X'),
+                    NVL(BL_VALID_FLAG,'X'),
+                    NVL(DOC_PRINT_FLAG,'X')
+               FROM GL_ACC_ENTITY_DOC_TYPE_VW
+              WHERE DOC_TYPE_CODE   = :chk_doc_type_code;
+
+    EXEC SQL DECLARE SY_DOC_TYPE_MAST_CUR CURSOR FOR
+              SELECT NVL(STATUS,'X')
+                FROM SY_DOC_TYPE_MASTER
+               WHERE DOC_TYPE_CODE = :chk_doc_type_code;
+
+    /* commented on 2/12/2003 to accomodate temporary adhoc function.
+	EXEC SQL DECLARE AR_PATIENT_DTLS_CUR CURSOR FOR
+              SELECT DOC_TYPE_CODE,
+                     DOC_NUM,
+                     PATIENT_ID,
+                     BILL_DOC_TYPE_CODE,
+                     BILL_NUM,
+                     TO_CHAR(BILL_DATE,'YYYYMMDD'),
+                     REMARKS,
+                     NVL(AMOUNT,0),
+                     ROWID
+                FROM AR_PATIENT_DTLS
+               WHERE DOC_TYPE_CODE = :doc_type_code
+                 AND DOC_NUM       = :doc_num
+               ORDER BY BILL_DATE, PATIENT_ID
+                 FOR UPDATE OF LINE_NUM NOWAIT;
+    */
+	/* Added on 2/12/2003 to accomodate temporary adhoc function*/	
+
+		if (strcmp(d_pb_invoice_yn.arr,"Y") == 0)
+		{
+	           strcpy(l_sql_stmt," SELECT AR_INVOICE_DOC_TYPE_CODE DOC_TYPE_CODE, \
+                                          AR_INVOICE_DOC_NUM DOC_NUM, \
+                                          PATIENT_ID, \
+                                          DOC_TYPE_CODE BILL_DOC_TYPE_CODE, \
+                                          DOC_NUM BILL_NUM, \
+                                          TO_CHAR(DOC_DATE,'YYYYMMDD') BILL_DATE, \
+                                          DOC_REF REMARKS, \
+                                          NVL(DOC_AMT,0) AMOUNT, \
+                                          ROWID \
+                                     FROM AR_PAT_BILLS_TEMP \
+                                    WHERE AR_INVOICE_DOC_TYPE_CODE = :doc_type_code \
+                                      AND AR_INVOICE_DOC_NUM       = :doc_num \
+                                 ORDER BY DOC_DATE, PATIENT_ID"); 
+
+
+        }
+		else
+        {		       
+               strcpy(l_sql_stmt," SELECT DOC_TYPE_CODE, \
+                                          DOC_NUM, \
+                                          PATIENT_ID, \
+                                          BILL_DOC_TYPE_CODE, \
+                                          BILL_NUM, \
+                                          TO_CHAR(BILL_DATE,'YYYYMMDD'), \
+                                          REMARKS, \
+                                          NVL(AMOUNT,0), \
+                                          ROWID \
+                                     FROM AR_PATIENT_DTLS  \
+                                    WHERE DOC_TYPE_CODE = :doc_type_code \
+                                      AND DOC_NUM       = :doc_num \
+                                 ORDER BY BILL_DATE, PATIENT_ID \
+                                      FOR UPDATE OF LINE_NUM NOWAIT");		 
+		 }
+
+	     EXEC SQL PREPARE SELECT_PATIENT FROM :l_sql_stmt;
+
+         if(OERROR)
+		    err_mesg("DECLARE failed while PREPARING cursor AR_PATIENT_DTLS_CUR",0,"");
+
+	     EXEC SQL DECLARE AR_PATIENT_DTLS_CUR CURSOR FOR SELECT_PATIENT;
+
+	     if(OERROR)	   
+		    err_mesg("DECLARE failed on cursor AR_PATIENT_DTLS_CUR",0,"");
+
+} 
+
+fetch_cur()    
+{
+
+   doc_type_code.arr[0]     = '\0';
+   doc_num.arr[0]           = '\0';
+   
+   doc_type_code.len        = 0;
+   doc_num.len              = 0;
+   
+
+   EXEC SQL FETCH CUR_INV_HDR 
+             INTO :doc_type_code, :doc_num ;
+
+   if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_INV_HDR",0,"");
+
+   doc_type_code.arr[doc_type_code.len]     = '\0';
+   doc_num.arr[doc_num.len]                 = '\0';
+   
+   if (LAST_ROW)
+       return(0);
+   else
+       return(1);
+}
+
+fetch_rec()
+{
+   cust_code.arr[0]         = '\0';
+   pmnt_terms_code.arr[0]   = '\0';
+   billing_group.arr[0]     = '\0';
+   patient_id.arr[0]        = '\0';
+
+   d_hdr_main_acc1_code.arr[0]       = '\0';
+   d_hdr_main_acc2_code.arr[0]       = '\0';
+   d_hdr_dept_code.arr[0]            = '\0';
+   d_hdr_product_group_code.arr[0]   = '\0';
+   d_hdr_product_line_code.arr[0]    = '\0';
+   d_hdr_subledger_group_code.arr[0] = '\0';
+   d_hdr_subledger_line_code.arr[0]  = '\0';
+
+   rowid_hdr.arr[0]              = '\0';
+   doc_date.arr[0]               = '\0';
+   doc_date_chking.arr[0]        = '\0';
+
+   print_flag.arr[0]             = '\0';       
+
+   cust_code.len            = 0;
+   pmnt_terms_code.len      = 0;
+   billing_group.len        = 0;
+   patient_id.len           = 0;
+   print_flag.len           = 0;       
+   
+   d_hdr_main_acc1_code.len       = 0;
+   d_hdr_main_acc2_code.len       = 0;
+   d_hdr_dept_code.len            = 0;
+   d_hdr_product_group_code.len   = 0;
+   d_hdr_product_line_code.len    = 0;
+   d_hdr_subledger_group_code.len = 0;
+   d_hdr_subledger_line_code.len  = 0;
+   rowid_hdr.len              = 0;
+   doc_date.len               = 0;
+   doc_date_chking.len        = 0;  
+
+   nd_dtl_tot_amt             = 0;
+   nd_dtl_tot_deb_amt         = 0;  
+   payable_amt                = 0;
+   d_chk_payable_amt.arr[0]   = '\0';
+   d_chk_payable_amt.len      = 0;
+ 
+   d_hdr_acc_entity_code.arr[0]   = '\0';
+   d_hdr_last_line_num.arr[0]   = '\0';
+   d_hdr_narration.arr[0]   = '\0';
+   d_hdr_base_date.arr[0]   = '\0';
+   d_chk_base_date.arr[0]   = '\0';
+   d_hdr_due_date.arr[0]   = '\0';
+   d_chk_due_date.arr[0]   = '\0';
+   d_hdr_gross_amt.arr[0]   = '\0';
+   d_hdr_discount_amt.arr[0]   = '\0';
+   d_hdr_markup_amt.arr[0]   = '\0';
+   d_hdr_currency_code.arr[0]   = '\0';
+   d_hdr_exchg_rate.arr[0]   = '\0';
+   d_hdr_settlement_date.arr[0]   = '\0';
+   d_chk_settlement_date.arr[0]   = '\0';
+   d_hdr_settlement_perc.arr[0]   = '\0';
+   d_hdr_cust_ref.arr[0]   = '\0';
+   d_hdr_bill_doc_type_code.arr[0]   = '\0';
+   d_hdr_bill_num.arr[0]   = '\0';
+   d_hdr_bill_date.arr[0]   = '\0';
+   d_chk_bill_date.arr[0]   = '\0';
+   d_hdr_doctor_fee_amt.arr[0]   = '\0';
+   d_hdr_post_month.arr[0]   = '\0';
+   d_hdr_post_year.arr[0]   = '\0';
+   d_hdr_misc_cust_long_name.arr[0]   = '\0';
+   d_hdr_misc_cust_short_name.arr[0]   = '\0';
+   d_hdr_misc_cust_add1_desc.arr[0]   = '\0';
+   d_hdr_misc_cust_add2_desc.arr[0]   = '\0';
+   d_hdr_misc_cust_add3_desc.arr[0]   = '\0';
+   d_hdr_misc_cust_zip_desc.arr[0]   = '\0';
+   d_hdr_cust_long_name_locl.arr[0]   = '\0';
+   d_hdr_cust_short_name_locl.arr[0]   = '\0';
+   d_hdr_cust_add1_desc_locl.arr[0]   = '\0';
+   d_hdr_cust_add2_desc_locl.arr[0]   = '\0';
+   d_hdr_cust_add3_desc_locl.arr[0]   = '\0';
+   d_hdr_cust_zip_desc_locl.arr[0]   = '\0';
+
+   d_consolidated_inv.arr[0] = '\0';
+   d_module_id.arr[0] = '\0';
+
+   d_hdr_tel_num.arr[0]   = '\0';
+   d_hdr_contact_name.arr[0]   = '\0';
+   d_hdr_contact_name_title.arr[0]   = '\0';
+   d_hdr_error_flag.arr[0]   = '\0';
+
+   d_hdr_acc_entity_code.len     = 0;
+   d_hdr_last_line_num.len     = 0;
+   d_hdr_narration.len     = 0;
+   d_hdr_base_date.len     = 0;
+   d_chk_base_date.len     = 0;
+   d_hdr_due_date.len     = 0;
+   d_chk_due_date.len     = 0;
+   d_hdr_gross_amt.len     = 0;
+   d_hdr_discount_amt.len     = 0;
+   d_hdr_markup_amt.len     = 0;
+   d_hdr_currency_code.len     = 0;
+   d_hdr_exchg_rate.len     = 0;
+   d_hdr_settlement_date.len     = 0;
+   d_chk_settlement_date.len     = 0;
+   d_hdr_settlement_perc.len     = 0;
+   d_hdr_cust_ref.len     = 0;
+   d_hdr_bill_doc_type_code.len     = 0;
+   d_hdr_bill_num.len     = 0;
+   d_hdr_bill_date.len     = 0;
+   d_chk_bill_date.len     = 0;
+   d_hdr_doctor_fee_amt.len     = 0;
+   d_hdr_post_month.len     = 0;
+   d_hdr_post_year.len     = 0;
+   d_hdr_misc_cust_long_name.len     = 0;
+   d_hdr_misc_cust_short_name.len     = 0;
+   d_hdr_misc_cust_add1_desc.len     = 0;
+   d_hdr_misc_cust_add2_desc.len     = 0;
+   d_hdr_misc_cust_add3_desc.len     = 0;
+   d_hdr_misc_cust_zip_desc.len     = 0;
+   d_hdr_cust_long_name_locl.len     = 0;
+   d_hdr_cust_short_name_locl.len     = 0;
+   d_hdr_cust_add1_desc_locl.len     = 0;
+   d_hdr_cust_add2_desc_locl.len     = 0;
+   d_hdr_cust_add3_desc_locl.len     = 0;
+   d_hdr_cust_zip_desc_locl.len     = 0;
+
+   d_consolidated_inv.len = 0;
+   d_module_id.len = 0;
+   d_pb_invoice_yn.len = 0; 
+
+   d_hdr_tel_num.len     = 0;
+   d_hdr_contact_name.len     = 0;
+   d_hdr_contact_name_title.len     = 0;
+   d_hdr_error_flag.len     = 0;
+
+
+   EXEC SQL OPEN CUR_INV_REC;
+
+   if (RESOURCE_BUSY)
+        return (0);
+   else if (OERROR)
+         err_mesg("OPEN failed on cursor CUR_INV_REC",0,"");
+
+   EXEC SQL FETCH CUR_INV_REC
+             INTO :doc_date,
+                  :doc_date_chking,
+                  :cust_code,                 :pmnt_terms_code,
+                  :billing_group,             :patient_id,
+                  :payable_amt,
+                  :d_chk_payable_amt,         :print_flag,
+                  :d_hdr_main_acc1_code,      :d_hdr_main_acc2_code,
+                  :d_hdr_dept_code,           :d_hdr_product_group_code,
+                  :d_hdr_product_line_code,   :d_hdr_subledger_group_code,
+                  :d_hdr_subledger_line_code, :rowid_hdr,
+/*** Additional Fields  ***/
+
+                  :d_hdr_acc_entity_code                   ,
+                  :d_hdr_last_line_num                     ,
+                  :d_hdr_narration                         ,
+                  :d_hdr_base_date                          ,
+                  :d_chk_base_date                          ,
+                  :d_hdr_due_date                           ,
+                  :d_chk_due_date                           ,
+                  :d_hdr_gross_amt                          ,
+                  :d_hdr_discount_amt                       ,
+				  :d_hdr_markup_amt                       ,
+                  :d_hdr_currency_code                     ,
+                  :d_hdr_exchg_rate                         ,
+                  :d_hdr_settlement_date                    ,
+                  :d_chk_settlement_date                    ,
+                  :d_hdr_settlement_perc                   ,
+                  :d_hdr_cust_ref                           ,
+                  :d_hdr_bill_doc_type_code                ,
+                  :d_hdr_bill_num                          ,
+                  :d_hdr_bill_date                          ,
+                  :d_chk_bill_date                          ,
+                  :d_hdr_doctor_fee_amt                     ,
+                  :d_hdr_post_month                        ,
+                  :d_hdr_post_year                         ,
+                  :d_hdr_misc_cust_long_name                ,
+                  :d_hdr_misc_cust_short_name               ,
+                  :d_hdr_misc_cust_add1_desc                ,
+                  :d_hdr_misc_cust_add2_desc                ,
+                  :d_hdr_misc_cust_add3_desc                ,
+                  :d_hdr_misc_cust_zip_desc                 ,
+                  :d_hdr_cust_long_name_locl        ,
+                  :d_hdr_cust_short_name_locl       ,
+                  :d_hdr_cust_add1_desc_locl        ,
+                  :d_hdr_cust_add2_desc_locl        ,
+                  :d_hdr_cust_add3_desc_locl        ,
+                  :d_hdr_cust_zip_desc_locl         ,
+                  :d_hdr_tel_num                            ,
+                  :d_hdr_contact_name                       ,
+                  :d_hdr_contact_name_title                 ,
+                  :d_hdr_error_flag  ,
+				  :d_consolidated_inv ,
+				  :d_module_id,
+				  :d_pb_invoice_yn ;
+
+
+   if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_INV_REC",0,"");
+
+   cust_code.arr[cust_code.len]             = '\0';
+   pmnt_terms_code.arr[pmnt_terms_code.len] = '\0';
+   billing_group.arr[billing_group.len]     =  '\0';
+   patient_id.arr[patient_id.len]           =  '\0';
+   d_chk_base_date.arr[d_chk_base_date.len] = '\0';
+   d_chk_due_date.arr[d_chk_due_date.len]   = '\0';
+   d_chk_settlement_date.arr[d_chk_settlement_date.len]   = '\0';
+   d_chk_bill_date.arr[d_chk_bill_date.len] = '\0';
+
+   rowid_hdr.arr[rowid_hdr.len]                           =  '\0';
+
+
+   d_hdr_main_acc1_code.arr[d_hdr_main_acc1_code.len]             = '\0';
+   d_hdr_main_acc2_code.arr[d_hdr_main_acc2_code.len]             = '\0';
+   d_hdr_dept_code.arr[d_hdr_dept_code.len]                       = '\0';
+   d_hdr_product_group_code.arr[d_hdr_product_group_code.len]     = '\0';
+   d_hdr_product_line_code.arr[d_hdr_product_line_code.len]       = '\0';
+   d_hdr_subledger_group_code.arr[d_hdr_subledger_group_code.len] = '\0';
+   d_hdr_subledger_line_code.arr[d_hdr_subledger_line_code.len]   = '\0';
+
+   d_hdr_post_month.arr[d_hdr_post_month.len]                     = '\0';
+   d_hdr_post_year.arr[d_hdr_post_year.len]                       = '\0';
+   doc_date.arr[doc_date.len]                                     = '\0';
+   doc_date_chking.arr[doc_date_chking.len]                       = '\0';
+   d_chk_payable_amt.arr[d_chk_payable_amt.len]                   = '\0';
+   d_hdr_gross_amt.arr[d_hdr_gross_amt.len]                       = '\0';
+   d_hdr_discount_amt.arr[d_hdr_discount_amt.len]                 = '\0';
+   d_hdr_markup_amt.arr[d_hdr_markup_amt.len]                 = '\0';
+
+d_hdr_acc_entity_code.arr[d_hdr_acc_entity_code.len] = '\0';
+d_hdr_last_line_num.arr[d_hdr_last_line_num.len] = '\0';
+d_hdr_narration.arr[d_hdr_narration.len] = '\0';
+d_hdr_base_date.arr[d_hdr_base_date.len] = '\0';
+d_chk_base_date.arr[d_chk_base_date.len] = '\0';
+d_hdr_due_date.arr[d_hdr_due_date.len] = '\0';
+d_chk_due_date.arr[d_chk_due_date.len] = '\0';
+d_hdr_gross_amt.arr[d_hdr_gross_amt.len] = '\0';
+d_hdr_discount_amt.arr[d_hdr_discount_amt.len] = '\0';
+d_hdr_markup_amt.arr[d_hdr_markup_amt.len] = '\0';
+
+d_hdr_currency_code.arr[d_hdr_currency_code.len] = '\0';
+d_hdr_exchg_rate.arr[d_hdr_exchg_rate.len] = '\0';
+d_hdr_settlement_date.arr[d_hdr_settlement_date.len] = '\0';
+d_chk_settlement_date.arr[d_chk_settlement_date.len] = '\0';
+d_hdr_settlement_perc.arr[d_hdr_settlement_perc.len] = '\0';
+d_hdr_cust_ref.arr[d_hdr_cust_ref.len] = '\0';
+d_hdr_bill_doc_type_code.arr[d_hdr_bill_doc_type_code.len] = '\0';
+d_hdr_bill_num.arr[d_hdr_bill_num.len] = '\0';
+d_hdr_bill_date.arr[d_hdr_bill_date.len] = '\0';
+d_chk_bill_date.arr[d_chk_bill_date.len] = '\0';
+d_hdr_doctor_fee_amt.arr[d_hdr_doctor_fee_amt.len] = '\0';
+d_hdr_post_month.arr[d_hdr_post_month.len] = '\0';
+d_hdr_post_year.arr[d_hdr_post_year.len] = '\0';
+d_hdr_misc_cust_long_name.arr[d_hdr_misc_cust_long_name.len] = '\0';
+d_hdr_misc_cust_short_name.arr[d_hdr_misc_cust_short_name.len] = '\0';
+d_hdr_misc_cust_add1_desc.arr[d_hdr_misc_cust_add1_desc.len] = '\0';
+d_hdr_misc_cust_add2_desc.arr[d_hdr_misc_cust_add2_desc.len] = '\0';
+d_hdr_misc_cust_add3_desc.arr[d_hdr_misc_cust_add3_desc.len] = '\0';
+d_hdr_misc_cust_zip_desc.arr[d_hdr_misc_cust_zip_desc.len] = '\0';
+d_hdr_cust_long_name_locl.arr[d_hdr_cust_long_name_locl.len] = '\0';
+d_hdr_cust_short_name_locl.arr[d_hdr_cust_short_name_locl.len] = '\0';
+d_hdr_cust_add1_desc_locl.arr[d_hdr_cust_add1_desc_locl.len] = '\0';
+d_hdr_cust_add2_desc_locl.arr[d_hdr_cust_add2_desc_locl.len] = '\0';
+d_hdr_cust_add3_desc_locl.arr[d_hdr_cust_add3_desc_locl.len] = '\0';
+d_hdr_cust_zip_desc_locl.arr[d_hdr_cust_zip_desc_locl.len] = '\0';
+
+d_consolidated_inv.arr[d_consolidated_inv.len] = '\0';
+d_module_id.arr[d_module_id.len] = '\0';
+d_pb_invoice_yn.arr[d_pb_invoice_yn.len] = '\0';
+
+d_hdr_tel_num.arr[d_hdr_tel_num.len] = '\0';
+d_hdr_contact_name.arr[d_hdr_contact_name.len] = '\0';
+d_hdr_contact_name_title.arr[d_hdr_contact_name_title.len] = '\0';
+d_hdr_error_flag.arr[d_hdr_error_flag.len] = '\0';
+
+   return(sqlca.sqlerrd[2]);
+}
+
+validate_inv_header()
+{
+   char chk1_arr[30],chk2_arr[30] , chk3_arr[30];
+
+   
+   strcpy(chk_doc_type_code.arr,doc_type_code.arr);
+   chk_doc_type_code.len =  strlen(chk_doc_type_code.arr);
+
+   EXEC SQL OPEN SY_ACC_ENTITY_DOC_TYPE_CUR;
+ 
+   if (OERROR)
+       err_mesg("OPEN failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR",0,"");
+
+   d_ar_acc_status.arr[0]     = '\0';
+   d_ar_acc_valid_flag.arr[0] = '\0';
+   d_bl_acc_valid_flag.arr[0] = '\0';
+   sy_doc_print_flag.arr[0]   = '\0';
+
+   d_ar_acc_valid_flag.len = 0;
+   d_bl_acc_valid_flag.len = 0;
+   d_ar_acc_status.len     = 0;
+   sy_doc_print_flag.len   = 0;
+
+   EXEC SQL FETCH SY_ACC_ENTITY_DOC_TYPE_CUR
+             INTO :d_ar_acc_status,
+                  :d_ar_acc_valid_flag,
+				  :d_bl_acc_valid_flag,
+                  :sy_doc_print_flag;
+   
+   if (OERROR)
+        err_mesg("FETCH failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR",0,""); 
+
+   d_ar_acc_status.arr[d_ar_acc_status.len]         = '\0';
+   d_ar_acc_valid_flag.arr[d_ar_acc_valid_flag.len] = '\0';
+   d_bl_acc_valid_flag.arr[d_bl_acc_valid_flag.len] = '\0';
+   sy_doc_print_flag.arr[sy_doc_print_flag.len]     = '\0';
+   
+   if (NOT_FOUND)
+         error_insert("   0","SY1610");
+   else
+   { 
+      if ((d_ar_acc_valid_flag.arr[0] != 'Y') && (d_bl_acc_valid_flag.arr[0] != 'Y'))
+            error_insert("   0","SY1700");
+      if (d_ar_acc_status.arr[0] == 'S')
+            error_insert("   0","SY1640");
+
+      if (nd_proc_flag.arr[0] == 'P') 
+      {
+          if (print_flag.arr[0] != 'Y' && sy_doc_print_flag.arr[0] == 'Y')
+               error_insert("   0","SY2370");
+      }
+   } 
+
+   EXEC SQL OPEN SY_DOC_TYPE_MAST_CUR;
+
+   if (OERROR)
+       err_mesg("OPEN failed on cursor SY_DOC_TYPE_MAST_CUR",0,""); 
+
+   mast_status.arr[0] = '\0';
+   mast_status.len    = 0;
+
+   EXEC SQL FETCH SY_DOC_TYPE_MAST_CUR
+             INTO :mast_status;
+ 
+   if (OERROR)
+       err_mesg("FETCH failed on cursor SY_DOC_TYPE_MAST_CUR",0,""); 
+
+   mast_status.arr[mast_status.len] = '\0';
+   
+   if (NOT_FOUND)
+        error_insert("   0","SY1610");
+   else if (mast_status.arr[0] == 'S')
+        error_insert("   0","SY2190");
+   
+   EXEC SQL OPEN AR_TRN_DOC_TYPE_CUR;
+
+   if (OERROR)
+        err_mesg("OPEN failed on cursor AR_TRN_DOC_TYPE_CUR",0,"");
+
+   EXEC SQL FETCH AR_TRN_DOC_TYPE_CUR
+             INTO :dummy;
+
+   if (OERROR)
+        err_mesg("FETCH failed on cursor AR_TRN_DOC_TYPE_CUR",0,"");
+
+   if (NOT_FOUND)
+        error_insert("   0","AR1890");
+
+   EXEC SQL OPEN SY_DOC_CONTROL_CUR;
+
+   if (OERROR)
+        err_mesg("OPEN failed on cursor SY_DOC_CONTROL_CUR",0,"");
+
+   EXEC SQL FETCH SY_DOC_CONTROL_CUR
+             INTO :dummy;
+
+   if (OERROR)
+        err_mesg("FETCH failed on cursor SY_DOC_CONTROL_CUR",0,"");
+
+   if (!NOT_FOUND)   /*   Record Exists   */
+        error_insert("   0","AR1080");
+  
+   /****   AR_CUSTOMER Validation   *****/
+  
+   EXEC SQL OPEN AR_CUSTOMER_CUR;
+
+   if (OERROR)
+        err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR",0,"");
+
+   d_customer_status.arr[0]       = '\0';
+   d_customer_patient_flag.arr[0] = '\0';
+   d_last_inv_doc_date.arr[0]     = '\0';
+
+   d_customer_status.len       = 0;
+   d_customer_patient_flag.len = 0;
+   d_last_inv_doc_date.len     = 0;
+
+   EXEC SQL FETCH AR_CUSTOMER_CUR
+             INTO :d_customer_status,
+                  :d_customer_patient_flag,
+                  :d_last_inv_doc_date;
+
+   d_customer_status.arr[d_customer_status.len]             = '\0';
+   d_customer_patient_flag.arr[d_customer_patient_flag.len] = '\0';
+   d_last_inv_doc_date.arr[d_last_inv_doc_date.len]         = '\0';
+
+   if (OERROR)
+        err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR",0,"");
+
+   if (NOT_FOUND)
+        error_insert("   0","AR1210");
+   else
+     if (d_customer_status.arr[0] == 'S')
+        error_insert("   0","AR1220");
+
+   /****   AR_PMNT_TERMS  Validation   *****/
+
+   EXEC SQL OPEN AR_PMNT_TERMS_CUR;
+
+   if (OERROR)
+        err_mesg("OPEN failed on cursor AR_PMNT_TERMS_CUR",0,"");
+
+   d_pmnt_terms_status.arr[0] = '\0';
+   d_pmnt_terms_status.len    = 0;
+
+   EXEC SQL FETCH AR_PMNT_TERMS_CUR
+             INTO :d_pmnt_terms_status;
+
+   d_pmnt_terms_status.arr[d_pmnt_terms_status.len] = '\0';
+
+   if (OERROR)
+        err_mesg("FETCH failed on cursor AR_PMNT_TERMS_CUR",0,"");
+
+   if (NOT_FOUND)
+        error_insert("   0","AR1240");
+   else
+      if (d_pmnt_terms_status.arr[0] == 'S')
+           error_insert("   0","AR1250");
+
+   /****   PATIENT_MAST & BL_BLNG_GRP Validation    *****/
+
+   if (d_customer_patient_flag.arr[0] == 'Y')
+   {
+      
+	  if (bl_instal_flag > 0 && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+      {
+          d_bl_blng_grp_status.arr[0] = '\0';
+          d_bl_blng_grp_status.len    = 0;
+
+          EXEC SQL SELECT NVL(STATUS,'X')
+                     INTO :d_bl_blng_grp_status
+                     FROM BL_BLNG_GRP
+                    WHERE BLNG_GRP_ID  = :billing_group;
+
+          d_bl_blng_grp_status.arr[d_bl_blng_grp_status.len] = '\0';
+
+          if (OERROR)
+              err_mesg("SELECT failed on table BL_BLNG_GRP",0,"");
+
+          if (NOT_FOUND)
+             error_insert("   0","SY0110");
+          else if (d_bl_blng_grp_status.arr[0] == 'S')
+             error_insert("   0","BL0026");
+
+      }
+      /*
+      if (mp_instal_flag > 0) 
+      {
+          EXEC SQL SELECT 'X'
+                     INTO :dummy
+                     FROM MP_PATIENT_MAST
+                    WHERE PATIENT_ID  = :patient_id;
+
+          if (OERROR)
+             err_mesg("SELECT failed on table MP_PATIENT_MAST",0,"");
+          if (NOT_FOUND)
+             error_insert("   0","SY2021");
+      }
+      */
+   }
+
+   validate_posting("   0",0);
+
+      if (atoi(d_hdr_post_month.arr) > atoi(d_sy_num_acc_per.arr))
+             error_insert("   0","GL2290");
+
+      if (atoi(d_hdr_post_year.arr) < atoi(curr_acc_year.arr))
+             error_insert("   0","GL1595");
+
+      if ( (atoi(d_hdr_post_year.arr) == atoi(curr_acc_year.arr) && 
+              atoi(d_hdr_post_month.arr) < atoi(curr_acc_month.arr)) &&
+               prior_post_allow.arr[0] != 'Y' )
+                  error_insert("   0","GL1310");
+
+      if (atol(d_chk_base_date.arr) <  atol(doc_date_chking.arr))
+                  error_insert("   0","AR1090");
+
+      if (atol(d_chk_due_date.arr) <  atol(d_chk_base_date.arr))
+                  error_insert("   0","AR1100");
+
+      if (d_chk_settlement_date.len != 0)
+      {
+          if (atol(d_chk_settlement_date.arr) < atol(d_chk_base_date.arr) ||
+              atol(d_chk_settlement_date.arr) > atol(d_chk_due_date.arr))
+                  error_insert("   0","AR1110");
+
+          if (d_hdr_settlement_perc.len == 0)
+                  error_insert("   0","AR1130");
+      }
+      else if (d_hdr_settlement_perc.len != 0)
+              error_insert("   0","AR1120");
+
+      /*Commented on 19/Jul/2004 as per request from BL Team 
+      if (atof(d_hdr_gross_amt.arr) <= 0)
+                error_insert("   0","AR1140");
+      */
+  
+      if (nd_no_of_decimal == 3)
+	     {
+			  sprintf(chk1_arr,"%15.3f",atof(d_hdr_discount_amt.arr));
+			  sprintf(chk3_arr,"%15.3f",atof(d_hdr_markup_amt.arr));
+			  sprintf(chk2_arr,"%15.3f",atof(d_hdr_gross_amt.arr) + atof(d_hdr_markup_amt.arr) - payable_amt);
+          }
+	  else
+	     {
+			  sprintf(chk1_arr,"%15.2f",atof(d_hdr_discount_amt.arr));
+			  sprintf(chk3_arr,"%15.2f",atof(d_hdr_markup_amt.arr));
+			  sprintf(chk2_arr,"%15.2f",atof(d_hdr_gross_amt.arr) + atof(d_hdr_markup_amt.arr) - payable_amt);
+          }
+/*
+      ltrim(chk1_arr); 
+      ltrim(chk2_arr);
+	  ltrim(chk3_arr);
+*/
+      format_amt(chk1_arr,nd_no_of_decimal);
+	  format_amt(chk2_arr,nd_no_of_decimal);
+	  format_amt(chk3_arr,nd_no_of_decimal);
+/*
+	  if (strcmp(chk1_arr,"-0.00") == 0)
+         strcpy(chk1_arr,"0.00");
+      if (strcmp(chk2_arr,"-0.00") == 0)
+         strcpy(chk2_arr,"0.00");
+*/
+      if (strcmp(chk1_arr,chk2_arr))
+      {
+           error_insert("   0","AR1160");
+      }
+
+      if (d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+      {
+          if (atol(d_chk_bill_date.arr) > atol(doc_date_chking.arr))
+                error_insert("   0","AR1170");
+
+          if (atof(d_hdr_doctor_fee_amt.arr) > payable_amt)
+                error_insert("   0","AR1180");
+
+          strcpy(chk_doc_type_code.arr,d_hdr_bill_doc_type_code.arr);
+          chk_doc_type_code.len =  strlen(chk_doc_type_code.arr);
+
+          EXEC SQL OPEN SY_ACC_ENTITY_DOC_TYPE_CUR;
+ 
+          if (OERROR)
+               err_mesg("OPEN failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR - 2",
+                         0,"");
+
+          d_ar_acc_status.arr[0]     = '\0';
+          d_ar_acc_valid_flag.arr[0] = '\0';
+          sy_doc_print_flag.arr[0]   = '\0';
+
+          d_ar_acc_valid_flag.len = 0;
+          d_ar_acc_status.len     = 0;
+          sy_doc_print_flag.len   = 0;
+
+          EXEC SQL FETCH SY_ACC_ENTITY_DOC_TYPE_CUR
+                    INTO :d_ar_acc_status,
+                         :d_ar_acc_valid_flag,
+                         :sy_doc_print_flag;
+   
+          if (OERROR)
+               err_mesg("FETCH failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR - 2",
+                          0,""); 
+          d_ar_acc_status.arr[d_ar_acc_status.len]         = '\0';
+          d_ar_acc_valid_flag.arr[d_ar_acc_valid_flag.len] = '\0';
+          sy_doc_print_flag.arr[sy_doc_print_flag.len]     = '\0';
+   
+          if (NOT_FOUND)
+                error_insert_null("   0","SY1610","(BILL DOC TYPE)");
+          else
+          {
+             if (d_ar_acc_status.arr[0] == 'S')
+                   error_insert_null("   0","SY1640","(BILL DOC TYPE)");
+          } 
+      }
+
+  
+	  
+     if (doc_date.len == 0)
+            error_insert_null("   0","SY1470","Field = DOC DATE");
+     if (cust_code.len == 0)
+            error_insert_null("   0","SY1470","Field = CUST CODE");
+     if (pmnt_terms_code.len == 0)
+            error_insert_null("   0","SY1470","Field = PAY TERMS");
+     if (d_chk_base_date.len == 0)
+            error_insert_null("   0","SY1470","Field = BASE DATE");
+     if (d_chk_due_date.len == 0)
+            error_insert_null("   0","SY1470","Field = DUE DATE");
+     if (d_hdr_gross_amt.len == 0)
+            error_insert_null("   0","SY1470","Field = GROSS AMT");
+     if (d_chk_payable_amt.len == 0)
+            error_insert_null("   0","SY1470","Field = PAYABLE AMT");
+
+     if (billing_group.len == 0 && d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+            error_insert_null("   0","SY1470","Field = BILLING GROUP");
+     if (d_hdr_bill_doc_type_code.len == 0 && d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+            error_insert_null("   0","SY1470","Field = BILL DOC TYPE");
+     if (d_hdr_bill_num.len == 0 && d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+            error_insert_null("   0","SY1470","Field = BILL NUM");
+     if (d_hdr_bill_date.len == 0 && d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+            error_insert_null("   0","SY1470","Field = BILL DATE");
+  
+     if (patient_id.len == 0 && d_customer_patient_flag.arr[0] == 'Y' && d_pb_invoice_yn.arr[0] == 'N' && strcmp(d_module_id.arr,"RL") != 0 && strcmp(d_module_id.arr,"SS") != 0 && strcmp(d_module_id.arr,"ST") != 0)
+            error_insert_null("   0","SY1470","Field = PATIENT NO");
+
+     if (d_hdr_post_month.len == 0)
+            error_insert_null("   0","SY1470","Field = POST MONTH");
+     if (d_hdr_post_year.len == 0)
+            error_insert_null("   0","SY1470","Field = POST YEAR");
+
+/*  Commented since validate_posting_acct is doing this validation */
+
+/*      check_bank_reconcile("   0",0); */
+
+}  
+
+open_patient_dtls()
+{
+   EXEC SQL OPEN AR_PATIENT_DTLS_CUR USING :doc_type_code,:doc_num;
+
+   if (RESOURCE_BUSY)
+   {
+     error_insert("   0","AR2070");
+     update_err_flg();
+     EXEC SQL COMMIT WORK;
+     return (0);
+   }
+   else if (OERROR)
+        err_mesg("OPEN failed on cursor AR_PATIENT_DTLS_CUR",0,"");
+
+   return (1);
+}
+
+fetch_patient_dtls()
+{
+ar_pat_doc_type_code.arr[0]       = '\0';
+ar_pat_doc_num.arr[0]             = '\0';
+ar_pat_patient_id.arr[0]          = '\0';
+ar_pat_bill_doc_type_code.arr[0]  = '\0';
+ar_pat_bill_num.arr[0]            = '\0';
+ar_pat_bill_date.arr[0]           = '\0';
+ar_pat_remarks.arr[0]             = '\0';
+ar_pat_rowid.arr[0]               = '\0';
+
+ar_pat_doc_type_code.len          = 0;
+ar_pat_doc_num.len                = 0;
+ar_pat_patient_id.len             = 0;
+ar_pat_bill_doc_type_code.len     = 0;
+ar_pat_bill_num.len               = 0;
+ar_pat_bill_date.len              = 0;
+ar_pat_remarks.len                = 0;
+ar_pat_rowid.len                  = 0;
+
+ar_pat_amount                     = 0;
+
+   EXEC SQL FETCH AR_PATIENT_DTLS_CUR
+             INTO :ar_pat_doc_type_code,
+                  :ar_pat_doc_num,
+                  :ar_pat_patient_id,
+                  :ar_pat_bill_doc_type_code,
+                  :ar_pat_bill_num,
+                  :ar_pat_bill_date,
+                  :ar_pat_remarks,
+                  :ar_pat_amount,
+                  :ar_pat_rowid;
+
+   if (OERROR)
+       err_mesg("FETCH failed on cursor AR_PATIENT_DTLS_CUR",0,"");
+
+ar_pat_doc_type_code.arr[ar_pat_doc_type_code.len]           = '\0';
+ar_pat_doc_num.arr[ar_pat_doc_num.len]                       = '\0';
+ar_pat_patient_id.arr[ar_pat_patient_id.len]                 = '\0';
+ar_pat_bill_doc_type_code.arr[ar_pat_bill_doc_type_code.len] = '\0';
+ar_pat_bill_num.arr[ar_pat_bill_num.len]                     = '\0';
+ar_pat_bill_date.arr[ar_pat_bill_date.len]                   = '\0';
+ar_pat_remarks.arr[ar_pat_remarks.len]                       = '\0';
+ar_pat_rowid.arr[ar_pat_rowid.len]                           = '\0';
+
+   if (LAST_ROW)
+       return (0);
+   else 
+       return (1);
+}
+
+validate_patient_dtls()
+{
+   if (ar_pat_patient_id.len == 0)
+         error_insert_null("   1","SY1470","Field = PATIENT NO ");
+   else if (mp_instal_flag > 0)
+   {
+        EXEC SQL SELECT 'X'
+                   INTO :dummy
+                   FROM MP_PATIENT_MAST
+                  WHERE PATIENT_ID  = :ar_pat_patient_id;
+
+         if (OERROR)
+             err_mesg("SELECT failed on table MP_PATIENT_MAST",0,"");
+
+         if (NOT_FOUND)
+            error_insert_null("   1","SY2021","");
+   }
+
+   if (ar_pat_bill_doc_type_code.len == 0)
+         error_insert_null("   1","SY1470","Field = BILL DOC TYPE ");
+   else
+   {
+         strcpy(chk_doc_type_code.arr,ar_pat_bill_doc_type_code.arr);
+         chk_doc_type_code.len = strlen(chk_doc_type_code.arr);
+
+         EXEC SQL OPEN SY_ACC_ENTITY_DOC_TYPE_CUR;
+
+         if (OERROR)
+             err_mesg("OPEN failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR - 3",0,"");
+
+         d_ar_acc_status.arr[0]     = '\0';
+         d_ar_acc_valid_flag.arr[0] = '\0';
+         sy_doc_print_flag.arr[0]   = '\0';
+
+         d_ar_acc_valid_flag.len    = 0;
+         d_ar_acc_status.len        = 0;
+         sy_doc_print_flag.len      = 0;
+
+         EXEC SQL FETCH SY_ACC_ENTITY_DOC_TYPE_CUR
+                   INTO :d_ar_acc_status,
+                        :d_ar_acc_valid_flag,
+                        :sy_doc_print_flag;
+         if (OERROR)
+             err_mesg("FETCH failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR - 3",0,""); 
+         d_ar_acc_status.arr[d_ar_acc_status.len]         = '\0';
+         d_ar_acc_valid_flag.arr[d_ar_acc_valid_flag.len] = '\0';
+
+         if (NOT_FOUND)
+               error_insert_null("   1","SY1610","");
+         else if (d_ar_acc_status.arr[0] == 'S')
+                    error_insert_null("   1","SY1640","");
+      }
+
+      if (atol(ar_pat_bill_date.arr) > atol(doc_date_chking.arr))
+            error_insert_null("   1","AR1170","");
+
+      if (ar_pat_bill_num.len == 0)
+            error_insert_null("   1","SY1470","Field = BILL NUM ");
+      if (ar_pat_bill_date.len == 0)
+            error_insert_null("   1","SY1470","Field = BILL DATE ");
+      //if (ar_pat_remarks.len == 0)
+      //      error_insert_null("   1","SY1470","Field = REMARKS ");
+      if (ar_pat_amount == 0)
+            error_insert_null("   1","SY1470","Field = AMOUNT ");
+
+  ar_pat_tot_amt += ar_pat_amount;
+
+}
+
+update_pat_dtls()
+{
+    EXEC SQL UPDATE AR_PATIENT_DTLS
+                SET LINE_NUM = :ar_pat_line_num
+              WHERE ROWID    = :ar_pat_rowid;
+
+     if (OERROR)
+         err_mesg("UPDATE failed on table AR_PATIENT_DTLS",0,"");
+
+    ar_pat_line_num ++;
+
+}
+
+validate_posting(loc_line_num,ind)
+char loc_line_num[];
+int ind;
+{
+
+  if (ind == 0)
+  {
+    strcpy(d_module_valid_id.arr , "AR");
+      if(validate_posting_acct( d_hdr_main_acc1_code.arr,
+                                d_hdr_main_acc2_code.arr,
+                                d_hdr_dept_code.arr,
+                                d_hdr_product_group_code.arr,
+                                d_hdr_product_line_code.arr,
+                                d_hdr_subledger_group_code.arr,
+                                d_hdr_subledger_line_code.arr,
+                                'Y',   /* For chking Bank Reconcile */
+								d_module_valid_id.arr,
+                                atol(d_hdr_post_year.arr),
+								atol(d_hdr_post_month.arr),
+								&g_err_typ,
+                                g_err_id,
+                                g_err_msg
+                             ) ==  -1)
+      {
+             if(g_err_typ == 0)
+                   err_mesg(g_err_msg,0,"");
+             else 
+                error_insert(loc_line_num,g_err_id);
+       }
+  }
+  else 
+  { 
+
+      strcpy(d_module_valid_id.arr , "AR");
+	   
+      if(validate_posting_acct( d_main_acc1_code.arr,
+                                d_main_acc2_code.arr,
+                                d_dept_code.arr,
+                                d_product_group_code.arr,
+                                d_product_line_code.arr,
+                                d_subledger_group_code.arr,
+                                d_subledger_line_code.arr,
+                                'Y',   /* For chking Bank Reconcile */
+								d_module_valid_id.arr,
+                                atol(d_hdr_post_year.arr),
+								atol(d_hdr_post_month.arr),
+                                &g_err_typ,
+                                g_err_id,
+                                g_err_msg
+                             ) ==  -1)
+      {
+             if(g_err_typ == 0)
+                   err_mesg(g_err_msg,0,"");
+             else 
+                error_insert(loc_line_num,g_err_id);
+       }
+   }
+}
+
+validate_inv_line()
+{
+  
+
+   EXEC SQL OPEN CUR_INV_LINE;
+
+   if (RESOURCE_BUSY)
+   {
+        error_insert("   0","AR2070");
+        update_err_flg();
+        EXEC SQL COMMIT WORK;
+        return (0);
+   }
+   else if (OERROR)
+         err_mesg("OPEN failed on cursor AR_INV_LINE",0,"");
+
+   while (1)
+   {
+      amt_local = 0;
+      line_num.arr[0] = '\0';
+      line_num.len    = 0;
+
+      d_main_acc1_code.arr[0]       = '\0';
+      d_main_acc2_code.arr[0]       = '\0';
+      d_dept_code.arr[0]            = '\0';
+      d_product_group_code.arr[0]   = '\0';
+      d_product_line_code.arr[0]    = '\0';
+      d_subledger_group_code.arr[0] = '\0';
+      d_subledger_line_code.arr[0]  = '\0';
+      d_chk_amt_local.arr[0]        = '\0';
+
+      d_main_acc1_code.len       = 0;
+      d_main_acc2_code.len       = 0;
+      d_dept_code.len            = 0;
+      d_product_group_code.len   = 0;
+      d_product_line_code.len    = 0;
+      d_subledger_group_code.len = 0;
+      d_subledger_line_code.len  = 0;
+      d_chk_amt_local.len        = 0;
+
+      EXEC SQL FETCH CUR_INV_LINE
+                INTO :amt_local, :line_num,
+                     :d_main_acc1_code,
+                     :d_main_acc2_code,
+                     :d_dept_code,
+                     :d_product_group_code,
+                     :d_product_line_code,
+                     :d_subledger_group_code,
+                     :d_subledger_line_code,
+                     :d_chk_amt_local;
+
+      if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_INV_LINE",0,"");
+
+      line_num.arr[line_num.len] = '\0';
+
+      d_main_acc1_code.arr[d_main_acc1_code.len]             = '\0';
+      d_main_acc2_code.arr[d_main_acc2_code.len]             = '\0';
+      d_dept_code.arr[d_dept_code.len]                       = '\0';
+      d_product_group_code.arr[d_product_group_code.len]     = '\0';
+      d_product_line_code.arr[d_product_line_code.len]       = '\0';
+      d_subledger_group_code.arr[d_subledger_group_code.len] = '\0';
+      d_subledger_line_code.arr[d_subledger_line_code.len]   = '\0';
+      d_chk_amt_local.arr[d_chk_amt_local.len]               = '\0';
+
+      if (LAST_ROW) break;
+
+      nd_dtl_tot_amt += amt_local;
+
+      if (amt_local < 0)
+         nd_dtl_tot_deb_amt -= amt_local; 
+
+/****           deb_amt = deb_amt + abs(loc_amt)                      ****/
+
+      validate_posting(line_num.arr,1);
+
+/*  Commented since validate_posting_acct is doing this validation */
+
+/*      check_bank_reconcile(line_num.arr,1); */
+
+     if (d_chk_amt_local.len == 0)
+            error_insert_null(line_num.arr,"SY1470","Field = AMOUNT");
+   }
+   return (1);
+}
+
+validate_inv_amt()  
+{
+   char l_ch_dtl_amt[20],l_ch_payable_amt[20];
+   double l_diff_amts = 0;
+    if (nd_no_of_decimal == 3)
+      {
+		sprintf(l_ch_dtl_amt,"%15.3f",nd_dtl_tot_amt);
+		sprintf(l_ch_payable_amt,"%15.3f",payable_amt);
+      }
+	else
+      {
+		sprintf(l_ch_dtl_amt,"%15.2f",nd_dtl_tot_amt);
+		sprintf(l_ch_payable_amt,"%15.2f",payable_amt);
+      }
+/*
+    ltrim(l_ch_dtl_amt); 
+    ltrim(l_ch_payable_amt);
+ 
+     
+  if (strcmp(l_ch_dtl_amt,"-0.00") == 0)
+     strcpy(l_ch_dtl_amt,"0.00");
+  if (strcmp(l_ch_payable_amt,"-0.00") == 0)
+     strcpy(l_ch_payable_amt,"0.00");
+*/
+    format_amt(l_ch_dtl_amt,nd_no_of_decimal);
+	format_amt(l_ch_payable_amt,nd_no_of_decimal);   
+
+    if (strcmp(l_ch_dtl_amt,l_ch_payable_amt) != 0) 
+    {
+          error_insert("   0","AR1200");
+    }
+} 
+
+gl_doc_insert()
+{  
+
+
+
+   EXEC SQL INSERT INTO GL_TXN_DOC_HDR
+          (
+           ACC_ENTITY_CODE,
+           DOC_TYPE_CODE,
+           BATCH_NUM,
+           DOC_NUM,
+           DOC_DATE,
+           DOC_REF,
+           NARRATION,
+           POST_MONTH,
+           POST_YEAR,
+           CTRL_AMT,
+           DOC_NATURE,
+           UNIT_TYPE_CODE,
+           CURRENCY_CODE,
+           EXCHG_RATE,
+           ERROR_FLAG,
+           ADDED_BY_ID,
+           MODIFIED_BY_ID,
+           ADDED_DATE,
+           MODIFIED_DATE,
+           MAX_LINE_NUM,
+           MODULE_ID,
+           TXN_TYPE_DESC,
+           STD_JV_REF,
+           PRINT_FLAG
+           )
+      VALUES
+         (
+           :nd_acc_entity_code,
+           :doc_type_code,
+           0,
+           :doc_num,
+           TO_DATE(:doc_date,'DD/MM/YYYY'),
+           SUBSTR(:d_hdr_cust_ref,1,10),
+           :d_hdr_narration,
+           :d_hdr_post_month,
+           :d_hdr_post_year,
+           NVL(:payable_amt,0) + NVL(:nd_dtl_tot_deb_amt,0),
+           NULL,
+           NULL,
+           NULL,
+           NULL,
+           NULL,
+           USER,
+           USER,
+           SYSDATE,
+           SYSDATE,
+           :d_hdr_last_line_num,
+           'AR',
+           NULL,
+           NULL,
+           NULL );
+
+    if (OERROR)
+         err_mesg("INSERT failed on table GL_TXN_DOC_HDR",0,"");
+  
+  
+         
+  EXEC SQL INSERT INTO GL_TXN_DOC_LINE
+         (
+           ACC_ENTITY_CODE,
+           BATCH_NUM,  
+           DOC_TYPE_CODE,
+           DOC_NUM,
+           MAIN_ACC1_CODE,
+           MAIN_ACC2_CODE,
+           SUBLEDGER_GROUP_CODE,
+           SUBLEDGER_LINE_CODE,
+           DEPT_CODE,
+           PRODUCT_GROUP_CODE,
+           PRODUCT_LINE_CODE,
+           FOREIGN_AMT,
+           LOCAL_AMT,
+           NARRATION,
+           LINE_NUM,
+           INTER_ACC_ENTITY,
+	CUST_SUPP_CODE
+         )
+      VALUES
+         (
+           :nd_acc_entity_code,
+           0,
+           :doc_type_code,
+           :doc_num,
+           :d_hdr_main_acc1_code,
+           :d_hdr_main_acc2_code,
+           :d_hdr_subledger_group_code,
+           :d_hdr_subledger_line_code,
+           :d_hdr_dept_code,
+           :d_hdr_product_group_code,
+           :d_hdr_product_line_code,
+           NULL,
+           :payable_amt,
+           :d_hdr_narration,
+           0,
+           NULL,
+		   :cust_code
+         );
+
+     if (OERROR)
+	    
+		 err_mesg("INSERT failed on table GL_TXN_DOC_LINE",0,"");  
+	 
+
+  EXEC SQL INSERT INTO GL_TXN_DOC_LINE
+         (
+           ACC_ENTITY_CODE,
+           BATCH_NUM,
+           DOC_TYPE_CODE,
+           DOC_NUM,
+           MAIN_ACC1_CODE,
+           MAIN_ACC2_CODE,
+           SUBLEDGER_GROUP_CODE,
+           SUBLEDGER_LINE_CODE,
+           DEPT_CODE,
+           PRODUCT_GROUP_CODE,
+           PRODUCT_LINE_CODE,
+           FOREIGN_AMT,
+           LOCAL_AMT,
+           NARRATION,
+           LINE_NUM,
+           INTER_ACC_ENTITY,
+		   CUST_SUPP_CODE
+         )
+         SELECT
+           :nd_acc_entity_code,
+           0,
+           DOC_TYPE_CODE,
+           DOC_NUM,
+           MAIN_ACC1_CODE,
+           MAIN_ACC2_CODE,
+           SUBLEDGER_GROUP_CODE,
+           SUBLEDGER_LINE_CODE,
+           DEPT_CODE,
+           PRODUCT_GROUP_CODE,
+           PRODUCT_LINE_CODE,
+           NULL,
+           AMT_LOCAL * -1,
+           NARRATION,
+           LINE_NUM,
+           NULL ,
+		   :cust_code
+     FROM  AR_INV_LINE
+    WHERE  DOC_TYPE_CODE = :doc_type_code
+      AND  DOC_NUM       = :doc_num;
+
+     if (OERROR)
+         err_mesg("INSERT failed on table GL_TXN_DOC_LINE - for line",0,"");    
+
+}
+
+gl_posting()    
+{
+ char r_err_msg[100];
+
+ if (post_doc((long)0,doc_type_code.arr,atol(doc_num.arr),r_err_msg) == -1)
+        err_mesg(r_err_msg,0,""); 		
+
+   return (0);
+}
+
+insert_ar_patient_dtls()
+{
+   if (strcmp(d_pb_invoice_yn.arr,"Y") == 0)
+   {
+   EXEC SQL INSERT INTO AR_PATIENT_DTLS 
+             (DOC_TYPE_CODE,  
+              DOC_NUM,
+              PATIENT_ID,
+              PATIENT_NAME,
+              BILL_DOC_TYPE_CODE,
+              BILL_NUM,
+              BILL_DATE,  
+              BILLING_GROUP,  
+              AMOUNT,
+              PEND_AMOUNT,
+              LINE_NUM
+             )
+            SELECT 
+              A.AR_INVOICE_DOC_TYPE_CODE, 
+              A.AR_INVOICE_DOC_NUM,
+              A.PATIENT_ID,
+              SUBSTR(B.SHORT_NAME,1,30),
+              A.DOC_TYPE_CODE,
+              A.DOC_NUM,
+              A.DOC_DATE,
+              A.BILLING_GROUP,
+              A.DOC_AMT,
+              A.DOC_AMT,
+              ROWNUM
+            FROM AR_PAT_BILLS_TEMP A, MP_PATIENT_MAST B
+           WHERE A.PATIENT_ID                = B.PATIENT_ID
+             AND A.AR_INVOICE_DOC_TYPE_CODE  = :doc_type_code
+             AND A.AR_INVOICE_DOC_NUM        = :doc_num;
+
+    if (OERROR)
+         err_mesg("INSERT failed on table AR_PATIENT_DTLS",0,"");
+   }
+
+}
+
+
+
+delete_gl_recs()
+{
+ EXEC SQL DELETE FROM GL_TXN_DOC_HDR 
+                WHERE DOC_TYPE_CODE = :doc_type_code
+                  AND DOC_NUM       = :doc_num;
+
+  if (OERROR)
+         err_mesg("DELETE failed on table GL_TXN_DOC_HDR",0,"");
+
+ EXEC SQL DELETE FROM GL_TXN_DOC_LINE
+                WHERE DOC_TYPE_CODE = :doc_type_code
+                  AND DOC_NUM       = :doc_num;
+
+  if (OERROR)
+         err_mesg("DELETE failed on table GL_TXN_DOC_LINE",0,"");
+
+}
+
+error_insert(line_no,msg_id)
+char line_no[],msg_id[];
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     VARCHAR ar_line_no[5],
+             ar_err_code[7],
+             l_ar_doc_error_text[71];
+   EXEC SQL END DECLARE SECTION;
+
+   varchar l_ch_payable_amt[25],
+        l_ch_tot_amt[25];
+
+   if (strcmp(line_no,"   0"))
+     sprintf(ar_line_no.arr,"%4d",atoi(line_no) + 10);
+   else
+     strcpy(ar_line_no.arr,line_no);
+
+   ar_line_no.len = strlen(ar_line_no.arr);
+
+   strcpy(ar_err_code.arr,msg_id);
+   ar_err_code.len = strlen(ar_err_code.arr);
+
+   l_ar_doc_error_text.len = 0;
+   l_ar_doc_error_text.arr[0] = '\0';
+ 
+   EXEC SQL SELECT MESSAGE_TEXT 
+            INTO   :l_ar_doc_error_text
+			FROM   MESSAGE 
+			WHERE  MESSAGE_ID = :ar_err_code;
+ 
+      
+   if (strcmp(ar_err_code.arr,"AR1200") == 0)
+   {
+    
+	   if (nd_no_of_decimal == 3) 
+	     {
+		   sprintf(l_ch_payable_amt,"%19.3f",payable_amt);
+		   sprintf(l_ch_tot_amt,"%19.3f",nd_dtl_tot_amt);
+         }
+       else 
+	     {
+		   sprintf(l_ch_payable_amt,"%19.2f",payable_amt);
+		   sprintf(l_ch_tot_amt,"%19.2f",nd_dtl_tot_amt);
+         }
+  
+/* 
+       ltrim(l_ch_payable_amt);
+       ltrim(l_ch_tot_amt);
+*/ 
+       format_amt(l_ch_payable_amt,nd_no_of_decimal);
+	   format_amt(l_ch_tot_amt,nd_no_of_decimal);
+
+	
+       sprintf(l_ar_doc_error_text.arr,"Doc Amt = %s   Sum of Line Amt = %s ",
+                   l_ch_payable_amt,l_ch_tot_amt);
+       l_ar_doc_error_text.len = strlen(l_ar_doc_error_text.arr);
+   } 
+   l_ar_doc_error_text.arr[l_ar_doc_error_text.len] = '\0';
+ 
+   EXEC SQL INSERT INTO AR_DOC_ERROR
+                   (PGM_ID,
+                    DOC_TYPE_CODE,    DOC_NUM,
+                    LINE_NUM,         ERROR_CODE,
+                    ERROR_TEXT)
+            VALUES (:d_curr_pgm_name,:doc_type_code,   :doc_num,
+                    :ar_line_no,      :ar_err_code,
+                    :l_ar_doc_error_text);
+
+   if (OERROR) 
+   {
+     err_mesg("INSERT failed on table AR_DOC_ERROR",0,"");
+   }
+
+   strcpy(nd_error_flag.arr,"Y");
+   nd_error_flag.len = 1;
+}
+
+error_insert_null(line_no,msg_id,msg_txt)
+char line_no[],msg_id[],msg_txt[];
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     VARCHAR ar_line_no[5],
+             ar_err_code[7],
+             l_ar_doc_error_text[71];
+   EXEC SQL END DECLARE SECTION;
+
+   char l_ch_payable_amt[25],
+        l_ch_tot_amt[25];
+
+   if (strcmp(line_no,"   0") != 0 && strcmp(line_no,"   1") != 0)
+     sprintf(ar_line_no.arr,"%4d",atoi(line_no) + 10);
+   else
+     strcpy(ar_line_no.arr,line_no);
+
+   ar_line_no.len = strlen(ar_line_no.arr);
+
+   strcpy(ar_err_code.arr,msg_id);
+   ar_err_code.len = strlen(ar_err_code.arr);
+
+   l_ar_doc_error_text.len = 0;
+   l_ar_doc_error_text.arr[0] = '\0';
+
+
+   if (strcmp(ar_err_code.arr,"AR2180") == 0)
+   {
+       if (nd_no_of_decimal == 3)
+	     {
+		   sprintf(l_ch_payable_amt,"%19.3f",payable_amt);
+		   sprintf(l_ch_tot_amt,"%19.3f",ar_pat_tot_amt);
+         }
+        else
+	     {
+		   sprintf(l_ch_payable_amt,"%19.2f",payable_amt);
+		   sprintf(l_ch_tot_amt,"%19.2f",ar_pat_tot_amt);
+         }
+/*
+       ltrim(l_ch_payable_amt);
+       ltrim(l_ch_tot_amt);
+*/
+   	   format_amt(l_ch_payable_amt,nd_no_of_decimal);
+	   format_amt(l_ch_tot_amt,nd_no_of_decimal);
+
+       sprintf(l_ar_doc_error_text.arr,
+              "Doc Amt = %s Sum of Patient Line Amt = %s ",
+                   l_ch_payable_amt,l_ch_tot_amt);
+   }
+   else if (strcmp(line_no,"   1") == 0)
+   {
+       sprintf(l_ar_doc_error_text.arr,"%sin PATIENT DTLS Line %d ",msg_txt,
+                         ar_pat_line_num);
+   }
+   else 
+   {
+       strcpy(l_ar_doc_error_text.arr,msg_txt);
+   }
+
+   l_ar_doc_error_text.len = strlen(l_ar_doc_error_text.arr);
+
+   EXEC SQL INSERT INTO AR_DOC_ERROR
+                   (PGM_ID,
+                    DOC_TYPE_CODE,    DOC_NUM,
+                    LINE_NUM,         ERROR_CODE,
+                    ERROR_TEXT)
+            VALUES (:d_curr_pgm_name,:doc_type_code,   :doc_num,
+                    :ar_line_no,      :ar_err_code,
+                    :l_ar_doc_error_text);
+
+   if (OERROR)
+   {
+     err_mesg("INSERT failed on table AR_DOC_ERROR",0,"");
+   }
+
+   strcpy(nd_error_flag.arr,"Y");
+   nd_error_flag.len = 1;
+}
+
+update_err_flg()
+{
+   EXEC SQL UPDATE AR_INV_HDR 
+               SET ERROR_FLAG = :nd_error_flag
+             WHERE ROWID      = :rowid_hdr;
+
+   if (OERROR)
+         err_mesg("UPDATE failed on table AR_INV_HDR",0,"");
+
+}
+
+delete_records()
+{
+    
+    while (1)
+    {
+       EXEC SQL DELETE FROM AR_DOC_ERROR 
+                      WHERE PGM_ID = :d_curr_pgm_name
+                        AND ROWNUM < 500;
+
+       if (OERROR)
+         err_mesg("DELETE failed on table AR_DOC_ERROR",0,"");
+
+       EXEC SQL COMMIT WORK;
+       if (OERROR)
+            err_mesg("COMMIT failed",0,""); 
+
+       if (NOT_FOUND)
+             break;
+    }
+}
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+fetch_acc_entity_flag()
+{
+   EXEC SQL SELECT  NUM_OF_ACC_PERIODS , ACC_ENTITY_CODE , NO_OF_DECIMAL
+              INTO   :d_sy_num_acc_per, :nd_acc_entity_code, :nd_no_of_decimal
+              FROM SY_ACC_ENTITY
+		   where   ACC_ENTITY_ID = :nd_facility_id;
+
+
+   
+
+
+    
+
+    EXEC SQL EXECUTE 
+            BEGIN
+	         GET_INSTALLED_MODULES(:p_operational_modules);   
+            END;
+    END-EXEC; 
+
+	EXEC SQL SELECT INSTR(:p_operational_modules , 'BL|')
+	         into   :bl_instal_flag 
+			from dual ;
+
+	EXEC SQL SELECT INSTR(:p_operational_modules , 'MP|')
+	         into   :mp_instal_flag 
+			from dual ;
+
+
+
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+  
+   d_sy_num_acc_per.arr[d_sy_num_acc_per.len]               = '\0';
+
+   d_num_of_acc_periods = atoi(d_sy_num_acc_per.arr);
+}
+
+fetch_ar_parameter()
+{
+     ar_interface_code.arr[0] = '\0';
+     ar_interface_code.len    = 0;
+
+     EXEC SQL SELECT AR_INTERFACE_CODE 
+                INTO :ar_interface_code
+                FROM AR_PARAMETER; 
+
+     if (OERROR)
+         err_mesg("SELECT failed on table AR_PARAMETER",0,"");
+
+     ar_interface_code.arr[ar_interface_code.len]='\0';
+
+
+     EXEC SQL SELECT CURRENT_ACC_YEAR,CURRENT_ACC_MONTH,
+                     PRIOR_POSTING_ALLOW_FLAG,
+                     NVL(SUMMARY_PROCESS_FLAG,'X') 
+                INTO :curr_acc_year,    :curr_acc_month,
+                     :prior_post_allow, :gl_summ_pro_flag
+                FROM GL_PARAMETER;
+
+     if (OERROR)
+         err_mesg("SELECT failed on table GL_PARAMETER",0,"");
+
+     curr_acc_year.arr[curr_acc_year.len]       = '\0';
+     curr_acc_month.arr[curr_acc_month.len]     = '\0';
+     prior_post_allow.arr[prior_post_allow.len] = '\0';
+     gl_summ_pro_flag.arr[gl_summ_pro_flag.len] = '\0';
+
+d_curr_year  = atoi(curr_acc_year.arr);
+d_curr_month = atoi(curr_acc_month.arr);
+d_summ_flag  = gl_summ_pro_flag.arr[0];
+}
+
+run_report()
+{
+  char l_run_string[300],l_messg_str[132];
+  int  l_ret_run_rep;
+
+  sprintf(l_run_string,"runrep %s %s no \
+  %s session_id=%s pgm_date=%s %s desname=%s.lis",
+  "arrinlst",uid_pwd.arr,
+  (nd_view_print_flg.arr[0]=='V')?"batch=no":"batch=yes",
+  nd_session_id.arr,g_pgm_date,
+  (nd_view_print_flg.arr[0]=='V')?"destype=Screen":"destype=File",
+  (nd_proc_flag.arr[0]=='P')?"arbinpst":"arrinlst");
+ 
+  l_ret_run_rep = WinExec(l_run_string,SW_NORMAL);
+
+  if (l_ret_run_rep<32)
+  {
+     
+     disp_message(ERR_MESG,"Error in calling Report Writer Program");
+     proc_exit();
+     sprintf(l_messg_str,"RUNREP - arrinlst session = %s failed \
+return value %d",nd_session_id.arr,l_ret_run_rep);
+     err_mesg(l_messg_str,0,"");
+  }
+} 
+
+doubcmp(_doub1,_doub2)
+double _doub1,_doub2;
+{
+  varchar _doub_str1[25],_doub_str2[25];
+  if (nd_no_of_decimal == 3)
+  {
+	  sprintf(_doub_str1,"%15.3f",_doub1);
+	  sprintf(_doub_str2,"%15.3f",_doub2);
+  }
+  else
+  { 
+	  sprintf(_doub_str1,"%15.2f",_doub1);
+	  sprintf(_doub_str2,"%15.2f",_doub2);
+  }
+
+/* 
+  ltrim(_doub_str1);
+  ltrim(_doub_str2);
+  if (strcmp(_doub_str1,"-0.00") == 0)
+     strcpy(_doub_str1,"0.00");
+  if (strcmp(_doub_str2,"-0.00") == 0)
+     strcpy(_doub_str2,"0.00");
+*/
+  format_amt(_doub_str1,nd_no_of_decimal);
+  format_amt(_doub_str2,nd_no_of_decimal);
+  return(strcmp(_doub_str1,_doub_str2));
+}
+
+ltrim(l_str) 
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+

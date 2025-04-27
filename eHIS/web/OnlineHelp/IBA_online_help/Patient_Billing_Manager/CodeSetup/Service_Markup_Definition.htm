@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Service Markup Definition</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nCodeSetup\nService Markup Definition");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Service Markup Definition</h1>
+<p class="Italic">From this function you can <span style="color: #ff0000;"><font color="red" >Define</font></span> the service markup against the Billing group or Customer.</p>
+<p class="Text">This function allows you to define markup service against Billing group or Customer for the selected facility. Based on the set up defined against Billing group and customer, the system calculates the Factor value.</p>
+<p class="Text">The Mark up entry will be shown in a single entry in Discharge Bill Cum Receipt / Undercharge Bill Cum Receipt screen. This change is applicable only for IP / Day Care. &#160;</p>
+<p class="Text">The Mark-up entry is shown in Draft report / Discharge bill / Undercharge bills. The System date (Date on which bill is generated) is shown against the mark-up entry.</p>
+<p class="Text">Mark up service will be charge based service.</p>
+<h2>Defining Service Markup</h2>
+<p class="From">From the Masters, select Multi Pricing &gt; Service Markup Definition.</p>
+<p class="Text">The Service Markup Definition screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields found in the following tab pages:</p>
+</li>
+</ol>
+<p class="Number"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Billing Group</a></p>
+<div class="droptext" id="POPUP208016577" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Billing Group denotes various types of payments the Facility accepts from the patients or the customers paying on behalf of the patients. A Billing Group is assigned to a patient during registration. A patient bill is generated based on the prices set for the billing services associated to a Billing Group. You can define the Billing Group to be valid only for patient registration, for Outpatient visit registration or for an Inpatient admission. Service Level eligibility is defined for Inpatients. A patient is linked to a Billing Group during registration or admission.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: bold;">Enter the following details in the Billing Group tab:</p>
+<ol>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Facility</u></span> – By default, the logged in facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Billing Group</u></span> – Select the required billing group from the lov. The lov populates billing group value based on the data defined in Billing Group masters. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Indicator</u></span> – Select the indicator value from Lov. The indicator can be Service Group, Service Classification and Billing Service. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Service</u></span> - On selecting the Service Group or Service Classification, the system populates the corresponding code in the Service field. You can also enter the service group code or service classification code manually. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Description</u></span> - The corresponding short description of the selected service group / classification gets displayed. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>MarkUp Service</u></span> – Select the required markup service from the Lov. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Mark Up %</u></span> - Enter the mark up percentage value in numeric format. The minimum value is 1 and the maximum value is 100. You cannot enter decimals and negative values. This field is mandatory.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />When an invalid entry is entered and on querying the system displays the message ‘Query caused no records to be retrieved, please re-enter’ in the status bar.</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Apply On</u></span> - The drop-down list values include Gross and Net. You can select either Gross or Net. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Valid From</u></span> – Enter the valid date in DD/MM/YYYY’ date format and select the valid date by clicking the calendar. This field is mandatory. Valid From date should be Future date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Valid To</u></span> - &#160;Select the valid to date by clicking the calendar. This field is non-mandatory field. ‘Valid To’ date should be greater than current date and should not allow current date / backdates.</p>
+</li>
+</ol>
+</div>
+<p class="Number"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Customer</a></p>
+<div class="droptext" id="POPUP383498430" style="display: none;">
+<p class="BoldRFD">Enter the following details in the Customer tab:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Facility</u></span> - By default, the logged in facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Billing Group</u></span> – The first billing group in the alphabetical order gets displayed. Select the required billing group from the lov. The lov populates billing group value based on the data defined in Billing Group masters. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Indicator</u></span> - Select the indicator value from Lov. The data is populated from the Service Group / Service Classification masters. On selecting the Service Group or Service Classification, the system populates the corresponding code in the Indicator field. You can also enter the service group code or service classification code manually. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Service</u></span> - Select the required service from the Service Group lov. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Description</u></span> – The corresponding short description of the selected service group / classification gets displayed. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>MarkUp Service</u></span> - Select the MarkUp Service from the lov. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Mark Up %</u></span> - Enter the mark up percentage value in numeric format. The minimum value is 1 and the maximum value is 100. You cannot enter decimals and negative values. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Apply On</u></span> - The drop-down list values include Gross and Net. You can select either Gross or Net. This field is mandatory. By default, the value 'Gross' is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Valid From</u></span> - Enter the valid date in DD/MM/YYYY date format or select the valid date by clicking the calendar. This field is mandatory.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">'Valid From' date allows future date and should not allow backdate.</p>
+<p class="NumberRFD" style="margin-left: 40px;">Valid From date should be greater than System date.</p>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Valid To</u></span> - &#160;Select the valid to date by clicking the calendar. This field is non-mandatory field.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">'Valid To' date should be greater than current date and should not allow current date / backdates.</p>
+</div>
+<ol start="2">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> to save the records or <span class="BoldButton">[Clear Record]</span> to delete the data entered.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> to query for the existing records.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP208016577');
+	TextPopupInit('a2','POPUP383498430');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

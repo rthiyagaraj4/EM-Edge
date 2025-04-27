@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OP_OPCheckout_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to perform the Check out operation:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Type</span> - Visit Type of the Visit is displayed and cannot be changed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> – If a Practitioner is assigned, the Practitioner Name and Practitioner type are displayed and cannot be changed. In case the Practitioner is not assigned, you can assign a practitioner and the displayed list is limited based on a similar logic adopted while performing visit registration. This field is mandatory if Practitioner is not yet assigned.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Disposition</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date/Time</span> – The current date/time is displayed as the disposition date and time. The date/time cannot be modified.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - The Disposition Type defined in the OP Parameter gets displayed, by default. If no value is defined in the OP Parameter, the field displays as 'Select' for you to select the Disposition Type from the list of valid values. The displayed list is limited to a set of active Disposition Types valid for Visit Conclusion.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Case Definitions</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Medical</span> - Select the check box to indicate whether the case requires only medical attention.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Surgical</span> - Select the check box to indicate whether the case requires surgical attention.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Circumstance of Injury</span> - Select the required value for Circumstance of Injury from the list. The list displays all the enabled records created in 'Circumstance of Injury' master of Application Masters module.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">In the Event of Death</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Brought Dead</span> – Select the check box to indicate whether the patient is deceased and has been brought dead to the facility. If the patient is already registered as a brought dead case in 'Register Attendance’ function, this field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">MLC</span> – Select the check box to indicate the patient is registered under Medico Legal Case, or clear the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Postmortem Required</span> – Select the check box to indicate postmortem is required for the deceased body, or if post mortem is not required, clear the check box. This field is enabled only if the ‘Type’ selected is deceased.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>Note:</b></span> If the deceased / body part is going to be released to other facility, then performing postmortem will become optional, even if this check box has been selected.</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deceased Date/Time</span> – Enter the deceased date and time of the patient. If the ‘Type’ is selected as deceased, this field becomes mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">High Risk Body</span> – Select the check box to indicate the deceased body is a high risk body. If it is not of high risk, clear the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Body Release Date/Time</span> – If the ‘Type’ is selected as deceased, this field becomes mandatory and the current system date/time gets populated automatically.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Recall Details</p>
+<p class="BoldRFD"><span style="font-weight: normal;">If the Patient is required to come back to the clinic, then the following details are entered:</span></p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Come back After</span> - Click on the check box to indicate whether the Patient has to come back again on a future date. If it is selected, enter the number of days within which the patient has to come back in numeric format of three digits maximum length in ‘Day(s)’, ‘Week(s)’ or ‘Month(s)’. This field is mandatory on checking the ‘Come Back’ check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> - Enter the Reason for recalling the Patient in alphanumeric format of 200 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Instructions</span> - Enter the Instructions of Recall to the Patient in alphanumeric format of 200 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Book Appointment</span> – This button is enabled on checking the ‘Come Back’ check box. Appointment is booked in advance for patients who are asked to come back on a future date using this button. On clicking the <a href="../../Appointment_Scheduling/RFD/OA_Trans_SchApp_BookAppointment.htm" target="_blank"><span class="BoldNumberRFD">[Book Appointment]</span></a>, diary of the currently registered Location/Practitioner is invoked if schedule has been generated in ‘Appointment Scheduling’ module. The system also highlights the earliest available slot based on the come back period defined.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

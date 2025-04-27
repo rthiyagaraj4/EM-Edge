@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Block/Lift/Cancel Schedule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Appointment Scheduling\nSchedules\nBlock/Lift/Cancel Schedule");
+addTocInfo("Appointment Scheduling\nSchedules\nBlock/Lift/Cancel Schedule\nProcess_Flow_Diagram___Block_Lift_Cancel_Schedule");
+addAvenueInfo("Appointment Scheduling","Appointment_Scheduling/Schedules/Block_Appointment_Slot.htm","Appointment_Scheduling/Schedules/Change_Resource_For_Generated_Schedule.htm");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Block/Lift/Cancel Schedule</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Block</span> a schedule, <span class="RedItalic">Lift</span> a blocked schedule and <span class="RedItalic">Cancel</span> a Schedule for a Resource and Location for a selected period.</p>
+<p class="Text">A schedule generated against a location can be either blocked or canceled due to various reasons. The task is performed against a location or resource based on a period range and is justified by a reason for auditing. The Block option is used to block the schedule to prevent appointments from being booked. You can block the schedule of a practitioner from booking appointments based on the slots or slabs for a specific date and time range. The Lift option is used to lift the previously blocked schedule for a Resource and Location for a selected period. Once a block is lifted from a Location Schedule, appointments are booked for that Location Schedule. The Cancel option is used to cancel previously created Location Schedules and associated appointments for a Practitioner and Location for a specified period.</p>
+<p class="Text">&#160;</p>
+<p class="Text">If there are already appointments booked for a schedule, you can still block the schedule if the parameter Block Schedule even if Appointments exist has been selected in the <a href="../AdminSetup/OA_Parameter.htm">OA Parameter</a> &#160;screen. Else, you need to either cancel or transfer all existing appointments and only then block the schedule.</p>
+<p class="Text">Once the schedule is blocked, the schedule will appear in Red colour and you will not be able to perform any action.</p>
+<p class="Text">&#160;</p>
+<p class="ProcessFlowDiagram"><a href="#Process_Flow_Diagram___Block_Lift_Cancel_Schedule">Process Flow Diagram</a></p>
+<h2>Blocking/Lifting/Canceling Schedules</h2>
+<p class="From">From the OA Schedules, select the Block/Lift/Cancel Schedule function.</p>
+<p class="Text">Block/Lift/Cancel Schedule screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/OA_Sch_BlockLiftCanceSch.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">The schedule details are displayed based on the query criteria. 
+<a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/OA_Sch_BlockLiftCancelSch_RFD.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click 
+‘
+
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">No of Appts</a>
+’
+ to view the list of appointments for a day.</p>
+<div class="droptext" id="POPUP351430163" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Time</span> – This field displays the commencement time of an appointment based on the appointment type set up in timetable for scheduling.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">To Time</span> – This field displays the end time of an appointment based on the appointment type set up in timetable.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Details</span> – This field displays the details of the patient like Patient ID (Incase of registered patient), Name of the Patient, Gender and Age. This field is blank if no appointments exist.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Type</span> – This field displays the applicable visit type recorded while giving the appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason For Contact</span> – This field displays the reason for the patient seeking an appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Contact Details</span> – This field displays the contact details of the patient captured while booking an appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sec Res</span> – This field displays the secondary resource selected for an appointment with a hyperlink or this column is blank.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt Given By</span> – This field displays the name of the person who has given the appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt Given On</span> – This field displays the Date and Time on which appointment is scheduled.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Select the check box against the required schedule to block, cancel or lift a blocked schedule. Select the check box at the header to select all schedules to perform the action. If the check box is cleared, the corresponding schedules are not blocked, cancelled or lifted.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the time is not entered in the time slot, the slots for the selected date range get displayed based on the selected criteria.</p>
+<ol start="5">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to Block, Lift the Block or Cancel a schedule.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Generate Report]</span> to generate a report on blocked, cancelled or blocked schedules lifted.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Select check box is disabled for Block and Lift Block functions if appointments are booked against the location.</p>
+<p class="Note">&#160;</p>
+<h2 class="Note">Transferring or cancelling appointments within blocked schedule</h2>
+<p class="Text">1. Navigate to Transfer/Cancel Appointments screen.</p>
+<p class="Text">2. Select ‘Resource Type’ as Practitioner.</p>
+<p class="Text">3. Select the practitioner whose schedule has been blocked.</p>
+<p class="Text">4. Select the appointment date (schedule) that has been blocked.</p>
+<p class="Text">5. Transfer or cancel the appointments as required.</p>
+<p class="text">&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Reason','../../Application_Masters/CodeSetup/Reason.htm','Resource for Location','../../Outpatient_Management/CodeSetup/Resource_for_Location.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Generate Schedule','Generate_Schedule.htm','Schedule Appointment','../Transaction/Schedule_Appointment.htm','Timetable for Scheduling','../CodeSetup/Timetable_for_Scheduling.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<hr style="float: aligncenter;" />
+<h3><a name="Process_Flow_Diagram___Block_Lift_Cancel_Schedule" id="Process_Flow_Diagram___Block_Lift_Cancel_Schedule">Process Flow Diagram - Block/Lift/Cancel Schedule</a></h3>
+<p align="center"><img src="../../image599.gif" style="border: none;" alt="image599.gif" width="337" height="673" border="0" /></p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP351430163');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

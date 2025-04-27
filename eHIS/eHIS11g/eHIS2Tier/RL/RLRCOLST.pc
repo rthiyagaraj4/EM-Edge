@@ -1,0 +1,752 @@
+#include <stdio.h>   
+#include <string.h>
+#include <malloc.h>
+#include "gl.h"
+
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+#define INIT_MESG "Collection List"
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd					[41],
+	        d_accession_num         [30],
+		    d_pgm_date				[31],
+            rep_date				[31],
+            rep_date1				[31], //added for globalisation
+            //comp_name				[50],
+			comp_name				[300],
+            oper_id					[21],
+            d_curr_pgm_name			[15],
+			nd_session_id           [30],
+			nd_pgm_date             [30],
+
+	        nd_date					[30],
+			nd_type					[2],
+			l_fm_date_time			[30],
+			l_to_date_time			[30],
+			nd_fm_order_type_code	[10],
+			nd_to_order_type_code	[10],
+			nd_source_type			[5],
+			nd_fm_source			[10],
+			nd_to_source			[10],
+			nd_urgency_indicator	[5],
+			nd_location_type		[5],
+			nd_location_code		[15],
+			d_item_code             [15],
+			d_item_string			[100],
+			l_1						[20],
+			l_2						[20];
+			
+
+    VARCHAR d_source_code			[7],
+			d_patient_id			[20],
+			d_bed_num				[15],
+			d_episode_id			[15],
+			d_patient_name			[61],
+			d_order_type_code		[6],
+			d_order_id				[20],
+			nd_trx_ind              [2],
+			d_lab_section_code		[6],
+            d_request_num           [21];
+
+	VARCHAR sql_stmt				[6000];
+
+	/***************added for globalisation*************************/
+	varchar		l_translated_value		 [500],
+	language_id			[5];
+
+	int i;
+	/***************added for globalisation*************************/
+
+EXEC SQL END DECLARE SECTION; 
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H; 
+
+#include "winproc.h"
+
+EXEC ORACLE OPTION(HOLD_CURSOR = YES);
+
+//EXEC ORACLE OPTION(REBIND = NO);
+
+#define REP_WIDTH 80
+#define VER  "VER : 1.10.01\n"
+#define OERROR (sqlca.sqlcode < 0)
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1];
+
+char string_var[1000];
+char local_legend[35][500];//added for globalisation
+
+//char rep_title1[] = "COLLECTION LIST";
+char rep_title1[40] ; //added for globalisation
+char rep_title2[30];
+char item_title[30];
+
+int end_pgm_control = 0;
+
+FILE *f1;
+
+int page_no,
+    line_no;
+
+char filename[150];
+
+char d_string[100];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+    if(argc > 21) 
+	{
+
+        disp_message(ERR_MESG,"rlrcolst : Usage RLRCOLST userid/password \n");
+        proc_exit();
+    }
+
+    strcpy(g_pgm_id,"RLRCOLST");
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+	strcpy(nd_date.arr, argv[2]);
+	nd_date.len = strlen(nd_date.arr);
+
+	strcpy(nd_type.arr, argv[3]);
+	nd_type.len = strlen(nd_type.arr);
+
+	strcpy(l_fm_date_time.arr, argv[4]);
+	l_fm_date_time.len = strlen(l_fm_date_time.arr);
+
+	strcpy(l_to_date_time.arr, argv[5]);
+	l_to_date_time.len = strlen(l_to_date_time.arr);
+
+	strcpy(nd_fm_order_type_code.arr, argv[6]);
+	nd_fm_order_type_code.len = strlen(nd_fm_order_type_code.arr);
+	
+	strcpy(nd_to_order_type_code.arr, argv[7]);
+	nd_to_order_type_code.len = strlen(nd_to_order_type_code.arr);
+
+	strcpy(nd_source_type.arr, argv[8]);
+	nd_source_type.len = strlen(nd_source_type.arr);
+
+	strcpy(nd_fm_source.arr, argv[9]);
+	nd_fm_source.len = strlen(nd_fm_source.arr);
+
+	strcpy(nd_to_source.arr, argv[10]);
+	nd_to_source.len = strlen(nd_to_source.arr);
+
+	strcpy(l_1.arr, argv[11]);
+	l_1.len = strlen(l_1.arr);
+
+	strcpy(l_2.arr, argv[12]);
+	l_2.len = strlen(l_2.arr);
+
+	strcpy(nd_urgency_indicator.arr, argv[13]);
+	nd_urgency_indicator.len = strlen(nd_urgency_indicator.arr);
+
+	strcpy(nd_location_type.arr, argv[14]);
+	nd_location_type.len = strlen(nd_location_type.arr);
+
+	strcpy(nd_location_code.arr, argv[15]);
+	nd_location_code.len = strlen(nd_location_code.arr);
+
+	strcpy(nd_session_id.arr, argv[16]);
+	nd_session_id.len = strlen(nd_session_id.arr);
+
+	strcpy(nd_pgm_date.arr, argv[17]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+	/*** Debug Messages
+	sprintf(string_var, "nd_date %s nd_type %s l_fm_date_time %s  l_to_date_time %s  nd_fm_order_type_code  %s", nd_date.arr, nd_type.arr,
+	                    l_fm_date_time.arr , l_to_date_time.arr , nd_fm_order_type_code.arr);
+   	disp_message(ERR_MESG, string_var);
+	
+	sprintf(string_var, "nd_to_order_type_code %s nd_source_type %s nd_fm_source %s  nd_to_source %s ", nd_to_order_type_code.arr ,  nd_source_type.arr , nd_fm_source.arr,
+	                     nd_to_source.arr);
+	disp_message(ERR_MESG, string_var);
+
+    sprintf(string_var, "l_1 %s l_2 %s nd_urgency_indicator %s  nd_location_type %s nd_location_code %s",
+	                     l_1.arr , l_2.arr ,nd_urgency_indicator.arr ,nd_location_type.arr ,nd_location_code.arr);
+	disp_message(ERR_MESG, string_var);
+	
+	sprintf(string_var, "nd_session_id %s nd_pgm_date %s",
+	                     nd_session_id.arr ,  nd_pgm_date.arr);
+    disp_message(ERR_MESG, string_var);
+
+	***/
+
+	EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) 
+	{
+        disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+        proc_exit();
+    }
+
+    fetch_sys_info();
+
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"rlrcolst.lis");
+
+
+    if( (f1=fopen(filename,"w")) == NULL)
+	{
+        disp_message(ERR_MESG,"Error in opening output file...\n");
+		proc_exit();
+    }
+
+    page_no=1;
+    line_no=1;
+
+/*********************** added for globalisation ******************************/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+/*********************** added for globalisation ******************************/
+
+	get_legend_value(33); //added for globalisation
+
+	declare_collection_curs();
+
+    do_report();
+
+
+    print_end_of_rep();
+
+	get_trans_ind();
+
+    fclose(f1);
+
+
+	EXEC SQL  DELETE sy_prog_param
+			  WHERE  pgm_id = 'RLRCOLST'
+			  AND	 session_id = TO_NUMBER(:nd_session_id)
+			  AND	 pgm_date    = :nd_pgm_date;
+
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+/**** commented for compilation with srdv
+	if (nd_location_type.arr[0]	== '!') 
+		print_online(uid_pwd.arr,"RLRCOLST", "O"," ","rlrcolst.lis","S");
+	else
+		print_online(uid_pwd.arr,"RLRCOLST",nd_location_type.arr,nd_location_code.arr,"rlrcolst.lis","S");
+*/    
+/******** CHANGED ON 01/12/2002 AGAINST SCF - 279 OF KN **********
+	if (strcmp(nd_trx_ind.arr,"Y") == 0)
+	{
+		print_online(uid_pwd.arr,"RLRCOLST",nd_location_type.arr,nd_location_code.arr,"rlrcolst.lis","S");
+	}
+	else
+	{
+       print_online(uid_pwd.arr,"RLRCOLST","O"," ","rlrcolst.lis","S");
+	}
+******** UPTO HERE CHANGED ON 01/12/2002 AGAINST SCF - 279 OF KN **********/
+
+    return;
+
+}
+
+                  
+/********************* DECLARE COLLECTION CURSOR ************************/
+declare_collection_curs()
+{
+   
+	strcpy(sql_stmt.arr, " SELECT A.source_code, A.patient_id, A.order_type_code, A.order_id, A.request_num, A.episode_id, A.lab_section_code");
+    
+	strcat(sql_stmt.arr, ", D.accession_num "); //shh
+	
+	 if (nd_type.arr[0] == 'W')
+		strcat(sql_stmt.arr, ", B.cur_bed_num ");
+	 else
+		strcat(sql_stmt.arr, ", '!' ");
+	
+	strcat(sql_stmt.arr, " FROM OR_ORDER A");
+
+	 if (nd_type.arr[0] == 'W')
+		strcat(sql_stmt.arr, ", IP_EPISODE B");
+     
+	 strcat(sql_stmt.arr, ", OR_ORDER_LINE_LB C");
+
+     strcat(sql_stmt.arr, ", OR_ORDER_LINE D");
+	 
+	 strcat(sql_stmt.arr, "	WHERE  ((A.order_id , A.order_type_code)  IN (SELECT param1  , param2 \
+						                     FROM  sy_prog_param \
+											 WHERE pgm_id = 'RLRCOLST' \
+											 AND   session_id = TO_NUMBER(:nd_session_id) \
+											 AND   pgm_date   = :nd_pgm_date)) ");
+
+	 if (nd_type.arr[0] == 'W')
+	 {
+  
+	     strcat(sql_stmt.arr, " AND A.patient_id = B.patient_id \
+			    	AND A.episode_id = B.episode_id \
+					AND B.discharge_date_time IS NULL ");
+
+	}
+
+	strcat(sql_stmt.arr, " AND A.ORDER_ID = C.ORDER_ID \
+					AND A.ORDER_ID = D.ORDER_ID \
+					AND C.ORDER_LINE_NUM = 1 \
+					AND D.ORDER_LINE_NO = 1 \
+					AND A.order_type_code BETWEEN NVL(:nd_fm_order_type_code, '!!') AND \
+										NVL(:nd_to_order_type_code, '~~') \
+					AND A.source_type = DECODE(:nd_source_type, '!', A.source_type, :nd_source_type) \
+					AND A.source_code BETWEEN :nd_fm_source AND :nd_to_source \
+					AND A.urgency_indicator = DECODE(:nd_urgency_indicator, 'A', A.urgency_indicator, \
+													:nd_urgency_indicator) ");
+
+	 if (nd_type.arr[0] == 'W')
+		strcat(sql_stmt.arr, " ORDER BY A.source_code, B.cur_bed_num, A.order_date_time ");    
+	 else
+		strcat(sql_stmt.arr, " ORDER BY A.patient_id, A.order_date_time, A.source_code ");    
+
+	sql_stmt.len = strlen(sql_stmt.arr);
+
+
+	EXEC SQL PREPARE sr1 FROM :sql_stmt; 
+	EXEC SQL DECLARE collect_cur CURSOR FOR sr1;		
+
+
+	if (OERROR)
+	{	
+
+        err_mesg("DECLAR failed on cursor collect_cursor",0,"");
+	}
+
+    EXEC SQL OPEN collect_cur USING :nd_session_id,:nd_pgm_date,
+				:nd_fm_order_type_code, :nd_to_order_type_code, :nd_source_type,
+				:nd_source_type,
+				:nd_fm_source, :nd_to_source, 
+				:nd_urgency_indicator,
+				:nd_urgency_indicator;
+
+	if (OERROR)
+	{	
+
+		err_mesg("OPEN failed on cursor collect_cursor",0,"");
+	}
+
+
+}
+
+/********************* CLOSE TEST CURSOR ************************/
+close_collection_cursor()
+{
+	
+	EXEC SQL CLOSE collect_cur;
+
+	if (OERROR)
+        err_mesg("CLOSE failed on cursor collect_cursor",0,"");
+
+
+}
+
+/********************* FETCH TEST CURSOR ************************/
+fetch_collection_cursor()
+{
+	
+	d_source_code.arr[0]		= '\0';
+	d_source_code.len			= 0;
+	
+	d_accession_num.arr[0]		= '\0';
+	d_accession_num.len			= 0;
+
+	d_patient_id.arr[0]			= '\0';
+	d_patient_id.len			= 0;
+	d_order_type_code.arr[0]	= '\0';
+	d_order_type_code.len		= 0;
+	d_order_id.arr[0]			= '\0';
+	d_order_id.len				= 0;
+	d_request_num.arr[0]		= '\0';
+	d_request_num.len			= 0;
+	d_episode_id.arr[0]			= '\0';
+	d_episode_id.len			= 0;
+	d_lab_section_code.arr[0]	= '\0';
+	d_lab_section_code.len		= 0;
+	d_bed_num.arr[0]			= '\0';
+	d_bed_num.len				= 0;
+
+
+	EXEC SQL FETCH collect_cur
+			 INTO :d_source_code, :d_patient_id, :d_order_type_code,
+				:d_order_id,:d_request_num, :d_episode_id, :d_lab_section_code,
+				:d_accession_num,:d_bed_num;
+
+	if(OERROR)
+	    err_mesg("FETCH failed on cursor TEST_CURSOR CURSOR",0,"");
+
+	d_source_code.arr[d_source_code.len]			= '\0';
+	
+	d_accession_num.arr[d_accession_num.len]		= '\0';
+	
+	d_patient_id.arr[d_patient_id.len]				= '\0';
+	d_order_type_code.arr[d_order_type_code.len]	= '\0';
+	d_order_id.arr[d_order_id.len]					= '\0';
+	d_request_num.arr[d_request_num.len]			= '\0';
+	d_episode_id.arr[d_episode_id.len]				= '\0';
+	d_lab_section_code.arr[d_lab_section_code.len]	= '\0';
+	d_bed_num.arr[d_bed_num.len]					= '\0';
+
+
+    if(NO_DATA_FOUND)
+		return 0;
+	return 1;
+
+}
+
+
+/********************* PRINT END OF REPORT ************************/
+print_end_of_rep()
+{
+    int col;
+    char buff[REP_WIDTH+1];
+
+    memset(buff,' ',REP_WIDTH+1);
+    col = (int)(REP_WIDTH-19)/2;
+
+    strncpy(buff+col,"** END OF REPORT **",19);
+    fprintf(f1,"\n%s\n",buff);
+	fprintf(f1,"\f");
+}
+
+/********************* FETCH HOSPITAL NAME ************************/
+fetch_sys_info()
+{
+
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+		    TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+	     INTO   :comp_name,
+		    :rep_date,
+		    :oper_id
+	     FROM   SY_ACC_ENTITY_lang_vw
+		 where language_id = :language_id;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len] = '\0';
+    oper_id.arr[oper_id.len] = '\0';
+}
+
+/********************* CHECK PAGE BREAK ************************/
+chk_break(nol)
+int nol;
+{
+
+	if(line_no + nol >= 63)
+	{
+       line_no = 1;
+	   form_hdr();
+	   line_no += 5;
+	   put_hdr();
+	}
+}
+
+/********************* FORM HDR ************************/
+form_hdr()
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+
+        strcpy(rep_title2,"DATE : ");
+        strcat(rep_title2, nd_date.arr);
+
+    if(first) 
+	{
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+        memset(hdr_line4,' ',REP_WIDTH+1);
+		memset(hdr_line5,'-',REP_WIDTH);
+		hdr_line5[REP_WIDTH] = '\0';
+
+        strncpy(hdr_line1,"MDL : OR",8);
+        col = (int)(REP_WIDTH-strlen(comp_name.arr))/2;
+        strncpy(hdr_line1+col,comp_name.arr,strlen(comp_name.arr));
+
+		EXEC SQL EXECUTE
+			DECLARE
+				t_date   date;
+			BEGIN
+				t_date := GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+				:rep_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');	
+			END;
+		END-EXEC;
+
+        col = (REP_WIDTH-strlen(rep_date1.arr));
+        strcpy(hdr_line1+col-4,rep_date1.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,oper_id.arr);
+
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+    strncpy(hdr_line3,"REP : RLRCOLST",14);
+	strcpy(rep_title1, local_legend[1]); //added for globalisation
+    col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+ //   sprintf(buf,"PAGE : %4d",page_no++);
+    sprintf(buf,"%-4.4s : %4d",local_legend[2],page_no++); //added for globalisation
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf))-4,buf);
+
+    col = (int)(REP_WIDTH-strlen(rep_title2))/2;
+    strcpy(hdr_line4+col,rep_title2);
+
+    if(first)
+        fprintf(f1,"%s\n",hdr_line1);
+    else
+        fprintf(f1,"\f%s\n",hdr_line1);
+
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3);
+    fprintf(f1,"%s\n",hdr_line4);
+    fprintf(f1,"%s\n",hdr_line5);
+
+    first = 0;
+}
+
+/********************* REPORT HEADER ************************/
+put_hdr()
+{
+   
+//   fprintf(f1,"Source Bed No     Episode Id Patient ID    Name                 Order No                 ");
+   fprintf(f1,"%-6.6s %-6.6s     %-10.10s %-10.10s    %-4.4s                 %-8.8s                 ",
+			local_legend[3], local_legend[4], local_legend[5], local_legend[6], local_legend[7], local_legend[8]);
+   fprintf(f1, "\n");
+//   fprintf(f1,"Specimen No");
+   fprintf(f1,"%s", local_legend[9]); //added for globalisation
+   fprintf(f1, "\n");
+//   fprintf(f1,"Tests");
+   fprintf(f1,"%s", local_legend[10]); //added for globalisation
+   fprintf(f1, "\n");
+   fprintf(f1, "--------------------------------------------------------------------------------");
+   fprintf(f1, "\n");
+
+   line_no = line_no + 4;
+
+}
+
+do_report()
+{
+
+   form_hdr();
+   line_no += 5;
+   put_hdr();
+
+   while(fetch_collection_cursor())
+   {
+	  
+	  print_records();
+
+   }		
+
+   close_collection_cursor();
+
+}
+
+print_records()
+{
+
+	get_patient_name();
+
+	chk_break(1);
+
+    if (strcmp(d_bed_num.arr, "!") == 0)
+		strcpy(d_bed_num.arr ,"");
+
+	fprintf(f1, "%-4.4s   %-8.8s   %-8.8s   %-13.13s %-20.20s %-3.3s %-10.10s",
+					d_source_code.arr, d_bed_num.arr,d_episode_id.arr,
+					d_patient_id.arr, d_patient_name.arr, 
+//					d_order_type_code.arr, d_order_id.arr, d_request_num.arr);
+					d_order_type_code.arr, d_order_id.arr);
+	fprintf(f1, "\n");
+	fprintf(f1, "%-15.15s \n",d_accession_num.arr);
+
+	get_item_string();
+
+	fprintf(f1, "\n");
+/**
+    if (strcmp(d_bed_num.arr, "!") != 0)
+		fprintf(f1, "%-8.8s\n", d_bed_num.arr);
+	 else
+		fprintf(f1, "\n");
+**/
+	line_no++;
+	line_no++;
+	line_no++;
+
+}
+
+get_patient_name()
+{
+
+	d_patient_name.arr[0]		= '\0';
+	d_patient_name.len			= 0;
+
+	EXEC SQL SELECT DECODE(:language_id, 'en', SHORT_NAME, 'th', SHORT_NAME_LOC_LANG) short_name
+			 INTO :d_patient_name
+			 FROM MP_PATIENT_MAST
+			 WHERE patient_id = :d_patient_id;
+
+	if (NO_DATA_FOUND);
+
+	d_patient_name.arr[d_patient_name.len]		= '\0';
+
+}
+
+get_item_string()
+{
+
+	int i = 0;
+	int flg = 0;
+
+	EXEC SQL DECLARE item_curs CURSOR FOR
+			 /*SELECT item_code, item_short_desc
+			 FROM OR_ORDER_LINE
+			 WHERE order_type_code = :d_order_type_code
+			 AND order_id = :d_order_id;
+			*/
+			SELECT 'AA' item_code, 'BB' item_short_desc
+			 FROM OR_ORDER_LINE;
+	EXEC SQL OPEN item_curs;
+
+	strcpy(d_string, "");
+
+	while(fetch_item_curs())
+	{
+
+		if (i == 0)
+		{
+			flg  = 1;
+			strcpy(d_string, d_item_string.arr);
+		}
+		else
+		{
+			if ((80 - strlen(d_string)) > strlen(d_item_string.arr))
+			{
+			flg  = 1;
+			strcat(d_string, ",");
+			strcat(d_string, d_item_string.arr);
+			}
+			else
+			{
+			flg  = 0;
+			fprintf(f1, "%-60.60s \n", d_string);
+			strcpy(d_string, "");
+			line_no++;
+			}
+		}
+
+/**
+		if (i > 4)
+			break;
+**/
+		i++;
+	}
+
+	if (flg == 1)
+	{
+		fprintf(f1, "%-60.60s \n", d_string);
+		strcpy(d_string, "");
+		line_no++;
+	}
+
+}
+
+/********************* FETCH ITEM CURSOR ************************/
+fetch_item_curs()
+{
+	
+	d_item_code.arr[0]     = '\0';
+	d_item_code.len        = 0;
+	d_item_string.arr[0]   = '\0';
+	d_item_string.len	   = 0;
+
+	EXEC SQL FETCH item_curs
+			 INTO :d_item_code, :d_item_string;
+
+	if(OERROR)
+	    err_mesg("FETCH failed on cursor ITEM_CURSOR CURSOR",0,"");
+
+	d_item_code.arr[d_item_code.len]      = '\0';
+	d_item_string.arr[d_item_string.len]  = '\0';
+
+
+    if(NO_DATA_FOUND)
+		return 0;
+
+	return 1;
+
+}
+
+/**************************select transaction based or not ***************/
+get_trans_ind()
+{
+	
+	nd_trx_ind.arr[0]		= '\0';
+	nd_trx_ind.len		= 0;
+
+	EXEC SQL  SELECT TRANSACTION_BASED_YN 
+	          INTO   :nd_trx_ind
+	          FROM   sy_online_print_id
+              WHERE  ONLINE_PRINT_NAME = 'RLRCOLST';
+
+	if(OERROR)
+	    err_mesg("SELECT failed on  SY_ON_LINE_PRINT_ID",0,"");
+
+	nd_trx_ind.arr[nd_trx_ind.len]			= '\0';
+
+
+    if(NO_DATA_FOUND)
+		return 0;
+
+		
+	return 1;
+
+}
+
+
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND ('DF',:language_id,'RLRCOLST.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRCOLST.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+	}
+ }

@@ -1,0 +1,1043 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>jQuery Mobile Application</title> 
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="stylesheet" href="../jquery.mobile-1.0a4.1.min.css" /> 
+<script src="../jquery-1.5.2.min.js"></script> 
+<script src="../jquery.mobile-1.0a4.1.min.js"></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+   
+<link rel="stylesheet" href="../css/iPadwidget.css" />
+<link rel="stylesheet" href="../css/ipadAllergyContent.css" />
+
+
+<script>
+var b =false;
+$(document).bind("mobileinit", function () {
+    // As of Beta 2, jQuery Mobile's Ajax navigation does not work in all cases (e.g.,
+    // when navigating from a mobile to a non-mobile page, or when clicking "back"
+    // after a form post), hence disabling it.
+    $.mobile.ajaxEnabled = false;
+    $.mobile.loadingMessage = 'Loading...';
+
+});
+function showLoadingMsg()
+{
+	$.mobile.pageLoading();
+}
+function HideLoadingMsg()
+{
+	 $.mobile.pageLoading(true);
+}
+function changeOrientation(orient)
+{
+	//	alert(orient);
+	if(orient == "landscape")
+	   {
+	     document.getElementById("dvmain").style.height = "492px";
+	     document.getElementById("dvmain2").style.height = "492px";
+	     //document.getElementById("iframeResultDetails").style.height = "447px";
+	     $("#iframeResultDetails").css('min-height','491px');
+	     //$("#iframeAllergyDetails").css('min-height','491px');
+	     $(".dvWidgetHeader").css('height','20%');
+	     $(".dvWidgetContent").css('height','80%');
+	     document.getElementById("iframeResultDetails").contentWindow.changeOrientation(orient);
+	    // document.getElementById("iframeAllergyDetails").contentWindow.changeOrientation(orient);
+	   }
+     else
+	   {
+	    document.getElementById("dvmain").style.height = "748px";
+	    document.getElementById("dvmain2").style.height = "748px";
+	    //document.getElementById("iframeResultDetails").style.height = "703px";
+	    $("#iframeResultDetails").css('min-height','747px');
+	   // $("#iframeAllergyDetails").css('min-height','747px');
+	    $(".dvWidgetHeader").css('height','14%');
+	    $(".dvWidgetContent").css('height','86%');
+	    document.getElementById("iframeResultDetails").contentWindow.changeOrientation(orient);
+	   // document.getElementById("iframeAllergyDetails").contentWindow.changeOrientation(orient);
+	   }
+ 
+}
+
+function showAllergyCount(rowCount)
+{
+	//alert(rowCount);
+	if(rowCount == "" || rowCount == "/")
+		{
+		rowCount = "0";
+		}
+	//alert("rowcount");
+	 document.getElementById("spaAllergyRowCount").innerHTML =  " (" + rowCount + ")";
+}
+function showProblemsCount(rowCount)
+{
+	//alert(rowCount);
+	if(rowCount == "" || rowCount == "/")
+		{
+		rowCount = "0";
+		}
+	//alert("rowcount");
+	 
+	 document.getElementById("spaProblemsCount").innerHTML =  " (" + rowCount + ")";
+	
+}
+function showCurrentMedCount(rowCount)
+{
+	//alert(rowCount);
+	if(rowCount == "" || rowCount == "/")
+		{
+		rowCount = "0";
+		}
+	//alert("rowcount");
+	 
+	 document.getElementById("spaCurrentMedCount").innerHTML =  " (" + rowCount + ")";
+	
+}
+function showPendingScheduleCount(rowCount)
+{
+	//alert(rowCount);
+	if(rowCount == "" || rowCount == "/")
+		{
+		rowCount = "0";
+		}
+	//alert("rowcount");
+	 
+	 document.getElementById("spaPendingScheduleCount").innerHTML =  " (" + rowCount + ")";
+	
+}
+function showResultsCount(rowCount)
+{
+	if(rowCount == "" || rowCount == "/")
+	{
+	rowCount = "0";
+	}
+//alert("rowcount");
+ document.getElementById("spaResultsCount").innerHTML =  " (" + rowCount + ")";
+}
+function showOrderCount(rowCount)
+{
+	if(rowCount == "" || rowCount == "/")
+	{
+	rowCount = "0";
+	}
+//alert("rowcount");
+ document.getElementById("spaOrderCount").innerHTML =  " (" + rowCount + ")";
+}
+function showProcedureCount(rowCount)
+{
+	if(rowCount == "" || rowCount == "/")
+	{
+	rowCount = "0";
+	}
+//alert("rowcount");
+ document.getElementById("spaProcedureCount").innerHTML =  " (" + rowCount + ")";
+}
+
+function showPCFCount(rowCount)
+{
+	if(rowCount == "" || rowCount == "/")
+	{
+	rowCount = "0";
+	}
+//alert("rowcount");
+ document.getElementById("spaPCFCount").innerHTML =  " (" + rowCount + ")";
+}
+$(document).ready(function() {
+	
+	
+		$("#pageWidget").bind("swipeleft", function() {
+			widgetsummaryswipeps();
+		});
+		
+		$("#pageWidget1").bind("swiperight", function() {
+			//$.mobile.changePage("#pageWidget", "slide" , true,false);	
+			rightSwipe();
+		});
+		/*
+	    $("[data-swipe = 'page1']").bind("swipeleft", function() {
+			widgetsummaryswipeps();
+		});	
+		*/
+
+});
+	
+
+  function widgetsummaryswipeps()
+  { 
+	    $.mobile.changePage("#pageWidget1", "slide" , false,false);
+	    document.getElementById("iframependingschedules").src ="../jsp/PendingSchedules.jsp"; 
+	  	document.getElementById("iframecurrentmedications").src="../jsp/CurrentMedications.jsp";
+	  	document.getElementById("iframeproceduredetails").src="../jsp/ProcedureDetails.jsp";
+	  	document.getElementById("iframependingorders").src="../jsp/PendingOrders.jsp";  //changed the space
+  	  
+  	  
+  }
+  function rightSwipe()
+  {
+	 
+	  
+	  
+	  $.mobile.changePage("#pageWidget", "slide" , true,false);	
+  }
+  /*function widgetsummaryswipecm()
+  { 
+  	 document.getElementById("iframecurrentmedications").src="../jsp/CurrentMedications.jsp";
+  	  $.mobile.changePage("#pageWidget1", "slide" , true,false);
+  	  
+  }
+  function widgetsummaryswipepd()
+  { 
+  	 document.getElementById("iframeproceduredetails").src="../jsp/ProcedureDetails.jsp";
+  	  $.mobile.changePage("#pageWidget1", "slide" , true,false);
+  	  
+  }
+  function widgetsummaryswipepo()
+  { 
+  	 document.getElementById("iframependingorders").src="../jsp/Pending Orders.jsp"; 
+  	  $.mobile.changePage("#pageWidget1", "slide" , true,false);
+  	  
+  }*/
+   
+  function widgetDetails()
+  {
+	 // window.parent.document.getElementById("widgetFrame").src ="IP.jsp";
+  }
+  function expandwidget2()
+  {
+	 // window.parent.document.getElementById("trIcon").style.display = "block";
+	  $.mobile.changePage("#pageWidget", "pop", true,false);
+  }
+  function expandwidget3()
+  {
+	  $.mobile.changePage("#pageWidget", "pop", true,false);
+	  
+  }
+  function expandwidgetsecond()
+  {
+	  widgetsummary();
+	  //$.mobile.changePage("#pageWidget1", "pop", true,false);
+	  
+	  
+  }
+  function widgetsummary()
+  { 
+	  $.mobile.changePage("#pageWidget1", "pop", true,false);
+	  document.getElementById("iframependingschedules").src ="../jsp/PendingSchedules.jsp"; 
+  	document.getElementById("iframecurrentmedications").src="../jsp/CurrentMedications.jsp";
+  	document.getElementById("iframeproceduredetails").src="../jsp/ProcedureDetails.jsp";
+  	document.getElementById("iframependingorders").src="../jsp/PendingOrders.jsp"; //changed the space
+  	  
+  	  
+  }
+  /* function expandwidget4()
+  {
+	  $.mobile.changePage("#pageWidget1", "pop", true,false);
+	  
+  }
+ function expandwidget5()
+  {
+	  $.mobile.changePage("#pageWidget1", "pop", true,false);
+	  
+  } */
+  function expandwidget6()
+  {
+	  $.mobile.changePage("#pageWidget", "pop", true,false);
+	  
+  }
+  /* function expandwidget7()
+  {
+	  $.mobile.changePage("#pageWidget1", "pop", true,false);
+	  
+  }
+  */
+  function expandwidget8()
+  {
+	  $.mobile.changePage("#pageWidget", "pop", true,false);
+  }
+  function expandResults()
+  {
+	  
+	  refreshResultsExpandedview();
+	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+  }
+  function refreshResultsExpandedview()
+  {
+	  document.getElementById("iframeResultDetails").src = "../jsp/widgetResultDetail.jsp"; 
+  }
+  function expandallergies()
+ {
+	  
+	  refreshAllergiesExpandedview();
+	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+  }
+ 
+ 
+  function refreshAllergiesExpandedview()
+  {
+	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetAllergyDetails.jsp"; 
+  }
+  function expandschedules()
+  {
+  	  
+  	  refreshschedulesExpandedview();
+  	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+    }
+   
+   
+    function refreshschedulesExpandedview()
+    {
+  	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetPendingScheduleDetails.jsp"; 
+    }
+    function expandprocdetails()
+    {
+    	  
+    	  refreshprocdetailsExpandedview();
+    	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+    }
+     
+     
+      function refreshprocdetailsExpandedview()
+      {
+    	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetProcedureDetails.jsp"; 
+      }
+      function expandactiveproblems()
+      {
+    	  
+    	  refreshactiveproblemsExpandedview();
+    	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+      }
+     
+     
+      function refreshactiveproblemsExpandedview()
+      {
+    	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetActiveProblems.jsp"; 
+      }
+      function expandpendingorders()
+      {
+          	  
+          	  refreshpendingordersExpandedview();
+          	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+            }
+           
+           
+            function refreshpendingordersExpandedview()
+            {
+          	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetPendingOrders.jsp"; 
+            }
+            function expandcurrentmedications()
+            {
+                	  
+            	refreshcurrentmedicationsExpandedview()
+                	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+            }
+                 
+                 
+                  function refreshcurrentmedicationsExpandedview()
+                  {
+                	  document.getElementById("iframeResultDetails").src = "../jsp/WidgetCurrentMedications.jsp"; 
+                  }
+                  function expandpatientcareflowsheet()
+                  {
+                      	  
+                  	refreshpatientcareflowsheetExpandedview()
+                      	  $.mobile.changePage("#pageWidgetResultcontent", "pop", false,false);
+                   }
+                       
+                       
+                   function refreshpatientcareflowsheetExpandedview()
+                   {
+                      	 document.getElementById("iframeResultDetails").src = "../jsp/WidgetPatientCareFlow.jsp"; 
+                   } 
+  function expandwidget()
+  {
+		  
+	  
+  }
+  function Loading()
+  {
+  	window.parent.hideLoading();
+  }
+  function refreshWidget()
+  {
+	  window.parent.showLoadingMsg();
+  }
+    </script>
+
+</head> 
+<body onload = "Loading()"> 
+
+
+
+ <section id="pageWidget" data-role="page" style ="padding:0px" > 
+
+ 
+
+<form id='frmWidget' name= 'frmwidget' >
+
+
+ <!-- class ='divmain' -->
+ 
+ 
+ <!--  <div class = "dvWidgetRefresh"> -->
+   <table style="width:100%" border = "0" cellspacing = "0" cellpadding = "0" class = "dvWidgetRefresh">
+     <tr style = "width:100%;height:40px">
+       <td style="width:90%" valign = "center" >
+         <table style="width:100%" border = "0" cellspacing = "0" cellpadding = "0">
+            <tr style="width:100%;height:50%">
+               <td style = "width:100%" valign = "center">
+                  <span class = "spanChartSummary">Chart Summary</span> 
+               </td>
+            </tr>
+            <tr style="width:100%;height:50%">
+               <td style = "width:100%" valign = "top">
+                  <span class = "spanChartSummary" >Blood Group: Rh Factor</span> 
+               </td>
+            </tr>
+         </table>
+       </td>
+       <td style="width:10%" valign = "center" align = "right" onclick = "refreshWidget()">
+          <img src = "../images/Refresh.png" class = "imgWidgetRefresh"></img>
+       </td>
+       
+     </tr>
+   </table>
+<!--  </div>  -->
+<div    class ='divmain' id = 'dvmain' data-role = "none" style="padding:0px;background-color:#babcbb">
+
+
+ 
+   
+<!--  
+<div style="height:40px;width:100%;background-color:orange">
+refresh
+</div>
+-->
+<table   border='0' class = 'tbmain' id = 'tbWidget' cellpadding = "0" cellspacing = "0" style = "background-color:#babcbb" >
+	<tr style = 'height:50%;width:100%' id="tr1">
+		<td width = '50%' valign ='center' align = "center" id = "td1">
+		 
+			<div  class="dvwidgetContainer" onclick = "expandactiveproblems()" >
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+				  <tr style="width:100%;height:100%">
+				  
+				  <td  style="width:90%;height:100%" valign = "center" nowrap = "false">
+				  <span class="spaDvHeader">Active Problems and Diagnosis</span>  <span class="spaDvWidgetCount" id = "spaProblemsCount"></span>
+				  </td>
+				  
+				   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+				     <img src = "../images/Full Screen.png" > </img>
+				  </td>
+				  
+				  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent" style = "overflow:hidden;"> 
+			  
+			    <iframe src="../jsp/widContent.jsp" width="100%" height="100%" frameborder="0" scrolling ="no"></iframe> 
+			
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' align = "center" id="td2">
+		 
+			 <div  class="dvwidgetContainer" onclick = "expandallergies()" >
+			  <div class="dvWidgetHeader" >
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center">
+			  <span class="spaDvHeader">Allergies</span>  <span class="spaDvWidgetCount" id = "spaAllergyRowCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			      <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			   <iframe src="../jsp/widgetAllergy.jsp" width="100%" height="100%" frameborder="0" scrolling ="no" ></iframe>  
+			  
+			 
+			    
+			  </div>
+			</div>
+		</td>
+	</tr>
+	
+	<tr style = 'height:50%;width:100%'  id = "tr2" >
+		<td width = '50%' valign ='center' align = "center" id="td11">
+		 
+			<div  class="dvwidgetContainer" onclick = "expandpatientcareflowsheet()" >
+			  <div class="dvWidgetHeader" >
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center">
+			  <span class="spaDvHeader">Patient Care Flow Sheet</span><span class="spaDvWidgetCount" id = "spaPCFCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			     <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  <iframe src="../jsp/widOrder.jsp" width="100%" height="100%" frameborder="0" ></iframe>  
+			 
+			
+			  
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' align = "center" id="td12" >
+		 
+			 <div  class="dvwidgetContainer" onclick = "expandResults()" >
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center" >
+			  <span class="spaDvHeader">Results</span><span class="spaDvWidgetCount" id = "spaResultsCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			     <img src = "../images/Full Screen.png"> </img>
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  <iframe src="../jsp/widResults.jsp" width="100%" height="100%" frameborder="0" scrolling = "no"></iframe>   
+			
+			  
+			  </div>
+			</div>
+		</td>
+	</tr>
+   
+</table>
+
+
+
+<!--  	
+<div   style="height:40px;width:100%;background-color:orange">
+ footer1
+</div>
+
+-->
+</div>
+
+
+ <div style="height:20px;background-color:black">
+     <table style = "width:100%" border = "0" cellspacing = "0" cellpadding = "0">
+       <tr style = "width:100%;height:100%">
+         <td align = "center" valign = "top">
+            <img src = "../images/Page-1.png" style = "margin-bottom : 2px"></img>
+         </td>
+       </tr>
+     </table> 
+</div>
+</form> 
+
+
+
+
+ </section>
+
+
+
+
+<section id="pageWidget1" data-role="page" style ="background-color:white" > 
+
+<form id='frmWidget1' name= 'frmwidget1' >
+
+<table style="width:100%" border = "0" cellspacing = "0" cellpadding = "0" class = "dvWidgetRefresh">
+     <tr style = "width:100%;height:40px">
+       <td style="width:90%" valign = "center" >
+         <table style="width:100%" border = "0" cellspacing = "0" cellpadding = "0">
+            <tr style="width:100%;height:50%">
+               <td style = "width:100%" valign = "center">
+                  <span class = "spanChartSummary">Chart Summary</span> 
+               </td>
+            </tr>
+            <tr style="width:100%;height:50%">
+               <td style = "width:100%" valign = "top">
+                  <span class = "spanChartSummary" >Blood Group: Rh Factor</span> 
+               </td>
+            </tr>
+         </table>
+       </td>
+       <td style="width:10%" valign = "center" align = "right" onclick = "refreshWidget()">
+          <img src = "../images/Refresh.png" class = "imgWidgetRefresh"></img>
+       </td>
+       
+     </tr>
+   </table>
+<div class ='divmain' id = 'dvmain2' data-role = "none" style="padding:0px;background-color:#babcbb" >
+ 
+<table   border='0' class = 'tbmain' id = 'tbWidget1' cellpadding = "0" cellspacing = "0" style = "background-color:#babcbb">
+	<tr style = 'height:50%;width:100%' id="trwidget1">
+		<td width = '50%' valign ='center' align = "center" id = "tdwidget1">
+		 
+			<div  class="dvwidgetContainer" onclick = "expandschedules()">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center" nowrap = "false">
+			  <span class="spaDvHeader">Pending Schedules</span>  <span class="spaDvWidgetCount" id = "spaPendingScheduleCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			 <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe  id = "iframependingschedules" width="100%" height="100%" frameborder="0" ></iframe>
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center'  align = "center" id="tdwidget11">
+		 
+			 <div  class="dvwidgetContainer" onclick = "expandcurrentmedications()" >
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center" >
+			  <span class="spaDvHeader">Current Medications</span>  <span class="spaDvWidgetCount" id = "spaCurrentMedCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" onclick = "expandcurrentmedications()">
+			 <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe  id = "iframecurrentmedications" width="100%" height="100%" frameborder="0" ></iframe>
+			  </div>
+			</div>
+			
+		</td>
+	</tr>
+	
+	<tr style = 'height:50%;width:100%'  id = "trwidget11">
+		<td width = '50%' valign ='center' align = "center" id="tdwidget2">
+		 
+			<div  class="dvwidgetContainer" onclick = "expandprocdetails()" >
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center" >
+			  <span class="spaDvHeader">Procedure Details</span>  <span class="spaDvWidgetCount" id = "spaProcedureCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			 <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe id = "iframeproceduredetails" width="100%" height="100%" frameborder="0" ></iframe>
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' align = "center" id="tdwidget22" >
+		 
+			 <div  class="dvwidgetContainer" onclick= "expandpendingorders()">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0" class = "tbHeader">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%" valign = "center" nowrap = "false">
+			  <span class="spaDvHeader">Pending Orders</span>  <span class="spaDvWidgetCount" id = "spaOrderCount"></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%" align = "center" valign = "center" >
+			 <img src = "../images/Full Screen.png"> </img>
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe id = "iframependingorders" width="100%" height="100%" frameborder="0" ></iframe>
+			  </div>
+			</div>
+		</td>
+	</tr>
+   
+</table>
+	
+</div>
+<div style="height:20px;background-color:black">
+     <table style = "width:100%" border = "0" cellspacing = "0" cellpadding = "0">
+       <tr style = "width:100%;height:100%">
+         <td align = "center" valign = "top">
+            <img src = "../images/Page-2.png" style = "margin-bottom : 2px"></img>
+         </td>
+       </tr>
+     </table> 
+</div>
+</form> 
+
+ </section>
+
+
+  
+
+<section id="pageWidget2" data-role="page" style ="background-color:white" > 
+
+<form id='frmWidget1' name= 'frmwidget1' >
+
+<div class ='divmain' id = 'dvmain2'  >
+ 
+<table   border='0' class = 'tbmain' id = 'tbWidget' cellpadding = "0" cellspacing = "0" >
+	<tr style = 'height:50%;width:100%' id="tr1">
+		<td width = '50%' valign ='center' align = "center" id = "td1">
+		 
+			<div  class="dvwidgetContainer" onclick = "widgetDetails()">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Active Problems and Diagnosis3</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' id="td2">
+		 
+			 <div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Allergies3</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			 
+			     <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			    
+			  </div>
+			</div>
+		</td>
+	</tr>
+	
+	<tr style = 'height:50%;width:100%' valign ="top" id = "tr2" valign="center">
+		<td width = '50%' valign ='center' align = "center" id="td11">
+		 
+			<div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader" onclick = "expandwidget()">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Pending Orders3</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			   <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			  
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' id="td12" align = "left">
+		 
+			 <div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Results3</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  <iframe src="" width="100%" height="99%" frameborder="0" scrolling = "no"></iframe>
+			  
+			  </div>
+			</div>
+		</td>
+	</tr>
+   
+</table>
+	
+</div>
+</form> 
+
+ </section>
+
+
+
+<section id="pageWidget3" data-role="page" style ="background-color:white" > 
+
+<form id='frmWidget1' name= 'frmwidget1' >
+
+<div class ='divmain' id = 'dvmain2'  >
+ 
+<table   border='0' class = 'tbmain' id = 'tbWidget' cellpadding = "0" cellspacing = "0" >
+	<tr style = 'height:50%;width:100%' id="tr1">
+		<td width = '50%' valign ='center' align = "center" id = "td1">
+		 
+			<div  class="dvwidgetContainer" onclick = "widgetDetails()">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Active Problems and Diagnosis4</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  
+			    <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' id="td2">
+		 
+			 <div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Allergies4</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			 
+			     <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			    
+			  </div>
+			</div>
+		</td>
+	</tr>
+	
+	<tr style = 'height:50%;width:100%' valign ="top" id = "tr2" valign="center">
+		<td width = '50%' valign ='center' align = "center" id="td11">
+		 
+			<div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader" onclick = "expandwidget()">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Pending Orders4</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			   <iframe src="" width="100%" height="99%" frameborder="0"></iframe>
+			  
+			  </div>
+			</div>
+		
+		 </td>
+		<td width = '50%' valign = 'center' id="td12" align = "left">
+		 
+			 <div  class="dvwidgetContainer">
+			  <div class="dvWidgetHeader">
+			  <table style="width:100%;height:100%" border = "0">
+			  <tr style="width:100%;height:100%">
+			  
+			  <td  style="width:90%;height:100%">
+			  <span class="spaDvHeader"><b>Results4</b></span>
+			  </td>
+			  
+			   <td  style="width:10%;height:100%">
+			 
+			  </td>
+			  
+			  </tr>
+			  </table>
+			  
+			  </div>
+			  <div class = "dvWidgetContent"> 
+			  <iframe src="" width="100%" height="99%" frameborder="0" scrolling = "no"></iframe>
+			  
+			  </div>
+			</div>
+		</td>
+	</tr>
+   
+</table>
+	
+</div>
+</form> 
+
+ </section>
+
+
+<!--  
+	<section id="pageWidAllergycontent" data-role="page"
+		style="background-color: white">
+		<form id='frmWidAllergycontent' name='frmWidAllergycontent' id='frmWidAllergycontent'>
+
+			<div class="dvWidgetContentAllergy" style="padding: 0px">
+				<iframe src="" width="100%"  id = "iframeAllergyDetails" frameborder="0" scrolling = "yes" style = "display:block;"></iframe>
+			</div>
+		</form>
+	</section>
+-->
+
+
+	<section id="pageWidgetResultcontent" data-role="page" style ="background-color:white" > 
+<form id='frmWidResultcontent' name= 'frmResultcontent' >
+<!-- 
+<div class ='divmainResults' id = 'dvmainResults'  style="padding:0px">
+	<table   border='0' class = 'tbmainResults' id = 'tbWidgetResults' cellpadding = "0" cellspacing = "0" >
+		<tr style = "width:100%" >
+			<td width = '100%' valign = 'top'  align = "center">
+				 <div  class="dvwidgetContainerResults">
+					  <div class="dvWidgetHeaderResults" >
+						  <table style="width:100%" border = "0" cellpadding = "0" cellspacing = "0">
+							  <tr style="width:100%">
+								  <td  style="width:90%" valign = "middle" >
+								  <span class="spaDvHeaderResults">Results</span>
+								  </td>
+							      <td  style="width:5%" align = "left" valign = "middle" onclick = "refreshResultsExpandedview()">
+							        <img src = "images/Refresh.png"></img>
+							      </td>
+							       <td  style="width:5%" align = "center" valign = "middle" onclick = "expandwidget2()">
+							         <img src = "images/Collapse icon.png"></img>
+							      </td>
+							  </tr>
+						  </table>
+					  </div>
+					  <div class = "dvWidgetContentResults" style="padding:0px" data-role = "none"> 
+					  
+					      <iframe src="" width="100%"  id = "iframeResultDetails" frameborder="0" scrolling = "yes" style = "display:block;height:450px;"></iframe>  
+					    
+					  </div>
+					  <div style = "height:auto">
+	                         <iframe src = "widgetIcon.html" width = "100%" height = "62px" frameborder = "0" style = "display:block"></iframe>
+	                   </div>
+				</div>
+			</td>
+		</tr>
+		   
+	</table>	
+</div>
+ -->
+ 		 
+					  <div class = "dvWidgetContentResults" style="padding:0px" data-role = "none"> 
+					  
+					      <iframe src="" width="100%"  id = "iframeResultDetails" frameborder="0" scrolling = "yes" style = "display:block;"></iframe>  
+					    
+					  </div>
+					  
+				
+				<!--  
+				<div style = "height:auto;position:relative:margin-bottom:0px;border:1px solid orange">
+	                         <iframe src = "widgetIcon.html" width = "100%" height = "62px" frameborder = "0" style = "display:block"></iframe>
+	             </div>
+	             
+	             -->
+</form> 
+<!--<footer data-role = "footer" style = "padding:0px;border : 0px;">  -->
+<div style = "height:auto;padding:0px;border : 0px;">
+	                         <iframe src = "../html/widgetIcon.html" width = "100%" height = "62px" frameborder = "0" style = "display:block"></iframe>
+	             </div>
+<!--</footer>  -->
+</section>
+
+
+ </body>
+
+
+
+</html>
+

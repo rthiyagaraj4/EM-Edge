@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<%@ page import ="java.sql.*,webbeans.eCommon.*" contentType="text/html; charset=UTF-8" %>
+	 <%	request.setCharacterEncoding("UTF-8");	%>
+	 <%@ include file="../../eCommon/jsp/CommonInclude.jsp" %>
+<html>
+<head>
+<%
+String sStyle	=
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+<link rel='stylesheet' type ='text/css' href='../../eCommon/html/Tabs.css'></link>
+<link rel='stylesheet' type='text/css' href='../../eCommon/html/<%=sStyle%>'></link>
+<script src="../../eCommon/js/ValidateControl.js" language="javascript"></script>
+<script src="../../eCommon/js/common.js" language="javascript"></script>
+<script language="javascript" src="../../eOP/js/ArrivedDeparted.js"></script>
+<script language='javascript' src='../../eCommon/js/DateUtils.js'></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+</head>
+<script>		
+var prevTabObj="Departed_tab";
+</script>
+<body onKeyDown = 'lockKey();'>
+    <form name='trakmov_head' id='trakmov_head'>
+	<a alt='Departed'></a>
+	<ul id="tablist" class="tablist">
+
+		<li class="tablistitem" title="Departed">
+			<a onclick="javascript:tab_click('Departed_tab')" id="Departed_tab" class="tabClicked">
+			<span class="tabSpanclicked" id="Departed_tabspan"><fmt:message key="eOP.Departed.label" bundle="${op_labels}"/></span>
+			</a>
+		</li>
+
+		<li class="tablistitem" title="Arrived">
+			<a onclick="javascript:tab_click('Arrived_tab')" id="Arrived_tab" class="tabA">
+			<span class="tabAspan" id="Arrived_tabspan"><fmt:message key="eOP.arrived.label" bundle="${op_labels}"/></span>
+			</a>
+		</li>
+	
+	</ul>
+
+	<!--	<a name="Arrived" href="javascript:tab_click('Arrived_tab');" alt="Arrived" ><img src='../../eOP/images/Arrived.gif' name="Arr_tab" border='0' alt='Arrived' style='{ border-style: ridge;}'></img></a>
+		<a name="Departed" href="javascript:tab_click('Departed_tab');"><img src='../../eOP/images/Departed_click.gif' name="Dep_tab" border='0' alt='Departed' style='{ border-style: ridge;}'></img></a>-->
+
+		<input type='hidden' name='ct_tab_name' id='ct_tab_name' >        
+    </form>
+</body>
+</html>
+
