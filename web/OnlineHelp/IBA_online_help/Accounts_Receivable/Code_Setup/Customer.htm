@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Customer</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Accounts Receivable\nCode Setup\nCustomer");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2"></script>
+<h1>Customer</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Create</span> 
+ a Customer and <span class="RedItalic">Query</span> for a desired Customer 
+ record.</p>
+<p class="Text">The function Customer is used to enter the details of the 
+ Customers. Sometimes, a patient can be defined as a Customer. A person 
+ paying on behalf of the patient too can be considered as a Customer. All 
+ transactions processes are made against Customer codes. You also have 
+ an option to set the Customer validity for a patient class in the facility. 
+ &#160;</p>
+<p class="Text">Customers can be broadly classified as follows:</p>
+<p class="Text">• Patient related Customers</p>
+<p class="Text">• Non-Patient related Customers</p>
+<p class="Text">Patient related Customers are classified into two types:</p>
+<p class="Text">• Credit patients (patients themselves have to settle the 
+ bills)</p>
+<p class="Text">• Organizations to which credit facility is offered (sponsored 
+ patients)</p>
+<p class="Text">Organizations can be insurance companies, patient sponsoring 
+ companies, etc. that settles the organization’s invoices on behalf of 
+ the patients.</p>
+<p class="Text">Non-Patient related Customers are those Customers who purchase 
+ scrap or other items from the organization. Such Customers can be classified 
+ as:</p>
+<p class="Text">• Normal Customers</p>
+<p class="Text">• Miscellaneous Customers</p>
+<p class="Text">Miscellaneous Customers are one-time Customers and repeat 
+ business with such Customers is not envisaged. The name and address of 
+ such Customers is accepted during the processing of transaction.</p>
+<p class="Text">For each Customer, the mutually agreed frequency for sending 
+ the statement of accounts also is specified. The statement of accounts 
+ are posted on a weekly, monthly, quarterly or yearly basis. &#160;You 
+ can define the credit limits for credit control purposes, which can be 
+ reviewed and updated. The validity period for each Customer within the 
+ facility is also defined.</p>
+<h2>Creating a Customer</h2>
+<p class="From">From the Masters, double-click Customer function.</p>
+<p class="Text">The Customer screen gets displayed.</p>
+<ol>
+	<li class="p-Number"><p class="Number">Enter the details in the mandatory 
+	 (<span class="Asterisk">*</span>) fields. <span class="RFDhyperlink"><a href="javascript:void(0);" id="a1" style="text-decoration: none; " onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/AR_Code_Customer.htm',400,300);return false;">&lt;Related Field Description&gt;</a></span></p></li>
+	<li class="p-Number"><p class="Number">Enter the parameters for the 
+	 selected Customer under the following tabs:</p></li>
+</ol>
+<p><a class="dropspot" href="javascript:TextPopup(this)" id="a2" style="position: relative;">Reference 
+ Codes</a></p>
+<div class="droptext" id="POPUP1004811159" style="display: none;">
+	<p class="BoldRFD">Enter the following details:</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Customer 
+		 Type</span> – Click <span class="BoldNumberRFD">[List of Values]</span> 
+		 to select a Customer Type code. The list displays Customer Types 
+		 as created in the ‘Customer Type’ function under Masters. If the 
+		 code selected is valid, the short description of the respective 
+		 code is displayed for user verification. The description cannot 
+		 be edited. This is a mandatory field.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Customer 
+		 Group</span> - Click <span class="BoldNumberRFD">[List of Values]</span> 
+		 to select a Customer Group code. The list displays Customer Groups 
+		 as created in the ‘Customer Group’ function under Masters. If 
+		 the code selected is valid, the short description of the respective 
+		 code is displayed for user verification. The description cannot 
+		 be edited. &#160;This is a mandatory field.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Payment 
+		 Terms</span> - Payment Terms is a display field. On entering the 
+		 value for Customer Group value, the associated Payment Terms gets 
+		 displayed. &#160;&#160;This is a mandatory field.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Control 
+		 Account</span> – Click <span class="BoldNumberRFD">[List of Values]</span> 
+		 to select a Control Account code. The list displays the control 
+		 account as created in the ‘Chart of Accounts’ function under GL 
+		 Setup. The description for the selected Chart of Account gets 
+		 displayed. &#160;This is a mandatory field.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Reminder 
+		 Letter</span> - Click <span class="BoldNumberRFD">[List of Values]</span> 
+		 to select a Reminder Letter. The list displays the values created 
+		 using the ‘Reminder Letter’ function under Masters. The code cannot 
+		 be edited. The selected Reminder Letter is dispatched when the 
+		 payment is due for the selected Customer. This is a mandatory 
+		 field.</p></li>
+	</ol>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" id="a3" style="position: relative;">Customer 
+ Valid Flags</a></p>
+<div class="droptext" id="POPUP1004802888" style="display: none;">
+	<p class="BoldRFD">Select or clear the following check boxes:</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Valid 
+		 for Inpatients</span> – Select the check box, if the Customer 
+		 is valid for Inpatients. The check box is cleared, by default. 
+		 If the check box is selected, the Customer code gets displayed 
+		 while recording the financial details for an admission in Inpatient 
+		 and Day Care Management module.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Valid 
+		 for Outpatients</span> – Select the check box, if the Customer 
+		 is valid for Outpatients. The check box is cleared, by default. 
+		 If the check box is selected, the Customer code gets displayed 
+		 while recording the financial details for an Outpatient visit 
+		 in Outpatient Management module.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Valid 
+		 for External</span> – Select the check box, if the Customer is 
+		 valid for external or referral &#160;patients . The check box 
+		 is cleared, by default. If the check box is selected, the Customer 
+		 code gets displayed while recording the financial details for 
+		 a referral or external patient registration.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Covered 
+		 by Insurance</span> – Select the check box, if the Customer is 
+		 applicable for Insurance coverage. &#160;The check box is cleared, 
+		 by default. If the check box is selected, the Customer code gets 
+		 displayed while recording the financial details for an insured 
+		 patient.</p></li>
+	</ol>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" id="a4" style="position: relative;">Analysis</a></p>
+<div class="droptext" id="POPUP1004804698" style="display: none;">
+	<p class="BoldRFD">Enter the following details:</p>
+	<p class="BoldRFD">Analysis</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Statement 
+		 Frequency</span> – Select the appropriate Statement Frequency 
+		 from the list. The listed values are Weekly, Monthly, Quarterly 
+		 and Yearly. “Weekly” is displayed on the screen, by default.</p></li>
+	</ol>
+	<p class="BoldRFD">Analysis Codes</p>
+	<ol start="2">
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Billing 
+		 Group</span> – Click <span class="BoldNumberRFD">[List of Values]</span> 
+		 to select a Billing Group . The entries with code and its description 
+		 get populated only when valid Billing Groups are defined in the 
+		 Patient Billing Manager Module.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Code 
+		 2</span> - Enter the analysis code in alphanumeric format of eight 
+		 characters maximum length. The analysis codes are used for reporting 
+		 purpose.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Code 
+		 3</span> - Enter the analysis code in alphanumeric format of eight 
+		 characters maximum length. &#160;The analysis codes are used for 
+		 reporting purpose.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Credit 
+		 Limit</span> - Enter the credit limit in numeric format of 15 
+		 digit maximum length. The credit limit recorded indicates the 
+		 maximum credit amount for the selected Customer in the facility.</p></li>
+	</ol>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" id="a5" style="position: relative;">Local 
+ Address</a></p>
+<div class="droptext" id="POPUP1004810948" style="display: none;">
+	<p class="BoldRFD">Enter the following details:</p>
+	<p class="BoldRFD">&#160;</p>
+	<p class="BoldRFD">Name &amp; Address in Local Language</p>
+	<p class="BoldRFD" style="font-weight: normal;">This tab page is enabled 
+	 for entry, if the Local Language Reporting Required check box is selected.</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Long 
+		 Name</span> – Enter the long name of the Customer in local language 
+		 in alphanumeric format of 60 characters maximum length. This name 
+		 is printed in Statement of Accounts and Reminder Letters. This 
+		 is a mandatory field.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Short 
+		 Name</span> – Enter the short name of the Customer in local language 
+		 in alphanumeric format of 15 characters maximum length.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Address 
+		 [Line 1 – 5]</span> – Enter the address details of the Customer 
+		 in local language in alphanumeric format of 60 characters maximum 
+		 length for each line. &#160;</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">State</span> 
+		 – Click <span class="BoldNumberRFD">[List of Values]</span> to 
+		 select a State. The entries with code and its description get 
+		 populated only when Regions are defined in the Master Patient 
+		 Index Module.</p></li>
+	</ol>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" id="a6" style="position: relative;">Other 
+ Details</a></p>
+<div class="droptext" id="POPUP1004808331" style="display: none;">
+	<p class="BoldRFD">Enter the following details:</p>
+	<p class="BoldRFD">Other details</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Bank 
+		 Name</span> - Enter the Bank Name in alphanumeric format of 30 
+		 characters maximum length. This indicates the name of the Bank 
+		 where the transactions take place between the respective Customer 
+		 and the facility.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Bank 
+		 Acc No.</span> - Enter the bank account number of the Customer 
+		 in alphanumeric format of 20 characters maximum length.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Email 
+		 ID</span> - Enter the bank E-mail ID in alphanumeric format of 
+		 30 characters maximum length.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Alternate 
+		 Address 1</span> - Enter the contact address of the Customer in 
+		 five lines in alphanumeric format of 60 characters maximum length 
+		 each. This address is an alternate &#160;to the main address. 
+		 &#160;</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Alternate 
+		 Address 2</span> - Enter the contact address of the Customer in 
+		 five lines in alphanumeric format of 60 characters maximum length 
+		 each, This address is an alternate &#160;to the main address and 
+		 Alternate Address 1. &#160;</p></li>
+	</ol>
+</div>
+<ol start="3">
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Commit 
+	 Form]</span> or press <span class="BoldButton">[F10]</span> to save 
+	 a created Customer or <span class="BoldButton">[Clear Record]</span> 
+	 to clear the entered or queried data.</p></li>
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Execute 
+	 Query]</span> or press <span class="BoldButton">[F8]</span> to search 
+	 for an existing Customer record within the facility.</p></li>
+</ol>
+<p>&#160;</p>
+<hr align="center" />
+<p>
+
+<a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Chart of Accounts','../../Patient_Billing_Manager/Setup/Chart_of_Accounts.htm','Customer Details Query/Update','Customer_Details_Query_Update.htm','Customer Group','Customer_Group.htm','Customer Type','Customer_Type.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a>
+
+
+ &#160;&#160;&#160;&#160;&#160;
+
+<a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Admit Patient','../../Inpatient_Management/Transaction/Admit_Patient.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a>
+
+
+</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP1004811159');
+	TextPopupInit('a3','POPUP1004802888');
+	TextPopupInit('a4','POPUP1004804698');
+	TextPopupInit('a5','POPUP1004810948');
+	TextPopupInit('a6','POPUP1004808331');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

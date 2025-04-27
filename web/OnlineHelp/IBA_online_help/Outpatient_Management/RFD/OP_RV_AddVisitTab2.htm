@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_RV_AddVisitTab2</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Date Time</span> - The visit date time of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> - Select the Location from the list. This field represents the Outpatient Location to which the Patient has to be registered. All the locations of type 'Clinic' with level of care set to ambulatory and attached to the operator station is displayed. In case of an Appointment Patient, the Location is displayed from the Appointment details and cannot be modified. If an age group is associated with the location, the validity of the location is verified based on the age and gender of the patient. In case of Invited waitlist patients, the Location Type and Location is displayed from the waitlist details. The Location Type cannot be modified. You can select another location using the [?] function, if required. The locations of the Specialty specified while creating the waitlist is listed. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Room</span> - Select the room against which the visit has to be registered from the list. All the rooms associated to the selected location in 'Resource for Location' function is listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> - Select the service against which the visit is to be registered from the list. All the services associated to the selected location is displayed. The Service associated to the Location and Location Type is displayed by default, when a single service is associated to the Location and Location Type combination. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sub-Service</span> - Select the Sub-Service against which the visit is to be registered from the list. The list gets populated if any sub services are attached to the selected service. This field is optional. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Type</span> - Select the Visit Type from the list of valid values. This field represents the Visit Type against which the patient is registered. The displayed list is limited to the Visit Types associated to the selected Location. In case of an Appointment Patient, the Visit Type is made defaulted from the Appointment details and cannot be modified. The Visit Type associated to the Location and Location Type is displayed by default, when a single visit type is associated to the Location and Location Type combination. The Visit Type values for a follow up visit type are based on the 'Override Visit Type Control on Episode' setup in OP Parameter. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> - Enter the practitioner name in alphanumeric format of 30 characters maximum length or click <span class="BoldNumberRFD">[?]</span> function to search for the required practitioner. This field represents the Practitioner who provides consultation to the patient during the visit. The displayed list is based on various parameters set up already. If the selected location requires a practitioner as a primary resource and is open to all Resources, the list of practitioners who are associated to the logged in facility and to the specialty of the selected clinic form part of the displayed list. If the selected location is not open to all Resources, the list of Practitioners who are associated to the selected location in Practitioner for clinic form part of the displayed list. In case of an Appointment Patient, the Practitioner is made defaulted from the Appointment details and it cannot be modified. If a Practitioner has to be identified while registering a visit to the selected Location, based on the parameter set up of the Location, this field is mandatory, or this field is optional.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">&#160;</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>Note:</b></span> When you select an appointment number and register the visit is registered, an icon &#160;will be displayed here, if a secondary resource of type “Practitioner” had been captured while booking the appointment.</p>
+<p class="NumberRFD" style="margin-left: 40px;">When you re-assign practitioner for this visit, the practitioner selected during appointment booking will be displayed by default, disabled and you will not be able to change it.</p>
+<p class="NumberRFD">&#160;</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD">This function will come in handy when you want to assign multiple practitioners for the same appointment (group consultations.)</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog</span> - Enter the order catalog name in alphanumeric format of 40 characters maximum length or click [?] function to search for the required catalog and select orders. This field represents the order that is required to be placed upon registration of the patient's visit. The displayed list is based on order catalogs associated with the selected location.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>Note:</b></span> If orders have already been selected while the appointment was booked, the Order Catalog lookup will be disabled. You can only view the details of the orders already selected. The selected orders are displayed with their code and description.</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Other Resource Type</span> - Select the other resource type from the list. According to the value selected, the corresponding values get populated in the <span class="BoldNumberRFD">[?]</span> function. These values are populated from the Application Masters module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> - Select the Reason for Contact from the list. All the reason codes defined with applicability for Visit registration checked in Application Masters module are listed. In case of an Appointment Patient, the Reason for Contact is made defaulted from the Appointment details, entered when booking an appointment.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<GraphicalDisplay>
+	<ReportHeader referrence="LABSUMM" name="Department of Laboratory">
+		<MainGroup referrence="CLPA" name="CLINICAL PATHOLOGY"
+			ImageUrl="" Remarks="">
+			<Group EG2="1" referrence="EMPTY" name="EMPTY" UOM="EMPTY"
+				remarks="EMPTY">
+				<SubGroup ES2="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#8512010004@UR-RE~UR-RE" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+		</MainGroup>
+		<MainGroup referrence="HEMA" name="HEMATOLOGY" ImageUrl=""
+			Remarks="">
+			<Group G1="1" referrence="TCDC" name="TC,DC" UOM="%" remarks="">
+				<SubGroup ES1="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="2" name="TABLE OF INFORMATION"
+						Columns="5">
+						<ColumnType>
+							<ColumnType1>P</ColumnType1>
+							<ColumnType2>U</ColumnType2>
+							<ColumnType3>V</ColumnType3>
+							<ColumnType4>Y</ColumnType4>
+							<ColumnType5>R</ColumnType5>
+						</ColumnType>
+						<Column>
+							<ColumnName1>Parameter</ColumnName1>
+							<ColumnName2>Units</ColumnName2>
+							<ColumnName3>Values</ColumnName3>
+							<ColumnName4>Your value is </ColumnName4>
+							<ColumnName5>Reference</ColumnName5>
+						</Column>
+						<RowNo>
+							<RowNo1 ColumnName1="MONOCYTES" ColumnName2="%" bgcolor="#f0ffff"
+								ColumnName3="1" ColumnName4="Low" ColumnName5="2-9"></RowNo1>
+							<RowNo2 ColumnName1="EOSINOPHIL" ColumnName2="%" bgcolor=""
+								ColumnName3="1" ColumnName4="Normal" ColumnName5="1-4"></RowNo2>
+							<RowNo3 ColumnName1="BASOPHIL" ColumnName2="%" bgcolor=""
+								ColumnName3="0" ColumnName4="Normal" ColumnName5="0-2"></RowNo3>
+						</RowNo>
+					</Template>
+				</SubGroup>
+				<SubGroup S3="1" referrence="LYMPHO" name="LYMPHOCYTE"
+					remarks="">
+					<Template referrence="3" name="LINEAR GAUGE">
+						<TemplateRange RangeFrom="0" RangeTo="40"
+							TemplateSplit="1">
+							<TemplateSplit1 RangeFrom="20" RangeTo="40"
+								bgcolor="green"></TemplateSplit1>
+						</TemplateRange>
+						<ResultVal Result="10" bgcolor="#f0ffff" ResultStr="Your value is Low"></ResultVal>
+						<ResultNormal ResultNormal="Optimum:20-40"></ResultNormal>
+					</Template>
+				</SubGroup>
+				<SubGroup S3="1" referrence="TC" name="TLC" remarks="">
+					<Template referrence="3" name="LINEAR GAUGE">
+						<TemplateRange RangeFrom="0" RangeTo="15.4"
+							TemplateSplit="1">
+							<TemplateSplit1 RangeFrom="4.5" RangeTo="11"
+								bgcolor="green"></TemplateSplit1>
+						</TemplateRange>
+						<ResultVal Result="15.4" bgcolor="#f4a460" ResultStr="Your value is High"></ResultVal>
+						<ResultNormal ResultNormal="Optimum:4.5-11"></ResultNormal>
+					</Template>
+				</SubGroup>
+				<SubGroup S3="1" referrence="NEUTRO" name="NEUTROPHIL"
+					remarks="">
+					<Template referrence="3" name="LINEAR GAUGE">
+						<TemplateRange RangeFrom="0" RangeTo="88"
+							TemplateSplit="1">
+							<TemplateSplit1 RangeFrom="50" RangeTo="60"
+								bgcolor="green"></TemplateSplit1>
+						</TemplateRange>
+						<ResultVal Result="88" bgcolor="#f4a460" ResultStr="Your value is High"></ResultVal>
+						<ResultNormal ResultNormal="Optimum:50-60"></ResultNormal>
+					</Template>
+				</SubGroup>
+				<SubGroup ES3="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#2512023013@PFM~PFM" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+			<Group G1="1" referrence="CBC" name="COMPLETE HAEMOG" UOM="thou/cumm"
+				remarks="">
+				<SubGroup ES1="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="2" name="TABLE OF INFORMATION"
+						Columns="5">
+						<ColumnType>
+							<ColumnType1>P</ColumnType1>
+							<ColumnType2>U</ColumnType2>
+							<ColumnType3>V</ColumnType3>
+							<ColumnType4>Y</ColumnType4>
+							<ColumnType5>R</ColumnType5>
+						</ColumnType>
+						<Column>
+							<ColumnName1>Parameter</ColumnName1>
+							<ColumnName2>Units</ColumnName2>
+							<ColumnName3>Values</ColumnName3>
+							<ColumnName4>Your value is </ColumnName4>
+							<ColumnName5>Reference</ColumnName5>
+						</Column>
+						<RowNo>
+							<RowNo1 ColumnName1="TLC" ColumnName2="thou/cumm" bgcolor="#f4a460"
+								ColumnName3="15.4" ColumnName4="High" ColumnName5="4.5-11"></RowNo1>
+							<RowNo2 ColumnName1="PCV" ColumnName2="%" bgcolor="#f0ffff"
+								ColumnName3="31.7" ColumnName4="Low" ColumnName5="36-46"></RowNo2>
+							<RowNo3 ColumnName1="ESR" ColumnName2="mm/1st Hr" bgcolor="#f4a460"
+								ColumnName3="55" ColumnName4="High" ColumnName5="0-30"></RowNo3>
+							<RowNo4 ColumnName1="MCHC" ColumnName2="%" bgcolor="#f0ffff"
+								ColumnName3="29.3" ColumnName4="Low" ColumnName5="31-37"></RowNo4>
+							<RowNo5 ColumnName1="HAEMOGLOBIN" ColumnName2="g/dL"
+								bgcolor="#f0ffff" ColumnName3="9.3" ColumnName4="Low"
+								ColumnName5="12-16"></RowNo5>
+							<RowNo6 ColumnName1="MCV" ColumnName2="fl" bgcolor="#f0ffff"
+								ColumnName3="75.7" ColumnName4="Low" ColumnName5="80-100"></RowNo6>
+							<RowNo7 ColumnName1="NEUTROPHIL" ColumnName2="%" bgcolor="#f4a460"
+								ColumnName3="88" ColumnName4="High" ColumnName5="50-60"></RowNo7>
+							<RowNo8 ColumnName1="PLATELET COUNT" ColumnName2="lakhs/ul"
+								bgcolor="" ColumnName3="2.8" ColumnName4="Normal" ColumnName5="1.5-4"></RowNo8>
+							<RowNo9 ColumnName1="RBC COUNT" ColumnName2="million/cumm"
+								bgcolor="" ColumnName3="4.19" ColumnName4="Normal" ColumnName5="3.8-4.8"></RowNo9>
+							<RowNo10 ColumnName1="MCH" ColumnName2="pg" bgcolor="#f0ffff"
+								ColumnName3="22.2" ColumnName4="Low" ColumnName5="26-34"></RowNo10>
+							<RowNo11 ColumnName1="MONOCYTES" ColumnName2="%" bgcolor="#f0ffff"
+								ColumnName3="1" ColumnName4="Low" ColumnName5="2-9"></RowNo11>
+							<RowNo12 ColumnName1="BASOPHIL" ColumnName2="%" bgcolor=""
+								ColumnName3="0" ColumnName4="Normal" ColumnName5="0-2"></RowNo12>
+							<RowNo13 ColumnName1="LYMPHOCYTE" ColumnName2="%"
+								bgcolor="#f0ffff" ColumnName3="10" ColumnName4="Low"
+								ColumnName5="20-40"></RowNo13>
+							<RowNo14 ColumnName1="EOSINOPHIL" ColumnName2="%"
+								bgcolor="" ColumnName3="1" ColumnName4="Normal" ColumnName5="1-4"></RowNo14>
+						</RowNo>
+					</Template>
+				</SubGroup>
+				<SubGroup ES3="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#2512022922@PFM~PFM" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+			<Group G1="1" referrence="ABORH-P" name="ABO AND RH" UOM=""
+				remarks="">
+				<SubGroup ES1="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#2512022922@ABO~ABO" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#2512022922@RH~RH" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+		</MainGroup>
+		<MainGroup referrence="MICR" name="MICROBIOLOGY" ImageUrl=""
+			Remarks="">
+			<Group EG1="1" referrence="EMPTY" name="EMPTY" UOM="EMPTY"
+				remarks="EMPTY">
+				<SubGroup ES1="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#6512007036@BACT-CUL~BACT-CUL" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#6512007026@BAC-CUL-AE~BAC-CUL-AE"
+							dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#6512007027@BAC-CUL-AE~BAC-CUL-AE"
+							dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+		</MainGroup>
+		<MainGroup referrence="SERO" name="SEROLOGY" ImageUrl=""
+			Remarks="">
+			<Group G1="1" referrence="VIRAL-SCR" name="ROUTINE  HIV,HB"
+				UOM="" remarks="">
+				<SubGroup ES1="1" referrence="EMPTY" name="EMPTY" remarks="">
+					<Template referrence="5" name="NOTES">
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#7512006234@R-HCV~R-HCV" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#7512006234@ROU-HBSAG~ROU-HBSAG"
+							dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+						<NotesText notesType="LB" queryColumn="HIST_DATA"
+							columnName="HIST_REC_TYPE~CONTR_SYS_ID~ACCESSION_NUM~CONTR_SYS_EVENT_CODE"
+							columnData="LBIN~LB~FMK#7512006234@R-HIV~R-HIV" dataTable="CR_ENCOUNTER_DETAIL_TXT" />
+					</Template>
+				</SubGroup>
+			</Group>
+		</MainGroup>
+	</ReportHeader>
+</GraphicalDisplay>

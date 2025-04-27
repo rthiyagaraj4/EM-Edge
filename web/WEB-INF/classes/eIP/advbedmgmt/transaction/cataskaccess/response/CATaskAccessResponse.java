@@ -1,0 +1,43 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+/**
+ * 
+ */
+package eIP.advbedmgmt.transaction.cataskaccess.response;
+
+import eIP.advbedmgmt.common.response.BaseResponse;
+
+/**
+ * This is the response class holding the result of checking if 
+ * GBM submodule has access to a CA module task
+ * @author GRamamoorthy
+ *
+ */
+public class CATaskAccessResponse extends BaseResponse {
+
+	/**
+	 * data member in the class
+	 */
+	private CATaskAccessResult accessResult = null;
+
+	/**
+	 * @return the accessResult
+	 */
+	public CATaskAccessResult getAccessResult() {
+		return accessResult;
+	}
+
+	/**
+	 * @param accessResult the accessResult to set
+	 */
+	public void setAccessResult(CATaskAccessResult accessResult) {
+		this.accessResult = accessResult;
+	}
+	
+}

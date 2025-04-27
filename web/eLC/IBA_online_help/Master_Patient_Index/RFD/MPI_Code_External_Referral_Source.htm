@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>MPI_Code_External Referral Source</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to create an External Referral Source record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Code</span> - Enter the code for the External Referral Source in alphanumeric format of four characters maximum length. An External Referral Source code is to identify the External Referral Source. The External Referral Source code should be unique and cannot be changed after creation. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the long description of the External Referral Source in alphanumeric format of 30 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter the short description of the External Referral Source in alphanumeric format of 15 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Healthcare Setting Type</span> - Select the Healthcare Setting Type from the list box to which External Referral Source belongs. The options available are as defined using the function Healthcare Setting Type. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Organization Type</span> – Select the Organization Type from the list. The listed values are Government and Private. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> - Select the check box if the External Referral Source is to be activated and clear this check box if the External Referral Source is to be deactivated. By default, the check box is selected.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p><span class="UnderlineRFD">Characteristics tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Use as External/Referral Source At</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Registration/Visit/Admission</span> - The individual check boxes control whether this External Referral Source code are used as a Referral Source at Registration, Visit and Admission respectively or not.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Use as External/Referral Destination At</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Conclusion/Discharge</span> - The individual check boxes control whether this External Referral Source Code can be used &#160;as a Referral Destination during Visit Conclusion and Discharge respectively or not.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Use as External/Referral Source for Direct Ordering</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicability</span> – Select a value from the list that is predefined. The values listed are Referral, External, Both and Not Applicable. Select a value to indicate the applicability of the External/Referral Source to perform direct ordering for Referral/External/Both Referral and External patients. Select ‘Not Applicable’ if the External/Referral Source is not applicable for Direct Ordering. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Associated Enterprise Facility for Referral</span> – Select the facility from the list that is associated to the Enterprise for Referral. The values listed are defined in System Manager Module. If ‘Applicability’ is selected as Referral or Both, this field is enabled. If 'Applicability’ is selected as External or Not Applicable, this field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Prefix for identifying Source</span> – Enter the patient prefix for identifying the External/Referral Source in alphanumeric format of two characters maximum length. If 'Applicability’ is selected as Not Applicable, the field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Series for Ext Patient Numbering</span> – Select the series for External Patient Numbering from the list. The values are listed from Patient Series function with Series Type as 'External Source Series’ in the Master Patient Index Module. If ‘Applicability’ is selected as Not Applicable, this field is disabled.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Allow Direct Orders for</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="13" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Laboratory/Radiology/Pharmacy</span> – Select the check box if the External/Referral Source is allowed direct ordering for Laboratory, Radiology or Pharmacy. If 'Applicability’ is selected as Referral/External/Both, this field is enabled and on selecting ‘Applicability’ as Not Applicable, this field is disabled.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Use as External/Referral Source for Tissue Collection</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="14">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicability</span> – Select a value from the list that is predefined. The values listed are 'Tissue Collection’ and ‘Not Applicable’. Select a value to indicate the applicability of the External/Referral Source for tissue collection. Select ‘Not Applicable’ if the External/Referral Source is not applicable for tissue collection.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Donor Prefix for identifying Source</span> – Enter the Donor Prefix for Identifying the External/Referral Source in alphanumeric format of two characters maximum length. If 'Applicability’ is selected as Not Applicable, this field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Series for Donor Numbering</span> – Select the Series For Donor Numbering from the list. The values are listed from ‘Patient Series’ function with ‘Series Type’ as ‘External Patient/Donor Series’ in the Master Patient Index Module. If ‘Applicability’ is selected as Not Applicable, the field is disabled.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p><span class="UnderlineRFD">Contact Details tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Address Details</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="17">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Address</span> - Enter the address of the External Referral Source in alphanumeric format of 30 characters maximum length in each of the three boxes.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Country</span> - Select the country for the External Referral Source from the list. The values are listed from country function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Tel No</span> - Enter the telephone number of the External Referral Source in alphanumeric format of 18 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fax No</span> - Enter the fax number of the External Referral Source in alphanumeric format of 18 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Email</span> - Enter the email ID of the External Referral Source in alphanumeric format of 50 characters maximum length.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Contact Person Details</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="22">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> – Enter the name of the contact Person in External referral source in alphanumeric format of 40 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Title</span> – Enter the title for the name in alphanumeric format of 40 characters maximum length.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,1094 @@
+ /* Preprocessor Directives    */
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+//#include <sqlca.h>     
+//#include <sqlda.h> 
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <bl.h> 
+#include <winproc.h>    
+      
+/* Macros */
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define OERROR (sqlca.sqlcode < 0) 
+#define MAX_LINES 55
+
+/* Declarations */
+
+EXEC SQL BEGIN DECLARE SECTION;	
+
+	VARCHAR uid_pwd 	        [95],	        
+	     	nd_sysdate              [31],
+			nd_option		[2] ,
+			nd_facility_id		[4] ,			
+			nd_user_id  	        [31],	
+			nd_hospital_name	[61],		
+			nd_prev_customer_code	[9] ,
+			nd_prev_customer_name	[16],
+			nd_customer_code	[9] ,
+			nd_customer_name	[16],
+			nd_session_id		[20],
+			nd_pgm_date		[30],
+			nd_appl_num		[11],
+			nd_employee_id		[11],
+			nd_patient_id		[21],
+                  d_short_name_full       [61],
+			nd_patient_name		[61],
+			nd_patient_nam1		[61],
+			nd_hcare_scheme		[7] ,
+			nd_payment_option	[11],
+			nd_pgm_id		[30],
+			nd_hcare_start_date	[12],
+			nd_hcare_appl_date	[12],
+			nd_hcare_effective_date [12],
+			nd_app_type		[2] ,
+			nd_hcare_expiry_date	[12];		
+	char    buf[10];
+	
+	char    nd_filename	        [100];
+
+	double	nd_subscription_amt	  =0,		
+		nd_tot_amt		  =0,
+		nd_grand_tot_amt	  =0;
+
+	long	nd_fmt_string		  =0,
+		nd_no_of_dependant	  =0,
+		nd_tot_appl		  =0,
+		nd_grand_tot_appl	  =0;
+
+EXEC SQL END DECLARE SECTION;
+
+	FILE 	*f1;
+	int	page = 0;
+	int	line = 0;
+	int     cust_count = 0;
+	int     emp_count  = 0;
+        int     other_count = 0;
+
+void proc_main(argc, argv)
+	int	argc;
+	char	*argv[];
+{    
+   void prt_line(int l, char spl_symbol[1]);
+
+   void prt_hdr_initial();
+   void prt_hdr_next();
+   void prt_hdr();    
+   void page_hdr();
+   void dec_cursor();
+   void open_cursor();
+   void close_cursor();
+   int  fetch_cursor();
+
+   void dec_cursor1();
+   void open_cursor1();
+   void close_cursor1();   
+   int  fetch_cursor1();
+
+   void dec_cursor2();
+   void open_cursor2();
+   void close_cursor2();   
+   int  fetch_cursor2();
+
+  
+   void report_process();
+   void report_process1();
+   void report_process2();
+   void grand_tot_prt();
+   void tot_prt();
+   void prev_sub_hdr_prt();
+  
+   void line_check();
+   void sub_hdr_prt(); 
+   void rec_prt();
+   
+
+/* INPUT ARGUMENT CHECK */
+
+     if(argc < 7) 
+     {
+	disp_message(ORA_MESG, "Usage BLRHCSUB uid/passwd@db Session Pgm_date Operating-Facility-ID Option");
+	proc_exit();
+     }
+
+     strcpy(nd_pgm_id.arr, argv[0]);
+     nd_pgm_id.len = strlen(nd_pgm_id.arr);   
+     strcpy(g_pgm_id,nd_pgm_id.arr);
+
+     strcpy(uid_pwd.arr, argv[1]);
+     uid_pwd.len = strlen(uid_pwd.arr);   
+
+     strcpy(nd_session_id.arr, argv[2]);
+     nd_session_id.len = strlen(nd_session_id.arr);      	 
+     strcpy(g_session_id,nd_session_id.arr);	    
+
+     strcpy(nd_pgm_date.arr, argv[3]);
+     nd_pgm_date.len = strlen(nd_pgm_date.arr);      	    
+     strcpy(g_pgm_date,nd_pgm_date.arr);
+   	 
+     strcpy(nd_facility_id.arr, argv[5]);
+     nd_facility_id.len = strlen(nd_facility_id.arr);      
+     strcpy(g_facility_id,nd_facility_id.arr);
+   
+     strcpy(nd_option.arr, argv[6]);
+     nd_option.len = strlen(nd_option.arr);      	 
+
+/* DB LOGIN */
+
+    EXEC SQL CONNECT :uid_pwd;
+    if (OERROR) 
+    {
+    	disp_message (ORA_MESG, "UserId / Password failed to Connect");
+        proc_exit();  
+    }	  	
+
+  set_meduser_role();  
+
+/* OUTPUT FILE */
+
+	strcpy(nd_filename,WORKING_DIR);   
+	strcat(nd_filename,argv[0]);
+	strcat(nd_filename,".lis");
+	if((f1 = fopen(nd_filename, "w")) == NULL) 
+	{
+		 disp_message (ERR_MESG, " Error opening output file ....");
+		 proc_exit();
+        } 
+	
+  nd_sysdate.arr[0]       = '\0';  
+  nd_sysdate.len	  = 0;
+  EXEC SQL SELECT to_char(SYSDATE,'DD/MM/YYYY HH24:MI') INTO :nd_sysdate FROM dual;
+  nd_sysdate.arr[nd_sysdate.len]       = '\0';  
+  
+  nd_user_id.arr[0]       = '\0';  
+  nd_user_id.len = 0;
+  EXEC SQL SELECT USER INTO :nd_user_id FROM dual;
+  nd_user_id.arr[nd_user_id.len]       = '\0';  
+       
+  nd_hospital_name.arr[0]	= '\0';  
+  nd_hospital_name.len = 0;
+  EXEC SQL SELECT accounting_name, no_of_decimal 
+	   INTO :nd_hospital_name, nd_fmt_string
+	   FROM sy_acc_entity
+	   WHERE acc_entity_id = :nd_facility_id;
+  nd_hospital_name.arr[nd_hospital_name.len]	= '\0';  
+
+
+/* PROCESS */   
+  
+   page_hdr();  
+   
+	
+   if (strcmp(nd_option.arr,"C") == 0)
+	   { report_process() ;}
+   if (strcmp(nd_option.arr,"E") == 0)
+	   { report_process1();}
+   if (strcmp(nd_option.arr,"O") == 0)
+	   { report_process1();}
+
+   if (strcmp(nd_option.arr,"A") == 0)
+	   { report_process2();}
+   
+   grand_tot_prt();
+   fprintf(f1,"\n");	 		
+   prt_line(58," "); 
+   fprintf(f1,"*** End Of Report ***");
+   fprintf(f1, "\n");   	 
+	
+  
+/* CLOSE FILE */
+
+   EXEC SQL COMMIT RELEASE; 
+   fclose(f1);   
+   return;   
+}
+
+void line_check()
+{
+   if (line > MAX_LINES)
+   {
+	fprintf(f1,"\f");	    
+	page_hdr();
+   }
+}       
+
+void page_hdr()
+{
+   prt_hdr();
+   if (page==1)
+   { prt_hdr_initial();
+    }
+   else
+   { prt_hdr_next();}
+ }
+
+
+void prt_hdr()
+{     
+   line = 0;    
+   page = page +1;
+   fprintf(f1,"\n");       
+   fprintf(f1,"MDL : BL");
+   prt_line(42," "); 
+   fprintf(f1,"%-31s",nd_hospital_name.arr);
+   prt_line(30," "); 
+   fprintf(f1,"%-20s",nd_sysdate.arr);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"OPR : %-31s",nd_user_id.arr); 
+   prt_line(13," ");    
+   fprintf(f1,"HEALTHCARE SUBSCRIPTION STATUS");
+   prt_line(32," "); 
+   fprintf(f1,"Page :%-4d",page);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"REP : BLRHCSUB"); 
+   prt_line(40," "); 
+   fprintf(f1,"AS ON %-10.10s",nd_sysdate.arr); 
+   fprintf(f1,"\n"); 
+   prt_line(145,"-");   
+ }  
+
+void prt_hdr_initial()
+{
+   fprintf(f1,"\n");    
+   fprintf(f1,"VER : 4.1");
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"		INPUT PARAMETERS:");
+   fprintf(f1,"\n");    
+   fprintf(f1,"		-----------------");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+
+   fprintf(f1,"		Selection(Employess / Customers / Others):  ");
+
+   if (strcmp(nd_option.arr,"E") == 0)
+   {   fprintf(f1,"Employees");}
+
+   if (strcmp(nd_option.arr,"C") == 0)
+   {   fprintf(f1,"Customers");} 
+	
+   if (strcmp(nd_option.arr,"O") == 0)
+   {   fprintf(f1,"Others");} 
+
+   if (strcmp(nd_option.arr,"A") == 0)
+   {   fprintf(f1,"All");} 
+
+   fprintf(f1,"\n");    
+
+   line = MAX_LINES + 1; 
+
+}
+
+	
+void prt_hdr_next()
+{
+   fprintf(f1,"\n");    
+   fprintf(f1,"Appln. No           Date       Employee ID Patient ID           Name                ");  
+   fprintf(f1,"    Amount Payment   Members H/Care  H/Care      Effective ");
+   fprintf(f1,"\n");    
+   prt_line(83," ");        
+   fprintf(f1,"             Option            Scheme  Expiry Date Date      ");
+   fprintf(f1, "\n");   
+   prt_line(145,"-");  
+   fprintf(f1, "\n");     
+}
+
+void prt_line(int line_length, char spl_symbol[1])
+{  
+ int i;  
+  for(i=1;i<=line_length;i=i+1)
+	 {fprintf(f1,spl_symbol);}
+}
+
+void dec_cursor()/* include bl_health_scheme to get short_desc by passin
+					 scheme_id		byRVN on 06/05/03*/
+{ 
+  EXEC SQL DECLARE hcare_cursor CURSOR FOR   
+  		SELECT	a.customer_code				customer_code,
+				b.short_name 				customer_name,
+				a.hcare_appl_num			appl_num,
+				to_char(a.hcare_appl_date,'dd/mm/yyyy')	appl_date,
+				to_char(a.action_date,'dd/mm/yyyy')		effective_date,
+				a.employee_id				employee_id,
+				a.patient_id				patient_id,
+				SUBSTR(c.short_name,1,20) patinet_name,
+				SUBSTR(c.short_name,21,60) patinet_nam1,
+				d.short_desc				hcare_scheme,	
+				DECODE(a.payment_option,'I','Immediate',
+										'R','Credit',
+										'S','Salary Ded',
+										'L','Instalment')
+											payment,
+				to_char(a.hcare_start_date,'dd/mm/yyyy')	hcare_start_date,
+				to_char(a.hcare_expiry_date,'dd/mm/yyyy')	hcare_expiry_date,
+				a.subscription_amt			subscription_amt,
+				NVL(a.no_of_dependents,0)	no_of_dependant		
+
+		FROM	bl_hcare_trn			a,
+				ar_customer				b,  
+				mp_patient_mast				c,  
+				bl_health_scheme		d
+		WHERE	a.customer_code		=	b.cust_code
+		AND		a.scheme_id			=	d.scheme_id
+		AND		a.patient_id		=	c.patient_id
+		AND		a.emp_patient_id	IS 	NULL		
+		AND		a.customer_code		IS 	NOT NULL 	
+		AND		a.payment_option	=	'R'
+		AND     TRUNC(a.hcare_expiry_date) 	>=	TRUNC(SYSDATE)
+		AND		a.hcare_status		=	'A'
+		AND		a.operating_facility_id = 	:nd_facility_id
+		AND   	b.acc_entity_code IN ( SELECT acc_entity_code 
+										 FROM sy_acc_entity
+										WHERE acc_entity_id = :nd_facility_id)		
+		ORDER BY 	a.customer_code,a.hcare_appl_num;
+		return;
+}
+
+void dec_cursor1()/* include bl_health_scheme to get short_desc by passin
+					 scheme_id		byRVN on 06/05/03*/
+{ 
+
+  EXEC SQL DECLARE hcare_cursor1 CURSOR FOR   
+  		SELECT		a.customer_code			customer_code,
+				''	 						customer_name,
+				a.hcare_appl_num			appl_num,							TRUNC(a.hcare_appl_date) appl_date,
+				to_char(a.action_date,'dd/mm/yyyy')		effective_date,
+				a.employee_id				employee_id,
+				a.patient_id				patient_id,
+				SUBSTR(c.short_name,1,20) patinet_name,
+				SUBSTR(c.short_name,21,60) patinet_nam1,
+				d.short_desc				hcare_scheme,	
+				DECODE(a.payment_option,'I','Immediate',
+										'R','Credit',
+				                        'S','Salary Ded.',
+										'L','Instalment')
+											payment,
+				to_char(a.hcare_start_date,'dd/mm/yyyy')	hcare_start_date,
+				to_char(a.hcare_expiry_date,'dd/mm/yyyy')	hcare_expiry_date,
+				a.subscription_amt			subscription_amt,
+				NVL(a.no_of_dependents,0)	no_of_dependant		
+		
+		FROM	bl_hcare_trn			a,
+				mp_patient_mast				c,
+				bl_health_scheme		d
+		
+		WHERE	a.patient_id		=	c.patient_id
+		AND		a.scheme_id			=	d.scheme_id
+		AND		a.emp_patient_id	IS 	NULL
+		AND		a.hcare_status		=	'A'
+		AND		((:nd_option	 	=	'E'
+				AND a.employee_id	IS NOT NULL
+				AND a.payment_option    <> 'R')
+				OR
+				(:nd_option	 	=	'O'
+				AND a.employee_id	IS     NULL
+				AND a.customer_code	IS     NULL))	
+		AND     TRUNC(a.hcare_expiry_date) >= TRUNC(SYSDATE)
+		AND		a.operating_facility_id = :nd_facility_id		
+		ORDER BY 	a.customer_code,a.hcare_appl_num;	
+	 	return;
+ }
+
+void dec_cursor2()/* include bl_health_scheme to get short_desc by passin
+					 scheme_id		byRVN on 06/05/03*/
+{ 
+  EXEC SQL DECLARE hcare_cursor2 CURSOR FOR   
+		SELECT	a.customer_code				customer_code,
+				b.short_name 				customer_name,
+				a.hcare_appl_num			appl_num,
+				to_char(a.hcare_appl_date,'dd/mm/yyyy')    appl_date,
+				to_char(a.action_date,'dd/mm/yyyy')	    effective_date,
+				a.employee_id				employee_id,
+				a.patient_id				patient_id,
+				SUBSTR(c.short_name,1,20) ent_name,
+				SUBSTR(c.short_name,21,60) ent_nam1,
+				d.short_desc				hcare_scheme,	
+				DECODE(a.payment_option,'I','Immediate',
+										'R','Credit',
+				                        'S','Salary Ded',
+										'L','Instalment')
+											Payment,
+				to_char(a.hcare_start_date,'dd/mm/yyyy') 	hcare_start_date,
+				to_char(a.hcare_expiry_date,'dd/mm/yyyy')  hcare_expiry_date,
+				a.subscription_amt			subscription_amt,
+				NVL(a.no_of_dependents,0) 	no_of_dependant,
+				DECODE(a.customer_code,NULL,'','C')	appl_type
+				FROM	bl_hcare_trn		a,
+				ar_customer			b,
+				mp_patient_mast			c,
+				bl_health_scheme	d
+		WHERE	a.customer_code		=	b.cust_code
+		AND		a.scheme_id			=	d.scheme_id
+		AND		a.patient_id		=	c.patient_id
+		AND		a.emp_patient_id	IS 	NULL		
+		AND		a.customer_code		IS 	NOT NULL 	
+		AND		a.payment_option	=	'R'
+		AND     TRUNC(a.hcare_expiry_date)	>=	TRUNC(SYSDATE)
+		AND		a.hcare_status		=	'A'
+		AND   		b.acc_entity_code IN ( SELECT acc_entity_code 
+						       FROM sy_acc_entity
+						       WHERE acc_entity_id = :nd_facility_id)		
+		AND		a.operating_facility_id = 	:nd_facility_id  		
+		UNION
+		SELECT	a.customer_code				customer_code,
+				'A'	 						customer_name,
+				a.hcare_appl_num			appl_num,	
+				to_char(a.hcare_appl_date,'dd/mm/yyyy')	appl_date,
+				to_char(a.action_date,'dd/mm/yyyy')	effective_date,   
+				a.employee_id				employee_id,
+				a.patient_id				patient_id,
+				SUBSTR(c.short_name,1,20) patinet_name,
+				SUBSTR(c.short_name,21,60) patinet_nam1, 
+				d.short_desc				hcare_scheme,	
+				DECODE(a.payment_option,'I','Immediate',
+										'R','Credit',
+				                        'S','Salary Ded.',
+										'L','Instalment')
+											Payment,
+				to_char(a.hcare_start_date,'dd/mm/yyyy')  hcare_start_date,
+				to_char(a.hcare_expiry_date,'dd/mm/yyyy')	 hcare_expiry_date,
+				a.subscription_amt			subscription_amt,
+				NVL(a.no_of_dependents,0)		no_of_dependant,						
+				DECODE(a.employee_id,NULL,'O','E')      appl_type
+		FROM	bl_hcare_trn			a,
+				mp_patient_mast				c,
+				bl_health_scheme		d
+		WHERE	a.patient_id		=	c.patient_id
+		AND		a.scheme_id			=	d.scheme_id
+		AND		a.emp_patient_id	IS 	NULL
+		AND		a.hcare_status		=	'A'
+		AND 		a.customer_code	IS     NULL
+		AND     TRUNC(a.hcare_expiry_date) 	>=     TRUNC(SYSDATE)
+		AND		a.operating_facility_id = :nd_facility_id		
+		ORDER BY 	15,1,3;
+	
+	 	return; 
+ }
+
+
+void open_cursor()
+{ 
+ EXEC SQL OPEN hcare_cursor;
+ if (sqlca.sqlcode < 0) 
+	 {	disp_message (ORA_MESG, "Open HCare Cursor Failed");
+       		proc_exit();
+	 } 
+	 return;
+ }
+
+void open_cursor1()
+{ 
+ EXEC SQL OPEN hcare_cursor1;
+ if (sqlca.sqlcode < 0) 
+	 {	disp_message (ORA_MESG, "Open HCare Cursor1 Failed");
+       		proc_exit();
+	 } 
+	 return;
+ }
+
+void open_cursor2()
+{ 
+ EXEC SQL OPEN hcare_cursor2;
+ if (sqlca.sqlcode < 0) 
+	 {	disp_message (ORA_MESG, "Open HCare Cursor2 Failed");
+       		proc_exit();
+	 } 
+	 return;
+ }
+
+int fetch_cursor()
+{ 
+		nd_customer_code.arr[0]		 = '\0';
+		nd_customer_name.arr[0] 	 = '\0';
+		nd_appl_num.arr[0]		 = '\0';
+		nd_hcare_appl_date.arr[0]	 = '\0';
+		nd_hcare_effective_date.arr[0]	 = '\0';
+		nd_employee_id.arr[0]		 = '\0';
+		nd_patient_id.arr[0]		 = '\0';
+		nd_patient_name.arr[0]		 = '\0';
+		nd_patient_nam1.arr[0]		 = '\0';
+		nd_hcare_scheme.arr[0]		 = '\0';
+		nd_payment_option.arr[0]	 = '\0';
+		nd_hcare_start_date.arr[0]	 = '\0';
+		nd_hcare_expiry_date.arr[0]	 = '\0';
+		nd_subscription_amt =0;
+		nd_no_of_dependant  =0;
+
+  		nd_customer_code.len = 0;
+		nd_customer_name.len = 0;
+		nd_appl_num.len = 0;
+		nd_hcare_appl_date.len = 0;
+		nd_hcare_effective_date.len = 0;
+		nd_employee_id.len = 0;
+		nd_patient_id.len = 0;
+		nd_patient_name.len = 0;
+		nd_patient_nam1.len = 0;
+		nd_hcare_scheme.len = 0;
+		nd_payment_option.len = 0;
+		nd_hcare_start_date.len = 0;
+		nd_hcare_expiry_date.len = 0;
+
+  EXEC SQL FETCH hcare_cursor 
+	   INTO :nd_customer_code,
+		:nd_customer_name,
+		:nd_appl_num,
+		:nd_hcare_appl_date,
+		:nd_hcare_effective_date,
+		:nd_employee_id,
+		:nd_patient_id ,
+		:nd_patient_name,
+		:nd_patient_nam1,
+		:nd_hcare_scheme,	
+		:nd_payment_option,
+		:nd_hcare_start_date,
+		:nd_hcare_expiry_date,
+		:nd_subscription_amt,
+		:nd_no_of_dependant;
+
+       if (OERROR)
+      err_mesg("FETCH failed on BL_RECEIPT_REFUND_DTL_CUR",0,"");
+
+   if (LAST_ROW) return (0);
+
+    nd_customer_code.arr[nd_customer_code.len]		= '\0';
+    nd_customer_name.arr[nd_customer_name.len]	 	= '\0';
+    nd_appl_num.arr[nd_appl_num.len]			= '\0';
+    nd_employee_id.arr[nd_employee_id.len]		= '\0';
+    nd_patient_id.arr[nd_patient_id.len] 		= '\0';
+    nd_patient_name.arr[nd_patient_name.len] 		= '\0';
+	nd_patient_nam1.arr[nd_patient_nam1.len] 		= '\0';
+    nd_hcare_scheme.arr[nd_hcare_scheme.len] 		= '\0';
+    nd_payment_option.arr[nd_payment_option.len]	= '\0';
+    nd_hcare_start_date.arr[nd_hcare_start_date.len]	= '\0';
+    nd_hcare_expiry_date.arr[nd_hcare_expiry_date.len] 	= '\0';
+    
+
+
+    return 1;
+ }
+
+int fetch_cursor1()
+{ 
+
+
+		nd_customer_code.arr[0]		 = '\0';
+		nd_customer_name.arr[0] 	 = '\0';
+		nd_appl_num.arr[0]		 = '\0';
+		nd_hcare_appl_date.arr[0]	 = '\0';
+		nd_hcare_effective_date.arr[0]	 = '\0';
+		nd_employee_id.arr[0]		 = '\0';
+		nd_patient_id.arr[0]		 = '\0';
+		nd_patient_name.arr[0]		 = '\0';
+		nd_patient_nam1.arr[0]		 = '\0';
+		nd_hcare_scheme.arr[0]		 = '\0';
+		nd_payment_option.arr[0]	 = '\0';
+		nd_hcare_start_date.arr[0]	 = '\0';
+		nd_hcare_expiry_date.arr[0]	 = '\0';
+		nd_subscription_amt =0;
+		nd_no_of_dependant  =0;
+
+  		nd_customer_code.len = 0;
+		nd_customer_name.len = 0;
+		nd_appl_num.len = 0;
+		nd_hcare_appl_date.len = 0;
+		nd_hcare_effective_date.len = 0;
+		nd_employee_id.len = 0;
+		nd_patient_id.len = 0;
+		nd_patient_name.len = 0;
+		nd_patient_nam1.len = 0;
+		nd_hcare_scheme.len = 0;
+		nd_payment_option.len = 0;
+		nd_hcare_start_date.len = 0;
+		nd_hcare_expiry_date.len = 0;
+
+  EXEC SQL FETCH hcare_cursor1 
+	   INTO :nd_customer_code,
+		:nd_customer_name,
+		:nd_appl_num,
+		:nd_hcare_appl_date,
+		:nd_hcare_effective_date,
+		:nd_employee_id,
+		:nd_patient_id,
+           
+		:nd_patient_name,
+		:nd_patient_nam1,
+		:nd_hcare_scheme,	
+		:nd_payment_option,
+		:nd_hcare_start_date,
+		:nd_hcare_expiry_date,
+		:nd_subscription_amt,
+		:nd_no_of_dependant;
+
+       if (OERROR)
+      err_mesg("FETCH failed on BL_RECEIPT_REFUND_DTL_CUR",0,"");
+
+   if (LAST_ROW) return (0);
+
+    nd_customer_code.arr[nd_customer_code.len]		= '\0';
+    nd_customer_name.arr[nd_customer_name.len]	 	= '\0';
+    nd_appl_num.arr[nd_appl_num.len]			= '\0';
+    nd_hcare_appl_date.arr[nd_hcare_appl_date.len]	= '\0';
+    nd_hcare_effective_date.arr[nd_hcare_effective_date.len]
+							= '\0';
+    nd_employee_id.arr[nd_employee_id.len]		= '\0';
+    nd_patient_id.arr[nd_patient_id.len] 		= '\0';
+    nd_patient_name.arr[nd_patient_name.len] 		= '\0';
+	nd_patient_nam1.arr[nd_patient_nam1.len] 		= '\0';
+    nd_hcare_scheme.arr[nd_hcare_scheme.len] 		= '\0';
+    nd_payment_option.arr[nd_payment_option.len]	= '\0';
+    nd_hcare_start_date.arr[nd_hcare_start_date.len]	= '\0';
+    nd_hcare_expiry_date.arr[nd_hcare_expiry_date.len] 	= '\0';
+        
+    return 1;
+ }
+
+int fetch_cursor2()
+{ 
+
+
+		nd_customer_code.arr[0]		 = '\0';
+		nd_customer_name.arr[0] 	 = '\0';
+		nd_appl_num.arr[0]		 = '\0';
+		nd_hcare_appl_date.arr[0]	 = '\0';
+		nd_hcare_effective_date.arr[0]	 = '\0';
+		nd_employee_id.arr[0]		 = '\0';
+		nd_patient_id.arr[0]		 = '\0';
+		nd_patient_name.arr[0]		 = '\0';
+		nd_patient_nam1.arr[0]		 = '\0';
+		nd_hcare_scheme.arr[0]		 = '\0';
+		nd_payment_option.arr[0]	 = '\0';
+		nd_hcare_start_date.arr[0]	 = '\0';
+		nd_hcare_expiry_date.arr[0]	 = '\0';
+		nd_subscription_amt =0;
+		nd_no_of_dependant  =0;
+		nd_app_type.arr[0]		 = '\0';
+
+  		nd_customer_code.len		 = 0;
+		nd_customer_name.len		 = 0;
+		nd_appl_num.len			 = 0;
+		nd_hcare_appl_date.len		 = 0;
+		nd_hcare_effective_date.len	 = 0;
+		nd_employee_id.len		 = 0;
+		nd_patient_id.len		 = 0;
+		nd_patient_name.len		 = 0;
+		nd_patient_nam1.len		 = 0;
+		nd_hcare_scheme.len		 = 0;
+		nd_payment_option.len		 = 0;
+		nd_hcare_start_date.len		 = 0;
+		nd_hcare_expiry_date.len	 = 0;
+		nd_app_type.len			 = 0;
+
+  EXEC SQL FETCH hcare_cursor2 
+	   INTO :nd_customer_code,
+		:nd_customer_name,
+		:nd_appl_num,
+		:nd_hcare_appl_date,
+		:nd_hcare_effective_date,
+		:nd_employee_id,
+		:nd_patient_id,
+        	:nd_patient_name,
+		:nd_patient_nam1,
+		:nd_hcare_scheme,	
+		:nd_payment_option,
+		:nd_hcare_start_date,
+		:nd_hcare_expiry_date,
+		:nd_subscription_amt,
+		:nd_no_of_dependant,
+		:nd_app_type	   ;
+
+       if (OERROR)
+      err_mesg("FETCH failed on BL_RECEIPT_REFUND_DTL_CUR",0,"");
+
+   if (LAST_ROW) return (0);
+
+    nd_customer_code.arr[nd_customer_code.len]		= '\0';
+    nd_customer_name.arr[nd_customer_name.len]	 	= '\0';
+    nd_appl_num.arr[nd_appl_num.len]			= '\0';
+    nd_hcare_appl_date.arr[nd_hcare_appl_date.len]	= '\0';
+    nd_hcare_effective_date.arr[nd_hcare_effective_date.len]
+							= '\0';
+    nd_employee_id.arr[nd_employee_id.len]		= '\0';
+    nd_patient_id.arr[nd_patient_id.len] 		= '\0';
+    nd_patient_name.arr[nd_patient_name.len] 		= '\0';
+	nd_patient_nam1.arr[nd_patient_nam1.len] 		= '\0';
+    nd_hcare_scheme.arr[nd_hcare_scheme.len] 		= '\0';
+    nd_payment_option.arr[nd_payment_option.len]	= '\0';
+    nd_hcare_start_date.arr[nd_hcare_start_date.len]	= '\0';
+    nd_hcare_expiry_date.arr[nd_hcare_expiry_date.len] 	= '\0';
+    nd_app_type.arr[nd_app_type.len]		 	= '\0';
+   d_short_name_full.arr[d_short_name_full.len]               = '\0';
+ 
+ EXEC SQL EXECUTE
+ BEGIN
+ declare
+      str1   varchar2(100);
+     str2   varchar2(60);
+     
+    
+   BEGIN
+     blcommon.split_words(:d_short_name_full,30,'*',1,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_patient_name   :=str2;
+       END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',2,str1,str2);
+       IF str2 IS NOT NULL THEN
+         :nd_patient_nam1  := str2;
+      END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',3,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_patient_nam1    := :nd_patient_nam1 || str2;
+       end if;
+
+	 
+     
+ END;
+  END;
+       
+   END-EXEC;
+       nd_patient_name.arr[nd_patient_name.len]  = '\0';
+       nd_patient_nam1.arr[nd_patient_nam1.len]  = '\0';
+    return 1;
+ }
+
+void close_cursor()
+{ 
+ EXEC SQL CLOSE hcare_cursor;
+ return;
+ }
+
+void close_cursor1()
+{ 
+ EXEC SQL CLOSE hcare_cursor1;
+ return;
+ }
+void close_cursor2()
+{ 
+ EXEC SQL CLOSE hcare_cursor2;
+ return;
+ }
+
+
+void sub_hdr_prt()
+
+{	
+	fprintf(f1,"Customer  : %-9s" ,nd_customer_code.arr); 		
+        fprintf(f1," - ");
+	fprintf(f1,"%-60s" 	      ,nd_customer_name.arr); 		
+       	fprintf(f1,"\n");
+   	fprintf(f1,"\n");
+	line = line +2;
+	line_check();
+}
+	
+void prev_sub_hdr_prt()
+
+{	
+	fprintf(f1,"Customer  : %-9s" ,nd_prev_customer_code.arr); 		
+        fprintf(f1," - ");
+	fprintf(f1,"%-60s" 	      ,nd_prev_customer_name.arr); 		
+       	fprintf(f1,"\n");
+   	fprintf(f1,"\n");
+	line = line +2;
+	line_check();
+}
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);
+        format_amt(s_amt);
+	strcat(s_amt,"-");
+        sprintf(str_amt,"%10s",s_amt);        
+        fprintf(f1,"%10s",str_amt);
+        }
+    else 
+	{
+        put_val(s_amt,loc_amount);        
+        format_amt(s_amt);	
+        sprintf(str_amt,"%10s",s_amt);
+        fprintf(f1,"%10s",str_amt);
+        }
+}
+
+void rec_prt()
+{
+       {fprintf(f1,"%-20.20s "	,nd_appl_num.arr);	
+	fprintf(f1,"%-10s "	,nd_hcare_appl_date.arr);		
+        fprintf(f1,"%-10s  "  	,nd_employee_id.arr);
+	fprintf(f1,"%-20s " 	,nd_patient_id.arr);
+        fprintf(f1,"%-20.20s " 	,nd_patient_name.arr);
+    /*
+    if (nd_fmt_string == 3)
+	{fprintf(f1,"%10.3f " 	,nd_subscription_amt);}
+    else
+	{fprintf(f1,"%10.2f " 	,nd_subscription_amt);}
+    */   
+        print_formated(nd_subscription_amt);
+	fprintf(f1," ");	
+
+	fprintf(f1,"%-11s"  	,nd_payment_option.arr);
+	fprintf(f1,"  %4d "  	,nd_no_of_dependant);
+
+	fprintf(f1,"%-7s " 	,nd_hcare_scheme.arr);
+        
+	fprintf(f1,"%-10s  " 	,nd_hcare_start_date.arr);
+        fprintf(f1,"%-10s "  	,nd_hcare_expiry_date.arr);
+
+        nd_tot_appl = nd_tot_appl + 1;
+        nd_tot_amt  = nd_tot_amt + nd_subscription_amt;
+	nd_grand_tot_appl = nd_grand_tot_appl + 1;
+	nd_grand_tot_amt  = nd_grand_tot_amt + nd_subscription_amt; 
+
+
+        fprintf(f1,"\n");
+
+		if(strlen(nd_patient_nam1.arr) > 2)
+{
+ fprintf(f1,"%65s %s \n"," ",nd_patient_nam1.arr);
+ line++;
+}
+     }   
+
+	line = line + 1;	
+	line_check();
+}
+
+void tot_prt()
+   {
+	fprintf(f1,"\n");
+	prt_line(85," ");
+	prt_line(15,"-");
+	fprintf(f1,"\n");
+	prt_line(30," ");
+
+	fprintf(f1,"Total No. Of Applications  %-7d",nd_tot_appl);
+       	fprintf(f1,"           Total      ");
+        print_formated(nd_tot_amt);
+	fprintf(f1," ");	
+
+	nd_tot_appl = 0;
+        nd_tot_amt  = 0;
+	fprintf(f1,"\n");
+		prt_line(85," ");
+	prt_line(15,"-");
+	fprintf(f1,"\n");
+
+	fprintf(f1,"\n");
+	line = line +5;
+	line_check();
+    }
+  
+
+void grand_tot_prt()
+   {	
+	prt_line(30," ");
+	fprintf(f1,"Grand Total                %-7d",nd_grand_tot_appl);
+       	fprintf(f1,"           Total      ");
+	/*
+	if (nd_fmt_string == 3)
+		{fprintf(f1,"%10.3f " 	,nd_grand_tot_amt);}
+	else
+		{fprintf(f1,"%10.2f " 	,nd_grand_tot_amt);}
+	*/
+        print_formated(nd_grand_tot_amt);
+	fprintf(f1," ");	
+	
+	fprintf(f1,"\n");
+	line = line +2;
+	line_check();
+
+    }
+
+
+void report_process()
+{        
+    int fetch_cursor_check;
+	dec_cursor();
+	open_cursor();	    
+	line_check();  
+        fetch_cursor_check = fetch_cursor();
+        strcpy(nd_prev_customer_code.arr,nd_customer_code.arr);
+        strcpy(nd_prev_customer_name.arr,nd_customer_name.arr);
+	nd_prev_customer_code.len = strlen(nd_prev_customer_code.arr);
+	nd_prev_customer_name.len = strlen(nd_prev_customer_name.arr);
+	line_check();          
+  while(fetch_cursor_check)  {  
+     if (strcmp(nd_prev_customer_code.arr,nd_customer_code.arr) == 0)
+        { 
+	 if (line == 0 )
+	  {  sub_hdr_prt();}
+	     rec_prt();}	
+     else
+       { 
+	
+          if (line == 0 )
+	  	{ prev_sub_hdr_prt();} 
+	    	  tot_prt();		
+          if (line > (MAX_LINES-3))
+          	{ line = MAX_LINES +1;
+	    	  line_check();	
+		}	
+	       	  sub_hdr_prt();
+		  rec_prt();
+       }        
+        strcpy(nd_prev_customer_code.arr,nd_customer_code.arr);
+        strcpy(nd_prev_customer_name.arr,nd_customer_name.arr);
+	nd_prev_customer_code.len = strlen(nd_prev_customer_code.arr);
+	nd_prev_customer_name.len = strlen(nd_prev_customer_name.arr);
+        fetch_cursor_check = fetch_cursor();	             
+     }
+ 	tot_prt();	
+	close_cursor();
+  }
+
+void report_process1()
+{        
+    int fetch_cursor_check;
+	dec_cursor1();
+	open_cursor1();	    
+        fetch_cursor_check = fetch_cursor1();        
+
+	line_check();  
+         
+  while(fetch_cursor_check)  {  
+ 
+	rec_prt();      
+        fetch_cursor_check = fetch_cursor1();	 	
+	
+       }
+	tot_prt(); 	
+	close_cursor1();
+}
+
+void report_process2()
+{        
+	int fetch_cursor_check;
+	cust_count = 0;
+ 	emp_count = 0;
+	other_count = 0;
+	
+	dec_cursor2();
+	open_cursor2();	    
+        fetch_cursor_check = fetch_cursor2();
+        strcpy(nd_prev_customer_code.arr,nd_customer_code.arr);
+        strcpy(nd_prev_customer_name.arr,nd_customer_name.arr);
+	nd_prev_customer_code.len = strlen(nd_prev_customer_code.arr);
+	nd_prev_customer_name.len = strlen(nd_prev_customer_name.arr);
+
+	line_check();  
+         
+  while(fetch_cursor_check)  {  
+  if (strcmp(nd_app_type.arr,"C") == 0 )   
+  {
+     if (strcmp(nd_prev_customer_code.arr,nd_customer_code.arr) == 0)
+        { 
+	 if (line == 0 )
+            {  
+	       if (cust_count == 0)
+	       {	
+	       fprintf(f1,"Customers");
+	       fprintf(f1,"\n");		
+       	       fprintf(f1,"\n");	
+	       line = line + 2;
+	       line_check();	   }
+		
+		sub_hdr_prt();}
+	     	rec_prt();
+	}	
+     else
+       { 	
+          if (line == 0 )
+	  	{ prev_sub_hdr_prt();} 
+	    	  tot_prt();		
+          if (line > (MAX_LINES-3))
+          	{ line = MAX_LINES +1;
+	    	  line_check();	
+		}	
+	       	  sub_hdr_prt();
+		  rec_prt();
+       }        
+	strcpy(nd_prev_customer_code.arr,nd_customer_code.arr);
+        strcpy(nd_prev_customer_name.arr,nd_customer_name.arr);        
+	nd_prev_customer_code.len = strlen(nd_prev_customer_code.arr);
+	nd_prev_customer_name.len = strlen(nd_prev_customer_name.arr);
+	cust_count = cust_count + 1;
+     }
+
+    if (strcmp(nd_app_type.arr,"E") == 0 )
+    { 
+       if (line > (MAX_LINES-3))
+          	{ line = MAX_LINES +1;
+	    	  line_check();			  
+		}	
+      if (line == 0 && cust_count > 0 && emp_count == 0 )
+      { sub_hdr_prt();
+	tot_prt();} 
+  
+      if (line != 0 && cust_count > 0 && emp_count == 0 )
+      { tot_prt();} 
+
+      if (line == 0 || emp_count == 0)	
+      {fprintf(f1,"Employees");
+       fprintf(f1,"\n");		
+       fprintf(f1,"\n");	
+       line = line + 2;
+       line_check();}
+       
+       rec_prt();      
+       emp_count = emp_count + 1;
+
+     }
+
+    if (strcmp(nd_app_type.arr,"O") == 0 )
+    {        
+    
+      if (line > (MAX_LINES-3))
+          	{ line = MAX_LINES +1;
+	    	  line_check();			  
+		}	
+      if (line == 0 && cust_count > 0 && emp_count == 0 && other_count == 0 )
+      { sub_hdr_prt();
+	tot_prt();} 
+  
+      if (line != 0 && cust_count > 0 && emp_count == 0 && other_count == 0)
+      { tot_prt();} 
+  
+      if (line == 0 && emp_count > 0  &&  other_count == 0 )
+      { 
+	    fprintf(f1,"Employees");
+	    fprintf(f1,"\n");		
+            fprintf(f1,"\n");	
+            line = line + 2;
+            line_check();
+	    tot_prt();} 
+  
+      if (line != 0 && emp_count > 0 && other_count == 0)
+      { tot_prt();} 
+      
+
+      if (line == 0 || other_count == 0)	
+      {fprintf(f1,"Others");
+       fprintf(f1,"\n");		
+       fprintf(f1,"\n");	
+       line = line + 2;
+       line_check();}
+       other_count = other_count + 1;       
+       rec_prt();      
+     }        
+         
+        fetch_cursor_check = fetch_cursor2();	                   
+    }
+   
+	tot_prt();       
+	close_cursor2();
+  }
+
+
+
+

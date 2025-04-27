@@ -1,0 +1,58 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+package com.iba.ehis.lc.requestForCleaningLinen.vo;
+
+import com.iba.ehis.lc.core.vo.LcVO;
+import com.iba.framework.core.util.AutoGenerationList;
+
+
+
+public class RequestForCleaningLinenMainVO extends LcVO {
+	private PlaceCleaningLinenRequestVO placeCleaningLinenRequestVO ;
+	private CleaningRequestsListVO cleaningRequestsListVO ;	
+	private PendingCountConfirmVO pendingCountConfirmVO; 
+	private String viewCode; 
+	private String checkView;
+	
+	public String getViewCode() {
+		return viewCode;
+	}
+	public void setViewCode(String viewCode) {
+		this.viewCode = viewCode;
+	}
+
+	public PlaceCleaningLinenRequestVO getPlaceCleaningLinenRequestVO() {
+		placeCleaningLinenRequestVO=(placeCleaningLinenRequestVO==null?new PlaceCleaningLinenRequestVO():placeCleaningLinenRequestVO);
+		return placeCleaningLinenRequestVO;
+	}
+	public void setPlaceCleaningLinenRequestVO(PlaceCleaningLinenRequestVO placeCleaningLinenRequestVO) {
+		placeCleaningLinenRequestVO=(placeCleaningLinenRequestVO==null?new PlaceCleaningLinenRequestVO():placeCleaningLinenRequestVO);
+		this.placeCleaningLinenRequestVO = placeCleaningLinenRequestVO;
+	}
+	public CleaningRequestsListVO getCleaningRequestsListVO() {
+		cleaningRequestsListVO=(cleaningRequestsListVO==null?new CleaningRequestsListVO():cleaningRequestsListVO);
+		return cleaningRequestsListVO;
+	}
+	public void setCleaningRequestsListVO(CleaningRequestsListVO cleaningRequestsListVO) {
+		this.cleaningRequestsListVO = cleaningRequestsListVO;
+	}
+	public String getCheckView() {
+		return checkView;
+	}
+	public void setCheckView(String checkView) {
+		this.checkView = checkView;
+	}
+	public PendingCountConfirmVO getPendingCountConfirmVO() {
+		return pendingCountConfirmVO;
+	}
+	public void setPendingCountConfirmVO(PendingCountConfirmVO pendingCountConfirmVO) {
+		this.pendingCountConfirmVO = pendingCountConfirmVO;
+	}
+	
+}

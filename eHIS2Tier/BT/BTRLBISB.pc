@@ -1,0 +1,955 @@
+
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+#define OERROR 		  (sqlca.sqlcode < 0)
+#define INIT_MESG "Label Printing"
+#define ESC 0x1B
+
+#include <stdio.h>  
+#include <string.h>
+#include <math.h>
+#include <malloc.h> 
+#include <rl.h>  
+
+EXEC SQL BEGIN DECLARE SECTION;                  
+
+VARCHAR uid_pwd                 [42],     
+		nd_source_type	        [2],
+		nd_fm_source	        [7],
+        d_no_copy				[2],
+        nd_facility_id			[3],
+		nd_session_id           [50],
+		nd_ws_no                [50],
+		nd_trx_ind			    [2],
+		nd_printer_type          [2],
+
+
+
+		d_fm_unit_no	        [41],
+		d_fm_product_code       [41],
+		d_facility_id           [41],
+		d_facility_name         [101],
+        d_unit_barcode_value    [101],
+		d_product_code_temp     [41], 
+		d_product_desc_temp     [101],
+		d_store_instr_code      [11],
+		d_store_instr_desc_temp [41],
+
+        nd_donation_date         [21],
+        nd_donor_product_code    [41], 
+        nd_donor_unit_no         [41],
+        nd_product_code          [41], 
+		nd_product_desc          [101], 
+        nd_unit_no               [41],
+        nd_blood_group           [41], 
+        nd_rhesus_code           [41], 
+        nd_expiry_date           [41],
+        nd_screened_legend       [41],
+
+
+        d_donation_date         [20][21],
+        d_donor_product_code    [20][41], 
+        d_donor_unit_no         [20][41],
+        d_product_code          [20][41], 
+		d_store_instr_desc      [20][101], 
+		d_product_desc          [20][101], 
+        d_unit_no               [20][41],
+        d_blood_group           [20][41], 
+        d_rhesus_code           [20][41], 
+        d_expiry_date           [20][41],
+        d_screened_legend       [20][41],
+
+//Dhana changes
+		nd_bld_grp_rh_barcode	 [15],	
+		nd_prod_barcode_msg1	 [200],
+		nd_prod_barcode_msg2	 [200],
+		nd_donor_id				 [20],
+		nd_center_code			 [4],
+		nd_product_barcode_value [15],
+		nd_donation_process		 [2],	
+
+
+
+		d_bld_grp_rh_barcode	 [20][15],	
+		d_prod_barcode_msg1		 [20][200],
+		d_prod_barcode_msg2		 [20][200],
+		d_donor_id				 [20][20],
+		d_center_code			 [20][4],
+		d_product_barcode_value	 [20][15],
+		d_donation_process		 [20][2],	
+
+
+		d_flag			[2],
+
+		er_msg                  [171], 
+
+/***************** variables added for label_cur cursor ***********/
+
+		a_ws_no					[41],
+		a_cmd_line_arg			[500],
+		a_rowid					[41],
+		a_pgm_id				[41],
+
+/***************** variables added for enhancement ***********/
+
+//		nd_file_no			[100],
+		nd_print_source_type	[2],
+		nd_print_source		[2];
+
+  int         d_volume[500],
+              nd_volume,
+              d_tot_no_products,
+	  		  h_no_of_rec = 0;
+
+
+ char string_var[100];
+
+/*tern  char WORKING_DIR_NAME [75];*/
+
+  int er_msg_type = 0;	
+  int err_flag = 0;
+  
+  char string_char[100];
+  	
+EXEC SQL END DECLARE SECTION; 
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+char filename[150];
+char filename1[150];
+
+char *command;  
+char gtt_yn = 'N';
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+ err_flag = 0;
+ 
+
+//ins_message(ERR_MESG,"rlrlbprn : Start");
+
+
+  if(argc != 7) 
+  {
+     ins_message(ERR_MESG,"bdrlabel : Usage - BTRLBISB UID_PWD SESSION_ID PGM_ID UNIT_NO PRODUCT_CODE FACILITY_ID WS_NO arguments wrong\n");
+  }
+
+
+    strcpy(filename,WORKING_DIR);
+
+
+
+    strcpy(a_pgm_id.arr,argv[0]);
+    a_pgm_id.len = strlen(a_pgm_id.arr); 
+
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr); 
+
+
+    strcpy(nd_session_id.arr, argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+
+
+    strcpy(a_pgm_id.arr,argv[3]);
+    a_pgm_id.len = strlen(a_pgm_id.arr); 
+	
+
+    strcpy(filename1, a_pgm_id.arr);
+
+    strcat(filename, strcat(filename1, ".lis"));
+
+    if (strcmp(strupr(a_pgm_id.arr), "BTRLBISB") == 0)
+    {
+
+	strcpy(d_fm_unit_no.arr,argv[4]);
+	d_fm_unit_no.len = strlen(d_fm_unit_no.arr);
+
+    
+	strcpy(d_fm_product_code.arr,argv[5]);
+	d_fm_product_code.len = strlen(d_fm_product_code.arr);
+
+
+
+	strcpy(d_facility_id.arr,argv[6]);
+	d_facility_id.len = strlen(d_facility_id.arr);
+
+
+	strcpy(nd_ws_no.arr, argv[7]);
+	nd_ws_no.len = strlen(nd_ws_no.arr);
+
+
+    }
+
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL CONNECT :uid_pwd;
+
+
+	printf("connected/n");
+
+    set_meduser_role();
+
+    get_facility_name();
+
+    get_printer_type();
+
+	get_trans_ind();
+
+
+
+
+
+	if (strcmp(strupr(a_pgm_id.arr), "BTRLBISB") == 0)
+    {
+
+
+      dclr_un_screened_cur();
+			
+      while(fetch_un_screened_cur())
+	  {	  
+	  get_product_desc();	  
+      get_graph_barcode();
+	  get_center_code();
+	  get_product_barcode_msg();
+	  get_donation_details();  
+	  
+        h_no_of_rec = h_no_of_rec + 1;
+      }
+	  
+    }  
+
+	   
+	
+    call_main_report();
+
+	
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+	fclose(f1);
+    sprintf(string_var,"%s -> %s\n",d_fm_unit_no.arr, sqlca.sqlerrm.sqlerrmc);
+    ins_message(ORA_MESG,string_var);
+//	disp_message(ERR_MESG, string_var);
+    EXEC SQL COMMIT WORK RELEASE;
+
+
+
+	//fclose(f2);
+}
+
+
+dclr_un_screened_cur()
+{
+ 
+   
+		EXEC SQL DECLARE c_scr CURSOR FOR
+                       SELECT A.product_code, 
+                              A.unit_no, 
+							  A.blood_group,
+							  A.rhesus_code,                              
+                              TO_CHAR(A.expiry_date, 'DD/MM/YYYY')                              
+                       FROM   bd_component_label_vw A
+                       WHERE  A.donor_unit_no = :d_fm_unit_no
+                       AND    A.donor_product_code = :d_fm_product_code 
+                       AND    A.operating_facility_id = :d_facility_id
+					   AND    (1=1 and ( :a_pgm_id = 'BTRLBISB' AND NVL(A.add_to_stock_yn, 'N') = 'Y' )					          
+					          ) ;
+
+		EXEC SQL OPEN c_scr;
+		
+  
+    if (OERROR) 
+	{
+        ins_message (ORA_MESG, "OPEN Cursor c_scr Failed ");
+
+    }
+
+}
+
+
+
+
+
+int fetch_un_screened_cur()
+{
+
+
+
+
+nd_product_code.arr[0] ='\0';
+nd_product_code.len =0;
+
+nd_unit_no.arr[0] ='\0';
+nd_unit_no.len =0;
+
+nd_blood_group.arr[0] ='\0';
+nd_blood_group.len =0;
+
+nd_rhesus_code.arr[0] ='\0';
+nd_rhesus_code.len =0;
+
+nd_expiry_date.arr[0] ='\0';
+nd_expiry_date.len =0;
+
+
+
+
+      EXEC SQL FETCH c_scr INTO
+                        :nd_product_code,
+                        :nd_unit_no,
+                        :nd_blood_group,
+                        :nd_rhesus_code,						
+                        :nd_expiry_date;						                       
+
+
+					 
+// disp_message(ERR_MESG, "s1");
+    if (OERROR)
+	{
+//		sprintf(string_var,"%s get_facility_name()-> %s\n", d_facility_id.arr, sqlca.sqlerrm.sqlerrmc);
+//		disp_message(ERR_MESG, string_var);
+        ins_message (ORA_MESG, "FETCH failed c2 ");
+		return 0;
+      }
+
+    if (NO_DATA_FOUND)
+      return 0;
+
+  nd_unit_no.arr[nd_unit_no.len]='\0';
+  nd_expiry_date.arr[nd_expiry_date.len]='\0';
+
+  sprintf(d_product_code[h_no_of_rec].arr,"%s", nd_product_code.arr);
+  d_product_code[h_no_of_rec].len = strlen(d_product_code[h_no_of_rec].arr);
+
+  sprintf(d_unit_no[h_no_of_rec].arr,"%s", nd_unit_no.arr);
+  d_unit_no[h_no_of_rec].len = strlen(d_unit_no[h_no_of_rec].arr);
+
+  sprintf(d_blood_group[h_no_of_rec].arr,"%s", nd_blood_group.arr);
+  d_blood_group[h_no_of_rec].len = strlen(d_blood_group[h_no_of_rec].arr);
+
+  sprintf(d_rhesus_code[h_no_of_rec].arr,"%s", nd_rhesus_code.arr);
+  d_rhesus_code[h_no_of_rec].len = strlen(d_rhesus_code[h_no_of_rec].arr);
+
+  sprintf(d_expiry_date[h_no_of_rec].arr,"%s", nd_expiry_date.arr);
+  d_expiry_date[h_no_of_rec].len = strlen(d_expiry_date[h_no_of_rec].arr);
+
+  
+
+  d_volume[h_no_of_rec] = nd_volume;
+
+  return 1;
+  
+}
+
+
+
+
+//start Dhana
+
+get_graph_barcode()
+{
+
+nd_bld_grp_rh_barcode.arr[0]='\0';
+nd_bld_grp_rh_barcode.len=0;
+
+
+EXEC SQL	SELECT BLOOD_GRP_RH_BARCODE_CODE INTO :nd_bld_grp_rh_barcode
+			FROM BT_BLOOD_GRP_RH_BARCODE  
+			WHERE 	BLOOD_GROUP=:d_blood_group[h_no_of_rec]
+			AND RHESUS_CODE=:d_rhesus_code[h_no_of_rec];
+
+	nd_bld_grp_rh_barcode.arr[nd_bld_grp_rh_barcode.len]='\0';
+
+
+
+  sprintf(d_bld_grp_rh_barcode[h_no_of_rec].arr,"%s", nd_bld_grp_rh_barcode.arr);
+  d_bld_grp_rh_barcode[h_no_of_rec].len = strlen(nd_bld_grp_rh_barcode.arr);
+
+
+
+if(OERROR)
+	{
+		sprintf(string_var,"%s and %s and %s  get_graph_barcode-> %s\n", d_product_code[h_no_of_rec].arr,d_blood_group[h_no_of_rec].arr,d_rhesus_code[h_no_of_rec].arr,sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+}
+
+
+get_center_code()
+ {
+
+nd_center_code.arr[0]='\0';
+nd_center_code.len=0;
+
+
+
+EXEC SQL SELECT CENTRE_CODE into :nd_center_code
+		FROM BD_BLOOD_UNITS_MAST 
+	WHERE UNIT_NO=:d_unit_no[h_no_of_rec]
+	and product_code=:d_product_code[h_no_of_rec];
+
+
+
+
+ sprintf(d_center_code[h_no_of_rec].arr,"%s", nd_center_code.arr);
+  d_center_code[h_no_of_rec].len = strlen(nd_center_code.arr);
+
+
+if(OERROR)
+	{
+		sprintf(string_var,"%s get_center_code-> %s\n", d_unit_no[h_no_of_rec].arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+
+ }
+
+
+get_product_barcode_msg()
+ {
+
+
+nd_prod_barcode_msg1.arr[0]='\0';
+nd_prod_barcode_msg1.len=0;
+
+
+EXEC SQL SELECT PRODUCT_BARCODE_MESS1,PRODUCT_BARCODE_MESS2,PRODUCT_BARCODE_CODE into :nd_prod_barcode_msg1,:nd_prod_barcode_msg2,:nd_product_barcode_value
+			  FROM BT_PRODUCT_MAST 
+			 //WHERE PRODUCT_CODE=:d_product_code[h_no_of_rec];
+			 WHERE PRODUCT_CODE=:d_fm_product_code;
+
+
+
+  sprintf(d_prod_barcode_msg1[h_no_of_rec].arr,"%s", nd_prod_barcode_msg1.arr);
+  d_prod_barcode_msg1[h_no_of_rec].len = strlen(nd_prod_barcode_msg1.arr);
+
+  sprintf(d_prod_barcode_msg2[h_no_of_rec].arr,"%s", nd_prod_barcode_msg2.arr);
+  d_prod_barcode_msg2[h_no_of_rec].len = strlen(nd_prod_barcode_msg2.arr);
+
+
+  sprintf(d_product_barcode_value[h_no_of_rec].arr,"%s", nd_product_barcode_value.arr);
+  d_product_barcode_value[h_no_of_rec].len = strlen(nd_product_barcode_value.arr);
+
+ if(OERROR)
+	{
+		sprintf(string_var,"%s get_center_code-> %s\n", d_unit_no[h_no_of_rec].arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+ 
+ }
+
+ get_donation_details()
+  {
+
+
+
+nd_donor_id.arr[0]='\0';
+nd_donor_id.len=0;
+
+
+nd_donation_process.arr[0]='\0';
+nd_donation_process.len=0;
+
+EXEC SQL 	 SELECT DONOR_ID,DONATION_PROCESS
+				 INTO :nd_donor_id,:nd_donation_process
+				 FROM BD_DONOR_Q_P_HDR
+				 WHERE UNIT_NO=:d_unit_no[h_no_of_rec] AND PRODUCT_CODE=:d_fm_product_code;         
+
+
+//fprintf(f2,"\nDONOR_ID = %s  DONATION_PROCESS=%s",nd_donor_id.arr,nd_donation_process.arr);
+
+nd_donor_id.arr[nd_donor_id.len]='\0';
+
+sprintf(d_donor_id[h_no_of_rec].arr,"%s", nd_donor_id.arr);
+d_donor_id[h_no_of_rec].len = strlen(nd_donor_id.arr);
+
+  sprintf(d_donation_process[h_no_of_rec].arr,"%s", nd_donation_process.arr);
+  d_donation_process[h_no_of_rec].len = strlen(nd_donation_process.arr);
+
+
+if(OERROR)
+	{
+		sprintf(string_var,"%s get_center_code-> %s\n", d_unit_no[h_no_of_rec].arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+  }
+
+
+
+
+//End Dhana
+
+
+
+get_facility_name()
+{
+	d_facility_name.arr[0]		= '\0';
+	d_facility_name.len		= 0;
+
+	EXEC SQL  SELECT facility_name
+	            INTO :d_facility_name
+	            FROM sm_facility_param
+               WHERE facility_id = :d_facility_id;
+
+	if(OERROR)
+	{
+		sprintf(string_var,"%s get_facility_name()-> %s\n", d_facility_id.arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+
+	d_facility_name.arr[d_facility_name.len]   = '\0';
+	d_facility_name.len = strlen(d_facility_name.arr);
+
+    if(NO_DATA_FOUND)
+    {
+      d_facility_name.arr[d_facility_name.len]   = '\0';
+      d_facility_name.len = strlen(d_facility_name.arr);
+    }
+}
+
+get_product_desc()
+{
+
+    d_store_instr_code.arr[0]		     = '\0';
+	d_store_instr_code.len		         = 0;
+
+    d_store_instr_desc_temp.arr[0]	     = '\0';
+	d_store_instr_desc_temp.len		     = 0;
+
+	d_product_desc[h_no_of_rec].arr[0]	 = '\0';
+	d_product_desc[h_no_of_rec].len		 = 0;
+
+	d_store_instr_desc[h_no_of_rec].arr[0]	 = '\0';
+	d_store_instr_desc[h_no_of_rec].len		 = 0;
+
+	strcpy(d_product_code_temp.arr, d_product_code[h_no_of_rec].arr);
+	d_product_code_temp.arr[strlen(d_product_code_temp.arr)]='\0';
+	d_product_code_temp.len = strlen(d_product_code_temp.arr);
+
+	EXEC SQL  SELECT store_instr_code, long_desc
+	            INTO :d_store_instr_code, :d_product_desc_temp
+	            FROM bt_product_mast
+               WHERE product_code = :d_product_code_temp;
+
+	//fprintf(f2,"\nstore_instr_code = %s long_desc=%s",d_store_instr_code.arr,d_product_desc_temp.arr);
+
+	if(OERROR)
+	{
+		sprintf(string_var,"%s get_product_desc()-> %s\n", d_fm_unit_no.arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+
+    if(NO_DATA_FOUND)
+    {
+      d_product_desc[h_no_of_rec].arr[d_product_desc[h_no_of_rec].len]   = '\0';
+      d_product_desc[h_no_of_rec].len = strlen(d_product_desc[h_no_of_rec].arr);
+    }
+
+	d_product_desc_temp.arr[d_product_desc_temp.len]   = '\0';
+	d_product_desc_temp.len = strlen(d_product_desc_temp.arr);
+
+	strcpy(d_product_desc[h_no_of_rec].arr, d_product_desc_temp.arr );
+    d_product_desc[h_no_of_rec].arr[strlen(d_product_desc[h_no_of_rec].arr)]   = '\0';
+    d_product_desc[h_no_of_rec].len = strlen(d_product_desc[h_no_of_rec].arr);
+
+    d_store_instr_code.arr[strlen(d_store_instr_code.arr)]   = '\0';
+    d_store_instr_code.len = strlen(d_store_instr_code.arr);
+
+	EXEC SQL  SELECT short_desc
+	            INTO :d_store_instr_desc_temp
+	            FROM bd_storage_instruction
+               WHERE store_instr_code = :d_store_instr_code;
+
+	if(OERROR)
+	{
+		sprintf(string_var,"%s get_product_desc()-> %s\n", d_fm_unit_no.arr, sqlca.sqlerrm.sqlerrmc);
+	}
+
+    if(NO_DATA_FOUND)
+    {
+      d_store_instr_desc_temp.arr[d_store_instr_desc_temp.len]   = '\0';
+      d_store_instr_desc_temp.len = strlen(d_store_instr_desc_temp.arr);
+    }
+
+    d_store_instr_desc_temp.arr[strlen(d_store_instr_desc_temp.arr)]   = '\0';
+    d_store_instr_desc_temp.len = strlen(d_store_instr_desc_temp.arr);
+
+	strcpy(d_store_instr_desc[h_no_of_rec].arr, d_store_instr_desc_temp.arr );
+    d_store_instr_desc[h_no_of_rec].arr[strlen(d_store_instr_desc[h_no_of_rec].arr)]   = '\0';
+    d_store_instr_desc[h_no_of_rec].len = strlen(d_store_instr_desc[h_no_of_rec].arr);
+
+}
+
+/**************************select transaction based or not ***************/
+get_trans_ind()
+{
+	
+	nd_trx_ind.arr[0]		= '\0';
+	nd_trx_ind.len		= 0;
+
+	EXEC SQL  SELECT NVL(TRANSACTION_BASED_YN, 'N')
+	            INTO :nd_trx_ind
+	            FROM sy_online_print_id
+               WHERE MODULE_ID = 'RL'
+   		         AND ONLINE_PRINT_NAME = :a_pgm_id;
+
+	if(OERROR)
+	{
+		sprintf(string_var,"%s get_trans_ind()-> %s\n", d_fm_unit_no.arr, sqlca.sqlerrm.sqlerrmc);
+		ins_message(ORA_MESG, string_var);
+	}
+
+	nd_trx_ind.arr[nd_trx_ind.len]   = '\0';
+
+    if(NO_DATA_FOUND)
+	  nd_trx_ind.arr[nd_trx_ind.len]   = '\0';
+		
+     if (strcmp(nd_trx_ind.arr, "Y") == 0)
+	 {
+		strcpy(nd_print_source_type.arr, nd_source_type.arr);
+		strcpy(nd_print_source.arr, nd_fm_source.arr);
+	 }
+	 else
+	 {
+        strcpy(nd_print_source_type.arr, "O");
+        strcpy(nd_print_source.arr, " ");
+	 }
+
+}
+
+call_main_report()
+{
+  call_print_label();
+}
+
+set_fonts()
+{
+
+	fprintf(f1,"%c&a0L",ESC);	/* This will make the left margin to reduce	 to 0 */
+	fprintf(f1,"%c&l0E\n",ESC);	/* This will make the top margin to reduce	 to 0 */
+	fprintf(f1,"%c&l12D",ESC);	/* This will make no. of lines per inch		 to 8 */
+}
+
+
+call_print_label()
+{
+  int v_i = 0;
+
+  //fprintf(f2,"enter print label");
+
+  
+   
+	for (v_i=0;v_i<h_no_of_rec;v_i++)
+   {  
+   //fprintf(f2,"enter in to for loop print label");   
+      print_isb_label(v_i);
+	}
+	
+
+ 	
+   
+  
+}
+
+
+/* print_bar_code (char *dat,int x,int y)
+ {
+
+    print_barcode(f1,dat, x, y, 40, 250,atoi(nd_printer_type.arr));
+    fprintf(f1,"\n");  
+
+//fprintf(f1,"%c%-s%c\n",2,dat,5);
+
+ } */
+
+
+
+
+
+
+
+
+
+
+print_isb_label(int position)
+{
+
+//Barcode
+
+ if ( ( f1 = fopen ( filename, "w" ) ) == NULL ) 
+    {	
+      ins_message(ERR_MESG,"Error in opening output file...\n");  
+    }
+
+ 
+    if (strcmp(nd_printer_type.arr,"3")!= 0)
+    {
+      fprintf(f1, "%cE", ESC);
+      set_fonts();
+    }
+
+
+
+
+//atoi(nd_printer_type.arr)
+
+nd_printer_type.arr[0]='3';
+nd_printer_type.arr[1]='\0';
+
+
+print_barcode(f1,d_unit_no[position].arr, 0, 0, 60, 250,atoi(nd_printer_type.arr));
+fprintf(f1,"\n"); 
+print_barcode(f1,d_bld_grp_rh_barcode[position].arr, 0,25,  60, 250,atoi(nd_printer_type.arr));
+fprintf(f1,"\n"); 
+
+fprintf(f1,"%-s\n",d_unit_no[position].arr);
+fprintf(f1,"%-s\n",d_bld_grp_rh_barcode[position].arr);
+
+
+ 
+
+
+
+ //Value
+ 
+
+
+
+ 
+ 
+
+ fprintf(f1,"%-s\n",d_center_code[position].arr);
+ fprintf(f1,"%-s\n",d_prod_barcode_msg1[position].arr);
+
+
+fprintf(f1,"%-s\n",d_blood_group[position].arr);
+ 
+
+ fprintf(f1,"%-s\n",d_donation_process[position].arr);
+
+fprintf(f1,"%-s\n",d_rhesus_code[position].arr);
+ 
+
+//Barcode
+
+//atoi(nd_printer_type.arr)
+
+print_barcode(f1,d_donor_id[position].arr,22,0,  60, 250,atoi(nd_printer_type.arr));
+fprintf(f1,"\n");
+
+ //fprintf(f1,"\nX%-sX",d_donor_id[position].arr,135,135);
+
+
+print_barcode(f1,d_expiry_date[position].arr, 22,25,  60, 250,atoi(nd_printer_type.arr));
+fprintf(f1,"\n");
+
+fprintf(f1,"%-s\n",d_donor_id[position].arr); 
+fprintf(f1,"%-s\n",d_expiry_date[position].arr); 
+
+//fprintf(f1,"\nX%-sX",d_expiry_date[position].arr);
+
+
+
+//Value
+
+
+
+
+
+
+ fprintf(f1,"%-s\n",d_product_barcode_value[position].arr);
+
+ fprintf(f1,"%s\n",d_prod_barcode_msg2[position].arr);
+
+ fclose(f1);
+print_barcode_label(1);
+ 
+
+
+}
+
+
+/******************* added on 28.07.2003 ********/
+get_printer_type()
+{
+
+	  strcpy(nd_printer_type.arr, "3");
+	  nd_printer_type.len = strlen(nd_printer_type.arr);
+
+	  EXEC SQL SELECT NVL(printer_type, '1')
+  	           INTO  :nd_printer_type
+  	           FROM   SY_ONLINE_PRINT_ID
+	           WHERE  module_id = 'RL'
+	           AND    online_print_name = :a_pgm_id; 
+
+        if(NO_DATA_FOUND)
+   		strcpy(nd_printer_type.arr, "3");
+		nd_printer_type.len = strlen(nd_printer_type.arr);
+  	  if(OERROR)
+   		strcpy(nd_printer_type.arr, "3");
+		nd_printer_type.len = strlen(nd_printer_type.arr);
+
+	  nd_printer_type.arr[nd_printer_type.len]  = '\0';
+	  nd_printer_type.len = 0;
+
+}
+
+print_unit_label(int v_ind)
+{
+
+	if (strcmp(nd_printer_type.arr,"3")!=0)	
+	  {
+	     print_barcode(f1,d_fm_unit_no.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));
+	     fprintf(f1,"\n");  
+	  }
+	else
+	 {
+	     print_barcode(f1, d_fm_unit_no.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));		
+	     fprintf(f1,"\n");
+	 }
+	fprintf(f1, "%-20s\n", d_fm_unit_no.arr);
+}
+
+print_unscreened_label(int v_ind)
+{
+
+	fprintf(f1, "%-13s", d_donation_date[v_ind].arr);
+	fprintf(f1, "%-s\n", d_product_desc[v_ind].arr);
+	sprintf(d_unit_barcode_value.arr,"%s %s ", d_unit_no[v_ind].arr, d_product_code[v_ind].arr);
+//	sprintf(d_unit_barcode_value.arr,"%s %s %d/%d", d_unit_no[v_ind].arr, d_product_code[v_ind].arr, v_ind+1, h_no_of_rec);
+
+	if (strcmp(nd_printer_type.arr,"3")!=0)	
+	  {
+	     print_barcode(f1,d_unit_barcode_value.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));
+	     fprintf(f1,"\n");  
+	  }
+	else
+	 {
+	     print_barcode(f1, d_unit_barcode_value.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));		
+	     fprintf(f1,"\n");
+	 }
+	fprintf(f1, "%-s\n", d_blood_group[v_ind].arr);
+	fprintf(f1, "%-s\n", d_rhesus_code[v_ind].arr);
+	fprintf(f1, "%-d\n", d_volume[v_ind]);
+	fprintf(f1, "%-s    ", d_unit_barcode_value.arr);
+	fprintf(f1, "%-s\n", "UNSCREENED");
+}
+
+print_screened_label(int v_ind)
+{
+
+	fprintf(f1, "%-s\n", d_facility_name.arr);
+	fprintf(f1, "%-s\n", d_product_desc[v_ind].arr);
+	fprintf(f1, "Storage   : %-s\n", d_store_instr_desc[v_ind].arr);
+	fprintf(f1, "Collected : %-s\n", d_donation_date[v_ind].arr);
+	fprintf(f1, "Expires   : %-s\n", d_expiry_date[v_ind].arr);
+//	fprintf(f1, "FOR FRACTIONATION\n");
+	fprintf(f1, "%-s\n", d_blood_group[v_ind].arr);
+	fprintf(f1, "%-d\n", d_volume[v_ind]);
+	fprintf(f1, "%-s\n", d_rhesus_code[v_ind].arr);
+	sprintf(d_unit_barcode_value.arr,"%s %s", d_unit_no[v_ind].arr, d_product_code[v_ind].arr);
+//	sprintf(d_unit_barcode_value.arr,"%s %s %d/%d", d_unit_no[v_ind].arr, d_product_code[v_ind].arr, v_ind+1, h_no_of_rec);
+	if (strcmp(nd_printer_type.arr,"3")!=0)	
+	  {
+	     print_barcode(f1,d_unit_barcode_value.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));
+	     fprintf(f1,"\n");  
+	  }
+	else
+	 {
+	     print_barcode(f1, d_unit_barcode_value.arr, 0, 0, 40, 250,atoi(nd_printer_type.arr));		
+	     fprintf(f1,"\n");
+	 }
+	fprintf(f1, "    %-s\n", d_unit_barcode_value.arr);
+	fprintf(f1, "    SCREENED");
+}
+
+
+/***************** Print BarCode Label ********************/
+print_barcode_label(int nolabel)
+ {
+    int i;
+    int WSPrintstatus;
+
+    for(i=0;i<nolabel;i++)
+		  {
+
+		 		if (nd_source_type.arr[0]	== '!')
+				{					
+
+					 WSPrintDocument 
+						   (
+							uid_pwd.arr,		//char	*PUidPwd;
+							nd_session_id.arr,	//char	*PSessionID;
+							d_facility_id.arr,	//char	*PFacilityID;
+							"RL",				//char	*PModuleID;
+							a_pgm_id.arr,			//char	*PDocumentID;
+							filename,	    	//char	*POnlinePrintFileNames;
+							"O",				//char	*PLocationTypes;
+							" ",				//char	*PLocationCodes;
+							1,			//int	PNumOfCopies;
+							1,				    //int	PPageFrom;
+							9999,				//int	PPageTo;
+							nd_ws_no.arr,		//char	*PWorkstationID
+							WORKING_DIR			//char	*PReportOutputDir
+						   );
+				}						   
+				else
+				{
+
+
+					WSPrintstatus =		 WSPrintDocument
+						   (
+							uid_pwd.arr,				//char	*PUidPwd;
+							nd_session_id.arr,			//char	*PSessionID;
+							d_facility_id.arr,			//char	*PFacilityID;
+							"RL",						//char	*PModuleID;
+							a_pgm_id.arr,					//char	*PDocumentID;
+							filename,	    			//char	*POnlinePrintFileNames;
+							nd_print_source_type.arr,	//char	*PLocationTypes;
+							nd_print_source.arr,	    //char	*PLocationCodes;
+							1,					//int	PNumOfCopies;
+							1,							//int	PPageFrom;
+							9999,						//int	PPageTo;
+							nd_ws_no.arr,				//char	*PWorkstationID
+							WORKING_DIR					//char	*PReportOutputDir
+						   );
+
+				}	  					   
+		  }
+ 
+ }
+
+
+/*--------------------------------------------------*/
+ins_message(int msg_type,char msg[])
+{
+   er_msg.arr[0] = '\0';
+   er_msg.len = 0;
+   
+   er_msg_type = 0;
+
+   strcpy(er_msg.arr,msg);
+   er_msg.len = strlen(er_msg.arr);
+ 
+   er_msg_type = msg_type;   
+
+
+   EXEC SQL
+
+   INSERT INTO SY_PROG_MSG
+         (OPERATING_FACILITY_ID,PGM_ID,MSG_TYPE,MSG_NUM,MSG_DESC,MSG_DATE_TIME,SESSION_ID,PGM_DATE)
+   VALUES 
+         (:nd_facility_id,'BTRLBISB',:er_msg_type,NULL, SUBSTR(:er_msg, 1, 70),SYSDATE,USERENV('sessionid'),TO_CHAR(SYSDATE,'DD/MM/YYYY'));
+
+   err_flag = 1;
+}
+

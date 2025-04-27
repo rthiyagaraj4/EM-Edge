@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>MPI_Trans_Change Patient Details_Patient Search</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Patient Search</h1>
+<p class="Italic">From this function you can <span style="color: #ff0000;"><font color="red" >Search</font></span> records of the patients by specifying desired search criteria.</p>
+<p class="Text">&#160;</p>
+<p class="Text">Based on the specified search conditions, records are displayed for selection. When the search function retrieves a single record, the control automatically returns back to the called function along with the retrieved data. If the search function retrieves more than one record, then these records are displayed in the result area. You can select the appropriate record. On selecting the required record, the search screen is closed and control shifts back to the called function. &#160;</p>
+<p class="Text">In MP parameter, if “Accept Patient Name in Local Language” is checked, then patient name is entered in local language as one of the search criteria. If “Maintain Family Link” is set in MP parameter, the Head patient Identifier is specified for searching the required patient. Based on the result formats specified in the function “Patient Search Result Format”, the retrieved details are displayed in the result area.</p>
+<h2>SEARCHING PATIENT RECORDS:</h2>
+<p class="From">From the MP Transactions&gt; select the Query function for any transactions.</p>
+<p class="Text">The Patient Search screen displays</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter at least one search criteria if not all and click <span style="font-weight: bold;"><b>[Search]</b></span> to display <span style="color: #0000ff;"><font color="blue" >
+<a class="dropspot" href="javascript:TextPopup(this)" style="font-size: 9pt; position: relative;" id="a3">patient records</a></font></span> according to the entered criteria. <span style="color: #0000ff; font-weight: bold;"><font color="blue" ><b>
+<a href="javascript:void(0);" style="text-decoration: none;" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('MPI_Trans_Change_Patient_Details.htm',400,300);return false;">&lt;Related Field Description&gt;</a></b></font></span></p>
+<div class="droptext" id="POPUP350570366" style="display: none;">
+<p class="BoldRFD">Patient Records</p>
+<ol type="1">
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Result Page</u></span> – The first set of 10 records are displayed initially. If more than 10 records are retrieved for the search criteria, then each set of 10 records is grouped and numbered. These numbers are hyperlinked. To view the records under a number, click on the hyperlink. The page numbers displayed on the screen is limited to 5 pages. Click on the numbers to view the details of patients in the respective pages.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Order By</u></span> - By default, Patient records are sorted and displayed in the ascending order of the value specified for the field 'Order By'. Using the column hyperlink, the user can further sort the result set. On clicking the column hyperlink, the displayed result set is sorted and displayed in the ascending order of the column. &#160;</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span class="UnderlineRFD"><font size="1" color="blue" style="font-size:8.000000pt;">+</font></span> - The '+' hyperlink is provided against each record. Click '+' to view the demographics of the patient.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Patient ID</u></span> – Click on the patient ID of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Color Coding</u></span> - Status of the patient is indicated by a unique color code. &#160;The user cannot access these records. The color-codes displayed are:</p>
+</li>
+</ol>
+<p style="font-size: 8pt; color: #0000ff;">&#160;<img src="../../image17.gif" style="border: none;" alt="image17.gif" width="36" height="12" border="0" />(Red) - Indicates the Patient is deceased.</p>
+<p style="font-size: 8pt; color: #0000ff;">&#160;<img src="../../image18.gif" style="border: none;" alt="image18.gif" width="37" height="12" border="0" />(Brown) - Indicates the Patient record is Inactive.</p>
+<p style="font-size: 8pt; color: #0000ff;">&#160;<img src="../../image19.gif" style="border: none;" alt="image19.gif" width="39" height="13" border="0" />(Grey) – Ind<span style="font-size: 8pt; color: #0000ff;"><font size="1" color="blue" style="font-size:8.000000pt;">icates Patient is suspended.</font></span></p>
+<ol start="6" type="1">
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Sex</u></span> – The gender of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Date of Birth</u></span> – The Date of Birth of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>National ID No</u></span>. – The National ID No. of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Alternate ID No.</u></span> – The Alternate ID No. of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Name Prefix</u></span> - The Name Prefix of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>First Name</u></span> - The First Name of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Second Name</u></span> - The Second Name of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Third Name</u></span> - The Third Name of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Family Name</u></span> - The Family Name of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Name Suffix</u></span> - The Name Suffix of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Nationality</u></span> - The Nationality of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>M. R No.</u></span> – The MR No. of the patient is displayed. Click Multiple MRNs hyperlink to view the Patient File Numbers of the Patient by invoking Patient File No dialog.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>MR Facility</u></span> – The MR Facility of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Old MR No.</u></span> - The Old MR No of the patient is displayed.</p>
+</li>
+<li style="font-size: 8pt; color: #0000ff;" class="p">
+<p style="font-size: 8pt; color: #0000ff;"><span style="text-decoration: underline;"><u>Registration Mode</u></span> – The registration mode of the patient is displayed.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','MP Parameter','../AdminSetup/MP_Parameter.htm','Patient Search Result Format','../AdminSetup/Patient_Search_Result_Format.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a3','POPUP350570366');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

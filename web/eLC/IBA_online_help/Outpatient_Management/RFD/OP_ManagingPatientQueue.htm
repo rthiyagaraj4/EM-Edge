@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OP_MPQ_ManagingPatientQueue</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="Text" style="color: #0000ff; font-size: 8pt; font-weight: bold;">Enter the following details to search the Patient Queue records, the following query criteria can be entered which are common for both Single and Multiple views:</p>
+<p class="Text">&#160;</p>
+<ol>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Date</u></span> - Displays the current date. It cannot be modified.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Start Time</u></span> - Displays ‘00:00’ as Start Time, which means that Patients who have registered from ‘00:00’ hours onwards for the current day will be displayed. It cannot be modified.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>View (single/multiple)</u></span> - Click on the appropriate radio button to select the view required.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>By Visit Type</u></span> - Click on the check box to group the Patient queue records based on Visit Type.</p>
+</li>
+</ol>
+<p class="Text" style="color: #0000ff; font-size: 8pt;">If the user has selected Single View, following additional query criteria can be specified to restrict the Patient records display:</p>
+<ol start="5">
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Patient ID</u></span> - Enter the Patient ID in alphanumeric format of maximum length as specified in MP Parameter.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Gender</u></span> – Select the required value for gender from the list box. The valid values are ‘Male’, ‘Female’ and ‘Unknown’.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Encounter ID</u></span> - Enter the Encounter ID in numeric format of 12 digits maximum length.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Queue No</u></span> - Enter the Queue Number in alphanumeric format of 6 characters maximum length.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Appt Status</u></span> - Select the required value for appointment status from the list box. The valid values are ‘Yet to come’, ‘On time’, ‘Late’ or ‘No show’.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;">&#160;<span style="text-decoration: underline;"><u>Location</u></span> - Select the Location type and Location from the list of valid values. The locations that are associated with the Operator Station are only displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;">&#160;<span style="text-decoration: underline;"><u>Practitioner</u></span> - Select the Practitioner using <span style="font-weight: bold;"><b>[?]</b></span> button. The practitioners who are associated with the displayed locations are only displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number" style="color: #0000ff; font-size: 8pt;"><span style="text-decoration: underline;"><u>Specialty</u></span> – Select the required specialty for which the visit records are to be displayed from the list of valid values.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

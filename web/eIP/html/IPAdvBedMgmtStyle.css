@@ -1,0 +1,425 @@
+/*
+	style sheet for IP Advanced Bed Management Transactions
+	Created By Sudhakar.
+*/
+
+body {
+	overflow:no;
+	margin:0px;
+	/*overflow:auto;
+	border:1px solid red;*/
+}
+.floorWrapper{
+	overflow:auto;
+	position:relative;	
+	background:#E2E2E2;
+}
+/*
+	foor which is set up in modal window. width and height of floor comes from DB(based on user set up).
+	Other properties can be changed.
+*/
+.floor{ 
+	padding:1px;				
+	border:0px solid silver;
+	/*background:#ffffff;*/				
+}
+/* css for room  div elements starts*/
+/*
+	roomcontainer left position,top position,height and width are user defined.
+*/
+.room{
+	position:absolute;/* should not be changed*/
+	margin:0px;
+	/*border-style:solid;
+	border-color:#276677;
+	background:#E4F0FE;*/
+	/*border-style:solid;
+	border:2px;
+	border-color:#276677;*/
+	font-family:arial; 
+	font-size:12px; 
+	/* color:#FFFFFF; */
+	border:1px;
+	border-style:solid;
+	border-color:#276677;
+}
+/*
+	roomheader displays room no and details like bed availability,bed occupied in numbers
+*/
+.roomheader{
+	height:20px;
+	font-size:10pt;
+	margin-bottom:1px;
+	background-color:#276677;	
+}
+/*
+	room is where actual beds are displaying
+*/
+.roombody{
+	position:relative;/* should not be changed*/
+}
+/* css for room   div elements  ends*/
+
+
+/* css for bed div elements starts*/
+
+/*
+	bed left position,top position,height,width and back ground color are user defined.
+*/
+.bed{
+	/*float:left;
+	height:60px;
+	width:120px;				
+	border:0px solid black;
+	text-align: center;
+	font-size:10pt;
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	border:1px solid black;*/
+	text-align: center;
+	border:0px solid black;
+	margin:1px;
+	position:absolute;
+}
+/*
+	bed header display bed no
+*/
+.bedheader{
+	height:8px;
+	float:left;
+	width:100%;	
+	font-size:7pt;
+	margin-bottom:3px;
+	font-weight:bold;
+}
+/*
+	details of patient id and patient name ,age and gender we are displaying.
+*/
+.bedbody{
+	top:15px;
+	height:20px;
+	width:100%;
+	float: left;
+}
+.bedfooter{
+	height:20px;
+	float:left;
+	width:100%;
+}
+/*
+	below style is used to display curved edges for beds as IE 8 doesn't support curved edegs without images.
+	height,width elements should not be changed.
+	starts
+*/
+
+
+.bedtop{
+	display:block; 
+	/*background:#FFFFFF;this back ground color is same as room color*/
+}
+
+.bedtopone{
+	/* margin: 0 5px; */
+	margin: 0 6px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+}
+
+.bedtoptwo{
+	/* margin: 0 3px; */
+	margin: 0 4px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+}
+.bedtopthree{
+	margin: 0 2px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+}
+.bedtopfour{
+	margin: 0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+}
+.bedtopfive{
+	margin: 0 1px;
+	display: block; 
+	height: 1px;
+	overflow: hidden;
+}
+
+.bedbottom{
+	float: left;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display:block;	
+	/*background:#FFFFFF;this back ground color is same as room color*/
+}
+
+.bedbottomone{
+	margin:0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+}
+
+.bedbottomtwo{
+	/* margin: 0 2px; */
+	margin: 0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+}
+.bedbottomthree{
+	/* margin: 0 3px; */
+	margin: 0 2px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+}
+.bedbottomfour{
+	/* margin: 0 5px; */
+	margin: 0 4px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+}
+.bedbottomfive{
+	/* margin: 0 5px; */
+	margin: 0 6px;
+	display: block; 
+	height: 1px;
+	overflow: hidden; 
+}
+/*
+	above style is used to display curved edges for beds as IE 8 doesn't support curved edegs without images.
+	height,width elements should not be changed.
+	ends
+*/
+/*style for bed patient id patient name details*/
+.bedrow {
+	text-align:left;
+	font-size:8pt;
+}
+.ipbedfutbkg{
+	height:15px;
+	float: left;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display:block;
+}
+.ipiconrow{
+	top:40px;
+	height:20px;
+	width:100%;
+	float: left;
+	/*background:#E4F0FE;*/
+}
+.ipicon {
+	height:100%;
+	width:20px;
+	float: left;
+	position: relative;
+	/*background:#E4F0FE;*/
+	background-repeat: no-repeat;
+}
+.bedrowpatid {
+	text-align:left;
+	font-size:8pt;
+	font-weight:bold;
+}
+.bedrowencid {
+	text-align:left;
+	font-size:8pt;
+	/*cursor:pointer;*/
+}
+/* css for tool tip*/
+/*
+	details like encounter id,patient name,practitioner name and other details display in tool tip
+	below properties can be changed.
+*/
+p{
+  COLOR:#F5F5FE;
+  FONT-SIZE: 10pt;
+  TEXT-ALIGN: LEFT;
+  PADDING-LEFT:7px;
+  PADDING-RIGHT:7px;
+}
+/* css for In Patient Operations applicable which are displayed in tool tip*/
+.IPOPRS{
+	height:25px;
+	background-color:#213737;
+	margin:1px;
+	cursor:pointer;
+	text-align: center;
+	color: #F5F5FE;
+}
+
+TABLE {
+   FONT-SIZE: smaller;
+   PADDING: 0;
+	border-style:none;
+}
+TD.labeltooltip
+{
+   COLOR:#FFFFFF;
+  FONT-SIZE:12px;
+  TEXT-ALIGN:LEFT;
+  PADDING-LEFT:7px;
+  PADDING-RIGHT:7px;
+  font-weight:bold;
+  font-family:"Arial";
+}
+
+TD.labeltooltipdata
+{
+   COLOR:#000000;
+  FONT-SIZE:12px;
+  TEXT-ALIGN:LEFT;
+  PADDING-LEFT:5px;
+  PADDING-RIGHT:5px;
+  font-weight:bold;
+  font-family:"Arial";
+}
+.trnsdiv{
+	background:#E0E0E0;
+}
+
+
+.bedWOHighlight{
+	text-align: center;
+	border:0px solid black;
+	margin:1px;
+	position:absolute;
+	
+}
+
+.bedWithHighlight{
+	text-align: center;
+	margin:1px;
+	position:absolute;
+	/* border-left:2px #004EFF solid;
+	border-right: 2px #004EFF solid; */
+}
+
+.bedhighlighttopone{
+	margin: 0 6px;
+	display: block;
+	height: 0px; 
+	overflow: hidden;
+	/* border-top: 1px solid #004EFF; */
+	border-top: 1px solid #000000;
+}
+
+.bedhighlighttoptwo{
+	margin: 0 4px;
+	display: block; 
+	height: 0px;
+	overflow: hidden; 
+	/* border-top: 1px solid #004EFF; */
+	border-top: 1px solid #000000;
+}
+.bedhighlighttopthree{
+	margin: 0 2px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+	/* border-left: 3px #004EFF solid; 
+	border-right: 3px #004EFF solid; */
+	border-left: 3px #000000 solid; 
+	border-right: 3px #000000 solid;
+}
+.bedhighlighttopfour{
+	margin: 0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+	/* border-left: 3px #004EFF solid; 
+	border-right: 3px #004EFF solid; */
+	border-left: 3px #000000 solid; 
+	border-right: 3px #000000 solid;
+}
+
+.bedhighlighttopfive{
+	margin: 0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden;
+	/* border-left: 1px #004EFF solid; 
+	border-right: 1px #004EFF solid; */
+	border-left: 1px #000000 solid; 
+	border-right: 1px #000000 solid;
+}
+
+.bedhighlightbottomone{
+	margin:0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+	/* border-left: 1px #004EFF solid; 
+	border-right: 1px #004EFF solid; */
+	border-left: 1px #000000 solid; 
+	border-right: 1px #000000 solid;
+}
+
+.bedhighlightbottomtwo{
+	/* margin: 0 2px; */
+	margin: 0 1px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+	/* border-left: 3px #004EFF solid; 
+	border-right: 3px #004EFF solid; */
+	border-left: 3px #000000 solid; 
+	border-right: 3px #000000 solid;
+}
+.bedhighlightbottomthree{
+	margin: 0 2px;
+	display: block; 
+	height: 1px; 
+	overflow: hidden; 
+	/* border-left: 3px #004EFF solid; 
+	border-right: 3px #004EFF solid; */
+	border-left: 3px #000000 solid; 
+	border-right: 3px #000000 solid;
+}
+.bedhighlightbottomfour{
+	/* margin: 0 5px; */
+	margin: 0 4px;
+	display: block; 
+	height: 0px; 
+	overflow: hidden; 
+	/* border-bottom: 1px #004EFF solid; */
+	border-bottom: 1px #000000 solid;
+}
+
+.bedhighlightbottomfive{
+	margin: 0 6px;
+	display: block; 
+	height: 0px;
+	overflow: hidden; 
+	/* border-bottom: 1px #004EFF solid; */
+	border-bottom: 1px #000000 solid;
+}
+
+.bedinnerdiv{
+	display: block;
+}
+
+.bedhighlightinnerdiv{
+	display: block;
+	/* border-left: 2px solid #004eff;
+	border-right: 2px solid #004eff; */
+	border-left: 2px solid #000000;
+	border-right: 2px solid #000000;
+}

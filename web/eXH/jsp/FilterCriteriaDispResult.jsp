@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html> 
+<%
+String sStyle = (session.getAttribute("PREFERRED_STYLE")!=null)?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+request.setCharacterEncoding("UTF-8");
+%> 
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp" %>
+
+<link rel='StyleSheet' href='../eCommon/html/<%=sStyle%>' type='text/css'></link>
+<head>
+<script Language="JavaScript"  src="../eCommon/js/ValidateControl.js" ></script> 
+<script src='../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+<script language="JavaScript">
+function initFunc()
+{
+	parent.frames[3].document.location.reload();
+}
+
+</script>
+
+											   
+</head>
+<BODY CLASS="MESSAGE" onMouseDown="CodeArrest()" onKeyDown ='lockKey()' onLoad="initFunc()">
+<form>
+<p align="left">																					    
+${param.stMessage}
+</p>	
+</form>
+</BODY>															  
+</html>																						 		 
+

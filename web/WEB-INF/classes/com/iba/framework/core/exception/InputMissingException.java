@@ -1,0 +1,35 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+/**
+ * Created on Sep 8, 2006
+ */
+package com.iba.framework.core.exception;
+
+/**
+ * @author Sabarinathan S
+ * @version
+ */
+public class InputMissingException extends SystemException {
+	public InputMissingException(String code) {
+		super(code);
+	}
+
+	public InputMissingException(String code, Throwable cause) {
+		super(code, cause);
+	}
+
+	public InputMissingException(String code, String exceptionMessage) {
+		super(code, exceptionMessage);
+	}
+
+	public InputMissingException(String code, String exceptionMessage,
+			Throwable cause) {
+		super(code, exceptionMessage, cause);
+	}
+}

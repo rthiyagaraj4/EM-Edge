@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BillTypes_InterfaceToGL</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Interface to GL</h1>
+<p class="BoldRFD" style="font-weight: normal;">The GL Interface code serves as a link between the Patient Billing Manager module and the General Ledger module. The Bill Type has to be interfaced to the General Ledger module for the transaction to take place.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD">Enter the following details to interface a Bill Type to the GL codes:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Type</span> - The selected Bill Type appears automatically when the Bill Type is defined under the Bill Type tab.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Control A/C Codes for</p>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill</span> - Click [<span class="BoldNumberRFD">List of Values]</span> to view and to select a valid GL Interface code. The values beginning with 'R' only gets listed. 'R' indicates that the account code is a receivable account. The posting account defined against this GL interface code is debited while posting billing charges to General Ledger module. The selected posting account is credited while settling the bill or transferring the bill to Accounts Receivable module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">A/R</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to view and to select a valid GL Interface code. The values beginning with 'R' only get listed. 'R' indicates that the account code is a receivable account. The posting account defined against this GL interface code is debited while transferring the deferred patient's bill from Billing to Credit Management module and the Billing Receivable control account will be credited.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DCP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to view and to select a valid GL Interface code. The GL Interface code signifies the Billing Receivable Control Account for Deferred Cash Patients "R" indicates that it is a receivable account. The posting account defined against this GL interface code is debited while transferring the Cash patient's bill from Billing to Deferred Cash Patient and the Billing Receivable control account is credited.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Rounding</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to view and to select a valid GL Interface code. The Control Account signifies the bill rounding. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Discount Account. The values defined in the General Ledger module get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Adjustment Account. The values defined in the General Ledger module get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exemption</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Exemption Account. The values defined in the General Ledger module get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Write-Off</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Write-Off account. The values defined in the General Ledger module get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. From Date</span> – Click Calendar function to select a date. The date signifies the day from when the GL interface codes are effective for the bill type. The date selected has to be greater than the system date and should not overlap with the existing definitions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. To Date</span> - Enter the date until when the GL Interface code is effective for the bill type. The date entered has to be greater than the effective from date.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Control Account Descriptions for</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The description for all the control accounts appears in the appropriate text box when the Control codes are set.</span></p>
+<p>&#160;</p>
+<p class="BoldRFD">Control A/C by Payers</p>
+<p class="BoldRFD" style="font-weight: normal;">You have to associate Control Accounts to individual Payers.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<ol start="12">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Payer. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Name</span> – The description for the selected Payer gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to associate a Discount accounting code to the Payer. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to associate an Adjustment code to the Payer. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exemption</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to associate a valid Exemption code to the Payer. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Write Off</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to associate a valid Write-Off accounting code to the Payer. This is a mandatory field.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Control A/C Description</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The description for the selected Control Accounts associated with to Payers gets displayed.</span></p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

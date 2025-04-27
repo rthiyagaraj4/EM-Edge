@@ -1,0 +1,966 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File	         : rlrupdwk.pc
+   Author        : Sheelvant   
+   Date Created  : 07/03/1998
+   Last Modified : 07/03/1998
+
+*  Ver 1.10.01
+   
+*  Purpose : To Update Numeric Result of all the test that are in
+	     WORKLIST DETAIL from RL_TEST_RESULT Table. Called from
+	     Form rltreswl before calling result entry by specimen form
+            
+*  Input Parameters :  
+                      Command line inputs
+		              1. Usr_id/Password
+                      2. Session id
+		              3. Program Date
+
+                      Parameters from SY_PROG_PARAM table 
+                      4. Section Code                                   
+                      5. Worklist_name                                  
+                      6. Worklist Number                                
+                      7. Worklist Date                                  
+  
+*  Table Accessed : RL_WORKLIST_FMT_DTL,RL_TEST_RESULT,
+		    RL_WORKLIST_DTL
+
+*****************************************************************************/  
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "gl.h"
+
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define INIT_MESG "Fetching Worklist..."
+#define VER  "VER : 1.10.01\n"
+#define ONLINE_PRINTING 1
+    
+/*
+#define DEBUG 
+*/
+
+    
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+       /* increased the length all varchar variables by one to take care */
+       /* for null termination */
+	VARCHAR   nd_operating_facility_id     [3],
+	          uid_pwd                      [91],
+
+        /* from RL_WORKLIST_FMT_DTL */
+		d_worklist_test_code	[11],
+
+        /* from RL_WORKLIST_DTL */
+		d_specimen_no    	[21],
+		d_patient_id    	[21],
+        d_req_test_yn       [26],
+		d_rowid           	[61],
+
+
+            /* from RL_TEST_RESULT */     
+		d_num_result            [16],
+		d_res_comment           [6],
+
+            /* from RL_QC_MATERIAL_TEST */
+		d_qc_test_code		[11],
+
+                /* Dummy Variable */     
+	        d_req_test_code  	[11],
+	        d_numeric_result_1      [16],
+	        d_numeric_result_2      [16],
+	        d_numeric_result_3      [16],
+	        d_numeric_result_4      [16],
+	        d_numeric_result_5      [16],
+	        d_numeric_result_6      [16],
+	        d_numeric_result_7      [16],
+	        d_numeric_result_8      [16],
+	        d_numeric_result_9      [16],
+	        d_numeric_result_10     [16],
+	        d_numeric_result_11     [16],
+	        d_numeric_result_12     [16],
+	        d_numeric_result_13     [16],
+	        d_numeric_result_14     [16],
+	        d_numeric_result_15     [16],
+	        d_numeric_result_16     [16],
+	        d_numeric_result_17     [16],
+	        d_numeric_result_18     [16],
+	        d_numeric_result_19     [16],
+	        d_numeric_result_20     [16],
+	        d_numeric_result_21     [16],
+	        d_numeric_result_22     [16],
+	        d_numeric_result_23     [16],
+	        d_numeric_result_24     [16],
+	        d_numeric_result_25     [16],
+
+		
+		/* input parameters to main() */
+        nd_session_id  [21],
+		nd_pgm_date	   [20],
+
+		/******** parameters from SY_PROG_PARAM table ***********/
+		nd_section_code    	[2],
+		nd_worklist_name   	[11],
+		nd_worklist_date   	[11],
+
+               /* variable for cursor */
+		nd_cur_specimen_no      [21],
+		nd_cur_patient_id       [21],
+
+	       /* for header routine */
+	       //d_acc_entity_name         [41],
+			d_acc_entity_name         [300],
+	       d_user                    [31],
+	       d_sysdate                 [20],
+		   d_test_code				 [15];
+
+/* Fields from table SY_PROG_PARAM*/                          
+int  		nd_worklist_no;
+
+/* Fields from table RL_WORKLIST_FMT_DTL */                          
+int  		d_seq_no;                                       
+
+/* Fields from table RL_WORKLIST_DTL */                          
+int			v_count = 0;
+int  		d_cup_no;                                       
+char 		d_cup_ind, d_num_prefix,d_result_status;
+  
+/* Fields from table RL_TEST_CODE */                          
+char 		d_num_result_yn;          
+  
+/* Dummy Fields  */                                                  
+int  		ic,no_of_test;                                       
+int  		line_no,page_no;                                       
+char 		cup_ind;                                  
+char		nd_qc_code;
+
+char      num_prefix[30];
+char      result_status[30];
+char      num_result[30][16];
+
+int l_count = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int       rec_inserted;
+int       specimen_over;
+char      worklist_test[26][11];
+char	  string_var[300];
+//char      g_facility_id[50];
+
+/*FILE *f1;*/
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+  void  get_params(),
+  	get_header_dtls(),
+        dclr_worklist_dtl_cur(),
+  	dclr_wrklst_specimen_cur(),
+        dclr_qc_matl_test_cur(),
+  	do_report();
+ 
+   if(argc < 4) {
+     disp_message(ERR_MESG,"Usage rlrupdwk uid/passwd session_id pgm_date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+   //strcpy(g_facility_id, ' ');
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+   
+   set_meduser_role();
+
+   get_params();
+
+   dclr_worklist_dtl_cur();
+   dclr_wrklst_specimen_cur();
+
+   /*dclr_qc_matl_test_cur();*/
+   
+   get_header_dtls();
+
+   do_report();
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK RELEASE;
+
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}   
+
+
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+           PARAM1,
+		   PARAM2,
+		   PARAM3,
+		   PARAM4
+            INTO 
+		:nd_operating_facility_id,
+		:nd_section_code ,  
+		:nd_worklist_name,  
+		:nd_worklist_no  ,
+		:nd_worklist_date
+        FROM SY_PROG_PARAM
+	    WHERE   PGM_ID = 'RLRUPDWK'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+
+  nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+  nd_section_code.arr[nd_section_code.len] 			    = '\0';
+  nd_worklist_name.arr[nd_worklist_name.len] 			= '\0';
+  nd_worklist_date.arr[nd_worklist_date.len] 			= '\0';
+
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE SY_PROG_PARAM
+	   WHERE PGM_ID = 'RLRUPDWK'
+	         AND SESSION_ID = :nd_session_id
+		 AND PGM_DATE = :nd_pgm_date;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit();
+}
+ 
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(LPAD(ACC_ENTITY_NAME,
+	   TRUNC(15 + 0.5*LENGTH(ACC_ENTITY_NAME))),1,30),
+	   USER,
+	   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+       INTO :d_acc_entity_name,
+	   :d_user,
+	   :d_sysdate
+         FROM SY_ACC_ENTITY
+         WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;  
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+ 
+
+/* function declares cursor RL_WORKLIST_FMT_DTL */
+void dclr_worklist_dtl_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE WORKLIST_DTL_CUR CURSOR FOR
+         SELECT TEST_CODE,              
+         	SEQ_NO
+         FROM   RL_WORKLIST_FMT_DTL                        
+         WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 AND SECTION_CODE = :nd_section_code
+	     AND WORKLIST_NAME = :nd_worklist_name              
+         ORDER BY SEQ_NO ;                                     
+
+
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_worklist_dtl_cur() occured....\n");
+   proc_exit();
+}
+
+/* function declares cursor RL_WORKLIST_DTL */
+void dclr_wrklst_specimen_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE WRKLST_SPECIMEN_CUR CURSOR FOR
+         SELECT WORKLIST_CUP_NO,
+		WORKLIST_CUP_INDICATOR,
+		SPECIMEN_NO,
+            PATIENT_ID,               
+	    	NVL(TEST_1_YN,' ')||
+	    	NVL(TEST_2_YN,' ')||
+	    	NVL(TEST_3_YN,' ')||
+	    	NVL(TEST_4_YN,' ')||
+	    	NVL(TEST_5_YN,' ')||
+	    	NVL(TEST_6_YN,' ')||
+	    	NVL(TEST_7_YN,' ')||
+	    	NVL(TEST_8_YN,' ')||
+	    	NVL(TEST_9_YN,' ')||
+	    	NVL(TEST_10_YN,' ')||
+	    	NVL(TEST_11_YN,' ')||
+	    	NVL(TEST_12_YN,' ')||
+	   	    NVL(TEST_13_YN,' ')||
+	    	NVL(TEST_14_YN,' ')||
+	   	    NVL(TEST_15_YN,' ')||
+	    	NVL(TEST_16_YN,' ')||
+	    	NVL(TEST_17_YN,' ')||
+	    	NVL(TEST_18_YN,' ')||
+	    	NVL(TEST_19_YN,' ')||
+	   	    NVL(TEST_20_YN,' ')||
+	    	NVL(TEST_21_YN,' ')||
+	    	NVL(TEST_22_YN,' ')||
+	  	    NVL(TEST_23_YN,' ')||
+	    	NVL(TEST_24_YN,' ')||
+	    	NVL(TEST_25_YN,' ') 
+         FROM   RL_WORKLIST_DTL                        
+         WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 AND SECTION_CODE  = :nd_section_code 
+		 AND WORKLIST_NAME = :nd_worklist_name 
+		 AND WORKLIST_NO   = :nd_worklist_no 
+		 AND WORKLIST_DATE = TO_DATE(:nd_worklist_date,'DD/MM/YYYY')
+         ORDER BY WORKLIST_CUP_NO;                             
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_worklist_specimen_cur() occured....\n");
+   proc_exit();
+}
+
+
+
+/* function declares cursor RL_QC_MATERIAL_TEST */
+void dclr_qc_matl_test_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE QC_MATRL_TST_CUR CURSOR FOR
+      SELECT TEST_CODE              
+      FROM   RL_TEST_code                        
+      WHERE  TEST_CODE       = :nd_qc_code  ;          
+
+   /*  Done in Do Report   */
+   /*EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN TRN_ITEMS_CUR; */
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_qc_dtl_cur() occured....\n");
+   proc_exit();
+}
+
+
+/* prints the master-detail record until the cursor is empty */
+void do_report()
+{
+  void open_wrklst_dtl_cursor();
+  void open_wrklst_specimen_cursor();
+  void open_qc_matrl_cursor();
+  void close_qc_matrl_cursor();
+  void initialize_worklist_array();
+  void initialize_wrklst_specm_array();
+  void get_result_dtls();
+  void get_test_details();
+  void upd_worklist_dtl();
+  int fetch_wrklst_specimen_cur();
+  int fetch_worklist_dtl_cur();
+  int fetch_qc_matrl_cur();
+  int still_wrk_test_left;
+  int still_qc_left;
+  int still_wrk_specimen_left;
+  int rec_no;
+
+    initialize_worklist_array();
+	initialize_wrklst_specm_array();
+
+    open_wrklst_dtl_cursor();
+    open_wrklst_specimen_cursor();
+
+    still_wrk_test_left = fetch_worklist_dtl_cur();
+
+    no_of_test=0;
+    while(still_wrk_test_left)    /* Worklist Test Details */
+    {
+      no_of_test+=1;
+      strcpy(worklist_test[d_seq_no-1],d_worklist_test_code.arr);
+  
+	
+      still_wrk_test_left = fetch_worklist_dtl_cur();
+    }
+
+  
+    rec_inserted=1;
+    specimen_over=1;
+    still_wrk_specimen_left = fetch_wrklst_specimen_cur();
+
+
+    while (still_wrk_specimen_left)
+	{
+      /* Check whether it is patient specimen or QC */
+      if (d_cup_ind == 'P')
+      {
+	if(d_specimen_no.len != 0)
+	{
+         for (ic=0;ic<no_of_test;ic++)
+         {
+	   if (d_req_test_yn.arr[ic] == '\0') 
+	      break;
+           else
+	   {
+		 
+
+// Newly added on 20/11/2002 to refresh the worklist 
+//if the test is added from any other function
+		 if (d_req_test_yn.arr[ic] == 'N') 
+		 {
+			d_test_code.arr[0]			= '\0';
+			d_test_code.len				= 0;
+
+			strcpy(d_test_code.arr, worklist_test[ic]);
+			d_test_code.len = strlen(d_test_code.arr);
+
+			check_test_ordered_yn();
+		 }
+// Upto here Newly added on 20/11/2002 to refresh the worklist 
+//if the test is added from any other function
+
+		
+	     if (d_req_test_yn.arr[ic] != 'N') 
+	     {
+
+               strcpy(d_req_test_code.arr, worklist_test[ic]);
+               d_req_test_code.len = strlen(d_req_test_code.arr);
+
+              
+	       get_test_details();
+ 
+ /* Initialising so that the old values are not carried */
+                 d_num_result.arr[0]    = '\0';
+                 d_res_comment.arr[0]   = '\0';
+                 d_num_result.len       = 0;
+                 d_res_comment.len      = 0;
+
+               get_result_dtls();
+
+	       if (d_num_result_yn == 'Y')
+	       {
+				if (strlen(d_num_result.arr)) 
+			    {
+					num_prefix[ic]=d_num_prefix;
+					strcpy(num_result[ic],d_num_result.arr);
+                 }
+		//		else
+		//		{
+		//			num_prefix[ic]=' ';
+		//			strcpy(num_result[ic],d_res_comment.arr);
+        //        }
+           }
+// comment is removed on 20/11/2002
+/********** changed on 05/09/2002 for worklist all result components
+	now the result comment will be in different field */
+	       else
+	       {
+	         num_prefix[ic]=' ';
+	         strcpy(num_result[ic],d_res_comment.arr);
+           }
+/********** upto here added on 05/09/2002 *****************/
+
+	       result_status[ic]=d_result_status;
+
+   	     }
+	     else
+	     {
+	       num_prefix[ic]=' ';
+	       result_status[ic]= 'N';
+	       strcpy(num_result[ic],"     ");
+   	     }
+   	   }
+   	 }
+	 upd_worklist_dtl();
+        }
+      }
+      initialize_wrklst_specm_array();
+      still_wrk_specimen_left = fetch_wrklst_specimen_cur();
+   } 
+}
+
+
+
+/*This Procedure to open Worklist Cursor */
+void open_wrklst_dtl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN WORKLIST_DTL_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error while Opening work list dtl cur occured...\n");
+  proc_exit();
+}
+
+
+/*This Procedure to open worklist Specimen Cursor */ 
+void open_wrklst_specimen_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN WRKLST_SPECIMEN_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error while Opening Wrklst Specimen Cur() occured....\n");
+  proc_exit();
+}
+
+
+
+/*This Procedure to open QC Material Test Cursor */
+void open_qc_matrl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN QC_MATRL_TST_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error while Opening QC Matrl Cur() occured....\n");
+  proc_exit();
+}
+
+
+/*This Procedure to Close QC Material Test Cursor */
+void close_qc_matrl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CLOSE QC_MATRL_TST_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error while Close QC Matrl Cur() occured....\n");
+  proc_exit();
+}
+
+
+/* fetches the next record from CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_worklist_dtl_cur()
+{
+
+  d_worklist_test_code.arr[0]                                   = '\0';
+  d_worklist_test_code.len                                      = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH WORKLIST_DTL_CUR INTO
+		:d_worklist_test_code,  
+		:d_seq_no ;
+
+  if (NODATAFOUND)
+    return 0;
+
+
+  d_worklist_test_code.arr[d_worklist_test_code .len]		= '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_wrklst_dtl_cur() occured....\n");
+   proc_exit();
+
+}
+
+/* fetches the next record from CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_wrklst_specimen_cur()
+{
+
+  d_specimen_no.arr[0]		 			= '\0';
+  d_patient_id.arr[0]		 			= '\0';
+  d_req_test_yn.arr[0]		 			= '\0';
+
+  d_specimen_no.len		 			= 0;
+  d_patient_id.len                		    	= 0;
+  d_req_test_yn.len                		    	= 0;
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH WRKLST_SPECIMEN_CUR INTO
+		:d_cup_no,       
+		:d_cup_ind,       
+		:d_specimen_no,  
+		:d_patient_id,
+		:d_req_test_yn;
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_specimen_no.arr[d_specimen_no.len]			= '\0';
+  d_patient_id.arr[d_patient_id.len]			= '\0';
+  d_req_test_yn.arr[d_req_test_yn.len]			= '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_wrklst_specimen_cur() occured....\n");
+   proc_exit();
+
+}
+
+
+
+/* fetches the next record from QC Material Test CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_qc_matrl_cur()
+{
+
+  d_qc_test_code.arr[0]	 			= '\0';
+
+  d_qc_test_code.len                            = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH QC_MATRL_TST_CUR INTO
+		:d_qc_test_code;
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_qc_test_code.arr[d_qc_test_code .len]	 		= '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_qc_matrl_cur() occured....\n");
+   proc_exit();
+
+}
+
+
+/* get the numeric prefix and numeric result for the test code */
+/* from RL_TEST_RESULT */
+void get_result_dtls()
+{
+  d_num_result.arr[0]		 			= '\0';
+  d_res_comment.arr[0]		 			= '\0';
+  
+
+  d_num_result.len	       	                        = 0;
+  d_res_comment.len	       	                        = 0;
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT NUMERIC_PREFIX,                
+		   NUMERIC_RESULT, 
+		   RESULT_COMMENT_CODE1,
+		   STATUS
+	    INTO   :d_num_prefix,       
+		   :d_num_result,
+		   :d_res_comment ,
+		   :d_result_status
+            FROM   RL_TEST_RESULT 
+	    WHERE PATIENT_ID  = :d_patient_id and
+		  SPECIMEN_NO = :d_specimen_no
+          AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  AND TEST_CODE   = :d_req_test_code;
+
+  d_num_result.arr[d_num_result.len] 		= '\0';
+  d_res_comment.arr[d_res_comment.len] 		= '\0';
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_result_dtls() occured....\n");
+   proc_exit();
+}
+ 
+
+
+/* get NUMERIC_RESULT_YN  from RL_TEST_CODE  */
+void get_test_details()
+{
+   d_num_result_yn=' ';
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT NUMERIC_RESULT_YN              
+	        INTO   :d_num_result_yn     
+            FROM   RL_TEST_CODE   
+	        WHERE  TEST_CODE   = :d_req_test_code;
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_test_details() occured....\n");
+   proc_exit();
+}
+ 
+
+
+
+/* to initialize worklist array with some default value */
+void initialize_worklist_array()
+{
+  int    i;
+
+  for (i=0;i<25;i++)
+  {
+    strcpy(worklist_test[i], "     ");
+  }
+
+}
+
+
+/* to initialize worklist specimen_array with some default value */
+void initialize_wrklst_specm_array()
+{
+  int    i;
+
+  for (i=0;i<25;i++)
+  {
+    strcpy(num_result[i], "     ");
+    num_prefix[i]=' ';
+    result_status[i]=' ';
+  }
+
+}
+
+
+/* UPDATE RL_WORKLIST_DTL */
+void upd_worklist_dtl()    
+{
+  strcpy(d_numeric_result_1.arr,num_result[0]);
+  d_numeric_result_1.len= strlen(d_numeric_result_1.arr);
+  strcpy(d_numeric_result_2.arr,num_result[1]);
+  d_numeric_result_2.len= strlen(d_numeric_result_2.arr) ;
+  strcpy(d_numeric_result_3.arr,num_result[2]);
+  d_numeric_result_3.len = strlen(d_numeric_result_3.arr) ;
+  strcpy(d_numeric_result_4.arr,num_result[3]);
+  d_numeric_result_4.len = strlen(d_numeric_result_4.arr) ;
+  strcpy(d_numeric_result_5.arr,num_result[4]);
+  d_numeric_result_5.len = strlen(d_numeric_result_5.arr) ;
+  strcpy(d_numeric_result_6.arr,num_result[5]);
+  d_numeric_result_6.len = strlen(d_numeric_result_6.arr) ;
+  strcpy(d_numeric_result_7.arr,num_result[6]);
+  d_numeric_result_7.len = strlen(d_numeric_result_7.arr) ;
+  strcpy(d_numeric_result_8.arr,num_result[7]);
+  d_numeric_result_8.len = strlen(d_numeric_result_8.arr) ;
+  strcpy(d_numeric_result_9.arr,num_result[8]);
+  d_numeric_result_9.len = strlen(d_numeric_result_9.arr) ;
+  strcpy(d_numeric_result_10.arr,num_result[9]);
+  d_numeric_result_10.len = strlen(d_numeric_result_10.arr) ;
+  strcpy(d_numeric_result_11.arr,num_result[10]);
+  d_numeric_result_11.len = strlen(d_numeric_result_11.arr) ;
+  strcpy(d_numeric_result_12.arr,num_result[11]);
+  d_numeric_result_12.len = strlen(d_numeric_result_12.arr) ;
+  strcpy(d_numeric_result_13.arr,num_result[12]);
+  d_numeric_result_13.len = strlen(d_numeric_result_13.arr) ;
+  strcpy(d_numeric_result_14.arr,num_result[13]);
+  d_numeric_result_14.len = strlen(d_numeric_result_14.arr) ;
+  strcpy(d_numeric_result_15.arr,num_result[14]);
+  d_numeric_result_15.len = strlen(d_numeric_result_15.arr) ;
+  strcpy(d_numeric_result_16.arr,num_result[15]);
+  d_numeric_result_16.len = strlen(d_numeric_result_16.arr) ;
+  strcpy(d_numeric_result_17.arr,num_result[16]);
+  d_numeric_result_17.len = strlen(d_numeric_result_17.arr) ;
+  strcpy(d_numeric_result_18.arr,num_result[17]);
+  d_numeric_result_18.len = strlen(d_numeric_result_18.arr) ;
+  strcpy(d_numeric_result_19.arr,num_result[18]);
+  d_numeric_result_19.len = strlen(d_numeric_result_19.arr) ;
+  strcpy(d_numeric_result_20.arr,num_result[19]);
+  d_numeric_result_20.len = strlen(d_numeric_result_20.arr) ;
+  strcpy(d_numeric_result_21.arr,num_result[20]);
+  d_numeric_result_21.len = strlen(d_numeric_result_21.arr) ;
+  strcpy(d_numeric_result_22.arr,num_result[21]);
+  d_numeric_result_22.len = strlen(d_numeric_result_22.arr) ;
+  strcpy(d_numeric_result_23.arr,num_result[22]);
+  d_numeric_result_23.len = strlen(d_numeric_result_23.arr) ;
+  strcpy(d_numeric_result_24.arr,num_result[23]);
+  d_numeric_result_24.len = strlen(d_numeric_result_24.arr) ;
+  strcpy(d_numeric_result_25.arr,num_result[24]);
+  d_numeric_result_25.len = strlen(d_numeric_result_25.arr) ;
+
+  EXEC SQL WHENEVER SQLERROR GO TO err_exit;
+  EXEC SQL SELECT rowid into :d_rowid   
+	       FROM RL_WORKLIST_DTL
+           WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id
+		   AND SECTION_CODE  = :nd_section_code AND
+		   WORKLIST_NAME = :nd_worklist_name AND
+	  	   WORKLIST_NO   = :nd_worklist_no AND
+           WORKLIST_DATE = TO_DATE(:nd_worklist_date,'DD/MM/YYYY') AND
+		   WORKLIST_CUP_NO = :d_cup_no  AND
+		   SPECIMEN_NO   = :d_specimen_no
+           FOR UPDATE OF NUMERIC_1_PREFIX NOWAIT;
+
+		  d_rowid.arr[d_rowid.len] = '\0';
+
+
+  EXEC SQL WHENEVER SQLERROR GO TO err_exit;
+
+  EXEC SQL UPDATE RL_WORKLIST_DTL         
+	   SET NUMERIC_1_PREFIX = substr(:num_prefix,1,1),
+	       NUMERIC_1_RESULT = :d_numeric_result_1,    
+	       TEST_1_YN        = substr(:result_status,1,1),
+	       NUMERIC_2_PREFIX = substr(:num_prefix,2,1),
+	       NUMERIC_2_RESULT = :d_numeric_result_2,    
+	       TEST_2_YN        = substr(:result_status,2,1),
+	       NUMERIC_3_PREFIX = substr(:num_prefix,3,1),
+	       NUMERIC_3_RESULT = :d_numeric_result_3,    
+	       TEST_3_YN        = substr(:result_status,3,1),
+	       NUMERIC_4_PREFIX = substr(:num_prefix,4,1),
+	       NUMERIC_4_RESULT = :d_numeric_result_4,    
+	       TEST_4_YN        = substr(:result_status,4,1),
+	       NUMERIC_5_PREFIX = substr(:num_prefix,5,1),
+	       NUMERIC_5_RESULT = :d_numeric_result_5,    
+	       TEST_5_YN        = substr(:result_status,5,1),
+	       NUMERIC_6_PREFIX = substr(:num_prefix,6,1),
+	       NUMERIC_6_RESULT = :d_numeric_result_6,    
+	       TEST_6_YN        = substr(:result_status,6,1),
+	       NUMERIC_7_PREFIX = substr(:num_prefix,7,1),
+	       NUMERIC_7_RESULT = :d_numeric_result_7,    
+	       TEST_7_YN        = substr(:result_status,7,1),
+	       NUMERIC_8_PREFIX = substr(:num_prefix,8,1),
+	       NUMERIC_8_RESULT = :d_numeric_result_8,    
+	       TEST_8_YN        = substr(:result_status,8,1),
+	       NUMERIC_9_PREFIX = substr(:num_prefix,9,1),
+	       NUMERIC_9_RESULT = :d_numeric_result_9,    
+	       TEST_9_YN        = substr(:result_status,9,1),
+	       NUMERIC_10_PREFIX = substr(:num_prefix,10,1),
+	       NUMERIC_10_RESULT = :d_numeric_result_10,    
+	       TEST_10_YN        = substr(:result_status,10,1),
+	       NUMERIC_11_PREFIX = substr(:num_prefix,11,1),
+	       NUMERIC_11_RESULT = :d_numeric_result_11,    
+	       TEST_11_YN        = substr(:result_status,11,1),
+	       NUMERIC_12_PREFIX = substr(:num_prefix,12,1),
+	       NUMERIC_12_RESULT = :d_numeric_result_12,    
+	       TEST_12_YN        = substr(:result_status,12,1),
+	       NUMERIC_13_PREFIX = substr(:num_prefix,13,1),
+	       NUMERIC_13_RESULT = :d_numeric_result_13,    
+	       TEST_13_YN        = substr(:result_status,13,1),
+	       NUMERIC_14_PREFIX = substr(:num_prefix,14,1),
+	       NUMERIC_14_RESULT = :d_numeric_result_14,    
+	       TEST_14_YN        = substr(:result_status,14,1),
+	       NUMERIC_15_PREFIX = substr(:num_prefix,15,1),
+	       NUMERIC_15_RESULT = :d_numeric_result_15,    
+	       TEST_15_YN        = substr(:result_status,15,1),
+	       NUMERIC_16_PREFIX = substr(:num_prefix,16,1),
+	       NUMERIC_16_RESULT = :d_numeric_result_16,    
+	       TEST_16_YN        = substr(:result_status,16,1),
+	       NUMERIC_17_PREFIX = substr(:num_prefix,17,1),
+	       NUMERIC_17_RESULT = :d_numeric_result_17,    
+	       TEST_17_YN        = substr(:result_status,17,1),
+	       NUMERIC_18_PREFIX = substr(:num_prefix,18,1),
+	       NUMERIC_18_RESULT = :d_numeric_result_18,    
+	       TEST_18_YN        = substr(:result_status,18,1),
+	       NUMERIC_19_PREFIX = substr(:num_prefix,19,1),
+	       NUMERIC_19_RESULT = :d_numeric_result_19,    
+	       TEST_19_YN        = substr(:result_status,19,1),
+	       NUMERIC_20_PREFIX = substr(:num_prefix,20,1),
+	       NUMERIC_20_RESULT = :d_numeric_result_20,    
+	       TEST_20_YN        = substr(:result_status,20,1),
+	       NUMERIC_21_PREFIX = substr(:num_prefix,21,1),
+	       NUMERIC_21_RESULT = :d_numeric_result_21,    
+	       TEST_21_YN        = substr(:result_status,21,1),
+	       NUMERIC_22_PREFIX = substr(:num_prefix,22,1),
+	       NUMERIC_22_RESULT = :d_numeric_result_22,    
+	       TEST_22_YN        = substr(:result_status,22,1),
+	       NUMERIC_23_PREFIX = substr(:num_prefix,23,1),
+	       NUMERIC_23_RESULT = :d_numeric_result_23,    
+	       TEST_23_YN        = substr(:result_status,23,1),
+	       NUMERIC_24_PREFIX = substr(:num_prefix,24,1),
+	       NUMERIC_24_RESULT = :d_numeric_result_24,    
+	       TEST_24_YN        = substr(:result_status,24,1),
+	       NUMERIC_25_PREFIX = substr(:num_prefix,25,1),
+	       NUMERIC_25_RESULT = :d_numeric_result_25,   
+	       TEST_25_YN        = substr(:result_status,25,1)
+           WHERE rowid = :d_rowid;
+
+
+EXEC SQL COMMIT WORK;
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at Update Worklist Detail occured....\n");
+   proc_exit();
+
+}
+/*--------------------------------------------------------------------------------*/
+check_test_ordered_yn()
+{
+	v_count = 0;
+
+	EXEC SQL SELECT COUNT(*)
+	INTO :v_count
+	FROM RL_TEST_RESULT
+	WHERE specimen_no = TO_NUMBER(:d_specimen_no)
+	AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND test_code = :d_test_code;
+
+	if (v_count > 0)
+	{
+		d_req_test_yn.arr[ic] = 'Y';
+	}
+
+}
+/*--------------------------------------------------------------------------------*/
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

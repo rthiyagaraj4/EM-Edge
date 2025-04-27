@@ -1,0 +1,1601 @@
+<!--
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="StyleSheet" href="../../eCommon/html/dtree.css" type="text/css" />
+<link rel="StyleSheet" href="../../eCommon/html/lris_style.css" type="text/css" />
+<script type="text/javascript" src="../../eCommon/js/dtree1.js"></script>
+<script language="JavaScript">
+d = new dTree('d');
+var cou1=0;
+var g1;
+var g2;
+var g3;
+var g4;
+var TextArray;
+var TextArray1
+var fl=0;
+function SEGDOWN()
+{
+var inputK=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+var temp='';
+var cou=0;
+PercentArray=new Array();
+var cou2=0;
+ TextArray1=new Array();
+for(var i=0;i<inputK.length;i++)
+{
+  curval= inputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+ var value2=temp.substring(1);
+      TextArray1[cou]="#"+value2;
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray1[cou]="$"+value3;
+ 	  cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+      PercentArray[cou2]=cou;
+	
+      TextArray1[cou]="%"+value4;
+	  cou++;
+	  cou2++;
+	}
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+if(value5=="")
+{
+}
+else
+{
+      TextArray1[cou]="|"+value5;
+       cou++;
+	  }
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	   TextArray1[cou]="^"+value6;
+	   cou++;
+	 }
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      TextArray1[cou]="#"+value2;
+      cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray1[cou]="$"+value3;
+      cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+	PercentArray[cou2]=cou;
+   TextArray1[cou]="%"+value4;
+              cou++;
+			   cou2++;
+}
+			   break;
+      case '|':
+      var value5=temp.substring(1);
+ if(value5=="")
+{
+}
+else
+{
+  	  
+      TextArray1[cou]="|"+value5;
+   
+     cou++;
+}
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	  TextArray1[cou]="^"+value6;
+	  cou++;
+	}
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+var selectedItem;
+var h=0,g=0;
+
+var p=1;
+selectedItem=TextArray1[(d.getSelected()-1)];
+var i=0;
+if((d.getSelected()-1)>PercentArray[parseInt(PercentArray.length-1)])
+{
+alert("cannotmove");
+}
+else
+{
+if(TextArray1[(d.getSelected()-1)].indexOf("%")!=-1)
+{
+alert("cannot move");
+}
+else if(TextArray1[(d.getSelected()-1)].indexOf("%")==-1)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+while(i<TextArray1.length)
+{
+      if((d.getSelected()-1)==i)
+        {
+          while(p<PercentArray.length)
+           {
+if((PercentArray[parseInt(PercentArray.length-p)]>=(d.getSelected()-1))&&(PercentArray[parseInt(PercentArray.length-(p+1))]<=(d.getSelected()-1)))
+      {
+	var Percentvalue;  
+	if(PercentArray[parseInt(PercentArray.length-(p-1))]==null)
+	{
+Percentvalue=TextArray1.length;
+	}
+	else if(PercentArray[parseInt(PercentArray.length-(p-1))]!=null)
+{
+Percentvalue=PercentArray[parseInt(PercentArray.length-(p-1))];
+}
+         for(var k=(d.getSelected());k<Percentvalue;k++)
+         {
+         
+                   parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+                   
+              i++;
+         }
+		    parent.parent.frames[1].document.forms[0].UsrDefStr.value+=selectedItem;	
+			   i++;
+              }
+
+              p++;
+             
+           }
+		   }
+  if(TextArray1[i]!=null)
+	 {
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[i];
+i++;
+}    
+}
+}
+}
+parent.frames[2].location.href="dummy.html";
+
+
+}
+function SEGUP()
+{
+
+var inputK=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+var temp='';
+var input1="|"+inputK;
+var cou=0;
+PercentArray=new Array();
+PercentArray1=new Array();
+var cou2=0;
+TextArray=new Array();
+ TextArray1=new Array();
+for(var i=0;i<inputK.length;i++)
+{
+  curval= inputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+ var value2=temp.substring(1);
+      TextArray1[cou]="#"+value2;
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray1[cou]="$"+value3;
+ 	  cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+      PercentArray[cou2]=cou;
+	
+      TextArray1[cou]="%"+value4;
+	  cou++;
+	  cou2++;
+	}
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+if(value5=="")
+{
+}
+else
+{
+      TextArray1[cou]="|"+value5;
+       cou++;
+	  }
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	   TextArray1[cou]="^"+value6;
+	   cou++;
+	 }
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      TextArray1[cou]="#"+value2;
+      cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray1[cou]="$"+value3;
+      cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+	PercentArray[cou2]=cou;
+   TextArray1[cou]="%"+value4;
+              cou++;
+			   cou2++;
+}
+			   break;
+      case '|':
+      var value5=temp.substring(1);
+ if(value5=="")
+{
+}
+else
+{
+  	  
+      TextArray1[cou]="|"+value5;
+   
+     cou++;
+}
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	  TextArray1[cou]="^"+value6;
+	  cou++;
+	}
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+
+var	selectedItem=TextArray1[(d.getSelected()-1)]; 
+var p=1;
+
+
+if((d.getSelected()-1)<PercentArray[1])
+{
+alert("cannt Move");
+}
+else
+{
+if(TextArray1[(d.getSelected()-1)].indexOf("%")!=-1)
+{
+alert("cannot move");
+}
+else if(TextArray1[(d.getSelected()-1)].indexOf("%")==-1)
+{
+if((d.getSelected()-1)>PercentArray[(PercentArray.length-1)])
+{
+ parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+/*if((TextArray1.length>=(d.getSelected()-1))&&(PercentArray[parseInt(PercentArray.length-p)]<=(d.getSelected()-1)))
+ {
+ }*/
+ for(var k=0;k<PercentArray[parseInt(PercentArray.length-1)];k++)
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+}
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=selectedItem;
+for(var k=(PercentArray[parseInt(PercentArray.length-1)]);k<(d.getSelected()-1);k++)
+ {
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+for(var k=((d.getSelected()-1)+1);k<TextArray1.length;k++)
+ {
+ parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+
+}
+else if((d.getSelected()-1)<=PercentArray[(PercentArray.length-1)])
+{
+//parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+while(p<PercentArray.length)
+{
+
+if((PercentArray[parseInt(PercentArray.length-p)]>=(d.getSelected()-1))&&(PercentArray[parseInt(PercentArray.length-(p+1))]<=(d.getSelected()-1)))
+ {
+ parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+
+for(var k=0;k<PercentArray[parseInt(PercentArray.length-(p+1))];k++)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+}
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=selectedItem;
+for(var k=(PercentArray[parseInt(PercentArray.length-(p+1))]);k<(d.getSelected()-1);k++)
+ {
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+for(var k=((d.getSelected()-1)+1);k<TextArray1.length;k++)
+ {
+ parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+}
+p++;
+}
+
+}
+}
+ }    
+parent.frames[2].location.href="dummy.html";
+}
+	function UP()
+{
+var inputK=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+var temp='';
+var cou=0;
+PercentArray=new Array();
+PercentArray1=new Array();
+var cou2=0;
+TextArray=new Array();
+ TextArray1=new Array();
+for(var i=0;i<inputK.length;i++)
+{
+  curval= inputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+ var value2=temp.substring(1);
+      TextArray[cou]=value2;
+
+
+      if(cou==0)
+      {
+      TextArray1[cou]="#"+value2;
+      }
+      else if(cou!=0)
+      {
+	 // PercentArray1[cou2]="%"+value2;
+       TextArray1[cou]="#"+value2;
+      }
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray[cou]=value3;
+	  
+      if(cou==0)
+      {
+      TextArray1[cou]="$"+value3;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="$"+value3;
+      }
+	  cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+      PercentArray[cou2]=cou;
+
+      TextArray[cou]=value4;
+	    
+      if(cou==0)
+      {
+	  PercentArray1[cou2]="%"+value4;
+      TextArray1[cou]="%"+value4;
+      }
+      else if(cou!=0)
+      {
+	  PercentArray1[cou2]="%"+value4;
+       TextArray1[cou]="%"+value4;
+      }
+	  cou++;
+	  cou2++;
+	}
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+if(value5=="")
+{
+}
+else
+{
+      TextArray[cou]=value5;
+	  if(cou==0)
+      {
+      TextArray1[cou]="|"+value5;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="|"+value5;
+      }
+	  cou++;
+	  }
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	  TextArray[cou]=value6;
+      if(cou==0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  else if(cou!=0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  cou++;
+	 }
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      //PercentArray[cou2]=value4;
+      TextArray[cou]=value2;
+	   
+      if(cou==0)
+      {
+      TextArray1[cou]="#"+value2;
+      }
+      else if(cou!=0)
+      {
+	  
+       TextArray1[cou]="#"+value2;
+      }
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray[cou]=value3;
+	  	 
+      if(cou==0)
+      {
+      TextArray1[cou]="$"+value3;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="$"+value3;
+      }
+	  cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+	PercentArray[cou2]=cou;
+                TextArray[cou]=value4;
+					 
+                if(cou==0)
+               {
+			   PercentArray1[cou2]="%"+value4;
+                TextArray1[cou]="%"+value4;
+               }
+               else if(cou!=0)
+               {
+			 PercentArray1[cou2]="%"+value4;
+                TextArray1[cou]="%"+value4;
+               }
+	           cou++;
+			   cou2++;
+}
+			   break;
+      case '|':
+      var value5=temp.substring(1);
+ if(value5=="")
+{
+}
+else
+{
+
+	  TextArray[cou]=value5;
+	  	  
+      if(cou==0)
+      {
+      TextArray1[cou]="|"+value5;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="|"+value5;
+      }
+	  cou++;
+}
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+  TextArray[cou]=value6;
+	  	  
+	  if(cou==0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  else if(cou!=0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  cou++;
+	}
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+
+var currentvalue;
+var currentsimvalue;
+var topvalue;
+var topsimvalue;
+var p=1;
+if(d.getSelected()==1)
+{
+alert("cannot move");
+}
+else if(d.getSelected()==2)
+{
+alert("cannot move");
+}
+else if(d.getSelected()==3)
+{
+alert("cannot move");
+}
+else if(d.getSelected()==4)
+{
+alert("cannot move");
+}
+if(TextArray1[(d.getSelected()-1)].indexOf("%")!=-1)
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+while(p<PercentArray.length)
+{
+var currentvalue=TextArray1[(d.getSelected()-1)];
+var topvalue=TextArray1[PercentArray[parseInt(PercentArray.length-(p+1))]];
+if((PercentArray[parseInt(PercentArray.length-p)]>=(d.getSelected()-1))&&(PercentArray[parseInt(PercentArray.length-(p+1))]<(d.getSelected()-1)))
+ {
+// alert("varuthu");
+for(var k=0;k<PercentArray[parseInt(PercentArray.length-(p+1))];k++)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+}
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=currentvalue;
+for(var k=(PercentArray[parseInt(PercentArray.length-(p+1))]+1);k<(d.getSelected()-1);k++)
+ {
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=topvalue;
+for(var k=((d.getSelected()-1)+1);k<TextArray1.length;k++)
+ {
+ parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+ }
+}
+p++;
+}
+ parent.frames[2].location.href="dummy.html";
+}
+else if(TextArray1[(d.getSelected()-1)].indexOf("%")==-1)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+var k=0;
+while(k<TextArray1.length)
+{
+
+ if((d.getSelected()-2)==k)
+{
+topvalue=TextArray[(d.getSelected()-2)];
+currentvalue=TextArray[(d.getSelected()-1)];
+currentsimvalue=TextArray1[(d.getSelected()-1)];
+topsimvalue=TextArray1[(d.getSelected()-2)];
+if (TextArray1[k].indexOf("|")!=-1)
+{
+			if (TextArray1[(k+1)].indexOf("|")!=-1)
+			{
+			TextArray1[(k+1)]=topsimvalue;
+			}
+			else if (TextArray1[(k+1)].indexOf("^")!=-1)
+			{
+				TextArray1[(k+1)]="^"+topvalue;
+			}
+}
+else if (TextArray1[k].indexOf("^")!=-1)
+{
+   if (TextArray1[(k+1)].indexOf("|")!=-1)
+   {
+	TextArray1[(k+1)]="|"+topvalue;
+   }
+   else if (TextArray1[(k+1)].indexOf("^")!=-1)
+   {
+		TextArray1[(k+1)]=topsimvalue;
+   }
+}
+if (TextArray1[(k+1)].indexOf("|")!=-1)
+ {
+     if (TextArray1[k].indexOf("|")!=-1)
+	{
+	  TextArray1[k]=currentsimvalue;
+	}
+else if (TextArray1[k].indexOf("^")!=-1)
+{
+	TextArray1[k]="^"+currentvalue;
+}
+}
+else if (TextArray1[(k+1)].indexOf("^")!=-1)
+{
+   if (TextArray1[k].indexOf("|")!=-1)
+   {
+	TextArray1[k]="|"+currentvalue;
+   }
+  else if (TextArray1[k].indexOf("^")!=-1)
+  {
+	TextArray1[k]=currentsimvalue;
+  }
+
+}
+
+}
+ else if((d.getSelected()-1)==k)
+{
+
+}
+
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+  k++;
+  }
+
+ parent.frames[2].location.href="dummy.html";
+  }
+	
+}
+
+
+function Down()
+{
+
+var inputK=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+//var input1="|"+inputK;
+var temp='';
+var input1="|"+inputK;
+var cou=0;
+PercentArray=new Array();
+PercentArray1=new Array();
+var cou2=0;
+TextArray=new Array();
+ TextArray1=new Array();
+for(var i=0;i<inputK.length;i++)
+{
+  curval= inputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+ var value2=temp.substring(1);
+      TextArray[cou]=value2;
+
+
+      if(cou==0)
+      {
+      TextArray1[cou]="#"+value2;
+      }
+      else if(cou!=0)
+      {
+	 // PercentArray1[cou2]="%"+value2;
+       TextArray1[cou]="#"+value2;
+      }
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray[cou]=value3;
+	  
+      if(cou==0)
+      {
+      TextArray1[cou]="$"+value3;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="$"+value3;
+      }
+	  cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+      PercentArray[cou2]=cou;
+
+      TextArray[cou]=value4;
+	    
+      if(cou==0)
+      {
+	  PercentArray1[cou2]="%"+value4;
+      TextArray1[cou]="%"+value4;
+      }
+      else if(cou!=0)
+      {
+	  PercentArray1[cou2]="%"+value4;
+       TextArray1[cou]="%"+value4;
+      }
+	  cou++;
+	  cou2++;
+	}
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+if(value5=="")
+{
+}
+else
+{
+      TextArray[cou]=value5;
+	  if(cou==0)
+      {
+      TextArray1[cou]="|"+value5;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="|"+value5;
+      }
+	  cou++;
+	  }
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+	  TextArray[cou]=value6;
+      if(cou==0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  else if(cou!=0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  cou++;
+	 }
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      //PercentArray[cou2]=value4;
+      TextArray[cou]=value2;
+	   
+      if(cou==0)
+      {
+      TextArray1[cou]="#"+value2;
+      }
+      else if(cou!=0)
+      {
+	  
+       TextArray1[cou]="#"+value2;
+      }
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray[cou]=value3;
+	  	 
+      if(cou==0)
+      {
+      TextArray1[cou]="$"+value3;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="$"+value3;
+      }
+	  cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+	PercentArray[cou2]=cou;
+                TextArray[cou]=value4;
+					 
+                if(cou==0)
+               {
+			   PercentArray1[cou2]="%"+value4;
+                TextArray1[cou]="%"+value4;
+               }
+               else if(cou!=0)
+               {
+			 PercentArray1[cou2]="%"+value4;
+                TextArray1[cou]="%"+value4;
+               }
+	           cou++;
+			   cou2++;
+}
+			   break;
+      case '|':
+      var value5=temp.substring(1);
+ if(value5=="")
+{
+}
+else
+{
+
+	  TextArray[cou]=value5;
+	  	  
+      if(cou==0)
+      {
+      TextArray1[cou]="|"+value5;
+      }
+      else if(cou!=0)
+      {
+       TextArray1[cou]="|"+value5;
+      }
+	  cou++;
+}
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+  TextArray[cou]=value6;
+	  	  
+	  if(cou==0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  else if(cou!=0)
+	  {
+	  TextArray1[cou]="^"+value6;
+	  }
+	  cou++;
+	}
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+
+var currentvalue;
+var currentsimvalue;
+var nextvalue;
+var nextsimvalue;
+var p=1;
+var i=0;
+
+
+
+if(TextArray1[(d.getSelected()-1)].indexOf("%")!=-1)
+{
+if((d.getSelected()-1)==PercentArray[parseInt(PercentArray.length-1)])
+{
+alert("cannotmove");
+}
+else 
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+while(p<PercentArray.length)
+ {
+if((PercentArray[parseInt(PercentArray.length-p)]>(d.getSelected()-1))&&(PercentArray[parseInt(PercentArray.length-(p+1))]<=(d.getSelected()-1)))
+      {
+var currentvalue=TextArray1[(d.getSelected()-1)];
+var nextvalue=TextArray1[PercentArray[parseInt(PercentArray.length-p)]];
+var Percentvalue;
+if(PercentArray[parseInt(PercentArray.length-(p-1))]==null)
+	{
+Percentvalue=TextArray1.length;
+	}
+	else if(PercentArray[parseInt(PercentArray.length-(p-1))]!=null)
+{
+Percentvalue=PercentArray[parseInt(PercentArray.length-(p-1))];
+}
+
+  for(var k=0;k<(d.getSelected()-1);k++)
+         {
+           parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+         }
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=nextvalue;
+  for(var k=(d.getSelected());k<PercentArray[parseInt(PercentArray.length-p)];k++)
+         {
+           parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+          }
+		 parent.parent.frames[1].document.forms[0].UsrDefStr.value+=currentvalue;	
+		 for(var k=(PercentArray[parseInt(PercentArray.length-p)]+1);k<TextArray1.length;k++)
+         {
+           parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+         }
+		  }
+              p++;
+             
+          }
+		  }
+		   
+}
+
+else if(TextArray1[(d.getSelected()-1)].indexOf("%")==-1)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+ for(var k=0;k<TextArray1.length;k++)
+ {
+if((d.getSelected()-1)==k)
+{
+nextvalue=TextArray[(d.getSelected())];
+currentvalue=TextArray[(d.getSelected()-1)];
+currentsimvalue=TextArray1[(d.getSelected()-1)];
+nextsimvalue=TextArray1[(d.getSelected())];
+
+
+if(TextArray1[(k+1)]==null)
+{
+alert("cannt move");
+}
+else if(TextArray1[(k+1)]!=null)
+{
+
+if (TextArray1[(k+1)].indexOf("|")!=-1)
+{
+			if (TextArray1[k].indexOf("|")!=-1)
+			{
+			TextArray1[k]=nextsimvalue;
+
+			}
+			else if (TextArray1[k].indexOf("^")!=-1)
+			{
+				TextArray1[k]="^"+nextvalue;
+			}
+
+		}
+		else if (TextArray1[(k+1)].indexOf("^")!=-1)
+		{
+		   if (TextArray1[k].indexOf("|")!=-1)
+		   {
+				TextArray1[k]="|"+nextvalue;
+		   }
+		   else if (TextArray1[k].indexOf("^")!=-1)
+		   {
+				TextArray1[k]=nextsimvalue;
+		   }
+}
+if (TextArray1[k].indexOf("|")!=-1)
+		 {
+			if (TextArray1[(k+1)].indexOf("|")!=-1)
+			{
+			TextArray1[(k+1)]=currentsimvalue;
+
+			}
+			else if (TextArray1[(k+1)].indexOf("^")!=-1)
+			{
+				TextArray1[(k+1)]="^"+currentvalue;
+			}
+
+		}
+		else if (TextArray1[k].indexOf("^")!=-1)
+		{
+		   if (TextArray1[(k+1)].indexOf("|")!=-1)
+		   {
+			TextArray1[(k+1)]="|"+currentvalue;
+		   }
+		   else if (TextArray1[(k+1)].indexOf("^")!=-1)
+		   {
+				TextArray1[(k+1)]=currentsimvalue;
+		   }
+
+		}
+
+		}
+}
+else if(d.getSelected()==k)
+{
+}
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+
+   }
+   }
+	  parent.frames[2].location.href="dummy.html";
+}
+
+
+function Alladd()
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+
+var firstInput=parent.parent.frames[1].document.forms[0].SysDefStr.value;
+parent.parent.frames[1].document.forms[0].UsrDefStr.value=firstInput;
+parent.frames[2].location.href="dummy.html";
+}
+function Alladd2()
+{
+var firstInput=parent.parent.frames[1].document.forms[0].SysDefStr.value;
+var Percent=firstInput.indexOf("%");
+var substring1=firstInput.substring(0,Percent);
+var second="";
+parent.parent.frames[1].document.forms[0].UsrDefStr.value=second;
+parent.parent.frames[1].document.forms[0].UsrDefStr.value=substring1;
+parent.frames[2].location.href="dummy.html";
+}
+
+
+function Remove()
+{
+var inputK=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+
+
+PercentArray=new Array();
+PercentArray1=new Array();
+var temp='';
+//var input1="|"+inputK;
+var cou=0;
+var cou2=0;
+
+ TextArray1=new Array();
+for(var i=0;i<inputK.length;i++)
+{
+  curval= inputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+ var value2=temp.substring(1);
+
+
+
+     
+      TextArray1[cou]="#"+value2;
+     
+     
+	 // PercentArray1[cou2]="%"+value2;
+       TextArray1[cou]="#"+value2;
+     
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+     
+      TextArray1[cou]="$"+value3;
+      cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+      PercentArray[cou2]=cou;
+
+      TextArray1[cou]="%"+value4;
+           cou++;
+	  cou2++;
+	}
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+if(value5=="")
+{
+}
+else
+{
+
+
+       TextArray1[cou]="|"+value5;
+
+	  cou++;
+	  }
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+
+	  TextArray1[cou]="^"+value6;
+	  cou++;
+	 }
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      //PercentArray[cou2]=value4;
+
+	   
+      TextArray1[cou]="#"+value2;
+
+	  
+	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+    TextArray1[cou]="$"+value3;
+
+	  cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+if(value4=="")
+{
+}
+else
+{
+	PercentArray[cou2]=cou;
+    TextArray1[cou]="%"+value4;
+    cou++;
+    cou2++;
+}
+   break;
+      case '|':
+      var value5=temp.substring(1);
+ if(value5=="")
+{
+}
+else
+{
+      TextArray1[cou]="|"+value5;
+
+	  cou++;
+}
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  if(value6=="")
+{
+}
+else
+{
+
+	  	  
+	  TextArray1[cou]="^"+value6;
+
+	  cou++;
+	}
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+if(TextArray1[(d.getSelected()-1)].indexOf("%")!=-1)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+var NextPercent;
+for(var i=0;i<PercentArray.length;i++)
+{
+if(PercentArray[i]==(d.getSelected()-1))
+{
+if(PercentArray[(i+1)]==null)
+{
+NextPercent=TextArray1.length;
+
+}
+else if(PercentArray[(i+1)]!=null)
+{
+NextPercent=PercentArray[(i+1)];
+}
+}
+}
+for(var k=0;k<(d.getSelected()-1);k++)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+}
+for(var k=(d.getSelected()-1);k<NextPercent;k++)
+{
+
+}
+for(var k=NextPercent;k<TextArray1.length;k++)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+}
+parent.frames[2].location.href="dummy.html";
+}
+else if(TextArray1[(d.getSelected()-1)].indexOf("%")==-1)
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value="";
+for(var k=0;k<=TextArray1.length;k++)
+{
+
+if((d.getSelected()-1)==k)
+{
+
+}
+else if((d.getSelected()-1)!=k)
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=TextArray1[k];
+parent.frames[2].location.href="dummy.html";
+}
+}
+}
+
+}
+function add()
+{
+d = new dTree('d');
+		
+var PercentValue;
+var temp='';
+var cou2=0;
+var InputK=parent.parent.frames[1].document.forms[0].SysDefStr.value;
+//var inputdata=input1;
+//inputdata=trim(inputdata);
+
+var cou=0;
+ PercentArray=new Array();
+  PercentArray1=new Array();
+TextArray=new Array();
+ TextArray1=new Array();
+
+ for(var i=0;i<InputK.length;i++)
+  {
+   curval= InputK.charAt(i);
+ if(curval == '#' ||curval == '$' ||curval == '%' ||curval == '|' ||curval == '^')
+ {
+ if(temp.length>0)
+{
+   switch(temp.charAt(0))
+    {
+case '#':
+      var value2=temp.substring(1);
+      //PercentArray[cou2]=value4;
+      TextArray1[cou]="#"+value2;
+     	  cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+      TextArray1[cou]="$"+value3;
+         
+	  cou++;
+	  break;
+      case '%':
+      var value4=temp.substring(1);
+      PercentArray1[cou2]="%"+value4;
+      TextArray1[cou]="%"+value4;
+      cou++;
+	  cou2++;
+	  break;
+	  case '|':
+      var value5=temp.substring(1);
+      TextArray1[cou]="|"+value5;
+      cou++;
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+	  TextArray1[cou]="^"+value6;
+	  cou++;
+	  break;
+	  }
+	  }
+      temp=curval;
+      }
+      else 
+      {
+	  temp=temp+curval;
+      }
+    }
+	if(temp.length>0)
+         {
+			switch(temp.charAt(0))
+			{
+     case '#':
+      var value2=temp.substring(1);
+      TextArray1[cou]="#"+value2;
+      cou++;
+	  break;
+	  case '$':
+      var value3=temp.substring(1);
+     
+      TextArray1[cou]="$"+value3;
+     
+      cou++;
+	  break;
+	case '%':
+    var value4=temp.substring(1);
+
+
+                TextArray1[cou]="%"+value4;
+
+	           cou++;
+			   cou2++;
+	           break;
+      case '|':
+      var value5=temp.substring(1);
+
+      TextArray1[cou]="|"+value5;
+
+	  cou++;
+	  break;
+	  case '^':
+	  var value6=temp.substring(1);
+
+	  TextArray1[cou]="^"+value6;
+	  cou++;
+	  break;
+
+		   }
+            cou=cou+1;
+         }
+for(i=0;i<(TextArray1.length);i++)
+{
+if(d.getSelected()==0)
+{
+}
+else if(d.getSelected()==i)
+{
+var treevalue=TextArray1[d.getSelected()-1];
+var confirmvalue=confirm("do you wants to parent ");
+var g=parent.parent.frames[1].document.forms[0].UsrDefStr.value;
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=treevalue;
+parent.frames[2].location.href="dummy.html";
+/*if(treevalue.indexOf("%")!=-1)
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=treevalue;
+parent.frames[2].location.href="dummy.html";
+}
+else
+{
+if(confirmvalue==true)
+{
+if(cou=='')
+{
+cou=0;
+}
+ g1=cou;g2=treevalue;g3=cou2; g4=confirmvalue;
+fl=1;
+
+if(g=="")
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=treevalue;
+}
+else if(g!="")
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+="|"+TextArray[(d.getSelected()-1)];
+}
+parent.frames[2].location.href="dummy.html";
+
+}
+else if(confirmvalue==false)
+{
+g1=cou;g2=treevalue;g3=cou-1; g4=confirmvalue;
+fl=1;
+if(g=="")
+{
+
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+=treevalue;
+}
+else if(g!="")
+{
+parent.parent.frames[1].document.forms[0].UsrDefStr.value+="^"+TextArray[(d.getSelected()-1)];
+}
+
+parent.frames[2].location.href="dummy.html";
+}
+}*/
+//
+}
+//width='40%' height='20%'
+}
+}
+function Trim(str)
+{ 
+while(str.charAt(0) == (" ") )
+  {  str = str.substring(1);
+  }
+  while(str.charAt(str.length-1) == "," )
+  {  str = str.substring(0,str.length-1);
+  }
+  return str;
+}
+</script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+     
+</head>
+<body bgcolor='#F7F3F7' topmargin=0 leftmargin=0 valign=top>
+<table border=0 cellpadding=5 cellspacing=0  class="th_1" width="80%" align=center>
+<tr>
+<td>
+<table  cellspacing=0 cellpadding=5 border=0 width='40%' height='20%' align='center'>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<tr>
+<td>
+<input type="button" name="Move" id="Move" value="        >       " class="gb" onClick='add();' align=center></td>
+</tr>
+<tr>
+<td>
+<input type="button" value="       >>      " class="gb" onClick='Alladd();'align=center></td>
+</tr>
+<tr>
+<td>
+<input type="button" value="       <<      " class="gb"  onClick='Alladd2();'align=center></td>
+</tr>
+<tr>
+<td>
+<input type="button" value="        <       " class="gb" onClick='Remove();' align=center></td>
+</tr>
+<tr>
+<td>
+<input type="button" value="     UP       " class="gb" onClick='UP();' align=center></td>
+</tr>
+<tr>
+<td>
+<input type="button" value="   DOWN   " class="gb" onClick='Down()'align=center></td>
+</tr>
+<tr>
+<td><input type="button" value=" SEG UP   " class="gb" onClick='SEGUP();' align=center></td>
+
+</tr>
+<tr>
+<td><input type="button" value="SEG Down" class="gb" onClick='SEGDOWN();' align=center></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

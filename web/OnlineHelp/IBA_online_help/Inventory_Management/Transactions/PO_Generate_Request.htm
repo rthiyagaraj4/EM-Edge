@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>PO Generate Request</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Inventory Management\nTransactions\nPO Generate Request");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2"></script>
+<h1>PO Generate Request</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Generate</span> 
+ Purchase Order requests for multiple Items.</p>
+<p class="Text">This function should be interfaced with the Oracle Inventory. 
+ You can access this function if 'Purchase Order Applicable' check box 
+ is selected in the 'Entity Parameter' function. Based on the re-order 
+ levels of stock, Purchase Orders are raised by the main stores. The system 
+ calculates the Request Quantity based on the Reorder Level, Maximum Stock 
+ Level, Reorder Quantity and Quantity in Hand.</p>
+<h2>Generating Purchase Order Requests</h2>
+<p class="From">From the ST Transactions &gt; PO Request, select the PO 
+ Generate Request function.</p>
+<p class="Text">The PO Generate Request screen gets displayed.</p>
+<ol>
+	<li class="p-Number"><p class="Number">Enter the details in the mandatory 
+	 (<span class="Asterisk">*</span>) fields. <span class="RFDhyperlink"><a href="javascript:void(0);" id="a1" style="text-decoration: none; " onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/STTransPOGenerateRequest.htm',400,300);return false;">&lt;Related Field Description&gt;</a></span></p></li>
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Search]</span> 
+	 to display the required Items for which the request has to be raised.</p></li>
+	<li class="p-Number"><p class="Number">On searching, the Items which 
+	 do not require ‘Special Request’ and for which ‘By manual’ value is 
+	 not set for ‘Req Gen Base’ in Item for Store function are displayed.</p></li>
+	<li class="p-Number"><p class="Number">If the requested quantity is 
+	 not available in the Requested on Store, these Items are indicated 
+	 by a unique indicator.</p></li>
+	<li class="p-Number"><p class="Number">Select the check box against 
+	 the required Item to generate purchase order request for refill of 
+	 Items. Select the Item check</p></li>
+	<li class="p-Number"><p class="Number">box in the heading to select 
+	 all the displayed Items to generate purchase order request for refill 
+	 of Items.</p></li>
+	<li class="p-Number"><p class="Number">Enter the Required Quantity 
+	 in numeric format of 10 digits maximum length. On placing the mouse 
+	 pointer on the Request</p></li>
+	<li class="p-Number"><p class="Number">Quantity text box, the Item 
+	 is selected by default and the Item details are displayed with a unique 
+	 color.</p></li>
+	<li class="p-Number"><p class="Number">If the entered Required Quantity 
+	 value is greater than the ‘Max Stock Quantity’, you will be prompted 
+	 with an alert message</p></li>
+	<li class="p-Number"><p class="Number">‘Req Qty should be less than 
+	 Max Stock Qty. Proceed?’. Click <span class="BoldButton">[OK]</span> 
+	 to proceed with the request generation or <span class="BoldButton">[Cancel]</span> 
+	 to cancel the request generation for the selected Item.</p></li>
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Apply]</span> 
+	 to generate the request or <span class="BoldButton">[Reset]</span> 
+	 to clear the entered data.</p></li>
+</ol>
+<p class="Text">&#160;</p>
+<hr align="center" />
+<p>
+
+<a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Entity Parameter','../Administration/Entity_Parameter.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics4.gif" border="0" height="17" width="78" alt="Related Topics" /></a>
+
+
+</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+	FilePopupInit('a1');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

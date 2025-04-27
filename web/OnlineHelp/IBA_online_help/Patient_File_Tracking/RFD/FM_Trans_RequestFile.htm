@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>FM_Trans_RequestFile</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Request From</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">FS Location Identity</span> - Select the FS Location identity from the list. The values displayed are Clinic, Nursing Unit, Day Care Unit, Procedure Unit, Practitioner and Department.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">FS Location</span> - Select the required FS Location from the list of valid values. The list displays all the FS Locations (Permanent, Non-permanent and Temporary locations) for the selected Identity and user rights defined. This field is mandatory.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the 'Security Access to be Enforced' check box in FM Parameter function is selected, only those File Storage Locations of the selected Identity and to which the logged in user has access are displayed in the list.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the 'Security Access to be Enforced' check box in FM parameter function is cleared, all the File Storage Locations associated with the logged in facility of the selected identity are displayed in the list.</p>
+</li>
+</ol>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Requesting</span> - Based on the selected identity, the field label is displayed. Enter the required location name in alphanumeric format of 30 characters or use <span class="BoldNumberRFD">[?]</span> function to search for the requesting location. The <span class="BoldNumberRFD">[?]</span> function displays locations corresponding to the selected identity and associated to the selected FS Location. Select the required location. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Borrowing</span> - On selecting the File Storage Location, the narration specified for the selected FS Location is displayed. Select the applicable reason for borrowing from the list. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> - The logged in user name is displayed, by default. The person requesting for the files on behalf of the selected FS Location is specified in this field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the 'Security Access to be Enforced' check box in FM parameter function is selected, the user name cannot be changed and <span class="BoldNumberRFD">[?]</span> function is disabled.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the 'Security Access to be Enforce' check box in FM parameter is cleared, the user name is defaulted to the logged in user but the other names can be selected using <span class="BoldNumberRFD">[?]</span> function.</p>
+</li>
+</ol>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Remarks</u></span> – This field appears only when ‘Others’ value is selected in the ‘Reason for Borrowing’ field. Enter the remarks in alphanumeric format up to 100 characters except these four " '~` special characters. But you can enter these four special characters in the text box by copy and paste function. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Request To</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> - The field is displayed based on the requesting FS Location.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the request for file(s) is made by non-permanent/temporary FS Location, the user can select only the Logged in facility. The non-permanent FS Locations can request for files only from the Permanent Locations of the logged in facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If request for file(s) is/are made by the permanent FS locations, the user can select either Logged in facility or Enterprise facility from the list. The permanent FS locations are allowed to request for files from other facilities of the enterprise, provided, they have the access rights to request across facilities of an enterprise. If access rights are not defined, they cannot request for files across the facilities of an enterprise.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If 'Request To' is selected as 'Enterprise Facility', select the required facility name from the Facility list displayed. This field is mandatory. The list contains facility names of the enterprise.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">On entering the Request From and Request To details, the required patient file details are to be entered. Enter the following details for requesting file(s) of a patient.</span></p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Enter a valid Patient ID in alphanumeric format of length as specified in Master Patient Index module or use <span class="BoldNumberRFD">[?]</span> function to select the required patient. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">File Type</span> - On selecting the Patient ID, the File Type(s) associated to the patient is displayed. If more than one File Type is associated, select the required Type from the list of values. On selecting the Patient ID, the default File Type associated in the File Type For FS Location is displayed. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Volume No</span> - The active Volume no is displayed, by default. Select required Volume Number from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Patient File Request Slip</span> – Select the ‘Print Patient File Request Slip’ check box to print the Patient file request slip for Walk in patients. Clear the check box, not to print the patient file request slip for the selected criteria. This check box is selected or unselected by default according to setup made in FM Parameter.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If File Maintenance is set as Multiple and Numbering Control is set to Keep File Number same as Patient ID in Master Patient Index module, MP Parameter function, the File Type field is displayed. If Numbering control is Allow separate MRN and File Maintenance is set as Multiple, the File Number is displayed.</p>
+<p class="BoldRFD">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

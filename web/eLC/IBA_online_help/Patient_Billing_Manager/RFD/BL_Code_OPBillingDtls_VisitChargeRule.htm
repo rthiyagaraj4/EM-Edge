@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_OPBillingDtls_VisitChargeRule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Visit Charge Rule</h1>
+<p class="BoldRFD"><span style="font-weight: normal;">Visit Charge Rule tab enables you to define the price for a Visit Type associated to a Clinic. You have to associate a Billing Service or a Billing Panel to a Visit Type. The bill generation for a relevant Clinic depends on the billing services associated for the Visit Type and the Medical Personnel Fee.</span></p>
+<p>&#160;</p>
+<p class="BoldRFD">Enter the following details to define a Visit Charge:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Clinic Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Clinic. The description for the selected Clinic Code gets displayed. This is a mandatory field.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Visit Types</p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Grp Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the billing group code. If the Insurance Group radio button in the OP Parameter screen is selected, this field is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Grp Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer Group Code. If the Insurance Group radio button in the OP Parameter screen is selected, this field is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Policy Type Code. If the Insurance Group radio button in the OP Parameter screen is selected, this field is displayed</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer Code. If the Insurance Group radio button in the OP Parameter screen is selected, this field is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Visit. The values defined using the Visit Types function in the Outpatient Management module gets listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Visit Type gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doctor ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Practitioner. Select ‘**’ to associate all the Practitioners to a Visit Type. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> – The Name of the selected Practitioner gets displayed. If the Doctor ID is selected as ‘**’, ‘All Doctors’ is displayed in the text box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> – Select an Indicator from list. The values are system defined – 'Service' and 'Panel'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service – Select Service to associate a Service. The Doctor fee is calculated based on the charges defined for the Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Panel – Select Panel to associate a Panel. The Doctor fee is calculated based on the charges defined for the Panel.</p>
+</li>
+</ol>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service/Panel for Visit Charge</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Billing Service or Billing Panel. The values defined using the functions Billing Service and Panel get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Billing Service or the Panel gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> – Select an Indicator from list. The values are system defined – 'Service' and 'Panel'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service – Select Service to associate a Service. The Medical Personnel fee is calculated based on the charges defined for the Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Panel – Select Panel to associate a Panel. The Medical Personnel fee is calculated based on the charges defined for the Panel.</p>
+</li>
+</ol>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service/Panel for Medical Pers Fees</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Billing Service or Billing Panel to compute the Medical Personal Fees. The values defined using the function Billing Services with the ‘Doctor’s Share Applicable’ check box as selected gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Billing Service or the Billing Panel gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alternate Visit Charge During Close Consult</span> - This field is enabled only if the 'Billing Service/Panel for Medical Pers Fees' is selected as 'Panel'. Click <span class="BoldNumberRFD">[List of Values]</span> to select a Billing Service. Billing Services associated to the Billing Panel with the 'Medical Personal Fee' as selected gets displayed. If the medical personal fee is not charged during consultation, then the respective Visit Type to the Clinic is charged based on the associated alternate Billing Service.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

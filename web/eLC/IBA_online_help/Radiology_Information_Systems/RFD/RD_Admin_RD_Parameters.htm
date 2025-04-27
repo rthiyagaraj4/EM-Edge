@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>RD_Admin_RD Parameters</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to define RD Parameter:</p>
+<p class="BoldRFD">Examination Parameters</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Examination Coding Scheme</span> - Select the ‘Examination Coding Scheme’ from the list. The listed system defined values are ‘CPT4’, ‘ICD 9CM’ and ‘User Defined’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Workload Reporting Units Measured In</span> - Select the unit from the list. The listed system defined values are ‘Korner Units’ and ‘RVU’.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Workload reporting is used to measure the load of work in the Radiology department.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Registration Numbering</p>
+<p class="BoldRFD">Based On</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Based on</span> - Select the required option to generate the registration number based on the selected option. If ‘Section’ is selected, the registration number is generated based on the ‘Section’. If ‘Storage’ is selected, the registration number is generated based on the Storage Location.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Registration No. Length</span> – Enter the length of the registration number in numeric format. The value cannot be greater than 10. The registration length specified is calculated based on the Length Parameters. You cannot modify the value on saving the record.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Length Parameters</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prefix</span> – Enter the Section/Storage Location prefix, which defines the length of the Section code or Location Code. If registration numbering rule is based on Section, the prefix legend is displayed as ‘Section Prefix’ and the Registration Number is generated based on the length specified in the Section Prefix. If registration numbering rule is based on Storage Location, the prefix legend is displayed as ‘Storage Location Prefix’ and the Registration Number is generated based on the length specified in the Storage Location Prefix.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Year</span> – Enter the length of the Year, to be displayed in the Registration Number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Serial Number</span> – The Serial Number is calculated and displayed based on the Prefix and Year length specified.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The total length must match with the length of the ‘Registration No. Length’ field.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Radiation</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Measured in</span> – Enter the Unit for measuring the radiation in the numeric format of four digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Diagnosis Coding Scheme</span> – Select the Diagnosis Coding Scheme from the list. The listed system defined values are ‘ICD 10’, ‘ICD 9CM’ and ‘User Defined’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Schedule Type</span> – Select the Schedule Type from the drop-down list. The listed values are ‘Radiology Schedule’ and ‘General Schedule’. If the value ‘Radiology Schedule’ is selected, the radiology appointments are scheduled in &#160;Radiology &#160;module. If the value ‘General Schedule’ is selected, the RIS appointment scheduling is done in Appointment Scheduling screen in Appointment Scheduling (OA) module. The Schedule Type drop-down list gets disabled once the RIS Appointment Scheduling is enabled in OA.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

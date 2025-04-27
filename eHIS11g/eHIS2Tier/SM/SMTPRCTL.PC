@@ -1,0 +1,143 @@
+#include <windows.h>
+#include <winuser.h>
+#include <winspool.h>
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+HWND	hwnd;
+MSG	msg;
+WNDCLASS wndclass;
+HANDLE hPrinter;
+char string_var[100];
+
+char pgm_id[150];
+char userpwd[150];
+char session_id[20];
+char facility_id[2];
+char pgm_date[20];
+char l_priority[4];
+char ser_request[10];
+char command_line[300];
+int l_count = 0;
+
+// Main Window program
+int WINAPI WinMain(HINSTANCE  hInstance,HINSTANCE  hPrevInstance,
+    LPSTR  lpCmdLine,int  nShowCmd)
+{
+	char	debug_function_name[64];
+	char sep[3]= ";" ;
+	char *uid,*datetime, *session,*facility, *pgmid ,*priority , *request;
+	int  res,i, start=1;
+	char testfile[100],test[100];
+   	char mcname[20];
+	DWORD mcno = 20;
+	
+
+	uid     =strtok(lpCmdLine,sep);
+	session =strtok(NULL,sep);
+	datetime=strtok(NULL,sep);
+	facility=strtok(NULL,sep);
+	pgmid=strtok(NULL,sep);
+	priority=strtok(NULL,sep);
+	request=strtok(NULL,sep);
+
+	 strcpy(userpwd, uid);
+	 strcpy(session_id, session);
+	 strcpy(pgm_date, datetime);
+	 strcpy(facility_id, facility);
+	 strcpy(pgm_id, pgmid);
+	 strcpy(l_priority, priority);
+	 strcpy(ser_request, request);
+
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc    = NULL;
+	wndclass.cbClsExtra		= 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.hInstance		= hInstance;
+	wndclass.hIcon			= NULL;  //LoadIcon ( NULL, IDI_APPLICATION );
+	wndclass.hCursor		= NULL;  //LoadCursor ( NULL, IDC_ARROW);
+//	wndclass.hbrBackground	= GetStockObject (WHITE_BRUSH);
+	wndclass.hbrBackground	= (HBRUSH) GetStockObject (LTGRAY_BRUSH);
+	wndclass.lpszMenuName	= NULL;
+	wndclass.lpszClassName	= "Printing Pc";
+	RegisterClass ( &wndclass );
+
+	hwnd = CreateWindow("Print Server",(LPSTR)NULL,
+                         WS_POPUP | WS_DLGFRAME,170,190,300,100,
+                         (HWND)NULL,(HMENU)NULL,(HANDLE)hInstance,
+						 (LPSTR) lpCmdLine);
+
+
+   strcpy(command_line, pgm_id);
+   strcat(command_line, " ");
+   strcat(command_line, userpwd);
+   strcat(command_line, " ");
+   strcat(command_line, pgm_date);
+   strcat(command_line, " ");
+   strcat(command_line, session_id);
+   strcat(command_line, " ");
+   strcat(command_line, facility_id);
+   strcat(command_line, " ");
+   strcat(command_line, l_priority);
+   strcat(command_line, " ");
+   strcat(command_line, ser_request);
+
+   if (strcmp(pgm_id,"SMTFMSRV") == 0)
+   {	strcat(command_line, " ");
+		strcat(command_line, "H"); 
+   }
+
+    get_count();
+
+	do_execute();
+
+
+	if (l_count = 0)
+		exit(0);
+    
+	return;
+
+	err_exit:
+   
+   exit(0);
+}   
+
+get_count()
+{
+
+	l_count = 1;
+}
+
+do_execute()
+{
+
+	if (l_count > 0)
+	{
+
+		WinExec(command_line, SW_SHOWNORMAL);	        
+
+		l_count = 0;
+
+		exit(0);
+	}
+	else
+	{
+		exit(0);
+	}
+
+
+}
+
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

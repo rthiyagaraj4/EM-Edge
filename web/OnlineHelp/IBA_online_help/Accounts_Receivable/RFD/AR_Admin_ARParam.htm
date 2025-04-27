@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>AR_Admin_ARParam</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define AR Parameters:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Current Month/Year</span> – Enter the Current Month/Year in numeric format of mm/yyyy. The Month and Year is associated with the month end processing. You cannot modify the month and year once the values are recorded. This period denotes the period when the Accounts Receivable module is implemented. The values set for the Current Month and Year is updated automatically to the next period during the month end processing. This period must always denote the fiscal month and year and not the calendar month and year. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">AR to GL Interface</span> – Select the value from the list. The listed values are ‘Batch’, ‘Online’ and ‘No Integration’. If ‘Batch’ is selected, transaction records are posted to General Ledger module periodically. If ‘Online’ is selected, individual transaction records are posted to General Ledger module whenever it is saved. If ‘No Integration’ is selected, individual transaction records are not posted to General Ledger module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Purge Doc After Months</span> – Enter the value in numeric format of two digits maximum length. This function allows you to remove all fully settled documents from the database after the specified period. For Example, if the value entered is six, the fully settled records are available in the system for six months and deleted after six months.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Customer Code Parameters</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Code Length</span> – Enter the Customer Code length in numeric format of one digit maximum length. You cannot modify the recorded value. When you specify the Customer Code value, the system checks for the Code Length specified.</p>
+</li>
+</ol>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Code Scheme Type</span> – Select the ‘Customer Code Scheme Type’ option. The options are ‘Numeric’ and ‘Alphanumeric’. If ‘Numeric’ is selected, you must enter the Customer Code in numeric format. If ‘Alphanumeric’ is selected, you can enter the Customer Code in combination of alphabets and numerals. You cannot modify the recorded value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validity Period</span> – Enter the Validity Period in numeric format of three digits maximum length. The Customer Code is considered valid for usage until the recorded period.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Back Dated Validity Allowed</span> – Enter the number of days in numeric format of three digits maximum length. The Customer Code is considered valid for usage preceding the current day.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reminder Frequency</span> – Enter the Reminder Frequency period in numeric format of two digits maximum length. The reminder letters are delivered to the Customer based on the period recorded.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Ageing Analysis Slots in Days</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ageing Analysis Slots in Days</span> –Enter the Ageing Analysis period in the Slot1, Slot2, Slot3, Slot4 and Slot5 in numeric format of three digits maximum length. Subsequent slot values must be in incremental order.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Posting Accounts</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank A/c</span> – Select the required Bank Account in Posting Account Code format from the <span class="BoldNumberRFD">[List of Values]</span>. The displayed values are defined in the &#160;Chart of Accounts function with Bank Code check box enabled.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /> The Bank Account Code is displayed while entering the receipt transaction in Receipts entry option in Cashier’s menu, by default.</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Suspense A/c</span> – Select the required &#160;Suspense Account in Posting Account Code format from the <span class="BoldNumberRFD">[List of Values]</span>. The displayed values are defined in the &#160;Chart of Accounts function.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The Suspense Account is displayed while entering receipt transaction in Receipts entry option in Cashier’s menu, by default.</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mark Up A/c - Bills</span> - Select the required Mark Up Account - Bills in Posting Account Code format from the <span class="BoldNumberRFD">[List of Values]</span>. The displayed values are defined in the &#160;Chart of Accounts function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mark Up A/c - Inventory</span> - Select the required Mark Up Account - Inventory in Posting Account Code format from the <span class="BoldNumberRFD">[List of Values]</span>. The displayed values are defined in the &#160;Chart of Accounts function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mark Up A/c - CSSD</span> - Select the required Mark Up Account – CSSD (Sterile Stock) in Posting Account Code format from the <span class="BoldNumberRFD">[List of Values]</span>. &#160;The displayed values are defined in the &#160;Chart of Accounts function</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Transaction Document Types</p>
+<ol start="15" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoices</span> – Enter the required Invoices or select the required Invoice Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Invoice code set is considered as the default value, if no data is specified for Invoice in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Debit Notes</span> – Select the required Debit Note Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Debit Note code set is considered as the default value, if no data is specified for Debit Notes in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Notes</span> – Select the required Credit Note Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Credit Note code set is considered as the default value, if no data is specified for Credit Notes in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustments</span> – Select the required Adjustment Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Adjustment Code set is considered as the default value, if no data is specified for Adjustments in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipts</span> – Select the required Receipt Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Receipt code set is considered as the default value, if no data is specified for Receipts in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refunds</span> – Select the required Refund Code from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Refund code set is considered as the default value, if no data is specified for Receipts in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext. Sales Dispatch</span> – Select the required Extended Sales Dispatch from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Extended Sales Dispatch code set is considered as the default value, if no data is specified for Extended Sales Dispatch.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Document Types</p>
+<ol start="22" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Note settlement Discounts</span> – Select the required Credit Note Settlement Discounts from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Credit Note Settlement Discounts code set is considered as the default value, if no data is specified for Credit Note Settlement Discounts in transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment Unmark Bad Debts</span> – Select the required Adjustment Unmark Bad Debts from the <span class="BoldNumberRFD">[List of Values]</span>. The Document Types defined in the Financials Base module are displayed. The Adjustment Unmark Bad Debts code set here is considered as the default value, if no data is specified for Adjustment Unmark Bad Debts in transactions.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Functional Parameters</p>
+<ol start="24">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Posting of Official Receipts?</span> – Select the check box to indicate that the Official Receipts can be posted online, instead of batch processing. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque Details entry as part of Refund?</span> – Select the check box to indicate that the details of cheque entry are part of Refund details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Marking/Unmarking of Bad Debts?</span> – Select the check box to allow you to mark or unmark the bad debts.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

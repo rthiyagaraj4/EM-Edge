@@ -1,0 +1,1275 @@
+package jsp_servlet._exh._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.util.*;
+import java.sql.*;
+import java.util.*;
+import java.net.*;
+import eXH.*;
+import webbeans.eCommon.ConnectionManager;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __reviewcommprocesspopup extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/exh/jsp/ReviewCommProcessPopup.jsp", 1742550259666L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n<HTML>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n<HEAD>\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n\n";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<link rel=\'stylesheet\' type=\'text/css\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\'></link>\n";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="\n<script language=\'javascript\' src=\'../../eCommon/js/common.js\'></script>\n<script language=\'javascript\' src=\'../../eCommon/js/ValidateControl.js\'></script>\n<script language=\"JavaScript\">\n//function RefreshMethod\nfunction RefreshMethod()\n{\n\nthis.document.review_commprocess_popup_form.action = \'../../eXH/jsp/ReviewCommProcessPopup.jsp\';\nthis.document.review_commprocess_popup_form.submit();\n\n}\n//function resetMethod\nfunction resetMethod()\n{\n   this.document.review_commprocess_popup_form.mode.value=\'I\';\n   this.document.review_commprocess_popup_form.action = \'../../eXH/jsp/ReviewCommProcessPopup.jsp\';\n   this.document.review_commprocess_popup_form.submit();\n}\n</script>\n<Script src=\\\"../../eCommon/js/showModalDialog.js\\\" language=\\\"JavaScript\\\"></Script>\n\n\n\n<BODY  leftmargin=0 topmargin=0  onMouseDown=\"CodeArrest()\" onKeyDown = \'lockKey()\'>\n<form name=\"review_commprocess_popup_form\" id=\"review_commprocess_popup_form\" >\n<input type=\"hidden\" name=\"appli\" id=\"appli\" value=\'";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\'/>\n<input type=\"hidden\" name=\"appln_name\" id=\"appln_name\" value=\'";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\'/>\n<input type=\"hidden\" name=\"fac\" id=\"fac\" value=\'";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="\'/>\n<input type=\"hidden\" name=\"facility_name\" id=\"facility_name\" value=\'";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\'/>\n<input type=\"hidden\" name=\"com\" id=\"com\" value=\'";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="\'/>\n<input type=\"hidden\" name=\"proc1\" id=\"proc1\" value=\'";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="\'/>\n<input type=\"hidden\" name=\"mode\" id=\"mode\" />\n<table border=0 cellspacing=0 cellpadding=3 width=\'100%\' align=center>\n<tr>\n<td width=\'10%\'></td> \n<td width=\'40%\'></td> \n<td width=\'10%\'></td> \n<td width=\'40%\'></td> \n</tr>\n<tr>\n<td class=label >";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="</td>\n<td class=\'fields\'><input type=text name=applval id=applval value=\'";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="\' size=40></td>\n<td class=label >";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="</td>\n<td class=\'fields\'><input type=text size=20 value=\'";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="\'>\n</td>\n</tr>\n<tr>\n<td class=label >";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    private final static java.lang.String  _wl_block19 ="</td>\n<td class=\'fields\'><input type=text name=proc_type id=proc_type value=\'";
+    private final static byte[]  _wl_block19Bytes = _getBytes( _wl_block19 );
+
+    private final static java.lang.String  _wl_block20 ="\' size=10></td>\n<td class=label >";
+    private final static byte[]  _wl_block20Bytes = _getBytes( _wl_block20 );
+
+    private final static java.lang.String  _wl_block21 ="</td><td class=\'fields\'>\n<input type=text size=15 value=\'";
+    private final static byte[]  _wl_block21Bytes = _getBytes( _wl_block21 );
+
+    private final static java.lang.String  _wl_block22 ="\'>\n</td>\n</tr>\n<tr>\n<td width=\'10%\'></td> \n<td width=\'40%\'></td> \n<td width=\'10%\'></td> \n<td width=\'40%\'></td> \n</tr>\n</table>\n";
+    private final static byte[]  _wl_block22Bytes = _getBytes( _wl_block22 );
+
+    private final static java.lang.String  _wl_block23 ="\n\t     <script>\nalert(getMessage(\'XH1021\',\'XH\'));\n         </script>\n         ";
+    private final static byte[]  _wl_block23Bytes = _getBytes( _wl_block23 );
+
+    private final static java.lang.String  _wl_block24 ="\n\t\t\n      <p>\n<table align=\'right\'>\n\t<tr>\n\t<td>\n\t";
+    private final static byte[]  _wl_block24Bytes = _getBytes( _wl_block24 );
+
+    private final static java.lang.String  _wl_block25 ="\n\n</td>\n</tr>\n</table>\n</p>\n<br><br>\n\n<table border=1 cellspacing=0 cellpadding=3 width=\'100%\' align=center>\n<tr>\n\t<td class=\'COLUMNHEADER\' width=\'2%\'></td>\n\t<td class=\'COLUMNHEADER\'>";
+    private final static byte[]  _wl_block25Bytes = _getBytes( _wl_block25 );
+
+    private final static java.lang.String  _wl_block26 ="</td>\n\t<td class=\'COLUMNHEADER\'>";
+    private final static byte[]  _wl_block26Bytes = _getBytes( _wl_block26 );
+
+    private final static java.lang.String  _wl_block27 ="</td>\n</tr>\n";
+    private final static byte[]  _wl_block27Bytes = _getBytes( _wl_block27 );
+
+    private final static java.lang.String  _wl_block28 ="\n<tr>\n<td nowrap class=\'";
+    private final static byte[]  _wl_block28Bytes = _getBytes( _wl_block28 );
+
+    private final static java.lang.String  _wl_block29 ="\'><img src=\'";
+    private final static byte[]  _wl_block29Bytes = _getBytes( _wl_block29 );
+
+    private final static java.lang.String  _wl_block30 ="\' width=15 height=15/></td>\n<td nowrap class=\'";
+    private final static byte[]  _wl_block30Bytes = _getBytes( _wl_block30 );
+
+    private final static java.lang.String  _wl_block31 ="\'>";
+    private final static byte[]  _wl_block31Bytes = _getBytes( _wl_block31 );
+
+    private final static java.lang.String  _wl_block32 ="</td>\n<td nowrap class=\'";
+    private final static byte[]  _wl_block32Bytes = _getBytes( _wl_block32 );
+
+    private final static java.lang.String  _wl_block33 ="</td>\n\n";
+    private final static byte[]  _wl_block33Bytes = _getBytes( _wl_block33 );
+
+    private final static java.lang.String  _wl_block34 ="        \n</tr>\n\n<table cellspacing=0 cellpadding=3 width=\'100%\' align=center>\n<tr></tr>\n<tr></tr>\n<tr></tr>\n<tr></tr>\n<tr>\n<td width=\'20%\'  class=label><img src=\'../../eCommon/images/dark_blue_square.jpg\' width=40 height=15 > ";
+    private final static byte[]  _wl_block34Bytes = _getBytes( _wl_block34 );
+
+    private final static java.lang.String  _wl_block35 ="</td>\n<td width=\'20%\'  class=label><img src=\'../../eCommon/images/yello_square.jpg\' width=40 height=15 > ";
+    private final static byte[]  _wl_block35Bytes = _getBytes( _wl_block35 );
+
+    private final static java.lang.String  _wl_block36 ="</td> \n<td width=\'20%\'  class=label><img src=\'../../eCommon/images/green_square.jpg\' width=40 height=15 > ";
+    private final static byte[]  _wl_block36Bytes = _getBytes( _wl_block36 );
+
+    private final static java.lang.String  _wl_block37 ="</td> \n<td width=\'20%\'  class=label><img src=\'../../eCommon/images/pink_square.jpg\' width=40 height=15 > ";
+    private final static byte[]  _wl_block37Bytes = _getBytes( _wl_block37 );
+
+    private final static java.lang.String  _wl_block38 ="</td> \n<td width=\'20%\'  class=label><img src=\'../../eCommon/images/red_square.jpg\' width=40 height=15 > ";
+    private final static byte[]  _wl_block38Bytes = _getBytes( _wl_block38 );
+
+    private final static java.lang.String  _wl_block39 ="</td> \n</tr>\n</table>\n</table>\n";
+    private final static byte[]  _wl_block39Bytes = _getBytes( _wl_block39 );
+
+    private final static java.lang.String  _wl_block40 ="\n<table align=right>\n<tr>\n<td colspan=4><input class=\'BUTTON\' type=\"button\"  name=reset id=reset value=\'";
+    private final static byte[]  _wl_block40Bytes = _getBytes( _wl_block40 );
+
+    private final static java.lang.String  _wl_block41 ="\' onClick=\"resetMethod();\"><input class=\'BUTTON\' type=\"button\"  name=reset id=reset value=\'";
+    private final static byte[]  _wl_block41Bytes = _getBytes( _wl_block41 );
+
+    private final static java.lang.String  _wl_block42 ="\' onClick=\"RefreshMethod();\"><input class=\'BUTTON\' type=\"button\"  name=reset id=reset value=\'";
+    private final static byte[]  _wl_block42Bytes = _getBytes( _wl_block42 );
+
+    private final static java.lang.String  _wl_block43 ="\' onClick=\"window.close();\"></td>\n</tr>\n</table>\n</form>\n</body>\n</html>\n\n";
+    private final static byte[]  _wl_block43Bytes = _getBytes( _wl_block43 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+String sStyle	=
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block3Bytes, _wl_block3);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+request.setCharacterEncoding("UTF-8"); 
+            _bw.write(_wl_block1Bytes, _wl_block1);
+ String locale = ((String)session.getAttribute("LOCALE"));	
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+String process_id="";
+String processtype="";
+String appl=request.getParameter("appli");
+String appln_name=request.getParameter("appln_name");
+String facility=request.getParameter("fac");
+String facility_name=request.getParameter("facility_name");
+String commu_client=request.getParameter("com");
+String proc=request.getParameter("proc1");
+if(proc.equalsIgnoreCase("I")) processtype="Inbound";
+if(proc.equalsIgnoreCase("O")) processtype="Outbound";
+
+String sql_query = request.getParameter("sql_query"); 
+String from = request.getParameter("from") ;
+String to = request.getParameter("to") ;
+if( sql_query==null){
+  sql_query="SELECT PROCESS_ID,TO_CHAR(START_DATE_TIME,'DD/MM/YYYY HH:MI:SS')START_DATE_TIME,"+
+ " TO_CHAR(STOP_DATE_TIME,'DD/MM/YYYY HH:MI:SS')STOP_DATE_TIME,TO_CHAR(LAST_COMM_DATE_TIME,'DD/MM/YYYY HH:MI:SS')LAST_COMM_DATE_TIME,"+
+"LAST_OUTBOUND_RETRIES,LAST_MESSAGE_ID,TOTAL_MESSAGES,STARTED_BY_ID,STOPPED_BY_ID,PROCESS_STATUS "+
+"FROM XH_COMM_PROCESS WHERE APPLICATION_ID=NVL('"+appl+"',APPLICATION_ID) AND FACILITY_ID=NVL('"+facility+"',FACILITY_ID)"+
+ " AND CLIENT_ID=NVL('"+commu_client+"',CLIENT_ID)"+
+"AND PROCESS_TYPE=NVL('"+proc+"',PROCESS_TYPE) ORDER BY START_DATE_TIME DESC ";    
+  }
+ int p_rec_cnt	= 0;
+String mode=request.getParameter("mode");
+String sql="SELECT MAX(PROCESS_ID) FROM XH_COMM_PROCESS WHERE APPLICATION_ID='"+appl+"' AND  CLIENT_ID='"+commu_client+"' AND FACILITY_ID='"+facility+"' AND PROCESS_TYPE ='"+proc+"'";
+Connection con = null;
+Statement pstmt=null,pstmt1=null;
+ResultSet rs=null;
+con =  ConnectionManager.getConnection(request);
+CallableStatement ostmt = null; 
+String sts="",message_text2="";
+if(mode!=null)
+{
+try{
+    pstmt1=con.createStatement();
+    rs = pstmt1.executeQuery(sql); 
+    while(rs.next())
+    {
+     process_id=rs.getString(1);
+   }
+   if(rs!=null) rs.close();
+   if(pstmt1!=null) pstmt1.close();
+    ostmt =con.prepareCall("{ call xhcomm.reset_process(?,?,?) }" ); 
+	ostmt.setString(1,process_id);
+	ostmt.registerOutParameter(2,java.sql.Types.VARCHAR);
+	ostmt.registerOutParameter(3,java.sql.Types.VARCHAR);
+	ostmt.execute(); 
+	sts =ostmt.getString(2);
+	message_text2 = ostmt.getString(3);
+	if(sts.equals("0"))
+	{
+		con.commit();
+	 } else {
+			con.rollback();
+			}
+
+	ostmt.close();
+    }catch(Exception e ){System.out.println(" exception review comm process ");e.printStackTrace(System.err);}	
+}
+
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(appl));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+            out.print( String.valueOf(appln_name));
+            _bw.write(_wl_block10Bytes, _wl_block10);
+            out.print( String.valueOf(facility));
+            _bw.write(_wl_block11Bytes, _wl_block11);
+            out.print( String.valueOf(facility_name));
+            _bw.write(_wl_block12Bytes, _wl_block12);
+            out.print( String.valueOf(commu_client));
+            _bw.write(_wl_block13Bytes, _wl_block13);
+            out.print( String.valueOf(proc));
+            _bw.write(_wl_block14Bytes, _wl_block14);
+
+            if (_jsp__tag0(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block15Bytes, _wl_block15);
+            out.print( String.valueOf(appln_name));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+
+            if (_jsp__tag1(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block17Bytes, _wl_block17);
+            out.print( String.valueOf(facility_name));
+            _bw.write(_wl_block18Bytes, _wl_block18);
+
+            if (_jsp__tag2(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block19Bytes, _wl_block19);
+            out.print( String.valueOf(processtype));
+            _bw.write(_wl_block20Bytes, _wl_block20);
+
+            if (_jsp__tag3(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block21Bytes, _wl_block21);
+            out.print( String.valueOf(commu_client));
+            _bw.write(_wl_block22Bytes, _wl_block22);
+  
+	int start = 0 ;
+	int end = 0 ;
+	int i=1;
+
+	if ( from == null )
+		start = 1 ;
+	else
+		start = Integer.parseInt( from ) ;
+
+	if ( to == null )
+	  	end = 13 ;
+	else	end = Integer.parseInt( to ) ;   
+
+	
+	int maxRecord = 0;
+
+	try
+	{
+	  String sql2=sql_query;
+		 pstmt=con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE , ResultSet.CONCUR_READ_ONLY);
+		 rs = pstmt.executeQuery(sql2); 
+		 rs.last();
+		 maxRecord=rs.getRow();
+		 rs.beforeFirst();
+		 if (maxRecord==0)
+	    {
+        
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+	      }
+	   else
+	   {
+		
+            _bw.write(_wl_block24Bytes, _wl_block24);
+  
+	if ( !(start <= 1) )
+	out.println("<A  "+ "HREF='../../eXH/jsp/ReviewCommProcessPopup.jsp?facility_name="+facility_name+"&fac="+facility+"&com="+commu_client+"&appli="+appl+""+"&proc1="+proc+"&from="+(start-13)+"&to="+(end-13)+"&sql_query="+URLEncoder.encode(sql_query)+"'"+" "+"text-decoration='none'>"+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eXH.Previous.Label","xh_labels")+"</A>");
+
+	if ( !( (start+13) > maxRecord ) )
+	out.println("<A "+  "HREF='../../eXH/jsp/ReviewCommProcessPopup.jsp?facility_name="+facility_name+"&fac="+facility+"&com="+commu_client+"&appli="+appl+""+"&proc1="+proc+"&from="+(start+13)+"&to="+(end+13)+"&sql_query="+URLEncoder.encode(sql_query)+"'"+" "+"text-decoration='none'>"+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eXH.Next.Label","xh_labels")+"</A>"); 
+	
+            _bw.write(_wl_block25Bytes, _wl_block25);
+
+            if (_jsp__tag4(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag5(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag6(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag7(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag8(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag9(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag10(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag11(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag12(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block27Bytes, _wl_block27);
+ 
+if ( start != 1 )
+for( int j=1; j<start; i++,j++ )
+{
+   rs.next() ;
+}
+String strTDClass = "" ;
+while ( rs!=null && rs.next() && i<=end )
+ {
+	 if ( i % 2 == 0 )
+		  	strTDClass = "QRYEVEN" ;
+	 else
+		  	strTDClass = "QRYODD" ;
+
+int PROCESS_ID=rs.getInt("PROCESS_ID");
+
+String START_DATE_TIME=""; 
+String processDate="";
+processDate=rs.getString("START_DATE_TIME")==null?"":rs.getString("START_DATE_TIME");
+if(!processDate.equals("")) START_DATE_TIME =com.ehis.util.DateUtils.convertDate(processDate,"DMYHMS","en",locale);
+String endDate1="";
+String STOP_DATE_TIME="";
+endDate1=rs.getString("STOP_DATE_TIME")==null?"":rs.getString("STOP_DATE_TIME");
+if(!endDate1.equals("")) STOP_DATE_TIME =com.ehis.util.DateUtils.convertDate(endDate1,"DMYHMS","en",locale);
+
+String endDate="";
+String LAST_COMM_DATE_TIME="";
+endDate=rs.getString("LAST_COMM_DATE_TIME")==null?"":rs.getString("LAST_COMM_DATE_TIME");
+if(!endDate.equals("")) LAST_COMM_DATE_TIME =com.ehis.util.DateUtils.convertDate(endDate,"DMYHMS","en",locale);
+
+int LAST_OUTBOUND_RETRIES=rs.getInt("LAST_OUTBOUND_RETRIES"); 
+String LAST_MESSAGE_ID=rs.getString("LAST_MESSAGE_ID"); if(LAST_MESSAGE_ID==null)  LAST_MESSAGE_ID="";
+int TOTAL_MESSAGES=rs.getInt("TOTAL_MESSAGES");
+String STARTED_BY_ID=rs.getString("STARTED_BY_ID"); if(STARTED_BY_ID==null)  STARTED_BY_ID="";
+String STOPPED_BY_ID=rs.getString("STOPPED_BY_ID"); if(STOPPED_BY_ID==null)  STOPPED_BY_ID="";
+String PROCESS_STATUS=rs.getString("PROCESS_STATUS"); if(PROCESS_STATUS==null)  PROCESS_STATUS="";
+String imgsrc="imgsrc="+"../../eCommon/images/dark_blue_square.jpg";
+if(PROCESS_STATUS.equalsIgnoreCase("A")) imgsrc="../../eCommon/images/green_square.jpg";
+if(PROCESS_STATUS.equalsIgnoreCase("C")) imgsrc="../../eCommon/images/red_square.jpg";
+if(PROCESS_STATUS.equalsIgnoreCase("S")) imgsrc="../../eCommon/images/pink_square.jpg";
+if(PROCESS_STATUS.equalsIgnoreCase("W")) imgsrc="../../eCommon/images/yello_square.jpg";
+
+            _bw.write(_wl_block28Bytes, _wl_block28);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block29Bytes, _wl_block29);
+            out.print( String.valueOf(imgsrc));
+            _bw.write(_wl_block30Bytes, _wl_block30);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(PROCESS_ID));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(START_DATE_TIME));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(STOP_DATE_TIME));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(LAST_COMM_DATE_TIME));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(LAST_OUTBOUND_RETRIES));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(LAST_MESSAGE_ID));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(TOTAL_MESSAGES));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(STARTED_BY_ID));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(strTDClass));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(STOPPED_BY_ID));
+            _bw.write(_wl_block33Bytes, _wl_block33);
+
+i++;
+p_rec_cnt++;
+}//endwhile 
+            _bw.write(_wl_block34Bytes, _wl_block34);
+
+            if (_jsp__tag13(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block35Bytes, _wl_block35);
+
+            if (_jsp__tag14(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block36Bytes, _wl_block36);
+
+            if (_jsp__tag15(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block37Bytes, _wl_block37);
+
+            if (_jsp__tag16(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block38Bytes, _wl_block38);
+
+            if (_jsp__tag17(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block39Bytes, _wl_block39);
+}
+
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+    
+if(rs!=null) rs.close();
+if(pstmt!=null)	pstmt.close();
+}catch(Exception e)
+	{
+		e.toString();
+		out.println(e.toString()); 
+     }
+	finally   
+	{
+		 if(con!=null)
+		 ConnectionManager.returnConnection(con,request);
+    }  
+
+            _bw.write(_wl_block40Bytes, _wl_block40);
+
+            if (_jsp__tag18(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block41Bytes, _wl_block41);
+
+            if (_jsp__tag19(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block42Bytes, _wl_block42);
+
+            if (_jsp__tag20(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block43Bytes, _wl_block43);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+
+    private boolean _jsp__tag0(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag0 = null ;
+        int __result__tag0 = 0 ;
+
+        if (__tag0 == null ){
+            __tag0 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag0);
+        }
+        __tag0.setPageContext(pageContext);
+        __tag0.setParent(null);
+        __tag0.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Application.Label", java.lang.String .class,"key"));
+        __tag0.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag0;
+        __result__tag0 = __tag0.doStartTag();
+
+        if (__result__tag0!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag0== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag0.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag0);
+            return true;
+        }
+        _activeTag=__tag0.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag0);
+        __tag0.release();
+        return false;
+    }
+
+    private boolean _jsp__tag1(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag1 = null ;
+        int __result__tag1 = 0 ;
+
+        if (__tag1 == null ){
+            __tag1 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag1);
+        }
+        __tag1.setPageContext(pageContext);
+        __tag1.setParent(null);
+        __tag1.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Facility.Label", java.lang.String .class,"key"));
+        __tag1.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag1;
+        __result__tag1 = __tag1.doStartTag();
+
+        if (__result__tag1!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag1== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag1.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag1);
+            return true;
+        }
+        _activeTag=__tag1.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag1);
+        __tag1.release();
+        return false;
+    }
+
+    private boolean _jsp__tag2(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag2 = null ;
+        int __result__tag2 = 0 ;
+
+        if (__tag2 == null ){
+            __tag2 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag2);
+        }
+        __tag2.setPageContext(pageContext);
+        __tag2.setParent(null);
+        __tag2.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.ProcessType.Label", java.lang.String .class,"key"));
+        __tag2.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag2;
+        __result__tag2 = __tag2.doStartTag();
+
+        if (__result__tag2!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag2== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag2.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag2);
+            return true;
+        }
+        _activeTag=__tag2.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag2);
+        __tag2.release();
+        return false;
+    }
+
+    private boolean _jsp__tag3(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag3 = null ;
+        int __result__tag3 = 0 ;
+
+        if (__tag3 == null ){
+            __tag3 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag3);
+        }
+        __tag3.setPageContext(pageContext);
+        __tag3.setParent(null);
+        __tag3.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.CommunicationClient.Label", java.lang.String .class,"key"));
+        __tag3.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag3;
+        __result__tag3 = __tag3.doStartTag();
+
+        if (__result__tag3!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag3== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag3.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag3);
+            return true;
+        }
+        _activeTag=__tag3.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag3);
+        __tag3.release();
+        return false;
+    }
+
+    private boolean _jsp__tag4(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag4 = null ;
+        int __result__tag4 = 0 ;
+
+        if (__tag4 == null ){
+            __tag4 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag4);
+        }
+        __tag4.setPageContext(pageContext);
+        __tag4.setParent(null);
+        __tag4.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.ProcessID.Label", java.lang.String .class,"key"));
+        __tag4.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag4;
+        __result__tag4 = __tag4.doStartTag();
+
+        if (__result__tag4!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag4== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag4.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag4);
+            return true;
+        }
+        _activeTag=__tag4.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag4);
+        __tag4.release();
+        return false;
+    }
+
+    private boolean _jsp__tag5(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag5 = null ;
+        int __result__tag5 = 0 ;
+
+        if (__tag5 == null ){
+            __tag5 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag5);
+        }
+        __tag5.setPageContext(pageContext);
+        __tag5.setParent(null);
+        __tag5.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.StartDateTimee.Label", java.lang.String .class,"key"));
+        __tag5.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag5;
+        __result__tag5 = __tag5.doStartTag();
+
+        if (__result__tag5!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag5== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag5.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag5);
+            return true;
+        }
+        _activeTag=__tag5.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag5);
+        __tag5.release();
+        return false;
+    }
+
+    private boolean _jsp__tag6(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag6 = null ;
+        int __result__tag6 = 0 ;
+
+        if (__tag6 == null ){
+            __tag6 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag6);
+        }
+        __tag6.setPageContext(pageContext);
+        __tag6.setParent(null);
+        __tag6.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.StopDateTime.Label", java.lang.String .class,"key"));
+        __tag6.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag6;
+        __result__tag6 = __tag6.doStartTag();
+
+        if (__result__tag6!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag6== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag6.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag6);
+            return true;
+        }
+        _activeTag=__tag6.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag6);
+        __tag6.release();
+        return false;
+    }
+
+    private boolean _jsp__tag7(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag7 = null ;
+        int __result__tag7 = 0 ;
+
+        if (__tag7 == null ){
+            __tag7 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag7);
+        }
+        __tag7.setPageContext(pageContext);
+        __tag7.setParent(null);
+        __tag7.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.LastCommnTime.Label", java.lang.String .class,"key"));
+        __tag7.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag7;
+        __result__tag7 = __tag7.doStartTag();
+
+        if (__result__tag7!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag7== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag7.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag7);
+            return true;
+        }
+        _activeTag=__tag7.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag7);
+        __tag7.release();
+        return false;
+    }
+
+    private boolean _jsp__tag8(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag8 = null ;
+        int __result__tag8 = 0 ;
+
+        if (__tag8 == null ){
+            __tag8 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag8);
+        }
+        __tag8.setPageContext(pageContext);
+        __tag8.setParent(null);
+        __tag8.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.LastOutboundRetries.Label", java.lang.String .class,"key"));
+        __tag8.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag8;
+        __result__tag8 = __tag8.doStartTag();
+
+        if (__result__tag8!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag8== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag8.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag8);
+            return true;
+        }
+        _activeTag=__tag8.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag8);
+        __tag8.release();
+        return false;
+    }
+
+    private boolean _jsp__tag9(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag9 = null ;
+        int __result__tag9 = 0 ;
+
+        if (__tag9 == null ){
+            __tag9 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag9);
+        }
+        __tag9.setPageContext(pageContext);
+        __tag9.setParent(null);
+        __tag9.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.LastMessageID.Label", java.lang.String .class,"key"));
+        __tag9.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag9;
+        __result__tag9 = __tag9.doStartTag();
+
+        if (__result__tag9!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag9== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag9.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag9);
+            return true;
+        }
+        _activeTag=__tag9.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag9);
+        __tag9.release();
+        return false;
+    }
+
+    private boolean _jsp__tag10(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag10 = null ;
+        int __result__tag10 = 0 ;
+
+        if (__tag10 == null ){
+            __tag10 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag10);
+        }
+        __tag10.setPageContext(pageContext);
+        __tag10.setParent(null);
+        __tag10.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.TotalMessages.Label", java.lang.String .class,"key"));
+        __tag10.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag10;
+        __result__tag10 = __tag10.doStartTag();
+
+        if (__result__tag10!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag10== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag10.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag10);
+            return true;
+        }
+        _activeTag=__tag10.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag10);
+        __tag10.release();
+        return false;
+    }
+
+    private boolean _jsp__tag11(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag11 = null ;
+        int __result__tag11 = 0 ;
+
+        if (__tag11 == null ){
+            __tag11 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag11);
+        }
+        __tag11.setPageContext(pageContext);
+        __tag11.setParent(null);
+        __tag11.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.StartedbyID.Label", java.lang.String .class,"key"));
+        __tag11.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag11;
+        __result__tag11 = __tag11.doStartTag();
+
+        if (__result__tag11!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag11== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag11.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag11);
+            return true;
+        }
+        _activeTag=__tag11.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag11);
+        __tag11.release();
+        return false;
+    }
+
+    private boolean _jsp__tag12(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag12 = null ;
+        int __result__tag12 = 0 ;
+
+        if (__tag12 == null ){
+            __tag12 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag12);
+        }
+        __tag12.setPageContext(pageContext);
+        __tag12.setParent(null);
+        __tag12.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.StoppedbyID.Label", java.lang.String .class,"key"));
+        __tag12.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag12;
+        __result__tag12 = __tag12.doStartTag();
+
+        if (__result__tag12!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag12== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag12.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag12);
+            return true;
+        }
+        _activeTag=__tag12.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag12);
+        __tag12.release();
+        return false;
+    }
+
+    private boolean _jsp__tag13(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag13 = null ;
+        int __result__tag13 = 0 ;
+
+        if (__tag13 == null ){
+            __tag13 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag13);
+        }
+        __tag13.setPageContext(pageContext);
+        __tag13.setParent(null);
+        __tag13.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.NoAction.Label", java.lang.String .class,"key"));
+        __tag13.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag13;
+        __result__tag13 = __tag13.doStartTag();
+
+        if (__result__tag13!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag13== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag13.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag13);
+            return true;
+        }
+        _activeTag=__tag13.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag13);
+        __tag13.release();
+        return false;
+    }
+
+    private boolean _jsp__tag14(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag14 = null ;
+        int __result__tag14 = 0 ;
+
+        if (__tag14 == null ){
+            __tag14 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag14);
+        }
+        __tag14.setPageContext(pageContext);
+        __tag14.setParent(null);
+        __tag14.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.WarmingUp.Label", java.lang.String .class,"key"));
+        __tag14.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag14;
+        __result__tag14 = __tag14.doStartTag();
+
+        if (__result__tag14!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag14== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag14.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag14);
+            return true;
+        }
+        _activeTag=__tag14.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag14);
+        __tag14.release();
+        return false;
+    }
+
+    private boolean _jsp__tag15(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag15 = null ;
+        int __result__tag15 = 0 ;
+
+        if (__tag15 == null ){
+            __tag15 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag15);
+        }
+        __tag15.setPageContext(pageContext);
+        __tag15.setParent(null);
+        __tag15.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.Active.label", java.lang.String .class,"key"));
+        __tag15.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag15;
+        __result__tag15 = __tag15.doStartTag();
+
+        if (__result__tag15!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag15== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag15.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag15);
+            return true;
+        }
+        _activeTag=__tag15.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag15);
+        __tag15.release();
+        return false;
+    }
+
+    private boolean _jsp__tag16(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag16 = null ;
+        int __result__tag16 = 0 ;
+
+        if (__tag16 == null ){
+            __tag16 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag16);
+        }
+        __tag16.setPageContext(pageContext);
+        __tag16.setParent(null);
+        __tag16.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.AbouttoStop.Label", java.lang.String .class,"key"));
+        __tag16.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag16;
+        __result__tag16 = __tag16.doStartTag();
+
+        if (__result__tag16!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag16== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag16.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag16);
+            return true;
+        }
+        _activeTag=__tag16.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag16);
+        __tag16.release();
+        return false;
+    }
+
+    private boolean _jsp__tag17(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag17 = null ;
+        int __result__tag17 = 0 ;
+
+        if (__tag17 == null ){
+            __tag17 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag17);
+        }
+        __tag17.setPageContext(pageContext);
+        __tag17.setParent(null);
+        __tag17.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Completed.Label", java.lang.String .class,"key"));
+        __tag17.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag17;
+        __result__tag17 = __tag17.doStartTag();
+
+        if (__result__tag17!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag17== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag17.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag17);
+            return true;
+        }
+        _activeTag=__tag17.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag17);
+        __tag17.release();
+        return false;
+    }
+
+    private boolean _jsp__tag18(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag18 = null ;
+        int __result__tag18 = 0 ;
+
+        if (__tag18 == null ){
+            __tag18 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag18);
+        }
+        __tag18.setPageContext(pageContext);
+        __tag18.setParent(null);
+        __tag18.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Reset.Label", java.lang.String .class,"key"));
+        __tag18.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag18;
+        __result__tag18 = __tag18.doStartTag();
+
+        if (__result__tag18!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag18== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag18.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag18);
+            return true;
+        }
+        _activeTag=__tag18.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag18);
+        __tag18.release();
+        return false;
+    }
+
+    private boolean _jsp__tag19(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag19 = null ;
+        int __result__tag19 = 0 ;
+
+        if (__tag19 == null ){
+            __tag19 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag19);
+        }
+        __tag19.setPageContext(pageContext);
+        __tag19.setParent(null);
+        __tag19.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Refresh.Label", java.lang.String .class,"key"));
+        __tag19.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag19;
+        __result__tag19 = __tag19.doStartTag();
+
+        if (__result__tag19!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag19== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag19.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag19);
+            return true;
+        }
+        _activeTag=__tag19.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag19);
+        __tag19.release();
+        return false;
+    }
+
+    private boolean _jsp__tag20(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag20 = null ;
+        int __result__tag20 = 0 ;
+
+        if (__tag20 == null ){
+            __tag20 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag20);
+        }
+        __tag20.setPageContext(pageContext);
+        __tag20.setParent(null);
+        __tag20.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eXH.Close.Label", java.lang.String .class,"key"));
+        __tag20.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${xh_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag20;
+        __result__tag20 = __tag20.doStartTag();
+
+        if (__result__tag20!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag20== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag20.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag20);
+            return true;
+        }
+        _activeTag=__tag20.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag20);
+        __tag20.release();
+        return false;
+    }
+}

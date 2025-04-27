@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_MPQ_ReassignPractitioner</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript" src="../../ehlpdhtm.js"></script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Reassign Practitioner</h1>
+<p class="Text">The Reassign practitioner option is used to reassign a Practitioner to patients with queue status as ‘Checked-in’ or ‘At Nursing Station’ or ‘Vital Signs Recorded’.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click the Reassign Practitioner option from the queue status to display the Reassign Practitioner screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The details already assigned to the patient record are displayed under ‘Current’ heading.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select and re-assign the Location, Room, Sub-service and Practitioner to the patient record.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Record]</span> to reassign the Practitioner or <span class="BoldButton">[Close]</span> to exit from the screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">If the Practitioner is reassigned to a patient registered with an appointment, an alert message is displayed – ‘This is an Appointment Patient, delink it’.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to de-link the association. The existing queue record is closed and a new queue record is created as a Walk in patient. Click <span class="BoldButton">[Cancel]</span> to abort the operation and the control goes back to Reassign Practitioner screen.</p>
+</li>
+</ol>
+<p class="Number" style="font-weight: bold; text-decoration: underline;">&#160;</p>
+<p class="Number" style="font-weight: bold; text-decoration: underline;">Booking group consultation for a patient</p>
+<p class="Number">You can use this screen to arrange group consultations for a patient. In group consultation, multiple practitioners attend a single patient in the same appointment.</p>
+<p class="Number" style="font-weight: bold; font-style: italic;">For group consultation, a multi-specialty practitioner must be selected as the primary resource during <a href="../../Appointment_Scheduling/Transaction/Book_Appointment.htm">appointment booking</a>.</p>
+<p class="Number">&#160;</p>
+<p class="Number">The following fields in this screen can be used for group consultation:</p>
+<ul type="disc">
+<li style="margin-left: -20px;" class="p-Number">
+<p class="Number"><span style="font-weight: bold; text-decoration: underline;"><u><b>Secondary Resources</b></u></span> – The secondary resources of type Practitioner, if selected during appointment booking will be automatically displayed here.</p>
+</li>
+<li style="margin-left: -20px;" class="p-Number">
+<p class="Number"><span style="font-weight: bold; text-decoration: underline;"><u><b>Additional Secondary Resources</b></u></span> – Click this button and select additional practitioners if you want to arrange group consultation for the patient.</p>
+</li>
+</ul>
+<p class="Number">A minimum of two secondary resources of type 'Practitioner' should be available during Re-Assign Practitioner if the specialty is of type multi-specialty. (Group consultation)</p>
+<p class="Number">If you try to assign less than two Secondary Resources of type Practitioner, the following error message will be displayed: “At least two secondary resources should be selected”.</p>
+<p class="Number">&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','OP_MPQ_AssignPractitioner','OP_MPQ_AssignPractitioner.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

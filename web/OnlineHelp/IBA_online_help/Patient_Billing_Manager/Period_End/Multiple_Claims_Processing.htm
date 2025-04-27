@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Multiple Claims Processing</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Multiple Claims Processing</h1>
+<p class="Italic">From this function you can <span style="color: #ff0000;"><font color="red" >Process</font></span> multiple claims of the patient.</p>
+<p class="Text">This function allows to process multiple claims for the patient having customer group defined in the Multiple Claim setup. &#160;&#160;This function lists out patients who were discharged for the current month / previous month.</p>
+<p class="Text">&#160;</p>
+<p class="Text">This function is applicable only if the ‘Multi Claims Processing’ check box is selected in BL Parameters screen. &#160;If the check box is cleared, the message ‘Function not applicable for the facility’ gets displayed.</p>
+<p class="Text">• If the patient is having customer group which is not defined in Claims Setup, the system displays the validation message 'Not applicable for customer group'. &#160;On tab out of the Patient ID, no data will be populated for the same patient.</p>
+<p class="Text">• If the patient is having customer group defined in claims but discharge is not initiated or bill is not generated, the system prompts the validation message 'Patient details not found,' on tab out of the Patient ID. No data will be populated for the same patient.</p>
+<p class="Text">• If the patient is having 4 episodes with discharge status as 'Still admitted', with discharge is not initiated or discharge bill not generated for the 5th episode, on tab out of the Patient ID, the system shows the corresponding four episodes for the patient and the fifth episode details will not be displayed since discharge is not initiated.</p>
+<h2>Multiple Claims Processing</h2>
+<p class="From">From the Period End, select the Multiple Claims Processing function.</p>
+<p class="Text">The Multiple Claims Processing screen gets displayed.</p>
+<ol type="1">
+<li class="p-Text">
+<p class="Text">Select the Patient ID from the lookup. On tab out of the Patient ID, the system defaults the values in the Patient Name, Customer Group Code, Customer Group Description, Customer Code, Customer Code Description fields. All fields are non-editable.</p>
+</li>
+<li class="p-Text">
+<p class="Text">There are two tabs: Current and History</p>
+</li>
+</ol>
+<p class="Text" style="margin-left: 40px;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Current</a></p>
+<div class="droptext" id="POPUP211998525" style="display: none;">
+<p style="font-size: 8pt;">T<span style="color: #0000ff;"><font color="blue" >his tab shows the episodes which are yet to be discharged and their claim status. Only the active records (with the value Still admitted in the Discharge field) are displayed.</font></span></p>
+<p style="font-size: 8pt; color: #0000ff;">&#160;</p>
+<p style="font-size: 8pt; color: #0000ff;">I. Select the ‘Admission Date/Time’ for the episode by clicking the calendar icon. You cannot select current or future date. It is editable field. This field is mandatory.</p>
+<p style="font-size: 8pt; color: #0000ff;">Note: Admission date and time can be modified before generation of approval number. Post &#160;&#160;generation of approval number, Approval date and time for the episode cannot be changed.</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">• Select the Discharge Status from the list. The listed values include Select, Still Admitted, and Discharged. By default, the value 'Select' gets displayed.</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">• If the patient is still admitted with a new episode ID, select 'Still Admitted' value from the Discharge Status. &#160;</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">• If the patient is discharged, select the value 'Discharged' from the drop-down list. The Discharge date is mandatory field when discharge is selected from drop-down list.</p>
+<p style="font-size: 8pt; color: #0000ff;">II. The Discharge Date values can be changed at any time before generation of Approval Doc number in ‘Approval Bill’ function. The Discharge Date values cannot be changed after posting.</p>
+<p style="font-size: 8pt; color: #0000ff;">III. Select the ‘Discharge Date’ by clicking the calendar icon. It is mandatory to select when the patient is marked as discharged. If the patient is not discharged, this field is non-editable.</p>
+<p style="font-size: 8pt; color: #0000ff;">IV. Select the Status if the corresponding episode bills are pending in Approval Bill Function. The system shows the status color as Grey.</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">o If the episode bill is approved in Approval Bill function, the system shows the status color as yellow.</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">o If the episode bill is approved and posted, the system shows the status color as 'Green'.</p>
+<p style="font-size: 8pt; margin-left: 40px; color: #0000ff;">o The color Indicators are shown at the bottom of the function.</p>
+</div>
+<p class="Text" style="margin-left: 40px;">&#160;</p>
+<p class="Text" style="margin-left: 40px;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">History</a></p>
+<div class="droptext" id="POPUP211908204" style="display: none;">
+<p style="font-size: 8pt; color: #0000ff;">This tab shows only the patient which are physically discharged and the corresponding claim details. All the fields shown in the History tab are non-editable. The Discharge date updated with physical discharge date time records processed for review, approval and posting to be made available in the history tab.</p>
+<p style="font-size: 8pt; color: #0000ff;">&#160;</p>
+<p style="font-size: 8pt; color: #0000ff;">1. The columns available are: Episode ID, From Date &amp; To Date, Bill Doc No, Bill Doc Date, Net Bill Amount, Admission Date/Time, Discharge Date/Time, Approval No, Posted Month, Posted By.</p>
+<p style="font-size: 8pt; color: #0000ff;">2. Approval No - If the corresponding episode bill is approved, the system shows the Approval No.</p>
+<p style="font-size: 8pt; color: #0000ff;">3. Posted Month - If the corresponding episode bill is approved and posted, the system displays the Posted month.</p>
+<p style="font-size: 8pt; color: #0000ff;">4. Posted by - &#160;The system displays the ID of the user who posted it.</p>
+</div>
+<p class="Text">&#160;</p>
+<hr style="float: aligncenter;" />
+<p class="Text">&#160;</p>
+<p class="Text">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP211998525');
+	TextPopupInit('a2','POPUP211908204');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

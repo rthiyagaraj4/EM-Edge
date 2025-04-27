@@ -1,0 +1,84 @@
+<%@ page import ="java.sql.*,java.util.*,java.net.*,webbeans.eCommon.*,eCommon.Common.*,org.json.simple.*" contentType="text/html;charset=UTF-8" %>
+<jsp:useBean id="obj" scope="page" class="webbeans.eCommon.XMLStringParser"/> 
+<%
+	request.setCharacterEncoding("UTF-8");
+	Connection conn=null;
+	conn=ConnectionManager.getConnection(request);
+
+try{
+	Map hash = (Map)obj.parseXMLString( request ) ;
+	hash = (Map)hash.get("SEARCH") ;
+	String action			=	(String) hash.get("action")==null?"":(String) hash.get("action");
+	String facilityId		=	(String)session.getAttribute("facility_id");
+	String locale = (String)session.getAttribute("LOCALE"); // added by mujafar for ML-MMOH-CRF-0632
+
+	if (action.equals("validateFollowUp")){
+		String pat_id			= (String) hash.get("pat_id");
+		String FollowUpCnt_yn	= "N";
+		int FollowUpCnt			= eAE.AECommonBean.getFollowUpCnt(conn,pat_id,facilityId);	
+
+		if(FollowUpCnt > 0)
+			FollowUpCnt_yn = "Y";
+		else
+			FollowUpCnt_yn	= "N";
+
+		out.println(FollowUpCnt_yn);
+	} 
+// added by mujafar for ML-MMOH-CRF-0632	
+	if(action.equals("PopulatePatientData"))
+	{    
+			String pat_id			= (String) hash.get("patientId");
+			JSONObject getPatientDetails				= new JSONObject();
+			getPatientDetails  = eAE.AECommonBean.getPatientData(conn,pat_id,facilityId,locale);
+			
+			
+			String res_addr_line1     = (String)getPatientDetails.get("res_addr_line1");
+			String res_addr_line2     = (String)getPatientDetails.get("res_addr_line2"); 
+			String res_addr_line3     = (String)getPatientDetails.get("res_addr_line3"); 
+			String res_addr_line4     = (String)getPatientDetails.get("res_addr_line4"); 
+			String res_town_desc      = (String)getPatientDetails.get("res_town_desc"); 
+			String res_area_desc      = (String)getPatientDetails.get("res_area_desc");  
+			String res_region_desc    = (String)getPatientDetails.get("res_region_desc");
+			String postal_desc        = (String)getPatientDetails.get("postal_desc"); 
+			String res_country_desc   = (String)getPatientDetails.get("res_country_desc");
+			String res_tel_no         = (String)getPatientDetails.get("res_tel_no");
+			String res_mob_no         = (String)getPatientDetails.get("res_mob_no");
+			String res_mail_id        = (String)getPatientDetails.get("res_mail_id");
+			String date_of_birth      = (String)getPatientDetails.get("date_of_birth");
+			String res_national_id_no = (String)getPatientDetails.get("res_national_id_no");
+			String pat_name           = (String)getPatientDetails.get("pat_name");
+			String res_town_code      =(String)getPatientDetails.get("res_town_code");
+			String res_area_code      =(String)getPatientDetails.get("res_area_code");
+			String res_region_code    =(String)getPatientDetails.get("res_region_code");
+			String postal_code        =(String)getPatientDetails.get("postal_code");
+			String res_country_code   =(String)getPatientDetails.get("res_country_code"); 
+			String ocpn_desc          =(String)getPatientDetails.get("ocpn_desc"); // added by mujafar for ML-MMOH-CRF-0632
+			
+			out.println("PopulatePatData(\"" + res_addr_line1 + "\",\"" + res_addr_line2 + "\",\"" + res_addr_line3 + "\",\"" + res_addr_line4 + "\",\"" + res_town_desc + "\",\"" + res_area_desc + "\",\"" + res_region_desc + "\",\"" + postal_desc + "\",\"" + res_country_desc + "\",\"" + res_tel_no + "\",\"" + res_mob_no + "\",\"" + res_mail_id + "\",\"" + date_of_birth + "\",\"" + res_national_id_no + "\",\"" + pat_name + "\",\"" + res_town_code + "\",\"" + res_area_code + "\",\"" + res_region_code + "\",\"" + postal_code + "\",\"" + res_country_code + "\",\"" + ocpn_desc + "\");"); // // MODIFIED by mujafar for ML-MMOH-CRF-0632
+			
+		
+	}else if (action.equals("validateNOKNatId")){/*Added by Thamizh selvi on 6th Aug 2018 against ML-MMOH-CRF-1177 Start*/
+		String nationalityId	= (String) hash.get("nationalityId");
+		String retVal			= "";
+		JSONObject dobJSONObj	= new JSONObject();
+
+		dobJSONObj		= eMP.MPCommonBean.getDOBFrmNationalityId(conn, nationalityId);
+		String dateOfBirthNOK	= (String)dobJSONObj.get("dateOfBirth");
+		String resDOB			= (String)dobJSONObj.get("result");
+		String errMesg			= (String)dobJSONObj.get("errorMsg");
+		
+		retVal = dateOfBirthNOK + "#" + resDOB + "#" + errMesg;
+		out.println(retVal);
+	}/*End*/
+	
+}catch(Exception e) { 
+	e.printStackTrace();
+	
+}finally{ 
+	if(conn != null) {
+		ConnectionManager.returnConnection(conn,request);
+	}	
+}                           
+%>          
+            
+            

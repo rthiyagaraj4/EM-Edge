@@ -1,0 +1,633 @@
+/*****************************************************************************/
+/*                           BLBPGINC.PC                                     */
+/*****************************************************************************/
+/*   Converted To Windows : Prasad B G S                                    */
+/*
+#define DEBUG
+*/
+#define VIEW_LOG_FILE   1 
+#include <stdio.h>
+#include <string.h>
+#include <bl.h>        
+                                       
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd[91],
+	    d_session_id[16],
+	    d_pgm_date[14],
+        rep_date[20],
+        comp_name[50],
+	    oper_id[31],
+	    nd_mth[3],
+	    nd_yr[5],  /* It was size 3 changed to 5 Y2K correction VSK 13/11/1999 */
+        nd_mnthly_daily_ind[2],
+		nd_operating_facility_id [3];
+
+VARCHAR     d_blng_serv_code[11],
+            d_pkg_serv_code[11],
+            d_acct_dept_code[7],
+            d_orig_dept_code[7],
+            d_physician_id[16],
+            d_serv_year[5],
+            d_serv_month[3],    
+	        d_serv_date[13];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+    
+
+    if(argc < 5) {
+      disp_message(ERR_MESG,"BLBPGINC : Usage BLBPGINC userid/password session_id pgm_date");
+      proc_exit();
+    }
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    strcpy(g_pgm_id,"BLBPGINC");
+    strcpy(g_pgm_date,argv[3]);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+		disp_message(ORA_MESG,"Unable to connect to oracle.");
+		proc_exit();
+    }
+
+    set_meduser_role();
+
+    start_prog_msg();
+
+    nd_mth.arr[0]              = '\0';
+    nd_yr.arr[0]               = '\0';
+    nd_mnthly_daily_ind.arr[0] = '\0';
+
+    nd_mth.len                 = 0;
+    nd_yr.len                  = 0;
+    nd_mnthly_daily_ind.len    = 0;
+
+    EXEC SQL SELECT OPERATING_FACILITY_ID,
+					PARAM1,            /* MONTH            */
+                    PARAM2,            /* YEAR             */
+                    PARAM3             /* Monthly/Daily Ind*/
+             INTO   :nd_operating_facility_id,
+			        :nd_mth,
+	            :nd_yr,
+                    :nd_mnthly_daily_ind
+             FROM   SY_PROG_PARAM
+	     WHERE  PGM_ID     = 'BLBPGINC'
+	     AND    PGM_DATE   = :d_pgm_date
+	     AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    nd_mth.arr[nd_mth.len]                           = '\0';
+    nd_yr.arr[nd_yr.len]                             = '\0';
+    nd_mnthly_daily_ind.arr[nd_mnthly_daily_ind.len] = '\0';
+
+   
+    if (nd_mnthly_daily_ind.arr[0] == 'M')
+    {
+       decl_curs_mnthly();
+       delete_serv_inc_mnthly();
+       delete_pkg_inc_mnthly();
+    }
+    else if (nd_mnthly_daily_ind.arr[0] == 'D')
+         {
+            decl_curs_daily();
+            delete_serv_inc_daily();
+            delete_pkg_inc_daily();
+         }
+
+    del_parm();
+
+    end_prog_msg();
+
+    EXEC SQL COMMIT RELEASE;
+
+    return;
+}
+
+del_parm()
+{
+
+    EXEC SQL DELETE SY_PROG_PARAM
+         WHERE  PGM_ID     = 'BLBPGINC' 
+         AND    PGM_DATE   = :d_pgm_date
+         AND    SESSION_ID = :d_session_id;
+
+    if(OERROR) 
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+
+}
+
+
+decl_curs_mnthly()
+{
+     EXEC SQL DECLARE SRV_MTH_HDR_CUR CURSOR FOR
+               SELECT BLNG_SERV_CODE,
+                      ACCT_DEPT_CODE,
+                      ORIG_DEPT_CODE,
+                      PHYSICIAN_ID,
+		      SERV_YEAR,
+		      SERV_MONTH
+                 FROM BL_SRV_INC_SUM_MTH_HDR
+	        WHERE LTRIM(TO_CHAR(SERV_YEAR,'0009'))||
+		      LTRIM(TO_CHAR(SERV_MONTH,'09')) <=
+		      :nd_yr || :nd_mth
+			  AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+     EXEC SQL DECLARE PKG_MTH_HDR_CUR CURSOR FOR
+               SELECT PACKAGE_CODE,
+                      ORIG_DEPT_CODE,
+                      PHYSICIAN_ID,
+                      SERV_YEAR,
+                      SERV_MONTH
+                 FROM BL_PKG_INC_SUM_MTH_HDR 
+	        WHERE LTRIM(TO_CHAR(SERV_YEAR,'0009'))||
+		      LTRIM(TO_CHAR(SERV_MONTH,'09')) <=
+		      :nd_yr || :nd_mth
+			 AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+}
+
+decl_curs_daily()
+{
+
+/*-- SERV_DATE format was YYMM changed to YYYYMM Y2K correction VSK 13/11/1999 */
+
+     EXEC SQL DECLARE SRV_HDR_CUR CURSOR FOR
+               SELECT BLNG_SERV_CODE,
+                      ACCT_DEPT_CODE,
+                      ORIG_DEPT_CODE,
+                      PHYSICIAN_ID,
+					  trunc(SERV_DATE)
+                 FROM BL_SRV_INC_SUM_HDR
+	        WHERE TO_CHAR(SERV_DATE,'YYYYMM') <= :nd_yr||:nd_mth
+			and   OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+     EXEC SQL DECLARE PKG_HDR_CUR CURSOR FOR
+               SELECT PACKAGE_CODE,
+                      ORIG_DEPT_CODE,
+                      PHYSICIAN_ID,
+                      SERV_DATE
+                 FROM BL_PKG_INC_SUM_HDR
+	        WHERE TO_CHAR(SERV_DATE,'YYYYMM') <= :nd_yr||:nd_mth
+			and   OPERATING_FACILITY_ID = :nd_operating_facility_id;
+}
+
+fetch_srv_mth_hdr()
+{
+    d_blng_serv_code.arr[0]  = '\0';
+    d_acct_dept_code.arr[0]  = '\0';
+    d_orig_dept_code.arr[0]  = '\0';
+    d_physician_id.arr[0]  = '\0';
+    d_serv_year.arr[0]  = '\0';
+    d_serv_month.arr[0]  = '\0';
+
+    d_blng_serv_code.len     = 0;
+    d_acct_dept_code.len     = 0;
+    d_orig_dept_code.len     = 0;
+    d_physician_id.len     = 0;
+    d_serv_year.len     = 0;
+    d_serv_month.len     = 0;
+
+    EXEC SQL FETCH SRV_MTH_HDR_CUR
+	     INTO  :d_blng_serv_code,
+                   :d_acct_dept_code,
+                   :d_orig_dept_code,
+                   :d_physician_id,
+                   :d_serv_year,
+                   :d_serv_month;
+
+	
+    if(OERROR)
+	err_mesg("FETCH failed on CURSOR SRV_MTH_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+      
+    d_blng_serv_code.arr[d_blng_serv_code.len]  = '\0';
+    d_acct_dept_code.arr[d_acct_dept_code.len]  = '\0';
+    d_orig_dept_code.arr[d_orig_dept_code.len]  = '\0';
+    d_physician_id.arr[d_physician_id.len]  = '\0';
+    d_serv_year.arr[d_serv_year.len]  = '\0';
+    d_serv_month.arr[d_serv_month.len]  = '\0';
+
+    return 1;
+}
+
+fetch_srv_hdr()
+{
+
+    d_blng_serv_code.arr[0]  = '\0';
+    d_acct_dept_code.arr[0]  = '\0';
+    d_orig_dept_code.arr[0]  = '\0';
+    d_physician_id.arr[0]  = '\0';
+    d_serv_date.arr[0]  = '\0';
+
+    d_blng_serv_code.len     = 0;
+    d_acct_dept_code.len     = 0;
+    d_orig_dept_code.len     = 0;
+    d_physician_id.len     = 0;
+    d_serv_date.len     = 0;
+
+    EXEC SQL FETCH SRV_HDR_CUR
+	     INTO  :d_blng_serv_code,
+                   :d_acct_dept_code,
+                   :d_orig_dept_code,
+                   :d_physician_id,
+                   :d_serv_date;
+
+    if(OERROR)
+	err_mesg("FETCH failed on CURSOR SRV_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+      
+    d_blng_serv_code.arr[d_blng_serv_code.len]  = '\0';
+    d_acct_dept_code.arr[d_acct_dept_code.len]  = '\0';
+    d_orig_dept_code.arr[d_orig_dept_code.len]  = '\0';
+    d_physician_id.arr[d_physician_id.len]  = '\0';
+    d_serv_date.arr[d_serv_date.len]  = '\0';
+
+    return 1;
+}
+
+fetch_pkg_mth_hdr()
+{
+
+    d_pkg_serv_code.arr[0]  = '\0';
+    d_orig_dept_code.arr[0]  = '\0';
+    d_physician_id.arr[0]  = '\0';
+    d_serv_year.arr[0]  = '\0';
+    d_serv_month.arr[0]  = '\0';
+
+    d_pkg_serv_code.len     = 0;
+    d_acct_dept_code.len     = 0;
+    d_orig_dept_code.len     = 0;
+    d_physician_id.len     = 0;
+    d_serv_year.len     = 0;
+    d_serv_month.len     = 0;
+
+    EXEC SQL FETCH PKG_MTH_HDR_CUR
+	     INTO  :d_pkg_serv_code,
+                   :d_orig_dept_code,
+                   :d_physician_id,
+                   :d_serv_year,
+                   :d_serv_month;
+
+    if(OERROR)
+	err_mesg("FETCH failed on CURSOR PKG_MTH_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+      
+    d_pkg_serv_code.arr[d_pkg_serv_code.len]  = '\0';
+    d_orig_dept_code.arr[d_orig_dept_code.len]  = '\0';
+    d_physician_id.arr[d_physician_id.len]  = '\0';
+    d_serv_year.arr[d_serv_year.len]  = '\0';
+    d_serv_month.arr[d_serv_month.len]  = '\0';
+
+    return 1;
+}
+
+fetch_pkg_hdr()
+{
+
+    d_pkg_serv_code.arr[0]  = '\0';
+    d_orig_dept_code.arr[0]  = '\0';
+    d_physician_id.arr[0]  = '\0';
+    d_serv_date.arr[0]  = '\0';
+
+    d_pkg_serv_code.len     = 0;
+    d_orig_dept_code.len     = 0;
+    d_physician_id.len     = 0;
+    d_serv_date.len     = 0;
+
+    EXEC SQL FETCH PKG_HDR_CUR
+	     INTO  :d_pkg_serv_code,
+                   :d_orig_dept_code,
+                   :d_physician_id,
+                   :d_serv_date;
+
+    if(OERROR)
+	err_mesg("FETCH failed on CURSOR PKG_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+      
+    d_pkg_serv_code.arr[d_pkg_serv_code.len]  = '\0';
+    d_orig_dept_code.arr[d_orig_dept_code.len]  = '\0';
+    d_physician_id.arr[d_physician_id.len]  = '\0';
+    d_serv_date.arr[d_serv_date.len]  = '\0';
+
+    return 1;
+}
+
+delete_serv_inc_mnthly()
+{
+    char aMesg[80];
+    int i = 0;
+    long srv_hdr = 0,
+	 srv_dtl = 0;
+
+    EXEC SQL OPEN SRV_MTH_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor SRV_MTH_HDR_CUR",0,"");
+	
+	    
+	while(fetch_srv_mth_hdr()) {
+
+	    
+
+	EXEC SQL DELETE BL_SRV_INC_SUM_MTH_DTL
+		 WHERE  BLNG_SERV_CODE = :d_blng_serv_code
+	           AND  ACCT_DEPT_CODE = :d_acct_dept_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  SERV_YEAR      = :d_serv_year
+		   AND  SERV_MONTH     = :d_serv_month;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_MTH_DTL",0,"");
+
+	srv_dtl += sqlca.sqlerrd[2];
+
+
+
+	EXEC SQL DELETE BL_SRV_INC_SUM_MTH_HDR
+		 WHERE  BLNG_SERV_CODE = :d_blng_serv_code
+	           AND  ACCT_DEPT_CODE = :d_acct_dept_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  SERV_YEAR      = :d_serv_year
+		   AND  SERV_MONTH     = :d_serv_month;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_MTH_HDR",0,"");
+
+	srv_hdr += sqlca.sqlerrd[2];
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_MTH_HDR",0,"");
+
+	i++;
+	if(i==500) {
+	    i = 0;
+	    sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_MTH_HDR\n",srv_hdr);
+        disp_message(INFO_MESG,aMesg);
+	    sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_MTH_DTL\n",srv_dtl);
+        disp_message(INFO_MESG,aMesg);
+	    EXEC SQL COMMIT WORK;
+	    if(OERROR)
+	        err_mesg("COMMIT failed on table BL_SRV_INC_SUM_MTH_HDR",0,"");
+	}
+
+    }
+
+    if(i%500) {
+        sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_MTH_HDR\n",srv_hdr);
+        disp_message(INFO_MESG,aMesg);
+        sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_MTH_DTL\n",srv_dtl);
+        disp_message(INFO_MESG,aMesg);
+        EXEC SQL COMMIT WORK;
+        if(OERROR)
+            err_mesg("COMMIT failed on table BL_SRV_INC_SUM_MTH_HDR",0,"");
+    }
+
+    EXEC SQL CLOSE SRV_MTH_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("CLOSE failed on CURSOR SRV_MTH_HDR_CUR",0,"");
+}
+
+delete_serv_inc_daily()
+{
+    char aMesg[80];
+    int i = 0;
+    long srv_hdr = 0,
+	 srv_dtl = 0;
+
+    EXEC SQL OPEN SRV_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor SRV_HDR_CUR",0,"");
+
+    while(fetch_srv_hdr()) {
+
+	EXEC SQL DELETE BL_SRV_INC_SUM_DTL
+		 WHERE  BLNG_SERV_CODE = :d_blng_serv_code
+	           AND  ACCT_DEPT_CODE = :d_acct_dept_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  trunc(SERV_DATE)      = :d_serv_date;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_DTL",0,"");
+
+	srv_dtl += sqlca.sqlerrd[2];
+
+	EXEC SQL DELETE BL_SRV_INC_SUM_HDR
+		 WHERE  BLNG_SERV_CODE = :d_blng_serv_code
+	           AND  ACCT_DEPT_CODE = :d_acct_dept_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  trunc(SERV_DATE)      = :d_serv_date;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_HDR",0,"");
+
+	srv_hdr += sqlca.sqlerrd[2];
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_SRV_INC_SUM_HDR",0,"");
+
+	i++;
+	if(i==500) {
+	    i = 0;
+	    sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_HDR\n",srv_hdr);
+        disp_message(INFO_MESG,aMesg);
+	    sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_DTL\n",srv_dtl);
+        disp_message(INFO_MESG,aMesg);
+	    EXEC SQL COMMIT WORK;
+	    if(OERROR)
+	        err_mesg("COMMIT failed on table BL_SRV_INC_SUM_HDR",0,"");
+	}
+
+    }
+
+    if(i%500) {
+        sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_HDR\n",srv_hdr);
+        disp_message(INFO_MESG,aMesg);
+        sprintf(aMesg,"Purged %7ld records in BL_SRV_INC_SUM_DTL\n",srv_dtl);
+        disp_message(INFO_MESG,aMesg);
+        EXEC SQL COMMIT WORK;
+        if(OERROR)
+            err_mesg("COMMIT failed on table BL_SRV_INC_SUM_HDR",0,"");
+    }
+
+    EXEC SQL CLOSE SRV_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("CLOSE failed on CURSOR SRV_HDR_CUR",0,"");
+}
+
+delete_pkg_inc_mnthly()
+{
+    char aMesg[80];
+    int i=0;
+
+    long pkg_hdr = 0,
+	 pkg_dtl = 0;
+
+    EXEC SQL OPEN PKG_MTH_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor PKG_MTH_HDR_CUR",0,"");
+
+    while(fetch_pkg_mth_hdr()) {
+
+	EXEC SQL DELETE BL_PKG_INC_SUM_MTH_DTL
+		 WHERE  PACKAGE_CODE   = :d_pkg_serv_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  SERV_YEAR      = :d_serv_year
+		   AND  SERV_MONTH     = :d_serv_month;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_MTH_DTL",0,"");
+
+	pkg_dtl = sqlca.sqlerrd[2];
+
+	EXEC SQL DELETE BL_PKG_INC_SUM_MTH_HDR
+		 WHERE  PACKAGE_CODE   = :d_pkg_serv_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  SERV_YEAR      = :d_serv_year
+		   AND  SERV_MONTH     = :d_serv_month;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_MTH_HDR",0,"");
+
+	pkg_hdr += sqlca.sqlerrd[2];
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_MTH_HDR",0,"");
+
+	i++;
+	if(i==500) {
+	    i = 0;
+	    sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_MTH_HDR\n",pkg_hdr);
+        disp_message(INFO_MESG,aMesg);
+	    sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_MTH_DTL\n",pkg_dtl);
+        disp_message(INFO_MESG,aMesg);
+	    EXEC SQL COMMIT WORK;
+	    if(OERROR)
+	        err_mesg("COMMIT failed on table BL_PKG_INC_SUM_MTH_HDR",0,"");
+	}
+
+    }
+    if(i%500) {
+        sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_MTH_HDR\n",pkg_hdr);
+        disp_message(INFO_MESG,aMesg);
+        sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_MTH_DTL\n",pkg_dtl);
+        disp_message(INFO_MESG,aMesg);
+        EXEC SQL COMMIT WORK;
+        if(OERROR)
+            err_mesg("COMMIT failed on table BL_PKG_INC_SUM_MTH_HDR",0,"");
+    }
+
+    EXEC SQL CLOSE PKG_MTH_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("CLOSE failed on CURSOR PKG_MTH_HDR_CUR",0,"");
+}
+
+delete_pkg_inc_daily()
+{
+    int i=0;
+
+    long pkg_hdr = 0,
+	 pkg_dtl = 0;
+     char aMesg[80];
+
+    EXEC SQL OPEN PKG_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor PKG_HDR_CUR",0,"");
+
+    while(fetch_pkg_hdr()) {
+
+	EXEC SQL DELETE BL_PKG_INC_SUM_DTL
+		 WHERE  PACKAGE_CODE   = :d_pkg_serv_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  TRUNC(SERV_DATE)      = :d_serv_date;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_DTL",0,"");
+
+	pkg_dtl += sqlca.sqlerrd[2];
+
+	EXEC SQL DELETE BL_PKG_INC_SUM_HDR
+		 WHERE  PACKAGE_CODE   = :d_pkg_serv_code
+	           AND  ORIG_DEPT_CODE = :d_orig_dept_code
+	           AND  PHYSICIAN_ID   = :d_physician_id
+		   AND  TRUNC(SERV_DATE)      = :d_serv_date;
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_HDR",0,"");
+
+	pkg_hdr = sqlca.sqlerrd[2];
+
+	if(OERROR)
+	    err_mesg("DELETE failed on table BL_PKG_INC_SUM_HDR",0,"");
+
+	i++;
+	if(i==500) {
+	    i = 0;
+	    sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_HDR\n",pkg_hdr);
+        disp_message(INFO_MESG,aMesg);
+	    sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_DTL\n",pkg_dtl);
+        disp_message(INFO_MESG,aMesg);
+	    EXEC SQL COMMIT WORK;
+	    if(OERROR)
+	        err_mesg("COMMIT failed on table BL_PKG_INC_SUM_HDR",0,"");
+	}
+
+    }
+    if(i%500) {
+        sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_HDR\n",pkg_hdr);
+         disp_message(INFO_MESG,aMesg);
+       sprintf(aMesg,"Purged %7ld records in BL_PKG_INC_SUM_DTL\n",pkg_dtl);
+        disp_message(INFO_MESG,aMesg);
+        EXEC SQL COMMIT WORK;
+        if(OERROR)
+            err_mesg("COMMIT failed on table BL_PKG_INC_SUM_HDR",0,"");
+    }
+
+    EXEC SQL CLOSE PKG_HDR_CUR;
+
+    if(OERROR)
+	err_mesg("CLOSE failed on CURSOR PKG_HDR_CUR",0,"");
+
+}

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<%@ page import ="java.sql.*,java.util.*,java.net.*,webbeans.eCommon.*,eCommon.XSSRequestWrapper" contentType="text/html;charset=UTF-8" %>
+ <%@ include file="../../eCommon/jsp/CommonInclude.jsp"%> 
+<Script src="../../eCommon/js/ValidateControl.js" language="JavaScript"></Script>
+<Script src="../../eCommon/js/common.js" language="JavaScript"></Script>
+<script language='javascript' src='../../eOP/js/ManageSPatQueue.js'></script>
+
+
+<%  
+	request.setCharacterEncoding("UTF-8");
+	request= new XSSRequestWrapper(request);
+	response.addHeader("X-XSS-Protection", "1; mode=block");
+	response.addHeader("X-Content-Type-Options", "nosniff");
+	Connection conn=null;
+	conn=ConnectionManager.getConnection(request);
+	
+	
+	/*
+	Connection con = null;
+	CallableStatement cstmt=null;
+	Statement stmt=null;
+	ResultSet resultSet=null;
+	int episode_id=0;
+	int op_episode_visit_num=0;
+	*/
+	//(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+try{
+	
+	String called_function=request.getParameter("called_function")==null?"":request.getParameter("called_function");
+	 
+	
+	//String package_bl_install_YN=request.getParameter("package_bl_install_YN")==null?"N":request.getParameter("package_bl_install_YN");
+	String encounter_id=request.getParameter("encounter_id")==null?"":request.getParameter("encounter_id");
+	
+	String queue_date=request.getParameter("queue_date")==null?"":request.getParameter("queue_date");
+	String QStatus=request.getParameter("QStatus")==null?"":request.getParameter("QStatus");
+	String arriveDTime=request.getParameter("arriveDTime")==null?"":request.getParameter("arriveDTime");
+	String VitalDtime=request.getParameter("VitalDtime")==null?"":request.getParameter("VitalDtime");
+	String queue_num=request.getParameter("queue_num")==null?"":request.getParameter("queue_num");
+	String oper_id=request.getParameter("oper_id")==null?"":request.getParameter("oper_id");
+	String patient_id=request.getParameter("patient_id")==null?"":request.getParameter("patient_id");
+	String rowNum=request.getParameter("rowNum")==null?"":request.getParameter("rowNum");
+	String parameters=request.getParameter("parameters")==null?"":request.getParameter("parameters");
+	String pat_id =request.getParameter("pat_id")==null?"":request.getParameter("pat_id");
+	String pkg_pat_yn =request.getParameter("pkg_pat_yn")==null?"N":request.getParameter("pkg_pat_yn");
+	String pkg_enc_yn =request.getParameter("pkg_enc_yn")==null?"N":request.getParameter("pkg_enc_yn");
+	
+	String bl_interfaced_yn =request.getParameter("bl_interfaced_yn")==null?"N":request.getParameter("bl_interfaced_yn");
+	String facilityid=(String)session.getValue("facility_id");
+	String build_episode_rule = request.getParameter("build_episode_rule");	
+    String assign_queue_num_by = request.getParameter("assign_queue_num_by");	
+    String sys_date = request.getParameter("sys_date");	
+    String status = request.getParameter("status");	
+	 
+	 
+	//String resultFlag="";
+	//String sql="";
+	if(called_function.equals("REVISEVISIT")) {
+		/*
+		sql="select EPISODE_ID,OP_EPISODE_VISIT_NUM from op_current_patient where facility_id='"+facilityid+"' and encounter_id="+encounter_id;
+		stmt=con.createStatement();
+		resultSet=stmt.executeQuery(sql);
+		if(resultSet!=null && resultSet.next()){
+			episode_id=Integer.parseInt(resultSet.getString("EPISODE_ID"));
+			op_episode_visit_num=Integer.parseInt(resultSet.getString("OP_EPISODE_VISIT_NUM"));
+		}
+		sql = "SELECT blpackage.get_pkg_pat_yn('"+facilityid+"','"+patient_id+"','"+episode_id+"','"+op_episode_visit_num+"') pat_pakYN FROM dual";
+		resultSet=stmt.executeQuery(sql);
+		if(resultSet!=null && resultSet.next()){
+			resultFlag=resultSet.getString(1);
+		}
+		*/
+		%>
+		<script>
+			parent.messageFrame.location.href='../../eCommon/jsp/error.jsp';
+			if('<%=pkg_pat_yn%>'=='Y') {
+				alert(getMessage('PACKAGE_REVISE_VISIT','OP'));
+				var rowNum='<%=rowNum%>';
+				rowNum=parseInt(rowNum);
+				rowNum=rowNum+1;
+				/*for( k=0;k<6;k++)
+					parent.f_query_add_mod.document.getElementById("tb1").rows(rowNum).cells(k).style.backgroundColor="white";*/
+			} else {
+				//parent.rv.rows='42,10%,*,30';				
+				parent.frames[1].document.location.href='../../eCommon/jsp/pline.jsp?P_MODULE_ID=OP&P_FUNCTION_ID=REVISE_VISIT&EncounterId=<%=encounter_id%>';				parent.frames[2].document.location.href="../../eOP/jsp/ReviseVisitMain.jsp?encounter_id=<%=encounter_id%>&queue_date=<%=queue_date%>&Patient=<%=patient_id%>&QStatus=<%=QStatus%>&ArriveDTime=<%=arriveDTime%>&VitalDTime=<%=VitalDtime%>&queue_num=<%=queue_num%>&oper_id=<%=oper_id%>&bl_interfaced_yn=<%=bl_interfaced_yn%>&build_episode_rule=<%=build_episode_rule%>&assign_queue_num_by=<%=assign_queue_num_by%>&sys_date=<%=sys_date%>&status=<%=status%>";
+				parent.frames[3].document.location.href="../../eCommon/jsp/error.jsp"
+				parent.frames[4].document.location.href='../../eBL/jsp/BLSessionValuesReset.jsp'
+			}
+		</script>
+		<%
+	} else if(called_function.equals("OPCHECKOUTTOOLTIP") || called_function.equals("OPCHECKOUT")) {
+			/*
+			resultFlag="N";			
+			if(bl_install_yn.equals("Y")){
+				String flag="";
+				sql="select bl_package_enabled_yn('"+facilityid+"') from dual";
+				stmt=con.createStatement();
+				resultSet=stmt.executeQuery(sql);
+				if(resultSet!=null && resultSet.next()){
+					flag=resultSet.getString(1);
+				}
+				if(flag.equals("Y")){
+					sql="select EPISODE_ID,OP_EPISODE_VISIT_NUM from op_current_patient where facility_id='"+facilityid+"' and encounter_id="+encounter_id;
+					stmt=con.createStatement();
+					resultSet=stmt.executeQuery(sql);
+					if(resultSet!=null && resultSet.next()){
+						episode_id=Integer.parseInt(resultSet.getString("EPISODE_ID"));
+						op_episode_visit_num=Integer.parseInt(resultSet.getString("OP_EPISODE_VISIT_NUM"));
+					}
+					//sql = "SELECT ORBLPACKAGE.OR_CHECK_PACKAGE_ORDER_COMP_YN('"+facilityid+"','"+encounter_id+"') FROM dual";			
+					sql = "SELECT blpackage.Is_pkg_open_for_encounter('"+facilityid+"','"+patient_id+"','O','"+episode_id+"','"+op_episode_visit_num+"') FROM dual";	
+					stmt=con.createStatement();
+					resultSet=stmt.executeQuery(sql);
+					if(resultSet!=null && resultSet.next()){
+						resultFlag=resultSet.getString(1);
+					}					
+				}
+			}
+			*/
+			if(pkg_enc_yn.equals("N")){	%>
+				<script>
+				async function OPPackageIntermediate(){
+				if('<%=called_function%>'=='OPCHECKOUTTOOLTIP'){
+					var dialogHeight= "75vh" ;
+					var dialogWidth = "70vw" ;
+					var features    = "dialogHeight:" + dialogHeight + "; dialogWidth:" + dialogWidth+";status=no" ;
+					var arguments   = "" ;
+					var param='<%=parameters%>';
+					//added @ UAT-4			
+					if(parent.frames[1].frames[1] && parent.frames[1].frames[2].document.ManagePatQue && parent.frames[1].frames[1] && parent.frames[1].frames[2].document.ManagePatQue.modalWindowOpen){
+						parent.frame1.frame2.document.forms[0].modalWindowOpen.value="Y";}
+					var retVal = await parent.frames[1].window.showModalDialog("../../eOP/jsp/PatCheckoutCall.jsp"+param,arguments,features);
+					parent.messageFrame.location.href='../../eCommon/jsp/error.jsp';				
+					if(retVal==undefined)	{	
+						//added @ UAT-4
+						
+						/*Below line code was modified by venkatesh.S on 21/Feb/2013 against 38068*/
+						if(parent.frames[1].frames[1] && parent.frames[1].frames[2].document.ManagePatQue && parent.frames[1].frames[1] && parent.frames[1].frames[2].document.ManagePatQue.modalWindowOpen) { 
+						
+							if(parent.frame1.searchbutton.document.forms[0].refresh.value==getLabel("Common.search.label","Common")){
+							
+								parent.frame1.frame2.document.forms[0].modalWindowOpen.value="N";					
+								parent.frame1.searchbutton.document.forms[0].refresh.click();
+		                        //parent.frame1.ManagePatQueueFrame.rows="29%,5%,80%,3%";
+		                        //parent.frame1.document.getElementById("frame1").style.height="38vh";
+								var ChkOut=parent.frame1.document.forms[0].ChkOut.value;
+								parent.frame1.document.getElementById("frame1").style.height="38vh";
+								if (ChkOut == "ChkOut")
+								{
+									parent.frame1.document.getElementById("frame1").style.height="34vh";
+								}
+								parent.frame1.document.getElementById("searchbutton").style.height="4vh";
+								parent.frame1.document.getElementById("frame2").style.height="50vh";
+								parent.frame1.document.getElementById("checkbox").style.height="5vh";
+								parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("Common.search.label","Common");
+							}
+							if(parent.frame1.searchbutton.document.forms[0].refresh.value==getLabel("eMR.Expand.label","eMR")){ 
+							 
+							 	parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("Common.search.label","Common");
+								parent.frame1.searchbutton.document.forms[0].refresh.click();
+								parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("eMR.Expand.label","eMR");
+							    parent.frame1.frame2.document.forms[0].modalWindowOpen.value="N";	
+							    //parent.frame1.ManagePatQueueFrame.rows="5.1%,3%,40%,1.5%"; 
+							    parent.frame1.document.getElementById("frame1").style.height="18.5vh";
+								parent.frame1.document.getElementById("searchbutton").style.height="4vh";
+								parent.frame1.document.getElementById("frame2").style.height="65vh";
+								parent.frame1.document.getElementById("checkbox").style.height="5vh";
+							
+							}						
+						}
+					/* end  38068 */		
+					}
+				}else if('<%=called_function%>'=='OPCHECKOUT'){
+					var dialogHeight= "75vh" ;
+					var dialogWidth = "70vw" ;
+					var status = "no";
+					var scroll = "no";
+					var features    = "dialogHeight:" + dialogHeight + "; dialogWidth:" + dialogWidth + "; status:"+ status + "; scroll:"+ scroll;
+					var arguments   = "" ;
+					//added @ UAT-4
+					if(parent.frame1.frame2 && parent.frame1.frame2.document.ManagePatQue.modalWindowOpen)
+						parent.frame1.frame2.document.forms[0].modalWindowOpen.value="Y";
+					retVal = await window.showModalDialog("../../eOP/jsp/PatCheckoutCall.jsp?"+'<%=parameters%>',arguments,features);
+					
+					parent.messageFrame.location.href='../../eCommon/jsp/error.jsp';
+					if(retVal==undefined)	{
+						//added @ UAT-4
+						/*Below line code was modified by venkatesh.S on 21/Feb/2013 against 38068*/
+						if(parent.frame1.frame2 && parent.frame1.frame2.document.ManagePatQue.modalWindowOpen){
+							
+						    if(parent.frame1.searchbutton.document.forms[0].refresh.value==getLabel("Common.search.label","Common")){
+								parent.frame1.frame2.document.forms[0].modalWindowOpen.value="N";					
+								parent.frame1.searchbutton.document.forms[0].refresh.click();
+		                        //parent.frame1.ManagePatQueueFrame.rows="29%,5%,80%,3%";	
+		                        //parent.frame1.document.getElementById("frame1").style.height="38vh";
+								var ChkOut=parent.frame1.document.forms[0].ChkOut.value;
+								parent.frame1.document.getElementById("frame1").style.height="38vh";
+								if (ChkOut == "ChkOut")
+								{
+									parent.frame1.document.getElementById("frame1").style.height="34vh";
+								}
+								parent.frame1.document.getElementById("searchbutton").style.height="4vh";
+								parent.frame1.document.getElementById("frame2").style.height="50vh";
+								parent.frame1.document.getElementById("checkbox").style.height="5vh";
+								parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("Common.search.label","Common");
+							}
+							if(parent.frame1.searchbutton.document.forms[0].refresh.value==getLabel("eMR.Expand.label","eMR")){ 
+							
+								parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("Common.search.label","Common");
+								parent.frame1.searchbutton.document.forms[0].refresh.click();
+								parent.frame1.searchbutton.document.forms[0].refresh.value=getLabel("eMR.Expand.label","eMR");
+								parent.frame1.frame2.document.forms[0].modalWindowOpen.value="N";	
+								//parent.frame1.ManagePatQueueFrame.rows="5.1%,3%,40%,1.5%"; 
+								parent.frame1.document.getElementById("frame1").style.height="18.5vh";
+								parent.frame1.document.getElementById("searchbutton").style.height="4vh";
+								parent.frame1.document.getElementById("frame2").style.height="65vh";
+								parent.frame1.document.getElementById("checkbox").style.height="5vh";
+							}
+						}
+					}
+				/*end 3806*/
+				}
+				}OPPackageIntermediate();
+				</script>
+			<%}else{%>
+				<script>
+					alert(getMessage('ALL_ORDERS_NOT_COMPLETED','OP'));
+					parent.messageFrame.location.href='../../eCommon/jsp/error.jsp';
+				</script>
+			<%}
+		} else if(called_function.equals("CANCELVISIT")) {
+			String sql1 = "SELECT count(*) FROM or_order WHERE order_status NOT IN (SELECT order_status_code FROM or_order_status_code WHERE order_status_type IN ('99','93','96')) AND encounter_id= ? AND patient_id = ? AND ordering_facility_id =? ";
+
+			int count = 0 ;			
+			PreparedStatement pstmt=null;
+			ResultSet rs1=null;
+				
+			pstmt = conn.prepareStatement(sql1);
+			pstmt.setString(1,encounter_id);
+			pstmt.setString(2,pat_id);
+			pstmt.setString(3,facilityid);
+			rs1 = pstmt.executeQuery();			
+			if(rs1!=null && rs1.next()) {		 
+				count = rs1.getInt(1);				
+			} 
+
+			out.println("#"+count);		
+
+			if(pstmt != null) pstmt.close();
+			if(rs1  != null) rs1.close();			
+		}
+}catch(Exception e) { 
+	//if(resultSet != null) resultSet.close();
+	//if(stmt != null) stmt.close();
+	e.printStackTrace();
+	
+}finally{ 
+	if(conn != null) {
+		ConnectionManager.returnConnection(conn,request);
+	}	
+}                           
+%>          
+            
+            
+

@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>PH_Trans_MAR_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to get the administration details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Class</span> - Select the Patient Class Option. The options are 'Inpatient', 'Daycare', 'Emergency', 'Outpatient'. The option 'Inpatient' is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – Enter the Location based on the Patient Class selected or select the Location using <span class="BoldNumberRFD">[?]</span> function. The Locations listed are based on Operator Station defined for the logged in user. The Operator Station is defined in ‘Application Masters’ module. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Administration Window</span> – The range gets displayed as read-only text. Based on the value specified for ‘Record Administration Within [] hrs’ in PH Parameter for Facility these values are calculated. The system considers current system date/time and displays it in the second value of ‘Administration Window’. The first value is calculated by subtracting the ‘Record Administration Within [] hrs’ from the current system date/time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Administration Status</span> – Select the status from the list. The listed values are ‘Due for Administration’ and ‘All’.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<table style="vertical-align: top;" cellspacing="0" width="100%">
+<col style="width: 24.269%;" />
+<col style="width: 75.731%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000;width: 24.269%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Due for Administration</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.731%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">The details displayed correspond to medications that are due for administration.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.269%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">All</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.731%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Details displayed correspond to medication administration based on the ‘From’ and ‘To’ values. The ‘Record Administration within [] hrs’ is not considered while displaying the result set. All the details like Orders Held, Discontinued, Administered, Not Administered and Verbal Orders are displayed.</p>
+</td>
+</tr>
+</table>
+<p class="Text">&#160;</p>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From</span> – The medication administration details are displayed from the specified date/time. Refer to the table below for validation. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<table style="vertical-align: top;" cellspacing="0" width="100%">
+<col style="width: 24.131%;" />
+<col style="width: 75.869%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000;width: 24.131%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Administration Status</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.869%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">From</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.131%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Due for Administration</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.869%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">The ‘From’ value can be equal to ‘Administration Window’ first box value and less than current system date/time displayed in the second box.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.131%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">All</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.869%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Enter the required value in date format of dd/mm/yyyy hh:mm.</p>
+</td>
+</tr>
+</table>
+<p class="Text">&#160;&#160;</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">To</span> – The Medication Administration details are displayed up to the specified date/time. Refer to the table below for validation.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<table style="vertical-align: top;" cellspacing="0" width="100%">
+<col style="width: 24.409%;" />
+<col style="width: 75.591%;" />
+<tr style="vertical-align: top;">
+<td style="border: Solid 1px #000000;width: 24.409%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Administration Status</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.591%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">To</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.409%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Due for Administration</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.591%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">The ‘To’ date/time has to be a value within the values displayed for ‘Administration Window’. But ‘To’ has to be greater than or equal to ‘From’ value.</p>
+</td>
+</tr>
+<tr style="vertical-align: top;">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.409%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">All</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 75.591%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Enter the required value in date format of dd/mm/yyyy hh:mm.</p>
+</td>
+</tr>
+</table>
+<p class="Text">&#160;&#160;</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Display Order By</span> - Select the value from the list. The available values are Drug Name, Dosage Form and Scheduled Date/Time. The value Scheduled Date/Time is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed no. [From-To]</span> – Select the bed number from the list. Specify the range. The listed beds correspond to the selected Nursing Unit. Based on the location selected, the Bed From and To fields are populated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admin Route Category</span> - Select the value from the list. The listed values are defined in the 'Admin Route Category' function in PH Code Setup. On selecting the Admin Route Category, the administration routes associated to the selected category in 'Routes for Admin Route Category' are listed for selection.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Route of Administration</span> - Select the Route of Administration value from the list to filter the Medication Order by Route of Administration. The available values are As directed and Dilute before use.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include</span> - &#160;Select the Value from the list. The listed values are 'All', 'Rx', 'Compounding Rx', 'IV Rx', 'PRN', 'Stat', 'TPN' and 'Oncology'. The value 'All' is displayed by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Display Held/Discontinued Orders</span> - Select the check box to display orders that are held/discontinued. These orders are indicated using a unique color-code.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The balance administration dose in MAR is displayed on user editing the PRN order. An alert message with prescribed details and administered dosage is displayed on selecting the ‘Select’ check box.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

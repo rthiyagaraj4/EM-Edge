@@ -1,0 +1,1386 @@
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+    height: 100%;
+    width: 100%;
+	font-family:Arial, Helvetica, sans-serif
+}
+.clearfix:after {
+ content: "."; 
+ display: block; 
+ height: 0; 
+ clear: both; 
+ visibility: hidden;
+ }
+.clearfix{display: inline-block;}
+* html .clearfix{height: 1%;}
+.clearfix{display: block;}
+
+/***************************************************************************************************/
+.table
+{
+	display:table;
+}
+.row
+{
+	display:table-row;
+}
+.cell
+{
+	display:table-cell;
+}
+
+
+
+
+.orderSelFrame{
+	padding-left: 7px;
+}
+#OrderListPopup{
+	display:none;
+	width:340px;
+	height:400px;
+	z-index:500
+}
+#OrderErrorDialog{
+	display:none;
+	width:340px;
+	height:280px;
+	z-index:500
+}
+.orderSearchSfs{
+	z-index: 1000;
+	position: absolute;
+	padding: 0px;
+	top: 30px;
+	height: 315px;
+	right: 5px;
+	width: 345px;
+	display: block;
+	overflow: hidden;
+}
+
+.sfs-bubble-arrow {
+	border-style: solid;
+	border-width: 5px;
+	height: 0;
+	width: 0;
+	position: absolute;
+	top: 0px;
+	right: 65px;
+}
+
+.ordSfsSmall {
+	position: absolute;
+	padding: 0px;
+	top: 10px; 
+	height: 300px;
+	/* right: 5px; */
+	width: 340px;
+	display: block;
+	overflow: hidden;
+}
+.ordSelParent
+{
+	min-height:100%;
+	min-width:100%;
+	height:100%;
+	width:100%;
+	position:absolute;
+	display:table;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+.ordSelHeaderMenu
+{
+	display:table-row;
+	width: 100%;
+    height:1%;
+}
+.ordSelHeaderMenuCont
+{
+	display:table-cell;
+	width: 100%;
+    height: 37px;
+	position:relative;
+	background: rgb(73,77,89); 
+	background-image:url(../images/Header_Bg.png)
+}
+.ordSelMenuCont
+{
+	display:table-cell;
+	width: 1%;
+    text-align:left; 
+	vertical-align:middle;
+	height:37px;
+}
+.ordCartMenuCont
+{
+	display:table-cell;
+	width: 99%;
+    text-align:left; 
+	vertical-align:middle;
+	height:37px;
+}
+.ordSelMenuIconbg
+{
+	width:55px;
+	height:37px;
+	background-image:url(../images/Header_icon.png);
+}
+.ordSelMenuIcon
+{
+	width:55px;
+	height:37px;
+	background-image:url(../images/Dummy_icon.PNG);
+	background-position:30% 50%;
+	background-repeat:no-repeat;
+}
+.ordSelMenuTitle
+{
+
+	height:37px;
+	text-align:left;
+	vertical-align:middle;
+	font-size:16px;
+	font-weight:bold;
+	padding-left:5px;
+	color:#04334a;
+	text-shadow: 1px 1px 2px rgba(255, 255, 255, 1);	
+}
+
+.ordSelMenuright
+{
+	display:table-cell;
+	width: 50px;
+	vertical-align:middle;
+	height:37px;
+	float:right;
+}
+.ordSelHeaderBtnTheme {
+	margin-top: 3px;
+	margin-left:2px;
+	margin-right:2px;
+	-moz-box-shadow:inset 0px 1px 0px 0px #16a4c4;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #16a4c4;
+	box-shadow:inset 0px 1px 0px 0px #16a4c4;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #0d97b9), color-stop(1, #04678e) );
+	background:-moz-linear-gradient( center top, #0d97b9 5%, #04678e 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#0d97b9', endColorstr='#04678e');
+	background-color:#0d97b9;
+	-webkit-border-top-left-radius:3px;
+	-moz-border-radius-topleft:3px;
+	border-top-left-radius:3px;
+	-webkit-border-top-right-radius:3px;
+	-moz-border-radius-topright:3px;
+	border-top-right-radius:3px;
+	-webkit-border-bottom-right-radius:3px;
+	-moz-border-radius-bottomright:3px;
+	border-bottom-right-radius:3px;
+	-webkit-border-bottom-left-radius:3px;
+	-moz-border-radius-bottomleft:3px;
+	border-bottom-left-radius:3px;
+	text-indent:1px;
+	border:1px solid #3b4551;
+	display:inline-block;
+	color:#ffffff;
+	font-family:arial;
+	font-size:12px;
+	font-weight:bold;
+	font-style:normal;
+	height:30px;
+	line-height:30px;
+	width:45px;
+	text-decoration:none;
+	text-align:center;
+	cursor:pointer;
+	text-shadow:1px 1px 0px #080008;
+}
+.ordSelHeaderBtnTheme:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #04678e), color-stop(1, #0d97b9) );
+	background:-moz-linear-gradient( center top, #04678e 5%, #0d97b9 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#04678e', endColorstr='#0d97b9');
+	background-color:#04678e;
+}.ordSelHeaderBtnTheme:active {
+	position:relative;
+}
+.ordSelHdrBtnIcon
+{
+	padding-top: 6px;
+}
+.orderCartHL{
+	box-shadow: 0 0 3px #515151;
+    transition: box-shadow 0.5s;
+}
+.ordTickDropdownContTheme {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  height: 30px;
+  width: 180px;
+  background: #03415a;
+  border: 1px solid;
+  /* border-color: white #002534 #002534; */
+  border-radius: 3px;
+  background-image: -webkit-linear-gradient(top, transparent, rgba(0, 0, 0, 0.06));
+  background-image: -moz-linear-gradient(top, transparent, rgba(0, 0, 0, 0.06));
+  background-image: -o-linear-gradient(top, transparent, rgba(0, 0, 0, 0.06));
+  background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.06));
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+  margin-top: 3px;
+  margin-right:2px;
+  float:right;
+  font-size:12px;
+  
+}
+.tickSectComboCont
+{
+	display:table-row;
+	width: 100%;
+    height:1%;
+}
+.tickSectCombo
+{
+	display:table-cell;
+	width: 100%;
+    height: 50px;
+	position:relative;
+	background-color:#f4f6f8;
+	padding:5px;
+	font-size: 14px;
+	color: #484848;
+}
+.ordSelItemsCont
+{
+	display:table-row;
+	width: 100%;
+    height: 97%;
+}
+
+.ordItemsCont
+{
+	width:100%;
+	height:100%;
+	background-color:#fbfbfb;
+	display:table-cell;
+	padding:5px;
+}
+.ordItemsBox1
+{
+width: 100%;
+height: 100%;
+min-height: 100%;
+position: relative;
+}
+.ordItemsBox2
+{
+width: 100%;
+height: 50%;
+min-height: 50%;
+position: relative;
+
+}
+.ordItemsBox3
+{
+width: 100%;
+height: 33%;
+min-height:10%;
+position: relative;
+
+}
+.ordItemBoxIn
+{
+	width:100%;
+	height:99%;
+	position:relative;
+	background-image:url(../images/Item_Bg.PNG);
+	display: table;
+	border:#cccccc 1px solid;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	-moz-box-shadow:inset 0px 1px 0px 1px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 1px #ffffff;
+	box-shadow:inset 0px 1px 0px 1px #ffffff;
+}
+
+.ordItemBoxCellHd
+{
+	width:100%;
+	height:2%;
+}
+.ordItemBoxRowConCell
+{
+	width:100%;
+	height:100%;
+
+}
+.ordItemBoxHdr{
+	width: 100%;
+	height: 32px;
+	border-bottom:#c7c7c7 1px solid;
+	vertical-align:middle;	
+}
+.ordItemBoxHdrTxt
+{
+	padding-top: 7px;
+	padding-left: 5px;
+	font-size:15px;
+	font-weight:bold;
+	color:#03415a;
+	text-shadow: 0px 1px 1px rgba(255, 255, 255, 1);
+}
+
+.ordItemBoxTable
+{width: 100%;
+height: 100%;
+min-height: 100%;
+position: relative;
+display: table;
+}
+.ordItemBoxRowHd
+{
+	height:2%
+}
+.ordItemBoxRowCon
+{
+	height:98%;
+}
+
+/* Items list page STARTS*/
+.ordItemscroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: auto;
+	height: 100%;
+	-webkit-transform: translateZ(0);
+	-moz-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	-o-transform: translateZ(0);
+	transform: translateZ(0);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-text-size-adjust: none;
+	-moz-text-size-adjust: none;
+	-ms-text-size-adjust: none;
+	-o-text-size-adjust: none;
+	text-size-adjust: none;
+}
+.ordListcontainer {
+  height: 90%;
+  /* width:100%; */
+  position: absolute;
+}
+
+.ordListColWrap .ordListcol {
+  display:table-cell;
+  vertical-align: top;
+  padding-left:3px;
+   padding-Top:3px;
+}
+.ordListcontainer li
+{
+	list-style:none;
+	/* padding-top:2px;
+	padding-left:2px; */
+	padding:0px;
+}
+.ordListColItem {
+  display: block;
+}
+.ordListcontainer ul {
+	display: block;
+	list-style-type: disc;
+	-webkit-margin-before: 0em;
+	-webkit-margin-after:0em;
+	-webkit-margin-start:0px;
+	-webkit-margin-end: 0px;
+	-webkit-padding-start: 00px;
+}
+.ordListHWrapper{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.ordItemBoxTheme {
+	-moz-box-shadow:inset 0px 0px 1px 2px #ffffff;
+	-webkit-box-shadow:inset 0px 0px 1px 2px #ffffff;
+	box-shadow:inset 0px 0px 1px 2px #ffffff;
+	cursor:pointer;
+	background: #f3f3f3; /* Old browsers */
+background: -moz-linear-gradient(-45deg, #f3f3f3 1%, #fdfdfd 50%, #ffffff 52%, #efefef 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right bottom, color-stop(1%,#f3f3f3), color-stop(50%,#fdfdfd), color-stop(52%,#ffffff), color-stop(100%,#efefef)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(-45deg, #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(-45deg, #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(-45deg, #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* IE10+ */
+background: linear-gradient(135deg, #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', endColorstr='#efefef',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	-webkit-border-top-left-radius:5px;
+	-moz-border-radius-topleft:5px;
+	border-top-left-radius:5px;
+	-webkit-border-top-right-radius:5px;
+	-moz-border-radius-topright:5px;
+	border-top-right-radius:5px;
+	-webkit-border-bottom-right-radius:5px;
+	-moz-border-radius-bottomright:5px;
+	border-bottom-right-radius:5px;
+	-webkit-border-bottom-left-radius:5px;
+	-moz-border-radius-bottomleft:5px;
+	border-bottom-left-radius:5px;
+/*	text-indent:-50px;*/
+	border:1px solid #d8d8d8;
+	display:inline-block;
+	color:#484848;
+	font-family:Arial;
+	font-size:12px;
+	font-weight:bold;
+	font-style:normal;
+	height:50px;
+	line-height:50px;
+	width:162px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #ffffff;
+	text-align: left;
+	padding-left: 5px;
+}
+.ordItemBoxTheme:hover {
+	background: #f3f3f3; /* Old browsers */
+background: -moz-linear-gradient(45deg,  #f3f3f3 1%, #fdfdfd 50%, #ffffff 52%, #efefef 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left bottom, right top, color-stop(1%,#f3f3f3), color-stop(50%,#fdfdfd), color-stop(52%,#ffffff), color-stop(100%,#efefef)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(45deg,  #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(45deg,  #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(45deg,  #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* IE10+ */
+background: linear-gradient(45deg,  #f3f3f3 1%,#fdfdfd 50%,#ffffff 52%,#efefef 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3f3f3', endColorstr='#efefef',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+}
+.ordItemBoxTheme:active {
+	position:relative;
+	top:1px;
+}
+.ordItemBtnIcon
+{
+	display: block;
+	float: left;
+	width: 100%;
+	height: auto;
+}
+.ordItemLeftBlock {
+	display: block;
+	float: left;
+}
+.ordItemText{
+	word-wrap: break-word;
+	line-height: normal;
+	height: 46px;
+	width: 125px;
+	text-align: left;
+	vertical-align: middle;max-width:125px;max-height:46px;overflow:hidden;
+	display: table-cell
+}
+.ordItemRightBlock {
+	display: block;
+	float: right;
+}
+.ordItemDragBtn
+{
+	padding-top: 5px;
+	padding-right: 5px;
+}
+/* Items list page ENDS*/
+
+/* Order Field items CSS STARTS*/
+.ordFldsScroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	height: auto;
+}
+
+.ordFldHeader {
+	min-height: 100px;
+	min-width: 100%;
+	height: 100px;
+	width: 100%;
+	/* position: absolute; */
+	display: table;
+	background-color: #fcfcfc;
+}
+.ordFldHdrRow {
+	display: table-row;
+	width: 100%;
+	height: 85px;
+}
+.ordFldHdrBorder {
+	display: table-cell;
+	width: 100%;
+	height: 15px;
+	background-image: url(../images/Border_bottom.PNG);
+	background-repeat: repeat-x;
+}
+.ordFldHdrTbl {
+	width: 100%;
+	height: 100%;
+	display: table;
+}
+.ordFldHdrTxtCell {
+	display: table-cell;
+	width: 35%;
+	height: 100%;
+	float: left;
+}
+.ordFldHdrIconCell {
+	display: table-cell;
+	width: 64%;
+	height: 100%;
+	float: right;
+}
+
+.ordFldHdrTitleTheme {
+	width: 100%;
+	height: 30px;
+	font-size: 16px;
+	color: #484848;
+	padding-left: 5px;
+	font-weight: bold;
+	display:table-cell;
+	vertical-align: middle;
+	text-align: left;
+}
+.ordFldHdrPractTbl {
+	display: table;
+	width: 100%;
+	height: 55px;
+	text-align: left;
+}
+.ordFldHdrPractCell {
+	display: table;
+	width: 100%;
+	height: 25px;
+}
+.ordFldHdrPractLblTheme {
+	width: 135px;
+	display: table-cell;
+	font-size: 13px;
+	color: #8b8b8b;
+	font-size: 13px;
+	color: #8b8b8b;
+	padding-left: 5px;
+}
+.ordFldHdrPractTxtTheme {
+	width: auto;
+	display: table-cell;
+	font-size: 13px;
+	color: #8b8b8b;
+	font-size: 13px;
+	color: #8b8b8b;
+	padding-left: 5px;
+}
+.ordFldHdrIconCircTheme {
+	width: 40px;
+	height: 40px;
+	margin-right: 7px;
+	margin-top: 5px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	border-radius: 20px;
+	background: #ffffff; /* Old browsers */
+	background: -moz-linear-gradient(top, #ffffff 0%, #e4e4e4 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #e4e4e4)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #ffffff 0%, #e4e4e4 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #ffffff 0%, #e4e4e4 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #ffffff 0%, #e4e4e4 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #ffffff 0%, #e4e4e4 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e4e4e4', GradientType=0 ); /* IE6-9 */
+	border: 1px solid #d4d4d4;
+	float: right;
+}
+.ordFldHdrIconPos {
+	padding: 8px;
+}
+.ordFldHdrIconHolder {
+	display: table;
+	width: 100%;
+	height: 85px;
+}
+.ordFldHdrPrice {
+	display: table-cell;
+	width: auto;
+	height: auto;
+	text-align: right;
+}
+.ordFldHdrPriceLblTheme {
+	color: #8b8b8b;
+	font-size: 11px;
+	font-weight: bold;
+}
+.ordFldHdrPriceTxtTheme {
+	color: #484848;
+	font-size: 16px;
+	font-weight: bold;
+}
+.imgGrayscale{
+	 
+	-webkit-filter: grayscale(1);
+	 opacity:0.7;
+}
+.actionTickIcon
+{
+	width: 45px;
+	height: 16px;
+	background-image: url(../images/Selected_Tick14x14.png);
+	background-repeat: no-repeat;
+	background-position: 50% 100%;
+}
+
+/* Order Field items CSS ENDS*/
+
+/* OrderCart CSS starts */
+.MoeIHEC_Downarrow {
+    width: 22px;
+    height: 22px;
+    background-image: url(../images/UpArrow11x8.png);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+ 	-webkit-transition-duration: .8s;
+    -moz-transition-duration: .8s;
+    -o-transition-duration: .8s;
+    transition-duration: .8s; 
+     -webkit-transition-property: -webkit-transform;
+    -moz-transition-property: -moz-transform;
+    -o-transition-property: -o-transform;
+    transition-property: transform;  
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+}
+
+
+.MoeTotalmain {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border: 1px solid #d7d7d7;
+    border-radius: 3px;
+    margin-top: -3px;
+}
+.MoeTotalC {
+    float: left;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    position: relative;
+}
+.MoeTotalCC {
+    height: 45px;
+    width: 100%
+}
+
+.MoeSubSelectOrder {
+    min-width: 100%;
+    width: 100%;
+    display: table;
+}
+
+.MoeFooterpricetxt1 {
+    display: table-cell;
+    vertical-align: middle;
+    height: 22px;
+    float: left;
+}
+
+#cartWrapper {
+	position: absolute;
+ 	z-index: 1;
+	left: 0;
+	width: 100%;
+	overflow: hidden;
+	height:100%;
+}
+
+#cartScroller {
+	position: absolute;
+	z-index: 1;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	width: 100%;
+	height: auto;
+}
+.ordCartAnim{
+    animation: fadein 1s;
+    -moz-animation: fadein 1s;
+    -webkit-animation: fadein 1s; 
+    -o-animation: fadein 1s; 
+}
+@keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-moz-keyframes fadein { 
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-webkit-keyframes fadein {
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+@-o-keyframes fadein { 
+    from {
+        opacity:0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.MoeTransactionErIcon{
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	top: 10px;
+	right: 10px;
+    background-image: url(../images/ValidationError16x16.png);
+    background-repeat: no-repeat;
+}
+
+
+
+/* new styles */
+
+.body {
+	margin: 0;
+	height: 100%;
+	width: 100%
+}
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.clearfix {
+	height: 1%
+}
+.clearfix {
+	display: block;
+}
+.table {
+	display: table;
+}
+.row {
+	display: table-row;
+}
+.cell {
+	display: table-cell;
+}
+.MoeSelectOrder {
+	min-height: 100%;
+	min-width: 297px;
+	height: 100%;
+	width: 297px;
+	display: table;
+}
+.MoeSelectOrderItem {
+	display: table-row;
+	width: 100%;
+	height: 98%;
+	border: 1px solid red;
+}
+
+.MoeFooterContainer {
+	display: table-row;
+	width: 100%;
+	height: 1%;
+	bottom: 0;
+}
+.MoeContainer {
+	width: 100%;
+	text-align: left;
+	height: 100%;
+	display: table-cell;
+	position: relative;
+}
+.MoeMain {
+	position: relative;
+	height: 100%;
+	border: 1px solid #d7d7d7;
+	border-bottom: 0;
+	border-radius: 3px;
+	overflow: auto;
+}
+.MoeSOI_List {
+	float: left;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	position: relative;
+}
+.MoeSOI_List_c {
+	background-color: #fff;
+	height: 100%;
+	width: 100%
+}
+.MoeHeader {
+	width: 100%;
+	height: 50px;
+	display: table;
+	margin-bottom: 1px;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.MoeHTitle {
+	width: 100%;
+	height: 50px;
+	display: table-row;
+	float: left;
+}
+
+.MoeIHclose {
+	width: 30px;
+	height: 50px;
+	background-image: url(../images/DeleteRed16x16.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	float: left;
+	display: table-cell;
+}
+.MoeIHTitle {
+	width: auto;
+	text-align: left;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.MoeIHCountCont {
+	width: 22px;
+	height: 22px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	padding-left: 3px;
+}
+.MoeIHcount {
+	width: 22px;
+	height: 22px;
+	-webkit-border-radius: 11;
+	-moz-border-radius: 11;
+	border-radius: 11px;
+	font-size: 12px;
+	vertical-align: middle;
+	display: table-cell;
+	-webkit-transition: visibility 1s ease-out 1s;
+	-moz-transition: visibility 1s ease-out 1s;
+	-ms-transition: visibility 1s ease-out 1s;
+	-o-transition: visibility 1s ease-out 1s;
+	transition: visibility 1s ease-out 1s;
+}
+
+.MoeIHECicon {
+  width: 22px;
+  height: 22px;
+  -webkit-border-radius: 11;
+  -moz-border-radius: 11;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid #5f5f5f;
+}
+.MoeIHEC_Uparrow {
+	width: 22px;
+	height: 22px;
+	background-image: url(../images/UpArrow11x8.png);
+	background-position: 48% 45%;
+	background-repeat: no-repeat;
+ 	-webkit-transition-duration: .8s;
+	-moz-transition-duration: .8s;
+	-o-transition-duration: .8s;
+	transition-duration: .8s;
+	-webkit-transition-property: -webkit-transform;
+	-moz-transition-property: -moz-transform;
+	-o-transition-property: -o-transform;
+	transition-property: transform;
+ 
+} 
+
+.MoeHBorder {
+	width: 100%;
+	border-top: 1px dashed #ebebeb;
+	border-bottom: 1px dashed #a4a4a4;
+	margin-top: 49px;
+}
+.MoeTotalcontainer {
+	width: 100%;
+	text-align: left;
+	height: 100%;
+	display: table-cell;
+	position: relative;
+}
+
+#MoeSubSelectOrder {
+	min-width: 100%;
+	width: 100%;
+	position: absolute;
+	display: table;
+}
+#MoeSubSelectOrderItem {
+	display: table-row;
+	width: 100%;
+	height: 98%;
+	border: 1px solid red;
+	background-color: #fbfbfb;
+}
+#Subcontainer {
+	width: 100%;
+	text-align: left;
+	display: table-cell;
+	position: relative;
+	padding: 3px 3px 0;
+}
+#SubcontainerOrders {
+	width: 100%;
+	text-align: left;
+	display: table-cell;
+	position: relative;
+	/* padding: 3px 3px 0; */
+}
+#submain {
+	position: relative;
+	overflow: hidden;
+	height: 100%;
+	border: 1px solid #d6d6d6;
+}
+.MoeSubItemheader {
+	width: 100%;
+	height: 40px;
+	background-color: #f3f3f3;
+	border-bottom: #e5e5e5 1px Solid;
+	display: table;
+}
+.MoeSubItemListOrders {
+	width: 100%;
+	height: 69px;
+	border-bottom: 1px dotted #838383;
+	display: table;
+}
+.MoeSubItemList
+{
+	width: 100%;
+	height: 90px;
+	border-bottom: 1px dotted #838383;
+	display: table;
+}
+.MoeSubclose {
+  width: 30px;
+  height: 69px;
+  background-image: url(../images/DeleteRed16x16.png);
+  background-repeat: no-repeat;
+  background-position: 17% 50%;
+  float: left;
+  display: table-row;
+  text-align: center;
+}
+.MoeSubcloseOrders{
+  width: 30px;
+  height: 69px;
+  background-image: url(../images/DeleteRed16x16.png);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  float: left;
+  display: table-row;
+  text-align: center;
+}
+@-webkit-keyframes close {
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+  }
+}
+
+@keyframes close {
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+  }
+}
+
+.MoeClose {
+  display: table-cell;
+  vertical-align: middle;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  width: 30px;
+  cursor: pointer;
+}
+.MoeClose:before {
+  content: url(../images/DeleteRed16x16.png);
+  width: 25px;
+  display: table-cell;
+  text-align: center;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+.MoeClose:hover:before, .MoeClose:focus:before, .MoeClose:active:before {
+  -webkit-animation-name: close;
+  animation-name: close;
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-timing-function: linear;
+  animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+}
+.MoeSubItemHeaderFont {
+	width: 240px;
+	height: 25px;
+	display: table-row;
+	float: left;
+}
+.MoeSubItemListDetailsOrders {
+	width: 240px;
+	height: 44px;
+	display: table-row;
+	float: left;
+}
+.MoeSubItemListDetails {
+	width: 240px;
+	height: 65px;
+	display: table-row;
+	float: left;
+}
+.MoeSILTitle {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #484848;
+  display: table-cell;
+  vertical-align: middle;
+  height: 25px;}
+.SILDate {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: 400;
+	color: #8b8b8b;
+}
+.SILtotalamt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: 700;
+	color: #666666;
+}
+.MoeSILTitle1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: 700;
+	color: #484848;
+	vertical-align: middle;
+	display: table-cell;
+	padding-left: 3px;
+}
+
+.MoeFooterCon {
+	width: 100%;
+	height: 45px;
+	display: table;
+}
+.footericon {
+	display: table-row;
+	width: 45px;
+	float: left;
+}
+.footeredit {
+	width: 45px;
+	height: 45px;
+	 background-image: url(../images/EditOrders33x33.png);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	display: table-cell;
+}
+.MoeFooterlable {
+	display: table-row;
+	width: 100px;
+	float: left;
+}
+.MoeFooterlabletxt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #333;
+	font-weight: 700;
+	display: table-cell;
+	vertical-align: middle;
+	height: 45px;
+	padding-left: 5px;
+}
+.MoeFooterprice {
+	display: table-row;
+	width: 100px;
+	float: right;
+	text-align: center;
+}
+.MoeFooterpricetxt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #2f82a4;
+	font-weight: 700;
+	display: table-cell;
+	vertical-align: middle;
+	height: 22px;
+	float: left;
+	width:100%;
+}
+.MoeFooterpricetxt1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #333;
+	font-weight: 700;
+	display: table-cell;
+	vertical-align: middle;
+	height: 22px;
+	float: left;
+	width:100%;
+}
+.MoeHTitlecell {
+	width: 188px;
+	height: 50px;
+	display: table-cell;
+	float: left;
+	max-width: 188px;
+}
+.MoeHTitlecellOS {
+	width: 160px;
+	height: 50px;
+	display: table-cell;
+	float: left;
+	max-width: 188px;
+}
+.MoeOHEXPCOL {
+	width: 60px;
+	height: 50px;
+	float: right;
+}
+.MoeOHEXPCOLord {
+	width: 60px; /* 80px; */
+	height: 50px;
+	float: right;
+}
+.MoeOHTTable {
+	width: 100%;
+	height: 50px;
+	display: table;
+}
+.MoeOHTRowtop {
+	width: 100%;
+	/*height: 25px;*/
+	display: table-row;
+}
+.MoeOHTRowbottom {
+	width: 100%;
+	height: 25px;
+	display: table-row;
+	float: left;
+}
+.MoeOHTCell1 {
+	width: 100%;
+	height: 25px;
+	display: table-cell;
+	vertical-align: middle;
+}
+.MoeOHTCELL2 {
+	width: 100%;
+	height: 25px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+.MoeOHTAMT {
+	width: 100%;
+	display: block;
+	line-height: 12px;
+}
+
+.StripControlcontainer {
+	width: 100%;
+	height: 100%;
+	display: table;
+}
+.MoeStripControlMore {
+	width: 35%;
+	height: 100%;
+	display: table-cell;
+	vertical-align: middle;
+	z-index: 500;
+}
+.MoeMoreDot {
+	width: 6px;
+	height: 6px;
+	border-radius: 3px;
+	margin: 3px;
+}
+
+.MoeStripControlExp {
+	width: 40%;
+	height: 100%;
+	display: table-cell;
+	vertical-align: middle;
+}
+.MoeStripControlExpOrd {
+	width: 40%;
+	height: 100%;
+	display: table-cell;
+	vertical-align: middle;
+	padding-right: 5px;
+}
+.MoeStripControlExp1 {
+	width: 20%;
+	height: 100%;
+	display: table-cell;
+	vertical-align: middle;
+	padding-right: 5px;
+}
+.MoeSILcon
+{
+  width: 240px;
+  height: 21px;
+  display: table-cell;
+  vertical-align: middle;
+  float: left;
+}
+.MoeSubicon
+{
+	width:20px;
+	height:20px;
+	padding-left:10px;
+}
+.subiconOrders
+{
+	width:20px;
+	height:20px;
+	vertical-align:middle;
+	text-align:center;
+	padding: 1px;
+}
+	
+.MoeIconDisablePO{
+	opacity: 0.5px;
+}
+.MoeNoData{
+	text-align: center;
+	font-size:12px;
+	color: #8B8B8B;
+}
+.MoeSelectOrderTxt{
+	vertical-align: middle;
+	display: table-cell;
+	height: 21px;
+}
+
+.MoeSOA { 
+    -webkit-animation-duration: .5s; 
+    animation-duration: .5s; 
+    -webkit-animation-fill-mode: both; 
+    animation-fill-mode: both; 
+    -webkit-animation-timing-function: ease-in; 
+    animation-timing-function: ease-in; 
+} 
+
+@-webkit-keyframes MoeSofl { 
+    0% { 
+        opacity: 0; 
+        -webkit-transform: translateX(-20px); 
+    } 
+    100% { 
+        opacity: 1; 
+        -webkit-transform: translateX(0); 
+    } 
+} 
+@keyframes MoeSofl { 
+    0% { 
+        opacity: 0; 
+        transform: translateX(-20px); 
+    } 
+    100% { 
+        opacity: 1; 
+        transform: translateX(0); 
+    } 
+} 
+.MoeSofl { 
+    -webkit-animation-name: MoeSofl; 
+    animation-name: MoeSofl; 
+}
+
+.MoeBlur{
+	opacity: 0.3;
+}
+
+/* order cart themes */
+.MoeMoreDotTheme{
+	background-color: #848484;
+}
+.MoeOHTAMTNUMTheme {
+	font-size: 12px;
+	color: #666666;
+	font-weight: bold;
+	font-family: arial;
+}
+.MoeOHTAMTLBETheme {
+	font-size: 11px;
+	color: #888888;
+	font-weight: normal;
+	font-family: arial;
+}
+.MoeTotalCCTheme {
+	background-color: #efefef;
+}
+.MoeFooterpricetxt1Theme{
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #333;
+    font-weight: 700;
+}
+.MoeSelectOrderItemTheme{
+	background-color: #fbfbfb;
+}
+.MoeHeaderTheme{
+	background-color: #e5e5e5;
+}
+.MoeIHTitleTheme{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #03415a;
+	font-weight: 700;
+}
+.MoeIHcountTheme{
+	background: #0c6b97;
+	color: #fff;
+}
+/* OrderCart CSS ends */
+

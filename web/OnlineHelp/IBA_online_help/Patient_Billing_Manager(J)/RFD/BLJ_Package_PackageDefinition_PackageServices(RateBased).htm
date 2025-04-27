@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BLJ_Package_PackageDefinition_PackageServices(RateBased)</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<p class="BoldRFD">Enter the following details to define and associate rate based services to the package:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - Select a Type from the list. The system-defined values are ‘Service Group’, ‘Service Classification’, ‘Billing Service’, ‘Item’, ‘Sales Category’ and ‘Package Group’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select ‘Service Group’ to define price for a Service Group.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select 'Service Classification' to define price for a Service Classification.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select 'Billing Service' to define price for a Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select ‘Item’ to define price for an Item.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select ‘Sales Category’ to define price for a Sales Category.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Select ‘Package Group’ to define price for Service Group, Service Classification, Billing Service, Item, Sales Category and Package Group.</p>
+</li>
+</ol>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Service associated to the selected Service Group or Service Classification.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalogue</span> - Click <span class="BoldNumberRFD">[?]</span> function to select and associate an Order Catalog to the Package. This field is enabled for selection only if the 'Episode Type' is selected as 'OP' and the 'Order Associated' check box is selected. The Order Catalogs associated to the selected Billing Service are displayed based on the definitions in 'Order Catalog Billing Details' function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Indicator</span> - Select a value from the list. The system-defined values are 'Standard', 'User Defined', 'As Per Rule' and 'Price Class'. Select 'Standard' to use the standard price defined for the Billing Service. Select 'As Per Rule' to use the Customer defined price for the Billing Service. Select 'User Defined' to use the price defined under the 'Package Base Price' tab. Select 'Price Class' to use the price defined in the 'Price Class Specific Price' function. The 'User Defined' indicator is valid only for 'Billing Service' and not valid for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Factor/Rate</span> - Enter the factor or rate in numeric format of 12 digits maximum length. The amount is calculated as (Factor*Base Price).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Quantity Limit</span> - Enter the restriction on the quantity of selected Billing Service that can be associated to the package. If the usage of service is more than the limit specified, the service is not considered to be a part of the package and the standard price for the Billing Service is charged to the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%/Amount Indicator</span> - Select a value from the list. The system-defined values are 'Percent', 'Amount' and 'Unlimited'. Select 'Percent' to define the service amount as the percentage of the base price for the selected quantity. Select 'Amount Indicator' to specify valid amount for the service and the quantity specified. If the usage of service exceeds the quantity or the amount specified, standard price of the respective Billing Service is charged to the patient. Select 'Unlimited' if there is no restriction on the amount that can be associated to the respective Billing Service for the quantity utilized.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%/Amount</span> - Enter the value in numeric format based on the value selected for '%/Amount Indicator'. If the usage of service exceeds the amount specified, the standard price defined for the Billing Service is considered. You cannot specify the value, if the indicator is selected as 'Unlimited'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round To</span> - Enter the value in numeric format. This indicates the value to which the price can be rounded off.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round Indicator</span> - Select a value from the round indicator. The system-defined values are 'Up' and 'Down'. Select 'Up' to round off the value to the highest nearing value specified for 'Round To'. Select 'Down' to round off the value to the lowest nearing value specified for 'Round To'. For Example, if the package value is 3,515 and the 'Round To' is set as 10 with the 'Round Indicator' as 'Up', the package price is rounded off to 3520.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Replace</span> - Select the check box if the Billing Service is replaceable with any other service. A legend 'Dtls' is displayed as a hyperlink when you select the check box. A new screen pops-up. Enter the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">details</a> in the pop-up screen. Click 'Dtls' hyperlink to view the details that are recorded. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+<div class="droptext" id="POPUP1004739668" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Code</span> - The selected Service Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Description</span> - The description of the selected Service Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog Code</span> - The selected Order Catalog Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog Desc</span> - The description of the selected Order Catalog Code is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Replaceable Service</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Service with which the existing Billing Service can be replaced.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Order Catalog with which the existing Order Catalog can be replaced. This field is enabled for selection only if the 'Order Catalog' is associated to the selected Billing Service.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[OK]</span> to save the details or <span class="BoldNumberRFD">[Cancel]</span> to cancel the process.</p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund Rate %</span> - Select the check box to specify refund rate for the Billing Service. Enter the value in the adjacent text box that can be issued as a refund, if the Billing Service is not utilized when the package is availed by the patient. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Auto Refund</span> - Select the check box if the Billing Service is auto refundable. The amount is automatically refunded, if the Billing Service is not utilized by the patient when the package is availed. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply Factor for Service Limit</span> - Select the check box to define the factor available for service limit. This field is enabled for selection only if the 'indicator' value is selected as 'factor through the 'Package Base Price' tab'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Close Package</span> - Select the radio button to indicate that the package can be closed when the corresponding Billing Service is associated to the patient. The radio button is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Limit (Dtls)</span> - Select the check box to associate services when the 'Type' is selected as either 'Service Group' or 'Service Classification'. This is not enabled for 'Billing Service'. A legend 'Dtls' is displayed as a hyperlink when you select the check box. A new table appears enabling you to associate Service Classification or Billing Service to the Service Group or Service Classification. Click 'Dtls' hyperlink to view the details that are recorded. The check box is disabled for 'Billing Service' and enabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to associate the Billing Service, Service Group or Service Classification to the package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Add]</span> - Click <span class="BoldNumberRFD">[Add]</span> to associate the Billing Service, Service Group or Service Classification to the Package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Delete]</span> - Click <span class="BoldNumberRFD">[Delete]</span> to delete a Billing Service, Service Group or Service Classification that is associated to the package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - Select a Type from the list. The system-defined values are 'Service Classification' and 'Service Group'. Select 'Service Group' to define price for a Service Group and Service Classification to define price for a Service Classification.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">The following tabular form is displayed, if the 'Type' is selected as 'Service Group' or 'service Classification':</p>
+<ol start="21">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - Select a Type from the list. The system-defined values are 'Service Classification' and 'Billing Service'. Select 'Service Classification' to define price for Service Classification that is associated to the selected Service Group. Select 'Billing Service' to define price for a Billing Service that is associated to the Service Classification and Service Group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Service associated to the selected Service Group or Service Classification.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exclude</span> - Select the check box to exclude Service Code or Service Classification from the package. On selecting the check box, other fields are disabled from selection except 'Select'. Clear the check box, if the Service is associated to the package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Quantity Limit</span> - Enter the quantity limit in numeric format to indicate the quantity of service that can be associated to the package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%/Amount Indicator</span> - Select a value from the list. The system-defined values are 'Percent' and 'Amount'. Select 'Percent' to define the package amount as the percentage of the base price. Select 'Amount Indicator' to specify valid amount for the package. The amount indicator is based on the quantity whereas the percent is not dependent on the quantity.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Limit</span> - Enter the amount limit in numeric format. It specifies the limit on the coverage for the respective quantity of service in the package. If the quantity of the service used exceeds the limit, the standard price defined for the service is considered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round To</span> - Enter the value in numeric format. This indicates the value to which the decimal value can be rounded off.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round Indicator</span> - Select a value from the round indicator. The system-defined values are 'Up' and 'Down'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Replace</span> - Select the check box if the Billing Service is replaceable with any other service. A legend 'Dtls' is displayed as a hyperlink when you select the check box. A new screen pops-up. Enter the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">details</a> in the pop-up screen. Click 'Dtls' hyperlink to view the details that are recorded. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+<div class="droptext" id="POPUP1004745772" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Code</span> - The selected Service Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Description</span> - The description of the selected Service Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog Code</span> - The selected Order Catalog Code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog Desc</span> - The description of the selected Order Catalog Code is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Replaceable Service</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Service with which the existing Billing Service can be replaced.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Order Catalog with which the existing Order Catalog can be replaced. This field is enabled for selection only if the 'Order Catalog' is associated to the selected Billing Service.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[OK]</span> to save the details or <span class="BoldNumberRFD">[Cancel]</span> to cancel the process.</p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund Rate %</span> - Select the check box to specify refund rate for the Billing Service. Enter the value in the adjacent text box that can be issued as a refund, if the Billing Service is not utilized when the package is availed by the patient. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Auto Refund</span> - Select the check box if the Billing Service is auto refundable. The amount is automatically refunded, if the Billing Service is not utilized by the patient when the package is availed. The check box is enabled only for 'Billing Service' and disabled for 'Service Group' or 'Service Classification'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply Factor for Service Limit</span> - Select the check box to define the factor available for service limit. This field is enabled for selection only if the 'indicator' value is selected as 'factor through the 'Package Base Price' tab'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to associate the Service Group or Service Classification to the package.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Add]</span> - Click <span class="BoldNumberRFD">[Add]</span> to associate the Service Group or Service Classification to the Package code.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Delete]</span> - Click <span class="BoldNumberRFD">[Delete]</span> to delete a Service Group or Service Classification that is associated to the package.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP1004739668');
+	TextPopupInit('a1','POPUP1004745772');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

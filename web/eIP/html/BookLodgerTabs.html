@@ -1,0 +1,105 @@
+
+	 <link rel='stylesheet' type='text/css' href='../../eCommon/html/IeStyle.css'></link>
+
+	<STYLE TYPE="text/css">
+	A:link {
+		COLOR: white;
+	}
+
+	A:visited {
+		COLOR:white ;
+	}
+	A:active {
+		COLOR: white;
+	}
+
+	TD.clicked {
+		background: gray;
+		color:white;
+		FONT-SIZE: 9pt ;
+		background-color:#10319C ;
+	}
+	TD.normal {
+		background: gray;
+		color:white;
+		FONT-SIZE: 8pt ;
+		background-color:#637BBD ;
+	}
+	A.HIGHER_LEVEL_LINK
+	{
+		COLOR:white;
+		FONT-SIZE: 9pt ;
+	}
+	A.SUB_LEVEL_LINK
+	{
+		COLOR:WHITE;
+		FONT-SIZE: 8pt ;
+	}
+	</STYLE>
+
+<html>
+	 <head>
+		<script>
+			async function display(from)
+			{
+			   parent.parent.frames[2].location.href ="../../eCommon/jsp/error.jsp";
+				if(from == "1")
+				{
+					document.getElementById("lodger").disabled=true;
+						var retVal = 	new String();
+						var dialogTop = "65";
+						var dialogHeight= "33.4" ;
+						var dialogWidth	= "50" ;
+						var status = "no";
+						var arguments	= "" ;
+						var features	= "dialogTop:"+dialogTop+"; dialogHeight:" + dialogHeight + "; dialogWidth:" + dialogWidth +" ; scroll=no; status:" + status;
+						retVal = await window.showModalDialog("../../eIP/jsp/InpatientLookupCall.jsp?modal=yes&title=Book Accompanying Person&wherecondn=CHECK_LODGER_YN&call_func=CheckInLodger ",arguments,features);
+						if(retVal!=null)
+						{
+							//document.getElementById("attendant").className="HIGHER_LEVEL_LINK";
+							//document.getElementById("attendant_col").className="clicked";
+							//document.getElementById("lodger").className="SUB_LEVEL_LINK";
+							//document.getElementById("lodger_col").className="CAHIGHER_LEVEL_COLOR";
+							parent.frames[1].location.href = "../../eCommon/jsp/pline.jsp?EncounterId="+retVal
+							parent.frames[2].location.href = "../../eIP/jsp/BookLodgerDetail.jsp?Category=A&EncounterId="+retVal
+						}
+				}
+				else if(from == "2")
+				{
+					//document.getElementById("attendant").className="SUB_LEVEL_LINK";
+					//document.getElementById("attendant_col").className="normal";
+					//document.getElementById("lodger").className="HIGHER_LEVEL_LINK";
+					//document.getElementById("lodger_col").className="clicked";
+					parent.frames[2].location.href = "../../eIP/jsp/BookLodgerDetail.jsp?Category=L"
+					parent.frames[1].location.href = "../../eCommon/html/blank.html"
+				}
+			}
+
+			function call(){};
+		</script>
+	 </head>
+
+	 <body>
+	 <form name=tabframe>
+		<table width=auto cellpadding='0' cellspacing='1' border='0' >
+			<tr>
+<!-- 				<td class="clicked" id='lodger_col' align='center' width='50%' height=20 onclick="javascript:display('2')">
+					<a href="javascript:call()" id='lodger'> Lodger</a>
+				</td>
+				<td class="normal" id='attendant_col' align='center' width='50%' height=20  onclick="javascript:display('1')">
+					<a id='attendant' href='javascript:call()'> Attendant </a>
+				</td>
+ -->
+  				<td class="label" align='center' >
+					<input class=button type=button name='lodger' id='lodger' value='Lodger' onClick="javascript:display('2')">
+				</td>
+  				<td class="label" align='center' >
+					<input class=button type=button name='attendant' id='attendant' value='Accompanying Person' onClick="javascript:display('1')">
+				</td>
+
+			</tr>
+		</table>
+		</form>
+	 </body>
+</html>
+

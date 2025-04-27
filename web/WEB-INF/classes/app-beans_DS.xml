@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<!--                MEAL TYPE BEANS                         -->
+
+	<bean name="mealTypeDAO"
+		class="com.iba.ehis.ds.mealtype.pojo.dao.MealTypeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="mealTypeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="mealTypeDAO" />
+		</property>
+	</bean>
+	<bean name="mealTypeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="mealTypeFacade" />
+		</property>
+	</bean>
+
+	<!--                MEAL class BEANS                         -->
+	
+	<bean name="mealClassDAO"
+		class="com.iba.ehis.ds.mealclass.pojo.dao.MealClassDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="mealClassFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="mealClassDAO" />
+		</property>
+	</bean>
+	
+	<bean name="mealClassDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="mealClassFacade" />
+		</property>
+	</bean>
+	
+<!--                ITEM TYPE BEANS                         -->
+	
+	<bean name="itemTypeDAO"
+		class="com.iba.ehis.ds.itemtype.pojo.dao.ItemTypeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="itemTypeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="itemTypeDAO" />
+		</property>
+	</bean>
+	<bean name="itemTypeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="itemTypeFacade" />
+		</property>
+	</bean>
+
+<!--   Diet Type Beans  -->
+	
+	<bean name="dietTypeAssembler"
+		class="com.iba.ehis.ds.diettype.util.DietTypeAssembler">
+	</bean>
+	
+	<bean name="dietTypeDAO"
+		class="com.iba.ehis.ds.diettype.pojo.dao.DietTypeDAOImpl">
+		<property name="appAssembler">
+			<ref bean="dietTypeAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean name="dietTypeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dietTypeDAO" />
+		</property>
+	</bean>
+	
+	<bean name="dietTypeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dietTypeFacade" />
+		</property>
+	</bean>
+
+<!--    INGREDIENTS BEANS   -->
+		
+	<bean name="ingredientsAssembler"
+		class="com.iba.ehis.ds.ingredients.util.IngredientsAssembler">
+	</bean>
+		
+	<bean name="ingredientsDAO"
+		class="com.iba.ehis.ds.ingredients.pojo.dao.IngredientsDAOImpl">
+		<property name="appAssembler">
+			<ref bean="ingredientsAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="ingredientsFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="ingredientsDAO" />
+		</property>
+	</bean>
+
+	<bean name="ingredientsDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="ingredientsFacade" />
+		</property>
+	</bean>
+
+<!--    RDAChart BEANS   -->
+	
+	<bean name="rdaChartAssembler"
+		class="com.iba.ehis.ds.rdachart.util.RDAChartAssembler">
+	</bean>
+	
+	<bean name="rdaChartDAO"
+		class="com.iba.ehis.ds.rdachart.pojo.dao.RDAChartDAOImpl">
+		<property name="appAssembler">
+			<ref bean="rdaChartAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="rdaChartFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="rdaChartDAO" />
+		</property>
+	</bean>
+
+	<bean name="rdaChartDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="rdaChartFacade" />
+		</property>
+	</bean>
+
+<!--  commercialFoodItem Function  -->
+	
+	 <bean name="commercialFoodItemDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="commercialFoodItemFacade"/>
+		</property>
+	</bean>
+
+	<bean name="commercialFoodItemFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="commercialFoodItemDaoFactory"/>
+		</property>
+	</bean>
+
+	<bean name="commercialFoodItemDaoFactory"
+		class="com.iba.ehis.ds.core.pojo.dao.DSDAOFactory">
+		<constructor-arg>
+			<ref bean="commercialFoodItemDaoImpl" />
+		</constructor-arg>
+	</bean>
+
+	<bean name="commercialFoodItemDaoImpl"
+		class="com.iba.ehis.ds.commercialfoodItem.pojo.dao.CommercialFoodItemDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler">
+			<ref bean="commercialFoodItemAssembler"/>
+		</property>
+	</bean>
+
+	<bean name="commercialFoodItemAssembler"
+		class="com.iba.ehis.ds.commercialfoodItem.util.CommercialFoodItemAssembler" />
+
+<!--  FOODITEMS BEANS  -->
+	
+	<bean name="foodItemDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="foodItemFacade"/>
+		</property>
+	</bean>
+
+	<bean name="foodItemFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="foodItemDAOImpl"/>
+		</property>
+	</bean>
+	
+	<bean name="foodItemDAOImpl" class="com.iba.ehis.ds.fooditem.pojo.dao.FoodItemDAOImpl">
+		<property name="appAssembler">
+			<ref bean="foodItemAssembler"/>
+		</property>
+		<property name="sessionFactory">
+				<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="foodItemAssembler" class="com.iba.ehis.ds.fooditem.util.FoodItemAssembler"/>
+
+
+<!--  MealCategory -->
+
+	<bean name="mealCategoryDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="mealCategoryFacade"/>
+		</property>
+	</bean>
+
+	<bean name="mealCategoryFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="mealCategoryDaoFactory"/>
+		</property>
+	</bean>
+
+	<bean name="mealCategoryDaoFactory"
+		class="com.iba.ehis.ds.core.pojo.dao.DSDAOFactory">
+		<constructor-arg>
+			<ref bean="mealCategoryDaoImpl" />
+		</constructor-arg>
+	</bean>
+
+	<bean name="mealCategoryDaoImpl"
+		class="com.iba.ehis.ds.mealCategory.pojo.dao.MealCategoryDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler" >
+			<ref bean="mealCategoryAssembler"/>
+		</property>
+	</bean>
+
+	<bean name="mealCategoryAssembler"
+		class="com.iba.ehis.ds.mealCategory.util.MealCategoryAssembler" />
+
+<!--   Recipe -->
+
+	<bean name="recipeDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="recipeFacade"/>
+		</property>
+	</bean>
+
+	<bean name="recipeFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="recipeDaoImpl"/>
+		</property>
+	</bean>
+
+	<bean name="recipeDaoImpl" class="com.iba.ehis.ds.recipe.pojo.dao.RecipeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler">
+			<ref bean="recipeAssembler"/>
+		</property>
+	</bean>
+
+	<bean name="recipeAssembler" class="com.iba.ehis.ds.recipe.util.RecipeAssembler" />
+
+
+
+<!--   Recipe -->
+
+	<!-- <bean name="recipeDelegator"
+		class="com.iba.ehis.ds.recipe.pojo.business.RecipeDelegator">
+		<property name="facade">
+			<ref bean="recipeFacade"/>
+		</property>
+	</bean>
+
+	<bean name="recipeFacade"
+		class="com.iba.ehis.ds.recipe.pojo.business.RecipeFacade">
+		<property name="masterDAO">
+			<ref bean="recipeDaoFactory"/>
+		</property>
+	</bean>
+
+	<bean name="recipeDaoFactory"
+		class="com.iba.ehis.ds.core.pojo.dao.DSDAOFactory">
+		<constructor-arg>
+			<ref bean="recipeDaoImpl" />
+		</constructor-arg>
+	</bean>
+
+	<bean name="recipeDaoImpl"
+		class="com.iba.ehis.ds.recipe.pojo.dao.RecipeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler">
+			<ref bean="recipeAssembler"/>
+		</property>
+	</bean>
+
+	<bean name="recipeAssembler"
+		class="com.iba.ehis.ds.recipe.util.RecipeAssembler" /> -->
+
+<!-- FEED TYPE BEANS    -->
+	
+	<bean name="feedTypeDAO"
+		class="com.iba.ehis.ds.feedtype.pojo.dao.FeedTypeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+			
+		</property>
+	</bean>
+	<bean name="feedTypeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="feedTypeDAO" />
+		</property>
+	</bean>
+	<bean name="feedTypeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="feedTypeFacade" />
+		</property>
+	</bean>
+
+<!--  COMPLAINTS BEANS       -->
+		
+	<bean name="complaintsDAO"
+		class="com.iba.ehis.ds.complaints.pojo.dao.ComplaintsDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="complaintsFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="complaintsDAO" />
+		</property>
+	</bean>
+	<bean name="complaintsDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="complaintsFacade" />
+		</property>
+	</bean>	
+
+<!--  DELIVERY INSTRUCTION BEANS    -->
+	
+	<bean name="deliveryInstructionDAO"
+		class="com.iba.ehis.ds.deliveryInstruction.pojo.dao.DeliveryInstructionDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="deliveryInstructionFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="deliveryInstructionDAO" />
+		</property>
+	</bean>
+	<bean name="deliveryInstructionDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="deliveryInstructionFacade" />
+		</property>
+	</bean>	
+
+<!--    DIET CYCLE        -->
+
+	 <bean name="dietcycleAssembler"
+		class="com.iba.ehis.ds.dietcycle.util.DietCycleAssembler"/>
+	
+
+	<bean name="dietcycleDAO"
+		class="com.iba.ehis.ds.dietcycle.pojo.dao.DietCycleDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="dietcycleAssembler" />
+		</property>
+	</bean>
+
+	<bean name="dietcycleFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dietcycleDAO" />
+		</property>
+	</bean>
+	<bean name="dietcycleDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dietcycleFacade" />
+		</property>
+	</bean>
+
+<!--                NUTRIENTS BEANS                         -->
+		
+	<bean name="nutrientsDAO"
+		class="com.iba.ehis.ds.nutrients.pojo.dao.NutrientsDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="nutrientsAssembler" />
+		</property>
+	</bean>
+
+	<bean name="nutrientsAssembler"
+		class="com.iba.ehis.ds.nutrients.util.NutrientsAssembler">
+	</bean>
+		
+	<bean name="nutrientsFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="nutrientsDAO" />
+		</property>
+	</bean>
+	
+	<bean name="nutrientsDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="nutrientsFacade" />
+		</property>
+	</bean>	
+
+<!--  DS PARAMETER ACROSS THE FACILITY BEANS       -->
+	
+	<bean name="dsParameterAcrossTheFacilityDAO"
+		class="com.iba.ehis.ds.dsparameteracrossfacility.pojo.dao.DSparameterAcrossTheFacilityDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="dsParamaAcrossFacilityAssembler" />
+		</property>
+	</bean>
+
+	<bean name="dsParamaAcrossFacilityAssembler"
+		class="com.iba.ehis.ds.dsparameteracrossfacility.util.DSparamaAcrossFacilityAssembler">
+	</bean>
+
+	<bean name="dsParameterAcrossTheFacilityFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dsParameterAcrossTheFacilityDAO" />
+		</property>
+	</bean>
+	
+	<bean name="dsParameterAcrossTheFacilityDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dsParameterAcrossTheFacilityFacade" />
+		</property>
+	</bean>	
+
+<!--   DS PARAMETER FOR THE FACILITY BEANS   -->
+	
+	<bean name="dsparameterforthefacilityDAO"
+		class="com.iba.ehis.ds.dsparameterforfacility.pojo.dao.DSparameterForTheFacilityDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	<property name="appAssembler">
+			<ref bean="dsParamForFacilityAssembler" />
+	</property>
+	</bean>
+
+	<bean name="dsParamForFacilityAssembler"
+	class="com.iba.ehis.ds.dsparameterforfacility.util.DSparameterForTheFacilityAssembler">
+	</bean>
+
+	<bean name="dsparameterforthefacilityFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dsparameterforthefacilityDAO" />
+		</property>
+	</bean>
+	
+	<bean name="dsparameterforthefacilityDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dsparameterforthefacilityFacade" />
+		</property>
+	</bean>	
+
+
+<!--  WARDSFORKITCHEN BEANS   -->
+		
+	<bean name="wardsforkitchenDAO"
+		class="com.iba.ehis.ds.wardsforkitchen.pojo.dao.WardsForKitchenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="wardsForKitchenAssembler" />
+	</property>
+	</bean>
+	<bean name="wardsForKitchenAssembler"
+	class="com.iba.ehis.ds.wardsforkitchen.util.WardsForKitchenAssembler">
+	</bean>
+	
+	<bean name="wardsforkitchenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="wardsforkitchenDAO" />
+		</property>
+	</bean>
+	
+	<bean name="wardsforkitchenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="wardsforkitchenFacade" />
+		</property>
+	</bean>
+
+<!-- DIET TIME TABLE   -->
+	
+	<bean name="dietTimeTableDAO"
+		class="com.iba.ehis.ds.diettimetable.pojo.dao.DietTimeTableDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="dietTimeTableAssembler" />
+	</property>
+	</bean>
+
+	<bean name="dietTimeTableAssembler"
+	class="com.iba.ehis.ds.diettimetable.util.DietTimeTableAssembler">
+	</bean>
+	
+
+	<bean name="dietTimeTableFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dietTimeTableDAO" />
+		</property>
+	</bean>
+
+	<bean name="dietTimeTableDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dietTimeTableFacade" />
+		</property>
+	</bean>
+
+<!--     Menu    -->
+
+	<bean name="MenuAssembler" class="com.iba.ehis.ds.menu.util.MenuAssembler"/>
+
+	<bean name="MenuDAO" class="com.iba.ehis.ds.menu.pojo.dao.MenuDAOImpl">
+		<property name="appAssembler">
+			<ref bean="MenuAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="MenuFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="MenuDAO" />
+		</property>
+	</bean>
+	<bean name="MenuDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="MenuFacade" />
+		</property>
+	</bean>
+
+<!--	  DIET CATEGORY BEANS           	-->
+
+	<bean name="dietCategoryDAO"
+		class="com.iba.ehis.ds.dietCategory.pojo.dao.DietCategoryDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="dietCategoryFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="dietCategoryDAO" />
+		</property>
+	</bean>
+	<bean name="dietCategoryDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="dietCategoryFacade" />
+		</property>
+	</bean>
+	
+	<!--   ******************  START OF DS-TRANSACTIONS ******************  -->
+
+<!--	MealPreparedServed LIST -->
+
+	<bean name="MealPreparedServedAssembler" class="com.iba.ehis.ds.mealpreparedservedcomplaints.util.MealPrepareServeComplaintAssembler"></bean>
+
+	<bean name="MealPreparedServedDAO" class="com.iba.ehis.ds.mealpreparedservedcomplaints.dao.MealPrepareServeComplaintsDAOImpl">
+		<property name="appAssembler">
+			<ref bean="MealPreparedServedAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+		<bean name="MealPreparedServedFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="MealPreparedServedDAO" />
+		</property>
+	</bean>
+		
+	<bean name="MealPreparedServedDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+		<ref bean="MealPreparedServedFacade"/>
+		</property>
+	</bean>
+
+<!--	Meal OrderFor Staff LIST -->
+	
+	<bean name="MealOrderForStaffAssembler" class="com.iba.ehis.ds.mealorderforstaff.util.MealOrderForStaffAssembler"></bean>
+	
+	<bean name="MealOrderForStaffDAO" class="com.iba.ehis.ds.mealorderforstaff.pojo.dao.MealOrderForStaffDAOImpl">
+		<property name="appAssembler">
+			<ref bean="MealOrderForStaffAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean name="MealOrderForStaffFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="MealOrderForStaffDAO" />
+		</property>
+	</bean>
+
+	<bean name="MealOrderForStaffDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="MealOrderForStaffFacade" />
+		</property>
+	</bean>
+
+<!--Place Diet Order-->
+
+	<bean id="placeDietOrderDelegator" class="com.iba.ehis.ds.placeDietOrder.pojo.business.PlaceDietOrderDelegator">
+		<property name="facade" ref="placeDietOrderFacade" />
+	</bean>
+
+	<bean id="placeDietOrderFacade" class="com.iba.ehis.ds.placeDietOrder.pojo.business.PlaceDietOrderFacade">
+		<property name="masterDAO" ref="placeDietOrderDaoFactory" />
+	</bean>
+
+	<bean id="placeDietOrderDaoFactory" class="com.iba.ehis.ds.core.pojo.dao.DSDAOFactory">
+		<constructor-arg>
+			<ref bean="placeDietOrderDaoImpl" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="placeDietOrderDaoImpl" class="com.iba.ehis.ds.placeDietOrder.pojo.dao.PlaceDietOrderDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler" ref="placeDietOrderAssembler" />
+	</bean>
+
+	<bean id="placeDietOrderAssembler" class="com.iba.ehis.ds.placeDietOrder.util.PlaceDietOrderAssembler" />
+
+<!--	WORK LIST ORDER LIST  -->
+
+	<bean id="workListOrderDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade" ref="workListOrderFacade" />
+	</bean>
+
+	<bean id="workListOrderFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO" ref="workListOrderDaoFactory" />
+	</bean>
+
+	<bean id="workListOrderDaoFactory" class="com.iba.ehis.ds.core.pojo.dao.DSDAOFactory">
+		<constructor-arg>
+			<ref bean="workListOrderDaoImpl" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="workListOrderDaoImpl" class="com.iba.ehis.ds.WorkListOrder.pojo.dao.WorkListOrderDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+
+		<property name="appAssembler" ref="workListOrderAssembler" />
+	</bean>
+
+	<bean id="workListOrderAssembler" class="com.iba.ehis.ds.WorkListOrder.util.WorkListOrderAssembler" />
+
+<!--			Food Item for kitchen Area 			-->
+
+	<bean name="foodItemForKitchenAreaDelegator" class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="foodItemForKitchenFacade"/>
+		</property>
+	</bean>
+
+	<bean name="foodItemForKitchenFacade" class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="foodItemForKitchenAreaDAOImpl"/>
+		</property>
+	</bean>
+	
+	<bean name="foodItemForKitchenAreaDAOImpl" class="com.iba.ehis.ds.fooditemforkitchenarea.pojo.dao.FoodItemForKitchenAreaDAOImpl">
+		<property name="appAssembler">
+			<ref bean="foodItemForKitchenAreaAssembler"/>
+		</property>
+		<property name="sessionFactory">
+				<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+
+	<bean name="foodItemForKitchenAreaAssembler" class="com.iba.ehis.ds.fooditemforkitchenarea.util.FoodItemForKitchenAreaAssembler"/>
+
+	<!--                KITCHEN BEANS                         -->
+	
+	<bean name="kitchenAssembler"
+		class="com.iba.ehis.ds.kitchen.util.KitchenAssembler">
+	</bean>
+			
+	<bean name="kitchenDAO"
+		class="com.iba.ehis.ds.kitchen.pojo.dao.KitchenDAOImpl">
+		<property name="appAssembler">
+			<ref bean="kitchenAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+	</bean>
+
+	<bean name="kitchenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="kitchenDAO"/>
+		</property>
+	</bean>
+	<bean name="kitchenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="kitchenFacade"/>
+		</property>
+	</bean>
+
+<!--    MODIFY MEAL PALN BEANS           -->
+	
+	<bean name="modifyMealPlanAssembler" class="com.iba.ehis.ds.modifymealplanforpatient.util.ModifyMealPlanAssembler"/>
+	
+	<bean name="modifyMealPlanDAO"
+		class="com.iba.ehis.ds.modifymealplanforpatient.pojo.dao.ModifyMealPlanDAOImpl">
+		<property name="appAssembler">
+			<ref bean="modifyMealPlanAssembler" />
+		</property>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="modifyMealPlanFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="modifyMealPlanDAO" />
+		</property>
+	</bean>
+	
+	<bean name="modifyMealPlanDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="modifyMealPlanFacade" />
+		</property>
+	</bean>
+
+<!--	                GENERATE MEAL PLAN                         	-->
+
+	<bean name="generateMealPlanDAO"
+		class="com.iba.ehis.ds.generatemealplan.pojo.dao.GenerateMealPlanDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="generateMealPlanFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="generateMealPlanDAO" />
+		</property>
+	</bean>
+	<bean name="generateMealPlanDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="generateMealPlanFacade" />
+		</property>
+	</bean>
+
+<!--   ******************  END OF DS-TRANSACTIONS ******************  -->
+
+</beans>

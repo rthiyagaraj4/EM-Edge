@@ -1,0 +1,1907 @@
+#include <stdio.h>
+#include <string.h> 
+    
+/*---------------------------------*/  
+#define PC_START		1
+#define PC_END			2
+#define	INFO_MESG		3
+#define ERR_MESG		4
+#define ORA_MESG		5  
+
+void proc_main (int, char **);
+void disp_message ( int, char *);
+void open_log_file();
+void proc_exit();
+/*-----------------------------------*/ 
+ 
+#define OERROR (sqlca.sqlcode < 0)
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define TABLE_ALREADY_EXISTS (sqlca.sqlcode == -955)
+
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+
+extern double atof();
+
+/*
+#define DEBUG 0
+*/
+    
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    int audit_option_flag;
+
+ VARCHAR    nd_gd_doc_type_code        [7],
+            nd_gd_doc_num              [9];
+
+ VARCHAR    l_gd_doc_type_code         [7],
+            l_gd_doc_num               [9],
+            l_gd_org_doc_type_code     [7],
+            l_gd_org_doc_num           [9],
+            l_gd_doc_date              [11],
+            l_gd_doc_ref               [16],
+            l_gd_cust_code             [9],
+            l_gd_main_acc1_code        [7],
+            l_gd_main_acc2_code        [5],
+            l_gd_subledger_group_code  [4],
+            l_gd_subledger_line_code   [9],
+            l_gd_dept_code             [11],
+            l_gd_product_group_code    [4],
+            l_gd_product_line_code     [4],
+
+            l_gd_main_acc1_code_susp   [7],  
+            l_gd_main_acc2_code_susp   [5],
+            l_gd_subled_group_code_susp[4],
+            l_gd_subled_line_code_susp [9],
+            l_gd_dept_code_susp        [11],
+            l_gd_prod_group_code_susp  [4],
+            l_gd_prod_line_code_susp   [4],
+
+            l_gd_amount                [19],
+            l_gd_amount_negative       [19],
+            l_gd_debit_amt             [19],
+            l_gd_credit_amt            [19],
+            l_gd_narration             [51],
+            l_gd_post_month            [3],
+            l_gd_post_year             [5],
+            l_gd_cheque_num            [11],
+            l_gd_cheque_date           [11],
+            l_gd_trn_type_code         [5],
+            l_gd_adj_type              [3],   /* For adjustments */
+            l_slmt_pmnt_entry_yn	   [2];   /* Added by Ravikiran on 09/04/2010*/	
+int         l_gd_sign_amount;    /* sign(amount)  0 -> 0   */
+                                 /*               1 -> +ve */
+                                 /*              -1 -> -ve */
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA; 
+ 
+/* #include "winproc.h" */
+
+/* modified ver 2.10.01   */ 
+  char string_var[100];
+  /*----------------------*/    
+  
+ins_gl_distrbn(passed_doc_type,passed_doc_num,passed_trn_type)
+char passed_doc_type[],
+     passed_doc_num[];
+int  passed_trn_type;
+{
+   audit_option_flag  = passed_trn_type;
+   strcpy(nd_gd_doc_type_code.arr,passed_doc_type);
+   nd_gd_doc_type_code.len = strlen(nd_gd_doc_type_code.arr);
+
+   strcpy(nd_gd_doc_num.arr,passed_doc_num);
+   nd_gd_doc_num.len = strlen(nd_gd_doc_num.arr);
+
+   switch  (audit_option_flag)
+   {
+        case 1 : process_inv();
+                 break;
+        case 2 : process_dn();
+                 break;
+        case 3 : process_cn();
+                 break;
+        case 4 : process_adj();
+                 break;
+        case 5 : process_rec();
+                 break;
+        case 6 : process_pay();
+                 break;
+        case 7 : process_cashier();
+                 break;
+   }
+   return (0);
+}
+
+declare_cursors()
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside declare cursors\n");
+   sprintf(string_var," opt flag is <%d>\n",audit_option_flag);
+   disp_message(INFO_MESG,string_var);
+#endif
+
+    switch  (audit_option_flag)
+    {
+        case 1 : decl_in_curs();
+                 break;
+        case 2 : decl_dn_curs();
+                 break;
+        case 3 : decl_cn_curs();
+                 break;
+        case 4 : decl_adj_curs();
+                 break;
+        case 5 : decl_rec_curs();
+                 break;
+        case 6 : decl_pay_curs();
+                 break;
+       case 7 : decl_cash_curs();
+                 break;
+    }
+}
+
+decl_in_curs()
+{
+#ifdef DEBUG 
+  disp_message(INFO_MESG,"Inside Decl inv cur\n");
+#endif
+       EXEC SQL DECLARE CUR_INV_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+                        TO_CHAR(DOC_DATE,'DD/MM/YYYY'),	
+                        CUST_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        PAYABLE_AMT,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        SIGN(PAYABLE_AMT),
+                        DECODE(SIGN(PAYABLE_AMT),-1,-PAYABLE_AMT,PAYABLE_AMT)
+                   FROM AR_INV_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_INV_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMT_LOCAL,
+                        SIGN(AMT_LOCAL),
+                        DECODE(SIGN(AMT_LOCAL),-1,-AMT_LOCAL,AMT_LOCAL)
+                   FROM AR_INV_LINE
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+}
+
+open_in_hdr()
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside Open Inv hdr\n");
+#endif
+       EXEC SQL OPEN CUR_INV_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_INV_HDR",0,"");
+}
+
+fetch_in_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside Fetch in hdr\n");
+#endif
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_INV_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date,
+                      :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_INV_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"INV");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+          return (0);
+       else 
+          return (1);
+}
+
+open_in_line()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside Open inv line\n");
+#endif
+       EXEC SQL OPEN CUR_INV_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_INV_LINE",0,"");
+}
+
+fetch_in_line()
+{
+#ifdef DEBUG 
+  disp_message(INFO_MESG,"Inside fetch inv line\n");
+#endif
+       init_variables(0);
+
+       EXEC SQL FETCH  CUR_INV_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_INV_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"INV");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+decl_dn_curs()
+{
+#ifdef DEBUG 
+  disp_message(INFO_MESG,"Inside decl Dn curs\n");
+#endif
+       EXEC SQL DECLARE CUR_DN_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+                        TO_CHAR(DOC_DATE,'DD/MM/YYYY')
+                   FROM AR_DN_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+                     
+
+
+       EXEC SQL DECLARE CUR_DN_INV_HDR CURSOR FOR
+                 SELECT CUST_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        DOC_AMT,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        SIGN(DOC_AMT),
+                        DECODE(SIGN(DOC_AMT),-1,-DOC_AMT,DOC_AMT),
+                        ORG_DOC_TYPE_CODE,
+                        ORG_DOC_NUM
+                   FROM AR_DN_INV_HDR 
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_DN_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMOUNT,
+                        SIGN(AMOUNT),
+                        DECODE(SIGN(AMOUNT),-1,-AMOUNT,AMOUNT)
+                   FROM AR_DN_LINE
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num
+                    AND ORG_DOC_TYPE_CODE = :l_gd_org_doc_type_code
+                    AND ORG_DOC_NUM       = :l_gd_org_doc_num;
+
+}
+
+open_dn_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside Open dn hdr\n");
+#endif
+       EXEC SQL OPEN CUR_DN_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_DN_HDR",0,"");
+}
+
+fetch_dn_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside fetch dn hdr\n");
+#endif
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_DN_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_DN_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"DEB");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+           return (0);
+       else 
+           return (1);
+}
+
+open_dn_inv_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside open dn inv hdr\n");
+#endif
+       EXEC SQL OPEN CUR_DN_INV_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_DN_INV_HDR",0,"");
+}
+
+fetch_dn_inv_hdr()
+{
+       init_variables(1);
+
+#ifdef DEBUG
+   disp_message(INFO_MESG,"In fetch dn inv hdr\n");
+   sprintf(string_var,"doc is <%s> - <%s> \n",l_gd_doc_type_code.arr,l_gd_doc_num.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"doc date is <%s>\n",l_gd_doc_date.arr);  
+   disp_message(INFO_MESG,string_var); 
+#endif
+
+       EXEC SQL FETCH CUR_DN_INV_HDR
+                 INTO :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative,
+                      :l_gd_org_doc_type_code,
+                      :l_gd_org_doc_num;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_DN_INV_HDR",0,"");
+
+       null_terminate(1);
+       strcpy(l_gd_trn_type_code.arr,"DEB");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_dn_line()
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Before open dn line\n");
+#endif
+
+       EXEC SQL OPEN CUR_DN_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_DN_LINE",0,"");
+}
+
+fetch_dn_line()
+{
+       init_variables(0);
+
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside Fetch dn line\n");
+#endif
+
+       EXEC SQL FETCH  CUR_DN_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_DN_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"DEB");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+decl_cn_curs()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"In decl cn curs\n");
+#endif
+       EXEC SQL DECLARE CUR_CN_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+                        TO_CHAR(DOC_DATE,'DD/MM/YYYY')
+                   FROM AR_CN_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+                     
+
+       EXEC SQL DECLARE CUR_CN_INV_HDR CURSOR FOR
+                 SELECT CUST_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        DOC_AMT,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        SIGN(DOC_AMT),
+                        DECODE(SIGN(DOC_AMT),-1,-DOC_AMT,DOC_AMT),
+                        ORG_DOC_TYPE_CODE,
+                        ORG_DOC_NUM
+                   FROM AR_CN_INV_HDR 
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_CN_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMOUNT,
+                        SIGN(AMOUNT),
+                        DECODE(SIGN(AMOUNT),-1,-AMOUNT,AMOUNT)
+                   FROM AR_CN_LINE 
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num
+                    AND ORG_DOC_TYPE_CODE = :l_gd_org_doc_type_code
+                    AND ORG_DOC_NUM       = :l_gd_org_doc_num;
+}
+
+open_cn_hdr()
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"In open cn hdr\n");
+#endif
+       EXEC SQL OPEN CUR_CN_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_CN_HDR",0,"");
+}
+
+fetch_cn_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside fetch cn hdr\n");
+#endif
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_CN_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_CN_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"CRE");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_cn_inv_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside open cn inv hdr\n");
+  sprintf(string_var,"doc is <%s> - <%s> \n",l_gd_doc_type_code.arr,l_gd_doc_num.arr);
+  disp_message(INFO_MESG,string_var); 
+#endif 
+       EXEC SQL OPEN CUR_CN_INV_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_CN_INV_HDR",0,"");
+}
+
+fetch_cn_inv_hdr()
+{
+       init_variables(1);
+#ifdef DEBUG
+   disp_message(INFO_MESG,"In fetch cn inv hdr\n");
+   sprintf(string_var,"doc is <%s> - <%s> \n",l_gd_doc_type_code.arr,l_gd_doc_num.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"doc date is <%s>\n",l_gd_doc_date.arr);
+   disp_message(INFO_MESG,string_var);
+#endif 
+
+       EXEC SQL FETCH CUR_CN_INV_HDR
+                 INTO :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative,
+                      :l_gd_org_doc_type_code,
+                      :l_gd_org_doc_num;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_CN_INV_HDR",0,"");
+
+       null_terminate(1);
+       strcpy(l_gd_trn_type_code.arr,"CRE");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_cn_line()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside open cn line\n");
+#endif
+       EXEC SQL OPEN CUR_CN_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_CN_LINE",0,"");
+}
+
+fetch_cn_line()
+{
+       init_variables(0);
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside fetch cn line\n");
+#endif
+
+       EXEC SQL FETCH  CUR_CN_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_CN_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"CRE");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+decl_adj_curs()
+{
+#ifdef DEBUG
+  dis_message(INFO_MESG,"In decl adj cur\n");
+#endif
+
+       EXEC SQL DECLARE CUR_ADJ_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+						TO_CHAR(DOC_DATE,'DD/MM/YYYY')
+                   FROM AR_ADJ_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+                     
+
+       EXEC SQL DECLARE CUR_ADJ_INV_HDR CURSOR FOR
+                 SELECT CUST_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        DOC_AMT,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        ADJ_TYPE,
+                        SIGN(DOC_AMT),
+                        DECODE(SIGN(DOC_AMT),-1,-DOC_AMT,DOC_AMT),
+                        ORG_DOC_TYPE_CODE,
+                        ORG_DOC_NUM
+                   FROM AR_ADJ_INV_HDR 
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_ADJ_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMOUNT,
+                        SIGN(AMOUNT),
+                        DECODE(SIGN(AMOUNT),-1,-AMOUNT,AMOUNT)
+                   FROM AR_ADJ_LINE
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num
+                    AND ORG_DOC_TYPE_CODE = :l_gd_org_doc_type_code
+                    AND ORG_DOC_NUM       = :l_gd_org_doc_num;
+}
+
+open_adj_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"In open adj hdr\n");
+#endif
+       EXEC SQL OPEN CUR_ADJ_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_ADJ_HDR",0,"");
+}
+
+fetch_adj_hdr()
+{
+       init_variables(2);
+#ifdef DEBUG
+  disp_message(INFO_MESG,"In fetch adj hdr\n");
+#endif
+
+       EXEC SQL FETCH CUR_ADJ_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_ADJ_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"ADJ");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_adj_inv_hdr()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"in open adj inv hdr\n");
+#endif
+       EXEC SQL OPEN CUR_ADJ_INV_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_ADJ_INV_HDR",0,"");
+}
+
+fetch_adj_inv_hdr()
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside fetch adj inv hdr\n");
+#endif
+       init_variables(1);
+       l_gd_adj_type.arr[0] = '\0';
+       l_gd_adj_type.len    = 0;
+ 
+       EXEC SQL FETCH CUR_ADJ_INV_HDR
+                 INTO :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_adj_type,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative,
+                      :l_gd_org_doc_type_code,
+                      :l_gd_org_doc_num;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_ADJ_INV_HDR",0,"");
+
+       l_gd_adj_type.arr[l_gd_adj_type.len]  = '\0';
+
+       null_terminate(1);
+       strcpy(l_gd_trn_type_code.arr,"ADJ");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+#ifdef DEBUG
+   sprintf(string_var,"After fetching Adj inv hdr  Adj type - <%s><%d>\n",
+            l_gd_adj_type.arr,
+            l_gd_adj_type.len);
+   disp_message(INFO_MESG,string_var);         
+#endif
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_adj_line()
+{
+       EXEC SQL OPEN CUR_ADJ_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_ADJ_LINE",0,"");
+}
+
+fetch_adj_line()
+{
+       init_variables(0);
+
+       EXEC SQL FETCH  CUR_ADJ_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_ADJ_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"ADJ");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+decl_rec_curs()
+{
+       EXEC SQL DECLARE CUR_REC_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+						TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                        DOC_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        AMT_LOCAL,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        CHEQUE_NUM,
+						TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                        SIGN(AMT_LOCAL),
+                        DECODE(SIGN(AMT_LOCAL),-1,-AMT_LOCAL,AMT_LOCAL)
+                   FROM AR_REC_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_REC_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMT_LOCAL,
+                        SIGN(AMT_LOCAL),
+                        DECODE(SIGN(AMT_LOCAL),-1,-AMT_LOCAL,AMT_LOCAL)
+                   FROM AR_REC_LINE
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+}
+
+open_rec_hdr()
+{
+       EXEC SQL OPEN CUR_REC_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_REC_HDR",0,"");
+}
+
+fetch_rec_hdr()
+{
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_REC_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date,
+                      :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_cheque_num,
+                      :l_gd_cheque_date,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_REC_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"REC");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+open_rec_line()
+{
+       EXEC SQL OPEN CUR_REC_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_REC_LINE",0,"");
+}
+
+fetch_rec_line()
+{
+       init_variables(0);
+
+       EXEC SQL FETCH  CUR_REC_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_REC_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"REC");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+
+decl_pay_curs()
+{
+       EXEC SQL DECLARE CUR_PAY_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+						TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                        DOC_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        AMT_LOCAL,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        CHEQUE_NUM,
+						TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                        SIGN(AMT_LOCAL),
+                        DECODE(SIGN(AMT_LOCAL),-1,-AMT_LOCAL,AMT_LOCAL)
+                   FROM AR_PAY_HDR
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       EXEC SQL DECLARE CUR_PAY_LINE CURSOR FOR
+                 SELECT MAIN_ACC1_CODE,
+                        MAIN_ACC2_CODE,
+                        SUBLEDGER_GROUP_CODE,
+                        SUBLEDGER_LINE_CODE,
+                        DEPT_CODE,
+                        PRODUCT_GROUP_CODE,
+                        PRODUCT_LINE_CODE,
+                        NARRATION,
+                        AMT_LOCAL,
+                        SIGN(AMT_LOCAL),
+                        DECODE(SIGN(AMT_LOCAL),-1,-AMT_LOCAL,AMT_LOCAL)
+                   FROM AR_PAY_LINE
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+}
+
+open_pay_hdr()
+{
+       EXEC SQL OPEN CUR_PAY_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_PAY_HDR",0,"");
+}
+
+fetch_pay_hdr()
+{
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_PAY_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date,
+                      :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_cheque_num,
+                      :l_gd_cheque_date,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_PAY_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"REF");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+#ifdef DEBUG
+ sprintf(string_var,"count is <%d>\n",sqlca.sqlerrd[2]);
+ disp_message(INFO_MESG,string_var);
+ sprintf(string_var,"code is <%d>\n",sqlca.sqlcode);
+ disp_message(INFO_MESG,string_var);
+#endif
+
+       if (LAST_ROW)
+          return (0);
+       else
+          return (1);
+}
+
+open_pay_line()
+{
+       EXEC SQL OPEN CUR_PAY_LINE;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_PAY_LINE",0,"");
+}
+
+fetch_pay_line()
+{
+       init_variables(0);
+
+       EXEC SQL FETCH  CUR_PAY_LINE
+                 INTO :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_narration,
+                      :l_gd_amount,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+   
+       if (OERROR)
+         err_mesg("FETCH failed on cursor CUR_PAY_LINE",0,"");
+
+       null_terminate(0);
+       strcpy(l_gd_trn_type_code.arr,"REF");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+       if (LAST_ROW)
+            return (0);
+       else
+            return (1);
+}
+/*****************************************************************/
+
+decl_cash_curs()
+{
+       EXEC SQL DECLARE CUR_CASH_HDR CURSOR FOR
+                 SELECT DOC_TYPE_CODE,
+                        DOC_NUM,
+				TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                        DOC_REF,
+                        CUST_CODE,
+                        MAIN_ACC1_CODE_BANK,            
+				MAIN_ACC2_CODE_BANK,            
+				SUBLEDGER_GROUP_CODE_BANK,
+				SUBLEDGER_LINE_CODE_BANK,       
+				DEPT_CODE_BANK,                 
+				PRODUCT_GROUP_CODE_BANK,        
+				PRODUCT_LINE_CODE_BANK,
+                        MAIN_ACC1_CODE_SUSP,            
+				MAIN_ACC2_CODE_SUSP,            
+				SUBLEDGER_GROUP_CODE_SUSP,
+				SUBLEDGER_LINE_CODE_SUSP,       
+				DEPT_CODE_SUSP,                 
+				PRODUCT_GROUP_CODE_SUSP,        
+				PRODUCT_LINE_CODE_SUSP,                  
+                        AMT_LOCAL,
+                        NARRATION,
+                        POST_MONTH,
+                        POST_YEAR,
+                        CHEQUE_NUM,
+	 			TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                        SIGN(AMT_LOCAL),
+                        -AMT_LOCAL
+			FROM AR_CASHIER
+                  WHERE DOC_TYPE_CODE = :nd_gd_doc_type_code
+                    AND DOC_NUM       = :nd_gd_doc_num;
+
+       
+}
+
+open_cash_hdr()
+{
+       EXEC SQL OPEN CUR_CASH_HDR;
+
+       if (OERROR)
+           err_mesg("OPEN failed on cursor CUR_CASH_HDR",0,"");
+}
+
+fetch_cash_hdr()
+{
+       init_variables(2);
+
+       EXEC SQL FETCH CUR_CASH_HDR
+                 INTO :l_gd_doc_type_code,
+                      :l_gd_doc_num,
+                      :l_gd_doc_date,
+                      :l_gd_doc_ref,
+                      :l_gd_cust_code,
+                      :l_gd_main_acc1_code,
+                      :l_gd_main_acc2_code,
+                      :l_gd_subledger_group_code,
+                      :l_gd_subledger_line_code,
+                      :l_gd_dept_code,
+                      :l_gd_product_group_code,
+                      :l_gd_product_line_code,
+                      :l_gd_main_acc1_code_susp,
+                      :l_gd_main_acc2_code_susp,
+                      :l_gd_subled_group_code_susp,
+                      :l_gd_subled_line_code_susp,
+                      :l_gd_dept_code_susp,
+                      :l_gd_prod_group_code_susp,
+                      :l_gd_prod_line_code_susp,
+                      :l_gd_amount,
+                      :l_gd_narration,
+                      :l_gd_post_month,
+                      :l_gd_post_year,
+                      :l_gd_cheque_num,
+                      :l_gd_cheque_date,
+                      :l_gd_sign_amount,
+                      :l_gd_amount_negative;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor CUR_CASH_HDR",0,"");
+
+       null_terminate(2);
+       strcpy(l_gd_trn_type_code.arr,"CASH");
+       l_gd_trn_type_code.len = strlen(l_gd_trn_type_code.arr);
+
+#ifdef DEBUG
+ sprintf(string_var,"count is <%d>\n",sqlca.sqlerrd[2]);
+ disp_message(INFO_MESG,string_var);
+ sprintf(string_var,"code is <%d>\n",sqlca.sqlcode);
+ disp_message(INFO_MESG,string_var);
+#endif
+
+       if (LAST_ROW)
+          return (0);
+       else
+          return (1);
+}
+
+
+
+
+/*****************************************************************/
+
+init_variables(flg)
+int flg;
+{
+
+  if (flg)   /* Before Fetching hdr or Inv hdr */
+  {
+    if (flg == 2)  /* Before Fetching hdr */
+    { 
+        l_gd_doc_type_code.arr[0]         = '\0';
+        l_gd_doc_num.arr[0]               = '\0';
+        l_gd_doc_date.arr[0]              = '\0';
+    }
+    l_gd_doc_ref.arr[0]               = '\0';
+    l_gd_cust_code.arr[0]             = '\0';
+    l_gd_post_month.arr[0]            = '\0';
+    l_gd_post_year.arr[0]             = '\0';
+    l_gd_cheque_num.arr[0]            = '\0';
+    l_gd_cheque_date.arr[0]           = '\0';
+  }
+
+l_gd_org_doc_type_code.arr[0]     = '\0';
+l_gd_org_doc_num.arr[0]           = '\0';
+
+l_gd_main_acc1_code.arr[0]        = '\0';
+l_gd_main_acc2_code.arr[0]        = '\0';
+l_gd_subledger_group_code.arr[0]  = '\0';
+l_gd_subledger_line_code.arr[0]   = '\0';
+l_gd_dept_code.arr[0]             = '\0';
+l_gd_product_group_code.arr[0]    = '\0';
+l_gd_product_line_code.arr[0]     = '\0';
+
+l_gd_main_acc1_code_susp.arr[0]   = '\0';
+l_gd_main_acc2_code_susp.arr[0]   = '\0';
+l_gd_subled_group_code_susp.arr[0] = '\0';
+l_gd_subled_line_code_susp.arr[0]  = '\0';
+l_gd_dept_code_susp.arr[0]         = '\0';
+l_gd_prod_group_code_susp.arr[0]   = '\0';
+l_gd_prod_line_code_susp.arr[0]    = '\0';
+
+l_gd_amount.arr[0]                = '\0';
+l_gd_debit_amt.arr[0]             = '\0';
+l_gd_credit_amt.arr[0]            = '\0';
+l_gd_narration.arr[0]             = '\0';
+l_gd_trn_type_code.arr[0]         = '\0';
+l_gd_amount_negative.arr[0]       = '\0';
+
+l_gd_sign_amount                  = 0;
+
+  if (flg)   /* Before Fetching hdr or Inv hdr */
+  {
+    if (flg == 2)  /* Before Fetching hdr */
+    { 
+       l_gd_doc_type_code.len            = 0;
+       l_gd_doc_num.len                  = 0;
+       l_gd_doc_date.len                 = 0;
+    }
+    l_gd_doc_ref.len                  = 0;
+    l_gd_cust_code.len                = 0;
+    l_gd_post_month.len               = 0;
+    l_gd_post_year.len                = 0;
+    l_gd_cheque_num.len               = 0;
+    l_gd_cheque_date.len              = 0;
+  }
+
+l_gd_org_doc_type_code.len        = 0;
+l_gd_org_doc_num.len              = 0;
+
+l_gd_main_acc1_code.len           = 0;
+l_gd_main_acc2_code.len           = 0;
+l_gd_subledger_group_code.len     = 0;
+l_gd_subledger_line_code.len      = 0;
+l_gd_dept_code.len                = 0;
+l_gd_product_group_code.len       = 0;
+l_gd_product_line_code.len        = 0;
+
+l_gd_main_acc1_code_susp.len     = 0;
+l_gd_main_acc2_code_susp.len     = 0;
+l_gd_subled_group_code_susp.len     = 0;
+l_gd_subled_line_code_susp.len     = 0;
+l_gd_dept_code_susp.len     = 0;
+l_gd_prod_group_code_susp.len     = 0;
+l_gd_prod_line_code_susp.len     = 0;
+
+
+l_gd_amount.len                   = 0;
+l_gd_debit_amt.len                = 0;
+l_gd_credit_amt.len               = 0;
+l_gd_narration.len                = 0;
+l_gd_trn_type_code.len            = 0;
+l_gd_amount_negative.len          = 0;
+
+}
+
+null_terminate(flg)
+int flg;
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside null termination\n");
+#endif
+ 
+  if (flg)   /* Before Fetching hdr or Inv hdr */
+  {
+    if (flg == 2)  /* Before Fetching hdr */
+    { 
+       l_gd_doc_type_code.arr[l_gd_doc_type_code.len]                  = '\0';
+       l_gd_doc_num.arr[l_gd_doc_num.len]                              = '\0';
+       l_gd_doc_date.arr[l_gd_doc_date.len]                            = '\0';
+    }
+    l_gd_doc_ref.arr[l_gd_doc_ref.len]                              = '\0';
+    l_gd_cust_code.arr[l_gd_cust_code.len]                          = '\0';
+    l_gd_post_month.arr[l_gd_post_month.len]                        = '\0';
+    l_gd_post_year.arr[l_gd_post_year.len]                          = '\0';
+    l_gd_cheque_num.arr[l_gd_cheque_num.len]                        = '\0';
+    l_gd_cheque_date.arr[l_gd_cheque_date.len]                      = '\0';
+  }
+
+l_gd_org_doc_type_code.arr[l_gd_org_doc_type_code.len]          = '\0';
+l_gd_org_doc_num.arr[l_gd_org_doc_num.len]                      = '\0';
+
+l_gd_main_acc1_code.arr[l_gd_main_acc1_code.len]                = '\0';
+l_gd_main_acc2_code.arr[l_gd_main_acc2_code.len]                = '\0';
+l_gd_subledger_group_code.arr[l_gd_subledger_group_code.len]    = '\0';
+l_gd_subledger_line_code.arr[l_gd_subledger_line_code.len]      = '\0';
+l_gd_dept_code.arr[l_gd_dept_code.len]                          = '\0';
+l_gd_product_group_code.arr[l_gd_product_group_code.len]        = '\0';
+l_gd_product_line_code.arr[l_gd_product_line_code.len]          = '\0';
+
+l_gd_main_acc1_code_susp.arr[l_gd_main_acc1_code_susp.len]       = '\0';
+l_gd_main_acc2_code_susp.arr[l_gd_main_acc2_code_susp.len]       = '\0';
+l_gd_subled_group_code_susp.arr[l_gd_subled_group_code_susp.len] = '\0';
+l_gd_subled_line_code_susp.arr[l_gd_subled_line_code_susp.len]   = '\0';
+l_gd_dept_code_susp.arr[l_gd_dept_code_susp.len]                 = '\0';
+l_gd_prod_group_code_susp.arr[l_gd_prod_group_code_susp.len]     = '\0';
+l_gd_prod_line_code_susp.arr[l_gd_prod_line_code_susp.len]       = '\0';
+
+l_gd_amount.arr[l_gd_amount.len]                                = '\0';
+l_gd_debit_amt.arr[l_gd_debit_amt.len]                          = '\0';
+l_gd_credit_amt.arr[l_gd_credit_amt.len]                        = '\0';
+l_gd_narration.arr[l_gd_narration.len]                          = '\0';
+l_gd_trn_type_code.arr[l_gd_trn_type_code.len]                  = '\0';
+l_gd_amount_negative.arr[l_gd_amount_negative.len]              = '\0';
+
+#ifdef DEBUG
+  sprintf(string_var,"doc is <%s><%d> - <%s><%d> <%s>-<%d>\n",
+       l_gd_doc_type_code.arr,
+       l_gd_doc_type_code.len,
+       l_gd_doc_num.arr,
+       l_gd_doc_num.len,
+       l_gd_doc_date.arr,
+       l_gd_doc_date.len);
+  disp_message(INFO_MESG,string_var);     
+  sprintf(string_var," main <%s><%d> - <%s><%d>\n",
+       l_gd_main_acc1_code.arr,
+       l_gd_main_acc1_code.len,
+       l_gd_main_acc2_code.arr,
+       l_gd_main_acc2_code.len);
+  disp_message(INFO_MESG,string_var);     
+  sprintf(string_var," amt is <%s><%d> amt neg is <%s> sign is <%d>\n",
+       l_gd_amount.arr,
+       l_gd_amount.len,
+       l_gd_amount_negative.arr,
+       l_gd_sign_amount);
+  disp_message(INFO_MESG,string_var);     
+#endif
+}
+
+
+process_inv()
+{
+   open_in_hdr();
+
+   while (fetch_in_hdr())
+   {
+       insert_distrbn(0); 
+       open_in_line();
+       while(fetch_in_line())
+       {
+          insert_distrbn(1); 
+       }
+    }
+}
+ 
+process_dn()
+{
+   open_dn_hdr();
+
+   while (fetch_dn_hdr())
+   {
+       open_dn_inv_hdr();
+       while (fetch_dn_inv_hdr())
+       {
+           insert_distrbn(0); 
+           open_dn_line();
+           while(fetch_dn_line())
+           {
+              insert_distrbn(1); 
+           }
+        }
+    }
+}
+
+process_cn()
+{
+   open_cn_hdr();
+
+   while (fetch_cn_hdr())
+   {
+       open_cn_inv_hdr();
+       while (fetch_cn_inv_hdr())
+       {
+           insert_distrbn(0); 
+           open_cn_line();
+           while(fetch_cn_line())
+           {
+              insert_distrbn(1); 
+           }
+        }
+    }
+}
+
+process_adj()
+{
+   open_adj_hdr();
+
+   while (fetch_adj_hdr())
+   {
+       open_adj_inv_hdr();
+       while (fetch_adj_inv_hdr())
+       {
+           insert_distrbn(0); 
+           open_adj_line();
+           while(fetch_adj_line())
+           {
+              insert_distrbn(1); 
+           }
+        }
+    }
+}
+
+process_rec()
+{
+   open_rec_hdr();
+
+   while (fetch_rec_hdr())
+   {
+       insert_distrbn(0); 
+       open_rec_line();
+       while(fetch_rec_line())
+       {
+          insert_distrbn(1); 
+       }
+    }
+}
+
+process_pay()
+{
+   open_pay_hdr();
+
+   while (fetch_pay_hdr())
+   {
+       insert_distrbn(0); 
+       open_pay_line();
+       while(fetch_pay_line())
+       {
+          insert_distrbn(1); 
+       }
+   }
+}
+
+
+process_cashier()
+{
+   open_cash_hdr();
+
+   fetch_cash_hdr();
+    
+   insert_cash_disturbution(); 
+       
+    
+}
+
+insert_cash_disturbution()
+{
+     
+
+   EXEC SQL INSERT INTO AR_GL_DISTRBN
+     (
+         	DOC_TYPE_CODE,         
+		DOC_NUM,
+		DOC_DATE,               
+		DOC_REF,                
+		CUST_CODE,              
+		MAIN_ACC1_CODE,         
+		MAIN_ACC2_CODE,         
+		SUBLEDGER_GROUP_CODE,   
+		SUBLEDGER_LINE_CODE,    
+		DEPT_CODE,              
+		PRODUCT_GROUP_CODE,     
+		PRODUCT_LINE_CODE,      
+		DEBIT_AMT,              
+		CREDIT_AMT,             
+		NARRATION,              
+		POST_MONTH,             
+		POST_YEAR,
+		CHEQUE_NUM,             
+		CHEQUE_DATE,            
+		TRN_TYPE_CODE,
+	   SLMT_PMNT_ENTRY_YN
+    )
+    VALUES
+    (
+               :l_gd_doc_type_code,
+               :l_gd_doc_num,
+                TO_DATE(:l_gd_doc_date,'DD/MM/YYYY'),
+               :l_gd_doc_ref,
+               :l_gd_cust_code,
+               :l_gd_main_acc1_code,
+               :l_gd_main_acc2_code,
+               :l_gd_subledger_group_code,
+               :l_gd_subledger_line_code,
+               :l_gd_dept_code,
+               :l_gd_product_group_code,
+               :l_gd_product_line_code,
+               :l_gd_amount,
+               0,
+               :l_gd_narration,
+               :l_gd_post_month,
+               :l_gd_post_year,
+               :l_gd_cheque_num,
+			   TO_DATE(:l_gd_cheque_date,'DD/MM/YYYY'),
+               'REC',
+				'Y'
+   );
+
+
+if (OERROR)
+           err_mesg("INSERT failed on table AR_GL_DISTRBN",0,"");
+
+   
+    EXEC SQL INSERT INTO AR_GL_DISTRBN
+     (
+         	DOC_TYPE_CODE,         
+		DOC_NUM,
+		DOC_DATE,               
+		DOC_REF,                
+		CUST_CODE,              
+		MAIN_ACC1_CODE,         
+		MAIN_ACC2_CODE,         
+		SUBLEDGER_GROUP_CODE,   
+		SUBLEDGER_LINE_CODE,    
+		DEPT_CODE,              
+		PRODUCT_GROUP_CODE,     
+		PRODUCT_LINE_CODE,      
+		DEBIT_AMT,              
+		CREDIT_AMT,             
+		NARRATION,              
+		POST_MONTH,             
+		POST_YEAR,
+		CHEQUE_NUM,             
+		CHEQUE_DATE,            
+		TRN_TYPE_CODE,
+		SLMT_PMNT_ENTRY_YN
+    )
+    VALUES
+    (
+               :l_gd_doc_type_code,
+               :l_gd_doc_num,
+                TO_DATE(:l_gd_doc_date,'DD/MM/YYYY'),
+               :l_gd_doc_ref,
+               :l_gd_cust_code,
+               :l_gd_main_acc1_code_susp,
+               :l_gd_main_acc2_code_susp,
+               :l_gd_subled_group_code_susp,
+               :l_gd_subled_line_code_susp,
+               :l_gd_dept_code_susp,
+               :l_gd_prod_group_code_susp,
+               :l_gd_prod_line_code_susp,
+               0,
+               :l_gd_amount,
+               :l_gd_narration,
+               :l_gd_post_month,
+               :l_gd_post_year,
+               :l_gd_cheque_num,
+			   TO_DATE(:l_gd_cheque_date,'DD/MM/YYYY'),
+               'REC',
+			   'Y'
+   );
+
+
+   if (OERROR)
+           err_mesg("INSERT failed on table AR_GL_DISTRBN",0,"");
+
+
+
+}
+
+
+
+insert_distrbn(hdr_line)
+int hdr_line;
+{
+   calculate_credit_debit(hdr_line);
+
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside insert distrbn \n");
+   sprintf(string_var,"doc is <%s> - <%s>\n",l_gd_doc_type_code.arr,l_gd_doc_num.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var," deb is <%s><%d> cre is <%s><%d>\n",
+        l_gd_debit_amt.arr,
+        l_gd_debit_amt.len,
+        l_gd_credit_amt.arr,
+        l_gd_credit_amt.len);
+   disp_message(INFO_MESG,string_var);     
+   getchar();
+#endif
+   if(hdr_line==0)
+   {
+   EXEC SQL INSERT INTO AR_GL_DISTRBN
+            (
+               DOC_TYPE_CODE,
+               DOC_NUM,
+               DOC_DATE,
+               DOC_REF,
+               CUST_CODE,
+               MAIN_ACC1_CODE,
+               MAIN_ACC2_CODE,
+               SUBLEDGER_GROUP_CODE,
+               SUBLEDGER_LINE_CODE,
+               DEPT_CODE,
+               PRODUCT_GROUP_CODE,
+               PRODUCT_LINE_CODE,
+               DEBIT_AMT,
+               CREDIT_AMT,
+               NARRATION,
+               POST_MONTH,
+               POST_YEAR,
+               CHEQUE_NUM,
+               CHEQUE_DATE,
+               TRN_TYPE_CODE,
+			   SLMT_PMNT_ENTRY_YN
+            )
+        VALUES
+            (
+               :l_gd_doc_type_code,
+               :l_gd_doc_num,
+                TO_DATE(:l_gd_doc_date,'DD/MM/YYYY'),
+               :l_gd_doc_ref,
+               :l_gd_cust_code,
+               :l_gd_main_acc1_code,
+               :l_gd_main_acc2_code,
+               :l_gd_subledger_group_code,
+               :l_gd_subledger_line_code,
+               :l_gd_dept_code,
+               :l_gd_product_group_code,
+               :l_gd_product_line_code,
+               :l_gd_debit_amt,
+               :l_gd_credit_amt,
+               :l_gd_narration,
+               :l_gd_post_month,
+               :l_gd_post_year,
+               :l_gd_cheque_num,
+			   TO_DATE(:l_gd_cheque_date,'DD/MM/YYYY'),
+               :l_gd_trn_type_code,
+	           decode(:l_gd_trn_type_code,'REC','Y','REF','Y','N')
+            );
+ 
+        if (OERROR)
+           err_mesg("INSERT failed on table AR_GL_DISTRBN",0,"");
+
+    }
+    else
+    {
+	EXEC SQL INSERT INTO AR_GL_DISTRBN
+            (
+               DOC_TYPE_CODE,
+               DOC_NUM,
+               DOC_DATE,
+               DOC_REF,
+               CUST_CODE,
+               MAIN_ACC1_CODE,
+               MAIN_ACC2_CODE,
+               SUBLEDGER_GROUP_CODE,
+               SUBLEDGER_LINE_CODE,
+               DEPT_CODE,
+               PRODUCT_GROUP_CODE,
+               PRODUCT_LINE_CODE,
+               DEBIT_AMT,
+               CREDIT_AMT,
+               NARRATION,
+               POST_MONTH,
+               POST_YEAR,
+               CHEQUE_NUM,
+               CHEQUE_DATE,
+               TRN_TYPE_CODE,
+			   SLMT_PMNT_ENTRY_YN
+            )
+        VALUES
+            (
+               :l_gd_doc_type_code,
+               :l_gd_doc_num,
+                TO_DATE(:l_gd_doc_date,'DD/MM/YYYY'),
+               :l_gd_doc_ref,
+               :l_gd_cust_code,
+               :l_gd_main_acc1_code,
+               :l_gd_main_acc2_code,
+               :l_gd_subledger_group_code,
+               :l_gd_subledger_line_code,
+               :l_gd_dept_code,
+               :l_gd_product_group_code,
+               :l_gd_product_line_code,
+               :l_gd_debit_amt,
+               :l_gd_credit_amt,
+               :l_gd_narration,
+               :l_gd_post_month,
+               :l_gd_post_year,
+               :l_gd_cheque_num,
+			   TO_DATE(:l_gd_cheque_date,'DD/MM/YYYY'),
+               :l_gd_trn_type_code,
+	           'N'
+            );
+    }
+
+}
+
+
+calculate_credit_debit(hdr_line) /* 0 -> Hdr   1 -> Line */
+int hdr_line;
+{
+ int trn_flg = 0;
+ 
+
+ if (audit_option_flag == 7)
+ {
+    if (!strcmp(l_gd_trn_type_code.arr,"INV"))
+          trn_flg = 1;
+    else if (!strcmp(l_gd_trn_type_code.arr,"DEB"))
+            trn_flg = 2;
+         else if (!strcmp(l_gd_trn_type_code.arr,"CRE"))
+               trn_flg = 3;
+              else if (!strcmp(l_gd_trn_type_code.arr,"ADJ"))
+                    trn_flg = 4;
+                 else if (!strcmp(l_gd_trn_type_code.arr,"REC"))
+                       trn_flg = 5;
+                 else if (!strcmp(l_gd_trn_type_code.arr,"REF"))
+                       trn_flg = 6;
+  }
+  else
+     trn_flg = audit_option_flag;
+
+#ifdef DEBUG
+  sprintf(string_var,"Amt is <%s> - <%f> hdr_line is <%d> \n",l_gd_amount.arr,
+              atof(l_gd_amount.arr),
+             hdr_line);
+  disp_message(INFO_MESG,string_var);              
+              
+#endif
+ 
+  switch  (trn_flg)
+  {
+      case 1 :  
+               if ( !hdr_line )   /* Hdr rec */
+                   Debit();
+               else if (atof(l_gd_amount.arr) < 0.00)    /* -ve */
+                       Debit(); 
+                    else 
+                       Credit();
+               break; 
+      case 2 :
+               if ( !hdr_line )   /* Hdr rec */
+                   Debit();
+               else if (atof(l_gd_amount.arr) < 0.00)   /* -ve */
+                       Debit(); 
+                    else 
+                       Credit();
+               break;
+      case 3 : 
+               if ( !hdr_line )   /* Hdr rec */
+                   Credit();
+               else if (atof(l_gd_amount.arr) < 0.00)   /* -ve */
+                       Credit(); 
+                    else 
+                       Debit();
+               break;
+      case 4 : 
+               if ( !hdr_line )   /* Hdr rec */
+               {
+                   if (l_gd_adj_type.arr[0] == 'D')
+                        Debit();
+                   else
+                        Credit();
+               }
+               else if (atof(l_gd_amount.arr) < 0.00)   /* -ve */
+                    {
+                       if (l_gd_adj_type.arr[0] == 'D')
+                            Debit();
+                       else
+                            Credit();
+                    }
+                    else 
+                    {
+                       if (l_gd_adj_type.arr[0] == 'D')
+                            Credit();
+                       else
+                            Debit();
+                    }
+               break;
+      case 5 :
+               if ( !hdr_line )   /* Hdr rec */
+                   Debit();
+               else if (atof(l_gd_amount.arr) < 0.00)
+                       Debit(); 
+                  else 
+                       Credit();
+               break;
+      case 6 :
+               if ( !hdr_line )   /* Hdr rec */
+                   Credit();
+               else if (atof(l_gd_amount.arr) < 0.00)
+                       Debit();
+                  else 
+                       Credit(); 
+               break;
+    }
+
+}
+
+Credit()
+{
+#ifdef DEBUG
+ sprintf("In Credit sign is <%d>",l_gd_sign_amount);
+ disp_message(INFO_MESG,string_var);           
+           
+
+#endif
+
+   if (l_gd_sign_amount == 0)
+         strcpy(l_gd_credit_amt.arr,"");
+   else
+   {
+       if (l_gd_sign_amount == -1)
+         strcpy(l_gd_credit_amt.arr,l_gd_amount_negative.arr);
+       else
+         strcpy(l_gd_credit_amt.arr,l_gd_amount.arr);
+    }
+
+   strcpy(l_gd_debit_amt.arr,"");
+
+   l_gd_credit_amt.len = strlen(l_gd_credit_amt.arr);
+   l_gd_debit_amt.len = strlen(l_gd_debit_amt.arr);
+}
+
+Debit()
+{
+#ifdef DEBUG
+ sprintf(string_var,"In Debit sign is <%d>",l_gd_sign_amount);  
+ disp_message(INFO_MESG,string_var);
+#endif
+   if (l_gd_sign_amount == 0)
+         strcpy(l_gd_debit_amt.arr,"");
+   else
+   {
+        if (l_gd_sign_amount == -1)
+           strcpy(l_gd_debit_amt.arr,l_gd_amount_negative.arr);
+        else
+           strcpy(l_gd_debit_amt.arr,l_gd_amount.arr);
+   }
+
+   strcpy(l_gd_credit_amt.arr,"");
+
+   l_gd_credit_amt.len = strlen(l_gd_credit_amt.arr);
+   l_gd_debit_amt.len = strlen(l_gd_debit_amt.arr);
+}

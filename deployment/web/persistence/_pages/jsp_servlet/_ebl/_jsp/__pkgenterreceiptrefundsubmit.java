@@ -1,0 +1,763 @@
+package jsp_servlet._ebl._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import java.util.*;
+import webbeans.eCommon.*;
+import webbeans.op.CurrencyFormat;
+import eBL.Common.*;
+import eBL.*;
+import eCommon.Common.*;
+import com.ehis.util.*;
+import com.ehis.persist.*;
+import eCommon.Common.*;
+import java.lang.*;
+import java.util.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __pkgenterreceiptrefundsubmit extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/ebl/jsp/PkgEnterReceiptRefundSubmit.jsp", 1733477221181L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/GetPersistenceBean.jsp", 1717476031037L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n\n<script language=\"javascript\" src=\"../../eCommon/js/common.js\"></script>\n<script language=\"javascript\" src=\"../../eCommon/js/ValidateControl.js\"></script>\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<SCRIPT>\n//window.parent.returnValue=\"Y\";\n\t\t//parent.window.close();\nparent.parent.document.querySelectorAll(\"#dialog_tag\")[parent.parent.document.querySelectorAll(\"#dialog_tag\").length -2].close();\ntoCloseTopShowModal(\"Y\");\t\n</SCRIPT>\n</html>\n\n";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+	
+	/** START FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	public Object getBean(String sessionid,String userid,String ws_no,java.sql.Timestamp session_creation_date,Properties jdbc_props){
+		return PersistenceHelper.getBean(sessionid,userid,ws_no,session_creation_date,jdbc_props);
+	}
+	
+	public Object getObjectFromBean(String id,String ClassName,javax.servlet.http.HttpSession session){
+		return PersistenceHelper.getObjectFromBean( id,ClassName,session);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpSession session){
+		PersistenceHelper.putObjectInBean(id,obj,session);
+	}
+
+	/** END FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	/** START FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+	public Object getBeanObject(String id,String ClassName,javax.servlet.http.HttpServletRequest request){
+		return PersistenceHelper.getBeanObject(id,ClassName,request);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.putObjectInBean(id,obj,request);
+	}
+
+	public void cleanBeanObject(String id,String className,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.	cleanBeanObject(id,className,request);
+	} 
+	/** END FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+
+	/** START TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+	public void cleanAll(javax.servlet.http.HttpSession session){
+		PersistenceHelper.cleanAll(session);
+	}
+	/** END TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block5Bytes, _wl_block5);
+
+try{
+	request.setCharacterEncoding("UTF-8");
+	HttpSession httpSession = request.getSession(false);
+	Properties p = (Properties)httpSession.getValue("jdbc");
+	HashMap support_data = new HashMap();
+	HashMap mult_slmt_vals = new HashMap();
+	String facility_id="", client_ip_address="", user_id="" ;
+	String locale="";	
+	locale	= (String)session.getAttribute("LOCALE");	
+	if(locale==null || locale.equals("")) locale="en";	
+	facility_id = (String) session.getValue("facility_id");
+	if (facility_id==null) facility_id = "";
+	user_id	=  (String) session.getValue("login_user");	
+	if (user_id==null) user_id = "";
+
+	client_ip_address = p.getProperty("client_ip_address");
+	if (client_ip_address==null) client_ip_address = "";
+	String bean_id		= "PkgEnterReceptRefundBean" ;
+	String bean_name	= "eBL.PkgEnterReceptRefundBean";
+	PkgEnterReceptRefundBean bean			= (PkgEnterReceptRefundBean)getBeanObject( bean_id, bean_name, request ) ;
+	bean.clearBean();
+	putObjectInBean(bean_id,bean,request);
+	String patient_id="",  visit_id="", episode_id="", episode_type="", encounter_id="";
+	String rcpt_rfnd_ind="", rcpt_nature_code="", cash_counter_code="",	shift_id="", doc_amt="", narration="", ip_adm_trf_dep_ind="", rec_ref_format_ind="", rfnd_dep_in_use_yn="", pmnt_thru_mail="",ext_acc_facility_id="", ext_acc_code="", ext_acc_dept_code="", mult_slmt_yn="", downtime_entry_yn="", downtime_reason_code="", downtime_doc_type_code="", downtime_doc_num="", downtime_doc_date="", cc_machine_id="", payers_add1="", payers_add2="", payers_add3="", payers_tel_num="", consolidated_receipt_yn="",rcpt_type_code="",currdate="";
+	String str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd="N",hand_without_counter_chk_out="N";
+    String  pkgSeqNo="";String str_tot_rec="";	
+	int doc_sr_no=1;String str_doc_sr_no ="0",rtn_str_doc_sr_no="";
+	int totalRecords=0;
+	patient_id= request.getParameter("patient_id");
+	if(patient_id==null) patient_id="";		
+
+	visit_id=request.getParameter("visit_id");
+	if(visit_id==null) visit_id="";
+
+	episode_id=request.getParameter("episode_id");
+	if(episode_id==null) episode_id="";
+
+	episode_type=request.getParameter("episode_type");
+	if(episode_type==null) episode_type="";
+
+	encounter_id=request.getParameter("encounter_id");
+	if(encounter_id==null) encounter_id="";
+
+	rcpt_rfnd_ind=request.getParameter("rcpt_rfnd_ind");
+	if(rcpt_rfnd_ind==null) rcpt_rfnd_ind	="";
+
+	rcpt_nature_code=request.getParameter("rcpt_nature_code");
+	if(rcpt_nature_code==null) rcpt_nature_code="";
+
+	cash_counter_code=request.getParameter("cash_counter_code");
+	if(cash_counter_code==null) cash_counter_code="";
+
+	shift_id=request.getParameter("shift_id");
+	if(shift_id==null) shift_id="";
+
+	doc_amt=request.getParameter("doc_amt");
+	if(doc_amt==null) doc_amt="";	
+
+	narration=request.getParameter("narration");
+	if(narration==null) narration="";
+
+	ip_adm_trf_dep_ind=request.getParameter("ip_adm_trf_dep_ind");
+	if(ip_adm_trf_dep_ind==null) ip_adm_trf_dep_ind="";
+
+	rec_ref_format_ind=request.getParameter("rec_ref_format_ind");
+	if(rec_ref_format_ind==null) rec_ref_format_ind="";
+
+	rfnd_dep_in_use_yn=request.getParameter("rfnd_dep_in_use_yn");
+	if(rfnd_dep_in_use_yn==null) rfnd_dep_in_use_yn="";
+
+	pmnt_thru_mail=request.getParameter("pmnt_thru_mail");
+	if(pmnt_thru_mail==null) pmnt_thru_mail="";	 
+
+	ext_acc_facility_id=request.getParameter("ext_acc_facility_id");
+	if(ext_acc_facility_id==null) ext_acc_facility_id="";	 
+
+	ext_acc_code=request.getParameter("ext_acc_code");
+	if(ext_acc_code==null) ext_acc_code="";	 
+
+	ext_acc_dept_code=request.getParameter("ext_acc_dept_code");
+	if(ext_acc_dept_code==null) ext_acc_dept_code="";	 
+
+	mult_slmt_yn=request.getParameter("mult_slmt_yn");
+	if(mult_slmt_yn==null) mult_slmt_yn="";	 
+
+	downtime_entry_yn=request.getParameter("downtime_entry_yn");
+	if(downtime_entry_yn==null) downtime_entry_yn="";	 
+
+	downtime_reason_code=request.getParameter("downtime_reason_code");
+	if(downtime_reason_code==null) downtime_reason_code="";
+
+	downtime_doc_type_code=request.getParameter("downtime_doc_type_code");
+	if(downtime_doc_type_code==null) downtime_doc_type_code="";	 
+
+	downtime_doc_num=request.getParameter("downtime_doc_num");
+	if(downtime_doc_num==null) downtime_doc_num="";	 
+
+	downtime_doc_date=request.getParameter("downtime_doc_date");
+	if(downtime_doc_date==null) downtime_doc_date="";	
+	
+	cc_machine_id=request.getParameter("cc_machine_id");
+	if(cc_machine_id==null) cc_machine_id="";	 
+
+	payers_add1=request.getParameter("payers_add1");
+	if(payers_add1==null) payers_add1="";	
+
+	payers_add2=request.getParameter("payers_add2");
+	if(payers_add2==null) payers_add2="";	
+
+	payers_add3=request.getParameter("payers_add3");
+	if(payers_add3==null) payers_add3="";	
+	
+	payers_tel_num=request.getParameter("payers_tel_num");
+	if(payers_tel_num==null) payers_tel_num="";	 
+
+	consolidated_receipt_yn=request.getParameter("consolidated_receipt_yn");
+	if(consolidated_receipt_yn==null) consolidated_receipt_yn="";
+
+	rcpt_type_code=request.getParameter("rcpt_type_code");
+	if(rcpt_type_code==null) rcpt_type_code="";
+
+	currdate=request.getParameter("currdate");
+	if(currdate==null) currdate="";
+/*****************added for packge biling********************/
+		pkgSeqNo=request.getParameter("pkgSeqNo");
+		if(pkgSeqNo==null) pkgSeqNo="";
+/******************************END****************************/	
+		str_tot_rec = request.getParameter("total_records");
+		if(str_tot_rec == null) str_tot_rec="0";
+		totalRecords = Integer.parseInt(str_tot_rec);
+		str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd = request.getParameter("str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd");
+		if(str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd == null) str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd="";
+		hand_without_counter_chk_out = request.getParameter("hand_without_counter_chk_out");
+		if(hand_without_counter_chk_out == null) hand_without_counter_chk_out="";
+		support_data.clear();
+		support_data.put("facility_id",facility_id);
+		support_data.put("locale",locale);
+		support_data.put("patient_id",patient_id);		
+		support_data.put("visit_id",visit_id);
+		support_data.put("episode_id",episode_id);
+		support_data.put("episode_type",episode_type);
+		support_data.put("encounter_id",encounter_id);
+		support_data.put("rcpt_rfnd_ind",rcpt_rfnd_ind); 
+		support_data.put("rcpt_nature_code",rcpt_nature_code); 
+		support_data.put("cash_counter_code",cash_counter_code); 
+		support_data.put("shift_id",shift_id); 
+		support_data.put("doc_amt",doc_amt); 
+		support_data.put("narration",narration); 
+		support_data.put("ip_adm_trf_dep_ind",ip_adm_trf_dep_ind); 
+		support_data.put("rec_ref_format_ind",rec_ref_format_ind); 
+		support_data.put("rfnd_dep_in_use_yn",rfnd_dep_in_use_yn); 
+		support_data.put("pmnt_thru_mail",pmnt_thru_mail); 
+		support_data.put("ext_acc_facility_id",ext_acc_facility_id); 
+		support_data.put("ext_acc_code",ext_acc_code); 
+		support_data.put("ext_acc_dept_code",ext_acc_dept_code); 
+		support_data.put("mult_slmt_yn",mult_slmt_yn); 
+		support_data.put("downtime_entry_yn",downtime_entry_yn); 
+		support_data.put("downtime_reason_code",downtime_reason_code); 
+		support_data.put("downtime_doc_type_code",downtime_doc_type_code); 
+		support_data.put("downtime_doc_num",downtime_doc_num); 
+		support_data.put("downtime_doc_date",downtime_doc_date); 
+		support_data.put("cc_machine_id",cc_machine_id); 
+		support_data.put("payers_add1",payers_add1); 
+		support_data.put("payers_add2",payers_add2); 
+		support_data.put("payers_add3",payers_add3); 
+		support_data.put("payers_tel_num",payers_tel_num); 
+		support_data.put("consolidated_receipt_yn",consolidated_receipt_yn); 
+		support_data.put("user_id",user_id);
+		support_data.put("client_ip_address",client_ip_address);
+		support_data.put("rcpt_type_code",rcpt_type_code);
+		support_data.put("currdate",currdate);		
+		support_data.put("str_tot_rec",str_tot_rec);
+		support_data.put("str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd",str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd);
+		support_data.put("hand_without_counter_chk_out",hand_without_counter_chk_out);
+		/*********************added pkgSeqNo IN TAB DATA for package billing********************************************/
+		support_data.put("pkgSeqNo",pkgSeqNo);
+		bean.setSupportData(support_data);
+		//HashMap hm = new HashMap();
+		mult_slmt_vals.clear();
+		doc_sr_no=1;
+
+	if(str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd.equals("Y"))
+		{
+		str_doc_sr_no ="0";
+		ArrayList rtn_str_slmt_doc_amt=new ArrayList();
+		ArrayList rtn_str_slmt_type_code=new ArrayList();
+		ArrayList rtn_str_slmt_doc_ref_desc=new ArrayList();
+		ArrayList rtn_str_slmt_doc_ref_date=new ArrayList();
+		ArrayList rtn_str_slmt_doc_remarks=new ArrayList();
+		ArrayList rtn_str_app_ref_no=new ArrayList();
+		ArrayList rtn_str_cash_slmt_flag=new ArrayList();
+		ArrayList rtn_str_cc_batch_no=new ArrayList();
+		ArrayList rtn_str_cc_sale_draft_no=new ArrayList();
+		ArrayList rtn_str_cc_swipped_yn=new ArrayList();
+		ArrayList rtn_str_bank_code=new ArrayList();
+		ArrayList rtn_str_bank_branch=new ArrayList();
+		ArrayList rtn_str_cash_amt_given=new ArrayList();
+		ArrayList rtn_str_cash_amt_return=new ArrayList();
+		ArrayList rtn_str_payer_name=new ArrayList();
+		ArrayList rtn_str_rcpt_rfnd_id_no=new ArrayList();
+		ArrayList rtn_str_nominee_name=new ArrayList();
+		ArrayList rtn_str_doc_sr_no1=new ArrayList();
+		
+		ArrayList rtn_str_slmt_short_desc=new ArrayList();
+		ArrayList rtn_str_bank_name=new ArrayList();
+		ArrayList rtn_str_online_app=new ArrayList();
+
+
+		for(int i=0;i<totalRecords;i++)
+		{		
+
+
+				String str_slmt_doc_amt = request.getParameter("billslmtamt"+i);
+				if(str_slmt_doc_amt == null) str_slmt_doc_amt="";
+				rtn_str_slmt_doc_amt.add(str_slmt_doc_amt+"|");
+
+				String str_slmt_type_code = request.getParameter("slmttype"+i);
+				if(str_slmt_type_code ==null) str_slmt_type_code="";
+				String str_cash_slmt_flag =str_slmt_type_code;
+				str_slmt_type_code=str_slmt_type_code.substring(0,2);
+				str_cash_slmt_flag =str_cash_slmt_flag.substring(2,3);
+				rtn_str_slmt_type_code.add(str_slmt_type_code+"|");
+
+				String str_slmt_doc_ref_desc = request.getParameter("instref"+i);
+				if(str_slmt_doc_ref_desc == null) str_slmt_doc_ref_desc="";
+				rtn_str_slmt_doc_ref_desc.add(str_slmt_doc_ref_desc+"|");
+
+				String str_slmt_doc_ref_date = request.getParameter("instdate"+i);
+				if(str_slmt_doc_ref_date == null) str_slmt_doc_ref_date="";
+				rtn_str_slmt_doc_ref_date.add(str_slmt_doc_ref_date+"|");
+
+				String str_slmt_doc_remarks = request.getParameter("str_slmt_doc_remarks"+i);
+				if(str_slmt_doc_remarks == null) str_slmt_doc_remarks="";
+				rtn_str_slmt_doc_remarks.add(str_slmt_doc_remarks+"|");
+
+				String str_app_ref_no = request.getParameter("apprrefno"+i);
+				if(str_app_ref_no == null) str_app_ref_no="";
+				rtn_str_app_ref_no.add(str_app_ref_no+"|");
+
+				/*String str_cash_slmt_flag = request.getParameter("str_cash_slmt_flag"+i);
+				if(str_cash_slmt_flag == null) str_cash_slmt_flag="";
+				str_cash_slmt_flag="A";*/
+				rtn_str_cash_slmt_flag.add(str_cash_slmt_flag+"|");
+
+				String str_cc_batch_no = request.getParameter("batchno"+i);
+				if(str_cc_batch_no == null) str_cc_batch_no="";
+				rtn_str_cc_batch_no.add(str_cc_batch_no+"|");
+
+				String str_cc_sale_draft_no = request.getParameter("saledraftno"+i);
+				if(str_cc_sale_draft_no == null) str_cc_sale_draft_no="";
+				rtn_str_cc_sale_draft_no.add(str_cc_sale_draft_no+"|");
+
+				String str_cc_swipped_yn = request.getParameter("str_cc_swipped_yn"+i);
+				if(str_cc_swipped_yn == null) str_cc_swipped_yn="";
+				rtn_str_cc_swipped_yn.add(str_cc_swipped_yn+"|");
+
+				String str_bank_code = request.getParameter("instremarkcode"+i);
+				if(str_bank_code == null) str_bank_code="";
+				rtn_str_bank_code.add(str_bank_code+"|");
+
+				String str_bank_branch = request.getParameter("instbranch"+i);
+				if(str_bank_branch == null) str_bank_branch="";
+				rtn_str_bank_branch.add(str_bank_branch+"|");
+
+				String str_cash_amt_given = request.getParameter("cash_given"+i);
+				if(str_cash_amt_given == null) str_cash_amt_given="";
+				rtn_str_cash_amt_given.add(str_cash_amt_given+"|");
+
+				String str_cash_amt_return = request.getParameter("cash_return"+i);
+				if(str_cash_amt_return == null) str_cash_amt_return="";
+				rtn_str_cash_amt_return.add(str_cash_amt_return+"|");
+
+				String str_payer_name = request.getParameter("payername"+i);
+				if(str_payer_name == null) str_payer_name="";
+				rtn_str_payer_name.add(str_payer_name+"|");
+
+				String str_rcpt_rfnd_id_no = request.getParameter("recrefidno"+i);
+				if(str_rcpt_rfnd_id_no == null) str_rcpt_rfnd_id_no="";
+				rtn_str_rcpt_rfnd_id_no.add(str_rcpt_rfnd_id_no+"|");
+
+				String str_nominee_name = request.getParameter("str_nominee_name"+i);
+				if(str_nominee_name == null) str_nominee_name="";
+				rtn_str_nominee_name.add(str_nominee_name+"|");
+
+				str_doc_sr_no = String.valueOf(doc_sr_no);
+				rtn_str_doc_sr_no1.add(str_doc_sr_no+"|");
+				doc_sr_no=1;
+
+
+				String str_slmt_short_desc = request.getParameter("shortdesc"+i);
+				if(str_slmt_short_desc == null) str_slmt_short_desc="";
+				rtn_str_slmt_short_desc.add(str_slmt_short_desc+"|");
+
+				String str_bank_name = request.getParameter("instbankname"+i);
+				if(str_bank_name == null) str_bank_name="";
+				rtn_str_bank_name.add(str_bank_name+"|");
+
+				String str_online_app = request.getParameter("onlineapproval"+i);
+				if(str_online_app == null) str_online_app="";
+				rtn_str_online_app.add(str_online_app+"|");
+
+				mult_slmt_vals.put("rtn_str_slmt_doc_amt",rtn_str_slmt_doc_amt);
+				mult_slmt_vals.put("rtn_str_slmt_type_code",rtn_str_slmt_type_code);
+				mult_slmt_vals.put("rtn_str_slmt_doc_ref_desc",rtn_str_slmt_doc_ref_desc);
+				mult_slmt_vals.put("rtn_str_slmt_doc_ref_date",rtn_str_slmt_doc_ref_date);
+				mult_slmt_vals.put("rtn_str_slmt_doc_remarks",rtn_str_slmt_doc_remarks);
+				mult_slmt_vals.put("rtn_str_app_ref_no",rtn_str_app_ref_no);
+				mult_slmt_vals.put("rtn_str_cash_slmt_flag",rtn_str_cash_slmt_flag);
+				mult_slmt_vals.put("rtn_str_cc_batch_no",rtn_str_cc_batch_no);
+				mult_slmt_vals.put("rtn_str_cc_sale_draft_no",rtn_str_cc_sale_draft_no);
+				mult_slmt_vals.put("rtn_str_cc_swipped_yn",rtn_str_cc_swipped_yn);
+				mult_slmt_vals.put("rtn_str_bank_code",rtn_str_bank_code);
+				mult_slmt_vals.put("rtn_str_bank_branch",rtn_str_bank_branch);
+				mult_slmt_vals.put("rtn_str_cash_amt_given",rtn_str_cash_amt_given);
+				mult_slmt_vals.put("rtn_str_cash_amt_return",rtn_str_cash_amt_return);
+				mult_slmt_vals.put("rtn_str_payer_name",rtn_str_payer_name);
+				mult_slmt_vals.put("rtn_str_rcpt_rfnd_id_no",rtn_str_rcpt_rfnd_id_no);
+				mult_slmt_vals.put("rtn_str_nominee_name",rtn_str_nominee_name);
+				mult_slmt_vals.put("rtn_str_doc_sr_no",rtn_str_doc_sr_no1);
+				mult_slmt_vals.put("rtn_str_slmt_short_desc",rtn_str_slmt_short_desc);
+				mult_slmt_vals.put("rtn_str_bank_name",rtn_str_bank_name);
+				mult_slmt_vals.put("rtn_str_online_app",rtn_str_online_app);
+
+
+		}//end of for loop
+				bean.setMultSlmtVals(mult_slmt_vals);
+		}//end of if loop
+		else{
+
+			String rtn_str_slmt_doc_amt="", rtn_str_slmt_type_code="", rtn_str_slmt_doc_ref_desc="", rtn_str_slmt_doc_ref_date ="", rtn_str_slmt_doc_remarks ="" ,rtn_str_app_ref_no="", rtn_str_cash_slmt_flag="", rtn_str_cc_batch_no="", rtn_str_cc_sale_draft_no="", rtn_str_cc_swipped_yn="", rtn_str_bank_code="", rtn_str_bank_branch="", rtn_str_cash_amt_given="", rtn_str_cash_amt_return="", rtn_str_payer_name="", rtn_str_rcpt_rfnd_id_no="", rtn_str_nominee_name="",rtn_str_online_app="";
+			str_doc_sr_no ="0";rtn_str_doc_sr_no="";
+
+		for(int i=0;i<totalRecords;i++)
+		{		
+
+
+				String str_slmt_doc_amt = request.getParameter("billslmtamt"+i);
+				if(str_slmt_doc_amt == null) str_slmt_doc_amt="";
+
+				rtn_str_slmt_doc_amt=  rtn_str_slmt_doc_amt+str_slmt_doc_amt+"|";
+
+				String str_slmt_type_code = request.getParameter("slmttype"+i);
+				if(str_slmt_type_code ==null) str_slmt_type_code="";
+
+				String str_cash_slmt_flag =str_slmt_type_code;
+				str_slmt_type_code=str_slmt_type_code.substring(0,2);
+
+				//rtn_str_slmt_type_code=  rtn_str_slmt_doc_amt+str_slmt_type_code+"|";
+				str_cash_slmt_flag =str_cash_slmt_flag.substring(2,3);
+				rtn_str_slmt_type_code=  rtn_str_slmt_type_code+str_slmt_type_code+"|";
+
+
+				String str_slmt_doc_ref_desc = request.getParameter("instref"+i);
+				if(str_slmt_doc_ref_desc == null) str_slmt_doc_ref_desc="";
+
+
+				rtn_str_slmt_doc_ref_desc=  rtn_str_slmt_doc_ref_desc+str_slmt_doc_ref_desc+"|";
+
+				String str_slmt_doc_ref_date = request.getParameter("instdate"+i);
+				if(str_slmt_doc_ref_date == null) str_slmt_doc_ref_date="";
+
+
+				rtn_str_slmt_doc_ref_date=  rtn_str_slmt_doc_ref_date+str_slmt_doc_ref_date+"|";
+
+				String str_slmt_doc_remarks = request.getParameter("str_slmt_doc_remarks"+i);
+				if(str_slmt_doc_remarks == null) str_slmt_doc_remarks="";
+
+				rtn_str_slmt_doc_remarks=  rtn_str_slmt_doc_remarks+str_slmt_doc_remarks+"|";
+
+				String str_app_ref_no = request.getParameter("apprrefno"+i);
+				if(str_app_ref_no == null) str_app_ref_no="";
+
+				rtn_str_app_ref_no=  rtn_str_app_ref_no+str_app_ref_no+"|";
+
+				/*String str_cash_slmt_flag = request.getParameter("str_cash_slmt_flag"+i);
+				if(str_cash_slmt_flag == null) str_cash_slmt_flag="";*/
+
+				rtn_str_cash_slmt_flag=  rtn_str_cash_slmt_flag+str_cash_slmt_flag+"|";
+
+				String str_cc_batch_no = request.getParameter("batchno"+i);
+				if(str_cc_batch_no == null) str_cc_batch_no="";
+
+				rtn_str_cc_batch_no=  rtn_str_cc_batch_no+str_cc_batch_no+"|";
+
+				String str_cc_sale_draft_no = request.getParameter("saledraftno"+i);
+				if(str_cc_sale_draft_no == null) str_cc_sale_draft_no="";
+
+				rtn_str_cc_sale_draft_no=  rtn_str_cc_sale_draft_no+str_cc_sale_draft_no+"|";
+
+				String str_cc_swipped_yn = request.getParameter("str_cc_swipped_yn"+i);
+				if(str_cc_swipped_yn == null) str_cc_swipped_yn="";
+
+				rtn_str_cc_swipped_yn =  rtn_str_cc_swipped_yn+str_cc_swipped_yn+"|";
+
+				String str_bank_code = request.getParameter("instremarkcode"+i);
+				if(str_bank_code == null) str_bank_code="";
+
+				rtn_str_bank_code=  rtn_str_bank_code+str_bank_code+"|";
+
+				String str_bank_branch = request.getParameter("instbranch"+i);
+				if(str_bank_branch == null) str_bank_branch="";
+
+				rtn_str_bank_branch=  rtn_str_bank_branch+str_bank_branch+"|";
+
+				String str_cash_amt_given = request.getParameter("cash_given"+i);
+				if(str_cash_amt_given == null) str_cash_amt_given="";
+
+				rtn_str_cash_amt_given =  rtn_str_cash_amt_given+str_cash_amt_given+"|";
+
+				String str_cash_amt_return = request.getParameter("cash_return"+i);
+				if(str_cash_amt_return == null) str_cash_amt_return="";
+
+				rtn_str_cash_amt_return =  rtn_str_cash_amt_return+str_cash_amt_return+"|";
+
+
+				String str_payer_name = request.getParameter("payername"+i);
+				if(str_payer_name == null) str_payer_name="";
+				rtn_str_payer_name=  rtn_str_payer_name+str_payer_name+"|";
+
+				String str_rcpt_rfnd_id_no = request.getParameter("recrefidno"+i);
+				if(str_rcpt_rfnd_id_no == null) str_rcpt_rfnd_id_no="";
+
+				rtn_str_rcpt_rfnd_id_no =  rtn_str_rcpt_rfnd_id_no+str_rcpt_rfnd_id_no+"|";
+
+				String str_nominee_name = request.getParameter("str_nominee_name"+i);
+				if(str_nominee_name == null) str_nominee_name="";
+
+				rtn_str_nominee_name =  rtn_str_nominee_name+str_nominee_name+"|";
+
+				str_doc_sr_no = String.valueOf(doc_sr_no);
+				rtn_str_doc_sr_no=rtn_str_doc_sr_no+str_doc_sr_no+"|";
+
+					doc_sr_no++;
+
+				String str_online_app = request.getParameter("onlineapproval"+i);
+				if(str_online_app == null) str_online_app="";
+				rtn_str_online_app = rtn_str_online_app+str_online_app+"|";
+
+
+				mult_slmt_vals.put("rtn_str_slmt_doc_amt",rtn_str_slmt_doc_amt);
+				mult_slmt_vals.put("rtn_str_slmt_type_code",rtn_str_slmt_type_code);
+				mult_slmt_vals.put("rtn_str_slmt_doc_ref_desc",rtn_str_slmt_doc_ref_desc);
+				mult_slmt_vals.put("rtn_str_slmt_doc_ref_date",rtn_str_slmt_doc_ref_date);
+				mult_slmt_vals.put("rtn_str_slmt_doc_remarks",rtn_str_slmt_doc_remarks);
+				mult_slmt_vals.put("rtn_str_app_ref_no",rtn_str_app_ref_no);
+				mult_slmt_vals.put("rtn_str_cash_slmt_flag",rtn_str_cash_slmt_flag);
+				mult_slmt_vals.put("rtn_str_cc_batch_no",rtn_str_cc_batch_no);
+				mult_slmt_vals.put("rtn_str_cc_sale_draft_no",rtn_str_cc_sale_draft_no);
+				mult_slmt_vals.put("rtn_str_cc_swipped_yn",rtn_str_cc_swipped_yn);
+				mult_slmt_vals.put("rtn_str_bank_code",rtn_str_bank_code);
+				mult_slmt_vals.put("rtn_str_bank_branch",rtn_str_bank_branch);
+				mult_slmt_vals.put("rtn_str_cash_amt_given",rtn_str_cash_amt_given);
+				mult_slmt_vals.put("rtn_str_cash_amt_return",rtn_str_cash_amt_return);
+				mult_slmt_vals.put("rtn_str_payer_name",rtn_str_payer_name);
+				mult_slmt_vals.put("rtn_str_rcpt_rfnd_id_no",rtn_str_rcpt_rfnd_id_no);
+				mult_slmt_vals.put("rtn_str_nominee_name",rtn_str_nominee_name);
+				mult_slmt_vals.put("rtn_str_doc_sr_no",rtn_str_doc_sr_no);
+				mult_slmt_vals.put("rtn_str_online_app",rtn_str_online_app);
+			}
+			bean.setMultSlmtVals(mult_slmt_vals);
+	}
+
+		if(!str_slmt_mode_wise_rcpt_yn_for_rcpt_refnd.equals("Y"))
+		{
+			HashMap mult_slmt_vals1 = new HashMap();
+		str_doc_sr_no ="0";
+		ArrayList rtn_str_slmt_doc_amt1=new ArrayList();
+		ArrayList rtn_str_slmt_type_code1=new ArrayList();
+		ArrayList rtn_str_slmt_doc_ref_desc1=new ArrayList();
+		ArrayList rtn_str_slmt_doc_ref_date1=new ArrayList();
+		ArrayList rtn_str_slmt_doc_remarks1=new ArrayList();
+		ArrayList rtn_str_app_ref_no1=new ArrayList();
+		ArrayList rtn_str_cash_slmt_flag1=new ArrayList();
+		ArrayList rtn_str_cc_batch_no1=new ArrayList();
+		ArrayList rtn_str_cc_sale_draft_no1=new ArrayList();
+		ArrayList rtn_str_cc_swipped_yn1=new ArrayList();
+		ArrayList rtn_str_bank_code1=new ArrayList();
+		ArrayList rtn_str_bank_branch1=new ArrayList();
+		ArrayList rtn_str_cash_amt_given1=new ArrayList();
+		ArrayList rtn_str_cash_amt_return1=new ArrayList();
+		ArrayList rtn_str_payer_name1=new ArrayList();
+		ArrayList rtn_str_rcpt_rfnd_id_no1=new ArrayList();
+		ArrayList rtn_str_nominee_name1=new ArrayList();
+		ArrayList rtn_str_doc_sr_no11=new ArrayList();
+		ArrayList rtn_str_slmt_short_desc=new ArrayList();
+		ArrayList rtn_str_bank_name=new ArrayList();
+		ArrayList rtn_str_online_app=new ArrayList();
+		for(int i=0;i<totalRecords;i++)
+		{		
+				String str_slmt_doc_amt = request.getParameter("billslmtamt"+i);
+				if(str_slmt_doc_amt == null) str_slmt_doc_amt="";
+				rtn_str_slmt_doc_amt1.add(str_slmt_doc_amt+"|");
+				String str_slmt_type_code = request.getParameter("slmttype"+i);
+				if(str_slmt_type_code ==null) str_slmt_type_code="";
+				String str_cash_slmt_flag =str_slmt_type_code;
+				str_slmt_type_code=str_slmt_type_code.substring(0,2);
+				str_cash_slmt_flag =str_cash_slmt_flag.substring(2,3);
+				rtn_str_slmt_type_code1.add(str_slmt_type_code+"|");
+				String str_slmt_doc_ref_desc = request.getParameter("instref"+i);
+				if(str_slmt_doc_ref_desc == null) str_slmt_doc_ref_desc="";
+				rtn_str_slmt_doc_ref_desc1.add(str_slmt_doc_ref_desc+"|");
+				String str_slmt_doc_ref_date = request.getParameter("instdate"+i);
+				if(str_slmt_doc_ref_date == null) str_slmt_doc_ref_date="";
+				rtn_str_slmt_doc_ref_date1.add(str_slmt_doc_ref_date+"|");
+				String str_slmt_doc_remarks = request.getParameter("str_slmt_doc_remarks"+i);
+				if(str_slmt_doc_remarks == null) str_slmt_doc_remarks="";
+				rtn_str_slmt_doc_remarks1.add(str_slmt_doc_remarks+"|");
+				String str_app_ref_no = request.getParameter("apprrefno"+i);
+				if(str_app_ref_no == null) str_app_ref_no="";
+				rtn_str_app_ref_no1.add(str_app_ref_no+"|");				
+				/*String str_cash_slmt_flag = request.getParameter("str_cash_slmt_flag"+i);
+				if(str_cash_slmt_flag == null) str_cash_slmt_flag="";
+				str_cash_slmt_flag="A";*/
+				rtn_str_cash_slmt_flag1.add(str_cash_slmt_flag+"|");
+				String str_cc_batch_no = request.getParameter("batchno"+i);
+				if(str_cc_batch_no == null) str_cc_batch_no="";
+				rtn_str_cc_batch_no1.add(str_cc_batch_no+"|");
+				String str_cc_sale_draft_no = request.getParameter("saledraftno"+i);
+				if(str_cc_sale_draft_no == null) str_cc_sale_draft_no="";
+				rtn_str_cc_sale_draft_no1.add(str_cc_sale_draft_no+"|");
+				String str_cc_swipped_yn = request.getParameter("str_cc_swipped_yn"+i);
+				if(str_cc_swipped_yn == null) str_cc_swipped_yn="";
+				rtn_str_cc_swipped_yn1.add(str_cc_swipped_yn+"|");
+				String str_bank_code = request.getParameter("instremarkcode"+i);
+				if(str_bank_code == null) str_bank_code="";
+				rtn_str_bank_code1.add(str_bank_code+"|");
+				String str_bank_branch = request.getParameter("instbranch"+i);
+				if(str_bank_branch == null) str_bank_branch="";
+				rtn_str_bank_branch1.add(str_bank_branch+"|");
+				String str_cash_amt_given = request.getParameter("cash_given"+i);
+				if(str_cash_amt_given == null) str_cash_amt_given="";
+				rtn_str_cash_amt_given1.add(str_cash_amt_given+"|");
+				String str_cash_amt_return = request.getParameter("cash_return"+i);
+				if(str_cash_amt_return == null) str_cash_amt_return="";
+				rtn_str_cash_amt_return1.add(str_cash_amt_return+"|");
+				String str_payer_name = request.getParameter("payername"+i);
+				if(str_payer_name == null) str_payer_name="";
+				rtn_str_payer_name1.add(str_payer_name+"|");
+				String str_rcpt_rfnd_id_no = request.getParameter("recrefidno"+i);
+				if(str_rcpt_rfnd_id_no == null) str_rcpt_rfnd_id_no="";
+				rtn_str_rcpt_rfnd_id_no1.add(str_rcpt_rfnd_id_no+"|");
+				String str_nominee_name = request.getParameter("str_nominee_name"+i);
+				if(str_nominee_name == null) str_nominee_name="";
+				rtn_str_nominee_name1.add(str_nominee_name+"|");
+				str_doc_sr_no = String.valueOf(doc_sr_no);
+				rtn_str_doc_sr_no11.add(str_doc_sr_no+"|");
+				doc_sr_no=1;
+				String str_slmt_short_desc = request.getParameter("shortdesc"+i);
+				if(str_slmt_short_desc == null) str_slmt_short_desc="";
+				rtn_str_slmt_short_desc.add(str_slmt_short_desc+"|");
+				String str_bank_name = request.getParameter("instbankname"+i);
+				if(str_bank_name == null) str_bank_name="";
+				rtn_str_bank_name.add(str_bank_name+"|");
+
+				String str_online_app = request.getParameter("onlineapproval"+i);
+				if(str_online_app == null) str_online_app="";
+				rtn_str_online_app.add(str_online_app+"|");
+
+				mult_slmt_vals1.put("rtn_str_slmt_doc_amt",rtn_str_slmt_doc_amt1);
+				mult_slmt_vals1.put("rtn_str_slmt_type_code",rtn_str_slmt_type_code1);
+				mult_slmt_vals1.put("rtn_str_slmt_doc_ref_desc",rtn_str_slmt_doc_ref_desc1);
+				mult_slmt_vals1.put("rtn_str_slmt_doc_ref_date",rtn_str_slmt_doc_ref_date1);
+				mult_slmt_vals1.put("rtn_str_slmt_doc_remarks",rtn_str_slmt_doc_remarks1);
+				mult_slmt_vals1.put("rtn_str_app_ref_no",rtn_str_app_ref_no1);
+				mult_slmt_vals1.put("rtn_str_cash_slmt_flag",rtn_str_cash_slmt_flag1);
+				mult_slmt_vals1.put("rtn_str_cc_batch_no",rtn_str_cc_batch_no1);
+				mult_slmt_vals1.put("rtn_str_cc_sale_draft_no",rtn_str_cc_sale_draft_no1);
+				mult_slmt_vals1.put("rtn_str_cc_swipped_yn",rtn_str_cc_swipped_yn1);
+				mult_slmt_vals1.put("rtn_str_bank_code",rtn_str_bank_code1);
+				mult_slmt_vals1.put("rtn_str_bank_branch",rtn_str_bank_branch1);
+				mult_slmt_vals1.put("rtn_str_cash_amt_given",rtn_str_cash_amt_given1);
+				mult_slmt_vals1.put("rtn_str_cash_amt_return",rtn_str_cash_amt_return1);
+				mult_slmt_vals1.put("rtn_str_payer_name",rtn_str_payer_name1);
+				mult_slmt_vals1.put("rtn_str_rcpt_rfnd_id_no",rtn_str_rcpt_rfnd_id_no1);
+				mult_slmt_vals1.put("rtn_str_nominee_name",rtn_str_nominee_name1);
+				mult_slmt_vals1.put("rtn_str_doc_sr_no",rtn_str_doc_sr_no11);
+				mult_slmt_vals1.put("rtn_str_slmt_short_desc",rtn_str_slmt_short_desc);
+				mult_slmt_vals1.put("rtn_str_bank_name",rtn_str_bank_name);
+				mult_slmt_vals1.put("rtn_str_online_app",rtn_str_online_app);
+		}//end of for loop
+				bean.setSlmtVals(mult_slmt_vals1);
+				//System.out.println("mult_slmt_vals 1123"+mult_slmt_vals1);
+		}//end of if loop
+
+		putObjectInBean(bean_id,bean,request);
+}catch(Exception ee){
+	System.out.println("Error in Pkgrecrefsub"+ee);
+	ee.printStackTrace();
+}
+
+
+            _bw.write(_wl_block6Bytes, _wl_block6);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

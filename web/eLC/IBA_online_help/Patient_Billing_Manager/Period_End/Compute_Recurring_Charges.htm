@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Compute Recurring Charges</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nPeriod End\nCompute Recurring Charges");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Compute Recurring Charges</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Calculate</span> the recurring charges for the services utilized by the inpatients in the facility. The service charges of the inpatients currently admitted in the facility are calculated.</p>
+<p class="Text">Compute Recurring Charges function is used to calculate the charges for the inpatient services in the facility. The charges are computed until date. The inpatients admitted to the facility and currently availing services are only considered towards the recurring charge computation. Among the recurring charge transactions, the billing services for which the current process date is in between the start and end dates are selected. Recurring charges for inpatients are computed only when the inpatient billing is enabled. The charges, after computation, are transferred to the patients’ charges folio. Several 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">validations</a> are carried out while computing recurring charges.</p>
+<div class="droptext" id="POPUP239182254" style="display: none;">
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Recurring charge transactions are considered. The last recurring charge generated date has to be lesser than the process date.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The system checks, whether the financial details are defined for every admission number. If the financial details are not found, the system encounters an error message. System continues with the next eligible admission number. Recurring charge transactions for the relevant admission are processed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">For every admission number, the system captures the Billing Group from the financial details recorded during admission.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The current transfer serial number forms the basis for the billing details like billing class, bill type code, originating department code, etc.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The billing services whose start and end dates cover the process date are selected for recurring charge processing.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The system computes the patient charge, if the charge amount for the recurring charge line is null or zero. The amount is considered as the patient charge, if the charge amount is recorded. The billing rule and service discounts are not applied in such a case. In either case, system rounds-off the charge to the next higher integer and posts the charges to the patient's folio.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Standard billing computation is carried out to determine the gross charge, discount amount and the net charge, if the charge amount is null. After computation, the charges are rounded and then posted to the patient's folio.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The process date is set as the last date when the recurring charges were processed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">For every admission selected, system updates the admission and inpatient financial details automatically. The updated values get displayed when the financial details of the selected patient are accessed for further transactions.</p>
+</li>
+</ul>
+</div>
+<h2>Compute Recurring Charges</h2>
+<p class="From">From the Period End, double-click Compute Recurring Charges function.</p>
+<p class="Text">The Compute Recurring Charges screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">The system date gets displayed as the Process Date, by default. You cannot change the Process Date. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The previous date until when the recurring charges were computed gets displayed. You cannot update the Service Date. The recurring charges are computed for the Billing Services, where the date for the standard prices defined is in between the Process Date and the Service Date. The Service Date is incremented by one on computing the recurring charges for the selected date. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Service Time in numeric format as hh:mm:ss. Service Time is used to determine the Day Type and the Time Type codes to find out the additional rate/factor for patient charge computation.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Run Process]</span> to compute the charges. A screen pops-up requesting confirmation. Click <span class="BoldButton">[Yes]</span> to compute the recurring charges and <span class="BoldButton">[No]</span> to cancel the transaction. A log file is generated on clicking <span class="BoldButton">[Yes]</span>. Click <span class="BoldButton">[OK]</span> to view the report and <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You have to login to the Inpatient Cash Counter to compute the recurring charges.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Admit Patient','../../Inpatient_Management/Transaction/Admit_Patient.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics2.gif" border="0" height="23" width="101" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Discharge Bill Cum Receipt','../Transactions/IP_Cashier/Discharge_Bill_Cum_Receipt.htm');return false;" title="See Also"><img src="../../ss_btn_see_also2.gif" border="0" height="23" width="65" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP239182254');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

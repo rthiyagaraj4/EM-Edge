@@ -1,0 +1,3661 @@
+/***************************************************************************** 
+*  File	         : RLRHCRLN.pc
+   Author        : Hameed
+   Date Created  : 28/02/2005
+
+*  Ver 4.1  
+
+*  Purpose : To Generate Histo/Cyto Correlation Report
+
+*  Input Parameters : 
+                      Command line inputs
+	              1. Usr_id/Password
+                      2. Session id
+		              3. Program Date
+
+                      Parameters from SY_PROG_PARAM table
+  
+*  Tables Accessed :
+*****************************************************************************/  
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define LAST_ROW                (sqlca.sqlcode == 1403)
+#define VER  "VER : 4.1\n"
+#define ESC 0x1B
+#define REP_WIDTH 78
+/*
+#define DEBUG 
+*/
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    /* increased the length all varchar variables by one to take care
+       for null termination 
+	 */
+	 VARCHAR    nd_operating_facility_id [3],
+	            uid_pwd		            [91],
+				nd_file_name            [150] ,
+                nd_file_no              [15],
+                nd_session_id      	    [16],
+		        nd_pgm_date	   	        [20],
+				d_version_no			[20],
+				d_version  			    [20],
+
+				/* Specimen Information */
+				d_specimen_no           [21],
+				d_specimen_no_prv	    [21],
+				d_specimen_no_1         [21],
+				d_specimen_no_1_prv     [21],
+				d_specimen_no_2         [21],
+				d_specimen_no_2_prv     [21],
+				d_patient_id            [31],
+				
+				d_patient_name          [240],  //SD-CRF-20059 from here 
+				d_episode_type          [2],
+                d_soure_type            [1], 
+				d_nationality_id        [20],
+				d_source_code           [7] ,
+			    d_source_name           [100],  /*Modified By Manoj S for ML-MMOH-CRF-0752.6*/
+			    d_source_type           [2] ,
+                d_test_desc             [40],
+                d_test_code             [11], //SD-CRF-20059 upto here 
+                d_test_code_1           [11], //added on 26-10-2007 
+                d_test_code_2           [11], //added on 26-10-2007 
+				
+				d_patient_id_prv        [31],
+				d_category_code          [5],
+				d_category_year          [5],
+				d_category_num           [16],
+
+				d_category_code_2        [5],
+				d_category_year_2        [5],
+				d_category_num_2         [16],
+
+				d_section_ind            [5],
+				d_section_ind_prv        [5],
+
+				/*  Patient Master details  */
+				d_short_name            [61],
+
+				d_patient_name_1		[240],
+				d_patient_name_2		[240],
+				d_patient_name_3		[240],
+				d_patient_name_4		[240],
+
+				d_date_of_birth         [11],
+				d_sex                   [2],
+				d_actual_dob_yn			[2],
+
+				d_numeric_result	    [16],
+				d_rc_1         		    [41],
+				d_rc_2         		    [41],
+				d_rc_3         		    [41],
+				d_rc_4         		    [41],
+
+				d_numeric_result_2	    [16],
+				d_rc_1_2       		    [41],
+				d_rc_2_2       		    [41],
+				d_rc_3_2       		    [41],
+				d_rc_4_2       		    [41],
+
+                d_clinical_text_code	[5],
+			    d_clinical_text		    [4001],
+			    d_clinical_spec_no		[21],
+ 
+                d_result_text_code		[5],
+			    d_result_text		    [4001],
+			    d_result_spec_no		[21],
+
+                d_result_text_code_2	[5],
+			    d_result_text_2		    [4001],
+			    d_result_spec_no_2		[21],
+
+				/******** parameters from SY_PROG_PARAM table ***********/
+				nd_section_1            [3],
+				nd_section_2            [3],
+				nd_section_ind_1        [5],
+				nd_section_ind_2        [5],
+				nd_regd_date_fr_1		[31],
+				nd_regd_date_to_1		[31],
+				nd_regd_date_fr_2		[31],
+				nd_regd_date_to_2		[31],
+				nd_regd_date_fr_11		[31], //added for globalisation
+				nd_regd_date_to_11		[31], //added for globalisation
+				nd_regd_date_fr_21		[31], //added for globalisation
+				nd_regd_date_to_21		[31], //added for globalisation
+
+				nd_spec_type_fr_1		[5],
+				nd_spec_type_to_1		[5],
+				nd_spec_type_fr_2		[5],
+				nd_spec_type_to_2		[5],
+
+				nd_site_code			[5],
+
+				nd_anatomy_site_fr_1	[5],
+				nd_anatomy_site_to_1	[5],
+				nd_anatomy_site_fr_2	[5],
+				nd_anatomy_site_to_2	[5],
+
+				nd_category_prfx_1      [5],
+				nd_category_prfx_2      [5],
+				nd_search_result_text_1 [2],
+				nd_search_result_text_2 [2],
+				nd_search_type			[2],
+				nd_section_code         [3],
+
+				/* for header routine */
+				//d_acc_entity_name        [61],
+				d_acc_entity_name        [300],
+				d_user                   [21],
+				d_sysdate                [17],
+				d_sysdate1                [17],
+		/***************added for globalisation*************************/
+				l_translated_value		 [500],
+				language_id			[5];
+		/***************added for globalisation*************************/
+
+				char    sql_stmt[5000];
+
+				int l_count = 0;
+
+	/*  For Patient Age SYSDATE, MTHS */
+
+	 VARCHAR tday				[30],
+			t_days				[30],
+			mths				[30],
+			mths1				[30],
+			t_age				[30];
+
+	float mt;
+
+	int i; //added for globalisation
+
+	int  l_tab_exists ;
+	char src_code[11];
+	
+ EXEC SQL END DECLARE SECTION;
+
+
+	int		l_len = 30;
+	char	l_delimeter;
+
+	char    first_section_title[200], second_section_title[200];
+    
+ EXEC SQL INCLUDE SQLCA.H;
+ EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+char      sys_command[200];
+
+int   l_length = 0;
+int   i,nol = 1;
+int   rec_found =0;
+
+
+FILE *fp;
+void print_page_header();
+void print_col_heading();
+void prepare_new_page();
+void end_report();
+void print_detl_rec_1();
+void print_detl_rec_2();
+int  line_no = 0, page_no = 0,d_specimen_count = 0, l_sec_cnt =1;
+
+char word1[2];
+char string_var[100] ;
+char local_legend[35][500];//added for globalisation
+
+int something_to_print = 0;
+int qq = 0, cntr = 0, z = 0, l_var = 0, clt = 0, cmp = 0, t_rue = 0;
+
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1];
+
+
+//char rep_title1[] = "Histology - Cytology Correlation Report";
+char rep_title1[60];
+char rep_title2[50];
+
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+  void  get_params(),
+  		get_header_dtls(),
+  		dclr_request_header_cur_1(),
+		dclr_request_header_cur(),
+		dclr_request_header_cur_bb(),//added on 30/10/2007 against the ML-SD-SCF-1972 
+		dclr_test_result_cur_1(),
+		dclr_test_result_cur_2(),
+		dclr_request_detail(),//SD-CRF-20059
+		do_report();
+
+   if(argc < 4) {
+     disp_message(ORA_MESG,"Usage rlrhcrln uid/passwd session_id pgm_date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+   
+   strcpy(OUTPUT_FILE_NAME, argv[5]);
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL CONNECT :uid_pwd;
+
+#ifdef DEBUG
+    printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+#endif  
+   
+   set_meduser_role();
+ /*********************** added for globalisation ******************************/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+/*********************** added for globalisation ******************************/
+ 
+   get_params();
+
+	get_legend_value(33);
+
+
+   gen_file_name();
+   dclr_request_header_cur();
+   dclr_request_header_cur_bb();//added on 30/10/2007 against the ML-SD-SCF-1972 
+   //dclr_request_header_cur_1();
+   dclr_test_result_cur_1();
+   dclr_test_result_cur_2();
+   get_header_dtls();
+   do_report();
+     
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL COMMIT WORK RELEASE;
+
+   fclose(fp);
+
+   return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}
+
+/* -------------------------------------------------------------------------*/
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                */
+void get_params()
+{
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+                   PARAM1, PARAM2, PARAM3, PARAM4, PARAM5, PARAM6, PARAM7,
+				   PARAM8, PARAM9, PARAM19, PARAM10, PARAM11, PARAM12, PARAM13, PARAM14,
+				   PARAM15, PARAM16,PARAM17,PARAM18, PARAM20,PARAM21 
+            INTO 
+		           :nd_operating_facility_id,:nd_section_ind_1,
+				   :nd_section_1, :nd_regd_date_fr_1, :nd_regd_date_to_1,
+				   :nd_spec_type_fr_1, :nd_spec_type_to_1, 
+				   :nd_anatomy_site_fr_1,:nd_anatomy_site_to_1, :nd_category_prfx_1,
+				   :nd_search_result_text_1,
+				   :nd_section_ind_2,:nd_section_2, :nd_regd_date_fr_2,:nd_regd_date_to_2,
+		           :nd_spec_type_fr_2,:nd_spec_type_to_2,:nd_anatomy_site_fr_2,
+				   :nd_anatomy_site_to_2,:nd_category_prfx_2,
+				   :nd_search_result_text_2,:nd_search_type
+            FROM   SY_PROG_PARAM
+	        WHERE  UPPER(PGM_ID) = 'RLRHCRLN'
+		      AND  SESSION_ID = TO_NUMBER(:nd_session_id)
+		      AND  PGM_DATE = :nd_pgm_date;
+
+   nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+   nd_section_ind_1.arr[nd_section_ind_1.len]   = '\0';
+   nd_section_1.arr[nd_section_1.len]           = '\0';
+   nd_regd_date_fr_1.arr[nd_regd_date_fr_1.len] = '\0';
+   nd_regd_date_to_1.arr[nd_regd_date_to_1.len] = '\0';
+   nd_spec_type_fr_1.arr[nd_spec_type_fr_1.len] = '\0';
+   nd_spec_type_to_1.arr[nd_spec_type_to_1.len] = '\0';
+   nd_anatomy_site_fr_1.arr[nd_anatomy_site_fr_1.len] = '\0';
+   nd_anatomy_site_to_1.arr[nd_anatomy_site_to_1.len] = '\0';
+   nd_category_prfx_1.arr[nd_category_prfx_1.len] = '\0';
+   nd_search_result_text_1.arr[nd_search_result_text_1.len] = '\0';
+
+   nd_section_ind_2.arr[nd_section_ind_2.len]   = '\0';
+   nd_section_2.arr[nd_section_2.len]           = '\0';
+   nd_regd_date_fr_2.arr[nd_regd_date_fr_2.len] = '\0';
+   nd_regd_date_to_2.arr[nd_regd_date_to_2.len] = '\0';
+   nd_spec_type_fr_2.arr[nd_spec_type_fr_2.len] = '\0';
+   nd_spec_type_to_2.arr[nd_spec_type_to_2.len] = '\0';
+   nd_anatomy_site_fr_2.arr[nd_anatomy_site_fr_2.len] = '\0';
+   nd_anatomy_site_to_2.arr[nd_anatomy_site_to_2.len] = '\0';
+   nd_category_prfx_2.arr[nd_category_prfx_2.len] = '\0';
+   nd_search_result_text_2.arr[nd_search_result_text_2.len] = '\0';
+   nd_search_type.arr[nd_search_type.len] = '\0';
+
+#ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf(" nd_section_1       = %s\n",nd_section_1.arr);
+   printf(" nd_regd_date_fr_1  = %s\n",nd_regd_date_fr_1.arr);
+   printf(" nd_regd_date_to_1  = %s\n",nd_regd_date_to_1.arr);
+   printf(" nd_spec_type_fr_1  = %s\n",nd_spec_type_fr_1.arr);
+   printf(" nd_spec_type_to_1  = %s\n",nd_spec_type_to_1.arr);
+   printf(" nd_anatomy_site_fr_1  = %s\n",nd_anatomy_site_fr_1.arr);
+   printf(" nd_anatomy_site_to_1  = %s\n",nd_anatomy_site_to_1.arr);
+   printf(" nd_category_prfx_1 = %s\n",nd_category_prfx_1.arr);
+   printf(" nd_search_result_text_1 = %s\n",nd_search_result_text_1.arr);
+   printf(" nd_section_2       = %s\n",nd_section_2.arr);
+   printf(" nd_regd_date_fr_2  = %s\n",nd_regd_date_fr_2.arr);
+   printf(" nd_regd_date_to_2  = %s\n",nd_regd_date_to_2.arr);
+   printf(" nd_spec_type_fr_2  = %s\n",nd_spec_type_fr_2.arr);
+   printf(" nd_spec_type_to_2  = %s\n",nd_spec_type_to_2.arr);
+   printf(" nd_anatomy_site_fr_2  = %s\n",nd_anatomy_site_fr_2.arr);
+   printf(" nd_anatomy_site_to_2  = %s\n",nd_anatomy_site_to_2.arr);
+   printf(" nd_category_prfx_2 = %s\n",nd_category_prfx_2.arr);
+   printf(" nd_search_result_text_2 = %s\n",nd_search_result_text_2.arr);
+   printf(" nd_search_type = %s\n",nd_search_type.arr);
+#endif
+  
+   /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL DELETE SY_PROG_PARAM
+	   WHERE UPPER(PGM_ID)  = 'RLRHCRLN'
+	         AND SESSION_ID = :nd_session_id
+		     AND PGM_DATE   = :nd_pgm_date;
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit();
+}
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL SELECT ACC_ENTITY_NAME, USER, TO_CHAR(SYSDATE, 'DD/MM/YYYY')
+	        INTO :d_acc_entity_name,:d_user,:d_sysdate
+            FROM SY_ACC_ENTITY_lang_vw
+		    WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			and language_id = :language_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+
+
+#ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+
+/*-----------------------------------*/
+//Start Added Code on 15/05/2007 against scf1664 by ramesh
+
+void dclr_request_header_cur()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+	EXEC SQL DECLARE HEADER_CUR CURSOR FOR
+	    SELECT * FROM ((SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		--A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY')
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+	        AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+  	        AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		       --A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+ 	        AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+		)
+		INTERSECT
+        (SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		--A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY')
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+	        AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+  	        AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2
+		AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		       --A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+ 	        AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2 AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		))) ORDER BY 1;
+
+		
+		
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN HEADER_CUR;
+	return;
+err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_request_header_cur() occured....\n");
+	proc_exit();
+}
+/*_______________________________*/
+
+//End Added Code on 15/05/2007 against scf1664 by ramesh
+//start added on 30/10/2007 against the ML-SD-SCF-1972 
+void dclr_request_header_cur_bb()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+	EXEC SQL DECLARE HEADER_CUR_bb CURSOR FOR
+	    SELECT * FROM ((SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		--A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY')
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+	        AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+  	        AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		       --A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+ 	        AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+		)
+		union
+        (SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		--A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY')
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+	        AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+  	        AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2
+		AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.PATIENT_ID PATIENT_ID
+		       --A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+ 	        AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2 AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		))) ORDER BY 1;
+
+		
+		
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN HEADER_CUR_bb;
+	return;
+err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_request_header_cur_bb() occured....\n");
+	proc_exit();
+}
+//end
+//Start Modified Select Statement on 15/05/2007 against scf1664 by ramesh
+/*-----------------------------*/
+void dclr_request_header_cur_1()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+	EXEC SQL DECLARE HEADER_CUR1 CURSOR FOR
+	    SELECT * FROM(SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY') 
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1 
+	    AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO 
+		AND A.PATIENT_ID = nvl(:d_patient_id,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+        
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+										  AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND   NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND  A.SECTION_CODE = :nd_section_1 
+			AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+		
+		UNION
+		SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_1, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_1, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+) 
+		AND A.PATIENT_ID = nvl(:d_patient_id,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_1, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+										AND NVL(:nd_anatomy_site_to_1, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND  NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_1, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_1
+			AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		)
+	    )
+        UNION ALL
+		(SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1 
+	    AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO 
+		AND A.PATIENT_ID = nvl(:d_patient_id,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+        
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+										  AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND   NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND  A.SECTION_CODE = :nd_section_2 
+			AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+) 
+		AND A.PATIENT_ID = nvl(:d_patient_id,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+										AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND  NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2 
+			AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+		)
+
+		ORDER BY PATIENT_ID,SPECIMEN_NO;
+	
+		/**
+		SELECT A.SPECIMEN_NO, A.PATIENT_ID,A.CATEGORY_CODE, A.CATEGORY_YEAR , A.CATEGORY_NUMBER
+		FROM RL_REQUEST_HEADER A, RL_SECTION_CODE B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr, 'DD/MM/YYYY') AND
+		      A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') = NVL(:nd_spec_type, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(A.PERFORM_SITE_CODE, '!') = NVL(:nd_site_code, NVL(A.PERFORM_SITE_CODE,'!'))
+		AND NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = B.SECTION_CODE
+		AND NVL(B.SECTION_IND, '!') IN ('HI','CY')
+		ORDER BY B.SECTION_IND , A.PATIENT_ID, A.SPECIMEN_NO;
+	    **/
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN HEADER_CUR1;
+	return;
+err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_request_header_cur_1() occured....\n");
+	proc_exit();
+}
+
+/***SD-CRF-20059 from here ************/
+void dclr_request_detail()  
+{
+// char test_error[200];//sunil
+
+ //sprintf(test_error,"inside dclr_request_detail%s",d_specimen_no.arr);
+ //disp_message(ERR_MESG,test_error);
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE RL_REQ_DTL_CUR CURSOR FOR
+              SELECT A.TEST_CODE,B.LONG_DESC
+                FROM RL_REQUEST_DETAIL A,RL_TEST_CODE_lang_vw B 
+                WHERE SPECIMEN_NO = :d_specimen_no_1
+				AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				AND a.test_code = :d_test_code_1  //added condition against ML-SD-SCF-1972
+				AND A.TEST_CODE =B.TEST_CODE
+				and b.language_id = :language_id
+				ORDER BY LINE_NO;
+     
+	 return;
+     err_exit:
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at dclr_request_detail() occured....\n");
+    proc_exit();
+}
+
+void dclr_request_detail_2()  
+{
+ //char test_error[200];//sunil
+
+ //sprintf(test_error,"inside dclr_request_detail_2%s",d_specimen_no_2.arr);
+ //disp_message(ERR_MESG,test_error);
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE RL_REQ_DTL_CUR_2 CURSOR FOR
+              SELECT A.TEST_CODE,B.LONG_DESC
+                FROM RL_REQUEST_DETAIL A,RL_TEST_CODE_lang_vw B 
+                WHERE SPECIMEN_NO = :d_specimen_no_2
+				AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+				AND A.TEST_CODE = :d_test_code_2 //added condition against ML-SD-SCF-1972
+				AND A.TEST_CODE =B.TEST_CODE
+				and b.language_id = :language_id
+				ORDER BY LINE_NO;
+     
+	 return;
+     err_exit:
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at dclr_request_detail() occured....\n");
+    proc_exit();
+}
+
+/*********laxmna************/
+
+void dclr_test_result_cur_1()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE TEST_RESULT_CUR1 CURSOR FOR
+//	SELECT DISTINCT A.NUMERIC_RESULT, A.RESULT_COMMENT_DESC1, A.RESULT_COMMENT_DESC2,
+//  changed against ML-SD-SCF-1972
+	SELECT DISTINCT A.SPECIMEN_NO,A.TEST_CODE, A.NUMERIC_RESULT, A.RESULT_COMMENT_DESC1, A.RESULT_COMMENT_DESC2,
+	       A.RESULT_COMMENT_DESC3, A.RESULT_COMMENT_DESC4 
+	FROM RL_TEST_RESULT A
+	WHERE A.PATIENT_ID = :d_patient_id
+	AND A.SPECIMEN_NO =  :d_specimen_no
+	AND A.SECTION_CODE=  :nd_section_1
+	AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND ( ( :nd_search_result_text_1 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_1 = 'N' AND 1=1)
+		);
+
+    return;
+
+err_exit:
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at dclr_test_result_cur_1() occured....\n");
+    proc_exit();
+}
+
+void dclr_test_result_cur_2()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  /*	EXEC SQL DECLARE TEST_RESULT_CUR2 CURSOR FOR
+	SELECT  A.SPECIMEN_NO,B.CATEGORY_CODE, B.CATEGORY_YEAR,B.CATEGORY_NUMBER,
+			A.NUMERIC_RESULT, A.RESULT_COMMENT_DESC1, A.RESULT_COMMENT_DESC2,
+	        A.RESULT_COMMENT_DESC3, A.RESULT_COMMENT_DESC4 
+	FROM RL_TEST_RESULT A,RL_REQUEST_HEADER B
+	WHERE A.PATIENT_ID = :d_patient_id_prv
+	AND A.SPECIMEN_NO = B.SPECIMEN_NO
+	AND A.SPECIMEN_NO =  :d_specimen_no_prv
+	AND A.SECTION_CODE=  :nd_section_2
+	AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		);
+*/
+/*********start*********commented and changed the query on 26/10/2007 against ML-SD-SCF-1972**********
+	EXEC SQL DECLARE TEST_RESULT_CUR2 CURSOR FOR
+	SELECT DISTINCT A.SPECIMEN_NO,B.CATEGORY_CODE, B.CATEGORY_YEAR,B.CATEGORY_NUMBER,
+	       A.NUMERIC_RESULT, A.RESULT_COMMENT_DESC1, A.RESULT_COMMENT_DESC2,
+	       A.RESULT_COMMENT_DESC3, A.RESULT_COMMENT_DESC4
+	FROM RL_TEST_RESULT A, RL_REQUEST_HEADER B
+	WHERE A.SPECIMEN_NO = B.SPECIMEN_NO
+	AND A.SPECIMEN_NO IN (SELECT SPECIMEN_NO FROM RL_SAMPLE_DETAILS C
+						  WHERE C.SPECIMEN_NO = A.SPECIMEN_NO
+						    AND NVL(C.ANATOMY_SITE_CODE, '!') 
+							    BETWEEN NVL(:nd_anatomy_site_fr_2,NVL(C.ANATOMY_SITE_CODE,'!'))
+						        AND NVL(:nd_anatomy_site_to_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+						 )
+	 AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	 AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+	 AND A.PATIENT_ID = :d_patient_id_prv
+	 AND B.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+		 AND B.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+	 AND NVL(B.SPECIMEN_TYPE_CODE, '!') 
+	     BETWEEN NVL(:nd_spec_type_fr_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+		 AND NVL(:nd_spec_type_to_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+	 AND NVL(B.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(B.CATEGORY_CODE,'!'))
+	 AND NVL(B.STATUS,'O') != 'O'
+	 AND B.SECTION_CODE = :nd_section_2
+	AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+	 UNION
+	 SELECT DISTINCT A.SPECIMEN_NO , B.CATEGORY_CODE, B.CATEGORY_YEAR,B.CATEGORY_NUMBER,
+	        A.NUMERIC_RESULT, A.RESULT_COMMENT_DESC1, A.RESULT_COMMENT_DESC2,
+			A.RESULT_COMMENT_DESC3, A.RESULT_COMMENT_DESC4
+	 FROM RL_TEST_RESULT A, RL_REQUEST_HEADER B
+	 WHERE (A.SPECIMEN_NO = B.SPECIMEN_NO
+	 AND A.SPECIMEN_NO IN (SELECT SPECIMEN_NO FROM RL_SPECIMEN_ANATOMY_DTLS C  //CHANGED FROM (or) TO (and) on 03/09/2007 SD-CRF-20059
+						   WHERE C.SPECIMEN_NO = A.SPECIMEN_NO
+						   AND NVL(C.ANATOMY_SITE_CODE, '!') 
+						       BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+						       AND NVL(:nd_anatomy_site_to_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+						  ))
+	 AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	 AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+	 AND A.PATIENT_ID = :d_patient_id_prv
+	 AND B.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+		 AND B.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+	 AND NVL(B.SPECIMEN_TYPE_CODE,'!') 
+	     BETWEEN NVL(:nd_spec_type_fr_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+		 AND NVL(:nd_spec_type_to_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+	 AND NVL(B.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(B.CATEGORY_CODE, '!'))
+	 AND NVL(B.STATUS,'O') != 'O'
+	 AND B.SECTION_CODE = :nd_section_2
+	AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+	 ORDER BY 1;
+	 **********************end**********/
+	
+	/**
+	SELECT NUMERIC_RESULT, RESULT_COMMENT_DESC1, RESULT_COMMENT_DESC2,
+	       RESULT_COMMENT_DESC3, RESULT_COMMENT_DESC4 
+	FROM RL_TEST_RESULT
+	WHERE PATIENT_ID = :d_patient_id
+	AND SPECIMEN_NO = :d_specimen_no
+	AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+    **/
+		EXEC SQL DECLARE TEST_RESULT_CUR2 CURSOR FOR
+	    SELECT DISTINCT A.SPECIMEN_NO,B.TEST_CODE,A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,
+		B.NUMERIC_RESULT, B.RESULT_COMMENT_DESC1, B.RESULT_COMMENT_DESC2,
+	       B.RESULT_COMMENT_DESC3, B.RESULT_COMMENT_DESC4 
+		 FROM 
+		 (
+		 SELECT DISTINCT * FROM
+		(SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SAMPLE_DETAILS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+		AND	A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1 
+	    AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO 
+		AND A.PATIENT_ID = nvl(:d_patient_id_prv,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+        
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+										  AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND   NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+	AND NVL(A.STATUS,'O') != 'O'
+		AND  A.SECTION_CODE = :nd_section_2 
+			AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		)
+		UNION
+		SELECT DISTINCT A.SPECIMEN_NO ,A.PATIENT_ID PATIENT_ID,
+		       A.CATEGORY_CODE,A.CATEGORY_YEAR,A.CATEGORY_NUMBER,A.SECTION_CODE,
+			   A.SOURCE_CODE,A.EPISODE_TYPE,A.SOURCE_TYPE
+		FROM RL_REQUEST_HEADER A, RL_SPECIMEN_ANATOMY_DTLS B
+		WHERE A.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') AND
+			A.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO(+) 
+		AND A.PATIENT_ID = nvl(:d_patient_id_prv,A.PATIENT_ID)
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID(+)
+		AND NVL(A.SPECIMEN_TYPE_CODE, '!') BETWEEN NVL(:nd_spec_type_fr_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+										   AND NVL(:nd_spec_type_to_2, NVL(A.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.ANATOMY_SITE_CODE, '!') BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+										AND NVL(:nd_anatomy_site_to_2, NVL(B.ANATOMY_SITE_CODE,'!'))
+        AND  NVL(A.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(A.CATEGORY_CODE, '!'))
+		AND NVL(A.STATUS,'O') != 'O'
+		AND A.SECTION_CODE = :nd_section_2 
+			AND ( ( :nd_search_result_text_2 = 'Y' AND 
+	        EXISTS
+            (SELECT 'X' 
+            FROM   rl_result_text X
+            WHERE  X.patient_id = A.patient_id
+            AND    X.specimen_no = A.specimen_no
+            AND    X.operating_facility_id = A.operating_facility_id
+            AND    NVL(X.cancer_register_yn, 'N') = 'Y' 
+            )
+		  )
+          OR
+		  (:nd_search_result_text_2 = 'N' AND 1=1)
+		) 
+		)
+		)
+		 A,RL_TEST_RESULT B
+		WHERE A.SPECIMEN_NO = B.SPECIMEN_NO
+		  AND A.SECTION_CODE = B.SECTION_CODE
+     
+		ORDER BY A.SPECIMEN_NO;
+
+
+    return;
+
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at dclr_test_result_cur_2() occured....\n");
+    proc_exit();
+}
+
+
+
+void open_test_result_cur_1()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL OPEN TEST_RESULT_CUR1;
+
+	return;
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at open_test_result_cur_1() occured....\n");
+    proc_exit();
+}
+void open_request_detail_cur() //laxamn
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL OPEN RL_REQ_DTL_CUR;
+
+	return;
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at open_request_detail_cur() occured....\n");
+    proc_exit();
+}
+void open_request_detail_cur_2() //laxamn
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL OPEN RL_REQ_DTL_CUR_2;
+
+	return;
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at open_request_detail_cur() occured....\n");
+    proc_exit();
+}
+void open_test_result_cur_2()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL OPEN TEST_RESULT_CUR2;
+	return;
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error at open_test_result_cur_2() occured....\n");
+    proc_exit();
+}
+
+/* prepares for the new page */
+void prepare_new_page()
+{
+   fprintf(fp,"\n");
+
+   fprintf(fp,"\f");
+   line_no = 1;
+   // page_no++;
+   print_page_header();
+   print_col_heading();
+}
+
+/* to print the last line of the report */
+void end_report()
+{
+  fprintf(fp,"\n");  
+  //fprintf(fp,"                      ******** End of Report *********");
+  fprintf(fp,"                      ******** %s *********", local_legend[22]); //added for globalisation
+  fprintf(fp,"\n");
+  fprintf(fp,"\f");
+}
+
+gen_file_name()
+{
+	 /* For a constant file name (4 lines) */
+
+  	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+     nd_file_name.len = strlen(nd_file_name.arr);
+
+	 strcat(nd_file_name.arr,OUTPUT_FILE_NAME);
+	 nd_file_name.len = strlen(nd_file_name.arr);
+	 if ((fp = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit();
+     }
+
+}
+
+void do_report()
+{
+  char l_h_or_c;
+    
+  void open_test_result_cur_1();
+  int fetch_request_header();
+  int fetch_request_header_1();
+  int still_rec_left;
+  int still_rec_left1;
+  int still_dtl_left;//SD-CRF-20059
+  void print_rep_header();
+  void printt_page_header() ;
+  
+  int  get_in_patient_dtl(); //SD-CRF-20059
+  void get_referral_patient_dtl();//SD-CRF-20059
+  void get_source_name();//SD-CRF-20059
+  void open_request_detail_cur();//SD-CRF-20059
+  int fetch_request_detail();//SD-CRF-20059
+  page_no = 1;
+  line_no = 1;
+  
+  l_h_or_c = 'Z';
+  
+  if (strcmp(nd_section_ind_1.arr, "HI") == 0)
+     //strcpy(first_section_title, "Histology");
+     strcpy(first_section_title, local_legend[2]); //added for globalisation
+  else if (strcmp(nd_section_ind_1.arr, "CY") == 0)
+     //strcpy(first_section_title, "Cytology");
+     strcpy(first_section_title, local_legend[3]); //added for globalisation
+
+  if (strcmp(nd_section_ind_2.arr, "HI") == 0)
+     //strcpy(second_section_title, "Histology");
+     strcpy(second_section_title, local_legend[2]); //added for globalisation
+  else if (strcmp(nd_section_ind_2.arr, "CY") == 0)
+     //strcpy(second_section_title, "Cytology");
+     strcpy(second_section_title, local_legend[3]); //added for globalisation
+
+  strcpy(d_section_ind_prv.arr, "");
+
+  strcpy(d_patient_id_prv.arr, "");
+  
+ //Start Added Code on 15/05/2007 against scf1664 by ramesh
+
+if (strcmp(nd_search_type.arr, "Y") == 0)
+ {
+  still_rec_left1 = fetch_request_header();
+  print_rep_header();
+  print_page_header();
+  print_col_heading();
+ 
+ 
+  while(still_rec_left1)
+  {
+          dclr_request_header_cur_1();
+		  still_rec_left = fetch_request_header_1();
+		 
+		  while(still_rec_left)
+		  {
+			chk_break(line_no);
+
+			if (strcmp(d_patient_id.arr, d_patient_id_prv.arr) != 0)
+			{
+				if (strlen(d_patient_id_prv.arr) != 0)
+				{
+			
+				if (rec_found == 0 )
+				{
+
+		  			  //fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/  //ML-SD-SCF-1958
+	  		          fprintf(fp, "%s\n", second_section_title);
+			          //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */ //ML-SD-SCF-1958
+
+					  fprint_repeat(fp,'-',strlen(second_section_title)); //ML-SD-SCF-1958
+					  fprintf(fp,"\n");                                   //ML-SD-SCF-1958
+					line_no = line_no + 2;
+					d_patient_id_prv.len = strlen(d_patient_id_prv.arr);
+					open_test_result_cur_2();
+					print_detl_rec_2();
+					close_test_result_cur_2();
+					fprint_repeat(fp,'-',78);
+					fprintf(fp,"\n");
+					line_no = line_no + 1;
+                 }
+				}
+         
+		      if(strcmp(d_episode_type.arr,"I")==0 || strcmp(d_episode_type.arr,"O")==0 ||
+					strcmp(d_episode_type.arr,"H")==0)
+					i = get_in_patient_dtl();
+			  else
+				if(strcmp(d_episode_type.arr,"R")==0)
+					get_referral_patient_dtl();
+
+                get_source_name(); //SD-CRF-20059
+
+          
+
+				strcpy(d_patient_id_prv.arr, d_patient_id.arr);
+				//fprintf(fp,"Patient ID : %-15.15s\n", d_patient_id.arr);SD-CRF-20059
+				//fprintf(fp,"Patient ID :%-15.15s Name :%-59.59s\n", d_patient_id.arr,d_patient_name.arr);
+				fprintf(fp,"%-10.10s :%-15.15s %-4.4s :%-59.59s\n", local_legend[4], d_patient_id.arr,local_legend[5], d_patient_name.arr); //added for globalisation
+				//fprintf(fp,"NRIC  :%-20.20s Source :%s\n",d_nationality_id.arr,d_source_name.arr);  
+				fprintf(fp,"%-4.4s  :%-20.20s %-6.6s :%s\n",local_legend[6], d_nationality_id.arr,local_legend[6], d_source_name.arr);//added for   
+				fprintf(fp,"\n");
+				//line_no = line_no + 2;    SD-CRF-20059
+				line_no = line_no + 3;
+				
+				//fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/  //ML-SD-SCF-1958
+	  		    fprintf(fp, "%s\n", first_section_title);
+			    //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */  //ML-SD-SCF-1958
+				fprint_repeat(fp,'-',strlen(first_section_title)); //ML-SD-SCF-1958
+				fprintf(fp,"\n");                                  //ML-SD-SCF-1958
+				line_no = line_no + 2;
+
+			}
+			
+			if (strcmp(nd_section_code.arr,nd_section_1.arr)==0 )
+			{	
+			/*******commednted against ML-SD-SCF-1972
+					if (strlen(d_category_num.arr) > 0 )
+					{
+					fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code.arr,
+														  d_category_year.arr,
+														  d_category_num.arr); 
+					}
+					else
+					{
+						fprintf(fp, "%-5.5s %-4.4s %-11.11s", " ",
+														  " ",
+														  " "); 
+					}  ********** end *******/
+
+			open_test_result_cur_1();
+			print_detl_rec_1();
+		
+			}
+
+			still_rec_left = fetch_request_header_1();
+			if (still_rec_left == 0)
+			{
+		
+			   rec_found = 1;
+		        
+				//fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/  //ML-SD-SCF-1958
+	  		    fprintf(fp, "%s\n", second_section_title);
+			    //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */  //ML-SD-SCF-1958
+
+				fprint_repeat(fp,'-',strlen(second_section_title));  //ML-SD-SCF-1958
+				fprintf(fp,"\n");                                    //ML-SD-SCF-1958
+				line_no = line_no + 2;
+				d_patient_id_prv.len = strlen(d_patient_id_prv.arr);
+				open_test_result_cur_2();
+				print_detl_rec_2();
+				close_test_result_cur_2();
+				fprint_repeat(fp,'-',78);
+				fprintf(fp,"\n");
+				line_no = line_no + 1; 
+             }
+		     else
+			 {
+			 rec_found = 0;
+			}
+
+			fprintf(fp, "\n");
+
+		  }
+	    
+		close_request_header_1();
+	    close_test_result_cur_1(); 	 
+		still_rec_left1 = fetch_request_header();
+     }
+	
+	 close_request_header();
+     end_report();
+ }
+  else
+  {	
+  
+
+  //End Added Code on 15/05/2007 against scf1664 by ramesh
+
+  //start added on 30/10/2007 against the ML-SD-SCF-1972 
+  still_rec_left1 = fetch_request_header_bb();
+  print_rep_header();
+  print_page_header();
+  print_col_heading();
+
+  
+
+ 
+  while(still_rec_left1)
+  {
+  //end
+          dclr_request_header_cur_1();
+		  still_rec_left = fetch_request_header_1();
+
+		  l_sec_cnt = 0; // added on 02-11-2007
+		  while(still_rec_left)
+		  {
+			chk_break(line_no);
+			
+			if (strcmp(d_patient_id.arr, d_patient_id_prv.arr) != 0)
+			{
+				if (strlen(d_patient_id_prv.arr) != 0)
+				{
+			
+				if (rec_found == 0 )		//added check condition against ML-SD-SCF-1972
+				{
+/* from here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+//		  			  fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/
+//	  		          fprintf(fp, "%s\n", second_section_title);
+//			          fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */
+//					line_no = line_no + 1;
+/* upto here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+					d_patient_id_prv.len = strlen(d_patient_id_prv.arr);
+					l_sec_cnt =0; // added on 02-11-2007
+					open_test_result_cur_2();
+					print_detl_rec_2();
+					close_test_result_cur_2();
+					fprint_repeat(fp,'-',78);
+					fprintf(fp,"\n");
+					line_no = line_no + 1;
+                 }
+				}
+         
+		      if(strcmp(d_episode_type.arr,"I")==0 || strcmp(d_episode_type.arr,"O")==0 ||
+					strcmp(d_episode_type.arr,"H")==0)
+					i = get_in_patient_dtl();
+			  else
+				if(strcmp(d_episode_type.arr,"R")==0)
+					get_referral_patient_dtl();
+
+                get_source_name(); //SD-CRF-20059
+
+          
+
+				strcpy(d_patient_id_prv.arr, d_patient_id.arr);
+				//fprintf(fp,"Patient ID : %-15.15s\n", d_patient_id.arr);SD-CRF-20059
+				//fprintf(fp,"Patient ID :%-15.15s Name :%-59.59s\n", d_patient_id.arr,d_patient_name.arr);
+				fprintf(fp,"%-10.10s :%-15.15s %-4.4s :%-59.59s\n", local_legend[4], d_patient_id.arr,local_legend[5],d_patient_name.arr);//added for globalisation
+				//fprintf(fp,"NRIC  :%-20.20s Source :%s\n",d_nationality_id.arr,d_source_name.arr);  
+				fprintf(fp,"%-4.4s  :%-20.20s %-6.6s :%s\n",local_legend[6], d_nationality_id.arr,local_legend[7], d_source_name.arr); //added for globalisation 
+				fprintf(fp,"\n");
+				//line_no = line_no + 2;    SD-CRF-20059
+				line_no = line_no + 3;
+/* from here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+//				fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/
+//	  		    fprintf(fp, "%s\n", first_section_title);
+//			    fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */
+//				fprintf(fp,"\n");
+//				line_no = line_no + 1;
+/* upto here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+			}
+			
+			if (strcmp(nd_section_code.arr,nd_section_1.arr)==0 )
+			{
+				
+			/*******commednted against ML-SD-SCF-1972
+					if (strlen(d_category_num.arr) > 0 )
+					{
+					fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code.arr,
+														  d_category_year.arr,
+														  d_category_num.arr); 
+					}
+					else
+					{
+						fprintf(fp, "%-5.5s %-4.4s %-11.11s", " ",
+														  " ",
+														  " "); 
+					}  ********** end *******/
+			
+			open_test_result_cur_1();
+			print_detl_rec_1();
+		
+			}
+			
+
+			still_rec_left = fetch_request_header_1();
+			if (still_rec_left == 0)
+			{
+		
+			   rec_found = 1;   //ML-SD-SCF-1972
+/* from here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+//				fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/
+//	  		    fprintf(fp, "%s\n", second_section_title);
+//			    fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */
+//				line_no = line_no + 1;
+/* upto here commented on 02-11-2007	aginst ML-SD-SCF-1972 */
+				d_patient_id_prv.len = strlen(d_patient_id_prv.arr);
+				l_sec_cnt =0; // added on 02-11-2007
+				open_test_result_cur_2();
+				print_detl_rec_2();
+				close_test_result_cur_2();
+				fprint_repeat(fp,'-',78);
+				fprintf(fp,"\n");
+				line_no = line_no + 1; 
+             }
+		     else		//added else condition against ML-SD-SCF-1972
+			 {
+			 rec_found = 0;   
+			}
+
+			fprintf(fp, "\n");
+
+		  }
+		close_request_header_1();
+	    close_test_result_cur_1(); 	 
+		still_rec_left1 = fetch_request_header_bb();//added on 30/10/2007 against the ML-SD-SCF-1972 
+     }
+	
+	 close_request_header_bb();//added on 30/10/2007 against the ML-SD-SCF-1972 
+     end_report();
+ }
+}
+
+close_request_header_1()
+{
+	EXEC SQL CLOSE HEADER_CUR1;
+}
+
+/*------------*/
+//Start Added Close_request_header on 15/05/2007 against scf1664 by ramesh
+close_request_header()
+{
+	EXEC SQL CLOSE HEADER_CUR;
+}
+//start added on 30/10/2007 against the ML-SD-SCF-1972 
+close_request_header_bb()
+{
+	EXEC SQL CLOSE HEADER_CUR_bb;
+}
+//end
+//Start Fetch Request Header Code on 15/05/2007 against scf1664 by ramesh
+/*-------------------*/
+int fetch_request_header()
+{
+
+  /*d_category_code.arr[0]      = '\0';
+  d_category_year.arr[0]      = '\0';
+  d_category_num.arr[0]       = '\0';
+
+  d_category_code.len      = 0;
+  d_category_year.len      = 0;
+  d_category_num.len       = 0;*/
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH HEADER_CUR INTO :d_patient_id;
+                 /*:d_specimen_no, :d_patient_id,
+				 :d_category_code,:d_category_year,:d_category_num;*/
+  
+  if (NODATAFOUND)
+    return 0;
+  d_patient_id.arr[d_patient_id.len]        = '\0';
+  
+  /*d_specimen_no.arr[d_specimen_no.len]      = '\0';
+  
+  d_category_code.arr[d_category_code.len]  = '\0';
+  d_category_year.arr[d_category_year.len]  = '\0';
+  d_category_num.arr[d_category_num.len]    = '\0';*/
+
+#ifdef DEBUG
+  printf("d_specimen_no = %s\n",d_specimen_no.arr);
+  printf("d_patient_id = %s\n",d_patient_id.arr);
+#endif
+
+  return 1;
+
+err_exit:
+  EXEC SQL WHENEVER SQLERROR CONTINUE;
+  EXEC SQL ROLLBACK WORK RELEASE;
+  disp_message(ORA_MESG,"Oracle error at fetch_request_header() occured....\n");
+  proc_exit();
+}
+/*---------------------*/
+//start added on 30/10/2007 against the ML-SD-SCF-1972 
+int fetch_request_header_bb()
+{
+
+  /*d_category_code.arr[0]      = '\0';
+  d_category_year.arr[0]      = '\0';
+  d_category_num.arr[0]       = '\0';
+
+  d_category_code.len      = 0;
+  d_category_year.len      = 0;
+  d_category_num.len       = 0;*/
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH HEADER_CUR_bb INTO :d_patient_id;
+                 /*:d_specimen_no, :d_patient_id,
+				 :d_category_code,:d_category_year,:d_category_num;*/
+  
+  if (NODATAFOUND)
+    return 0;
+  d_patient_id.arr[d_patient_id.len]        = '\0';
+  
+  /*d_specimen_no.arr[d_specimen_no.len]      = '\0';
+  
+  d_category_code.arr[d_category_code.len]  = '\0';
+  d_category_year.arr[d_category_year.len]  = '\0';
+  d_category_num.arr[d_category_num.len]    = '\0';*/
+
+#ifdef DEBUG
+  printf("d_specimen_no = %s\n",d_specimen_no.arr);
+  printf("d_patient_id = %s\n",d_patient_id.arr);
+#endif
+
+  return 1;
+
+err_exit:
+  EXEC SQL WHENEVER SQLERROR CONTINUE;
+  EXEC SQL ROLLBACK WORK RELEASE;
+  disp_message(ORA_MESG,"Oracle error at fetch_request_header_bb() occured....\n");
+  proc_exit();
+}
+//end
+/*---------------------*/
+
+
+
+
+int fetch_request_header_1()
+{
+
+  d_category_code.arr[0]      = '\0';
+  d_category_year.arr[0]      = '\0';
+  d_category_num.arr[0]       = '\0';
+  nd_section_code.arr[0]       ='\0';
+  
+  d_category_code.len      = 0;
+  d_category_year.len      = 0;
+  d_category_num.len       = 0;
+  nd_section_code.len	   =0;	
+  
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH HEADER_CUR1 INTO
+                 :d_specimen_no, :d_patient_id,
+				 :d_category_code,:d_category_year,:d_category_num,:nd_section_code,
+				 :d_source_code,:d_episode_type,:d_source_type;
+  
+  if (NODATAFOUND)
+    return 0;
+
+  d_specimen_no.arr[d_specimen_no.len]      = '\0';
+  d_patient_id.arr[d_patient_id.len]        = '\0';
+  d_category_code.arr[d_category_code.len]  = '\0';
+  d_category_year.arr[d_category_year.len]  = '\0';
+  d_category_num.arr[d_category_num.len]    = '\0';
+  nd_section_code.arr[nd_section_code.len]  = '\0';
+  d_source_code.arr[d_source_code.len]  = '\0';
+  d_episode_type.arr[d_episode_type.len]  = '\0';
+  d_source_type.arr[d_source_type.len]  = '\0';
+
+#ifdef DEBUG
+  printf("d_specimen_no = %s\n",d_specimen_no.arr);
+  printf("d_patient_id = %s\n",d_patient_id.arr);
+#endif
+
+  return 1;
+
+err_exit:
+  EXEC SQL WHENEVER SQLERROR CONTINUE;
+  EXEC SQL ROLLBACK WORK RELEASE;
+  disp_message(ORA_MESG,"Oracle error at fetch_request_header_1() occured....\n");
+  proc_exit();
+}
+
+
+close_test_result_cur_1()
+{
+	EXEC SQL CLOSE TEST_RESULT_CUR1;
+}
+close_request_detail_cur()//SD-CRF-20059
+{
+	EXEC SQL CLOSE RL_REQ_DTL_CUR;
+}
+close_request_detail_cur_2()//SD-CRF-20059
+{
+	EXEC SQL CLOSE RL_REQ_DTL_CUR_2;
+}
+int fetch_test_result_1()
+{
+
+  d_numeric_result.arr[0] = '\0';
+  d_rc_1.arr[0] = '\0';
+  d_rc_2.arr[0] = '\0';
+  d_rc_3.arr[0] = '\0';
+  d_rc_4.arr[0] = '\0';
+
+  d_numeric_result.len = 0;
+  d_rc_1.len = 0;
+  d_rc_2.len = 0;
+  d_rc_3.len = 0;
+  d_rc_4.len = 0;  
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH TEST_RESULT_CUR1 
+	    //INTO :d_specimen_no_1,:d_numeric_result,:d_rc_1, :d_rc_2,:d_rc_3,:d_rc_4; 
+		//changed against ML-SD-SCF-1972
+	    INTO :d_specimen_no_1,:d_test_code_1, :d_numeric_result,:d_rc_1, :d_rc_2,:d_rc_3,:d_rc_4;
+  if (NODATAFOUND)
+    return 0;
+  d_specimen_no_1.arr[d_specimen_no_1.len] = '\0';
+  d_test_code_1.arr[d_test_code_1.len] = '\0';
+  d_numeric_result.arr[d_numeric_result.len] = '\0';
+  d_rc_1.arr[d_rc_1.len] = '\0';
+  d_rc_2.arr[d_rc_2.len] = '\0';
+  d_rc_3.arr[d_rc_3.len] = '\0';
+  d_rc_4.arr[d_rc_4.len] = '\0'; 
+
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_test_result_1() occured....\n");
+   proc_exit();
+}
+int fetch_request_detail() //SD-CRF-20059
+{
+   d_test_desc.arr[d_test_desc.len] = '\0';
+   d_test_desc.len = 0;
+    d_test_code.arr[d_test_code.len] = '\0';
+   d_test_code.len = 0;
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+  EXEC SQL FETCH RL_REQ_DTL_CUR 
+	    INTO :d_test_code,:d_test_desc;
+
+  if (NODATAFOUND)
+    return 0;
+     d_test_code.arr[d_test_code.len] = '\0';
+     d_test_desc.arr[d_test_desc.len] = '\0';
+   return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_request_detail() occured....\n");
+   proc_exit();
+}
+int fetch_request_detail_2() //SD-CRF-20059
+{
+   d_test_desc.arr[d_test_desc.len] = '\0';
+   d_test_desc.len = 0;
+    d_test_code.arr[d_test_code.len] = '\0';
+   d_test_code.len = 0;
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+  EXEC SQL FETCH RL_REQ_DTL_CUR_2 
+	    INTO :d_test_code,:d_test_desc;
+
+  if (NODATAFOUND)
+    return 0;
+     d_test_code.arr[d_test_code.len] = '\0';
+     d_test_desc.arr[d_test_desc.len] = '\0';
+   return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_request_detail_2() occured....\n");
+   proc_exit();
+}
+void print_detl_rec_1()
+{
+	
+	int p_flg2	 = 0;
+	int c_no2    = 0;
+    
+	strcpy(d_specimen_no_1_prv.arr, "");
+	d_specimen_no_1_prv.len = strlen(d_specimen_no_1_prv.arr);
+
+	
+	while (fetch_test_result_1())
+	{
+		if (strcmp(d_specimen_no_1.arr, d_specimen_no_1_prv.arr) != 0)
+		{
+			
+		/*	if (strlen(d_specimen_no_1_prv.arr) != 0)
+			{
+			   chk_break(line_no);
+               fprintf(fp, "\n");
+               line_no++;
+			   print_result_text();
+			}
+          */  
+			strcpy(d_specimen_no_1_prv.arr, d_specimen_no_1.arr);
+			d_specimen_no_1_prv.len = strlen(d_specimen_no_1_prv.arr);
+
+            chk_break(line_no);
+/*********** commented on 26-10-07 against  ML-SD-SCF-1972
+			fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code.arr,
+										  d_category_year.arr,
+										  d_category_num.arr);
+										  **************/
+            
+			p_flg2 = 0;
+
+		}
+/* from here added on 02-11-2007	aginst ML-SD-SCF-1972 */
+		if (l_sec_cnt ==0)
+		{
+				//fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/  //ML-SD-SCF-1958
+	  		    fprintf(fp, "%s\n", first_section_title);
+			    //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */ //ML-SD-SCF-1958
+				fprint_repeat(fp,'-',strlen(first_section_title));//ML-SD-SCF-1958
+				fprintf(fp,"\n");                                  //ML-SD-SCF-1958
+				line_no = line_no + 2;
+				l_sec_cnt++;
+		}
+/* upto here added on 02-11-2007	aginst ML-SD-SCF-1972 */
+/******** added on 26-10-2007  against ML-SD-SCF-1972 ****start********/
+			if (strlen(d_category_num.arr) > 0 )
+			{
+				chk_break(line_no);		/* Added by Durai Rajkumar against MF-SCF-0114 */
+				fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code.arr,
+													  d_category_year.arr,
+													  d_category_num.arr); 
+			}
+			else
+			{
+				chk_break(line_no);		/* Added by Durai Rajkumar against MF-SCF-0114 */
+				fprintf(fp, "%-5.5s %-4.4s %-11.11s", " /",
+													  " /",
+													  " /"); 
+			} /***********end*********/
+
+		if (strlen(d_rc_1.arr) != 0) 
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+			fprintf(fp, "%s","                      ");
+		  }
+
+		  c_no2 = 1;
+		  fprintf(fp, "%-40.40s\n", d_rc_1.arr);
+		  p_flg2 = 1;
+		  line_no++;
+
+		}
+		if (strlen(d_rc_2.arr) != 0)
+		{
+		  
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+		  if (c_no2 != 1)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 2;
+		  fprintf(fp, "%-40.40s\n", d_rc_2.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+		if (strlen(d_rc_3.arr) != 0) 
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+
+		  if (c_no2 != 2)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 3;
+		  fprintf(fp, "%-40.40s\n", d_rc_3.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+		if (strlen(d_rc_4.arr) != 0)
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+
+		  if (c_no2 != 3)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 4;
+		  fprintf(fp, "%-40.40s\n", d_rc_4.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+    
+             //FROM HERE SD-CRF-20059 
+			  fprintf(fp,"\n");
+			  line_no = line_no + 1;  
+  		      dclr_request_detail();
+              open_request_detail_cur(); 
+   			  //fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/ //ML-SD-SCF-1958
+			  //fprintf(fp,"Tests Ordered---->  Test Code   Test Description\n");
+			  fprintf(fp,"%-13.13s---->  %-9.9s   %-16.16s\n", local_legend[8],local_legend[9], local_legend[10]);//added for globalisation
+			  fprintf(fp,"------------------------------------------------\n"); //ML-SD-SCF-1958
+			  //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */  //ML-SD-SCF-1958
+			       //fprintf(fp,"\n");
+			  line_no = line_no + 2; 
+			  while(fetch_request_detail())
+              { 
+			   fprintf(fp, "%-19.s %-11.11s %s","",d_test_code.arr,d_test_desc.arr);
+			   fprintf(fp,"\n");
+               line_no = line_no + 1; 
+			   print_result_text(); //added on 26/10/2007 against ML-SD-SCF-1972
+			   fprintf(fp, "\n");
+			   line_no++;
+              } 
+			 close_request_detail_cur();
+			 //UPTO HERE SD-CRF-20059 
+  			
+           
+
+	}
+	
+	/*** After Finishing the While Loop , for Last Specimen ***/
+
+    chk_break(line_no);
+    fprintf(fp, "\n");
+   line_no++;
+ // print_result_text(); commented on 26/10/2007 against ML-SD-SCF-1972
+
+	// print_clinical_history();
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_detl_rec_1() occured....\n");
+   proc_exit();
+}
+
+
+print_result_text()
+{
+	int ctr = 0;
+	int len = 0;
+	int r_ctr = 0;
+	char l_string[100];
+
+ //char test_error[200];//sunil
+
+// sprintf(test_error,"inside print_result_text%s",d_specimen_no.arr);
+// disp_message(ERR_MESG,test_error);
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE result_text_cur CURSOR FOR
+		SELECT specimen_no , result_text_code, result_text
+		FROM RL_RESULT_TEXT
+		WHERE patient_id = :d_patient_id
+		AND specimen_no = :d_specimen_no_1
+		AND operating_facility_id = :nd_operating_facility_id
+		and test_code = :d_test_code_1      // addded condition against ML-SD-SCF-1972
+		AND ( ( :nd_search_result_text_1 = 'Y' AND NVL(cancer_register_yn, 'N') = 'Y') OR
+		      ( :nd_search_result_text_1 = 'N' AND 1=1)
+			)
+		ORDER BY specimen_no;
+
+	EXEC SQL OPEN result_text_cur;
+
+	ctr = 0;
+
+	split_result_text();
+
+	EXEC SQL CLOSE result_text_cur;
+
+	return;
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at print_result_text() occured....\n");
+	proc_exit();
+}
+
+/**** Splitting Result Text ****/
+split_result_text()
+{
+	char word[2];
+	char w_flag ;
+	char l_first;
+
+    strcpy(word1,"F");
+
+	w_flag = 'T';
+
+	l_first = 'Y';
+
+    while(fetch_result_text())
+    {
+	  if (l_first == 'Y')
+	  {  
+	    l_first = 'N';
+		/*
+		fprintf(fp,"     Text Result\n");
+        fprintf(fp,"     -----------\n");
+        line_no = line_no + 2;
+		*/
+	  }
+
+      something_to_print = 1;
+
+	  l_var = strlen(d_result_text.arr);
+
+         z = 0;
+	     clt = 0;
+	     strcpy(word1,"F"); 
+	     cntr = 1;
+	     qq = 0;
+
+         while(z<l_var)
+         {
+             word[0] = d_result_text.arr[z];
+ 		     word[1] = '\0';
+
+		     if (strcmp(word,"\n") == 0)
+		     {
+		       cntr = 0;
+		       strcpy(word1,"N");
+		       qq = z ;
+		      }
+
+  		      if(cntr >= 54) 
+		      {
+		   	
+			     cmp = cntr;
+			     while((d_result_text.arr[z] != 32) && (cmp > 1))
+			     {
+			         z--;
+				     cmp--;
+			      }
+
+				  qq = z;
+				  			   
+			      word[0] = d_result_text.arr[z];
+   			      word[1] = '\0';
+		
+		  	      if (cmp == 1)
+				     strcpy(word1,"W");
+			      else
+			         strcpy(word1,"T");
+			   
+		      }
+
+
+				if (((z == l_var) || (z == l_var - 1)) && (strcmp(word1,"F") == 0))
+				{
+	
+				   chk_break(line_no);
+
+				   fprint_repeat(fp,' ',22);
+				   for(i=clt;i < z + 1;i++)
+		           {
+						if(d_result_text.arr[i] == '\n')
+						{
+
+
+							    w_flag = 'F';
+ 						 }
+
+						fprintf(fp,"%c",d_result_text.arr[i]);
+		
+			       }
+
+				   if (w_flag == 'T')
+				   {
+				   };
+
+			       fprintf	(fp,"\n");
+                   line_no++;
+
+				   cntr = 0 ;
+				   clt = clt + 53 ;
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+				}
+
+			
+		       if (strcmp(word1,"N") == 0) 
+		       {
+				
+		          chk_break(line_no);
+				  
+				  line_no++;
+
+				  fprint_repeat(fp,' ',22);
+				  for(i=clt;i<=qq;i++)
+		          {
+			         if(d_result_text.arr[i] == '\n')
+					{
+						  
+								w_flag = 'F';
+
+				    }
+
+				    fprintf(fp,"%c",d_result_text.arr[i]);
+					
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+					
+			      strcpy(word1,"F");
+			      cntr = 0 ;
+			      clt = qq + 1;
+		          qq = 0;
+	   	       }
+
+		       if (strcmp(word1,"T") == 0)
+		       {
+		 										 
+			      chk_break(line_no);
+
+				  fprint_repeat(fp,' ',22);		   
+				  for(i=clt;i<= qq;i++)
+		          {
+		             if(d_result_text.arr[i] == '\n')
+					 {
+						w_flag = 'F';
+					  }
+
+					  fprintf(fp,"%c",d_result_text.arr[i]);
+				
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+
+					fprintf	(fp,"\n");
+					line_no++;
+
+			       cntr = 0 ;
+				   clt = qq + 1 ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+
+		        if (strcmp(word1,"W") == 0)
+		        {
+		 										 
+			       chk_break(line_no);
+
+				   fprint_repeat(fp,' ',22);
+				   for(i=clt;i < clt + 53;i++)
+		           {
+		              if(d_result_text.arr[i] == '\n')
+						{
+
+								w_flag = 'F';
+						}
+
+						fprintf(fp,"%c",d_result_text.arr[i]);
+			       }
+
+				   if (w_flag = 'T')
+				   {
+				   };
+
+			       fprintf(fp,"\n");
+                   line_no++;
+
+				   cntr = 0 ;
+				   clt = clt + 53;
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+			w_flag = 'T';	  
+	        cntr += 1;
+	        z++ ;
+          }
+		
+      }
+  
+       fflush(fp);
+
+#ifdef DEBUG
+   printf("rl_res_result_text = %s\n", d_result_text.arr);
+#endif
+
+if (OERROR)
+      disp_message(ERR_MESG, "SPLITTING failed on table RL_RESULT_TEXT");
+
+}
+
+
+/*------------------------------*/
+close_test_result_cur_2()
+{
+	EXEC SQL CLOSE TEST_RESULT_CUR2;
+}
+
+/*------------------------------*/
+int fetch_test_result_2()
+{
+  d_specimen_no_2.arr[0] = '\0';
+  d_test_code_2.arr[0] = '\0';  //ML-SD-SCF-1972
+  d_numeric_result_2.arr[0] = '\0'; 
+  d_rc_1_2.arr[0] = '\0';
+  d_rc_2_2.arr[0] = '\0';
+  d_rc_3_2.arr[0] = '\0';
+  d_rc_4_2.arr[0] = '\0';
+
+  d_specimen_no.len = 0;
+  d_test_code_2.len = 0;  //ML-SD-SCF-1972
+  d_numeric_result_2.len = 0;
+  d_rc_1_2.len = 0;
+  d_rc_2_2.len = 0;
+  d_rc_3_2.len = 0;
+  d_rc_4_2.len = 0;  
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH TEST_RESULT_CUR2
+ /** INTO :d_specimen_no_2,:d_category_code_2,d_category_year_2,d_category_num_2,
+		     :d_numeric_result_2,:d_rc_1_2, :d_rc_2_2,:d_rc_3_2,:d_rc_4_2;
+  ********changed against ML-SD-SCF-1972 ******/
+	    INTO :d_specimen_no_2,:d_test_code_2,:d_category_code_2,d_category_year_2,d_category_num_2,
+		     :d_numeric_result_2,:d_rc_1_2, :d_rc_2_2,:d_rc_3_2,:d_rc_4_2;
+ /*EXEC SQL FETCH TEST_RESULT_CUR2
+	    INTO     :d_numeric_result_2,:d_rc_1_2, :d_rc_2_2,:d_rc_3_2,:d_rc_4_2;*/
+  
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_specimen_no_2.arr[d_specimen_no_2.len] = '\0';
+  d_test_code_2.arr[d_test_code_2.len] = '\0';  //against ML-SD-SCF-1972
+  d_category_code_2.arr[d_category_code_2.len] = '\0';
+  d_category_year_2.arr[d_category_year_2.len] = '\0';
+  d_category_num_2.arr[d_category_num_2.len] = '\0';
+  d_numeric_result_2.arr[d_numeric_result_2.len] = '\0';
+  d_rc_1_2.arr[d_rc_1_2.len] = '\0';
+  d_rc_2_2.arr[d_rc_2_2.len] = '\0';
+  d_rc_3_2.arr[d_rc_3_2.len] = '\0';
+  d_rc_4_2.arr[d_rc_4_2.len] = '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_test_result_1() occured....\n");
+   proc_exit();
+}
+
+/*------------------------------*/
+void print_detl_rec_2()
+{
+	
+	int p_flg2	 = 0;
+	int c_no2    = 0;
+
+	strcpy(d_specimen_no_2_prv.arr, "");
+	d_specimen_no_2_prv.len = strlen(d_specimen_no_2_prv.arr);
+
+	
+	while (fetch_test_result_2())
+	{
+		if (strcmp(d_specimen_no_2.arr, d_specimen_no_2_prv.arr) != 0)
+		{
+			
+	/***	if (strlen(d_specimen_no_2_prv.arr) != 0)
+			{
+			   chk_break(line_no);
+               fprintf(fp, "\n");
+               line_no++;
+			   print_result_text_2();
+			}  ********* commented on 26/10/2007 against ML-SD-SCF-1972/
+            
+			strcpy(d_specimen_no_2_prv.arr, d_specimen_no_2.arr);
+			d_specimen_no_2_prv.len = strlen(d_specimen_no_2_prv.arr);
+
+	
+            chk_break(line_no);
+	/**********COMMENTED 26/10/2007******************against ML-SD-SCF-1972
+			fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code_2.arr,
+										  d_category_year_2.arr,
+										  d_category_num_2.arr);
+        ***************************/    
+			p_flg2 = 0;
+
+
+
+		}
+		if (l_sec_cnt ==0)
+		{
+		  //fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/  //ML-SD-SCF-1958
+	  	  fprintf(fp, "%s\n", second_section_title);
+		  //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */ //ML-SD-SCF-1958
+		
+		  fprint_repeat(fp,'-',strlen(second_section_title));  //ML-SD-SCF-1958
+		  fprintf(fp,"\n");                                    //ML-SD-SCF-1958
+		  line_no = line_no + 2;
+		  l_sec_cnt++;
+		}
+/********added against ML-SD-SCF-1972 ******START*/
+		if (strlen(d_category_num_2.arr) > 0 )
+		{
+			chk_break(line_no);		/* Added by Durai Rajkumar against MF-SCF-0114 */
+			fprintf(fp, "%-5.5s/%-4.4s/%-11.11s", d_category_code_2.arr,
+												  d_category_year_2.arr,
+												  d_category_num_2.arr); 
+		}
+		else
+		{
+			chk_break(line_no);		/* Added by Durai Rajkumar against MF-SCF-0114 */
+			fprintf(fp, "%-5.5s %-4.4s %-11.11s", " /",
+												  " /",
+												  " /"); 
+		} /*****************end*************/
+
+
+		if (strlen(d_rc_1_2.arr) != 0) 
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+			fprintf(fp, "%s","                      ");
+		  }
+
+		  c_no2 = 1;
+		  fprintf(fp, "%-40.40s\n", d_rc_1_2.arr);
+		  p_flg2 = 1;
+		  line_no++;
+
+		}
+		if (strlen(d_rc_2_2.arr) != 0)
+		{
+		  
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+		  if (c_no2 != 1)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 2;
+		  fprintf(fp, "%-40.40s\n", d_rc_2_2.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+		if (strlen(d_rc_3_2.arr) != 0) 
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+
+		  if (c_no2 != 2)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 3;
+		  fprintf(fp, "%-40.40s\n", d_rc_3_2.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+		if (strlen(d_rc_4_2.arr) != 0)
+		{
+		  if (p_flg2 != 0)
+		  {
+			chk_break(line_no);
+		  }
+
+		  if (c_no2 != 3)
+		  {
+			fprintf(fp, "%s","                                      ");
+		  }
+
+		  c_no2 = 4;
+		  fprintf(fp, "%-40.40s\n", d_rc_4_2.arr);
+		  p_flg2 = 1;
+		  line_no++;
+		}
+    
+             //FROM HERE SD-CRF-20059 
+			  fprintf(fp,"\n");
+			  line_no = line_no + 1;  
+  		      dclr_request_detail_2();
+              open_request_detail_cur_2(); 
+   			  //fprintf(fp,"%c&d0D",ESC);   /* Set  UnderLine ON*/ //ML-SD-SCF-1958
+			  //fprintf(fp,"Tests Ordered---->  Test Code   Test Description\n");
+			  fprintf(fp,"%-13.13s---->  %-9.9s   %-16.16s\n", local_legend[8],local_legend[9], local_legend[10]);//added for globalisation
+			  fprintf(fp,"------------------------------------------------\n"); //ML-SD-SCF-1958
+			  //fprintf(fp,"%c&d@",ESC);   /* Set UnderLine OFF */ //ML-SD-SCF-1958
+			       //fprintf(fp,"\n");
+			  line_no = line_no + 2; 
+			  while(fetch_request_detail_2())
+              { 
+			   fprintf(fp, "%-19.s %-11.11s %s","",d_test_code.arr,d_test_desc.arr);
+			   fprintf(fp,"\n");
+			   line_no = line_no + 1; 
+			   print_result_text_2(); //added on 26/10/2007 against ML-SD-SCF-1972
+			   fprintf(fp, "\n");
+			   line_no++;
+              } 
+			 close_request_detail_cur_2();
+			 //UPTO HERE SD-CRF-20059 
+  			
+           
+
+	}
+	
+	/*** After Finishing the While Loop , for Last Specimen ***/
+
+    chk_break(line_no);
+    fprintf(fp, "\n");
+    line_no++;
+    //print_result_text_2();   commented on 26/10/2007 against ML-SD-SCF-1972
+
+	// print_clinical_history();
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_detl_rec_1() occured....\n");
+   proc_exit();
+}
+
+print_result_text_2()
+{
+	int ctr = 0;
+	int len = 0;
+	int r_ctr = 0;
+
+	char l_string[100];
+
+/********************commented  against ML-SD-SCF-1972 ********start****
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL DECLARE result_text_cur2 CURSOR FOR
+		SELECT distinct A.SPECIMEN_NO , A.RESULT_TEXT_CODE, A.RESULT_TEXT
+		FROM RL_RESULT_TEXT A, RL_REQUEST_HEADER B
+		WHERE A.SPECIMEN_NO = :d_specimen_no_2
+		AND A.SPECIMEN_NO = B.SPECIMEN_NO
+		AND A.TEST_CODE = :d_test_code_2
+		AND A.SPECIMEN_NO IN (SELECT SPECIMEN_NO FROM RL_SAMPLE_DETAILS C
+		                      WHERE C.SPECIMEN_NO = A.SPECIMEN_NO
+							  AND NVL(C.ANATOMY_SITE_CODE, '!') 
+							  BETWEEN NVL(:nd_anatomy_site_fr_2,NVL(C.ANATOMY_SITE_CODE,'!'))
+							  AND NVL(:nd_anatomy_site_to_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+							 )
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND A.PATIENT_ID = :d_patient_id_prv
+		AND B.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+			AND B.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND NVL(B.SPECIMEN_TYPE_CODE, '!') 
+		    BETWEEN NVL(:nd_spec_type_fr_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+			AND NVL(:nd_spec_type_to_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(B.CATEGORY_CODE,'!'))
+		AND NVL(B.STATUS,'O') != 'O'
+	//	AND B.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_2 = 'Y' AND NVL(A.cancer_register_yn, 'N') = 'Y') OR
+		      ( :nd_search_result_text_2 = 'N' AND 1=1)
+			)
+		UNION
+		SELECT distinct A.SPECIMEN_NO , A.RESULT_TEXT_CODE, A.RESULT_TEXT
+		FROM RL_RESULT_TEXT A, RL_REQUEST_HEADER B
+		WHERE A.SPECIMEN_NO = :d_specimen_no_2
+		AND A.TEST_CODE = :d_test_code_2
+		AND (A.SPECIMEN_NO = B.SPECIMEN_NO
+		or A.SPECIMEN_NO IN (SELECT SPECIMEN_NO FROM RL_SPECIMEN_ANATOMY_DTLS C
+		                      WHERE C.SPECIMEN_NO = A.SPECIMEN_NO
+		                      AND NVL(C.ANATOMY_SITE_CODE, '!') 
+							  BETWEEN NVL(:nd_anatomy_site_fr_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+							  AND NVL(:nd_anatomy_site_to_2, NVL(C.ANATOMY_SITE_CODE,'!'))
+							 ))
+		AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		AND A.PATIENT_ID = :d_patient_id_prv
+		AND B.SPEC_REGD_DATE_TIME > TO_DATE(:nd_regd_date_fr_2, 'DD/MM/YYYY') 
+		AND B.SPEC_REGD_DATE_TIME < TO_DATE(:nd_regd_date_to_2, 'DD/MM/YYYY') + 1
+		AND NVL(B.SPECIMEN_TYPE_CODE,'!') 
+			BETWEEN NVL(:nd_spec_type_fr_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+			AND NVL(:nd_spec_type_to_2, NVL(B.SPECIMEN_TYPE_CODE,'!'))
+		AND NVL(B.CATEGORY_CODE,'!') = NVL(:nd_category_prfx_2, NVL(B.CATEGORY_CODE, '!'))
+		AND NVL(B.STATUS,'O') != 'O'
+	//	AND B.SECTION_CODE = :nd_section_1
+		AND ( ( :nd_search_result_text_2 = 'Y' AND NVL(A.cancer_register_yn, 'N') = 'Y') OR
+		      ( :nd_search_result_text_2 = 'N' AND 1=1)
+			)
+		ORDER BY 1;   ******************upto here ********/
+		
+		/*
+		SELECT specimen_no , result_text_code, result_text
+		FROM RL_RESULT_TEXT
+		WHERE patient_id = :d_patient_id
+		AND specimen_no = :d_specimen_no
+		AND operating_facility_id = :nd_operating_facility_id
+		ORDER BY specimen_no;
+		sunil */
+
+		EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+		EXEC SQL DECLARE result_text_cur2 CURSOR FOR
+		SELECT specimen_no , result_text_code, result_text
+		FROM RL_RESULT_TEXT
+		WHERE patient_id = :d_patient_id_prv
+		AND specimen_no = :d_specimen_no_2
+		AND operating_facility_id = :nd_operating_facility_id
+		AND TEST_CODE = :d_test_code_2  //added condition against ML-SD-SCF-1972
+		AND ( ( :nd_search_result_text_1 = 'Y' AND NVL(cancer_register_yn, 'N') = 'Y') OR
+		      ( :nd_search_result_text_1 = 'N' AND 1=1)
+			)
+		ORDER BY specimen_no;    
+
+
+	EXEC SQL OPEN result_text_cur2;
+
+	ctr = 0;
+
+	split_result_text_2();
+
+	EXEC SQL CLOSE result_text_cur2;
+
+	return;
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at print_result_text_2() occured....\n");
+	proc_exit();
+}
+
+/**** Splitting Result Text ****/
+
+split_result_text_2()
+{
+	char word[2];
+	char w_flag ;
+	char l_first;
+
+    strcpy(word1,"F");
+
+	w_flag = 'T';
+
+	l_first = 'Y';
+
+    while(fetch_result_text_2())
+    {
+	  if (l_first == 'Y')
+	  {  
+	    l_first = 'N';
+		/*
+		fprintf(fp,"     Text Result\n");
+        fprintf(fp,"     -----------\n");
+        line_no = line_no + 2;
+		*/
+	  }
+
+      something_to_print = 1;
+
+	  l_var = strlen(d_result_text_2.arr);
+
+         z = 0;
+	     clt = 0;
+	     strcpy(word1,"F"); 
+	     cntr = 1;
+	     qq = 0;
+
+         while(z<l_var)
+         {
+             word[0] = d_result_text_2.arr[z];
+ 		     word[1] = '\0';
+
+		     if (strcmp(word,"\n") == 0)
+		     {
+		       cntr = 0;
+		       strcpy(word1,"N");
+		       qq = z ;
+		      }
+
+  		      if(cntr >= 54) 
+		      {
+		   	
+			     cmp = cntr;
+			     while((d_result_text_2.arr[z] != 32) && (cmp > 1))
+			     {
+			         z--;
+				     cmp--;
+			      }
+
+				  qq = z;
+				  			   
+			      word[0] = d_result_text_2.arr[z];
+   			      word[1] = '\0';
+		
+		  	      if (cmp == 1)
+				     strcpy(word1,"W");
+			      else
+			         strcpy(word1,"T");
+			   
+		      }
+
+
+				if (((z == l_var) || (z == l_var - 1)) && (strcmp(word1,"F") == 0))
+				{
+	
+				   chk_break(line_no);
+
+				   fprint_repeat(fp,' ',22);
+				   for(i=clt;i < z + 1;i++)
+		           {
+						if(d_result_text_2.arr[i] == '\n')
+						{
+
+
+							    w_flag = 'F';
+ 						 }
+
+						fprintf(fp,"%c",d_result_text_2.arr[i]);
+			
+			       }
+
+				   if (w_flag == 'T')
+				   {
+				   };
+
+			       fprintf	(fp,"\n");
+
+                   line_no++;
+
+				   cntr = 0 ;
+				   clt = clt + 53 ;
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+				}
+
+			
+		       if (strcmp(word1,"N") == 0) 
+		       {
+				
+		          chk_break(line_no);
+				  
+				  line_no++;
+
+				  fprint_repeat(fp,' ',22);
+				  for(i=clt;i<=qq;i++)
+		          {
+			         if(d_result_text_2.arr[i] == '\n')
+					{
+						  
+								w_flag = 'F';
+
+				    }
+
+				    fprintf(fp,"%c",d_result_text_2.arr[i]);
+					
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+					
+			      strcpy(word1,"F");
+			      cntr = 0 ;
+			      clt = qq + 1;
+		          qq = 0;
+	   	       }
+
+		       if (strcmp(word1,"T") == 0)
+		       {
+		 										 
+			      chk_break(line_no);
+
+				  fprint_repeat(fp,' ',22);		   
+				  for(i=clt;i<= qq;i++)
+		          {
+		             if(d_result_text_2.arr[i] == '\n')
+					 {
+						w_flag = 'F';
+					  }
+
+					  fprintf(fp,"%c",d_result_text_2.arr[i]);
+				
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+
+			       fprintf	(fp,"\n");
+
+                   line_no++;
+
+			       cntr = 0 ;
+				   clt = qq + 1 ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+
+		        if (strcmp(word1,"W") == 0)
+		        {
+		 										 
+			       chk_break(line_no);
+
+				   fprint_repeat(fp,' ',22);
+				   for(i=clt;i < clt + 53;i++)
+		           {
+		              if(d_result_text_2.arr[i] == '\n')
+						{
+
+								w_flag = 'F';
+						}
+
+						fprintf(fp,"%c",d_result_text_2.arr[i]);
+				
+			       }
+
+				   if (w_flag = 'T')
+				   {
+				   };
+
+			       fprintf(fp,"\n");
+
+                   line_no++;
+
+				   cntr = 0 ;
+				   clt = clt + 53;
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+			w_flag = 'T';	  
+	        cntr += 1;
+	        z++ ;
+          }
+		
+      }
+  
+       fflush(fp);
+
+#ifdef DEBUG
+   printf("rl_res_result_text = %s\n", d_result_text_2.arr);
+#endif
+
+if (OERROR)
+      disp_message(ERR_MESG, "SPLITTING failed on table RL_RESULT_TEXT");
+
+}
+
+print_clinical_history()
+{
+
+	int ctr = 0;
+	int len = 0;
+	int r_ctr = 0;
+
+	char l_string[100];     
+	
+	// sprintf(string_var, "Patient ID %s  Spec No  %s ", d_patient_id.arr, d_specimen_no.arr);
+	// disp_message(ERR_MESG, string_var);
+
+		EXEC SQL DECLARE rl_clinical_cur CURSOR FOR
+				 SELECT specimen_no, clinical_text_code, SUBSTR(clinical_text, 1, 4000) 
+				 FROM RL_PATIENT_CLINICAL_TEXT
+				 WHERE specimen_no = :d_specimen_no
+				   AND patient_id  = :d_patient_id
+			       AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+			       AND NVL(order_questionnaire_yn, 'N') <> 'Y'
+				 ORDER BY specimen_no;
+
+
+		EXEC SQL OPEN rl_clinical_cur;
+
+		ctr = 0;
+
+		split_hist();
+
+		EXEC SQL CLOSE rl_clinical_cur;
+
+}
+
+
+/********** Splitting Clinical History  **********/
+split_hist()
+{
+  
+	char word[2];
+	char w_flag ;
+
+    strcpy(word1,"F");
+
+	w_flag = 'T';
+
+    while(fetch_clinical_text())
+    {
+          
+      something_to_print = 1;
+	  
+	  l_var = strlen(d_clinical_text.arr);
+
+         z = 0;
+	     clt = 0;
+	     strcpy(word1,"F"); 
+	     cntr = 1;
+	     qq = 0;
+
+         while(z<l_var)
+         {
+		 		  	
+		 
+             word[0] = d_clinical_text.arr[z];
+ 		     word[1] = '\0';
+
+		     if (strcmp(word,"\n") == 0)
+		     {
+   
+		       cntr = 0;
+		       strcpy(word1,"N");
+		       qq = z ;
+		      }
+
+
+  		      if(cntr >= 38) //71
+		      {
+		   	
+			     cmp = cntr;
+			     while((d_clinical_text.arr[z] != 32) && (cmp > 1))
+			     {
+
+			         z--;
+				     cmp--;
+				  
+			      }
+
+				  qq = z;
+				  			   
+			      word[0] = d_clinical_text.arr[z];
+   			      word[1] = '\0';
+		
+		  	      if (cmp == 1)
+				     strcpy(word1,"W");
+			      else
+			         strcpy(word1,"T");
+			   
+		
+		       }
+
+
+				if (((z == l_var) || (z == l_var - 1)) && (strcmp(word1,"F") == 0))
+				{
+	
+				   chk_break(line_no);
+
+				   fprint_repeat(fp,' ',38);		   
+				   for(i=clt;i < z + 1;i++)
+		           {
+			       		
+						if(d_clinical_text.arr[i] == '\n')
+						{
+
+
+							    w_flag = 'F';
+ 						 }
+
+						fprintf(fp,"%c",d_clinical_text.arr[i]);
+			
+			       }
+
+				   if (w_flag == 'T')
+				   {
+				   };
+
+			       fprintf	(fp,"\n");
+
+                   line_no++;
+		           // chk_break(line_no);
+
+				   cntr = 0 ;
+				   clt = clt + 37 ; //70
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+
+				}
+
+			
+		       if (strcmp(word1,"N") == 0) 
+		       {
+				
+		          chk_break(line_no);
+				  
+				  line_no++;
+
+				  fprint_repeat(fp,' ',38);
+				  for(i=clt;i<=qq;i++)
+		          {
+			         if(d_clinical_text.arr[i] == '\n')
+					{
+						  
+								w_flag = 'F';
+
+				    }
+
+				    fprintf(fp,"%c",d_clinical_text.arr[i]);
+					
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+					
+			      strcpy(word1,"F");
+			      cntr = 0 ;
+			      clt = qq + 1;
+		          qq = 0;
+	   	       }
+
+		       if (strcmp(word1,"T") == 0)
+		       {
+		 										 
+			      chk_break(line_no);
+
+				  fprint_repeat(fp,' ',38);		   
+				  for(i=clt;i<= qq;i++)
+		          {
+		             if(d_clinical_text.arr[i] == '\n')
+					 {
+						w_flag = 'F';
+					  }
+
+					  fprintf(fp,"%c",d_clinical_text.arr[i]);
+				
+			      }
+
+				  if (w_flag == 'T')
+				  {
+				  };
+
+			       fprintf	(fp,"\n");
+
+                   line_no++;
+		           // chk_break(line_no);
+
+			       cntr = 0 ;
+				   clt = qq + 1 ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+
+		        if (strcmp(word1,"W") == 0)
+		        {
+		 										 
+			       chk_break(line_no);
+
+				   fprint_repeat(fp,' ',38);
+				   for(i=clt;i < clt + 37;i++)   //70
+		           {
+		              if(d_clinical_text.arr[i] == '\n')
+						{
+
+								w_flag = 'F';
+						}
+
+						fprintf(fp,"%c",d_clinical_text.arr[i]);
+				
+			       }
+
+				   if (w_flag = 'T')
+				   {
+				   };
+
+			       fprintf(fp,"\n");
+
+                   line_no++;
+		           // chk_break(line_no);
+
+				   cntr = 0 ;
+				   clt = clt + 37 ;  //70
+				   z = clt ;
+			       qq = 0;
+				   strcpy(word1,"F");
+
+				
+		        }
+
+			w_flag = 'T';	  
+	        cntr += 1;
+	        z++ ;
+          }
+
+		
+      }
+  
+       fflush(fp);
+
+#ifdef DEBUG
+   printf("rl_res_result_text = %s\n", d_clinical_text.arr);
+#endif
+
+if (OERROR)
+      disp_message(ERR_MESG, "SPLITTING failed on table RL_PATIENT_CLINICAL_TEXT");
+
+}
+
+/*******************************************************************************************/
+fetch_result_text()
+{
+
+	d_result_text_code.arr[0]	= '\0';
+	d_result_text_code.len		= 0;
+	d_result_spec_no.arr[0]		= '\0';
+	d_result_spec_no.len		= 0;
+
+	d_result_text.arr[0]		= '\0';
+	d_result_text.len			= 0;
+
+    EXEC SQL FETCH result_text_cur
+              INTO :d_result_spec_no,
+				   :d_result_text_code, 
+				   :d_result_text;
+
+    if (OERROR)
+         disp_message(ORA_MESG,"FETCH failed on cursor RL_RESULT_TEXT");
+
+
+	d_result_spec_no.arr[d_result_spec_no.len]			= '\0';
+	d_result_text_code.arr[d_result_text_code.len]		= '\0';
+	d_result_text.arr[d_result_text.len]				= '\0';
+
+    return (LAST_ROW?0:1);
+}
+/*******************************************************************************************/
+
+fetch_result_text_2()
+{
+
+	d_result_text_code_2.arr[0]	    = '\0';
+	d_result_text_code_2.len		= 0;
+	d_result_spec_no_2.arr[0]		= '\0';
+	d_result_spec_no_2.len		    = 0;
+
+	d_result_text_2.arr[0]		    = '\0';
+	d_result_text_2.len			    = 0;
+
+    EXEC SQL FETCH result_text_cur2
+              INTO :d_result_spec_no_2,
+				   :d_result_text_code_2, 
+				   :d_result_text_2;
+
+    if (OERROR)
+         disp_message(ORA_MESG,"FETCH failed on cursor RL_RESULT_TEXT");
+
+	d_result_spec_no_2.arr[d_result_spec_no_2.len]			= '\0';
+	d_result_text_code_2.arr[d_result_text_code_2.len]		= '\0';
+	d_result_text_2.arr[d_result_text_2.len]				= '\0';
+
+    return (LAST_ROW?0:1);
+}
+
+
+/*******************************************************************************************/
+fetch_clinical_text()
+{
+
+	d_clinical_text_code.arr[0]		= '\0';
+	d_clinical_text_code.len		= 0;
+	d_clinical_spec_no.arr[0]		= '\0';
+	d_clinical_spec_no.len			= 0;
+
+	d_clinical_text.arr[0]			= '\0';
+	d_clinical_text.len				= 0;
+
+    EXEC SQL FETCH rl_clinical_cur
+              INTO :d_clinical_spec_no,
+				   :d_clinical_text_code, 
+				   :d_clinical_text;
+
+    if (OERROR)
+         disp_message(ORA_MESG,"FETCH failed on cursor RL_PATIENT_CLINICAL_TEXT");
+
+
+	d_clinical_spec_no.arr[d_clinical_spec_no.len]			= '\0';
+	d_clinical_text_code.arr[d_clinical_text_code.len]		= '\0';
+	d_clinical_text.arr[d_clinical_text.len]				= '\0';
+
+    return (LAST_ROW?0:1);
+}
+/*******************************************************************************************/
+
+void print_page_header()
+{
+   printt_page_header() ;
+   line_no += 5;
+}
+
+void print_col_heading()
+{
+   //fprintf(fp,"Category Number       Interpretations\n");
+   fprintf(fp,"%-15.15s       %-15.15s\n", local_legend[23], local_legend[24]); //added for globalisation
+   fprintf(fp,"------------------------------------------------------------------------------\n");
+   line_no += 2;
+}
+
+/*************SD-CRF-20059 from here *****************/
+void get_referral_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(DECODE(:language_id, 'en', SHORT_NAME, 'th', SHORT_NAME_LOC_LANG),1,59),NATIONAL_ID_NUM
+	           INTO :d_patient_name,:d_nationality_id
+            FROM RL_PATIENT_MAST
+	    WHERE PATIENT_ID = :d_patient_id;
+		/* AND OPERATING_FACILITY_ID = :nd_operating_facility_id; */
+
+  d_patient_name.arr[d_patient_name.len]     = '\0';
+  d_nationality_id.arr[d_nationality_id.len] = '\0';
+ 
+  #ifdef DEBUG
+   printf("d_patient_name= %s\n", d_patient_name.arr);
+  #endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_referral_patient_dtl() occured....\n");
+   proc_exit();
+}
+
+/* Function to fetch the INPATIENT details */
+int get_in_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(DECODE(:language_id, 'en', SHORT_NAME, 'th', SHORT_NAME_LOC_LANG),1,59),NATIONAL_ID_NUM INTO
+	           :d_patient_name,:d_nationality_id
+            FROM MP_PATIENT_MAST 
+	    WHERE PATIENT_ID = :d_patient_id;
+
+  if (NODATAFOUND)
+    return 0;
+  d_patient_name.arr[d_patient_name.len]     = '\0';
+  d_nationality_id.arr[d_nationality_id.len] = '\0';
+  #ifdef DEBUG
+   printf("d_patient_name= %s\n", d_patient_name.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_in_patient_dtl() occured....\n");
+   proc_exit();
+}
+/********* GET SOURCE_NAME  **********/
+  void get_source_name()
+  {
+    d_source_name.arr[0]	= '\0';
+	d_source_name.len		= 0;
+
+ 	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	if(strcmp(d_source_type.arr,"C") == 0)
+	{
+   				EXEC SQL SELECT LONG_DESC 
+				INTO :d_source_name
+				FROM OP_CLINIC_lang_vw 
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND clinic_code = :d_source_code
+				and language_id = :language_id;
+	}
+	else
+	{
+		if(strcmp(d_source_type.arr,"W") == 0) 
+		{
+		
+				EXEC SQL 
+				/*SELECT LONG_DESC
+				INTO :d_source_name
+				FROM IP_WARD 
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND ward_code = :d_source_code;
+				*/
+				SELECT LONG_DESC
+				INTO :d_source_name
+				FROM IP_NURSING_UNIT_LANG_VW 
+				WHERE FACILITY_ID = :nd_operating_facility_id
+				AND NURSING_UNIT_CODE = :d_source_code
+				and language_id = :language_id;
+		}
+		else
+		{
+			if((strcmp(d_source_type.arr,"R") == 0 ) || (strcmp(d_source_type.arr,"E") == 0 ) )
+			{
+					EXEC SQL SELECT LONG_DESC
+					INTO :d_source_name
+					FROM RL_REFERRAL_lang_vw 
+					WHERE referral_code = :d_source_code
+					and language_id = :language_id;
+			}
+		}
+	}
+
+#ifdef DEBUG
+    printf("leaving dclr_source_cur()\n");
+    fflush(stdout);
+#endif
+
+	d_source_name.arr[d_source_name.len]	= '\0';
+
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_source_cur() occured....\n");
+   proc_exit();	
+  }
+
+
+/********* GET SECTION_NAME  **********/
+
+/*************SD-CRF-20059 upto here *****************/
+/*********** PRINT REPORT HEADER **************/
+void print_rep_header()
+{
+  char nd_fr_process_date_desc[100],
+       nd_to_process_date_desc[100],
+	   nd_fr_process_date_desc_2[100],
+	   nd_to_process_date_desc_2[100];
+
+int rec_len; //added for globalisation
+
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_regd_date_fr_1,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_regd_date_fr_11 := to_char(t_date,'DD/MM/YYYY');
+				:nd_regd_date_fr_11 :=sm_convert_date_2t(to_date(:nd_regd_date_fr_1,'DD/MM/YYYY '),:language_id);
+				END;
+			END-EXEC;
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_regd_date_to_1,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_regd_date_to_11 := to_char(t_date,'DD/MM/YYYY');
+				:nd_regd_date_to_11 :=sm_convert_date_2t(to_date(:nd_regd_date_to_1,'DD/MM/YYYY '),:language_id);
+				END;
+			END-EXEC;
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_regd_date_fr_2,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_regd_date_fr_21 := to_char(t_date,'DD/MM/YYYY');
+				:nd_regd_date_fr_21 :=sm_convert_date_2t(to_date(:nd_regd_date_fr_2,'DD/MM/YYYY '),:language_id);
+				END;
+			END-EXEC;
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_regd_date_to_2,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_regd_date_to_21 := to_char(t_date,'DD/MM/YYYY');
+				:nd_regd_date_to_21 :=sm_convert_date_2t(to_date(:nd_regd_date_to_2,'DD/MM/YYYY '),:language_id);
+				END;
+			END-EXEC;
+
+
+  if(strcmp(nd_regd_date_fr_1.arr, "01/01/1800") == 0)
+    //strcpy(nd_fr_process_date_desc, "LOWEST");
+    strcpy(nd_fr_process_date_desc, local_legend[11]); //added for globalisation
+  else strcpy(nd_fr_process_date_desc, nd_regd_date_fr_11.arr);
+
+  if(strcmp(nd_regd_date_to_1.arr, "31/12/4712") == 0)
+    //strcpy(nd_to_process_date_desc, "HIGHEST");
+    strcpy(nd_to_process_date_desc, local_legend[12]); //added for globalisation
+  else strcpy(nd_to_process_date_desc, nd_regd_date_to_11.arr);
+
+  if(strcmp(nd_regd_date_fr_2.arr, "01/01/1800") == 0)
+    //strcpy(nd_fr_process_date_desc_2, "LOWEST");
+    strcpy(nd_fr_process_date_desc_2, local_legend[11]); //added for globalisation
+  else strcpy(nd_fr_process_date_desc_2, nd_regd_date_fr_21.arr);
+
+  if(strcmp(nd_regd_date_to_2.arr, "31/12/4712") == 0)
+    //strcpy(nd_to_process_date_desc_2, "HIGHEST");
+    strcpy(nd_to_process_date_desc_2, local_legend[12]); //added for globalisation
+  else strcpy(nd_to_process_date_desc_2, nd_regd_date_to_21.arr);
+  
+  #ifdef DEBUG
+      printf("before report header()\n");
+  #endif
+
+  printt_page_header();
+
+  #ifdef DEBUG
+      printf("after page header()\n");
+  #endif
+  
+  get_version_no();
+
+  fprintf(fp,"%s\n",d_version.arr);
+  fprintf(fp,"\n\n\n\n");
+  //fprintf(fp,"        ");
+  //fprintf(fp,"INPUT PARAMETERS :\n");
+  rec_len = strlen(local_legend[13]);//added for globalisation
+  print_space(25, rec_len,1);//added for globalisation
+  fprintf(fp,"%s:\n", local_legend[13]);//added for globalisation
+  //fprintf(fp,"        ");
+  //fprintf(fp,"------------------\n\n");
+  print_space(25, rec_len,1);//added for globalisation
+  print_space(25, rec_len,0);//added for globalisation
+  fprintf(fp,"\n\n");//added for globalisation
+  //fprintf(fp,"        ");
+  //fprintf(fp, "FOR %s\n", first_section_title);
+  fprintf(fp, "%11.11s %s\n", local_legend[14],first_section_title); //added for globalisation
+  fprintf(fp,"      ");
+  fprint_repeat(fp,'-',strlen(first_section_title) + 8);
+  fprintf(fp,"\n");
+
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"SPEC REGD DATE   FROM : %s\n", nd_fr_process_date_desc);
+  fprintf(fp,"%22.22s %8.8s  : %s\n",local_legend[15], local_legend[16], nd_fr_process_date_desc);
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO  : %s\n", nd_to_process_date_desc);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17], nd_to_process_date_desc); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"SPECIMEN TYPE    FROM : %s\n", nd_spec_type_fr_1.arr);
+  fprintf(fp,"%22.22s %8.8s  : %s\n", local_legend[18], local_legend[16],nd_spec_type_fr_1.arr); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO  : %s\n", nd_spec_type_to_1.arr);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17], nd_spec_type_to_1.arr); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"ANATOMY SITE     FROM : %s\n", nd_anatomy_site_fr_1.arr);
+  fprintf(fp,"%22.22s %8.8s  : %s\n", local_legend[19], local_legend[16],nd_anatomy_site_fr_1.arr);//added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO  : %s\n", nd_anatomy_site_to_1.arr);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17],nd_anatomy_site_to_1.arr);//added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"CATEGORY PREFIX        : %s",   nd_category_prfx_1.arr);
+  fprintf(fp,"%31.31s  : %s", local_legend[20], nd_category_prfx_1.arr);//added for globalisation
+  fprintf(fp,"\n");
+  
+  //fprintf(fp,"      ");
+  //fprintf(fp, "FOR %s\n", second_section_title);
+  fprintf(fp, "%11.11s %s\n", local_legend[14], second_section_title);//added for globalisation
+  fprintf(fp,"        ");
+  fprint_repeat(fp,'-',strlen(second_section_title) + 8);
+  fprintf(fp,"\n");
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"SPEC REGD DATE   FROM : %s\n", nd_fr_process_date_desc_2);
+  fprintf(fp,"%22.22s %8.8s  : %s\n",local_legend[15], local_legend[16], nd_fr_process_date_desc_2);//added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO    : %s\n", nd_to_process_date_desc_2);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17], nd_to_process_date_desc_2); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"SPECIMEN TYPE    FROM : %s\n", nd_spec_type_fr_2.arr);
+  fprintf(fp,"%22.22s %8.8s  : %s\n", local_legend[18], local_legend[16],nd_spec_type_fr_2.arr); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO    : %s\n", nd_spec_type_to_2.arr);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17], nd_spec_type_to_2.arr); //added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"ANATOMY SITE     FROM : %s\n", nd_anatomy_site_fr_2.arr);
+  fprintf(fp,"%22.22s %8.8s  : %s\n", local_legend[19], local_legend[16],nd_anatomy_site_fr_2.arr);//added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"                 TO    : %s\n", nd_anatomy_site_to_2.arr);
+  fprintf(fp,"%31.31s  : %s\n", local_legend[17],nd_anatomy_site_to_2.arr);//added for globalisation
+  //fprintf(fp,"                   ");
+  //fprintf(fp,"CATEGORY PREFIX        : %s",   nd_category_prfx_2.arr);
+  fprintf(fp,"%31.31s  : %s", local_legend[20], nd_category_prfx_2.arr);//added for globalisation
+  fprintf(fp,"\n");
+
+  fprintf(fp,"\f");
+}
+
+/********************* FORM HDR ************************/
+
+void printt_page_header()
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+
+        strcpy(rep_title2,"");
+        
+
+    if(first) 
+	{
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+        memset(hdr_line4,' ',REP_WIDTH+1);
+		memset(hdr_line5,'-',REP_WIDTH);
+		hdr_line5[REP_WIDTH] = '\0';
+	
+        strncpy(hdr_line1,"MDL : RL",8);
+        col = (int)(REP_WIDTH-strlen(d_acc_entity_name.arr))/2;
+        strncpy(hdr_line1+col,d_acc_entity_name.arr,strlen(d_acc_entity_name.arr));
+
+  EXEC SQL EXECUTE
+	DECLARE
+		t_date   date;
+	BEGIN
+		//t_date := GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+		//:d_sysdate1 := to_char(t_date,'DD/MM/YYYY HH24:MI'); //Added HH24:MI by srinivas 
+		:d_sysdate1 :=sm_convert_datetime_2t(SYSDATE,:language_id);
+	END;
+  END-EXEC;
+
+        col = (REP_WIDTH-strlen(d_sysdate1.arr));
+        strcpy(hdr_line1+col,d_sysdate1.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,d_user.arr);
+
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP : RLRHCRLN",14);
+
+    strcpy(rep_title1,local_legend[1]);
+
+    col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+    sprintf(buf,"%s : %4d",local_legend[21],page_no++);
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+
+    col = (int)(REP_WIDTH-strlen(rep_title2))/2;
+    strcpy(hdr_line4+col,rep_title2);
+
+    if(first)
+        fprintf(fp,"%s\n",hdr_line1);
+    else
+	 {   fprintf(fp,"\n");
+	    fprintf(fp,"%s\n",hdr_line1);
+	 }
+
+    fprintf(fp,"%s\n",hdr_line2);
+    fprintf(fp,"%s\n",hdr_line3);
+    fprintf(fp,"%s\n",hdr_line4);
+    fprintf(fp,"%s\n",hdr_line5);
+
+    first = 0;
+}
+
+chk_break(nol)
+{
+
+	if((line_no + 1) >= MAX_LINES)
+	{
+	   prepare_new_page();
+	   /**
+       line_no = 1;
+	   fprintf(f1, "\f");
+	   form_hdr();
+	   do_form_title();
+	   **/
+ 	}
+}
+
+
+fprint_repeat(l_fp,l_prn_chr,l_no)
+FILE *l_fp;
+char l_prn_chr;
+int  l_no;
+{
+   int l_i = 0;
+
+   for (l_i = 0;l_i < l_no;l_i++)
+        fputc(l_prn_chr,l_fp);
+}
+
+
+get_version_no()
+{
+     d_version_no.arr[0] = '\0';
+     d_version_no.len    =  0;
+
+     strcpy(d_version.arr,"VER : ");
+
+	 EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC;
+
+    if (l_tab_exists) 
+    {
+	    EXEC SQL SELECT VERSION_NO INTO :d_version_no 
+                 FROM   SM_INSTALLATION;
+
+        d_version_no.arr[d_version_no.len] = '\0';
+    }
+    else
+	    strcpy(d_version_no.arr,"2.1");
+
+	    strcat(d_version.arr,d_version_no.arr);
+
+
+    if (OERROR)
+	{
+	    strcpy(d_version_no.arr,"2.1");
+	    strcat(d_version.arr,d_version_no.arr);
+    }
+
+}
+
+/****************************** added for globalisation *****************************/
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRHCRLN.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRHCRLN.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+	}
+ }
+
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(fp,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(fp,"%s","-");
+		}	
+	}
+}
+
+/*************************** added for globalisation*************************************/
+
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

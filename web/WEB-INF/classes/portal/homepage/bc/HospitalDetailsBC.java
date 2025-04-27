@@ -1,0 +1,56 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+package portal.homepage.bc;
+
+import org.apache.log4j.Logger;
+
+import portal.homepage.dac.HospitalDetailsDAC;
+import portal.homepage.request.HospitalRequest;
+import portal.homepage.response.HospitalDetailsResponse;
+
+/**
+ * This method is used to call the DAC layer to
+ * get Hospital Details
+ * 
+ * @author skrishnared2
+ *
+ */
+public class HospitalDetailsBC {
+	
+	private static Logger logger = Logger.getLogger(HospitalDetailsBC.class.getName());
+	HospitalDetailsDAC dacInst;
+	HospitalDetailsResponse response;
+	
+	/**
+	 * @param dacInst the dacInst to set
+	 */
+	public void setDacInst(HospitalDetailsDAC dacInst) {
+		this.dacInst = dacInst;
+	}
+
+	/**
+	 * @param response the response to set
+	 */
+	public void setResponse(HospitalDetailsResponse response) {
+		this.response = response;
+	}
+
+	/**
+	 * This method calls the Hospital DAC with Hospital request
+	 * to get the hospital Response
+	 * @param request
+	 * @return
+	 */
+	public HospitalDetailsResponse getHospitalDetails(HospitalRequest request){
+		logger.debug("Entering the method : getHospitalDetails with request :"+request.toString());
+		response = dacInst.getHospitalDetails(request);
+		logger.debug("Leaving the method : getHospitalDetails with response :"+response.toString());		
+		return response;
+	}
+}

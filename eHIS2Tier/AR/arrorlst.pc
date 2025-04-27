@@ -1,0 +1,1251 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                   */
+/************************************************************************/
+/* PROGRAM NAME          : ARRORLST.PC                                  */
+/* AUTHOR                : S. SRIRAM                                    */
+/* DATE WRITTEN          : 09-FEB-1993                                  */
+/*                                                                      */
+/* CALLED FROM            :                                              */
+/*                                                                                                               */
+/*  FUNCTION               :                                              */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                      */
+/*         1.        AR_CASHIER              Query/Update              */
+/*         2.        GL_ACC_CHART                Lookup                 */
+/*         3.        SY_DEPT                     Lookup                 */
+/*         4.        GL_PRODUCT_LINE             Lookup                 */
+/*         5.        GL_SUBLEDGER_LINE           Lookup                 */
+/*         6.        GL_ACC_COMBINATION          Lookup                 */
+/*         7.        SY_DOC_CONTROL            Insert/Lookup            */
+/*         8.        SY_PROG_CONTROL           Update/Lookup            */
+/*         9.        SY_PROG_MESG                Insert                 */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*         2.        POST                validate_posting_acct          */
+/*         3.        POST_DOC            post_doc (GL posting acc val)  */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+                                 
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <gl.h>
+/*
+#define OERROR (sqlca.sqlcode < 0)
+*/
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define TABLE_ALREADY_EXISTS (sqlca.sqlcode == -955)
+
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR uid_pwd[132];
+
+    int process_rep_flg;
+
+   VARCHAR  nd_facility_id   [3],
+            nd_session_id    [16],
+            nd_pgm_date      [25],
+            nd_fm_doc_type   [7],
+            nd_to_doc_type   [7],
+            nd_fm_doc_num    [10],
+            nd_to_doc_num    [10],
+            nd_fm_doc_date   [12],
+            nd_to_doc_date   [12],
+            nd_proc_flag     [2],
+            nd_view_print_flg[2],
+
+            pmnt_terms_code  [3],
+            billing_group    [5],  -- CRF-0120
+            patient_id       [21],
+            patient_flag     [2],
+            bl_instal_flag   [2],
+            mp_instal_flag   [2],
+            nd_error_flag    [2],
+            print_flag       [3],
+	    nd_bank_flag     [2],
+            mast_status      [3],
+            d_curr_pgm_name  [15],
+            dummy            [10][5],
+
+            d_last_inv_doc_date           [12],
+			nd_acc_entity_code					[5],
+
+
+            d_sy_acc_bl_instal_flag       [4],
+            d_sy_acc_mp_instal_flag       [4],
+            d_ar_acc_status               [2],
+            d_ar_acc_valid_flag           [2],
+            d_customer_status             [2],
+            d_customer_patient_flag       [2],
+            d_pmnt_terms_status           [2],
+            d_bl_blng_grp_status          [2],
+
+            sy_doc_print_flag             [3],
+            curr_acc_year                 [5],
+            curr_acc_month                [3],
+            gl_summ_pro_flag              [2],
+            d_sy_num_acc_per              [5],
+            prior_post_allow              [3],
+            d_chk_amt_local               [19];
+
+ VARCHAR    d_rc_hdr_acc_entity_code               [5],
+            d_rc_hdr_doc_type_code                 [7],
+            d_rc_hdr_doc_num                       [9],
+            d_rc_hdr_party_type_code               [3],
+            d_rc_hdr_doc_date                      [15],
+            d_rc_hdr_doc_ref                       [11],
+            d_rc_hdr_cust_code                     [9],
+            d_rc_hdr_main_acc1_code_bk           [7],
+            d_rc_hdr_main_acc2_code_bk           [5],
+            d_rc_hdr_subl_group_code_bk          [4],
+            d_rc_hdr_subl_line_code_bk           [9],
+            d_rc_hdr_dept_code_bk                [11],
+            d_rc_hdr_pr_group_code_bk            [4],
+            d_rc_hdr_pr_line_code_bk             [5],
+            d_rc_hdr_main_acc1_code_sp           [7],
+            d_rc_hdr_main_acc2_code_sp           [5],
+            d_rc_hdr_subl_group_code_sp          [4],
+            d_rc_hdr_subl_line_code_sp           [9],
+            d_rc_hdr_dept_code_sp                [11],
+            d_rc_hdr_pr_group_code_sp            [4],
+            d_rc_hdr_pr_line_code_sp             [5],
+            d_rc_hdr_amt_foreign                   [17],
+            d_rc_hdr_amt_local                     [17],
+            d_rc_hdr_narration                     [51],
+            d_rc_hdr_post_month                    [3],
+            d_rc_hdr_post_year                     [5],
+            d_rc_hdr_currency_code                 [7],
+            d_rc_hdr_exchg_rate                    [15],
+            d_rc_hdr_bank_desc                     [31],
+            d_rc_hdr_cheque_num                    [11],
+            d_rc_hdr_cheque_date                   [15],
+            d_rc_hdr_misc_clong_name           [101],  -- CRF-0120
+            d_rc_hdr_misc_cshort_name          [101],  -- CRF-0120
+            d_rc_hdr_misc_cadd1_desc           [61],  -- CRF-0120
+            d_rc_hdr_misc_cadd2_desc           [61],  -- CRF-0120
+            d_rc_hdr_misc_cadd3_desc           [61],  -- CRF-0120
+            d_rc_hdr_misc_czip_desc            [31],
+            d_rc_hdr_misc_long_name_ch             [101],  -- CRF-0120
+            d_rc_hdr_misc_short_name_ch            [101],  -- CRF-0120
+            d_rc_hdr_misc_add1_desc_ch             [61],  -- CRF-0120
+            d_rc_hdr_misc_add2_desc_ch             [61],  -- CRF-0120
+            d_rc_hdr_misc_add3_desc_ch             [61],  -- CRF-0120
+            d_rc_hdr_misc_zip_desc_ch              [31],
+            d_rc_hdr_tel_num                       [31],
+            d_rc_hdr_contact_name                  [101],  -- CRF-0120
+            d_rc_hdr_contact_name_title            [61],  -- CRF-0120
+            d_rc_hdr_error_flag                    [2],
+            d_rc_hdr_print_flag                    [2],
+            d_rc_hdr_posted_flag                   [2],
+            d_rc_hdr_interface_flag                [2],
+            d_rc_hdr_posted_date                   [15],
+            d_rc_hdr_posted_by_id                  [21],
+            d_rc_hdr_rowid                         [31],
+            d_sy_doc_print_flag                    [2];
+    VARCHAR  p_language_id[4];
+    VARCHAR rep_date[20],
+            comp_name[50],
+            oper_id[21],
+           d_ar_cust_long_name         [101],  -- CRF-0120
+		   d_acct_desc_bank            [65],
+		   d_acct_desc_susp            [65],
+		   d_conv_date_doc             [12],
+		   d_conv_date_bank            [12],
+		   nd_conv_fm_date             [12],
+		   nd_conv_to_date             [12];
+
+double     d_amt_local;
+
+/* This variable is used for calling post_doc (Posting acc validation)   */
+
+int  d_num_of_acc_periods, nd_no_of_decimal;
+
+/*                                                                       */ 
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int g_err_typ,
+    g_tot_print,
+    g_print_bank;
+
+char g_err_id[10],
+     g_err_msg[80],
+     g_main_acc1_code[8],
+     g_main_acc2_code[6],
+     g_dept_code[12],
+     g_product_group_code[4],
+     g_product_line_code[6],
+     g_subledger_group_code[4],
+     g_subledger_line_code[10];
+
+double g_tot,
+       g_tot_bank;
+
+/* These variables are used for calling post_doc (Posting acc validation) */
+
+int  d_curr_year;
+int  d_curr_month;
+char d_summ_flag;
+
+/*                                                                         */
+
+FILE *f1;
+
+int page_no,
+    line_no,
+    first_break;
+char filename[150];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+	strcpy(filename,WORKING_DIR);
+	strcpy(OUTPUT_FILE_NAME,argv[5]);
+	strcat(filename,OUTPUT_FILE_NAME);
+
+	//strcat(filename,"arrorlst.lis");
+
+   if (argc < 6)
+   {
+    int i = 0;
+      disp_message(ERR_MESG,"Not enough Parameters for running this program");
+      proc_exit();
+   }
+
+   strcpy(g_pgm_id,"ARRORLST");
+
+   strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+   d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   if(sql_connect() == -1)
+   {
+      disp_message(ERR_MESG,"Error in connecting to Oracle");
+      proc_exit();
+   }
+
+   /***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+   strcpy(g_pgm_date,argv[3]);
+    strcpy(g_facility_id,argv[4]);
+   set_meduser_role();
+
+       strcpy(p_language_id.arr,l_language_id.arr);
+   p_language_id.len = l_language_id.len;
+
+   nd_fm_doc_type.arr[0]    = '\0';
+   nd_fm_doc_num.arr[0]     = '\0';
+   nd_fm_doc_date.arr[0]    = '\0';
+   nd_to_doc_type.arr[0]    = '\0';
+   nd_to_doc_num.arr[0]     = '\0';
+   nd_to_doc_date.arr[0]    = '\0';
+   nd_proc_flag.arr[0]      = '\0';
+   nd_view_print_flg.arr[0] = '\0';
+   nd_bank_flag.arr[0]      = '\0';
+   nd_facility_id.arr[0] = '\0';
+
+   nd_fm_doc_type.len       = 0;
+   nd_fm_doc_num.len        = 0;
+   nd_fm_doc_date.len       = 0;
+   nd_to_doc_type.len       = 0;
+   nd_to_doc_num.len        = 0;
+   nd_to_doc_date.len       = 0;
+   nd_proc_flag.len         = 0;
+   nd_view_print_flg.len    = 0;
+   nd_bank_flag.len         = 0;
+   nd_facility_id.len       = 0;
+
+   process_rep_flg          = 0;
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID ,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5,PARAM6,PARAM8,
+                   PARAM9,PARAM10,
+                   TO_CHAR(TO_DATE(PARAM3,'YYYYDDMM'),'DD/MM/YYYY'),
+		   TO_CHAR(TO_DATE(PARAM6,'YYYYDDMM'),'DD/MM/YYYY'),
+		   PARAM11
+              INTO :nd_facility_id, :nd_fm_doc_type, :nd_fm_doc_num, :nd_fm_doc_date,
+                   :nd_to_doc_type, :nd_to_doc_num, :nd_to_doc_date,
+                   :nd_proc_flag,
+                   :nd_view_print_flg, :process_rep_flg,
+		   :nd_conv_fm_date, :nd_conv_to_date,
+		   :nd_bank_flag
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'ARRORLST'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_fm_doc_type.arr[nd_fm_doc_type.len]    = '\0';
+   nd_fm_doc_num.arr[nd_fm_doc_num.len]      = '\0';
+   nd_fm_doc_date.arr[nd_fm_doc_date.len]    = '\0';
+   nd_to_doc_type.arr[nd_to_doc_type.len]    = '\0';
+   nd_to_doc_num.arr[nd_to_doc_num.len]      = '\0';
+   nd_to_doc_date.arr[nd_to_doc_date.len]    = '\0';
+   nd_proc_flag.arr[nd_proc_flag.len]        = '\0';
+   nd_view_print_flg.arr[nd_view_print_flg.len]        = '\0';
+   nd_conv_fm_date.arr[nd_conv_fm_date.len]  = '\0';
+   nd_conv_to_date.arr[nd_conv_to_date.len]  = '\0';
+   nd_facility_id.arr[nd_facility_id.len]        = '\0';
+
+
+   start_prog_msg();
+   
+   fetch_parameter();
+   fetch_detls();
+
+   open_files();
+  
+   declare_cursor();
+    page_no=1;
+    line_no=1;
+    g_tot = g_tot_bank = 0;
+    g_tot_print = 0;
+    first_break = 1;
+   
+   put_inp_parm();
+
+   put_hdr();
+
+   init_post_acc();
+
+   while (fetch_rec())
+   {
+      get_acct_desc();
+      g_print_bank = 1;
+
+      if(line_no == 1)
+	    put_hdr();
+
+      if( (nd_bank_flag.arr[0] == 'Y') && (!same_acct()) )
+	  do_bank();
+      
+      fetch_cust_dets();
+      put_doc_hdr();
+      g_tot_print = 1;
+
+      copy_val();
+
+   }
+
+   if(nd_bank_flag.arr[0] == 'Y' && g_print_bank)
+       print_bank_tot();
+
+   print_end_of_rep();
+   fclose(f1);
+
+   end_prog_msg();
+   EXEC SQL COMMIT WORK RELEASE;
+
+}
+
+declare_cursor()
+{
+
+   EXEC SQL DECLARE CUR_RECEIPTS CURSOR FOR
+             SELECT DOC_TYPE_CODE, DOC_NUM
+               FROM AR_CASHIER
+              WHERE DOC_TYPE_CODE >= NVL(:nd_fm_doc_type,'      ')
+                AND DOC_TYPE_CODE <= NVL(:nd_to_doc_type,'~~~~~~')
+                AND DOC_NUM       >= NVL(:nd_fm_doc_num,0)
+                AND DOC_NUM       <= NVL(:nd_to_doc_num,99999999)
+                AND NVL(DOC_DATE,SYSDATE)      >= 
+                    NVL(TO_DATE(:nd_fm_doc_date,'YYYYDDMM'),to_date('00010101','YYYYDDMM'))
+                AND NVL(DOC_DATE,SYSDATE)      <= 
+                    NVL(TO_DATE(:nd_to_doc_date,'YYYYDDMM'),to_date('47123112','YYYYDDMM'))
+                AND NVL(POSTED_FLAG,'N') = 'N'
+                ORDER BY DOC_TYPE_CODE,DOC_NUM;
+
+   EXEC SQL OPEN CUR_RECEIPTS;
+
+   if (OERROR)
+         err_mesg("OPEN failed on cursor CUR_RECEIPTS",0,"");
+
+ EXEC SQL DECLARE BL_REC_HDR_CUR1 CURSOR FOR
+           SELECT DOC_TYPE_CODE,
+                  DOC_NUM,
+                  ACC_ENTITY_CODE,
+                  PARTY_TYPE_CODE,
+                  TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                  DOC_REF,
+                  CUST_CODE,
+                  MAIN_ACC1_CODE_BANK,
+                  MAIN_ACC2_CODE_BANK,
+                  SUBLEDGER_GROUP_CODE_BANK,
+                  SUBLEDGER_LINE_CODE_BANK,
+                  DEPT_CODE_BANK,
+                  PRODUCT_GROUP_CODE_BANK,
+                  PRODUCT_LINE_CODE_BANK,
+                  MAIN_ACC1_CODE_SUSP,
+                  MAIN_ACC2_CODE_SUSP,
+                  SUBLEDGER_GROUP_CODE_SUSP,
+                  SUBLEDGER_LINE_CODE_SUSP,
+                  DEPT_CODE_SUSP,
+                  PRODUCT_GROUP_CODE_SUSP,
+                  PRODUCT_LINE_CODE_SUSP,
+                  AMT_FOREIGN,
+                  AMT_LOCAL,
+                  NARRATION,
+                  POST_MONTH,
+                  POST_YEAR,
+                  CURRENCY_CODE,
+                  EXCHG_RATE,
+                  BANK_DESC,
+                  CHEQUE_NUM,
+                  TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                  MISC_CUST_LONG_NAME,
+                  MISC_CUST_SHORT_NAME,
+                  MISC_CUST_ADD1_DESC,
+                  MISC_CUST_ADD2_DESC,
+                  MISC_CUST_ADD3_DESC,
+                  MISC_CUST_ZIP_DESC,
+                  MISC_CUST_LONG_NAME_CHINESE,
+                  MISC_CUST_SHORT_NAME_CHINESE,
+                  MISC_CUST_ADD1_DESC_CHINESE,
+                  MISC_CUST_ADD2_DESC_CHINESE,
+                  MISC_CUST_ADD3_DESC_CHINESE,
+                  MISC_CUST_ZIP_DESC_CHINESE,
+                  TEL_NUM,
+                  CONTACT_NAME,
+                  CONTACT_NAME_TITLE,
+                  PRINT_FLAG,
+                  ROWID
+             FROM AR_CASHIER
+             WHERE DOC_TYPE_CODE >= NVL(:nd_fm_doc_type,'      ')
+                AND DOC_TYPE_CODE <= NVL(:nd_to_doc_type,'~~~~~~')
+                AND DOC_NUM       >= NVL(:nd_fm_doc_num,0)
+                AND DOC_NUM       <= NVL(:nd_to_doc_num,99999999)
+                AND NVL(DOC_DATE,SYSDATE)      >= 
+                    NVL(TO_DATE(:nd_fm_doc_date,'YYYYDDMM'),to_date('00010101','YYYYDDMM'))
+                AND NVL(DOC_DATE,SYSDATE)      <= 
+                    NVL(TO_DATE(:nd_to_doc_date,'YYYYDDMM'),to_date('47123112','YYYYDDMM'))
+                AND NVL(POSTED_FLAG,'N') = 'N'
+                ORDER BY DOC_TYPE_CODE,DOC_NUM;
+
+
+ EXEC SQL DECLARE BL_REC_HDR_CUR2 CURSOR FOR
+           SELECT DOC_TYPE_CODE,
+                  DOC_NUM,
+                  ACC_ENTITY_CODE,
+                  PARTY_TYPE_CODE,
+                  TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                  DOC_REF,
+                  CUST_CODE,
+                  MAIN_ACC1_CODE_BANK,
+                  MAIN_ACC2_CODE_BANK,
+                  SUBLEDGER_GROUP_CODE_BANK,
+                  SUBLEDGER_LINE_CODE_BANK,
+                  DEPT_CODE_BANK,
+                  PRODUCT_GROUP_CODE_BANK,
+                  PRODUCT_LINE_CODE_BANK,
+                  MAIN_ACC1_CODE_SUSP,
+                  MAIN_ACC2_CODE_SUSP,
+                  SUBLEDGER_GROUP_CODE_SUSP,
+                  SUBLEDGER_LINE_CODE_SUSP,
+                  DEPT_CODE_SUSP,
+                  PRODUCT_GROUP_CODE_SUSP,
+                  PRODUCT_LINE_CODE_SUSP,
+                  AMT_FOREIGN,
+                  AMT_LOCAL,
+                  NARRATION,
+                  POST_MONTH,
+                  POST_YEAR,
+                  CURRENCY_CODE,
+                  EXCHG_RATE,
+                  BANK_DESC,
+                  CHEQUE_NUM,
+                  TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                  MISC_CUST_LONG_NAME,
+                  MISC_CUST_SHORT_NAME,
+                  MISC_CUST_ADD1_DESC,
+                  MISC_CUST_ADD2_DESC,
+                  MISC_CUST_ADD3_DESC,
+                  MISC_CUST_ZIP_DESC,
+                  MISC_CUST_LONG_NAME_CHINESE,
+                  MISC_CUST_SHORT_NAME_CHINESE,
+                  MISC_CUST_ADD1_DESC_CHINESE,
+                  MISC_CUST_ADD2_DESC_CHINESE,
+                  MISC_CUST_ADD3_DESC_CHINESE,
+                  MISC_CUST_ZIP_DESC_CHINESE,
+                  TEL_NUM,
+                  CONTACT_NAME,
+                  CONTACT_NAME_TITLE,
+                  PRINT_FLAG,
+                  ROWID
+             FROM AR_CASHIER
+              WHERE DOC_TYPE_CODE >= NVL(:nd_fm_doc_type,'      ')
+                AND DOC_TYPE_CODE <= NVL(:nd_to_doc_type,'~~~~~~')
+                AND DOC_NUM       >= NVL(:nd_fm_doc_num,0)
+                AND DOC_NUM       <= NVL(:nd_to_doc_num,99999999)
+                AND NVL(DOC_DATE,SYSDATE)      >= 
+                    NVL(TO_DATE(:nd_fm_doc_date,'YYYYDDMM'),to_date('00010101','YYYYDDMM'))
+                AND NVL(DOC_DATE,SYSDATE)      <= 
+                    NVL(TO_DATE(:nd_to_doc_date,'YYYYDDMM'),to_date('47123112','YYYYDDMM'))
+                AND NVL(POSTED_FLAG,'N') = 'N'
+                ORDER BY MAIN_ACC1_CODE_BANK,
+			 MAIN_ACC2_CODE_BANK,
+			 DEPT_CODE_BANK,
+			 PRODUCT_GROUP_CODE_BANK,
+			 PRODUCT_LINE_CODE_BANK,
+			 SUBLEDGER_GROUP_CODE_BANK,
+			 SUBLEDGER_LINE_CODE_BANK,
+			 DOC_TYPE_CODE,DOC_NUM;
+
+   if(nd_bank_flag.arr[0] == 'Y') {
+
+       EXEC SQL OPEN BL_REC_HDR_CUR2;
+   }
+   else  {
+
+       EXEC SQL OPEN BL_REC_HDR_CUR1;
+   }
+
+   if(OERROR)
+       err_mesg("OPEN failed on CURSOR BL_REC_HDR_CUR",0,"");
+
+
+   EXEC SQL DECLARE SY_ACC_ENTITY_DOC_TYPE_CUR CURSOR FOR
+             SELECT NVL(DOC_PRINT_FLAG,'X')
+               FROM GL_ACC_ENTITY_DOC_TYPE_VW
+              WHERE DOC_TYPE_CODE   = :d_rc_hdr_doc_type_code;
+    
+    EXEC SQL DECLARE AR_CUSTOMER_CUR CURSOR FOR
+              SELECT DECODE(CHINESE_REPORTING_FLAG,'Y',
+                     LONG_NAME_CHINESE,LONG_NAME)
+                FROM AR_CUSTOMER
+               WHERE CUST_CODE = :d_rc_hdr_cust_code;
+
+}
+
+
+fetch_rec()
+{
+   d_rc_hdr_doc_type_code.arr[0]     = '\0';
+   d_rc_hdr_doc_num.arr[0]           = '\0';
+
+   d_rc_hdr_doc_type_code.len        = 0;
+   d_rc_hdr_doc_num.len              = 0;
+
+d_rc_hdr_acc_entity_code.arr[0]           = '\0';
+d_rc_hdr_party_type_code.arr[0]           = '\0';
+d_rc_hdr_doc_date.arr[0]                  = '\0';
+d_rc_hdr_doc_ref.arr[0]                   = '\0';
+d_rc_hdr_cust_code.arr[0]                 = '\0';
+d_rc_hdr_main_acc1_code_bk.arr[0]       = '\0';
+d_rc_hdr_main_acc2_code_bk.arr[0]       = '\0';
+d_rc_hdr_subl_group_code_bk.arr[0]      = '\0';
+d_rc_hdr_subl_line_code_bk.arr[0]       = '\0';
+d_rc_hdr_dept_code_bk.arr[0]            = '\0';
+d_rc_hdr_pr_group_code_bk.arr[0]        = '\0';
+d_rc_hdr_pr_line_code_bk.arr[0]         = '\0';
+d_rc_hdr_main_acc1_code_sp.arr[0]       = '\0';
+d_rc_hdr_main_acc2_code_sp.arr[0]       = '\0';
+d_rc_hdr_subl_group_code_sp.arr[0]      = '\0';
+d_rc_hdr_subl_line_code_sp.arr[0]       = '\0';
+d_rc_hdr_dept_code_sp.arr[0]            = '\0';
+d_rc_hdr_pr_group_code_sp.arr[0]        = '\0';
+d_rc_hdr_pr_line_code_sp.arr[0]         = '\0';
+d_rc_hdr_amt_foreign.arr[0]               = '\0';
+d_rc_hdr_amt_local.arr[0]                 = '\0';
+d_rc_hdr_narration.arr[0]                 = '\0';
+d_rc_hdr_post_month.arr[0]                = '\0';
+d_rc_hdr_post_year.arr[0]                 = '\0';
+d_rc_hdr_currency_code.arr[0]             = '\0';
+d_rc_hdr_exchg_rate.arr[0]                = '\0';
+d_rc_hdr_bank_desc.arr[0]                 = '\0';
+d_rc_hdr_cheque_num.arr[0]                = '\0';
+d_rc_hdr_cheque_date.arr[0]               = '\0';
+d_rc_hdr_misc_clong_name.arr[0]       = '\0';
+d_rc_hdr_misc_cshort_name.arr[0]      = '\0';
+d_rc_hdr_misc_cadd1_desc.arr[0]       = '\0';
+d_rc_hdr_misc_cadd2_desc.arr[0]       = '\0';
+d_rc_hdr_misc_cadd3_desc.arr[0]       = '\0';
+d_rc_hdr_misc_czip_desc.arr[0]        = '\0';
+d_rc_hdr_misc_long_name_ch.arr[0]         = '\0';
+d_rc_hdr_misc_short_name_ch.arr[0]        = '\0';
+d_rc_hdr_misc_add1_desc_ch.arr[0]         = '\0';
+d_rc_hdr_misc_add2_desc_ch.arr[0]         = '\0';
+d_rc_hdr_misc_add3_desc_ch.arr[0]         = '\0';
+d_rc_hdr_misc_zip_desc_ch.arr[0]          = '\0';
+d_rc_hdr_tel_num.arr[0]                   = '\0';
+d_rc_hdr_contact_name.arr[0]              = '\0';
+d_rc_hdr_contact_name_title.arr[0]        = '\0';
+d_rc_hdr_rowid.arr[0]                     = '\0';
+d_rc_hdr_print_flag.arr[0]                = '\0';
+
+
+d_rc_hdr_acc_entity_code.len               = 0;
+d_rc_hdr_party_type_code.len               = 0;
+d_rc_hdr_doc_date.len                      = 0;
+d_rc_hdr_doc_ref.len                       = 0;
+d_rc_hdr_cust_code.len                     = 0;
+d_rc_hdr_main_acc1_code_bk.len           = 0;
+d_rc_hdr_main_acc2_code_bk.len           = 0;
+d_rc_hdr_subl_group_code_bk.len          = 0;
+d_rc_hdr_subl_line_code_bk.len           = 0;
+d_rc_hdr_dept_code_bk.len                = 0;
+d_rc_hdr_pr_group_code_bk.len            = 0;
+d_rc_hdr_pr_line_code_bk.len             = 0;
+d_rc_hdr_main_acc1_code_sp.len           = 0;
+d_rc_hdr_main_acc2_code_sp.len           = 0;
+d_rc_hdr_subl_group_code_sp.len          = 0;
+d_rc_hdr_subl_line_code_sp.len           = 0;
+d_rc_hdr_dept_code_sp.len                = 0;
+d_rc_hdr_pr_group_code_sp.len            = 0;
+d_rc_hdr_pr_line_code_sp.len             = 0;
+d_rc_hdr_amt_foreign.len                   = 0;
+d_rc_hdr_amt_local.len                     = 0;
+d_rc_hdr_narration.len                     = 0;
+d_rc_hdr_post_month.len                    = 0;
+d_rc_hdr_post_year.len                     = 0;
+d_rc_hdr_currency_code.len                 = 0;
+d_rc_hdr_exchg_rate.len                    = 0;
+d_rc_hdr_bank_desc.len                     = 0;
+d_rc_hdr_cheque_num.len                    = 0;
+d_rc_hdr_cheque_date.len                   = 0;
+d_rc_hdr_misc_clong_name.len           = 0;
+d_rc_hdr_misc_cshort_name.len          = 0;
+d_rc_hdr_misc_cadd1_desc.len           = 0;
+d_rc_hdr_misc_cadd2_desc.len           = 0;
+d_rc_hdr_misc_cadd3_desc.len           = 0;
+d_rc_hdr_misc_czip_desc.len            = 0;
+d_rc_hdr_misc_long_name_ch.len             = 0;
+d_rc_hdr_misc_short_name_ch.len            = 0;
+d_rc_hdr_misc_add1_desc_ch.len             = 0;
+d_rc_hdr_misc_add2_desc_ch.len             = 0;
+d_rc_hdr_misc_add3_desc_ch.len             = 0;
+d_rc_hdr_misc_zip_desc_ch.len              = 0;
+d_rc_hdr_tel_num.len                       = 0;
+d_rc_hdr_contact_name.len                  = 0;
+d_rc_hdr_contact_name_title.len            = 0;
+d_rc_hdr_print_flag.len                    = 0;
+d_rc_hdr_rowid.len                         = 0;
+
+
+if(nd_bank_flag.arr[0] == 'Y') {
+   EXEC SQL FETCH BL_REC_HDR_CUR2
+             INTO :d_rc_hdr_doc_type_code, 
+                  :d_rc_hdr_doc_num,
+                  :d_rc_hdr_acc_entity_code,
+                  :d_rc_hdr_party_type_code,
+                  :d_rc_hdr_doc_date,
+                  :d_rc_hdr_doc_ref,
+                  :d_rc_hdr_cust_code,
+                  :d_rc_hdr_main_acc1_code_bk,
+                  :d_rc_hdr_main_acc2_code_bk,
+                  :d_rc_hdr_subl_group_code_bk,
+                  :d_rc_hdr_subl_line_code_bk,
+                  :d_rc_hdr_dept_code_bk,
+                  :d_rc_hdr_pr_group_code_bk,
+                  :d_rc_hdr_pr_line_code_bk,
+                  :d_rc_hdr_main_acc1_code_sp,
+                  :d_rc_hdr_main_acc2_code_sp,
+                  :d_rc_hdr_subl_group_code_sp,
+                  :d_rc_hdr_subl_line_code_sp,
+                  :d_rc_hdr_dept_code_sp,
+                  :d_rc_hdr_pr_group_code_sp,
+                  :d_rc_hdr_pr_line_code_sp,
+                  :d_rc_hdr_amt_foreign,
+                  :d_rc_hdr_amt_local,
+                  :d_rc_hdr_narration,
+                  :d_rc_hdr_post_month,
+                  :d_rc_hdr_post_year,
+                  :d_rc_hdr_currency_code,
+                  :d_rc_hdr_exchg_rate,
+                  :d_rc_hdr_bank_desc,
+                  :d_rc_hdr_cheque_num,
+                  :d_rc_hdr_cheque_date,
+                  :d_rc_hdr_misc_clong_name,
+                  :d_rc_hdr_misc_cshort_name,
+                  :d_rc_hdr_misc_cadd1_desc,
+                  :d_rc_hdr_misc_cadd2_desc,
+                  :d_rc_hdr_misc_cadd3_desc,
+                  :d_rc_hdr_misc_czip_desc,
+                  :d_rc_hdr_misc_long_name_ch,
+                  :d_rc_hdr_misc_short_name_ch,
+                  :d_rc_hdr_misc_add1_desc_ch,
+                  :d_rc_hdr_misc_add2_desc_ch,
+                  :d_rc_hdr_misc_add3_desc_ch,
+                  :d_rc_hdr_misc_zip_desc_ch,
+                  :d_rc_hdr_tel_num,
+                  :d_rc_hdr_contact_name,
+                  :d_rc_hdr_contact_name_title,
+                  :d_rc_hdr_print_flag,
+                  :d_rc_hdr_rowid;
+}
+else {
+   EXEC SQL FETCH BL_REC_HDR_CUR1
+             INTO :d_rc_hdr_doc_type_code, 
+                  :d_rc_hdr_doc_num,
+                  :d_rc_hdr_acc_entity_code,
+                  :d_rc_hdr_party_type_code,
+                  :d_rc_hdr_doc_date,
+                  :d_rc_hdr_doc_ref,
+                  :d_rc_hdr_cust_code,
+                  :d_rc_hdr_main_acc1_code_bk,
+                  :d_rc_hdr_main_acc2_code_bk,
+                  :d_rc_hdr_subl_group_code_bk,
+                  :d_rc_hdr_subl_line_code_bk,
+                  :d_rc_hdr_dept_code_bk,
+                  :d_rc_hdr_pr_group_code_bk,
+                  :d_rc_hdr_pr_line_code_bk,
+                  :d_rc_hdr_main_acc1_code_sp,
+                  :d_rc_hdr_main_acc2_code_sp,
+                  :d_rc_hdr_subl_group_code_sp,
+                  :d_rc_hdr_subl_line_code_sp,
+                  :d_rc_hdr_dept_code_sp,
+                  :d_rc_hdr_pr_group_code_sp,
+                  :d_rc_hdr_pr_line_code_sp,
+                  :d_rc_hdr_amt_foreign,
+                  :d_rc_hdr_amt_local,
+                  :d_rc_hdr_narration,
+                  :d_rc_hdr_post_month,
+                  :d_rc_hdr_post_year,
+                  :d_rc_hdr_currency_code,
+                  :d_rc_hdr_exchg_rate,
+                  :d_rc_hdr_bank_desc,
+                  :d_rc_hdr_cheque_num,
+                  :d_rc_hdr_cheque_date,
+                  :d_rc_hdr_misc_clong_name,
+                  :d_rc_hdr_misc_cshort_name,
+                  :d_rc_hdr_misc_cadd1_desc,
+                  :d_rc_hdr_misc_cadd2_desc,
+                  :d_rc_hdr_misc_cadd3_desc,
+                  :d_rc_hdr_misc_czip_desc,
+                  :d_rc_hdr_misc_long_name_ch,
+                  :d_rc_hdr_misc_short_name_ch,
+                  :d_rc_hdr_misc_add1_desc_ch,
+                  :d_rc_hdr_misc_add2_desc_ch,
+                  :d_rc_hdr_misc_add3_desc_ch,
+                  :d_rc_hdr_misc_zip_desc_ch,
+                  :d_rc_hdr_tel_num,
+                  :d_rc_hdr_contact_name,
+                  :d_rc_hdr_contact_name_title,
+                  :d_rc_hdr_print_flag,
+                  :d_rc_hdr_rowid;
+}
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor BL_REC_HDR_CUR",0,"");
+
+   if (LAST_ROW)
+       return(0);
+
+   d_rc_hdr_doc_type_code.arr[d_rc_hdr_doc_type_code.len]     = '\0';
+   d_rc_hdr_doc_num.arr[d_rc_hdr_doc_num.len]                 = '\0';
+
+d_rc_hdr_acc_entity_code.arr[d_rc_hdr_acc_entity_code.len]             = '\0';
+d_rc_hdr_party_type_code.arr[d_rc_hdr_party_type_code.len]             = '\0';
+d_rc_hdr_doc_date.arr[d_rc_hdr_doc_date.len]                           = '\0';
+d_rc_hdr_doc_ref.arr[d_rc_hdr_doc_ref.len]                             = '\0';
+d_rc_hdr_cust_code.arr[d_rc_hdr_cust_code.len]                         = '\0';
+
+d_rc_hdr_main_acc1_code_bk.arr[d_rc_hdr_main_acc1_code_bk.len]     = '\0';
+d_rc_hdr_main_acc2_code_bk.arr[d_rc_hdr_main_acc2_code_bk.len]     = '\0';
+d_rc_hdr_subl_group_code_bk.arr[d_rc_hdr_subl_group_code_bk.len]   = '\0';
+d_rc_hdr_subl_line_code_bk.arr[d_rc_hdr_subl_line_code_bk.len]     = '\0';
+d_rc_hdr_dept_code_bk.arr[d_rc_hdr_dept_code_bk.len]               = '\0';
+d_rc_hdr_pr_group_code_bk.arr[d_rc_hdr_pr_group_code_bk.len]       = '\0';
+d_rc_hdr_pr_line_code_bk.arr[d_rc_hdr_pr_line_code_bk.len]         = '\0';
+
+d_rc_hdr_main_acc1_code_sp.arr[d_rc_hdr_main_acc1_code_sp.len]     = '\0';
+d_rc_hdr_main_acc2_code_sp.arr[d_rc_hdr_main_acc2_code_sp.len]     = '\0';
+d_rc_hdr_subl_group_code_sp.arr[d_rc_hdr_subl_group_code_sp.len]   = '\0';
+d_rc_hdr_subl_line_code_sp.arr[d_rc_hdr_subl_line_code_sp.len]     = '\0';
+d_rc_hdr_dept_code_sp.arr[d_rc_hdr_dept_code_sp.len]               = '\0';
+d_rc_hdr_pr_group_code_sp.arr[d_rc_hdr_pr_group_code_sp.len]       = '\0';
+d_rc_hdr_pr_line_code_sp.arr[d_rc_hdr_pr_line_code_sp.len]         = '\0';
+
+d_rc_hdr_amt_foreign.arr[d_rc_hdr_amt_foreign.len]                     = '\0';
+d_rc_hdr_amt_local.arr[d_rc_hdr_amt_local.len]                         = '\0';
+d_rc_hdr_narration.arr[d_rc_hdr_narration.len]                         = '\0';
+d_rc_hdr_post_month.arr[d_rc_hdr_post_month.len]                       = '\0';
+d_rc_hdr_post_year.arr[d_rc_hdr_post_year.len]                         = '\0';
+d_rc_hdr_currency_code.arr[d_rc_hdr_currency_code.len]                 = '\0';
+d_rc_hdr_exchg_rate.arr[d_rc_hdr_exchg_rate.len]                       = '\0';
+d_rc_hdr_bank_desc.arr[d_rc_hdr_bank_desc.len]                         = '\0';
+d_rc_hdr_cheque_num.arr[d_rc_hdr_cheque_num.len]                       = '\0';
+d_rc_hdr_cheque_date.arr[d_rc_hdr_cheque_date.len]                     = '\0';
+d_rc_hdr_misc_clong_name.arr[d_rc_hdr_misc_clong_name.len]     = '\0';
+d_rc_hdr_misc_cshort_name.arr[d_rc_hdr_misc_cshort_name.len]   = '\0';
+d_rc_hdr_misc_cadd1_desc.arr[d_rc_hdr_misc_cadd1_desc.len]     = '\0';
+d_rc_hdr_misc_cadd2_desc.arr[d_rc_hdr_misc_cadd2_desc.len]     = '\0';
+d_rc_hdr_misc_cadd3_desc.arr[d_rc_hdr_misc_cadd3_desc.len]     = '\0';
+d_rc_hdr_misc_czip_desc.arr[d_rc_hdr_misc_czip_desc.len]       = '\0';
+d_rc_hdr_misc_long_name_ch.arr[d_rc_hdr_misc_long_name_ch.len]         = '\0';
+d_rc_hdr_misc_short_name_ch.arr[d_rc_hdr_misc_short_name_ch.len]       = '\0';
+d_rc_hdr_misc_add1_desc_ch.arr[d_rc_hdr_misc_add1_desc_ch.len]         = '\0';
+d_rc_hdr_misc_add2_desc_ch.arr[d_rc_hdr_misc_add2_desc_ch.len]         = '\0';
+d_rc_hdr_misc_add3_desc_ch.arr[d_rc_hdr_misc_add3_desc_ch.len]         = '\0';
+d_rc_hdr_misc_zip_desc_ch.arr[d_rc_hdr_misc_zip_desc_ch.len]           = '\0';
+d_rc_hdr_tel_num.arr[d_rc_hdr_tel_num.len]                             = '\0';
+d_rc_hdr_contact_name.arr[d_rc_hdr_contact_name.len]                   = '\0';
+d_rc_hdr_contact_name_title.arr[d_rc_hdr_contact_name_title.len]       = '\0';
+d_rc_hdr_print_flag.arr[d_rc_hdr_print_flag.len]                       = '\0';
+d_rc_hdr_rowid.arr[d_rc_hdr_rowid.len]                                 = '\0';
+
+return(1);
+
+}
+
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+fetch_parameter()
+{
+
+     EXEC SQL SELECT CURRENT_ACC_YEAR,CURRENT_ACC_MONTH,
+                     PRIOR_POSTING_ALLOW_FLAG,
+                     NVL(SUMMARY_PROCESS_FLAG,'X') 
+                INTO :curr_acc_year,    :curr_acc_month,
+                     :prior_post_allow, :gl_summ_pro_flag
+                FROM GL_PARAMETER;
+
+     if (OERROR)
+         err_mesg("SELECT failed on table GL_PARAMETER",0,"");
+
+     curr_acc_year.arr[curr_acc_year.len]       = '\0';
+     curr_acc_month.arr[curr_acc_month.len]     = '\0';
+     prior_post_allow.arr[prior_post_allow.len] = '\0';
+     gl_summ_pro_flag.arr[gl_summ_pro_flag.len] = '\0';
+
+     d_num_of_acc_periods = 0;
+
+     EXEC SQL SELECT NUM_OF_ACC_PERIODS , ACC_ENTITY_CODE,
+	                 NO_OF_DECIMAL
+                INTO :d_num_of_acc_periods , :nd_acc_entity_code ,
+				     :nd_no_of_decimal
+              FROM SY_ACC_ENTITY
+			  where   ACC_ENTITY_ID = :nd_facility_id;
+
+     if (OERROR)
+        err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+d_curr_year  = atoi(curr_acc_year.arr);
+d_curr_month = atoi(curr_acc_month.arr);
+d_summ_flag  = gl_summ_pro_flag.arr[0];
+
+} 
+
+ltrim(l_str)
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+
+fetch_detls()
+{
+    EXEC SQL SELECT ACCOUNTING_NAME,
+		    TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+	     INTO   :comp_name,
+		    :rep_date,
+		    :oper_id
+	     FROM   SY_ACC_ENTITY
+		 where   ACC_ENTITY_ID = :nd_facility_id;;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len] = '\0';
+    oper_id.arr[oper_id.len] = '\0';
+
+
+}
+
+open_files()
+{
+   char		txt_msg[101];
+   if ((f1 = fopen(filename,"w")) == NULL)
+   {
+        sprintf(txt_msg,"Error While Opening File %s",filename);
+		err_mesg(txt_msg,0,"");
+		//err_mesg("\nError while opening File arrorpst.lis\n",0,"");
+        exit(0);
+   }
+
+}
+
+
+chk_break(nol) 
+int nol;
+{
+
+	if(line_no+nol >= 55) {
+           fprintf(f1,"");
+           line_no = 1;
+           ++page_no;
+	   put_hdr();
+	}
+
+}
+
+
+put_hdr()
+{
+  void print_hospital_name();
+/*
+    fprintf(f1,"MDL : AR                                       %30s                                      %s\n",comp_name.arr,rep_date.arr);
+*/
+    print_hospital_name(132,"AR",comp_name.arr,rep_date.arr);
+    fprintf(f1,"OPR : %s\n",oper_id.arr);
+
+    fprintf(f1,"REP : ARRORLST                                        CASHIER RECEIPTS - EDIT LIST                                       PAGE : %4d\n",page_no);
+
+    fprintf(f1,"------------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f1,"DOCUMENT  DOCUMENT    DOCUMENT     POST       DOCUMENT          CUSTOMER   CUSTOMER NAME                                   DOCUMENT \n");
+    fprintf(f1,"TYPE        NUMBER    DATE         MTH/YR     REFERENCE         CODE                                                         AMOUNT \n");
+    fprintf(f1,"------------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f1,"\n"); 
+
+    line_no=8;
+
+}
+
+put_doc_hdr()
+{
+
+    char s_amt[20];
+
+    d_amt_local             = 0;
+    d_conv_date_doc.arr[0]  = '\0';
+    d_conv_date_bank.arr[0] = '\0';
+
+    EXEC SQL SELECT TO_NUMBER(:d_rc_hdr_amt_local),
+		    TO_CHAR(TO_DATE(:d_rc_hdr_doc_date,'DD/MM/YYYY'),'DD/MM/YYYY'),
+		    TO_CHAR(TO_DATE(:d_rc_hdr_cheque_date,'DD/MM/YYYY'),'DD/MM/YYYY')
+	     INTO   :d_amt_local,
+		    :d_conv_date_doc,
+		    :d_conv_date_bank
+	     FROM   DUAL;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table DUAL",0,"");
+
+    d_conv_date_doc.arr[d_conv_date_doc.len] = '\0';
+    d_conv_date_bank.arr[d_conv_date_bank.len] = '\0';
+
+    g_tot += d_amt_local;
+    g_tot_bank += d_amt_local;
+ 
+    if (nd_no_of_decimal == 3)
+	   sprintf(s_amt,"%15.3f",d_amt_local);
+    else
+	   sprintf(s_amt,"%15.2f",d_amt_local);
+    format_amt(s_amt,nd_no_of_decimal);
+
+    chk_break(4); 
+
+    fprintf(f1,"%-8s  %8s    %-12s%2s/%4s",d_rc_hdr_doc_type_code.arr,
+	    d_rc_hdr_doc_num.arr,d_conv_date_doc.arr,
+	    d_rc_hdr_post_month.arr,d_rc_hdr_post_year.arr);
+
+    fprintf(f1,"     %-15s   %-10s %-40s %15s\n",d_rc_hdr_doc_ref.arr,
+	    d_rc_hdr_cust_code.arr,d_ar_cust_long_name.arr,s_amt);
+    fprintf(f1,"CHEQUE NO    : %-10s DATED : %-10s DRAWN ON BANK : %-30s\n",
+	    d_rc_hdr_cheque_num.arr,d_conv_date_bank.arr,
+	    d_rc_hdr_bank_desc.arr);
+
+    if(nd_bank_flag.arr[0] != 'Y') {
+        fprintf(f1,"BANK A/C     : %s-%s %s %s-%s %s-%s   DESC : %s\n",
+        d_rc_hdr_main_acc1_code_bk.arr, d_rc_hdr_main_acc2_code_bk.arr ,
+        d_rc_hdr_dept_code_bk.arr ,d_rc_hdr_pr_group_code_bk.arr,
+        d_rc_hdr_pr_line_code_bk.arr,d_rc_hdr_subl_group_code_bk.arr, 
+        d_rc_hdr_subl_line_code_bk.arr,d_acct_desc_bank.arr);
+    }
+
+    fprintf(f1,"SUSPENSE A/C : %s-%s %s %s-%s %s-%s   DESC : %s\n",
+    d_rc_hdr_main_acc1_code_sp.arr, d_rc_hdr_main_acc2_code_sp.arr ,
+    d_rc_hdr_dept_code_sp.arr ,d_rc_hdr_pr_group_code_sp.arr,
+    d_rc_hdr_pr_line_code_sp.arr,d_rc_hdr_subl_group_code_sp.arr, 
+    d_rc_hdr_subl_line_code_sp.arr,d_acct_desc_susp.arr);
+   
+   fprintf(f1,"NARRATION    : %s\n",d_rc_hdr_narration.arr); 
+   if(nd_bank_flag.arr[0] != 'Y') 
+       line_no += 7;
+   else
+       line_no += 6;
+
+    fprintf(f1,"\n\n");
+
+
+}
+
+
+put_inp_parm()
+{
+    void print_hospital_name();
+	/*
+	fprintf(f1,"MDL : AR                                       %30s                                      %s\n",comp_name.arr,rep_date.arr);
+    */
+	print_hospital_name(132,"AR",comp_name.arr,rep_date.arr);
+	fprintf(f1,"OPR : %s\n",oper_id.arr);
+    fprintf(f1,"REP : ARRORLST                                        CASHIER RECEIPTS - EDIT LIST                                       PAGE : %4d\n",page_no);
+    fprintf(f1,"------------------------------------------------------------------------------------------------------------------------------------\n");
+
+
+    fprintf(f1,"\n\n"); 
+    fprintf(f1,"\n\n");
+    fprintf(f1,"\tINPUT PARAMETERS\n");
+    fprintf(f1,"\t----------------\n\n");
+    fprintf(f1,"\t\tDOCUMENT TYPE   FROM  : %s\n",nd_fm_doc_type.arr);
+    fprintf(f1,"\t\t                TO    : %s\n\n",nd_to_doc_type.arr);
+    fprintf(f1,"\t\tDOCUMENT NUMBER FROM  : %s\n",nd_fm_doc_num.arr);
+    fprintf(f1,"\t\t                TO    : %s\n\n",nd_to_doc_num.arr);
+    fprintf(f1,"\t\tDOCUMENT DATE   FROM  : %s\n",nd_conv_fm_date.arr);
+    fprintf(f1,"\t\t                TO    : %s\n\n",nd_conv_to_date.arr);
+    fprintf(f1,"\t\tSORT BY BANK          : %c\n\n",nd_bank_flag.arr[0]);
+    fprintf(f1,"");
+    ++page_no;
+
+
+}
+
+
+fetch_cust_dets()
+{
+    EXEC SQL OPEN AR_CUSTOMER_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR",0,"");
+
+    d_ar_cust_long_name.arr[0]          = '\0';
+    d_ar_cust_long_name.len             = 0;
+
+    EXEC SQL FETCH AR_CUSTOMER_CUR
+              INTO :d_ar_cust_long_name;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR",0,"");
+
+     d_ar_cust_long_name.arr[d_ar_cust_long_name.len] = '\0';
+
+}
+
+get_acct_desc()
+{
+
+    d_acct_desc_bank.arr[0] = '\0';
+    d_acct_desc_susp.arr[0] = '\0';
+
+    EXEC SQL SELECT CONCAT_POST_ACC_DESC
+	     INTO   :d_acct_desc_bank
+	     FROM   GL_POSTING_ACC
+	     WHERE  MAIN_ACC1_CODE       =  :d_rc_hdr_main_acc1_code_bk
+	     AND    MAIN_ACC2_CODE       =  :d_rc_hdr_main_acc2_code_bk
+	     AND    DEPT_CODE            =  :d_rc_hdr_dept_code_bk
+	     AND    PRODUCT_GROUP_CODE   =  :d_rc_hdr_pr_group_code_bk
+	     AND    PRODUCT_LINE_CODE    =  :d_rc_hdr_pr_line_code_bk
+	     AND    SUBLEDGER_GROUP_CODE =  :d_rc_hdr_subl_group_code_bk
+	     AND    SUBLEDGER_LINE_CODE  =  :d_rc_hdr_subl_line_code_bk;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table GL_POSTING_ACC",0,"");
+
+
+    d_acct_desc_bank.arr[d_acct_desc_bank.len] = '\0';
+
+    EXEC SQL SELECT CONCAT_POST_ACC_DESC
+	     INTO   :d_acct_desc_susp
+	     FROM   GL_POSTING_ACC
+	     WHERE  MAIN_ACC1_CODE       =  :d_rc_hdr_main_acc1_code_sp
+	     AND    MAIN_ACC2_CODE       =  :d_rc_hdr_main_acc2_code_sp
+	     AND    DEPT_CODE            =  :d_rc_hdr_dept_code_sp
+	     AND    PRODUCT_GROUP_CODE   =  :d_rc_hdr_pr_group_code_sp
+	     AND    PRODUCT_LINE_CODE    =  :d_rc_hdr_pr_line_code_sp
+	     AND    SUBLEDGER_GROUP_CODE =  :d_rc_hdr_subl_group_code_sp
+	     AND    SUBLEDGER_LINE_CODE  =  :d_rc_hdr_subl_line_code_sp;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table GL_POSTING_ACC",0,"");
+
+
+    d_acct_desc_susp.arr[d_acct_desc_susp.len] = '\0';
+
+}
+
+print_end_of_rep()
+{
+    char s_amt[20];
+
+    if (nd_no_of_decimal == 3)
+	   sprintf(s_amt,"%15.3f",g_tot);
+    else
+       sprintf(s_amt,"%15.2f",g_tot);
+	
+	format_amt(s_amt,nd_no_of_decimal);
+
+
+    if(g_tot_print) {
+        chk_break(3);
+    
+        fprintf(f1,"\n\n                                                                                    TOTAL  ------>                  %15s\n",s_amt);
+        fprintf(f1,"\n\n                                              ** END OF REPORT **                                                               \n");
+    }
+
+}
+
+copy_val()
+{
+    strcpy(g_main_acc1_code,       d_rc_hdr_main_acc1_code_bk.arr);
+    strcpy(g_main_acc2_code,       d_rc_hdr_main_acc2_code_bk.arr);
+    strcpy(g_dept_code,            d_rc_hdr_dept_code_bk.arr);
+    strcpy(g_product_group_code,   d_rc_hdr_pr_group_code_bk.arr);
+    strcpy(g_product_line_code,    d_rc_hdr_pr_line_code_bk.arr);
+    strcpy(g_subledger_group_code, d_rc_hdr_subl_group_code_bk.arr);
+    strcpy(g_subledger_line_code,  d_rc_hdr_subl_line_code_bk.arr);
+}
+
+same_acct()
+{
+
+    if(!strcmp(g_main_acc1_code,       d_rc_hdr_main_acc1_code_bk.arr) &&
+       !strcmp(g_main_acc2_code,       d_rc_hdr_main_acc2_code_bk.arr) &&
+       !strcmp(g_dept_code,            d_rc_hdr_dept_code_bk.arr) &&
+       !strcmp(g_product_group_code,   d_rc_hdr_pr_group_code_bk.arr) &&
+       !strcmp(g_product_line_code,    d_rc_hdr_pr_line_code_bk.arr) &&
+       !strcmp(g_subledger_group_code, d_rc_hdr_subl_group_code_bk.arr) &&
+       !strcmp(g_subledger_line_code,  d_rc_hdr_subl_line_code_bk.arr)
+      ) 
+	return 1;
+    else
+	return 0;
+}
+
+
+init_post_acc()
+{
+
+        g_main_acc1_code[0] = '\0';
+        g_main_acc2_code[0]= '\0';
+        g_dept_code[0]= '\0';
+        g_product_group_code[0]= '\0';
+        g_product_line_code[0]= '\0';
+        g_subledger_group_code[0]= '\0';
+        g_subledger_line_code[0]= '\0';
+
+}
+
+do_bank()
+{
+
+
+    if(!first_break) 
+	print_bank_tot();
+
+
+    chk_break(1);
+
+    fprintf(f1,"BANK A/C     : %s-%s %s %s-%s %s-%s   DESC : %s\n\n\n",
+    d_rc_hdr_main_acc1_code_bk.arr, d_rc_hdr_main_acc2_code_bk.arr ,
+    d_rc_hdr_dept_code_bk.arr ,d_rc_hdr_pr_group_code_bk.arr,
+    d_rc_hdr_pr_line_code_bk.arr,d_rc_hdr_subl_group_code_bk.arr, 
+    d_rc_hdr_subl_line_code_bk.arr,d_acct_desc_bank.arr);
+
+    line_no += 3;
+
+    first_break = 0;
+    g_print_bank = 0;
+
+}
+
+print_bank_tot()
+{
+    char s_amt[20];
+
+        if (nd_no_of_decimal == 3 )
+		   sprintf(s_amt,"%15.3f",g_tot_bank);
+        else
+		   sprintf(s_amt,"%15.2f",g_tot_bank);
+        format_amt(s_amt, nd_no_of_decimal);
+	chk_break(3);
+        fprintf(f1,"                                                                               BANK TOTAL  ------>                  %15s\n\n\n",s_amt);
+	line_no += 3;
+	g_tot_bank = 0;
+
+}
+void print_hospital_name(nd_rep_width    ,
+                         nd_mod_id       ,
+                         nd_hospital_name,
+                         nd_date          )
+int  nd_rep_width;
+char nd_mod_id[3];
+char nd_hospital_name[31]; 
+char nd_date[17];
+{    
+	int i = 0 , pos = 0 , len = 0, len_date = 0 , pos_date = 0,len1 = 0;
+
+    /*Find the length of Hospital Name*/
+    for(len = 0; nd_hospital_name[len] != '\0'; len++);
+
+    /*Find the length of Date*/
+    for(len_date = 0; nd_date[len_date] != '\0'; len_date++);
+    
+    len1 = (len % 2 );
+
+	if (len1 == 0)
+	  len1=9;
+	else 
+	   len1=10;
+ 
+	
+    len = (len / 2 )  ;
+
+    pos = (nd_rep_width / 2	) - len;
+
+	pos_date = nd_rep_width - len_date;
+
+	fprintf(f1,"MDL : %2s",nd_mod_id);
+     
+    
+	for(i = len1; i < pos ; fprintf(f1," "),i++);
+
+	fprintf(f1,"%s",nd_hospital_name);
+
+	for(i = i + (len * 2) ; i < pos_date + 1; fprintf(f1," "),i++);
+
+    fprintf(f1,"%s\n",nd_date);
+}

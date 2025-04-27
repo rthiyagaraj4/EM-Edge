@@ -1,0 +1,1502 @@
+/* view pharma cart */
+
+.fullWidth{
+	width:100%;
+}
+
+.vAlignTop{
+  vertical-align:top;
+}
+
+.vAlignMiddle{
+  vertical-align:middle;
+}
+
+.vAlignBottom{
+  vertical-align:bottom;
+}
+
+.topPadding15px{
+	padding-top:15px;
+}
+
+.paddingBottom5px{
+	padding-bottom: 5px;
+}
+
+.padding10px{
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.paddingLeftRight10px{
+	padding-left: 12px;
+	padding-right: 10px;
+}
+
+.defaultFontColorOnCart{
+    font-family: Segoe UI;
+    color: #7b849f;
+}
+
+.viewCartWrapper{
+  width: 310px;
+  height: 100%;
+  top: 50%;
+  background-color: #bdcde2;
+  border: 1px solid #2a8fbd;
+  padding: 0;
+  position: absolute;
+  right: -1px;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+   transform: translateY(-50%); 
+   z-index: 90000;
+}
+
+.cartViewHeaderStyle{
+	width:100%;
+	height:50px;
+	background-color:#2a8fbd;
+	display: flex;
+}
+
+.cartViewHeaderStyle .cartViewHeaderContent{
+	width:300px;
+	display: flex;
+}
+
+.padding15Px{
+	padding: 15px 5px 15px 12px;
+}
+
+.viewCartText{
+	font-size: 14px;
+	font-family: "Segoe UI";
+	color: #fff;
+	-webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.cartItemCountWrapper{
+	padding: 10px;
+}
+
+.itemsCount{
+	padding: 10px;
+	position: relative;
+	background-color:#23789e;
+	text-align: center;
+	border-radius: 50%;
+	height: 29px;
+	width: 29px;
+}
+
+.countDisplayStyle{
+	font-size: 14px;
+	font-family:Segoe UI;
+	color: #fff;
+	position: relative;
+	top: 4px;
+}
+
+.closeCartPanel{
+   width:20px;
+   padding:15px;	
+}
+
+.cartViewDetailsCss{
+	width:100%;
+	top:50px;
+	position:absolute;
+	bottom:0;
+	background-color: #bdcde2;
+	text-align: center;
+}
+
+.innerCartDetailsCss{
+	width: 98%;
+	height: 99%;
+	margin:3px;
+	background-color: #F4F6FA;
+	text-align: center;
+	position: relative;
+}
+
+.innerCartDetailsCss .orderDetailsViewCss{
+	width: 100%;
+    position: absolute;
+    background-color: #F4F6FA;
+    top: 0px;
+    bottom: 45px;
+}
+
+.innerCartDetailsCss .orderDetailsFooterCss{
+	width: 100%;
+    height: 45px;
+    position: absolute;
+    bottom: 0px;
+    border-top: 1px solid #e4e8ec;
+    background-color: #fff;
+}
+
+.billingDetails{
+	width: 100%;
+	height: 40px;
+}
+
+.billingDetailsCell{
+   width:45%;
+   height:100%;	
+}
+
+.billingDetailsText{
+	top: 11px;
+	position: absolute;
+	left: 55px;
+	font-size:14px;
+	color:#44484a;
+	font-family:Segoe UI;
+}
+.billingBottomBorder{
+	width: 100%;
+	height: 5px;
+	background-color: #bdcde2;
+	background-image: url(../images/cartBottom.png);
+    background-repeat: repeat-x;
+
+}
+
+.billingAmount{
+	font-size:13px;
+	color:#237b9e;
+	letter-spacing: 1px;
+	line-height: 24px;
+	font-family:Segoe UI;
+}
+
+.billingAmountInfo{
+	font-size:11px;
+	line-height: 6px;
+	color:#65696f;
+	font-family:Segoe UI;
+}
+
+
+
+
+.addedDrugListWrapperCss{
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
+}
+
+.rxWrapperCss{
+	position: absolute;
+	width: 100%;
+	height: auto;
+	overflow:hidden;
+}
+
+.rxWrapperCss .drugListScrollerCss{
+	position: relative;
+	width: 100%;
+	height: auto;
+}
+
+.orderTypeCss{
+	width: 100%;
+	height: 50px;
+	background-color:#d3dce6;
+	display:flex;
+}
+
+.orderTypeCss .headerIconStyle{
+	width:40px;
+	float:left;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.headerIconStyle .deleteGroupWrapper{
+	width:25px;
+	height:25px;
+	position:relative;
+	background-color:#ff3d30;
+	border-radius:13px;
+}
+
+.orderTypeCss .headerTypeStyle{
+	width:223px;
+	float:left;
+	height:50px;
+}
+
+.headerTypeStyle .headerOrderName{
+	width:223px;
+	height:50%;
+	text-align: left;
+	margin-left: 10px;
+	font-size: 14px;
+	font-family:Segoe UI;
+	color: #23789e;
+}
+
+.headerTypeStyle .headerOrderPrice{
+	width:223px;
+	height:50%;
+	text-align: left;
+	margin-left: 10px;
+	font-size: 12px;
+	font-family:Segoe UI;
+	color: #23789e;
+}
+
+.orderTypeCss .collapseWidgetStyle{
+	height:50px;
+	width:40px;
+	float:left;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-items: center;
+	justify-content: center;
+}
+
+.collapseWidgetStyle .collapseCloseWidget{
+-moz-transform: scaleY(-1);
+-o-transform: scaleY(-1);
+-webkit-transform: scaleY(-1);
+transform: scaleY(-1);
+filter: FlipV;
+-ms-filter: "FlipV";
+}
+
+.drugListCss{
+	height: 100%;
+	margin-top: 0px;
+	padding-left: 0px;
+	margin-bottom: 4px;
+}
+
+.drugListCss .drugItemStyleWrapper{
+	width:98%;
+	padding: 1px 3px 0px 3px;
+	height:auto;
+	list-style:none;
+}
+
+.drugItemStyleWrapper .drugItemStyle{
+	min-height: 92px;
+	width: 294px;
+	display:flex;
+	border: 1px solid #e4e8ec;
+	border-radius: 5px;
+	background-color: #fff;
+	box-shadow: 0px 0px 2px #d3dae0;
+	margin-top: 3px;
+	margin-left: 1px;
+	margin-right: 1px;
+	margin-bottom: 0px;
+}
+
+.drugItemStyle .deleteDrugStyleWrapper{
+	min-height:92px;
+	width:25px;
+	background-color: #f7f0f0;
+	float:left;
+	position: relative;
+	align-items: stretch;
+	justify-content: center;
+}
+
+.deleteDrugStyleWrapper .deleteDrugStyle{
+	position: absolute;
+	top: 45%;
+	left: 5px;
+}
+
+.drugItemStyle .drugDetailsWrapper{
+	min-height:92px;
+	width:269px;
+	border-radius: 5px;
+	background-color:#fff;
+	float:left;
+	position:relative;
+}
+
+.drugDetailsStyle{
+	position:relative;
+	width:100%;
+	/*height:100%*/
+}
+
+.warningWrapperCss{
+	width: 100%;
+	height: 15px;
+	text-align: right;
+	margin-left: 5px;
+	margin: 0;
+}
+
+.drugDataContainer{
+    word-wrap: break-word;
+	width: 100%;
+	min-height: 45px;
+	text-align: left;
+	margin-left: 5px;
+	margin: 0;
+}
+
+.drugDescription{
+	min-height: 14px;
+	width: 98%;
+	padding: 0px 5px 0px 5px;
+	font-size: 13px;
+	line-height:13px;
+	font-family:Segoe UI;
+	color: #096b93;
+	-webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.drugDescriptionInnerCss{
+	width:92%;
+	min-height:14px;
+	height:auto;
+	display:inline-block;
+	word-break:break-word;
+}
+
+.deleteDrugCss{
+	width:16px;
+	min-height:14px;
+	display:inline-block;
+}
+
+.drugTradeName{
+	padding: 0px 5px 0px 5px;
+	font-size: 10px;
+	font-family:Segoe UI;
+	color: #096b93;
+}
+
+.durationDetailsWrapper{
+	padding: 2px 5px 0px 5px;
+	font-size: 9px;
+	font-family:Segoe UI;
+	color: #58899d;
+	text-align: left
+}
+
+.borderDivWrapperCss{
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.borderDivStyle{
+	width: 100%;
+	height:15px;
+	border-bottom:1px solid #e4e8ec;
+}
+
+.drugDateDataWrapper{
+	width:100%;
+}
+
+.drugDateContainer{
+	width:60px;
+	height: 32px;
+	float:left;
+}
+
+.drugStartDateStyle{
+	width:30px;
+	vertical-align: middle;
+	font-size:24px;
+	font-family:Segoe UI;
+	color:#7b849f;
+	line-height: 13px;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.startMonthStyleWrapper{
+	width:30px;
+	vertical-align: middle;
+}
+
+.startMonthStyleWrapper .startMonthStyle{
+	width: 100%;
+	height: 30px;
+	line-height: 11px;
+	vertical-align: middle;
+}
+
+.startMonthCellCss{
+	vertical-align:bottom;
+	font-size:11px;
+	font-family:Segoe UI;
+	color:#7b849f;
+	padding-top: 2px;
+	text-align: left;
+    /*letter-spacing: 0px;*/
+    line-height: 13px;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.startYearCellCss{
+	vertical-align:top;
+	font-size:9px;
+	font-family:Segoe UI;
+	color:#7b849f;
+	text-align: left;
+	/*letter-spacing:1px;*/
+	line-height: 8px;
+	-webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.toStylingWrapper{
+	width:15px;
+	height: 30px;
+	float:left;	
+}
+
+.toStyleCss{
+	vertical-align:middle;
+	padding:7px 5px 5px 0px;
+	color: #7b849f;
+	font-size:13px;
+	font-family:Segoe UI;
+	line-height: 6px;
+	-webkit-font-smoothing: antialiased;
+    letter-spacing: -0.8px;
+    font-weight: 600;
+}
+
+.priceDetailsWrapper{
+	width:60px;
+	height: 32px;
+	float:right;
+}
+.completePlaceOrdersDisable{
+	opacity: .5;
+    pointer-events: none;
+}
+
+ /* ivrx specific style */
+.borderDivWrapperIvrxStyle{
+	width:98%;
+	height: 70px;
+	margin-top:5px;
+	position: relative;
+}
+
+.borderDivWrapperIvrxStyle .fluidDescriptionCss{
+	width:98%;
+	bottom:18px;
+	top:0px;
+	border-top: 1px solid #e4e8ec;
+	position:absolute;	
+	text-align:center;
+}
+
+.borderDivWrapperIvrxWithoutAddStyle{
+	width:98%;
+	height: 20px;
+	margin-top:5px;
+	position: relative;
+}
+
+.fluidDescFontStyle{
+	position:relative;
+	top:25px;
+	font-size:11px;
+	font-family:Segoe UI;
+	color:#b2b4b7;
+}
+
+.borderDivWrapperIvrxStyle .ivrxTypeDescriptionCss{
+    height:15px;
+    width:98%;
+    position:absolute;
+    font-size:9px;
+    font-family:Segoe UI;
+    color:#b2b4b7;
+    text-align:right;
+    bottom:0px;
+    border-bottom: 1px solid #e4e8ec;
+}
+
+.ivrxWithoutAddTypeDescriptionCss{
+    height:15px;
+    width:100%;
+    font-size:9px;
+    font-family:Segoe UI;
+    color:#b2b4b7;
+    text-align:right;
+    bottom:0px;
+    border-bottom: 1px solid #e4e8ec;
+}
+ /* ivrx specific styles ends */
+/* view pharma cart ends */
+
+
+
+
+/* validation checks pop up window */
+#pharmacyValidationPopUp{
+	width:560px;
+	min-height:100px;
+	max-height:300px; 
+	box-shadow:#7e8081;
+	background-color:#ffffff;
+	border-radius: 3px;
+	display:none;
+}
+.HeightPopcontent{
+	height: 61%;	
+	padding: 5px 0px 10px 0px;
+}
+.pharPopLeftContentLabel{
+	padding-left: 5px;
+	padding-bottom: 15px;	
+}
+.pharContentWtLabel{
+	padding-left: 10px;
+	padding-bottom: 15px;
+}
+.pharContentBSALabel{
+	padding-left: 5px;
+	padding-top: 15px;
+}
+.pharContentBSAValue{
+	padding-left: 5px;
+	padding-top: 15px;
+	height: 20px;
+}
+.pharContentBMIValue{
+	padding-left: 10px;
+	padding-top: 15px;
+	height: 20px;
+	color:#6d798f;
+}
+
+.pharContentBMIBSAValue{
+	color:#6d798f;
+	font-size: 14px;
+	font-family: "Segoe UI";
+}
+.pharContentBMILabel{
+	padding-left: 10px;
+	padding-top: 15px;
+}
+.pharContentKgLabel{
+	height: 43px;
+	position:relative;
+}
+.ivRxInterContentKgLabel{
+	padding-left: 10px;
+	height: 41px;
+	position:relative;
+}
+.pharContentCmsLabel{
+	padding-left: 5px;
+	height: 20px;
+	position:relative;
+}
+.rowOneContainer{
+	width:100%;
+	height:35%
+}
+.rowTwoContainer{
+	width:100%;
+	height:65%;
+}
+.pharPopHeader{
+	height:50px;
+	line-height: 50px;
+	font-family: "Segoe UI";
+	font-size:14px;
+	color:#3386a6;
+	border-bottom: 1px solid #ececec;
+	padding-left:5px;
+}
+.pharPopLeftContent{
+	float:left;
+	width:49%;
+	color:#44484a;
+	font-size:13px;
+	/*padding-right: 13px;*/
+	font-family: "Segoe UI";
+}
+
+.pharHtWtTextbox{
+	width:95%;
+	position:relative;
+}
+
+.pharHtWtTextboxUnit{
+	color:#65696f; 
+	position:absolute;
+	display:inline-flex;	
+	top:11px;	
+	font-family: "Segoe UI";
+	font-size:13px;
+}
+  @media only screen and (min-width: 768px) {
+              .pharHtWtTextboxUnitCss {
+                   right:12px;
+                               }
+            }
+			
+			 @media only screen and (min-width: 1024px) {
+              .pharHtWtTextboxUnitCss {
+                       right: 10px;
+					 
+                               }
+            } 
+			
+.pharHtWtTextboxDurnUnit{
+	float: right;
+    width: auto ! important;
+	right: 14px;   
+    margin-top: -42px;
+    position: relative;
+    color: #65696f;   
+    right: 14px;
+    top: 11px;
+    font-family: "Segoe UI";
+    font-size: 13px;
+    width: 100%;
+    text-align: right;
+}
+.pharPopRightContent{
+	float:left;
+	width:49%;
+	color:#44484a;
+	font-size:13px;
+	font-family: "Segoe UI";
+}
+
+.pharPopOk{
+	float:right;
+	font-size:14px;
+	color:#3386a6;
+	padding:17px 15px 17px 12px;
+	font-family: "Segoe UI";
+}
+.pharPopCancel{
+	float:right;
+	font-size:14px;
+	color:#3386a6;
+	padding: 17px 10px 17px 13px;
+	font-family: "Segoe UI";
+}
+.pharPopFooter{
+	height:50px;
+	background-color:#f9f9f9;
+	border: 1px solid #ececec; 
+	border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;  
+}
+.HtWtDisplay{
+	width: 95%;
+	text-align:right;
+}
+
+/* Rx Details view */
+.pharmRxOrderItemName{
+   display: inline-block;
+   width: 70%;
+   height: auto;
+   font-size: 15px;
+   color: #096b93;
+   font-family: "Segoe UI";
+   text-align: left;
+   vertical-align: middle;
+   line-height: 40px;
+   }
+   .pharmRxOrderItemName10padding{
+   padding-left: 10px;
+   }
+   .pharmOrderItemHeader{
+   width:100%;
+   height:85px;
+   }
+   .pharmItemDescNameCell{
+   width:auto;
+   height:40px;
+   }
+   .pharmOrderItemHeaderRow{
+   width:auto;
+   height:1%;
+   background:#ffffff;
+   }
+   .pharmOrderItemBannerRow{
+   width:auto;
+   height:87px;
+   background:#ffffff;
+   }
+   .pharmCartBottomContainer{
+   width:auto;
+   height:5px;
+   background: #f5f9fc;
+   }
+   .pharmRxOrderItemIcons{
+   display:inline-block;
+   width:30%;
+   height:auto;
+   text-align: right;
+   }
+   .pharmRxOrderItemIconsVRalign{
+   width:36px;
+   height:36px;
+   vertical-align: middle;
+   display: inline-block;
+   }
+   .imgBannerIndicator {
+	   padding-right: 4px;
+	   padding-top: 5px;
+   }
+   .pharmRxOrderStrength{
+   display: inline-block;
+   width: auto;
+   height: auto;
+   padding-top: 2px;
+   font-size: 15px;
+   color: #096b93;
+   text-align: left;
+   }
+   .pharmRxOrderFooterCell{
+    display: inline-block;
+    width: 40%;
+    height: auto;
+    padding-top: 2px;
+    padding-left: 10px;
+    font-size: 15px;
+    color: #096b93;
+    text-align: left;
+   }
+   .pharmRxOrderFooter{
+   width: 20%;
+   height: auto;
+   font-size: 15px;
+   color: #65696f;
+   text-align: left;
+   }
+   .pharmRxOrderItemLabelFooter{
+    font-size: 13px;
+    color: #65696f;
+    font-weight: normal;
+    font-family: "Segoe UI";
+    float:left;
+   }   
+   .pharmRxOrderItemInfoFooter{
+    font-size: 13px;
+    color:#44484a;
+    font-family: "Segoe UI";
+    float: left;
+   }
+   .pharmRxOrderItemDescFooter{
+   padding-left: 10px;
+   display: inline-block;
+   }
+   
+   .pharmRxOrderItemRate{
+   display:inline-block;
+   width:20%;
+   height:auto;
+   text-align: right;
+   float: right;
+   }
+   .pharmRxOrderItemRate:after {
+   content: "";
+   display: table;
+   clear: both;
+   }
+   .pharmRxOrderStrength .pharmRxOrderItemDesc{
+   padding-left: 10px;
+   display: inline-block;
+   }
+   .pharmRxOrderStrength .pharmRxOrderItemDesc .pharmRxOrderItemLabel{
+   font-size: 13px;
+   color:#65696f;
+   font-weight:normal;
+   font-family: "Segoe UI";
+   }
+   .pharmRxOrderStrength .pharmRxOrderItemDesc .pharmRxOrderItemInfo{
+   font-size: 13px;
+   color:#44484a;
+   font-family: "Segoe UI";
+   height:20px;
+   }
+   .pharmRxOrderItemRate .pharmRxOrderItemRateDesc{
+   font-size: 13px;
+   color: #237b9e;
+   padding-right:10px;
+   font-family: "Segoe UI";
+   }
+   .pharmDataItemHeight{
+   width: 100%;
+   height: 100%;
+   }
+   .pharmDataContentScroller{
+   width:100%;
+   overflow:hidden;
+   height:100%
+   }
+   .pharmRxOrderItemRate .pharmRxOrderItemRateLabel{
+   font-size: 11px;
+   color: #65696f;
+   padding-right:10px;
+   font-family: "Segoe UI";
+   }
+   .pharmCartBottomImg{	
+   background-repeat: repeat-x;
+   background-image: url(../images/cartBottom.png);	
+   height: 7px;
+   }
+   .pharmOrderRxItemContainer{   
+   position: absolute;
+   width: 100%;
+   height: calc(100% - 87px);
+   background: #f5f9fc;
+   overflow: hidden;	
+   } 
+   .pharmOrderIVRxItemContainer{   
+   position: absolute;
+   height: calc(100% - 87px);
+   background: #f5f9fc;
+   overflow: hidden;
+   width:100%;	
+   } 
+   .sectionWrapper{
+   width:100%;
+   padding-top:5px;
+   min-height:165px;
+   }
+   .rxDurationSectionWrapper{
+   width:calc(100% - 10px);
+   padding-left:5px;
+   min-height:182px;
+   
+   }
+   .rxDetailsTextArea{
+	font-family: "Segoe UI";
+    border: 1px solid #f1f1f1;
+    -webkit-appearance: none;
+    border-top: 1px solid #d6d6d6;
+    border-radius: 3px;
+    height:54px;
+    /*padding-left: 3px;*/
+   }
+   .rxLeftContainer{
+   width:50%;
+   float: left;
+   }
+   .rxLeftContainerDuration{
+   width:calc(50% - 5px);
+   float: left;
+   }
+   .rxContainer{   
+   display:inline-block;
+   float: left;
+   width:50%;
+   height:111px;
+   } 
+  .ivrxContainer{   
+   display:inline-block;
+   width:50%;
+    height:80px;
+   }    
+   .rxRightContainer{
+   width: calc(50% - 5px); 
+   float: right;
+   padding-top:2px;
+   }
+   .rightSide .sub{
+   clear:both;
+   }
+   .dropDown{
+   width:100%;
+   }
+   .rxSectionHeader{
+   padding: 10px 10px 0 10px;
+   font-family: "Segoe UI";
+   font-size:15px;
+   color:#096b93;	
+   }
+   .rxDetailsMainContainer{
+   height:100%;
+   }
+   .rxLabel{
+   -webkit-font-smoothing: antialiased;
+   letter-spacing: -0.8px;
+   font-weight: 600;
+   padding: 10px 0 5px 0;
+   color:#44484a;
+   font-size:13px;
+   font-family: "Segoe UI";
+   } 
+   .rxMandatorIndi {
+	color: red;
+	margin-left: 3px;
+   }
+   
+   .rxHtWtLabel{
+	width:100%;
+	height:15%;
+	padding-left:5px;
+    color: #335d6f;
+   font-size:13px;
+   font-family: "Segoe UI";
+   }
+   .htWtWrapper{
+	   width:100%;
+	   height:85%;
+	   position:relative;
+	   
+   }
+   .rxDrugRouteLabel{
+   float:right;
+   color:#44484a;
+   font-size:10px;	
+   font-family: "Segoe UI";
+   }  
+   .rxCheckbox{
+   height:42px;
+   line-height:35px;
+   }
+   .rxTextArea{
+	font-family: "Segoe UI";
+    border:1px solid #f1f1f1;
+    -webkit-appearance: none;
+    border-top: 1px solid #d6d6d6;
+    height: 35px;
+    border-radius: 3px;
+    padding-left: 3px;
+   }
+   .rxTapRemarks{
+	   padding-left: 10px;
+	   padding-bottom: 2px;
+	   vertical-align: top;
+	   line-height: 30px;
+	   color:#44484a;
+	   font-size: 13px;
+	   font-family: "Segoe UI";
+   }
+   .pharmacySectionSperator{
+   border-bottom:1px solid #e4e8ec;;
+   } 
+   
+ /* Rx details End*/
+ 
+ /* IV Rx details view starts */
+ .IVtextBoxInlineUnit{
+	height: 30px;
+	width:49%;
+	position:relative;
+	padding:0;
+	display:inline-block;
+}
+
+  .ivrxDrugHeader{
+	  height:auto;
+	  font-family: "Segoe UI";
+	  font-size: 15px;
+	  color: #096b93;
+	  word-break: break-all;
+	  padding-top: 10px;
+	  padding-left: 10px;
+   }
+   .ivWithAdditiveTabCss{
+	   height:36px;
+	   padding-top: 8px;
+	   font-family: "Segoe UI";
+	   font-size: 14px;
+	   color: #032b3f;
+   }
+   .ivWidth99Important{
+	   width:99% ! important;
+   }
+   .ivWidth100Important{
+	   width:100% ! important;
+   }
+  .IVrxLabel{
+    color: #44484a;
+    font-size: 13px;
+    font-family: "Segoe UI";
+  }
+  
+  .ivRxTextArea{
+	  width: 99%;
+	  height: 57px;
+  }  
+  
+  .fluidnameCss{
+	  width:99%;
+	  height:36px;
+  }
+  
+  .fluidNameIvWithAddValues{
+	  width: 100%;
+  }
+ /* IV Rx details view ends */
+/* Crx details view starts */
+.pharmCRxOrderItemName{
+   display: inline-block;
+   width: 100%;
+   height: auto;
+   font-size: 15px;
+   color: #096b93;
+   font-family: "Segoe UI";
+   text-align: left;
+   vertical-align: middle;
+   line-height: 40px;
+   }
+/* Crx details view ends */
+
+
+/* Cart View */
+.viewCartWrapper{
+  width: 310px;
+  height: 100%;
+  float: right;
+  background-color: #bdcde2;
+  border: 1px solid #2a8fbd;
+  padding: 0;
+}
+#PharmacyCartValidationDialog {
+  display: none;
+  width: 340px;
+  height: 280px;
+  z-index: 500;
+}
+.Error_Window {
+	width: 325;
+	height: 200px;
+	border: 2px solid #ffffff;
+	background: #074860;
+	margin: 10px;
+	min-height: 200px;
+	max-width: 325px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-webkit-box-shadow: 0px 0px 15px 2px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 0px 15px 2px rgba(0,0,0,0.75);
+	box-shadow: 0px 0px 15px 2px rgba(0,0,0,0.75);
+	margin: 10px;
+	border-radius: 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	overflow: hidden
+}
+	.Error_msg_box {
+	width: 100%;
+	height: 150px;
+	max-height: 150px;
+	max-width: 100%;
+	 border-bottom: 1px solid #000000; 
+}
+	.Error_msg_diagnosisChk_box {
+	width: 100%;
+	height: 150px;
+	max-height: 150px;
+	max-width: 100%;
+	/* border-bottom: 1px solid #000000; */
+}
+	
+	.Error_msg {
+	height: 150px;
+	width: 100%;
+	overflow: auto;
+	z-index: 999999;
+	position: relative;
+	display: table;
+}
+	.Error_msg_Frame {
+	display: table-cell;
+	vertical-align: middle
+}
+	.Error_icon
+{
+	width:20%;
+	height:100%;
+	float:left;
+	text-align:center;
+}
+.Error_cont
+{
+	height:100%;
+	width:79%;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#ffffff;
+	text-align: left;
+	float: right;
+	margin-right:1%;
+}
+	.Error_iconCenter
+{
+	width:100%;
+	height:100%;
+	float:left;
+	text-align:center;
+}
+.Error_contCenter
+{
+	height:100%;
+	width:calc(100% - 5px);
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#ffffff;
+	text-align: left;
+	float: right;
+	margin-right:5px;
+}
+.Error_msg_Okbtn {
+    width: 100%;
+	height: 46px;
+	background: #2ea3c0; /* Old browsers */
+	background: -moz-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2ea3c0), color-stop(50%, #2195b0), color-stop(51%, #0c7f9a), color-stop(100%, #0c7d9a)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ea3c0', endColorstr='#0c7d9a', GradientType=0 ); /* IE6-9 */
+display:table;
+}
+.Error_msg_btn {
+	width: 100%;
+	height: 49px;
+	background: #2ea3c0; /* Old browsers */
+	background: -moz-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2ea3c0), color-stop(50%, #2195b0), color-stop(51%, #0c7f9a), color-stop(100%, #0c7d9a)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #2ea3c0 0%, #2195b0 50%, #0c7f9a 51%, #0c7d9a 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ea3c0', endColorstr='#0c7d9a', GradientType=0 ); /* IE6-9 */
+display:table;
+}
+
+.Error_btn_div_con
+{
+	width:159px;
+	height:100%;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	color:#ffffff;
+	text-align:center;	
+	display: table-cell;
+	vertical-align: middle;
+	cursor:pointer;
+	
+}
+.Error_btn_div
+{
+	width:0px;
+	height:100%;
+	border-left:1px solid #0bb5dd;
+	border-right:1px solid #023542;
+	float: left;
+}
+	.top_shadow {
+	width: 100%;
+	height: 90px;
+	background: #3b6f81; /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover, #3b6f81 0%, #074860 64%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #3b6f81), color-stop(64%, #074860)); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover, #3b6f81 0%, #074860 64%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover, #3b6f81 0%, #074860 64%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover, #3b6f81 0%, #074860 64%); /* IE10+ */
+	background: radial-gradient(ellipse at center, #3b6f81 0%, #074860 64%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b6f81', endColorstr='#074860', GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	margin-top: -40px;
+	margin-top: -240px;
+	z-index: -999;
+}
+/* IV RX */
+.pharmOrderIvRxItemContainer{  
+padding-left:10px; 
+   position: absolute;
+   width: 100%;
+   height: calc(100% - 147px);
+   background: #f5f9fc;
+   overflow: hidden;	
+   } 
+.pharmIvRxOrderItemBannerRow{
+   width:auto;
+   height:60px;
+   background:#f5f9fc;
+   }
+   .pharmIvRxItemDescNameCell{
+   width:auto;
+   height:20px;
+   }
+   .pharmIvRxDetailRow{
+width:100%;
+height:83px;
+}
+.pharmIvRxDetailIndRow{
+padding-right:1px;
+float: left;
+width:49%;
+height:83px;
+}
+
+.pharmIvRxLeftDetailRowContent{
+width:100%;
+height:auto;
+}
+.pharmIvRxRightDetailRowContent{
+width:100%;
+padding-right:5px;
+height:auto;
+}
+.pharmIvRxDetailLabel{
+width:100%;
+height:43px;
+}
+
+.pharmIvRxDetailLabelContent{
+    padding: 15px 0 15px 0;
+    color: #44484a;
+    font-size: 13px;
+    font-family: "Segoe UI";
+    font-weight: 500;
+    letter-spacing: 0px;
+}
+
+.pharmIvRxDetailCntlContent{
+width:100%;
+height:40px;
+}
+
+.pharmIvRxDetailCntlContentWa{
+width:99%;
+height:40px;
+}
+
+.pharmIvRxDetailInnerContent{
+float: right;
+width: auto !important;
+font-family: Segoe UI;	
+color: #65696f;
+text-align: end;
+margin-top: -32px;
+margin-right: 5px;
+font-size: 13px;
+position: relative;
+}
+
+.pharmIvRxDetail2IndRow{
+float: left;
+width:24.5%;
+height:83px;
+    padding-left: 3px;
+}
+@media only screen and (min-width: 768px) {
+             .pharmIvRxDetail2IndRow {
+                               width:24%;
+                               }
+           } 
+@media only screen and (min-width: 1024px) {
+             .pharmIvRxDetail2IndRow {
+                               width:24.4%;
+                               }
+           } 
+@media only screen and (min-width: 768px) {
+             .withAddEnddateCss {
+                               width:98%;
+                               }
+           } 
+@media only screen and (min-width: 1024px) {
+             .withAddEnddateCss {
+                               width:100%;
+                               }
+           } 
+		     
+		   
+ .pharmRxOrderItemMainHeader{
+    font-size: 13px;
+    color:#032b3f;
+    font-family: "Segoe UI";
+    height: 20px;
+    font-weight: 700;
+	letter-spacing:  0px !important;
+   }
+/* END */
+
+/*@media only screen and (min-width: 1024px) {
+             .ivrxDetailsViewContentRowWrapper {
+                               padding-left:3px;
+                               }
+           }*/ 
+
+.pharmOrderRxInterItemContainer		   {
+	 position: absolute;
+   width: 100%;
+   height: calc(100% - 87px);
+   background: #f5f9fc;
+   overflow: hidden;
+}
+/* Drug Interaction PopUp */
+.drugInterHeadingWrapper{
+	display:inline-block;
+	width:30%
+}
+.drugInterHeadingWrapper span{
+	font-size: 13px;
+	color: #65696f;
+	font-weight: normal;
+	font-family: "Segoe UI";
+}
+ .drugInteractionLabel{
+   font-size: 13px;
+   color:#65696f;
+   font-weight:normal;
+   font-family: "Segoe UI";
+   }
+   .drugInteractionLabelContent{
+   font-size: 13px;
+   color: #65696f;
+   font-family: Segoe UI;
+   }
+.drugInterImgWrapper{
+	 width:50px;
+	 height:100%;
+	 text-align: center;
+	 vertical-align: middle;
+	 line-height:0px;
+   }
+.drugInteractionLabelWrapper{
+	float:left;
+	width:auto;
+	padding: 0 10px 0 10px;
+}
+
+.drugInterDescLabel{
+	width:100%;
+	height:25px;
+	padding-left:10px;
+}
+.drugInteractionPopMainWrapper{
+	z-index: 10005;
+	display:none;
+	height:300px;
+	max-height:500px;
+	width:560px;
+}
+.drugInterPopupContainer{
+	width:100%;
+	background-color: #ffffff;
+}
+.drugInteractionPopWrapper{
+	height:auto;
+	width:100%;
+	box-shadow: 0px 0px 10px 5px #7e8081;
+	box-shadow: #7e8081; 
+	border-radius: 3px;
+}
+.drugInterContentWrap{
+	width:100%;height:auto;
+}
+.drugInterContentHeaderWrap{
+	width:100%;
+	height:25px;
+	margin-top:5px;
+}
+.drugInterScrollCss{
+	width:auto;
+	height:20px;
+	overflow:hidden;
+	position: relative;
+	padding: 0px 0px 0 10px;
+}
+.drugInterDescContent{
+	width: auto;
+	text-align:justify;
+	padding-right:10px;
+	max-height:500px;
+	position:absolute;
+	overflow: hidden;
+	font-size: 13px;
+	color: #65696f;
+	font-family: Segoe UI;
+}
+.pharTextarea{
+	height:57px;width:99%;
+}
+.enterRemaeksCell{
+	width:50%;height:100%;
+}
+.tapRemarks{
+	width:50%;line-height:28px;
+}
+.detailsViewWrapBorder{
+	border-bottom:1px solid #e4e8ec;
+}
+/*crx*/
+.radioTabs{
+	width:33%;
+	height:50px;
+	font-size: 14px;
+	font-family:Segoe UI Semibold;
+	color: #9298ae;
+}
+.radioTabsTable{
+	width:100%;
+	height:50px;
+}
+.radioTabsCell{
+	vertical-align: bottom;
+	text-align: center;
+}
+.CRxBannerIndWrapper{
+	height:100px;
+	width:auto;
+	background-color:#edf3f6;
+	border-top: 1px solid #d7dee1;
+	padding:0 5px 0 5px;
+}
+.CRxBannerContent{
+	height:auto;
+	width:50%;
+	float:left;
+}
+.finalProdSection{
+	width:100%;
+	height:70px;
+	padding-left: 10px;
+}
+.finalProdContent{
+	width:50%;
+	height:20px;
+}
+.CRxBaseCheckWrap{
+	width:15%;
+	padding-top:2px;
+}
+.CRxBaseCheckContent{
+	width:50%;
+	height:100%;
+}
+.CRxBannerIconsWrap{
+	height:40px;
+	padding-left:5px;
+}

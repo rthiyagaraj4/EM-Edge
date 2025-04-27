@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_PriceClassSpecificPrices_PriceClassSpecificPriceTab_PkgSetup</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Package Related Other Setup</h1>
+<p class="BoldRFD" style="font-weight: normal;">The Package Related other Setup tab enables you to define the additional factor for a Billing Class, define the discount for a Customer, associate charge based service limits or exclude the material items from a package.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Additional Factor by Billing Class</p>
+<p class="BoldRFD" style="font-weight: normal;">You can define the additional charge for a Billing Class based on which the package has to be charged. The additional factor is multiplied with the rate for the Billing Class to compute the price.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define the additional factor:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Blng Class Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Billing Class code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Billing Class gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Blng Class Addl Factor</span> - Enter the additional factor in numeric format. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Customer Discount</p>
+<p class="BoldRFD"><span style="font-weight: normal;">You can define the discount percentage for a specific customer. The customer is charged for the package after deducting the discount amount from the actual package price.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define discount percentage for a Customer:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Customer gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Type</span> - Select a Discount Type from the list. The system-defined values are 'Percent' and 'Value'. Select 'Percent' to enter the percentage of discount amount or 'Value' to enter the discount amount in numeric format. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount (%)</span> - Enter the discount percentage or amount in numeric format. You can specify a value upto '100' when the 'Discount Type' is selected as 'Percentage'. During transactions, the 'Discount Amount' should not exceed the discount amount recorded for the Customer. The discount amount is validated against the package amount during transactions. You cannot enter a negative value for discounts. You cannot record duplicate discount values for a Customer. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Charge Based Service Limit</p>
+<p class="BoldRFD"><span style="font-weight: normal;">You can select and associate the charge based services to the package and specify the limit amount for the charge based service within the package. The charge is computed for the service based on the package setup in BL Parameter.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define the limit amount for the charge based services:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Blng Serv Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Billing Service code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Billing Service gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Limit Amt</span> - Enter the service limit amount in numeric format. This identifies the amount limit for the service from the package amount.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Excluded Material Items</p>
+<p class="BoldRFD" style="font-weight: normal;">You can select the services, which are to be excluded from the package coverage. The package amount cannot be charged for the excluded material items, but the amount is charged based on the setup for the packages in the BL parameter.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to select the Material Items:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Item Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Item Code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the selected Item Code gets displayed.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

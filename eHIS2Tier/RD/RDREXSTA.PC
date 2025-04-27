@@ -1,0 +1,2478 @@
+/******************************************************************************/
+/* MEDICOM VER 4.1                                                            */
+/******************************************************************************/
+/* PROGRAM NAME     : rdrexsta.pc                                             */
+/* AUTHOR           : 												  */
+/* DATE WRITTEN     : 19-NOV-2003                                             */
+/*                                                                            */
+/* CALLED FROM      : rdrexsta.fmb                                            */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                  : SESSION_ID                                              */
+/*                  : PGM_DATE                                                */
+/*                  : APPOINTMENT FROM AND TO DATE                            */
+/*                  : APPOINTMENT FROM AND TO SECTION                         */
+/*                  : APPOINTMENT FROM AND TO CLINIC                          */
+/*                                                                            */
+/* TABLES ACCESSED  : SY_PROG_PARAM                                           */
+/*                  : RD_REQUEST                                              */
+/*                                                                            */
+/* OUTPUT FILE      : rdrexsta.lis                                            */
+/*                                                                            */
+/* FUNCTION         : This program prints a Patient Appointment List          */
+/*                    For a given SY_PROG_PARAM parameters                    */
+/*                                                                            */
+/* VERSION          : eHIS 4.1                                                */
+/* MODIFICATIONS    :                                                         */
+/*                                                                            */
+/******************************************************************************/
+
+#include <stdio.h>
+#include <math.h>
+#include "gl.h"
+#include <string.h>
+
+#define OERROR (sqlca.sqlcode < 0)
+//#define NO_DATA_FOUND sqlca.sqlcode==1403
+#define MAX_LINES 55
+#define REP_WIDTH 78
+#define REP_TITLE "EXAMINATION STATISTICS"
+#define VER  "VER : 10.2\n"
+#define ESC  0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR nd_facility_id		   [3],  --added 0n 18/Aug/2003
+			nd_pgm_id    		   [9],  --added 0n 18/Aug/2003
+			//uid_pwd		           [91], --size increased 0n 18/Aug/2003
+			uid_pwd		           [122], /* Length increased from 91 to 122 */
+			nd_session_id		   [16],
+			nd_pgm_date			   [13], /* Input Parameters       */
+
+			h_acc_entity_name      [61],  /* SY_ACC_ENTITY header access */
+			h_user                 [31],
+			h_sysdate              [17],
+
+			nd_exam_date           [11],  /* SY_PROG_PARAM Parameters */
+			nd_section_code        [5],
+			nd_wing_code           [3] ,
+			
+			h_wing_int_or_ext      [2],
+			h_order_type_code      [5],
+
+			t_wing_desc            [61],
+			t_section_desc         [51],   /* Desc for the Code access */
+			t_view_desc		       [51],
+			t_exam_desc            [41],
+
+			fm_period_date			[31],
+			to_period_date			[31],
+			consolidation_level		[2],
+			fm_wing_code			[3],
+			to_wing_code			[3],
+			fm_clinic_code			[5],
+			to_clinic_code			[5],
+			summarization_level		[2],
+			fm_section_code			[5],
+			to_section_code			[5],
+			fm_view_code			[5],
+			to_view_code			[5],
+			fm_exam_code			[11], 
+			to_exam_code			[11],
+			t_facility_id			[3],
+			t_facility_desc			[100],
+			age_group1				[5],
+			age_group2				[5],
+			d_fm_period				[30],
+			d_to_period				[30],
+			d_summ					[30],
+
+			t_range_1_desc			[16], 
+			t_range_2_desc			[16],   
+	
+			t_section_code			[7],
+			t_patient_class			[3],
+			t_nationality_code		[5],
+			t_exam_code				[11],
+			t_view_code				[5],
+			t_patient_id			[21],
+			t_sex					[2],
+			t_date_of_birth			[30],
+			cit_nationality_code	[5],
+
+			fm_main_exam_catg		[13],
+			to_main_exam_catg		[13],
+			fm_sub_exam_catg		[13],
+			to_sub_exam_catg		[13],
+
+
+			h_study_location		[5],
+			t_study_location		[5],
+			t_study_location_desc   [16],
+
+			t_exam_catg_code		[13],
+			h_exam_catg_code		[13],
+			t_exam_catg_desc		[31],
+			fm_clinic_desc			[31],	
+			to_clinic_desc			[31],	
+
+			h_section_code			[7], 
+			h_exam_code				[11],
+			h_patient_class			[3],
+			h_nationality_code		[5],
+			h_view_code				[5],
+
+			t_range_unit_desc		[16],
+			
+			t_range_1_fr_unit		[3],	
+			t_range_1_to_unit		[3],	
+			t_range_2_fr_unit		[3],	
+			t_range_2_to_unit		[3],	
+
+			t_wing_code            [3],
+			 
+			p_language_id		   [3],
+			date_convert		   [21],
+			nd_temp_date		   [21],
+			nd_loc_date            [21],
+			l_translated_value	   [200];
+
+	   int  t_male_nat_age1		= 0,
+			t_female_nat_age1	= 0,
+			t_male_oth_age1		= 0,
+			t_female_oth_age1	= 0,
+			t_male_nat_age2		= 0,
+			t_female_nat_age2	= 0,
+			t_male_oth_age2		= 0,
+			t_female_oth_age2	= 0,
+			sec_male_nat_tot1	= 0,
+			sec_female_nat_tot1	= 0,
+			sec_male_oth_tot1	= 0,
+			sec_female_oth_tot1	= 0,
+			sec_male_nat_tot2	= 0,
+			sec_female_nat_tot2	= 0,
+			sec_male_oth_tot2	= 0,
+			sec_female_oth_tot2	= 0,
+			t_date_of_birth_days = 0,
+			t_min_age1			= 0, 
+			t_max_age1			= 0, 
+			t_min_days1			= 0,
+			t_max_days1			= 0,
+			t_min_age2			= 0, 
+			t_max_age2			= 0,
+			t_min_days2			= 0,
+			t_max_days2			= 0;
+			int i=0;
+			int time_flag = 0;
+
+EXEC SQL END DECLARE SECTION; 
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H; 
+#include "winproc.h";
+
+char string_var[100];
+
+char string_age_range[100];
+char string_age_range_1[100];
+
+char filename[150];
+char temp[1000];
+
+char loc_legend[999][200];
+
+int line_no=0;
+int page_no=0;
+
+
+long   gr_total_inpat       = 0,
+       gr_total_outpat      = 0,
+       gr_total_referral    = 0,
+       gr_total_pat         = 0;
+
+
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+	void get_params(),
+         get_header_dtls(),
+         dclr_appt_cur(),
+		 get_default_values(),
+         do_report();
+
+	/*printf("RDREXSTD : Program Started.\n\n");     */
+
+    if (argc != 6) 
+    {
+		int i = 0;
+		disp_message(ERR_MESG,"Usage rdrexstd uid/passwd session_id pgm_date\n");
+		disp_message(ERR_MESG,"Exiting due to Mismatch of input parameters\007\007\007");
+		sprintf(string_var,"No of Parameters is <%d>\n",argc);
+		disp_message(ERR_MESG,string_var); 
+		disp_message(ERR_MESG,"The following are the parameters :-\n");
+
+		for ( i = 0; i < argc; i++ ) 
+		sprintf(string_var,"argv[ %d ] ---> <%s>\n",i,argv[i]); 
+		disp_message(ERR_MESG,string_var);
+
+		proc_exit();
+	}
+   
+	strcpy(nd_pgm_id.arr, argv[0]);
+	nd_pgm_id.len = strlen(nd_pgm_id.arr); 
+
+	strcpy(uid_pwd.arr, argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr); 
+
+	strcpy(nd_session_id.arr, argv[2]);
+	nd_session_id.len = strlen(nd_session_id.arr); 
+
+	strcpy(nd_pgm_date.arr, argv[3]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+	strcpy(nd_facility_id.arr, argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+
+	strcpy(OUTPUT_FILE_NAME, argv[5]);
+	
+
+    EXEC SQL CONNECT :uid_pwd;  
+
+    if (OERROR) 
+      {
+         disp_message(ERR_MESG,"USERID/PASSWORD failed to Connect\n");
+         proc_exit();
+      }
+  
+	set_meduser_role();
+
+	/*Code Included for internationalization*/
+	strcpy(p_language_id.arr,l_language_id.arr);
+	p_language_id.len = l_language_id.len;
+
+	
+	strcpy(filename,WORKING_DIR);
+	//strcat(filename,"rdrexstd.lis");
+	strcat(filename,OUTPUT_FILE_NAME);
+	if ((f1 = fopen(filename, "w")) == NULL) 
+    {
+		disp_message(ERR_MESG,".... Error opening output file ....\n");
+        proc_exit();
+	} 
+  
+	get_params();
+
+	fetch_legend_value();
+	
+	get_header_dtls();
+	
+	dclr_appt_cur();
+	
+	get_default_values();
+	
+	fprintf(f1,"%c&k4S",ESC); fprintf(f1,"%c&a8L",ESC);
+    
+    do_report();
+	
+    EXEC SQL COMMIT WORK RELEASE;
+	/*-------------- Check for any error and No data found ----------------------*/
+     if (OERROR) 
+       {
+          disp_message(ERR_MESG,"COMMIT failed\n");
+          proc_exit();
+       }
+
+	/*-------------------------- End of Error Check ------------------------------*/
+
+     fclose(f1);
+	/*     printf("RDREXSTD : Program Ended.\n\n");      */
+     return;
+}   
+
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+  {
+		  
+   /* read the parameter record */
+     
+	  EXEC SQL SELECT	PARAM1,
+						PARAM2,
+						PARAM3,
+						PARAM4,
+						PARAM5,
+						PARAM6,
+						PARAM7,
+						PARAM8,
+						PARAM9,
+						PARAM10,
+						PARAM11,
+						PARAM12,
+						PARAM13,
+						PARAM14,
+						PARAM15,
+						PARAM16,
+						PARAM17,
+						PARAM18,
+						PARAM19,
+						PARAM20,
+						PARAM21,
+						PARAM22
+				INTO    :fm_period_date,
+						:to_period_date,
+						:consolidation_level,
+						:fm_wing_code,
+						:to_wing_code,
+						:fm_clinic_code,
+						:to_clinic_code,
+						:summarization_level,
+						:fm_section_code,
+						:to_section_code,
+						:fm_exam_code, 
+						:to_exam_code,
+						:t_facility_id,
+						:age_group1,
+						:age_group2,
+						:t_facility_desc,
+						:fm_view_code,
+						:to_view_code,
+						:fm_main_exam_catg,
+						:to_main_exam_catg,
+						:fm_sub_exam_catg,
+						:to_sub_exam_catg
+          FROM      SY_PROG_PARAM
+	      WHERE     OPERATING_FACILITY_ID = :nd_facility_id
+		  AND		PGM_ID				  = 'RDREXSTA'
+	      AND       SESSION_ID			  = TO_NUMBER(:nd_session_id)
+	      AND       PGM_DATE			  = :nd_pgm_date;
+
+		  
+		  
+
+	/*-------------- Check for any error and No data found ----------------------*/
+	if (OERROR) 
+	{
+		disp_message(ERR_MESG,"SELECT failed on SY_PROG_PARAM\n");
+		proc_exit();
+    }
+	if (NO_DATA_FOUND)
+    {
+        disp_message(ERR_MESG,"No Data Found in the SY_PROG_PARAM\n");
+        proc_exit();
+    }
+	
+	/*-------------------------- End of Error Check ------------------------------*/
+    
+	fm_period_date.arr[fm_period_date.len]				= '\0';
+	to_period_date.arr[to_period_date.len]				= '\0';
+	consolidation_level.arr[consolidation_level.len]	= '\0';
+	fm_wing_code.arr[fm_wing_code.len]					= '\0';
+	to_wing_code.arr[to_wing_code.len]					= '\0';						
+	fm_clinic_code.arr[fm_clinic_code.len]				= '\0';						
+	to_clinic_code.arr[to_clinic_code.len]				= '\0';						
+	summarization_level.arr[summarization_level.len]	= '\0';
+	fm_section_code.arr[fm_section_code.len]			= '\0';						
+	to_section_code.arr[to_section_code.len]			= '\0';						
+	fm_exam_code.arr[fm_exam_code.len]					= '\0';						
+	to_exam_code.arr[to_exam_code.len]					= '\0';												
+	t_facility_id.arr[t_facility_id.len]				= '\0';												
+	t_facility_desc.arr[t_facility_desc.len]			= '\0';												
+	age_group1.arr[age_group1.len]						= '\0';												
+	age_group2.arr[age_group2.len]						= '\0';												
+	fm_view_code.arr[fm_view_code.len]					= '\0';						
+	to_view_code.arr[to_view_code.len]					= '\0';												
+
+	fm_main_exam_catg.arr[fm_main_exam_catg.len]		= '\0';												
+	to_main_exam_catg.arr[to_main_exam_catg.len]		= '\0';												
+	fm_sub_exam_catg.arr[fm_sub_exam_catg.len]			= '\0';												
+	to_sub_exam_catg.arr[to_sub_exam_catg.len]			= '\0';												
+
+
+    /* delete the parameter record */
+	EXEC SQL DELETE SY_PROG_PARAM
+			   WHERE OPERATING_FACILITY_ID = :nd_facility_id
+				 AND PGM_ID				   = 'RDREXSTA'
+				 AND SESSION_ID			   = TO_NUMBER(:nd_session_id)
+				 AND PGM_DATE			   = :nd_pgm_date;
+
+	/*-------------- Check for any error and No data found ----------------------*/
+	if (OERROR) 
+    {
+        disp_message(ERR_MESG,"DELETE failed on SY_PROG_PARAM\n");
+        proc_exit();
+    }
+
+	if (NO_DATA_FOUND) 
+    {
+        disp_message(ERR_MESG,"No Data Found in the SY_PROG_PARAM\n");
+        proc_exit();
+    }
+	/*------------------------- End of Error Check -------------------------------*/
+
+	return;
+
+  }
+
+  /*--------------------------- get the header details -------------------------*/
+void get_header_dtls()
+  {
+     h_acc_entity_name.len = 0;
+     h_user.len            = 0;
+     h_sysdate.len         = 0;
+
+     h_acc_entity_name.arr[h_acc_entity_name.len]   = '\0';
+     h_user.arr[h_user.len]                         = '\0';
+     h_sysdate.arr[h_sysdate.len]                   = '\0';
+	
+	/*For internationlization SY_ACC_ENTITY table is changed to SY_ACC_ENTITY_LANG_VW*/
+     EXEC SQL SELECT ACC_ENTITY_NAME, USER,
+		             TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+	            INTO :h_acc_entity_name, :h_user,
+		             :h_sysdate
+                FROM SY_ACC_ENTITY_LANG_VW
+			   WHERE ACC_ENTITY_ID = :nd_facility_id
+			   AND   LANGUAGE_ID   = :p_language_id;
+	
+	/*-------------- Check for any error and No data found ----------------------*/
+     if (OERROR)
+       {
+          disp_message(ERR_MESG,"SELECT failed on SY_ACC_ENTITY\n");
+          proc_exit();
+       }
+
+     if (NO_DATA_FOUND)
+       {
+          disp_message(ERR_MESG,"No Data Found in the SY_ACC_ENTITY\n");
+          proc_exit();
+       }
+
+	/*------------------------- End of Error Check -------------------------------*/
+     h_acc_entity_name.arr[h_acc_entity_name.len]   = '\0';
+     h_user.arr[h_user.len]                         = '\0';
+     h_sysdate.arr[h_sysdate.len]                   = '\0';
+
+  }
+/*------------------------- End of Header access -----------------------------*/
+
+
+/*------------------------- Appointments Cursor ------------------------------*/
+void dclr_appt_cur()
+  {
+	
+		 if (strcmp(summarization_level.arr,"S")==0)
+		 {
+		 
+		 EXEC SQL DECLARE REQUEST_CUR CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH)
+				FROM	RD_REQUEST A,RD_EXAM_VIEW_REQUESTED B,MP_PATIENT_MAST C
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				ORDER BY B.SECTION_CODE, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+
+		}
+		
+		if (strcmp(summarization_level.arr,"E")==0)
+		{
+		 
+		 EXEC SQL DECLARE  REQUEST_CUR1 CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH)
+				FROM	RD_REQUEST A,RD_EXAM_VIEW_REQUESTED B,MP_PATIENT_MAST C
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				ORDER BY B.EXAM_CODE, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+		}
+		
+		if (strcmp(summarization_level.arr,"V")==0)
+		{
+		 
+		 EXEC SQL DECLARE  REQUEST_CUR2 CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH),
+						NVL(D.VIEW_CODE,'XXXX') 
+				FROM	RD_REQUEST A, RD_EXAM_VIEW_REQUESTED B, MP_PATIENT_MAST C, RD_REQUEST_EXAM_VIEWS D
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND		D.OPERATING_FACILITY_ID(+)=B.OPERATING_FACILITY_ID
+				AND		D.REQUEST_NUM(+)=B.REQUEST_NUM
+				AND		D.REQUEST_LINE_NUM(+)=B.REQUEST_LINE_NUM
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     D.VIEW_CODE IS NOT NULL
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(B.EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				AND     NVL(D.VIEW_CODE,:fm_view_code) between :fm_view_code and :to_view_code
+				ORDER BY D.VIEW_CODE, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+		}
+
+
+		if (strcmp(summarization_level.arr,"M")==0)
+		{
+		 
+		 EXEC SQL DECLARE  REQUEST_CUR3 CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH),
+						E.EXAM_CATEGORY_PARENT 
+				FROM RD_REQUEST A,RD_EXAM_VIEW_REQUESTED B, MP_PATIENT_MAST C, RD_EXAMS D, RD_EXAM_CATEGORY E
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND     B.EXAM_CODE = D.EXAM_CODE
+				AND     D.EXAM_CATEGORY_CODE = E.EXAM_CATEGORY_CODE
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(A.WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(B.EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(B.EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				AND     NVL(E.EXAM_CATEGORY_PARENT,:fm_main_exam_catg) between :fm_main_exam_catg and :to_main_exam_catg
+				ORDER BY E.EXAM_CATEGORY_PARENT, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+		}
+
+
+		if (strcmp(summarization_level.arr,"U")==0)
+		{
+		 
+		 EXEC SQL DECLARE  REQUEST_CUR4 CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH),
+						E.EXAM_CATEGORY_CODE 
+				FROM RD_REQUEST A,RD_EXAM_VIEW_REQUESTED B, MP_PATIENT_MAST C, RD_EXAMS D, RD_EXAM_CATEGORY E
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND     B.EXAM_CODE = D.EXAM_CODE
+				AND     D.EXAM_CATEGORY_CODE = E.EXAM_CATEGORY_CODE
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(A.WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(B.EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(B.EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				AND     NVL(E.EXAM_CATEGORY_CODE,:fm_sub_exam_catg) between :fm_sub_exam_catg and :to_sub_exam_catg
+				ORDER BY E.EXAM_CATEGORY_CODE, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+		}
+
+
+		if (strcmp(summarization_level.arr,"L")==0)
+		{
+
+		 EXEC SQL DECLARE  REQUEST_CUR5 CURSOR FOR
+                SELECT	B.SECTION_CODE,
+						A.PATIENT_CLASS,
+						C.NATIONALITY_CODE,
+						B.EXAM_CODE,
+						A.PATIENT_ID,
+						C.SEX,
+						ROUND(REQUEST_DATE - C.DATE_OF_BIRTH),
+						B.EXAM_ROOM
+				FROM RD_REQUEST A,RD_EXAM_VIEW_REQUESTED B, MP_PATIENT_MAST C, RD_EXAMS D, RD_EXAM_CATEGORY E
+				WHERE   A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+				AND		A.REQUEST_NUM = B.REQUEST_NUM
+				AND		A.PATIENT_ID = C.PATIENT_ID
+				AND     B.EXAM_CODE = D.EXAM_CODE
+				AND     D.EXAM_CATEGORY_CODE = E.EXAM_CATEGORY_CODE
+				AND		NVL(B.STATUS,'X')!='99'
+				AND     A.OPERATING_FACILITY_ID = :t_facility_id
+				AND     TRUNC(A.REQUEST_DATE) between to_date(:fm_period_date,'dd/mm/yyyy') and to_date(:to_period_date,'dd/mm/yyyy')
+				AND     NVL(A.WING_CODE,:fm_wing_code) between :fm_wing_code and	:to_wing_code
+				AND     NVL(B.EXAM_ROOM,:fm_clinic_code) between :fm_clinic_code and :to_clinic_code
+				AND     NVL(B.SECTION_CODE,:fm_section_code) between :fm_section_code and :to_section_code
+				AND     NVL(B.EXAM_CODE,:fm_exam_code) between :fm_exam_code and :to_exam_code
+				AND     NVL(E.EXAM_CATEGORY_CODE,:fm_sub_exam_catg) between :fm_sub_exam_catg and :to_sub_exam_catg
+				AND     B.EXAM_ROOM BETWEEN nvl(:fm_clinic_code, B.EXAM_ROOM) and  nvl(:to_clinic_code , B.EXAM_ROOM)
+				ORDER BY B.EXAM_ROOM, A.PATIENT_CLASS, C.NATIONALITY_CODE;
+		}
+
+		
+/*-------------- Check for any error and No data found ----------------------*/
+
+     if (OERROR) 
+       {
+          disp_message(ERR_MESG,"SELECT failed on RD_REQUEST\n");
+          proc_exit();
+       }
+
+/*------------------------- End of Error Check -------------------------------*/
+
+     EXEC SQL OPEN REQUEST_CUR;
+	 EXEC SQL OPEN REQUEST_CUR1;
+	 EXEC SQL OPEN REQUEST_CUR2;
+	 EXEC SQL OPEN REQUEST_CUR3;
+	 EXEC SQL OPEN REQUEST_CUR4;
+	 EXEC SQL OPEN REQUEST_CUR5;
+
+/*-------------- Check for any error and No data found ----------------------*/
+
+     if (OERROR) 
+       {
+          disp_message(ERR_MESG,"OPEN failed on REQUEST_CUR\n");
+          proc_exit();
+       }
+
+/*------------------------- End of Error Check -------------------------------*/
+     return;
+/*------------------------- End of Appt Cursor -------------------------------*/
+  }
+
+ 
+
+
+ void get_default_values()
+ {
+     
+    
+		EXEC SQL SELECT CITIZEN_NATIONALITY_CODE       
+				 INTO   :cit_nationality_code
+				 FROM   MP_PARAM;
+
+			cit_nationality_code.arr[cit_nationality_code.len]		= '\0';												
+
+		
+		EXEC SQL select range_1_fr, range_1_fr_unit, range_1_to, range_1_to_unit,
+						range_2_fr, range_2_fr_unit, range_2_to, range_2_to_unit,
+						range_1_desc, range_2_desc   
+				 into   t_min_age1, t_range_1_fr_unit, t_max_age1, t_range_1_to_unit,
+						t_min_age2, t_range_2_fr_unit, t_max_age2, t_range_2_to_unit,
+						t_range_1_desc, t_range_2_desc   
+				 from   am_summ_range
+				 where  range_id = :age_group1;
+
+			t_range_1_fr_unit.arr[t_range_1_fr_unit.len]		= '\0';												
+			t_range_1_to_unit.arr[t_range_1_to_unit.len]		= '\0';												
+			t_range_2_fr_unit.arr[t_range_2_fr_unit.len]		= '\0';												
+			t_range_2_to_unit.arr[t_range_2_to_unit.len]		= '\0';												
+			t_range_1_desc.arr[t_range_1_desc.len]				= '\0';	
+			t_range_2_desc.arr[t_range_2_desc.len]				= '\0';	
+			
+			sprintf(string_age_range, "%d %s -  %d %s", t_min_age1, t_range_1_fr_unit.arr, t_max_age1, t_range_1_to_unit.arr);
+
+			sprintf(string_age_range_1, "%d %s -  %d %s",  t_min_age2, t_range_2_fr_unit.arr, t_max_age2, t_range_2_to_unit.arr);
+
+
+			if (strcmp(t_range_1_fr_unit.arr,"Y")==0)
+				t_min_days1	= (t_min_age1*365);
+			else if (strcmp(t_range_1_fr_unit.arr,"M")==0)
+				t_min_days1	= (t_min_age1*30);
+			else if (strcmp(t_range_1_fr_unit.arr,"D")==0)
+				t_min_days1	= t_min_age1;
+
+			if (strcmp(t_range_1_to_unit.arr,"Y")==0)
+				t_max_days1	= (t_max_age1*365);
+			else if (strcmp(t_range_1_to_unit.arr,"M")==0)
+				t_max_days1	= (t_max_age1*30);
+			else if (strcmp(t_range_1_to_unit.arr,"D")==0)
+				t_max_days1	= t_max_age1;
+
+
+			if (strcmp(t_range_2_fr_unit.arr,"Y")==0)
+				t_min_days2	= (t_min_age2*365);
+			else if (strcmp(t_range_2_fr_unit.arr,"M")==0)
+				t_min_days2	= (t_min_age2*30);
+			else if (strcmp(t_range_2_fr_unit.arr,"D")==0)
+				t_min_days2	= t_min_age2;
+
+			if (strcmp(t_range_2_to_unit.arr,"Y")==0)
+				t_max_days2	= (t_max_age2*365);
+			else if (strcmp(t_range_2_to_unit.arr,"M")==0)
+				t_max_days2	= (t_max_age2*30);
+			else if (strcmp(t_range_2_to_unit.arr,"D")==0)
+				t_max_days2	= t_max_age2;
+	
+     
+
+
+		
+	 if (OERROR)
+       {
+          disp_message(ERR_MESG,"SELECT failed on AM_SUMM_RANGE\n");
+          proc_exit();
+       }
+
+     if (NO_DATA_FOUND)
+       {
+          disp_message(ERR_MESG,"No Data Found in the AM_SUMM_RANGE\n");
+          proc_exit();
+       }
+
+
+     return;
+  }
+
+
+
+
+
+
+/*------------------------- Fetching from Appt Cursor ------------------------*/
+void do_report()
+  {
+     void	print_page_header(),
+       		print_rep_header(),
+			print_hdr(),
+			print_hdr_1(),
+			print_col_heading(),
+			print_detl_rec(),
+			print_section_total(),
+			get_exam_desc(),
+			get_wing_desc(),
+			get_view_desc(),
+			get_exam_catg_sub(),
+			get_exam_catg_par(),
+			get_section_desc(),
+			get_study_location_desc();
+     int   fetch_appt_cur();
+	 int   still_rec_left, posted = 0;
+
+    print_rep_header(); /* once for the report */
+	print_page_header();
+	
+	still_rec_left = fetch_appt_cur();
+		
+	while ( still_rec_left )
+    {
+		if (strcmp(summarization_level.arr,"S") == 0) 
+	 	{
+
+			print_hdr();
+			print_col_heading();
+
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+
+			strcpy(h_section_code.arr, t_section_code.arr);
+			h_section_code.len = strlen(t_section_code.arr);
+
+		 while((strcmp(h_section_code.arr, t_section_code.arr) == 0)
+					&& still_rec_left)
+		 {
+			strcpy(h_patient_class.arr, t_patient_class.arr);
+			h_patient_class.len = strlen(t_patient_class.arr);
+
+			t_male_nat_age1		= 0;
+			t_female_nat_age1	= 0;
+			t_male_oth_age1		= 0;
+			t_female_oth_age1	= 0;
+			t_male_nat_age2		= 0;
+			t_female_nat_age2	= 0;
+			t_male_oth_age2		= 0;
+			t_female_oth_age2	= 0;
+
+			while((strcmp(h_section_code.arr, t_section_code.arr) == 0)
+				  && (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+				  && still_rec_left)
+			{
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+							t_male_nat_age2	+= 1;
+						}
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+				}
+
+					still_rec_left = fetch_appt_cur();
+			
+			}
+					
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					print_detl_rec();
+
+		  }
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+		}				
+
+
+		if (strcmp(summarization_level.arr,"E") == 0) 
+	 	{
+			print_hdr();
+			print_col_heading();
+
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+			strcpy(h_exam_code.arr, t_exam_code.arr);
+			h_exam_code.len = strlen(t_exam_code.arr);
+
+			while((strcmp(h_exam_code.arr, t_exam_code.arr) == 0)
+					&& still_rec_left)
+			{
+				strcpy(h_patient_class.arr, t_patient_class.arr);
+				h_patient_class.len = strlen(t_patient_class.arr);
+
+				t_male_nat_age1		= 0;
+				t_female_nat_age1	= 0;
+				t_male_oth_age1		= 0;
+				t_female_oth_age1	= 0;
+				t_male_nat_age2		= 0;
+				t_female_nat_age2	= 0;
+				t_male_oth_age2		= 0;
+				t_female_oth_age2	= 0;
+
+				while( (strcmp(h_exam_code.arr, t_exam_code.arr) == 0)
+					&& (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+					&& still_rec_left)
+				{
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+					{
+							
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_nat_age2	+= 1;
+						}
+
+						
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+					}
+
+					still_rec_left = fetch_appt_cur();
+					
+			
+				}
+
+						
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					
+					print_detl_rec();
+					
+
+			}
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+					
+		}				
+
+
+		if (strcmp(summarization_level.arr,"V") == 0) 
+	 	{
+
+			print_hdr();
+			print_col_heading();
+
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+			strcpy(h_view_code.arr, t_view_code.arr);
+			h_view_code.len = strlen(t_view_code.arr);
+
+			while((strcmp(h_view_code.arr, t_view_code.arr) == 0)
+					&& still_rec_left)
+			{
+				strcpy(h_patient_class.arr, t_patient_class.arr);
+				h_patient_class.len = strlen(t_patient_class.arr);
+
+				t_male_nat_age1		= 0;
+				t_female_nat_age1	= 0;
+				t_male_oth_age1		= 0;
+				t_female_oth_age1	= 0;
+				t_male_nat_age2		= 0;
+				t_female_nat_age2	= 0;
+				t_male_oth_age2		= 0;
+				t_female_oth_age2	= 0;
+
+				while( (strcmp(h_view_code.arr, t_view_code.arr) == 0)
+					&& (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+					&& still_rec_left)
+				{
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_nat_age2	+= 1;
+						}
+
+						
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+					}
+
+					if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+					{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+					}
+
+					still_rec_left = fetch_appt_cur();
+					
+			
+				}
+
+						
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					
+					print_detl_rec();
+					
+
+			}
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+					
+		}				
+
+
+			
+		if (strcmp(summarization_level.arr,"M") == 0) 
+	 	{
+
+			print_hdr();
+			print_col_heading();
+
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+			strcpy(h_exam_catg_code.arr, t_exam_catg_code.arr);
+			h_exam_catg_code.len = strlen(t_exam_catg_code.arr);
+
+		 while((strcmp(h_exam_catg_code.arr, t_exam_catg_code.arr) == 0)
+					&& still_rec_left)
+		 {
+			strcpy(h_patient_class.arr, t_patient_class.arr);
+			h_patient_class.len = strlen(t_patient_class.arr);
+
+			t_male_nat_age1		= 0;
+			t_female_nat_age1	= 0;
+			t_male_oth_age1		= 0;
+			t_female_oth_age1	= 0;
+			t_male_nat_age2		= 0;
+			t_female_nat_age2	= 0;
+			t_male_oth_age2		= 0;
+			t_female_oth_age2	= 0;
+
+			while((strcmp(h_exam_catg_code.arr, t_exam_catg_code.arr) == 0)
+				  && (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+				  && still_rec_left)
+			{
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+							t_male_nat_age2	+= 1;
+						}
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+				}
+
+					still_rec_left = fetch_appt_cur();
+			
+			}
+					
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					print_detl_rec();
+
+		  }
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+		}
+
+
+			
+		if (strcmp(summarization_level.arr,"U") == 0) 
+	 	{
+
+			print_hdr();
+			print_col_heading();
+		
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+			strcpy(h_exam_catg_code.arr, t_exam_catg_code.arr);
+			h_exam_catg_code.len = strlen(t_exam_catg_code.arr);
+
+		 while((strcmp(h_exam_catg_code.arr, t_exam_catg_code.arr) == 0)
+					&& still_rec_left)
+		 {
+			strcpy(h_patient_class.arr, t_patient_class.arr);
+			h_patient_class.len = strlen(t_patient_class.arr);
+
+			t_male_nat_age1		= 0;
+			t_female_nat_age1	= 0;
+			t_male_oth_age1		= 0;
+			t_female_oth_age1	= 0;
+			t_male_nat_age2		= 0;
+			t_female_nat_age2	= 0;
+			t_male_oth_age2		= 0;
+			t_female_oth_age2	= 0;
+
+			while((strcmp(h_exam_catg_code.arr, t_exam_catg_code.arr) == 0)
+				  && (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+				  && still_rec_left)
+			{
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+							t_male_nat_age2	+= 1;
+						}
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+				}
+
+					still_rec_left = fetch_appt_cur();
+			
+			}
+					
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					print_detl_rec();
+
+		  }
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+		}
+
+		if (strcmp(summarization_level.arr,"L") == 0) 
+	 	{
+
+			print_hdr();
+
+			print_col_heading();
+		
+			sec_male_nat_tot1	= 0;
+			sec_female_nat_tot1	= 0;
+			sec_male_oth_tot1	= 0;
+			sec_female_oth_tot1	= 0;
+			sec_male_nat_tot2	= 0;
+			sec_female_nat_tot2	= 0;
+			sec_male_oth_tot2	= 0;
+			sec_female_oth_tot2	= 0;
+
+			strcpy(h_study_location.arr, t_study_location.arr);
+			h_study_location.len = strlen(t_exam_catg_code.arr);
+
+
+		 while((strcmp(h_study_location.arr, t_study_location.arr) == 0)
+					&& still_rec_left)
+		 {
+			strcpy(h_patient_class.arr, t_patient_class.arr);
+			h_patient_class.len = strlen(t_patient_class.arr);
+
+			t_male_nat_age1		= 0;
+			t_female_nat_age1	= 0;
+			t_male_oth_age1		= 0;
+			t_female_oth_age1	= 0;
+			t_male_nat_age2		= 0;
+			t_female_nat_age2	= 0;
+			t_male_oth_age2		= 0;
+			t_female_oth_age2	= 0;
+
+			while((strcmp(h_study_location.arr, t_study_location.arr) == 0)
+				  && (strcmp(h_patient_class.arr, t_patient_class.arr) == 0)
+				  && still_rec_left)
+			{
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_male_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+							t_male_nat_age2	+= 1;
+						}
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)==0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+							t_female_nat_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_nat_age2	+= 1;
+						}
+					
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"M")==0) && still_rec_left)
+				{
+						
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_male_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_male_oth_age2	+= 1;				
+						}
+
+
+				}
+
+				if ((strcmp(t_nationality_code.arr,cit_nationality_code.arr)!=0)
+					&& (strcmp(t_sex.arr,"F")==0) && still_rec_left)
+				{
+						if ((t_date_of_birth_days >= t_min_days1) &&
+							(t_date_of_birth_days <= t_max_days1) )
+						{
+								t_female_oth_age1	+= 1;
+						}
+							
+						if ((t_date_of_birth_days >= t_min_days2) &&
+							(t_date_of_birth_days <= t_max_days2) )
+						{
+								t_female_oth_age2	+= 1;				
+						}
+				}
+
+					still_rec_left = fetch_appt_cur();
+			
+			}
+					
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+					}
+					print_detl_rec();
+
+		  }
+
+					if ( ( line_no + 6 ) > MAX_LINES )
+					{	
+						page_skip();
+						print_line('_',REP_WIDTH);
+					}
+					else
+					print_line('_',REP_WIDTH);
+					print_section_total();
+					print_line('_',REP_WIDTH);
+
+		}
+
+	
+	}
+
+
+
+	
+	if ( ( line_no + 6 ) > MAX_LINES )
+	{	
+		page_skip();
+		print_line('_',REP_WIDTH);
+	}
+	else
+		print_line('_',REP_WIDTH);
+
+	print_end_of_rep();
+}
+/* -------------------------- End of Report function -------------------------*/
+
+/*--------------------------- Page Skip --------------------------------------*/
+page_skip()
+{
+     line_no = 11;
+     fprintf(f1,"\f");
+
+     print_page_header();
+
+	 print_hdr_1();
+	 print_col_heading();
+}
+/*--------------------------- End of Page Skip -------------------------------*/
+/* fetches the next record from REQUEST_CUR     */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_appt_cur()
+  {
+
+	 t_section_code.len				= 0;
+	 t_patient_class.len			= 0;
+	 t_nationality_code.len			= 0;
+	 t_exam_code.len				= 0;
+	 t_patient_id.len				= 0;
+	 t_sex.len						= 0;
+	 t_view_code.len				= 0;
+	 t_exam_catg_code.len			= 0;
+	 
+	 t_section_code.arr[t_section_code.len]					= '\0';
+	 t_patient_class.arr[t_patient_class.len]				= '\0';
+	 t_nationality_code.arr[t_nationality_code.len]			= '\0';						
+	 t_exam_code.arr[t_exam_code.len]						= '\0';												
+	 t_patient_id.arr[t_patient_id.len]						= '\0';																	
+	 t_sex.arr[t_sex.len]									= '\0';											
+	 t_view_code.arr[t_view_code.len]						= '\0';																		
+	 t_exam_catg_code.arr[t_exam_catg_code.len]				= '\0';																		
+
+	 if (strcmp(summarization_level.arr,"S")==0)
+	 {
+
+     EXEC SQL FETCH REQUEST_CUR INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days;
+	 }
+
+	 
+
+	 if (strcmp(summarization_level.arr,"E")==0)
+	 {
+		
+	   EXEC SQL FETCH REQUEST_CUR1 INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days;
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"V")==0)
+	 {
+		
+	   EXEC SQL FETCH REQUEST_CUR2 INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days,
+						:t_view_code;
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"M")==0)
+	 {
+		
+	   EXEC SQL FETCH REQUEST_CUR3 INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days,
+						:t_exam_catg_code;
+
+	 }
+
+
+	 if (strcmp(summarization_level.arr,"U")==0)
+	 {
+		
+	   EXEC SQL FETCH REQUEST_CUR4 INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days,
+						:t_exam_catg_code;
+
+	 }
+								
+
+	 if (strcmp(summarization_level.arr,"L")==0)
+	 {
+	
+	   EXEC SQL FETCH REQUEST_CUR5 INTO
+						:t_section_code,
+						:t_patient_class,
+						:t_nationality_code,
+						:t_exam_code,
+						:t_patient_id,
+						:t_sex,
+						:t_date_of_birth_days,
+						:t_study_location;
+
+	 }
+
+    
+     if (OERROR) 
+       {
+          disp_message(ORA_MESG,"FETCH failed\n");
+          proc_exit();
+       }
+
+     if (NO_DATA_FOUND)
+       return 0;
+
+     t_section_code.arr[t_section_code.len]					= '\0';
+	 t_patient_class.arr[t_patient_class.len]				= '\0';
+	 t_nationality_code.arr[t_nationality_code.len]			= '\0';						
+	 t_exam_code.arr[t_exam_code.len]						= '\0';												
+	 t_patient_id.arr[t_patient_id.len]						= '\0';																	
+	 t_sex.arr[t_sex.len]									= '\0';																	
+	 t_view_code.arr[t_view_code.len]						= '\0';													 						
+	 t_exam_catg_code.arr[t_exam_catg_code.len]				= '\0';													 						
+
+	 
+
+     return 1;
+  }
+ 
+         
+/* to print the detailed record with to horizontal summeries */
+void print_detl_rec()
+{
+    fprintf(f1,"%-4.4s", h_patient_class.arr); horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", t_male_nat_age1);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", t_female_nat_age1);horz_skip(2);
+	fprintf(f1,"%6d", t_male_oth_age1);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", t_female_oth_age1);horz_skip(2);
+
+	fprintf(f1,"%6d", t_male_nat_age2);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", t_female_nat_age2);horz_skip(2);
+	fprintf(f1,"%6d", t_male_oth_age2);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", t_female_oth_age2);
+
+	fprintf(f1,"\n\n");
+
+	sec_male_nat_tot1	+= t_male_nat_age1;
+	sec_female_nat_tot1	+= t_female_nat_age1;
+	sec_male_oth_tot1	+= t_male_oth_age1;
+	sec_female_oth_tot1	+= t_female_oth_age1;
+	sec_male_nat_tot2	+= t_male_nat_age2;
+	sec_female_nat_tot2	+= t_female_nat_age2;
+	sec_male_oth_tot2	+= t_male_oth_age2;
+	sec_female_oth_tot2	+= t_female_oth_age2;
+
+	line_no += 2;
+
+}
+
+/*----------------------------- Service    Total --------------------------*/
+void print_section_total()
+  { 
+    
+	fprintf(f1,"%-8s",loc_legend[31]);
+	fprintf(f1,"%6d", sec_male_nat_tot1);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", sec_female_nat_tot1);horz_skip(2);
+	fprintf(f1,"%6d", sec_male_oth_tot1);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", sec_female_oth_tot1);horz_skip(2);
+
+	fprintf(f1,"%6d", sec_male_nat_tot2);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", sec_female_nat_tot2);horz_skip(2);
+	fprintf(f1,"%6d", sec_male_oth_tot2);horz_skip(2);horz_skip(2);
+	fprintf(f1,"%6d", sec_female_oth_tot2);
+
+	fprintf(f1,"\n");
+
+	sec_male_nat_tot1	= 0;
+	sec_female_nat_tot1	= 0;
+	sec_male_oth_tot1	= 0;
+	sec_female_oth_tot1	= 0;
+	sec_male_nat_tot2	= 0;
+	sec_female_nat_tot2	= 0;
+	sec_male_oth_tot2	= 0;
+	sec_female_oth_tot2	= 0;
+
+	line_no += 2;
+
+  }
+
+
+/*-------------------------------- Grand Total -------------------------------*/
+print_grand_tot()
+{
+	  //fprintf(f1,"%-45.45s", "Grand   Total : ");
+	  fprintf(f1,"%-45.45s :", loc_legend[33]);
+	  fprintf(f1,"%7d",gr_total_inpat); horz_skip(2);
+	  fprintf(f1,"%6d",gr_total_outpat); horz_skip(2);
+	  fprintf(f1,"%8d",gr_total_referral); horz_skip(2);
+	  fprintf(f1,"%6d\n",gr_total_pat); 
+}
+
+/*----------------------------- Get Exam Desc --------------------------------*/
+void get_exam_desc ()
+  {
+     t_exam_desc.arr[0]  = '\0';
+     t_exam_desc.len     = 0;
+
+     EXEC SQL SELECT LONG_DESC
+	      INTO   :t_exam_desc
+	      FROM   RD_EXAMINATION
+	      WHERE  EXAM_CODE = :t_exam_code
+		  AND    LANGUAGE_ID = :p_language_id;
+
+     t_exam_desc.arr [t_exam_desc.len ] = '\0';
+  }
+
+
+ void get_exam_catg_par ()
+  {
+     t_exam_catg_desc.arr[0]  = '\0';
+     t_exam_catg_desc.len     = 0;
+
+     EXEC SQL SELECT SHORT_DESC
+	      INTO   :t_exam_catg_desc
+	      FROM   RD_EXAM_CATEGORY_LANG_VW
+	      WHERE  EXAM_CATEGORY_PARENT = :t_exam_catg_code
+		  AND    LANGUAGE_ID = :p_language_id;
+
+     t_exam_catg_desc.arr [t_exam_catg_desc.len ] = '\0';
+  }
+
+  void get_exam_catg_sub ()
+  {
+     t_exam_catg_desc.arr[0]  = '\0';
+     t_exam_catg_desc.len     = 0;
+
+     EXEC SQL SELECT SHORT_DESC
+	      INTO   :t_exam_catg_desc
+	      FROM   RD_EXAM_CATEGORY_LANG_VW
+	      WHERE  EXAM_CATEGORY_CODE = :t_exam_catg_code
+		  AND    LANGUAGE_ID = :p_language_id;
+
+     t_exam_catg_desc.arr [t_exam_catg_desc.len ] = '\0';
+  }
+
+/*-------------- Study location desc ---------------- */
+  void get_study_location_desc()
+  {
+     t_study_location_desc.arr[0]  = '\0';
+     t_study_location_desc.len     = 0;
+
+     EXEC SQL SELECT SHORT_DESC
+	      INTO   :t_study_location_desc
+	      FROM   RD_CLINIC_LANG_VW
+	      WHERE  CLINIC_CODE    = :t_study_location
+		  AND    OPERATING_FACILITY_ID = :nd_facility_id
+		  AND    LANGUAGE_ID  =  :p_language_id;
+
+     t_study_location_desc.arr [t_study_location_desc.len ] = '\0';
+  }
+
+
+
+
+
+
+/*----------------------------- End Exam Desc -------------------------------*/
+
+/*------ gets the Wing desc for the Wing code ----------------------------*/
+void get_wing_desc()
+{
+  
+  t_wing_desc.arr [0]   = '\0';
+  t_wing_desc.len     = 0;
+
+   EXEC SQL SELECT SHORT_DESC
+            INTO   :t_wing_desc
+			FROM   RD_WINGS_LANG_VW
+	    WHERE OPERATING_FACILITY_ID = :nd_facility_id
+			   AND WING_CODE = :t_wing_code
+			   AND LANGUAGE_ID = :p_language_id;	
+
+  t_wing_desc.arr [t_wing_desc.len ] = '\0';
+  return;
+}
+
+/*-------------------- End of Wing Desc ------------------------------------*/
+
+void get_section_desc()
+{
+  
+  t_section_desc.arr [0]   = '\0';
+  t_section_desc.len     = 0;
+
+   EXEC SQL SELECT SHORT_DESC
+            INTO   :t_section_desc
+			FROM   RD_SECTION_LANG_VW
+	    WHERE SECTION_CODE = :t_section_code
+		AND   LANGUAGE_ID  = :p_language_id;	
+
+  t_section_desc.arr [t_section_desc.len ] = '\0';
+  return;
+}
+
+void get_view_desc()
+{
+  
+  t_view_desc.arr [0]   = '\0';
+  t_view_desc.len     = 0;
+
+   EXEC SQL SELECT SHORT_DESC
+            INTO   :t_view_desc
+			FROM   RD_VIEW_LANG_VW
+	    WHERE VIEW_CODE = :t_view_code
+		AND    LANGUAGE_ID = :p_language_id;	
+
+  t_view_desc.arr [t_view_desc.len ] = '\0';
+
+  return;
+}
+
+
+/*-------------------- to print the header page for the report ---------------*/
+void print_rep_header()
+  {
+     print_page_header();
+
+     fprintf(f1,VER);
+     fprintf(f1,"\n\n\n\n");
+     fprintf(f1,"        ");
+     //fprintf(f1,"INPUT PARAMETERS :\n");  for internationlization
+	 fprintf(f1,"%s :\n",loc_legend[3]);
+     fprintf(f1,"        ");
+	 fprintf(f1 ,"________________\n\n");
+
+	 if (strcmp(summarization_level.arr,"S")==0){
+	    //strcpy(d_summ.arr, "Section");
+		strcpy(d_summ.arr, loc_legend[4]);
+	 }
+	 else if (strcmp(summarization_level.arr,"E")==0){
+	    //strcpy(d_summ.arr, "Exam");
+		strcpy(d_summ.arr, loc_legend[5]);
+
+	 }
+	 else if (strcmp(summarization_level.arr,"V")==0){
+	    //strcpy(d_summ.arr, "View");
+		strcpy(d_summ.arr, loc_legend[6]);
+	 }
+	 else if (strcmp(summarization_level.arr,"M")==0){
+	    //strcpy(d_summ.arr, "Main Exam Category");
+		strcpy(d_summ.arr, loc_legend[7]);
+
+	 }
+	 else if (strcmp(summarization_level.arr,"U")==0){
+	    //strcpy(d_summ.arr, "Sub Exam Category");
+		strcpy(d_summ.arr, loc_legend[8]);
+	 }
+	 else if (strcmp(summarization_level.arr,"L")==0){
+	    //strcpy(d_summ.arr, "Study Location");
+		strcpy(d_summ.arr, loc_legend[9]);
+	 }
+
+	 
+	 if (strcmp(fm_period_date.arr, "01/01/1800") ==0)
+	     //strcpy(d_fm_period.arr, "LOWEST");
+		 strcpy(d_fm_period.arr, loc_legend[13]);
+     else
+		{
+	     //strcpy(d_fm_period.arr, fm_period_date.arr);
+		 strcpy(date_convert.arr,fm_period_date.arr);
+		 time_flag = 0;
+         fun_change_loc_date();
+		 strcpy(d_fm_period.arr, date_convert.arr);
+		}
+
+	 if (strcmp(to_period_date.arr, "31/12/4712") ==0)
+	     //strcpy(d_to_period.arr, "HIGHEST");
+		 strcpy(d_to_period.arr, loc_legend[14]);
+     else
+		{
+	    // strcpy(d_to_period.arr, to_period_date.arr);
+		 strcpy(date_convert.arr,to_period_date.arr);
+		 time_flag = 0;
+         fun_change_loc_date();
+		 strcpy(d_to_period.arr, date_convert.arr);
+		}
+
+/*	 Commented for internationlization
+	 fprintf(f1,"\t\tSummarization Level   : %-30s\n\n", d_summ.arr);
+     fprintf(f1,"\t\tFROM EXAM DATE        : %-20s\n\n", d_fm_period.arr);
+	 fprintf(f1,"\t\tTO EXAM DATE          : %-20s\n\n", d_to_period.arr);*/
+
+ 	 fprintf(f1,"\t\t%-30.30s: %-30s\n\n", loc_legend[10],d_summ.arr);
+     fprintf(f1,"\t\t%-30.30s: %-20s\n\n", loc_legend[11],d_fm_period.arr);
+	 fprintf(f1,"\t\t%-30.30s: %-20s\n\n", loc_legend[12],d_to_period.arr);
+	 fprintf(f1,"\t\t%-30.30s: %-30s\n\n", loc_legend[15],t_facility_desc.arr);
+
+
+
+//   fprintf(f1,"\t\tFROM EXAM DATE        : %-20s\n\n", fm_period_date.arr);
+//	 fprintf(f1,"\t\tTO EXAM DATE          : %-20s\n\n", to_period_date.arr);
+
+//	 fprintf(f1,"\t\tFACILITY              : %-30s\n\n", t_facility_desc.arr);
+
+//     fprintf(f1,"                ");
+
+	 if (strcmp(fm_wing_code.arr,"!!") == 0)
+          /*  legend[16] -- ALL*/
+		  strcpy(t_wing_desc.arr, loc_legend[16]);
+     else 
+	     {
+	      strcpy(t_wing_code.arr,fm_wing_code.arr);
+		  t_wing_code.len = strlen(t_wing_code.arr);
+          get_wing_desc();
+		 }
+
+	 if (strcmp(fm_wing_code.arr,"!!") != 0) 
+	 /*  legend[17] -- FROM WING CODE*/
+	 fprintf(f1,"\t\t%-30s: %-2s %-16s\n\n",loc_legend[17],fm_wing_code.arr,t_wing_desc.arr);
+     if (strcmp(fm_wing_code.arr,"!!") == 0) 
+	 fprintf(f1,"\t\t%-30s: %-3s\n\n",loc_legend[17],t_wing_desc.arr);
+//	 fprintf(f1,"                ");
+
+	 if (strcmp(to_wing_code.arr,"~~") == 0)
+          strcpy(t_wing_desc.arr, loc_legend[16]);
+     else 
+	     {
+	      strcpy(t_wing_code.arr,to_wing_code.arr);
+		  t_wing_code.len = strlen(t_wing_code.arr);
+          get_wing_desc();
+		 }
+
+	 if (strcmp(to_wing_code.arr,"~~") != 0) 
+	 /*  legend[18] -- TO WING CODE*/
+	 fprintf(f1,"\t\t%-30s: %-2s %-16s\n\n",loc_legend[18], to_wing_code.arr,t_wing_desc.arr);
+     if (strcmp(to_wing_code.arr,"~~") == 0) 
+	 fprintf(f1,"\t\t%-30s: %-3s\n\n",loc_legend[18],t_wing_desc.arr);
+//	 fprintf(f1,"                ");
+
+	
+	 
+	 if (strcmp(fm_clinic_code.arr,"!!!!") == 0){
+          strcpy(fm_clinic_desc.arr, loc_legend[16]);
+	  }
+	 else
+          strcpy(fm_clinic_desc.arr, fm_clinic_code.arr);
+	 /*  legend[19] -- FROM STUDY LOCATION*/
+	  fprintf(f1, "\t\t%-30s: %-4s\n\n",loc_legend[19], fm_clinic_desc.arr);
+//   	  fprintf(f1,"                ");
+
+
+	 if (strcmp(to_clinic_code.arr,"~~~~") == 0){
+          strcpy(to_clinic_desc.arr, loc_legend[16]);
+	  }
+	 else
+          strcpy(to_clinic_desc.arr, to_clinic_code.arr);
+
+	 /*  legend[20] -- TO STUDY LOCATION*/
+	  fprintf(f1, "\t\t%-30s: %-4s\n\n",loc_legend[20], to_clinic_desc.arr);
+//   	  fprintf(f1,"                ");
+
+	 
+		
+	 if (strcmp(fm_section_code.arr,"!!!!") == 0)
+          strcpy(t_section_desc.arr, loc_legend[16]); 
+     else
+	     { 
+	      strcpy(t_section_code.arr,fm_section_code.arr);
+  		  t_section_code.len = strlen(t_section_code.arr);
+          get_section_desc(); 
+		 }
+			   
+	 if (strcmp(fm_section_code.arr,"!!!!") != 0) 
+	/*  legend[21] -- FROM SECTION CODE*/
+     fprintf(f1,"\t\t%-30s: %-4s %-16s\n\n",loc_legend[21],fm_section_code.arr,t_section_desc.arr);
+     if (strcmp(fm_section_code.arr,"!!!!") == 0) 
+	 fprintf(f1,"\t\t%-30s: %-3s\n\n",loc_legend[21],t_section_desc.arr);
+//	 fprintf(f1,"                ");
+
+     
+	 if (strcmp(to_section_code.arr,"~~~~") == 0)
+          strcpy(t_section_desc.arr, loc_legend[16]); 
+     else
+	     { 
+	      strcpy(t_section_code.arr,to_section_code.arr);
+  		  t_section_code.len = strlen(t_section_code.arr);
+          get_section_desc(); 
+		 }
+			   
+	 if (strcmp(to_section_code.arr,"~~~~") != 0) 
+	/*  legend[22] -- TO SECTION CODE */
+     fprintf(f1,"\t\t%-30s: %-4s %-16s\n\n",loc_legend[22],to_section_code.arr,t_section_desc.arr);
+     if (strcmp(to_section_code.arr,"~~~~") == 0) 
+	 fprintf(f1,"\t\t%-30s: %-3s\n\n",loc_legend[22],t_section_desc.arr);
+	 
+	 /* legend[23] -- AGE GROUP  */
+	 fprintf(f1,"\t\t%-30s: %-30s\n\n",loc_legend[23], age_group1.arr);
+	 
+     fprintf(f1,"\f");
+  }
+
+
+/* to print page headers the header details */ 
+void print_page_header()
+{
+    int hosp_nm_len, rep_title_len = 10, s1, s2;
+	char v_rep_title[200];
+	
+	fprintf(f1,"MDL : RD");
+	hosp_nm_len  =  h_acc_entity_name.len;
+	s1 = (REP_WIDTH-hosp_nm_len)/2;
+	horz_skip(s1-8);
+	fprintf(f1,"%s", h_acc_entity_name.arr);
+	s2 = (REP_WIDTH-s1-hosp_nm_len);
+	horz_skip(s2-16);
+
+
+    init_date_temp_var();
+	strcpy(date_convert.arr,h_sysdate.arr);
+	time_flag = 1;
+    fun_change_loc_date();
+
+
+	//fprintf(f1,"%s", h_sysdate.arr);  date_convert.arr
+	fprintf(f1,"%s", date_convert.arr);
+    
+	fprintf(f1,"\n"); fprintf(f1,"OPR : %s", h_user.arr); fprintf(f1,"\n");
+    
+	fprintf(f1,"REP : %s",nd_pgm_id.arr);
+
+    strcpy(v_rep_title,REP_TITLE);
+
+	/* leged[1]  --  EXAMINATION STATISTICS */
+    strcpy(v_rep_title,loc_legend[1]);
+
+	rep_title_len = strlen(v_rep_title);
+	s1 = (REP_WIDTH-rep_title_len)/2;
+	horz_skip(s1-14);
+	//fprintf(f1,"%s",REP_TITLE);
+	fprintf(f1,"%s",v_rep_title);
+
+	s2 = (REP_WIDTH-s1-rep_title_len);
+	horz_skip(s2-10);
+	fprintf(f1,"%s :%4d\n",loc_legend[2],++page_no);  
+    print_line('_',REP_WIDTH);
+
+	line_no = 5; 
+}
+/*------------------------------ Name Header ---------------------------------*/
+void print_hdr()
+  {  
+
+     if (strcmp(summarization_level.arr,"S") == 0) 
+	 {
+		get_section_desc(); 
+     
+		/* legend[24]  --  Facility  */
+		fprintf(f1,"%-15s:  %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/* legend[4]   --  Section   */
+		fprintf(f1,"%-15s:  %-30s \n",loc_legend[4],t_section_desc.arr);
+
+	 }
+
+	if (strcmp(summarization_level.arr,"E") == 0) 
+	 {
+		get_exam_desc(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[5]  --  Exam  */
+		fprintf(f1,"%-10s: %-40s \n",loc_legend[5],t_exam_desc.arr);
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"V") == 0) 
+	 {
+		get_view_desc(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[6]  --  View  */
+		fprintf(f1,"%-10s: %-30s \n",loc_legend[6],t_view_desc.arr);
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"M") == 0) 
+	 {
+		get_exam_catg_par(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[25]  --- Main Exam Category  */
+		fprintf(f1,"%-30s: %-30s \n",loc_legend[25],t_exam_catg_desc.arr);
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"U") == 0) 
+	 {
+		get_exam_catg_sub(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[26]  --  Exam Category  */
+		fprintf(f1,"%-25s: %-30s \n",loc_legend[26],t_exam_catg_desc.arr);
+
+	 }
+
+    if (strcmp(summarization_level.arr,"L") == 0) 
+	 {
+
+		get_study_location_desc(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[9]  -  Study location  */
+		fprintf(f1,"%-30s: %-30s \n",loc_legend[9],t_study_location_desc.arr);
+
+
+	 }
+
+
+	line_no += 4;
+  }
+
+/*------------------------------ End Header ----------------------------------*/
+void print_hdr_1()
+  {  
+
+     if (strcmp(summarization_level.arr,"S") == 0) 
+	 {
+	//	get_section_desc(); 
+     
+		/* legend[24]  --  Facility  */
+		fprintf(f1,"%-15s:  %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/* legend[4]   --  Section   */
+		fprintf(f1,"%-15s:  %-30s \n",loc_legend[4],t_section_desc.arr);
+
+	 }
+
+	if (strcmp(summarization_level.arr,"E") == 0) 
+	 {
+	//	get_exam_desc(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[5]  --  Exam  */
+		fprintf(f1,"%-10s: %-40s \n",loc_legend[5],t_exam_desc.arr);
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"V") == 0) 
+	 {
+	//	get_view_desc(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[6]  --  View  */
+		fprintf(f1,"%-10s: %-30s \n",loc_legend[6],t_view_desc.arr);
+
+	 }
+
+	 if (strcmp(summarization_level.arr,"M") == 0) 
+	 {
+	//	get_exam_catg_par(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[25]  --- Main Exam Category  */
+		fprintf(f1,"%-30s: %-30s \n",loc_legend[25],t_exam_catg_desc.arr);
+	 }
+
+	 if (strcmp(summarization_level.arr,"U") == 0) 
+	 {
+	//	get_exam_catg_sub(); 
+     
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[26]  --  Exam Category  */
+		fprintf(f1,"%-25s: %-30s \n",loc_legend[26],t_exam_catg_desc.arr);
+
+	 }
+
+    if (strcmp(summarization_level.arr,"L") == 0) 
+	 {
+
+		fprintf(f1,"%-15s: %-30s \n",loc_legend[24],t_facility_desc.arr);
+		/*  legend[9]  -  Study location  */
+		fprintf(f1,"%-30s: %-30s \n",loc_legend[9],t_study_location_desc.arr);
+
+	 }
+
+	line_no += 4;
+  }
+
+/*------------------------------ column Header -------------------------------*/
+/* print the heading */
+void print_col_heading()
+{
+     print_line('_',REP_WIDTH);
+	 fprintf(f1,"          <------ %-15s ------>    <------ %-15s ------>\n", string_age_range, string_age_range_1);
+/*	 fprintf(f1,"          Local             Non-Local         Local             Non-Local \n");
+	 fprintf(f1,"          Male    Female    Male    Female    Male    Female    Male    Female\n");*/
+
+	 fprintf(f1,"%15s %21s %13s %21s        \n",loc_legend[27],loc_legend[28],loc_legend[27],loc_legend[28]);
+	 fprintf(f1,"%14s %9s %7s %9s %7s %9s %7s %9s    \n",loc_legend[29],loc_legend[30],loc_legend[29],loc_legend[30],loc_legend[29],loc_legend[30],loc_legend[29],loc_legend[30]);
+
+     print_line('_',REP_WIDTH);
+	 line_no += 5;
+}
+
+    		
+
+print_end_of_rep()
+{
+    fprintf(f1,"\n");
+	horz_skip(23);
+	/*  legend[33] -- End of Report */
+	fprintf(f1,"***** %s *****",loc_legend[33]);
+	fprintf(f1,"%cE",ESC); /*for resetting to default mode 26/Aug/2003 */
+} 
+
+
+horz_skip(num) /* this is to obtain required blank space */
+int num;
+{
+	for(i=0;i<num;i++)fprintf(f1," ");
+}
+
+print_line(ch,n)
+  char ch;
+  int n;
+{
+ int i;
+ for(i=0;i<n;i++)
+ fprintf(f1,"%c",ch);  fprintf(f1,"\n");
+}
+
+/*--------------------------------- End Header -------------------------------*/
+
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+nd_temp_date.arr[nd_temp_date.len]='\0';
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}
+
+get_local_date()
+{
+
+
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+
+	
+	BEGIN
+	  
+       	get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);
+
+		IF :time_flag = 1 THEN
+		   :nd_loc_date := to_char(t_date,'DD/MM/YYYY HH24:MI');
+		   :time_flag := 0;
+		ELSE
+
+	       :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+
+		END IF;
+	
+
+	END;
+
+	END-EXEC;
+
+		nd_loc_date.arr[nd_loc_date.len]='\0';		     
+
+		if (OERROR)
+		disp_message(ERR_MESG,"Date conversion failed...\n");
+        //err_mesg("SELECTING Date failed",0,"");
+
+}
+
+fetch_legend_value()
+{
+	
+	int i=0;
+	EXEC SQL EXECUTE
+	BEGIN	      
+  	   sm_populate_report_legend.fetch_legend(:nd_facility_id,:p_language_id,'RDREXSTA.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+	for (i=1; i<=100; i++)
+	{
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+       :l_translated_value := GET_LEGEND(LTRIM(RTRIM('RDREXSTA.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//disp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(loc_legend[i],l_translated_value.arr);
+
+	}
+
+}
+
+
+
+
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef OERROR
+#undef MAX_LINES
+#undef VER

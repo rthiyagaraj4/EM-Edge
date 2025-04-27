@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_DCP_DCPTrans_EnterAllocTrans</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following to create allocating transactions:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc No</span> - Enter a valid Document Number. A description for the selected Document Type gets displayed. If the document number is system generated, you cannot enter the Document Number. Document Type Code and Document Number have to be unique. This is not pertinent to the Allocation Detail. This is a mandatory field. Following validations are carried out for the Allocating Document Number.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Document Type and Number must not be duplicated in this transaction entry.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Document Type and Number should not be present already in Pending Documents detail.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Document Type and Number should not be present in Document Control details.</p>
+</li>
+</ol>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> - The system date is displayed as the document date, by default. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Trx Type</span> – The Transaction Type is displayed based on the Document Type selected. You cannot update the Transaction Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> - Enter a valid Patient Number. Right click on ‘Click for User Option’ to search for a patient record. If the patient number is valid, the patient name, gender, age in years, months and days are displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Ref</span> - Enter the document reference details in alphanumeric format. The Document Reference is considered as the remarks.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Period</span> - The post month and year is defaulted from the Billing Parameters. Click Calendar function to update the period. The post month and year has to be greater than the Billing parameters post month and year.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount</span> - Enter the document amount for this document. Zero is a valid entry. If the transaction type is "3" or "5", the amount entered must be negative. If the transaction type is "1", "2" or "6", the amount entered must be positive. You have to take care to put the correct sign in case of transaction type equal to "4", since both signs are acceptable.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the narration for the allocating document. The narration is considered as the remarks for the selected Document Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Details Required</span> – Select the check box to view the Allocating Document details. Clear the check box and the allocating document details are not displayed. &#160;</p>
+</li>
+</ol>
+<p class="BoldRFD">Allocating Transactions – A/C Lines &#160;</p>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Posting A/C</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and to select a posting account. The description for the selected posting account gets displayed. When the document is posted, the selected posting account is credited or debited (whether the amount is positive or negative respectively) with the line amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the relevant Posting Account gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount</span> - Enter the amount for the selected GL distribution line. The amount can be either positive or negative irrespective of the Transaction Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the Narration for the General Ledger distribution line.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

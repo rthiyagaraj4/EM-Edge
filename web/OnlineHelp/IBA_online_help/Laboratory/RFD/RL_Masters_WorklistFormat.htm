@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>RL_Masters_WorklistFormat</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Worklist Name</span> - Enter Worklist Name in alphanumeric format of 10 characters maximum length. A worklist is specific to a department. A worklist is created, printed, resulted based on worklist name. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Department</span> - The logged in Department Code is displayed, by default. Select required department from the list, if you have access to more than one department.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Number Last Used</span> - Enter the Last Number assigned to the generated worklist in numeric format of five digits maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Specimen No</span> - Enter Default Specimen number in numeric format of 10 digits maximum length. You can set the Default Number for worklist to make use of it in specifying the starting range of specimen while creating worklist. The default specimen number has to match with the ‘Default Specimen Number’ recorded for the respective department in ‘Departmental Parameter for Facility’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Last Specimen No</span> - The last specimen number processed in a worklist is displayed after resulting the specimens in the Result Entry function. You can refer the last specimen number to specify the start range of specimen while creating the worklist.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Field Type</span> - Select the required Field Type from the list. Valid values are 'Assign To', 'Non Assign To' and 'Both'. The selection of specimen is based on the field type chosen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Spacing Between Cups - Enter the required value in numeric format of two digits maximum length to specify the spacing between cups while printing work list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Number of Cups</span> - Enter the Number of Cups in numeric format of three digits maximum length. Number of cups indicates the maximum number of specimens to be included in each worklist. The value specified is used in worklist creation and the number of specimens selected during the process is limited to this number. The maximum limit is 250. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Work List Tests</p>
+<p class="BoldRFD" style="font-weight: normal;">You can enter the tests that need to be included in the work list format. The criteria for including the specimen on the work list based on whether a test is present or not on the specimen is defined here. If a test is defined as mandatory and the specimen does not have the specified test though it may have the other tests of the work list, the specimen will not be included in the work list. If tests have been defined as optional and the specimen has any one or more tests associated to it, then the specimen is included in the work list. The maximum number of investigations or tests that can be defined in a single work list format is 25.</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Test</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a valid test code. The list displays values defined in ‘Test Codes’ function. The same test code is defined in different work list formats, but duplication is not allowed in the same work list format. Long name of the test code is displayed for user verification on entry of a valid test code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The corresponding Description of the selected test code is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> – Select a value from the list. The system-defined values are Pseudo code, Mandatory Test and optional test. ‘Pseudo code’ indicates that the corresponding column does not represent a test and is an extra column. The heading that has to appear is entered in the test column. For example, you can enter any remarks. ‘Mandatory Test’ indicates that a specimen is included in the work list only if the test codes specified as mandatory are ordered for the specimen. ‘Optional Test’ indicates that a specimen is included in the work list if it has any one or more of the test codes specified as optional.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Past Results</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Past Results Period</span> - Past results, which need to be printed for a period, is specified for the work list test.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Past Results Units</span> - Unit can be in hours, days, weeks, months and Years.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Past Results Max No</span> - Maximum number of times the result needs to be printed can be specified.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

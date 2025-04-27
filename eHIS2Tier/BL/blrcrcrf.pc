@@ -1,0 +1,719 @@
+/*****************************************************************************/
+/*																	 */
+/* PROGRAM      : 	BLRCRCRF.PC                 			                 */
+/* Purpose		:	TO PRINT CONSILIDATE RECEIPT/REFUND						 */
+/* Author		:	V.SRIKANTH                                               */
+/* Date			:   13/04/2000                                               */
+/* Modified		:	Changed by VSK to put total for the detail lines         */
+/*                  printed on the consolidated receipt 01/07/2000           */
+/*                                                                           */
+/*****************************************************************************/
+/*  UPGRADED TO 4.1   */ 
+                      
+#define ONLINE_PRINTING 1       
+#define REP_WIDTH 80
+#define EMPHASIZED_START 0x45
+#define EMPHASIZED_END 0x46
+#define UNDERLINE 0x2D
+#define ESC 0x1B
+
+
+#include <stdio.h>
+#include <string.h>
+#include <gl.h> 
+#include <bl.h>
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define ROW_COUNT            (sqlca.sqlerrd[2])
+#define	MAX_LINES   70
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd					[95],
+	    d_session_id				[16],
+	    d_pgm_date					[14],
+        rep_date					[20],
+          comp_name					[50],
+            oper_id					[21],
+	    d_pgm_id	 				[10],
+  	    cur_date					[11],
+		nd_user						[31],
+  	    cur_str						[8],
+	    nd_operating_facility_id	[3],
+		nd_calling_pgm_id			[30],
+	    sub_cur_str					[8];
+
+    VARCHAR d_patient_id				[21],
+			d_cash_counter				[5],
+			d_shift_id				[2],
+			d_slmt_type_code			[3],
+			d_slmt_doc_ref_desc			[21],
+			d_slmt_doc_ref_date			[11],
+			d_slmt_doc_remarks			[31],
+	                d_slmt_short_desc           [41],  
+			d_patient_name              [61],
+			d_bldcp_doc_type			[7],
+			d_bldcp_doc_num				[9],
+			d_bldcp_doc_date			[11],
+			d_recpt_doc_type			[7],
+			d_recpt_doc_num				[9];
+  
+int         hl	 = 196,     
+			vl	 = 179,
+			tlc	 = 218,
+			trc	 = 191,
+			blc	 = 192,
+			brc	 = 217,
+			vlti = 195,
+			vrti = 180,
+			htti = 194,
+			hbti = 193,
+			plus = 197;
+			
+int nd_decimal = 2;
+
+   double   d_tot_doc_amt, d_doc_amt, d_rf_tot;
+
+char filename[150],string_var[150];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+int page_no = 0,
+    line_no;
+
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+   void replicate();
+   void replicate_vl();
+
+
+    if(argc != 5) {
+        disp_message(ERR_MESG,"BLRCRCRF : Usage BLRCRCRF userid/password session_id pgm_date facility_id \n");
+        proc_exit();
+    }
+
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+		disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		proc_exit();
+    }
+
+    set_meduser_role();
+
+    d_patient_id.arr[0]  = '\0';
+	d_cash_counter.arr[0]  = '\0';
+	d_shift_id.arr[0]  = '\0';
+	d_slmt_type_code.arr[0]  = '\0';
+	d_slmt_doc_ref_desc.arr[0]  = '\0';
+	d_slmt_doc_ref_date.arr[0]  = '\0';
+	d_slmt_doc_remarks.arr[0]  = '\0';
+	nd_operating_facility_id.arr[0]   = '\0';
+	nd_calling_pgm_id.arr[0] = '\0';
+    
+	d_patient_id.len  = 0;
+	d_cash_counter.len  = 0;
+	d_shift_id.len  = 0;
+	d_slmt_type_code.len  = 0;
+	d_slmt_doc_ref_desc.len  = 0;
+	d_slmt_doc_ref_date.len  = 0;
+	d_slmt_doc_remarks.len  = 0;
+	nd_operating_facility_id.len = 0;       
+	nd_calling_pgm_id.len = 0;
+
+	nd_user.arr[0] = '\0';
+	nd_user.len = 0;
+
+ 	EXEC SQL SELECT
+			 		OPERATING_FACILITY_ID,
+					PARAM1,
+					to_number(PARAM2),
+					PARAM3,
+					PARAM4,
+					PARAM5,
+					PARAM6,
+					PARAM7,
+					PARAM8,
+					NVL(PARAM9,USER),
+					NVL(PARAM10,'BLRCRCRF')
+			 INTO   :nd_operating_facility_id,
+					:d_patient_id,
+					:d_tot_doc_amt,
+					:d_cash_counter,
+					:d_shift_id,
+					:d_slmt_type_code,
+					:d_slmt_doc_ref_desc,
+					:d_slmt_doc_ref_date,
+					:d_slmt_doc_remarks,
+					:nd_user,
+					:nd_calling_pgm_id
+     		 FROM   SY_PROG_PARAM
+			 WHERE  PGM_ID     = 'BLRCRCRF'
+			 AND    PGM_DATE   = :d_pgm_date
+			 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+	
+    	
+    if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    
+	d_patient_id.arr[d_patient_id.len]  = '\0';
+	d_cash_counter.arr[d_cash_counter.len]  = '\0';
+	d_shift_id.arr[d_shift_id.len]  = '\0';
+	d_slmt_type_code.arr[d_slmt_type_code.len]  = '\0';
+	d_slmt_doc_ref_desc.arr[d_slmt_doc_ref_desc.len]  = '\0';
+	d_slmt_doc_ref_date.arr[d_slmt_doc_ref_date.len]  = '\0';
+	d_slmt_doc_remarks.arr[d_slmt_doc_remarks.len]  = '\0';
+	nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+	nd_user.arr[nd_user.len] = '\0';
+	nd_calling_pgm_id.arr[nd_calling_pgm_id.len] = '\0';
+
+
+    strcpy(g_facility_id,nd_operating_facility_id.arr);
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrcrcrf.lis");
+
+    if((f1=fopen(filename,"w")) == NULL) 
+    {
+       disp_message(ERR_MESG,"Error in opening output file...\n");
+       proc_exit();
+    }
+
+    EXEC SQL SELECT ACCOUNTING_NAME,
+		            TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER,
+					NVL(no_of_decimal,2)
+	     INTO		:comp_name,
+					:rep_date,
+					:oper_id,
+					:nd_decimal
+		 FROM   SY_ACC_ENTITY
+	     WHERE acc_entity_id = :nd_operating_facility_id;
+		
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len]   = '\0';
+    oper_id.arr[oper_id.len]     = '\0';
+
+    line_no=1;
+
+    decl_curs();
+
+    do_report();
+
+    fclose(f1);
+
+    del_parm();
+	del_recref_tmp();
+ 
+	PrintDocument
+	   (
+		uid_pwd.arr,		//char	*PUidPwd;
+		d_session_id.arr,	//char	*PSessionID;
+		nd_operating_facility_id.arr,	//char	*PFacilityID;
+		"BL",				//char	*PModuleID;
+		nd_calling_pgm_id.arr,			//char	*PDocumentID;
+		filename,			//char	*POnlinePrintFileNames;
+		"O",				//char	*PLocationTypes;
+		"",				//char	*PLocationCodes;
+		1,					//int		PNumOfCopies;
+		1,					//int		PPageFrom;
+		9999					//int		PPageTo;
+	);
+
+    EXEC SQL COMMIT WORK RELEASE;
+    return;
+}
+
+/*--- Delete the Sy_Prog_Param Record */
+
+del_parm()
+{
+
+    EXEC SQL DELETE SY_PROG_PARAM
+	         WHERE  PGM_ID     = 'BLRCRCRF'
+			 AND    PGM_DATE   = :d_pgm_date
+			 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR) 
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+}
+
+
+del_recref_tmp()
+{
+
+    EXEC SQL DELETE BL_REC_REF_TEMP
+	         WHERE  PGM_DATE   = :d_pgm_date
+			 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR) 
+        err_mesg("DELETE failed on table BL_REC_REF_TEMP",0,""); 
+}
+
+/*--- Declaring the Cursors */
+
+decl_curs()
+{		
+		EXEC SQL DECLARE BL_REC_REF_TEMP_CUR CURSOR FOR
+		SELECT		BLDCP_DOC_TYPE_CODE,    
+					BLDCP_DOC_NUM,          
+					TRUNC(BLDCP_DOC_DATE),         
+					SETT_AMT,               
+					RECPT_DOC_TYPE_CODE,    
+					RECPT_DOC_NUM  
+		FROM BL_REC_REF_TEMP
+		WHERE  		TRUNC(PGM_DATE)  = :d_pgm_date AND
+			        SESSION_ID = TO_NUMBER(:d_session_id)         
+		ORDER BY BLDCP_DOC_TYPE_CODE,BLDCP_DOC_NUM,BLDCP_DOC_DATE;
+          
+   EXEC SQL OPEN BL_REC_REF_TEMP_CUR;
+
+   if(OERROR)
+	err_mesg("OPEN failed on cursor BL_REC_REF_TEMP_CUR",0,"");
+
+}
+
+
+
+/*--- Main procedure */
+
+do_report()
+{
+	d_rf_tot = 0.0;
+	fetch_patient_name();
+    print_hdr();
+
+    while(fetch_recref_temp_cur())
+			print_rec();       
+	
+   	  
+	fetch_slmt_type_desc();
+	print_ftr();
+
+}
+
+
+
+/*--- Printing The Receipt/Refund lines  */
+
+print_rec()
+{
+		
+   char s_amt[20];
+   
+   print_formated(s_amt,d_doc_amt);
+ 
+   chk_break(1);
+   	
+   fprintf(f1,"      %-6s/%-9s    %-10s  %15s    %-6s/%-9s\n",
+				d_bldcp_doc_type.arr,d_bldcp_doc_num.arr,d_bldcp_doc_date.arr,
+				s_amt,d_recpt_doc_type.arr,d_recpt_doc_num.arr);
+
+   d_rf_tot += d_doc_amt;	
+
+   line_no ++;
+}
+
+
+/*--- Fetching the Main Cursor */
+
+fetch_recref_temp_cur()
+{		
+
+
+	d_bldcp_doc_type.arr[0]  = '\0';
+	d_bldcp_doc_num.arr[0]  = '\0';
+	d_bldcp_doc_date.arr[0]  = '\0';
+	d_recpt_doc_type.arr[0]  = '\0';
+	d_recpt_doc_num.arr[0]  = '\0';
+	
+	d_doc_amt = 0.0;
+
+    d_bldcp_doc_type.len = 0;
+	d_bldcp_doc_num.len = 0;
+	d_bldcp_doc_date.len = 0;
+	d_recpt_doc_type.len = 0;
+	d_recpt_doc_num.len = 0;	
+	
+
+    EXEC SQL FETCH BL_REC_REF_TEMP_CUR INTO
+					:d_bldcp_doc_type,
+					:d_bldcp_doc_num,
+					:d_bldcp_doc_date,
+					:d_doc_amt,
+					:d_recpt_doc_type,
+					:d_recpt_doc_num;				
+	
+    if(OERROR)
+		err_mesg("FETCH failed on cursor BL_REC_REF_TEMP_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+		return 0;
+		
+	d_bldcp_doc_type.arr[d_bldcp_doc_type.len]  = '\0';
+	d_bldcp_doc_num.arr[d_bldcp_doc_num.len]  = '\0';
+	d_bldcp_doc_date.arr[d_bldcp_doc_date.len]  = '\0';
+	d_recpt_doc_type.arr[d_recpt_doc_type.len]  = '\0';
+	d_recpt_doc_num.arr[d_recpt_doc_num.len]  = '\0';		
+
+    return 1;
+
+}
+
+fetch_patient_name()
+{		
+
+	d_patient_name.arr[0]  = '\0';
+	d_patient_name.len = 0;
+
+
+    EXEC SQL SELECT SHORT_NAME INTO :d_patient_name
+		     FROM MP_PATIENT_MAST
+			 WHERE PATIENT_ID = :d_patient_id;
+			
+	
+    if(OERROR)
+		err_mesg("FETCH failed on cursor MP_PATIENT_MAST",0,"");
+
+    if(NO_DATA_FOUND)
+		return 0;
+		
+	d_patient_name.arr[d_patient_name.len]  = '\0';
+    
+	return 1;
+
+}
+
+
+fetch_slmt_type_desc()
+{		
+
+
+	d_slmt_short_desc.arr[0]  = '\0';
+	d_slmt_short_desc.len = 0;
+
+
+    EXEC SQL SELECT SHORT_DESC INTO :d_slmt_short_desc
+		     FROM BL_SLMT_TYPE
+			 WHERE SLMT_TYPE_CODE = :d_slmt_type_code
+			 AND ACC_ENTITY_CODE IN ( SELECT acc_entity_code 
+						  FROM sy_acc_entity
+						  WHERE acc_entity_id = :nd_operating_facility_id);
+			
+	
+    if(OERROR)
+		err_mesg("FETCH failed on cursor BL_SLMT_TYPE",0,"");
+
+    if(NO_DATA_FOUND)
+		return 0;
+		
+	d_slmt_short_desc.arr[d_slmt_short_desc.len]  = '\0';
+    
+	return 1;
+
+}
+
+
+/*--- Printing  Header  */
+
+print_hdr()
+{	
+	char out_str[10][133];
+    char s_tot_amt[20];	
+    int  length_str[10];
+    int  i = 0,no_of_lines = 0;
+
+    cur_str.arr[0]   = '\0';
+    cur_str.len      =  0;   
+    sub_cur_str.arr[0]   = '\0';
+    sub_cur_str.len      = 0;
+   
+    EXEC SQL SELECT BASE_CURRENCY,
+                    BASE_CURRENCY_DEC 
+             INTO   :cur_str,
+			        :sub_cur_str
+			 FROM   SY_ACC_ENTITY
+	     WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+    if (sqlca.sqlcode == 1403)
+     err_mesg("No base currency in table SY_ACC_ENTITY",0,"");
+    if (sqlca.sqlcode < 0)
+     err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+   
+    cur_str.arr[cur_str.len]  = '\0';
+    sub_cur_str.arr[sub_cur_str.len] = '\0';
+
+    length_str[0] = 45;
+    for (i =1;i<10;i++)
+      length_str[i] = 80;
+    for (i =1;i<10;i++)
+      strcpy(out_str[i],"");
+
+	
+    no_of_lines = print_in_words(d_tot_doc_amt<0?-d_tot_doc_amt:d_tot_doc_amt,MAX_LINES,sub_cur_str.arr,out_str,nd_decimal);
+
+    if(strlen(out_str[1]))
+       strcat(out_str[1],")");
+    else
+       strcat(out_str[0],")");
+    
+	EXEC SQL  SELECT TO_CHAR(SYSDATE,'DD/MM/YYYY') INTO :cur_date FROM DUAL;
+
+	fprintf(f1,"\n\n");
+	fprintf(f1,"                              ");
+	fprintf(f1,"%s",comp_name.arr);
+
+	fprintf(f1,"\n\n\n");
+	fprintf(f1,"                                                        ");
+	fprintf(f1,"Date : %s\n\n",cur_date.arr);
+	fprintf(f1,"                                                        ");
+	fprintf(f1,"%s / %s / %s\n\n",nd_user.arr,d_cash_counter.arr,d_shift_id.arr);
+
+	if (d_tot_doc_amt >= 0)
+		print_formated(s_tot_amt,d_tot_doc_amt);
+	else
+		print_formated(s_tot_amt,d_tot_doc_amt * -1);
+
+	if (d_tot_doc_amt >= 0)
+	{
+		fprintf(f1,"                            ");
+		fprintf(f1,"      OFFICIAL RECEIPT\n");
+		fprintf(f1,"                                  ");
+		replicate(hl,16);
+		fprintf(f1,"\n\n\n");
+//		fprintf(f1,"                            ");
+//		fprintf(f1,"      ----------------\n\n\n\n");
+		fprintf(f1,"      RECEIVED FROM  %s\n",d_patient_name.arr);
+		fprintf(f1,"                     ");
+		replicate(hl,51);
+		fprintf(f1,"\n");
+		fprintf(f1,"                     %s\n\n",d_patient_id.arr);
+		fprintf(f1,"      THE SUM OF %s : %s\n",cur_str.arr, s_tot_amt);
+		fprintf(f1,"                             ");
+		replicate(hl,43);
+		fprintf(f1,"\n");
+	}
+	else
+	{
+		fprintf(f1,"                            ");
+		fprintf(f1,"      REFUND ACKNOWLEDGEMENT\n");
+		fprintf(f1,"                                  ");
+		replicate(hl,22);
+		fprintf(f1,"\n\n\n");
+//		fprintf(f1,"      ----------------------\n\n\n\n");
+		fprintf(f1,"      REFUNDED TO    %s\n",d_patient_name.arr);
+		fprintf(f1,"                     ");
+		replicate(hl,51);
+		fprintf(f1,"\n");
+		fprintf(f1,"                     %s\n\n\n",d_patient_id.arr);
+		fprintf(f1,"      THE SUM OF %s : %s\n",cur_str.arr,s_tot_amt);
+		fprintf(f1,"                             ");
+		replicate(hl,43);
+		fprintf(f1,"\n");
+	}
+
+
+	if(d_tot_doc_amt != 0)
+    fprintf(f1,"      (%-6s ",cur_str.arr);
+   
+    if(d_tot_doc_amt == 0) 
+    {
+ 		fprintf(f1,"      (%s ",out_str[0]);
+    }
+    else
+		fprintf(f1,"%s",out_str[0]);
+  
+    fprintf(f1,"%s\n",out_str[1]);
+
+    fprintf(f1,"      ");
+	replicate(hl,66);
+	fprintf(f1,"\n");
+
+	fprintf(f1,"%c(s4B\n",ESC);/* This makes font Bold */
+	fprintf(f1,"      AS PAYMENT OF / FOR BILLS AS DETAILED BELOW:\n\n");
+	fprintf(f1,"%c(s-3B",ESC);/* This makes font Light */
+    
+	fprintf(f1,"      BILL NO.            DATE                 AMOUNT    REFERENCE\n");
+	
+	fprintf(f1,"      ");
+	replicate(hl,66);
+	fprintf(f1,"\n");
+
+    line_no=27;
+} 
+
+/*--- Apply the Page Break */
+
+chk_break(nol)
+int nol;
+{
+	if(line_no+nol >= 40) 
+	{
+	  page_no++;
+	  fprintf(f1,"      ");
+ 	  replicate(hl,66);
+	  for (line_no;line_no<58;line_no++) fprintf(f1,"\n");
+	  fprintf(f1,"                                                              Page : %d",page_no);
+      fprintf(f1,"");
+      line_no = 1;
+	  print_hdr();
+    }
+}
+
+/*--- Print End of Report Tag */
+
+print_ftr()
+{
+    char s_rf_tot[20]; 
+
+	print_formated(s_rf_tot,d_rf_tot);
+
+	fprintf(f1,"                                       ");
+	replicate(hl,15);
+	fprintf(f1,"\n");
+	//---------------\n");
+	fprintf(f1,"                               Total  %15s\n",s_rf_tot);
+	fprintf(f1,"      ");
+	fprintf(f1,"               ");
+	fprintf(f1,"                  ");
+	replicate(hl,15);
+	fprintf(f1,"\n");
+	fprintf(f1,"      ");
+	fprintf(f1,"PAYMENT DETAILS\n");
+	fprintf(f1,"      ");
+	replicate(hl,15);
+	
+	fprintf(f1,"\n");
+	//---------------\n");
+	
+//	fprintf(f1,"      ---------------\n\n");
+	fprintf(f1,"      TYPE      : %-15s\n",d_slmt_short_desc.arr);
+	fprintf(f1,"      DETAILS   : %-2s   %-20s\n",d_slmt_type_code.arr,d_slmt_doc_ref_desc.arr);
+	fprintf(f1,"                  %-10s\n",d_slmt_doc_ref_date.arr); 
+	fprintf(f1,"                  %-30s\n\n\n",d_slmt_doc_remarks.arr);
+
+	
+	if (d_tot_doc_amt >= 0)
+	{
+	fprintf(f1,"  **THIS IS A COMPUTER GENERATED RECEIPT. THEREFORE NO SIGNATURE REQUIRED**\n\n");
+
+	fprintf(f1,"                              N.B\n\n");
+	fprintf(f1,"                              1. THIS RECEIPT IS NOT VALID UNLESS CHEQUE \n");
+	fprintf(f1,"                                 IS CLEARED FOR PAYMENT.\n");
+    fprintf(f1,"                              2. FOR MATERNITY PATIENTS, NO REFUND FOR \n");
+	fprintf(f1,"                                 MATERNITY DEPOSIT.\n");
+	fprintf(f1,"                              3. PATIENTS ARE KINDLY REQUESTED TO PRESENT \n");
+	fprintf(f1,"                                 THIS DEPOSIT RECEIPT UPON DISCHARGE.\n");
+	}
+	else
+	{
+	fprintf(f1,"      ");
+	replicate(hl,41);
+	fprintf(f1,"\n");
+	fprintf(f1,"         ");
+	fprintf(f1,"SIGNATURE\n\n");
+	fprintf(f1,"         ");
+	fprintf(f1,"FULL NAME  ____________________________");
+	
+	fprintf(f1,"\n\n");
+	fprintf(f1,"         ");
+	fprintf(f1,"ID or Passport No. :\n\n");
+	fprintf(f1,"      ");
+	replicate(hl,41);
+
+	}
+
+    line_no+=19;
+	page_no++;
+	for (line_no;line_no<58;line_no++) fprintf(f1,"\n");
+	fprintf(f1,"                                                                 Page : %d",page_no);
+}
+
+
+/*--------replicate a print character   -----*/
+
+void replicate(printchar,no_of_times)
+int printchar;
+int no_of_times;
+{
+int i;
+   for (i = 0; i < no_of_times; i++)
+       fprintf(f1,"%c",printchar);
+	return;
+}
+
+/*--------replicate a print character and changing the font hight  -----*/
+
+void replicate_vl(printchar,no_of_times)
+int printchar;
+int no_of_times;
+{
+int i;
+    for (i = 0; i < no_of_times; i++)
+	    
+	    fprintf(f1,"%c",printchar);
+	   	          
+  	return;
+}
+
+/*  ------end of replicate prg    ------*/
+
+
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+
+  char str_amt[30], fstr_amt[30];
+
+  if(l_amt < 0){  
+
+	    put_val(s_amt,-l_amt);
+        format_amt(s_amt);        
+        sprintf(str_amt,"%14s",s_amt);				
+		ltrim (str_amt);		
+		rtrim (str_amt);		
+		strcpy(fstr_amt,"(-)");
+		strcat(fstr_amt,str_amt);		
+		ltrim (fstr_amt);		
+		rtrim (fstr_amt);
+		strcpy(s_amt,fstr_amt);
+
+   }
+ else {
+       put_val(s_amt,l_amt);
+       format_amt(s_amt);
+       strcat(s_amt," ");
+    }
+}
+
+
+/*****************************************************************/
+

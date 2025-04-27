@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Release Locked User Session</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Manager\nSMAdminSetup\nRelease Locked User Session");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Release Locked User Session</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Release</span> the locked user session i.e., users for whom session got terminated unexpectedly.</p>
+<p class="Text">This function lists the users who has logged in to the application after crossing the hours defined in the ‘Unlock User Session After X Hours’ parameter in Site screen. It allows you to release the locked users i.e., the users for whom session got terminated unexpectedly.</p>
+<p class="Text">&#160;</p>
+<p class="Text">If the user close/logoff the application in proper way, then system would not display those user IDs in the ‘Release Locked User Session’ screen. After close/logoff the application, the system allows the user to re-login the application without displaying any error message.</p>
+<p class="Text">&#160;</p>
+<p class="Text">If the application logged in by the user, unfortunately exceptional shutdown/forced log off happen for a user ID then this user ID gets displayed in ‘Release Locked User Session’ screen. After this if the user tries to re-login the application with the same credential then system displays an error message ‘User already logged in the system. Cannot login again’. You need to release the locked user.</p>
+<p class="Text">&#160;</p>
+<p class="Text">On clicking the Release Locked User Session menu, the system displays an alert message ‘Multi User login allowed at site level. Cannot access this function’ if the ‘Multiple Login Allowed’ check box is selected in Site level.</p>
+<h2>Releasing Locked User Session</h2>
+<p class="From">From the SM Admin Setup &gt; Application Security, select the Release Locked User Session.</p>
+<p class="Text">The Releasing Locked User Session screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">By default, the list of all the users logged in the application after crossing the hours defined in the ‘Unlock User Session After X Hours’ parameter is displayed. If hour is not defined in the parameter, the system lists of all the logged in users based on the system date/time.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the required ‘User ID’ from the lookup. The system displays the selected User details such as User ID, User Name, Login Date Time, WorkStation along with a Delete check box against the record.</p>
+</li>
+<li class="p-Number">
+<p class="Number">To delete the record, select the ‘Delete’ check box against the record and click <span style="font-weight: bold;"><b>[Apply].</b></span> The deleted user record gets removed from the list.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The system allows the user to re-log into the application using the same user ID.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the user is logged in 2T, the same user would not be allowed to login in 3T application. Similarly, if the user is logged in 3T, then same user would not be allowed to login 2T.</p>
+<hr style="float: aligncenter;" />
+<p>&#160;&#160;&#160;&#160;&#160;&#160;</p>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

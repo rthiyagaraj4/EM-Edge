@@ -1,0 +1,944 @@
+<!-- <?xml version="1.0"?> -->
+<!-- <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd"> -->
+
+<hibernate-mapping>
+
+<!-- Start of Linen Queries -->
+	<query name="ehis.LC.LC_LINEN_TYPE.masterQuery">
+		from LcLinenType lclinenType where 
+		upper(lclinenType.linenTypeCode) like upper(:linenTypeCode)
+		and upper(lclinenType.linenTypeDesc) like upper(:linenTypeDesc)
+		and	upper(lclinenType.effStatus) like upper(:effStatus) 
+	</query>
+
+	<query name="ehis.LC.LC_LINEN_ITEM.masterQuery">
+		from LcLinenItem lcLinenItem
+		where upper(lcLinenItem.linenItem) like upper(:linenItem) 
+		and upper(lcLinenItem.longDesc) like upper(:longDesc) 
+		and upper(lcLinenItem.shortDesc) like upper(:shortDesc)
+		and upper(lcLinenItem.disposableItem) like upper(:disposable)
+		and	upper(lcLinenItem.effStatus) like upper(:effStatus) 
+	</query>
+
+	<query name="ehis.lc.linenItem.getLinenType">
+		select linenType.id.linenTypeCode,linenType.id.linenTypeDesc from LcLinenTypeLangVw  as linenType
+		where linenType.id.languageId like :languageId
+	
+	</query>
+	
+	<query name="ehis.LC.LC_AGENCY_CODE.masterQuery">
+		from LcAgency lcAgency 
+		where upper(lcAgency.agencyCode) like upper(:agencyCode) 
+		and upper(lcAgency.agencyName) like upper(:agencyName)
+		and upper(lcAgency.effStatus) like upper(:effStatus)
+	</query>
+
+	<query name="ehis.lc.agencyCode.getAgencyCode">
+		select lcAgency.id.agencyCode,lcAgency.id.agencyName from LcAgencyLangVw lcAgency 
+		where upper(lcAgency.id.agencyName) like upper(:description)
+		and  upper(lcAgency.id.agencyCode) like upper(:code) 
+		and  lcAgency.id.languageId like :languageId
+	</query>
+
+	<query name="ehis.LC.LC_REASON.masterQuery">
+		from  LcReasonDtl dtl ,LcReason lcr
+		where upper(dtl.id.lcReason.reasonCode) like upper(:reasonCode) 
+		and upper(dtl.id.lcReason.reasonDesc) like upper(:reasonDesc)
+		and upper(dtl.id.lcReason.effStatus) like upper(:effStatus)
+		and upper(lcr.reasonCode) like upper(dtl.id.lcReason.reasonCode)
+	</query>
+
+	<query name="ehis.lc.reason.getData">
+		from  LcReasonDtl dtl
+		where  upper(dtl.id.lcReason.reasonCode) like upper(:reasonCode) 
+		and upper(dtl.id.lcReason.reasonDesc) like upper(:reasonDesc)
+		and upper(dtl.id.lcReason.effStatus) like upper(:effStatus)
+	</query>
+
+	<query name="ehis.lc.reason.getActionType">
+		select lcReasonActionType.id.actionTypeCode,lcReasonActionType.id.actionTypeDesc
+		from LcReasonActionTypeLangVw as lcReasonActionType 
+		where upper(lcReasonActionType.id.actionTypeDesc) like upper(:description)
+		and upper(lcReasonActionType.id.actionTypeCode) like upper(:code)
+		and  lcReasonActionType.id.languageId like :languageId
+	</query>
+
+	<query name="ehis.lc.reason.getallAction">
+		select lcReasonActionVw.id.actionTypeCode,lcReasonActionVw.id.actionTypeDesc,
+		lcReasonActionVw.id.activeYn from LcReasonActionVw lcReasonActionVw 
+		where lcReasonActionVw.id.reasonCode like :reasonCode
+		and  lcReasonActionVw.id.languageId like :languageId
+	</query>
+
+	<query name="ehis.lc.reasonCode.getReasonCode">
+		select  dtl.id.lcReason.reasonCode,dtl.id.lcReason.reasonDesc 
+		from LcReasonDtl as dtl 
+	</query> 
+		
+	<query name="ehis.LC.LC_LAUNDRY_USER.masterQuery">
+		from LcUsers lcUsers where 
+		upper(lcUsers.id.laundryUserId) like upper(:user)
+		and upper(lcUsers.overrideWardConf) like upper(:overRideWardConf)
+	</query>
+
+	<query name="ehis.lc.laundryUser.getUser">
+		select smApplUser.applUserId,smApplUser.applUserName
+		from SmApplUser as smApplUser
+		where upper(smApplUser.applUserName) like upper(:description)
+		and upper(smApplUser.applUserId) like upper(:code)
+	</query>
+	
+	<query name="ehis.lc.standardStock.nursingUnit">
+		select ip_ward.id.nursingUnitCode, ip_ward.id.shortDesc 
+		from IpNursingUnitLangVw as ip_ward 
+		where ip_ward.id.effStatus ='E' 
+		and upper(ip_ward.id.shortDesc ) like upper(:description)
+		and upper(ip_ward.id.nursingUnitCode) like upper(:code)
+		and ip_ward.id.facilityId like :facilityId
+		and ip_ward.id.languageId like :languageId
+		and upper(ip_ward.id.nursingUnitCode) != nvl( :fcode, '!!' )
+	</query> 
+
+	<query name="ehis.lc.standardStock.deptCode">
+		select amDept.id.deptCode,amDept.id.shortDesc 
+		from AmDeptLangVw as amDept where amDept.id.effStatus ='E' 
+		and upper(amDept.id.shortDesc) like upper(:description)
+		and upper(amDept.id.deptCode) like upper(:code)
+		and amDept.id.languageId like :languageId
+		and upper(amDept.id.deptCode) != nvl( :fcode, '!!' )
+	</query>
+
+	<query name="ehis.lc.standardStock.clinic">
+		select opClinic.id.clinicCode,
+		opClinic.id.shortDesc 
+		from OpClinicLangVw as opClinic 
+		where opClinic.id.effStatus ='E' 
+		and upper(opClinic.id.shortDesc) like upper(:description)
+		and upper(opClinic.id.clinicCode) like upper(:code)
+		and opClinic.id.facilityId like :facilityId
+		and opClinic.id.languageId like :languageId
+		and upper(opClinic.id.clinicCode) != nvl( :fcode, '!!' )
+	</query>
+
+	<query name="ehis.lc.standardStock.linenItem">
+		select lcLinenItem.id.linenItem,lcLinenItem.id.shortDesc 
+		from LcLinenItemLangVw as lcLinenItem where 
+		upper(lcLinenItem.id.shortDesc) like upper(:description)
+		and  upper(lcLinenItem.id.linenItem) like upper(:code)
+		and lcLinenItem.id.effStatus ='E' 
+		and lcLinenItem.id.languageId like :languageId
+	
+	</query>
+	<query name="ehis.LC.LC_STD_LINEN_STK.masterQuery">
+		from LcStdLinenQtyVw lcStdLinenQty
+		where upper(lcStdLinenQty.id.sourceType) like upper(:sourceType) 
+		and upper(lcStdLinenQty.id.sourceDesc) like upper(:sourceCode)
+		and upper(lcStdLinenQty.id.languageId) like upper(:languageId)
+	</query>
+
+	<query name="ehis.lc.standardStock.getStock">
+		select lcStdLinenQty.id.shortDesc ,lcStdLinenQty.id.linenItem,lcStdLinenQty.id.stdQty
+		from LcStdLinenQtyVw lcStdLinenQty 
+		where lcStdLinenQty.id.operatingFacilityId like :facilityId 
+		and lcStdLinenQty.id.sourceType like :sourceType 
+		and lcStdLinenQty.id.sourceCode like :sourceCode
+		and lcStdLinenQty.id.languageId like :languageId
+	</query>
+	<query name="ehis.lc.setUpparam.getAllTimes">
+		select to_char(lcParamForFacility.cutOffTimeForLinRecptTo,'HH24:MI'),to_char(lcParamForFacility.cutOffTimeForLinRecpt2To,'HH24:MI')
+		,to_char(lcParamForFacility.cutOffTimeForLinRecpt3To,'HH24:MI'),to_char(lcParamForFacility.cutOffTimeForLinenDelv,'HH24:MI'),to_char(lcParamForFacility.cutOffTimeForLinenDelv2,'HH24:MI'),to_char(lcParamForFacility.cutOffTimeForLinenDelv3,'HH24:MI'),lcParamForFacility.cutOfDaysForLinenDelv,lcParamForFacility.cutOfDaysForLinenDelv2,lcParamForFacility.cutOfDaysForLinenDelv3,lcParamForFacility.noOfcutOfTimings
+		from LcParamForFacility lcParamForFacility 
+		where lcParamForFacility.operatingFacilityId like :facilityId 
+	</query>
+	<query name="ehis.LC.LC_REQ_FOR_LINEN.masterQuery">
+		from LcRequestDtl lcRequestDtl
+		where upper(lcRequestDtl.id.lcRequestHdr.sourceType) like upper(:sourceType)
+		and upper(lcRequestDtl.id.lcRequestHdr.sourceCode) like upper(:srcCode)
+		and 
+		to_date(to_char(lcRequestDtl.id.lcRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcRequestDtl.id.lcRequestHdr.raisedBy) like upper(:raisedBy)
+		and upper(lcRequestDtl.id.lcRequestHdr.requestStatus) like upper(:requestStatus)
+		and upper(lcRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem) 
+		</query>
+	<query name="ehis.LC.ALL_REQ_FOR_LINEN.masterQuery">
+		from LcRequestDtl lcRequestDtl
+		where upper(lcRequestDtl.id.lcRequestHdr.sourceType) like upper(:sourceType)
+		and upper(lcRequestDtl.id.lcRequestHdr.sourceCode) like upper(:srcCode)
+		and 
+		to_date(to_char(lcRequestDtl.id.lcRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcRequestDtl.id.lcRequestHdr.raisedBy) like upper(:raisedBy)
+		and upper(lcRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem)
+
+	</query>
+	<query name="ehis.LC.REQ_FOR_LINEN.masterQuery">
+		from LcRequestDtl lcRequestDtl
+		where upper(lcRequestDtl.id.lcRequestHdr.sourceType) like upper(:sourceType)
+		and upper(lcRequestDtl.id.lcRequestHdr.sourceCode) like upper(:srcCode)
+		and 
+		to_date(to_char(lcRequestDtl.id.lcRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcRequestDtl.id.lcRequestHdr.raisedBy) like upper(:raisedBy)
+		and upper(lcRequestDtl.id.lcRequestHdr.requestStatus) in ('OS','PI')
+		and upper(lcRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem)
+	</query>
+
+	<query name="ehis.lc.requestForLinen.getlinen">
+		select lcLinen.id.linenItem,lcLinen.id.shortDesc 
+		from LcStdLinenStkDtl lcStdLinenStkDtl,LcLinenItemLangVw lcLinen
+		where lcStdLinenStkDtl.id.lcLinenItem.linenItem = lcLinen.id.linenItem
+		and  lcStdLinenStkDtl.id.lcStdLinenStkHdr.id.sourceType like :sourceType 
+		and lcStdLinenStkDtl.id.lcStdLinenStkHdr.id.sourceCode like :sourceCode
+		and upper(lcStdLinenStkDtl.id.lcLinenItem.linenItem) like upper(:code) 
+		and upper(lcStdLinenStkDtl.id.lcLinenItem.shortDesc) like upper(:description)
+		and lcLinen.id.languageId like :languageId
+	</query>
+	<query name="ehis.lc.lodgeComplaint.getlaundryLinen">
+		select lcLinen.id.linenItem,lcLinen.id.shortDesc 
+		from LcLaundryStk lcLaundryStk,LcLinenItemLangVw lcLinen
+		where lcLaundryStk.id.lcLinenItem.linenItem = lcLinen.id.linenItem
+		and upper(lcLaundryStk.id.lcLinenItem.linenItem) like upper(:code) 
+		and upper(lcLaundryStk.id.lcLinenItem.shortDesc) like upper(:description)
+		and lcLinen.id.languageId like :languageId
+	</query>
+	<query name="ehis.LC.requestForLinen.masterQuery">
+		select a.id.lcLinenItem.shortDesc,a.requestedQty,b.remarks,b.issuedQty
+		from LcRequestDtl a,LcIssueDtl b
+		where upper(a.id.lcRequestHdr.id.operatingFacilityId) like upper(:operatingfacilityId)
+		and upper(a.id.lcRequestHdr.id.requestNum) like upper(:requestNo)
+		and a.id.lcRequestHdr.id.operatingFacilityId= b.id.lcIssueHdr.id.operatingFacilityId(+)
+		and a.id.lcRequestHdr.id.requestNum = b.requestNum(+)
+		and a.id.lcLinenItem=b.id.lcLinenItem(+)
+		and upper(a.id.lcLinenItem) like upper(:linenItem)
+	</query>
+
+	<query name="ehis.LC.request.masterQuery">
+		select a.id.lcLinenItem.shortDesc,a.requestedQty,a.remarks
+		from LcRequestDtl a
+		where upper(a.id.lcRequestHdr.id.operatingFacilityId) like upper(:operatingfacilityId)
+		and upper(a.id.lcRequestHdr.id.requestNum) like upper(:requestNo)
+		and upper(a.id.lcLinenItem.linenItem) like upper(:linenItem)
+	</query>
+<!--
+	<query name="ehis.lc.requestForLinen.getReason">
+		select lcr.reasonCode,lcr.reasonDesc from LcReason lcr
+		where upper(lcr.reasonCode) like upper(:code) 
+		and upper(lcr.reasonDesc) like upper(:description)
+	</query>
+-->
+	<query name="ehis.lc.requestForLinen.getReason">
+		select reasonlang.id.reasonDesc,reasonlang.id.reasonCode
+		from LcReasonLangVw reasonlang
+		where upper(reasonlang.id.reasonCode) like upper(:code) 
+		and upper(reasonlang.id.reasonDesc) like upper(:description)
+		and reasonlang.id.languageId like :language_Id
+	</query>
+
+	<query name="ehis.lc.requestForLinen.getReqNo">
+		select lcRequestHdr.id.requestNum,lcRequestHdr.id.requestNum  
+		from LcRequestHdr as lcRequestHdr 
+		where lcRequestHdr.id.operatingFacilityId like upper(:facilityId)
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getlinen">
+		select lcRequestDtl.id.lcLinenItem.linenItem,lcRequestDtl.id.lcLinenItem.shortDesc
+		from LcRequestDtl lcRequestDtl
+		where lcRequestDtl.id.lcRequestHdr.id.requestNum like  :requestNo
+		and lcRequestDtl.id.lcRequestHdr.id.operatingFacilityId like  :operatingFacilityId
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getIssueQty">
+		select lcIssueDtl.requestNum,sum(lcIssueDtl.issuedQty)
+		from LcIssueDtl lcIssueDtl
+		where lcIssueDtl.id.lcIssueHdr.id.operatingFacilityId like :facilityId
+		and lcIssueDtl.requestNum like :requestNo
+		and lcIssueDtl.id.lcLinenItem.linenItem like :linenItem
+		group by lcIssueDtl.requestNum
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getStockParam">
+		select lcParamForFacility.operatingFacilityId,lcParamForFacility.stdStockChk
+		from LcParamForFacility lcParamForFacility
+		where lcParamForFacility.operatingFacilityId like :facilityId
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getIssueNo">
+		select lcIssueHdr.id.issueNum,lcIssueHdr.id.issueNum  
+		from LcIssueHdr lcIssueHdr
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getSumOfRequestQty">
+		select reqdtl.id.lcRequestHdr.id.requestNum,sum(reqdtl.requestedQty)
+		from LcRequestDtl reqdtl
+		where reqdtl.id.lcRequestHdr.id.operatingFacilityId = :facilityId
+		and   reqdtl.id.lcRequestHdr.id.requestNum = :requestNum
+		group by reqdtl.id.lcRequestHdr.id.requestNum
+	</query>
+
+	<query name="ehis.lc.issueOfLinen.getSumOfIssuedQty">
+		select issuedtl.id.lcIssueHdr.requestNum,sum(issuedtl.issuedQty)
+		from LcIssueDtl issuedtl
+		where issuedtl.id.lcIssueHdr.id.operatingFacilityId = :facilityId
+		and   issuedtl.id.lcIssueHdr.requestNum = :requestNum
+		group by issuedtl.id.lcIssueHdr.requestNum
+	</query>
+
+	<query name="ehis.LC.LC_REQ_FOR_CLEANING_LINEN.masterQuery">
+		from LcCleaningRequestDtl lcCleaningRequestDtl
+		where upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.sourceType) like upper(:sourceType)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.sourceCode) like upper(:sourceCode)
+		and to_date(to_char(lcCleaningRequestDtl.id.lcCleaningRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.linenHandedOverBy) like upper(:linenHandedOverBy)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.linenCollectedBy) like upper(:linenCollectedBy)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.requestStatus) like upper(:requestStatus)
+		and upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and upper(lcCleaningRequestDtl.id.category) like upper(:category)
+		and upper(lcCleaningRequestDtl.countConfirmedYn) like upper(:countConfirmedYn)
+	</query>
+
+	<query name="ehis.LC.REQ_FOR_CLEANING.masterQuery">
+		from LcCleaningRequestDtl lcCleaningRequestDtl
+		where upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.sourceType) like upper(:sourceType)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.sourceCode) like upper(:sourceCode)
+		and to_date(to_char(lcCleaningRequestDtl.id.lcCleaningRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.linenHandedOverBy) like upper(:linenHandedOverBy)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.linenCollectedBy) like upper(:linenCollectedBy)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.requestStatus) in ('OS','PD')
+		and upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and upper(lcCleaningRequestDtl.id.category) like upper(:category)
+		and upper(lcCleaningRequestDtl.countConfirmedYn) like upper(:countConfirmedYn)
+	</query>
+
+	<query name="ehis.LC.requestForCleaningLinen.masterQuery">
+		select lcCleaningRequestDtl.id.lcLinenItem.shortDesc,
+		lcCleaningRequestDtl.remarks,
+		lcCleaningRequestDtl.requestedQty,
+		lcCleanedLinenDeliveryDtl.deliveredQty,
+		lcCleanedLinenDeliveryDtl.deliveryDate,
+		lcCleanedLinenDeliveryDtl.lateDeliveryReason
+		from LcCleaningRequestDtl lcCleaningRequestDtl,LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+		where upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum) like upper(:requestNo)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId) = upper(lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.operatingFacilityId)
+		and lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum = lcCleanedLinenDeliveryDtl.requestNum
+		and upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) = upper(lcCleanedLinenDeliveryDtl.id.lcLinenItem.linenItem)
+	</query>
+
+	<query name="ehis.LC.cleaningLinen.masterQuery">
+		select lcCleaningRequestDtl.id.lcLinenItem.shortDesc,
+		lcCleaningRequestDtl.remarks,
+		lcCleaningRequestDtl.requestedQty
+		from LcCleaningRequestDtl lcCleaningRequestDtl
+		where upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum) like upper(:requestNo)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId) like upper(:operatingFacilityId)
+	</query>
+
+	<query name="ehis.lc.requestForCleaningLinen.getReqNo">
+		select lcCleaningRequestHdr.id.requestNum,lcCleaningRequestHdr.id.requestNum  
+		from LcCleaningRequestHdr as lcCleaningRequestHdr
+		where lcCleaningRequestHdr.id.operatingFacilityId= :facility
+	</query>
+	<query name="ehis.lc.requestForCleaningLinen.getscheduleDate">
+		select to_char(sysdate+1,'dd/mm/yyyy'),to_char(sysdate+1,'dd/mm/yyyy')
+		from LcParamForFacility paramFacility
+		where paramFacility.operatingFacilityId= :facilityId
+	</query>
+
+	<query name="ehis.lc.requestForCleaningLinen.getOverRideConf">
+			select lcParamForFacility.confReqdForDirtyLinen,to_char(lcParamForFacility.cutOffTimeForLinenDelv,'dd/mm/yyyy HH24:MI')  from LcParamForFacility as lcParamForFacility
+		where lcParamForFacility.operatingFacilityId= :facilityId
+	</query>
+
+	<query name="ehis.lc.requestForCleaningLinen.getDirtyLinenConf">
+		select lcParamForFacility.dirtyLinenEntryByLaundry,to_char(lcParamForFacility.cutOffTimeForLinRecptTo,'dd/mm/yyyy HH24:MI')  from LcParamForFacility as lcParamForFacility
+		where lcParamForFacility.operatingFacilityId= :facilityId
+	</query>
+
+	<query name="ehis.LC.enterCleanedLinen.getStockDetail">
+		select lcLaundryStk.id.lcLinenItem.linenItem,
+		lcLaundryStk.id.lcLinenItem.shortDesc,
+		lcLaundryStk.inCleaningQty
+		from LcLaundryStk lcLaundryStk
+		where upper(lcLaundryStk.id.lcLinenItem.linenItem) like nvl(upper(:linenItem),'%')
+		and upper(lcLaundryStk.id.operatingFacilityId)like upper(:facilityId)
+		and lcLaundryStk.inCleaningQty > 0 
+	</query>
+
+	<query name="ehis.lc.enterCleanedLinen.getReqNo">
+		select lcCleanedLinenHdr.id.cleaningRefNum,lcCleanedLinenHdr.id.cleaningRefNum  
+		from LcCleanedLinenHdr as lcCleanedLinenHdr
+	</query>
+
+	<query name="ehis.lc.deliverCleanedLinen.getSumOfRequestQty">
+		select lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum,sum(lcCleaningRequestDtl.requestedQty)
+		from LcCleaningRequestDtl lcCleaningRequestDtl
+		where lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId = :facilityId
+		and   lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum = :requestNum
+		group by lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum
+	</query>
+
+	<query name="ehis.lc.deliverCleanedLinen.getSumOfDeliveredQty">
+		select lcCleanedLinenDeliveryDtl.requestNum,sum(lcCleanedLinenDeliveryDtl.deliveredQty)
+		from LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+		where lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.operatingFacilityId = :facilityId
+		and   lcCleanedLinenDeliveryDtl.requestNum = :requestNum
+		group by lcCleanedLinenDeliveryDtl.requestNum
+	</query>
+
+	<query name="ehis.lc.deliverCleanedLinen.getDeliveryRefNo">
+		select lcCleanedLinenDeliveryHdr.id.deliveryRefNum,lcCleanedLinenDeliveryHdr.id.deliveryRefNum  
+		from LcCleanedLinenDeliveryHdr lcCleanedLinenDeliveryHdr
+	</query>
+
+	<query name="ehis.lc.deliverCleanedLinen.getScheduleDate">
+		select lcCleaningRequestDtl.requestedQty,to_char(lcCleaningRequestDtl.schdDeliveryDate,'DD/MM/YYYY HH24:MI')
+		from LcCleaningRequestDtl lcCleaningRequestDtl
+		where lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId= :facilityId 
+		and lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum= :requestNum
+		and lcCleaningRequestDtl.id.category = :category
+		and lcCleaningRequestDtl.id.lcLinenItem.linenItem= :linenItem
+	</query>
+
+	<query name="ehis.lc.deliverCleanedLinen.getDeliveredQty">
+		select lcCleanedLinenDeliveryDtl.requestNum,sum(lcCleanedLinenDeliveryDtl.deliveredQty)
+		from LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+		where lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.operatingFacilityId like :facilityId
+		and lcCleanedLinenDeliveryDtl.requestNum like :requestNo
+		and lcCleanedLinenDeliveryDtl.id.lcLinenItem.linenItem like :linenItem
+		group by lcCleanedLinenDeliveryDtl.requestNum
+	</query>
+	<query name="ehis.LC.deliverCleaningLinen.masterQuery">
+		select lcCleaningRequestDtl.id.lcLinenItem.shortDesc,
+		lcCleanedLinenDeliveryDtl.remarks,
+		lcCleaningRequestDtl.requestedQty,
+		lcCleanedLinenDeliveryDtl.deliveredQty,
+		lcCleanedLinenDeliveryDtl.deliveryDate,
+		lcCleanedLinenDeliveryDtl.lateDeliveryReason
+		from LcCleaningRequestDtl lcCleaningRequestDtl,LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+		where upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum like :requestNo
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId) like upper(:operatingFacilityId)
+		and upper(lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.operatingFacilityId) = upper(lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.operatingFacilityId)
+		and lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum = lcCleanedLinenDeliveryDtl.requestNum
+		and upper(lcCleaningRequestDtl.id.lcLinenItem.linenItem) = upper(lcCleanedLinenDeliveryDtl.id.lcLinenItem.linenItem)
+	</query>
+
+	<query name="ehis.lc.deptlookup">
+	  select dept.id.deptCode,dept.id.longDesc
+	  from AmDeptLangVw dept
+	  where nvl(dept.id.effStatus,'E') ='E'
+	</query>
+
+	<query name="ehis.lc.getLcUser">
+	  select lcUser.id.laundryUserId,lcUser.overrideWardConf 
+	  from LcUsers lcUser where lcUser.id.operatingFacilityId =:facility
+	  and lcUser.id.laundryUserId=:laundryUserId
+	 </query>
+
+	<query name="ehis.lc.getLoggedInUser">
+		select appluser.applUserName,appluser.applUserName
+		from SmApplUser appluser
+		where appluser.applUserId like upper (:userId)
+	</query>
+<!--
+	<query name="ehis.lc.natureofdefectlookup">
+		select reasondtl.id.lcReason.reasonDesc,reasondtl.id.lcReason.reasonCode
+		from LcReasonDtl reasondtl
+		where reasondtl.id.lcReasonActionType.actionTypeCode ='3'
+	</query>
+-->
+	<query name="ehis.lc.natureofdefectlookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='3'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id	</query>
+<!--
+	<query name="ehis.lc.qualityfailurelookup">
+		select reasondtl.id.lcReason.reasonDesc,reasondtl.id.lcReason.reasonCode
+		from LcReasonDtl reasondtl
+		where reasondtl.id.lcReasonActionType.actionTypeCode ='4'
+	</query>
+-->
+	<query name="ehis.lc.qualityfailurelookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='4'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id
+	</query>
+
+	<query name="ehis.lc.lateDeliverylookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='1'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id
+	</query>
+
+	<query name="ehis.LC.LC_STOCKSTATUS.masterQuery">
+		from LcSourceStk lcSourceStk 
+		where upper(lcSourceStk.id.lcLinenItem.linenItem) like upper(:linenItem)
+	</query>
+
+	<query name="ehis.LC.STOCKSTATUS.masterQuery">
+		from LcSourceStk lcSourceStk 
+		where upper(lcSourceStk.sourceCode) like upper(:sourceCode)
+	</query>
+
+	<query name="ehis.lc.laundryLevelStock">
+		select lcLaundryStk.id.lcLinenItem.linenItem,
+		lcLaundryStk.withLaundryQty,
+		lcLaundryStk.issuedOutQty,
+		lcLaundryStk.inCleaningQty,
+		lcLaundryStk.inMendingQty,
+		lcLaundryStk.withLaundryQty
+		from LcLaundryStk lcLaundryStk 
+		where lcLaundryStk.id.operatingFacilityId =:facilityId 
+		and lcLaundryStk.id.lcLinenItem.linenItem =:linenItem
+	</query>
+
+	<query name="ehis.lc.writeOffLinen.getRefNum">
+		select writeOff.id.writeOffRefNum,writeOff.id.writeOffRefNum
+		from LcWriteOff writeOff
+		where writeOff.id.operatingFacilityId = :facilityId
+	</query>
+	
+	<query name="ehis.lc.writeOffLinen.getExistingQty">
+		select 
+		laundryStk.id.lcLinenItem.linenItem,
+		nvl(laundryStk.withLaundryQty,0),nvl(laundryStk.inCleaningQty,0),
+		nvl(laundryStk.inMendingQty,0)
+		from LcLaundryStk laundryStk
+		where laundryStk.id.operatingFacilityId = :facilityId
+		and laundryStk.id.lcLinenItem.linenItem = :linenItem
+    </query>
+
+    <query name="ehis.lc.writeOffLinen.getLoggedInUser">
+       select 
+		lcUsers.id.laundryUserId,lcUsers.id.laundryUserId
+		from LcUsers lcUsers
+		where lcUsers.id.operatingFacilityId = :facilityId
+		and lcUsers.id.laundryUserId = :userId
+	</query>
+
+	<query name="ehis.lc.writeOffLinen.getExistQty">
+		select sourceStk.id.lcLinenItem.linenItem,
+		sourceStk.inUseQty,sourceStk.soiledQty,sourceStk.loanedQty from LcSourceStk sourceStk
+		where sourceStk.id.operatingFacilityId = :facilityId
+		and   sourceStk.sourceType = :sourceType
+		and   sourceStk.sourceCode = :sourceCode
+		and  sourceStk.id.lcLinenItem.linenItem = :linenItem
+	</query>
+<!--
+	<query name="ehis.lc.writeofflookup">
+		select reasondtl.id.lcReason.reasonCode,reasondtl.id.lcReason.reasonDesc
+		from LcReasonDtl reasondtl
+		where reasondtl.id.lcReasonActionType.actionTypeCode ='7'
+		and reasondtl.activeYn='Y'
+	</query>
+-->
+	<query name="ehis.lc.writeofflookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='7'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :languageId
+
+	</query>
+
+	<query name="ehis.lc.treeLookup">
+		select lcItem.id.shortDesc,
+		nvl(laundryStk.withLaundryQty,0)
+		from LcLaundryStk laundryStk,LcLinenItemLangVw lcItem
+		where  laundryStk.id.lcLinenItem.linenItem = lcItem.id.linenItem
+		and    laundryStk.id.operatingFacilityId = :facilityId
+		and   lcItem.id.languageId   = :language_Id
+	</query>
+
+	<query name="ehis.lc.inCleaningLookup">
+		select lcItem.id.shortDesc,
+		nvl(laundryStk.inCleaningQty,0)
+		from LcLaundryStk laundryStk,LcLinenItemLangVw lcItem
+		where laundryStk.id.lcLinenItem.linenItem = lcItem.id.linenItem
+		and   laundryStk.id.operatingFacilityId = :facilityId
+		and   lcItem.id.languageId   = :language_Id
+	</query>
+	<query name="ehis.lc.pandingCleaninglookup">
+		select lcItem.id.shortDesc,lcSourceStk.soiledQty
+		from LcSourceStk lcSourceStk,LcLinenItemLangVw lcItem
+		where  lcSourceStk.id.lcLinenItem.linenItem = lcItem.id.linenItem
+		and  lcSourceStk.sourceType =:sourceType
+		and  lcSourceStk.sourceCode =:source
+		and  lcItem.id.languageId  = :language_Id
+	</query>
+
+	<query name="ehis.lc.inUseQuantity">
+		select lcItem.id.shortDesc,lcSourceStk.inUseQty
+		from LcSourceStk lcSourceStk,LcLinenItemLangVw lcItem
+		where  lcSourceStk.id.lcLinenItem.linenItem = lcItem.id.linenItem
+		and  lcSourceStk.sourceType =:sourceType
+		and  lcSourceStk.sourceCode =:source
+		and  lcItem.id.languageId  = :language_Id
+	</query>
+
+	<query name="ehis.lc.pandingIssuelookup">
+		select lcPendingIssueQtyVw.id.shortDesc,lcPendingIssueQtyVw.id.pendingCleaningQty
+		from LcPendingIssueQtyVw lcPendingIssueQtyVw
+		where  lcPendingIssueQtyVw.id.sourceType =:sourceType
+		and  lcPendingIssueQtyVw.id.sourceCode =:source
+		and  lcPendingIssueQtyVw.id.languageId   = :language_Id
+		
+	</query>
+
+
+	<query name="ehis.lc.sendLinenForMending.getReqNo">
+		select lcMendingRequestHdr.id.requestNum,lcMendingRequestHdr.id.requestNum  
+		from LcMendingRequestHdr as lcMendingRequestHdr
+	</query>
+
+	<query name="ehis.LC.LC_SEND_REQ_FOR_MENDING.masterQuery">
+		from LcMendingRequestDtl lcMendingRequestDtl
+		where 
+		 to_date(to_char(lcMendingRequestDtl.id.lcMendingRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.lcAgency.agencyCode) like upper(:agencyCode)
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.requestStatus) in ('OS','PR')
+		and upper(lcMendingRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem)
+	</query>
+
+	<query name="ehis.LC.ALL_LC_SEND_REQ_FOR_MENDING.masterQuery">
+		from LcMendingRequestDtl lcMendingRequestDtl
+		where 
+		 to_date(to_char(lcMendingRequestDtl.id.lcMendingRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		 and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.lcAgency.agencyCode) like upper(:agencyCode)
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.sentBy) like upper(:sentBy)
+		and upper(lcMendingRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem)
+	</query>
+	<query name="ehis.LC.LC_SEND_REQ_FOR_MENDING1.masterQuery">
+		from LcMendingRequestDtl lcMendingRequestDtl
+		where 
+		 to_date(to_char(lcMendingRequestDtl.id.lcMendingRequestHdr.requestDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:requestDate,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:toRequestDate,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.lcAgency.agencyCode) like upper(:agencyCode)
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.requestStatus) like upper(:requestStatus)
+		and upper(lcMendingRequestDtl.id.lcLinenItem.linenItem) like upper(:linnenItem)
+	</query>
+
+	<query name="ehis.LC.mending.masterQuery">
+		select lcMendingRequestDtl.id.lcLinenItem.shortDesc,
+		lcMendingRequestDtl.remarks,
+		lcMendingRequestDtl.requestedQty
+		from LcMendingRequestDtl lcMendingRequestDtl
+		where upper(lcMendingRequestDtl.id.lcLinenItem.linenItem) like upper(:linenItem)
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.id.requestNum) like upper(:requestNo)
+		and upper(lcMendingRequestDtl.id.lcMendingRequestHdr.id.operatingFacilityId) like upper(:operatingFacilityId)
+	</query>
+
+	<query name="ehis.LC.requestForMending.masterQuery">
+		select a.id.lcLinenItem.shortDesc,b.id.remarks,a.requestedQty,b.id.receivedQty 
+		from LcMendingRequestDtl a,LcMendingReceiptDtl b
+		where upper(a.id.lcMendingRequestHdr.id.operatingFacilityId) like upper(:operatingfacilityId)
+		and upper(a.id.lcMendingRequestHdr.id.requestNum) like upper(:requestNo)
+		and a.id.lcMendingRequestHdr.id.operatingFacilityId= b.id.lcMendingReceiptHdr.id.operatingFacilityId
+		and a.id.lcMendingRequestHdr.id.requestNum = b.id.requestNum
+		and a.id.lcLinenItem.linenItem=b.id.linenItem
+	</query>
+
+	<query name="ehis.lc.issueLinenAfterMending.getReceiptNo">
+		select lcMendingReceiptHdr.id.receiptNum,lcMendingReceiptHdr.id.receiptNum  
+		from LcMendingReceiptHdr as lcMendingReceiptHdr
+	</query>
+
+	<query name="ehis.lc.issueOfLinenAfterMending.getSumOfReceivedQty">
+		select lcMendingReceiptDtl.id.requestNum,sum(lcMendingReceiptDtl.id.receivedQty)
+		from LcMendingReceiptDtl lcMendingReceiptDtl
+		where lcMendingReceiptDtl.id.lcMendingReceiptHdr.id.operatingFacilityId = :facilityId
+		and   lcMendingReceiptDtl.id.requestNum = :requestNum
+		group by lcMendingReceiptDtl.id.requestNum
+	</query>
+
+	<query name="ehis.lc.issueOfLinenAfterMending.getSumOfRequestQty">
+		select reqdtl.id.lcMendingRequestHdr.id.requestNum,sum(reqdtl.requestedQty)
+		from LcMendingRequestDtl reqdtl
+		where reqdtl.id.lcMendingRequestHdr.id.operatingFacilityId = :facilityId
+		and   reqdtl.id.lcMendingRequestHdr.id.requestNum = :requestNum
+		group by reqdtl.id.lcMendingRequestHdr.id.requestNum
+	</query>
+
+	<query name="ehis.lc.issueOfLinenAfterMending.getReceivedQty">
+		select lcMendingReceiptDtl.id.requestNum,sum(lcMendingReceiptDtl.id.receivedQty)
+		from LcMendingReceiptDtl lcMendingReceiptDtl
+		where lcMendingReceiptDtl.id.lcMendingReceiptHdr.id.operatingFacilityId like :facilityId
+		and lcMendingReceiptDtl.id.linenItem like :linenItem
+		and   lcMendingReceiptDtl.id.requestNum like :requestNum
+		group by lcMendingReceiptDtl.id.requestNum
+ 	</query>
+
+	<query name="ehis.lc.lodgeComplaint.getComNum">
+		select lcComplaintHdr.id.complaintNum,lcComplaintHdr.id.complaintNum
+		from LcComplaintHdr lcComplaintHdr
+		where upper(lcComplaintHdr.id.operatingFacilityId) like (:facilityId)
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.getRefNum">
+		select lcComplaintDtl.id.refRequestNum,lcComplaintDtl.id.refRequestNum
+		from LcComplaintDtl lcComplaintDtl
+	</query>
+<!--
+	<query name="ehis.lc.lodgeComplaint.laundryReasonlookup">
+	   select reasondtl.id.lcReason.reasonDesc,reasondtl.id.lcReason.reasonCode
+	   from LcReasonDtl reasondtl
+	   where reasondtl.id.lcReasonActionType.actionTypeCode ='8'
+	   and reasondtl.activeYn='Y'
+	</query>
+-->
+	<query name="ehis.lc.lodgeComplaint.laundryReasonlookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='8'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id
+	</query>
+<!--
+	<query name="ehis.lc.lodgeComplaint.WardsReasonlookup">
+	   select reasondtl.id.lcReason.reasonDesc,reasondtl.id.lcReason.reasonCode
+	   from LcReasonDtl reasondtl
+	   where reasondtl.id.lcReasonActionType.actionTypeCode ='9'
+	   and reasondtl.activeYn='Y'
+	</query>
+-->	
+	<query name="ehis.lc.lodgeComplaint.WardsReasonlookup">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='9'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id
+	</query>
+
+	<query name="ehis.lc.retunoflinentolaundry.getRefNum">
+		select lcLinenReturnHdr.id.refNum, lcLinenReturnHdr.id.refNum  
+		from LcLinenReturnHdr as lcLinenReturnHdr
+	</query>
+
+	<query name="ehis.lc.returnofLinenItemtoLaundry.getAvailbleStock">
+		select stk.id.lcLinenItem.shortDesc,stk.inUseQty
+		from LcSourceStk stk
+		where stk.id.operatingFacilityId = :facility
+		and   stk.sourceType =:sourType
+		and   stk.sourceCode = :source
+		and   stk.id.lcLinenItem.linenItem =:linenItem 
+	</query> 
+
+	<query name="ehis.lc.returnofLinenItemtoLaundry.linenItem">
+		select lcLinenItem.id.linenItem,lcLinenItem.id.shortDesc 
+		from LcLinenItemLangVw as lcLinenItem 
+		where lcLinenItem.id.effStatus ='E' 
+		and lcLinenItem.id.languageId like :languageId
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityOnelookup">
+	   select to_char(lcRequestHdr.requestDate,'dd/MM/yyyy hh24:mi'),lcRequestHdr.id.requestNum
+	   from LcRequestHdr lcRequestHdr
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityTwolookup">
+	   select to_char(lcCleaningRequestHdr.requestDate,'dd/MM/yyyy hh24:mi'),lcCleaningRequestHdr.id.requestNum
+	   from LcCleaningRequestHdr lcCleaningRequestHdr
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityThreelookup">
+	   select to_char(lcCleanedLinenDeliveryHdr.deliveryDate,'dd/MM/yyyy hh24:mi'),lcCleanedLinenDeliveryHdr.id.deliveryRefNum
+	   from LcCleanedLinenDeliveryHdr lcCleanedLinenDeliveryHdr
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityFourlookup">
+	   select to_char(lcCleanedLinenDeliveryHdr.deliveryDate,'dd/MM/yyyy hh24:mi'),lcCleanedLinenDeliveryHdr.id.deliveryRefNum 
+	   from LcCleanedLinenDeliveryHdr lcCleanedLinenDeliveryHdr
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityFivelookup">
+	   select to_char(lcMendingRequestHdr.requestDate,'dd/MM/yyyy hh24:mi'),lcMendingRequestHdr.id.requestNum
+	   from LcMendingRequestHdr lcMendingRequestHdr
+	</query>	
+
+	<query name="ehis.lc.lodgeComplaint.CActivitySixlookup">
+	   select to_char(lcMendingReceiptHdr.receiptDate,'dd/MM/yyyy hh24:mi'),lcMendingReceiptHdr.id.receiptNum
+	   from LcMendingReceiptHdr lcMendingReceiptHdr
+	</query>	
+	<!-- lodgeComplaint detail added on 10/03/2009-->
+	<query name="ehis.lc.lodgeComplaint.CActivityOnelookupDetail">
+	   select lcRequestDtl.id.lcLinenItem.linenItem,to_char(lcRequestDtl.requestedQty)
+	   from LcRequestDtl lcRequestDtl
+	   where lcRequestDtl.id.lcRequestHdr.id.requestNum like :requestNo
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityTwolookupDetail">
+	   select lcCleaningRequestDtl.id.lcLinenItem.linenItem,to_char(lcCleaningRequestDtl.requestedQty)	 from LcCleaningRequestDtl lcCleaningRequestDtl
+	   where lcCleaningRequestDtl.id.lcCleaningRequestHdr.id.requestNum like :requestNo
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityThreelookupDetail">
+	  select lcCleanedLinenDeliveryDtl.id.lcLinenItem.linenItem,to_char(lcCleanedLinenDeliveryDtl.deliveredQty)
+	   from LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+	   where lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.deliveryRefNum like :requestNo
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityFourlookupDetail">
+	   select lcCleanedLinenDeliveryDtl.id.lcLinenItem.linenItem,to_char(lcCleanedLinenDeliveryDtl.deliveredQty)
+	   from LcCleanedLinenDeliveryDtl lcCleanedLinenDeliveryDtl
+	   where lcCleanedLinenDeliveryDtl.id.lcCleanedLinenDeliveryHdr.id.deliveryRefNum like :requestNo
+	</query>
+
+	<query name="ehis.lc.lodgeComplaint.CActivityFivelookupDetail">
+	   select lcMendingRequestDtl.id.lcLinenItem.linenItem,to_char(lcMendingRequestDtl.requestedQty)
+	   from LcMendingRequestDtl lcMendingRequestDtl
+	   where lcMendingRequestDtl.id.lcMendingRequestHdr.id.requestNum like :requestNo
+	</query>	
+
+	<query name="ehis.lc.lodgeComplaint.CActivitySixlookupDetail">
+	   select lcMendingReceiptDtl.id.linenItem,to_char(lcMendingReceiptDtl.id.receivedQty)
+	   from LcMendingReceiptDtl lcMendingReceiptDtl
+	   where lcMendingReceiptDtl.lcMendingReceiptHdr.id.receiptNum like :requestNo
+	</query>	
+	<!-- end of lodge complaint detail queries -->
+
+	<query name="ehis.lc.loanLinen.getLoanRefNum">
+		select lcLoanDtls.id.loanRefNum,lcLoanDtls.id.loanRefNum  
+		from LcLoanDtls lcLoanDtls
+	</query>
+
+	<query name="ehis.lc.loanLinen.getLoanReason">
+		select reasondtl.id.reasonDesc,reasondtl.id.reasonCode
+		from LcReasonLangVw reasondtl
+		where upper(reasondtl.id.reasonDesc) like upper(:description)
+		and upper(reasondtl.id.reasonCode) like upper(:code)
+		and reasondtl.id.actionTypeCode ='5'
+		and reasondtl.id.activeYn='Y'
+		and reasondtl.id.languageId like :language_Id
+	</query>
+
+	<query name="ehis.LC.LOAN_LINEN.masterQuery">
+		from LcLoanDtls lcLoanDtls
+		where upper(lcLoanDtls.sourceType) like upper(:sourceType)
+		and upper(lcLoanDtls.sourceCode) like upper(:sourceCode)
+		and upper(lcLoanDtls.loanedToSourceType) like upper(:loanedToSourceType)
+		and upper(lcLoanDtls.loanedToSourceCode) like upper(:loanedToSourceCode)
+		and to_date(to_char(lcLoanDtls.loanDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:loanDateFrom,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:loanDateTo,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcLoanDtls.givenBy) like upper(:givenBy)
+		and upper(lcLoanDtls.receivedBy) like upper(:receivedBy)
+		and upper(lcLoanDtls.reasonForLoan) like upper(:reasonForLoanCode)
+		and upper(lcLoanDtls.loanStatus) in ('OS','L')
+		and upper(lcLoanDtls.linenItem) like upper(:linnenItem)
+	</query>
+
+	<query name="ehis.LC.LC_LOAN_LINEN.masterQuery">
+		from LcLoanDtls lcLoanDtls
+		where upper(lcLoanDtls.sourceType) like upper(:sourceType)
+		and upper(lcLoanDtls.sourceCode) like upper(:sourceCode)
+		and upper(lcLoanDtls.loanedToSourceType) like upper(:loanedToSourceType)
+		and upper(lcLoanDtls.loanedToSourceCode) like upper(:loanedToSourceCode)
+		and to_date(to_char(lcLoanDtls.loanDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:loanDateFrom,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:loanDateTo,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcLoanDtls.givenBy) like upper(:givenBy)
+		and upper(lcLoanDtls.receivedBy) like upper(:receivedBy)
+		and upper(lcLoanDtls.reasonForLoan) like upper(:reasonForLoanCode)
+		and upper(lcLoanDtls.loanStatus) like upper(:requestStatus)
+		and upper(lcLoanDtls.linenItem) like upper(:linnenItem)
+	</query>
+
+	<query name="ehis.LC.ALL_LOAN_LINEN.masterQuery">
+		from LcLoanDtls lcLoanDtls
+		where upper(lcLoanDtls.sourceType) like upper(:sourceType)
+		and upper(lcLoanDtls.sourceCode) like upper(:sourceCode)
+		and upper(lcLoanDtls.loanedToSourceType) like upper(:loanedToSourceType)
+		and upper(lcLoanDtls.loanedToSourceCode) like upper(:loanedToSourceCode)
+		and to_date(to_char(lcLoanDtls.loanDate,'DD/MM/YYYY HH24:MI'),'DD/MM/YYYY HH24:MI') between to_date(replace(:loanDateFrom,'%',''),'DD/MM/YYYY HH24:MI') and to_date(replace(:loanDateTo,'%',''),'DD/MM/YYYY HH24:MI')
+		and upper(lcLoanDtls.givenBy) like upper(:givenBy)
+		and upper(lcLoanDtls.receivedBy) like upper(:receivedBy)
+		and upper(lcLoanDtls.reasonForLoan) like upper(:reasonForLoanCode)
+		and upper(lcLoanDtls.linenItem) like upper(:linnenItem)
+	</query>
+	
+	<query name="ehis.LC.loan.masterQuery">
+		select b.shortDesc,a.loanQty,a.receivedQty
+		from LcLoanDtls a,LcLinenItem b
+		where a.linenItem = b.linenItem
+		and upper(a.id.operatingFacilityId) like upper(:operatingfacilityId)
+		and upper(a.id.loanRefNum) like upper(:loanRefNum)
+	</query>
+	
+	<query name="ehis.lc.patientlookup">
+	   select mpPatient.patientId,mpPatient.patientName
+	   from MpPatient mpPatient
+	 </query>
+	 
+<!-- 	changes for SCF 32276 - AMRI-SCF-0098: added sourceType column as well -->
+	 
+	<query name="ehis.LC.LC_LINENITEMSTOCKSTATUS.masterQuery">
+		select lineneItem.linenItem,lcSourceStk.sourceCode,lcSourceStk.inUseQty,lcSourceStk.loanedQty,lcSourceStk.soiledQty,lcSourceStk.sourceType from LcSourceStk lcSourceStk ,LcLinenItem lineneItem
+		where lcSourceStk.id.lcLinenItem.linenItem = lineneItem.linenItem
+		and   lineneItem.linenItem like upper(:linenItem)
+	</query>
+	
+		
+	<query name="ehis.LC.LC_SOURCESTOCKSTATUS.masterQuery">
+		from LcSourceStk lcSourceStk 
+		where upper(lcSourceStk.sourceCode) like upper(:sourceCode)
+	</query>
+
+	<query name="ehis.lc.stockLookup">
+		select lcStdLinenStkDtl.stdQty,lcStdLinenStkDtl.stdQty
+		from LcStdLinenStkDtl lcStdLinenStkDtl
+		where lcStdLinenStkDtl.id.lcStdLinenStkHdr.id.operatingFacilityId = :facilityId
+		and lcStdLinenStkDtl.id.lcStdLinenStkHdr.id.sourceType = :sourceType
+		and lcStdLinenStkDtl.id.lcStdLinenStkHdr.id.sourceCode = :sourceCode
+		and lcStdLinenStkDtl.id.lcLinenItem.linenItem = :linenItem
+	</query>
+
+	<query name="ehis.lc.inUseQtyLookup">
+		select lcSourceStk.inUseQty,lcSourceStk.soiledQty,lcSourceStk.loanedQty
+		from LcSourceStk lcSourceStk
+		where lcSourceStk.id.operatingFacilityId = :facilityId
+		and lcSourceStk.sourceType = :sourceType
+		and lcSourceStk.sourceCode = :sourceCode
+		and lcSourceStk.id.lcLinenItem.linenItem = :linenItem
+	</query>
+<!--
+	<query name="ehis.lc.inUseQtyLaundryLookup">
+		select lcLaundryStk.inCleaningQty,lcLaundryStk.withLaundryQty
+		from LcLaundryStk lcLaundryStk
+		where lcLaundryStk.id.operatingFacilityId = :facilityId
+		and lcLaundryStk.id.linenItem = :linenItem
+	</query>
+-->
+	<query name="ehis.lc.inUseQtyLaundryLookup">
+		select lcLaundryStk.inCleaningQty,
+		lcLaundryStk.withLaundryQty
+		from LcLaundryStk lcLaundryStk
+		where lcLaundryStk.id.operatingFacilityId = :facilityId
+		and lcLaundryStk.id.lcLinenItem.linenItem = :linenItem
+	</query>
+
+	<query name="ehis.lc.getstdStockChk">
+		select lcParamForFacility.stdStockChk,lcParamForFacility.stdStockChk 
+		from LcParamForFacility as lcParamForFacility
+		where lcParamForFacility.operatingFacilityId = :facilityId
+	</query>
+
+	<query name="ehis.lc.receivelinenAtlaundry.getReceiptNum">
+		select lcLaundryReceipts.id.receiptNum, lcLaundryReceipts.id.receiptNum  
+		from LcLaundryReceipts as lcLaundryReceipts
+		where lcLaundryReceipts.id.operatingFacilityId = upper(:facilityId)
+	</query>
+
+</hibernate-mapping>

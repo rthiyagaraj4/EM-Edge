@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>PH_AdminSetup_Dispense Location_PH_IP Tab</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Inpatient Prescription Tab</h1>
+<p class="BoldRFD" style="font-weight: normal;">The dispensing rules for Inpatients are specified in this tab. The dispensing rules defined for Inpatient in ‘PH Parameter for Facility’ are made default. You can change these values to suit working of the Dispense Location.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following dispensing rules for Inpatients.</p>
+<p class="BoldRFD">Stage</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Verification</span> – The check box is selected, if ‘Verification’ is applicable for Inpatient in ‘PH Parameter for Facility’. It indicates verification of drugs is required during dispensing for inpatients. Clear the check box to indicate ‘Verification’ is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">New Prescriptions Only</span> – Select the check box if the Dispensing Location is applicable for New Prescriptions only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fill</span> – Select the check box if ‘Fill’ is applicable for the Dispensing Location.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fill Process - Fill Period</span> – This field is used to compute the period for generating the fill sheet. The value specified in ‘PH Parameter for Facility’ is made default and can be modified but not exceeding the value defaulted. Specify the fill period in numeric format of two digits maximum length. The period can be defined in terms of ‘Hours’, ‘Days’ or can be based on the ‘Prescribe Period’. A fill sheet is generated for the specified period. If the fill period is based on hours or days, the period computed for fill sheet generation shall include the time specified in ‘Continuous/Intermittent Orders Schedule Start’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deliver</span> - The check box is selected, if ‘Delivery’ is applicable for Inpatient in ‘PH Parameter for Facility’. It indicates delivery stage is applicable for the Dispense Location. If delivery stage is not applicable to the Dispense Location.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Exclude Routine Orders Placed within [] Hours of Schedule Start</span> – The value specified in ‘PH Parameter for Facility’ is made default. Specify the period in numeric format of two digits maximum length. Routine orders placed within the specified duration are not listed in the generated fill sheet. The parameter value cannot be exceeded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allocate</span> – If allocation stage is applicable to the Dispense Location, select the check box. Clear the check box, if allocation is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Auto Dispense At Administration</span> – Select the check box to indicate automatic dispensing of the drug during medication administration. Stock of the drug is updated on administration to the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP fill process Schedule Start time</span> – The value specified in ‘PH Parameter for Facility’ is made default. Enter the start time in the time format of ‘hh:mm’. Fill sheet is generated from the specified start time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Medication Return</span> - Select the check box to allow returning of Inpatient Medication. If the check box is selected, it indicates dispensed medication can be returned back to the Dispense Location.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Daily Sequence Number Range</span> - Enter the ‘Display Sequence Number Range’ in numeric format of five digits maximum length. Click on the ‘<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">View Ranges</a>’ hyperlink to display ‘Defined Sequence Ranges’ screen. &#160;The Daily sequence number is generated at the Dispense Location level, which is mapped to different labels/reports printed in different printer in a Dispense Location for a patient. &#160;&#160;&#160;</p>
+<div class="droptext" id="POPUP1004957025" style="display: none;">
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The screen displays the sequence number range defined for other Dispense Locations within the facility. This helps in avoiding duplication of sequence number.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Printer Location</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">For Stat Order</span> - Enter the Printer Location for stat orders in alphanumeric format of six characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">For Routine Order</span> - Enter the Printer Location for routine orders in alphanumeric format of six characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Fill Period: Fill Without Fill List</u></span> – Specify the fill period in numeric format of two digits maximum length. The period can be defined in terms of ‘Hours’, ‘Days’ or can be based on the ‘Prescribe Period’. On loading, the ‘Fill Period: Fill Without Fill List’ value is same as the ‘Fill Process: Fill Period’ value but the user can modify as per the requirement, to display in 'Fill Without Fill List' screen only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Priority: Fill Without Fill List</u></span> – Select the priority from the list. The listed values are ‘All’, ‘Urgent’ and ‘Routine’.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004957025');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

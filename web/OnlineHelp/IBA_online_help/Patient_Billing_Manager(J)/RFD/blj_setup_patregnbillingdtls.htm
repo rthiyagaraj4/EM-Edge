@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>blj_setup_patregnbillingdtls</title>
+<link rel="stylesheet" href="../../default.css" type="text/css" />
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+
+<script type="text/javascript" language="JavaScript" title="WebHelpSplitCss">
+//<![CDATA[
+<!--
+if (navigator.appName !="Netscape")
+{   document.write("<link rel='stylesheet' href='../../default.css'>");}
+//-->
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+//<![CDATA[
+<!--
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+        origWidth = innerWidth;
+        origHeight = innerHeight;
+        onresize = reDo;
+}
+onerror = null; 
+//-->
+//]]>
+</script>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js">
+</script>
+<script type="text/javascript" language="javascript" src="../../whver.js">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js">
+</script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js">
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define patient registration billing rule:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Series</span> – Click <span class="BoldNumberRFD">[?]</span> function to select a Patient Series from the list. The Patient Series created using the Master Patient Index module gets listed. A patient is charged during registration on associating respective Billing Group, if selected Patient Series is used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Group</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Group from the list. The values defined using ‘Billing Group’ function in Patient Billing Manager module gets listed. A patient is charged during registration, if selected Billing Group is used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Payer Group from the list. The values defined using ‘Customer Group’ function in the Patient Billing Manager or Accounts Receivable module gets listed. This field is mandatory, if the selected Billing Group is Sponsor/Insurance.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> - Click <span class="BoldNumberRFD">[?]</span> function to select a Payer from the list. The values defined using ‘Customer’ function in the Revenue Management or Accounts Receivable module gets listed. This field is mandatory, if the selected Billing Group is Sponsor/Insurance.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Chargeable at Registration</span> – Select the check box, if the Patient Series and Billing Group combination is chargeable. The patient registration ID charges are computed during patient registration in the 'Master Patient Index' module. Clear the check box, if the Patient Series and Billing Group combination is non- chargeable.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Chargeable at Renewal</u></span> - Select the checkbox to apply charge for UHID renewal. Once the Patient UHID validity expires, the charge is applicable based on the other combination configured like patient series / billing group / payer group / service/panel. The renewal charges are applied based on the financial details of patient and not based on any encounter. This is applicable only for users in AMRI.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Chargeable at Encounter</span> – Select the check box to charge the patient during encounter registration, if the charge is not computed during registration. The check box is enabled for selection, if the ‘Chargeable at Registration’ check box is cleared. The patient registration ID charges are computed during encounter registration in Admit Patient, Register Visit and Register Attendance functions in the external module. Clear the check box, if the registration charges are to be computed during patient registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service/Panel</span> – Select a value from the list. The system-defined values are ‘Service’ and ‘Panel’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service - Select ‘Service’ to associate a Billing Service to the Patient Series and Billing Group combination in the Facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Panel - Select ‘Panel’ to associate a Billing Service to the Patient Series and Billing Group combination in the Facility.</p>
+</li>
+</ol>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service/Panel Description</span> – Click <span class="BoldNumberRFD">[?]</span> function to select a Billing Service or a Billing Panel. Patient is charged based on the price defined for the selected Billing Service/Billing Panel. This is a mandatory field. The legend changes to ‘Service Description’ or ‘Panel Description’ based on the value selected for ‘Billing Service/Panel’.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

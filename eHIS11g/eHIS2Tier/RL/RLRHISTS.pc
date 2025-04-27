@@ -1,0 +1,1537 @@
+/****************************************************************
+ * File             : RLRHISTS.pc
+ * Author           : Hameed
+ * Date Created     : 04/04/2005
+ 
+ * Version          : 4.1
+
+ * Purpose          : To generate the Histology Statistics Report
+ 
+ * Input Parameters : Command Line Arguments
+						1  UserId/Password
+						2  Session ID
+						3  Program Date
+						
+						Parameters From SY_PROG_PARAM Table
+
+ * Table Accessed   : 
+
+ ****************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+
+#define MAX_LINES   55
+#define OERROR      (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode == 1403
+#define LASTROW     (sqlca.sqlcode == 1403)
+#define VER         "VER : 4.1\n"
+#define ESC         0x1B
+#define REP_WIDTH   78
+
+EXEC SQL BEGIN DECLARE SECTION;
+     VARCHAR     nd_operating_facility_id [3],
+	             uid_pwd                  [91],
+				 nd_file_name             [150],
+				 nd_file_no               [15],
+				 nd_session_id            [16],
+				 nd_pgm_date              [31],
+				 d_version_no             [20],
+				 d_version                [20],
+
+				 /** Parameters from SY_PROG_PARAM **/
+				 nd_section_code          [3],
+				 nd_section_desc          [41],
+				 nd_spec_regd_date_fr     [31],
+				 nd_spec_regd_date_fr1     [31], //added for globalisation
+				 nd_spec_regd_date_to     [31],
+				 nd_spec_regd_date_to1     [31], //added for globalisation
+				 nd_option                [2],
+				 nd_category_fr           [5],
+				 nd_category_to           [5],
+				 nd_source_type           [4],	//13.09.2006
+				 nd_source_fr             [8],	//13.09.2006
+				 nd_source_to             [8],	//13.09.2006
+				 /** To fetch Header  cursor values **/
+				 d_specimen_no            [21],
+				 d_category_code          [5],
+				 d_category_where         [5],
+				 d_category_desc          [41],
+				 d_workgroup_desc         [41],
+				 d_workgroup_code         [5],
+				 d_workgroup_where        [5],
+				 d_sample_id              [6],
+				 d_anatomy_site_code      [5],
+				 d_sample_indicator       [4],
+				 d_block_seq_no           [4],
+				 d_block_indicator        [4],
+				 d_task_code              [5],
+				 d_slide_yn               [2],
+				 d_spec_stain_yn          [2],
+				 d_spec_stain_type_ind    [3],
+
+				 d_prv_category_code      [5],
+				 d_prv_workgroup_code     [5],
+				 d_prv_specimen_no        [21],
+				 d_prv_sample_id          [6],
+				 d_prv_block_seq_no       [4],
+
+				 /** For Header Routine **/
+				 //d_acc_entity_name    [61],
+				 d_acc_entity_name        [300],
+				 d_user                   [21],
+				 d_sysdate                [31],
+				 d_sysdate1                [31], //added for globalisation
+		/***************added for globalisation*************************/
+				l_translated_value		 [500],
+				language_id			[5];
+		/***************added for globalisation*************************/
+
+	int  l_tab_exists, d_no_of_control_slides;
+
+	int i; //added for globalisation
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *fp;
+void print_page_header();
+void print_col_heading();
+void prepare_new_page();
+void print_detl_rec();
+
+void print_no_sample_dtl();
+void print_sample_same_dtl();
+void print_sample_diff_dtl();
+void print_total();
+void end_report();
+
+int page_no = 0, line_no = 0;
+
+int l_tot_count1 = 0, l_block_count1 = 0, l_hne_slide_count1 = 0, 
+    l_spec_stain_count1 = 0, l_spec_stain_hc_count1 = 0, 
+	l_spec_stain_ih_count1 = 0, l_spec_stain_if_count1 = 0,
+	l_no_con_slides_count1 = 0; //13.09.2006
+
+int l_tot_count2 = 0, l_block_count2 = 0, l_hne_slide_count2 = 0, 
+    l_spec_stain_count2 = 0, l_spec_stain_hc_count2 = 0, 
+	l_spec_stain_ih_count2 = 0, l_spec_stain_if_count2 = 0,
+	l_no_con_slides_count2 = 0; //13.09.2006
+
+int l_tot_count3 = 0, l_block_count3 = 0, l_hne_slide_count3 = 0, 
+    l_spec_stain_count3 = 0, l_spec_stain_hc_count3 = 0, 
+	l_spec_stain_ih_count3 = 0, l_spec_stain_if_count3 = 0,
+	l_no_con_slides_count3 = 0; //13.09.2006
+
+int l_tot_count_g = 0, l_block_count_g = 0, l_hne_slide_count_g = 0, 
+    l_spec_stain_count_g = 0, l_spec_stain_hc_count_g = 0, 
+	l_spec_stain_ih_count_g = 0, l_spec_stain_if_count_g = 0,
+	l_no_con_slides_count_g = 0; //13.09.2006
+
+
+char flg, spc_brk_flg;
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1];
+
+char //rep_title1[] = "Histology Statistics Report",
+     rep_title1[60],
+	 rep_title2[60];
+
+char string_var[500];
+
+char local_legend[40][500];//added for globalisation
+
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+	void get_params(),
+	get_header_dtls(),
+	dclr_hdr_no_sample(), 
+	dclr_hdr_sample_same(),
+	dclr_hdr_sample_diff(),
+	do_report();
+
+	if(argc < 4) 
+	{
+		disp_message(ERR_MESG, "Usage: rlrhists userid/pwd sessionid pgm_date\n");
+		proc_exit();
+	}
+
+	strcpy(uid_pwd.arr , argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr);
+
+	strcpy(nd_session_id.arr, argv[2]);
+	nd_session_id.len = strlen(nd_session_id.arr);
+
+	strcpy(nd_pgm_date.arr, argv[3]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+	strcpy(OUTPUT_FILE_NAME, argv[5]);
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL CONNECT :uid_pwd;
+
+	#ifdef DEBUG
+		printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+	#endif  
+
+	set_meduser_role();
+
+/*********************** added for globalisation ******************************/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+/*********************** added for globalisation ******************************/
+
+
+	get_params();
+
+	get_legend_value(37); //added for globalisation
+
+	gen_file_name();
+	get_header_dtls();
+	
+	//s
+	//sprintf(string_var, "Date : %s  %s  %s %s",nd_source_fr.arr,
+	//                                              nd_source_to.arr,
+	//											  nd_source_type.arr, nd_category_to.arr);
+	//disp_message(ERR_MESG, string_var);
+
+	dclr_hdr_no_sample();
+	dclr_hdr_sample_same();
+	dclr_hdr_sample_diff();
+
+	do_report();
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL COMMIT WORK RELEASE;
+
+	fclose(fp);
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+	proc_exit();
+}
+
+void do_report()
+{
+	void print_rep_header();
+	void print_header();
+	int fetch_hdr_no_sample();
+	int fetch_hdr_sample_same();
+	int fetch_hdr_sample_diff();
+
+	page_no = 1;
+	line_no = 1;
+
+	print_rep_header();
+	print_page_header();
+	print_col_heading();
+
+	print_detl_rec();
+
+	close_hdr_no_sample();
+	close_hdr_sample_same();
+	close_hdr_sample_diff();
+
+	end_report();
+
+}
+
+/*** Get the Parameters from SY_PROG_PARAM Table ***/
+
+void get_params()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL SELECT OPERATING_FACILITY_ID,
+	                PARAM1, PARAM2, PARAM3, PARAM4,PARAM5,
+					PARAM6, PARAM7, PARAM8 //13.09.2006
+	         INTO :nd_operating_facility_id, 
+			      :nd_section_code,:nd_spec_regd_date_fr,
+				  :nd_spec_regd_date_to,
+				  :nd_category_fr, :nd_category_to,
+				  :nd_source_type, :nd_source_fr, :nd_source_to //13.09.2006
+			 FROM SY_PROG_PARAM
+			 WHERE UPPER(PGM_ID) = 'RLRHISTS'
+			 AND SESSION_ID = TO_NUMBER(:nd_session_id)
+			 AND PGM_DATE = :nd_pgm_date;
+
+	nd_operating_facility_id.arr[nd_operating_facility_id.len]   = '\0';
+	nd_section_code.arr[nd_section_code.len]                     = '\0';
+	nd_spec_regd_date_fr.arr[nd_spec_regd_date_fr.len]           = '\0';
+	nd_spec_regd_date_to.arr[nd_spec_regd_date_to.len]           = '\0';
+	nd_category_fr.arr[nd_category_fr.len]                       = '\0';
+	nd_category_to.arr[nd_category_to.len]                       = '\0';
+	nd_source_type.arr[nd_source_type.len]                       = '\0'; //13.09.2006
+	nd_source_fr.arr[nd_source_fr.len]                           = '\0'; //13.09.2006
+	nd_source_to.arr[nd_source_to.len]                           = '\0'; //13.09.2006
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DELETE FROM SY_PROG_PARAM
+	         WHERE UPPER(PGM_ID) = 'RLRHISTS'
+			 AND SESSION_ID = TO_NUMBER(:nd_session_id)
+			 AND PGM_DATE = :nd_pgm_date;
+
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+	proc_exit();
+}
+
+/** Get Header informations **/
+void get_header_dtls()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL SELECT ACC_ENTITY_NAME,
+					USER,
+					TO_CHAR(SYSDATE,'DD/MM/YYYY')
+             INTO :d_acc_entity_name,
+			      :d_user,
+				  :d_sysdate
+			 FROM SY_ACC_ENTITY_lang_vw
+			 WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			 and language_id = :language_id;
+
+	d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+	d_user.arr[d_user.len]                       = '\0';
+	d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+	proc_exit();
+
+}
+
+/** Declare cursor for Single Specimen/Slide (No smaple) **/
+
+void dclr_hdr_no_sample()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE NO_SAMPLE_HEADER CURSOR FOR
+	SELECT A.SPECIMEN_NO , A.CATEGORY_CODE,
+	C.SAMPLE_ID, C.ANATOMY_SITE_CODE, C.SAMPLE_INDICATOR,
+	E.TASK_CODE, NVL(F.SLIDE_YN,'N') ,
+	NVL(F.SPECIAL_STAIN_YN, 'N'), F.SPECIAL_STAIN_TYPE_IND,
+	NVL(C.no_of_control_slides, 0) //13.09.2006
+	FROM RL_REQUEST_HEADER A,  RL_SAMPLE_DETAILS C,
+		 RL_SAMPLE_TASK_DTL E, RL_TASK_MAST F
+	WHERE A.SPEC_REGD_DATE_TIME BETWEEN TO_DATE(:nd_spec_regd_date_fr,'DD/MM/YYYY HH24:MI:SS')
+	AND TO_DATE(:nd_spec_regd_date_to,'DD/MM/YYYY HH24:MI:SS')+1
+	AND A.SPECIMEN_NO = C.SPECIMEN_NO
+	AND A.SPECIMEN_NO = E.SPECIMEN_NO
+	AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND A.OPERATING_FACILITY_ID = C.OPERATING_FACILITY_ID
+	AND A.OPERATING_FACILITY_ID = E.OPERATING_FACILITY_ID
+	AND C.SAMPLE_ID = E.SAMPLE_ID
+	AND C.SAMPLE_INDICATOR = 'NA'
+	AND A.SECTION_CODE = :nd_section_code
+	AND A.SECTION_CODE = C.SECTION_CODE
+	AND A.SECTION_CODE = F.SECTION_CODE
+	AND E.TASK_CODE = F.TASK_CODE
+	AND A.SOURCE_TYPE=DECODE(:nd_source_type,'W','W','C','C','E','E',SOURCE_TYPE)  //ADDED ON 14.05.2007 TO GET WARD/CLINIC/EXTERNAL SOURCES DATA CORRECTLY
+	AND NVL(A.SOURCE_CODE, '!!!!!!') BETWEEN :nd_source_fr AND :nd_source_to //13.09.2006
+	AND NVL(A.CATEGORY_CODE, '!!!') BETWEEN :nd_category_fr AND :nd_category_to
+	ORDER BY A.CATEGORY_CODE,A.SPECIMEN_NO, C.SAMPLE_ID, C.ANATOMY_SITE_CODE,E.TASK_CODE;
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN NO_SAMPLE_HEADER;
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_hdr_no_sample() occured....\n");
+	proc_exit();
+}
+
+/** Declare cursor for Single Organ (Anatomy site same for all smaple) **/
+
+void dclr_hdr_sample_same()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE SAMPLE_SAME_HEADER CURSOR FOR
+	SELECT A.SPECIMEN_NO , A.CATEGORY_CODE,
+	C.SAMPLE_ID, C.ANATOMY_SITE_CODE, C.SAMPLE_INDICATOR,
+	D.BLOCK_SEQ_NO, D.BLOCK_INDICATOR, E.TASK_CODE, NVL(F.SLIDE_YN,'N') ,
+	NVL(F.SPECIAL_STAIN_YN, 'N'), F.SPECIAL_STAIN_TYPE_IND,
+	NVL(C.no_of_control_slides, 0) //13.09.2006
+	FROM RL_REQUEST_HEADER A,  RL_SAMPLE_DETAILS C,
+		 RL_BLOCKS_FOR_SAMPLE D, RL_SAMPLE_TASK_DTL E, 
+		 RL_TASK_MAST F
+	WHERE A.SPEC_REGD_DATE_TIME BETWEEN TO_DATE(:nd_spec_regd_date_fr,'DD/MM/YYYY HH24:MI:SS')
+	AND TO_DATE(:nd_spec_regd_date_to,'DD/MM/YYYY HH24:MI:SS')+1
+	AND A.SPECIMEN_NO = C.SPECIMEN_NO
+	AND A.SPECIMEN_NO = D.SPECIMEN_NO
+	AND A.SPECIMEN_NO = E.SPECIMEN_NO
+	AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND A.OPERATING_FACILITY_ID = C.OPERATING_FACILITY_ID
+	AND A.OPERATING_FACILITY_ID = D.OPERATING_FACILITY_ID
+	AND A.OPERATING_FACILITY_ID = E.OPERATING_FACILITY_ID
+	AND C.SAMPLE_ID = D.SAMPLE_ID
+	AND C.SAMPLE_ID = E.SAMPLE_ID
+	AND ( (D.BLOCK_SEQ_NO = E.BLOCK_SEQ_NO AND D.BLOCK_INDICATOR = 'BL')
+		  OR ( E.BLOCK_SEQ_NO = 0 AND E.TASK_INDICATOR IN ( 'SA', 'SP') )
+//08.09.2005		  D.BLOCK_INDICATOR IN ('SA', 'SP') )
+		 )
+	AND 1 =  (SELECT COUNT(COUNT(SPECIMEN_NO))FROM RL_SAMPLE_DETAILS X
+						  WHERE A.SPECIMEN_NO = X.SPECIMEN_NO
+						  AND A.OPERATING_FACILITY_ID = X.OPERATING_FACILITY_ID
+						  GROUP BY ANATOMY_SITE_CODE
+						  )
+	AND A.SECTION_CODE = :nd_section_code
+	AND A.SECTION_CODE = C.SECTION_CODE
+	AND A.SECTION_CODE = F.SECTION_CODE
+	AND E.TASK_CODE = F.TASK_CODE
+	AND A.SOURCE_TYPE=DECODE(:nd_source_type,'W','W','C','C','E','E',SOURCE_TYPE)  //ADDED ON 14.05.2007 TO GET WARD/CLINIC/EXTERNAL SOURCES DATA CORRECTLY
+	AND NVL(A.SOURCE_CODE, '!!!!!!') BETWEEN :nd_source_fr AND :nd_source_to //13.09.2006
+	AND NVL(A.CATEGORY_CODE,'!!!') BETWEEN :nd_category_fr AND :nd_category_to
+	ORDER BY A.CATEGORY_CODE,A.SPECIMEN_NO, C.SAMPLE_ID, C.ANATOMY_SITE_CODE,
+	         D.BLOCK_SEQ_NO,E.TASK_CODE;
+
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN SAMPLE_SAME_HEADER;
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_hdr_sample_same() occured....\n");
+	proc_exit();
+}
+
+/** Declare cursor for Specimen with more than one tissue/Organ 
+    (Anatomy site different for all smaple) **/
+
+void dclr_hdr_sample_diff()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL DECLARE SAMPLE_DIFF_HEADER CURSOR FOR
+	SELECT A.SPECIMEN_NO , A.CATEGORY_CODE,
+	C.SAMPLE_ID, C.ANATOMY_SITE_CODE, C.SAMPLE_INDICATOR,
+	D.BLOCK_SEQ_NO, D.BLOCK_INDICATOR, E.TASK_CODE, NVL(F.SLIDE_YN,'N') ,
+	NVL(F.SPECIAL_STAIN_YN, 'N'), F.SPECIAL_STAIN_TYPE_IND,
+	NVL(C.no_of_control_slides, 0)
+	FROM RL_REQUEST_HEADER A,  RL_SAMPLE_DETAILS C,
+		 RL_BLOCKS_FOR_SAMPLE D, RL_SAMPLE_TASK_DTL E, 
+		 RL_TASK_MAST F
+	WHERE A.SPEC_REGD_DATE_TIME BETWEEN TO_DATE(:nd_spec_regd_date_fr,'DD/MM/YYYY HH24:MI:SS')
+	AND TO_DATE(:nd_spec_regd_date_to,'DD/MM/YYYY HH24:MI:SS')+1 
+	AND A.SPECIMEN_NO = C.SPECIMEN_NO
+	AND A.SPECIMEN_NO = D.SPECIMEN_NO
+	AND A.SPECIMEN_NO = E.SPECIMEN_NO
+	AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND A.OPERATING_FACILITY_ID = C.OPERATING_FACILITY_ID
+	AND A.OPERATING_FACILITY_ID = D.OPERATING_FACILITY_ID
+	AND A.OPERATING_FACILITY_ID = E.OPERATING_FACILITY_ID
+	AND C.SAMPLE_ID = D.SAMPLE_ID
+	AND C.SAMPLE_ID = E.SAMPLE_ID
+	AND ( (D.BLOCK_SEQ_NO = E.BLOCK_SEQ_NO AND D.BLOCK_INDICATOR = 'BL')
+		  OR ( E.BLOCK_SEQ_NO = 0 AND E.TASK_INDICATOR IN ( 'SA', 'SP') )
+//08.09.2005		  D.BLOCK_INDICATOR IN ('SA', 'SP') )
+		 )
+	AND 1 <  (SELECT COUNT(COUNT(SPECIMEN_NO))FROM RL_SAMPLE_DETAILS X
+						  WHERE A.SPECIMEN_NO = X.SPECIMEN_NO
+						  AND A.OPERATING_FACILITY_ID = X.OPERATING_FACILITY_ID
+						  GROUP BY ANATOMY_SITE_CODE
+						  )
+	AND A.SECTION_CODE = :nd_section_code
+	AND A.SECTION_CODE = C.SECTION_CODE
+	AND A.SECTION_CODE = F.SECTION_CODE
+	AND E.TASK_CODE = F.TASK_CODE
+	AND A.SOURCE_TYPE=DECODE(:nd_source_type,'W','W','C','C','E','E',SOURCE_TYPE)  //ADDED ON 14.05.2007 TO GET WARD/CLINIC/EXTERNAL SOURCES DATA CORRECTLY
+	AND NVL(A.SOURCE_CODE, '!!!!!!') BETWEEN :nd_source_fr AND :nd_source_to //13.09.2006
+	AND NVL(A.CATEGORY_CODE, '!!!') BETWEEN :nd_category_fr AND :nd_category_to
+	ORDER BY A.CATEGORY_CODE,A.SPECIMEN_NO, C.SAMPLE_ID, C.ANATOMY_SITE_CODE,
+	         D.BLOCK_SEQ_NO,E.TASK_CODE;
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL OPEN SAMPLE_DIFF_HEADER;
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG,"Oracle error at dclr_hdr_sample_same() occured....\n");
+	proc_exit();
+}
+
+/** Fetch Cursor (Single Specimen/Slide - No sample) **/
+
+int fetch_hdr_no_sample()
+{
+	d_specimen_no.arr[0]         = '\0';
+	d_category_code.arr[0]       = '\0';
+	d_sample_id.arr[0]           = '\0';
+	d_anatomy_site_code.arr[0]   = '\0';
+	d_sample_indicator.arr[0]    = '\0';
+	d_task_code.arr[0]           = '\0';
+	d_slide_yn.arr[0]            = '\0';
+	d_spec_stain_yn.arr[0]       = '\0';
+	d_spec_stain_type_ind.arr[0] = '\0';
+
+	d_specimen_no.len          = 0;
+	d_category_code.len        = 0;
+	d_sample_id.len            = 0;
+	d_anatomy_site_code.len    = 0;
+	d_sample_indicator.len     = 0;
+	d_task_code.len            = 0;
+	d_slide_yn.len             = 0;
+	d_spec_stain_yn.len        = 0;
+	d_spec_stain_type_ind.len  = 0;
+	d_no_of_control_slides = 0; //13.09.2006
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL FETCH NO_SAMPLE_HEADER INTO 
+	:d_specimen_no,:d_category_code , :d_sample_id, :d_anatomy_site_code,
+	:d_sample_indicator,:d_task_code,:d_slide_yn, 
+	:d_spec_stain_yn,:d_spec_stain_type_ind, 
+	:d_no_of_control_slides; //13.09.2006
+
+	if (NODATAFOUND)
+		return 0;
+
+	d_specimen_no.arr[d_specimen_no.len]                 = '\0';
+	d_category_code.arr[d_category_code.len]             = '\0';
+	d_sample_id.arr[d_sample_id.len]                     = '\0';
+	d_anatomy_site_code.arr[d_anatomy_site_code.len]     = '\0';
+	d_sample_indicator.arr[d_sample_indicator.len]       = '\0';
+	d_task_code.arr[d_task_code.len]                     = '\0';
+	d_slide_yn.arr[d_slide_yn.len]                       = '\0';
+	d_spec_stain_yn.arr[d_spec_stain_yn.len]             = '\0';
+	d_spec_stain_type_ind.arr[d_spec_stain_type_ind.len] = '\0';
+
+// 07.09.2005
+	l_tot_count1 += 1;
+
+//13.09.2006
+	//l_no_con_slides_count1 = l_no_con_slides_count1 + d_no_of_control_slides; 
+
+	return 1;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at fetch_hdr_no_sample() occured....\n");
+	proc_exit();
+}
+
+/** Fetch Cursor (Single Organ - Same anatomy for all sample) **/
+
+int fetch_hdr_sample_same()
+{
+	d_specimen_no.arr[0]         = '\0';
+	d_category_code.arr[0]       = '\0';
+	d_sample_id.arr[0]           = '\0';
+	d_anatomy_site_code.arr[0]   = '\0';
+	d_sample_indicator.arr[0]    = '\0';
+	d_block_seq_no.arr[0]        = '\0';
+	d_block_indicator.arr[0]     = '\0';
+	d_task_code.arr[0]           = '\0';
+	d_slide_yn.arr[0]            = '\0';
+	d_spec_stain_yn.arr[0]       = '\0';
+	d_spec_stain_type_ind.arr[0] = '\0';
+
+	d_specimen_no.len          = 0;
+	d_category_code.len        = 0;
+	d_sample_id.len            = 0;
+	d_anatomy_site_code.len    = 0;
+	d_sample_indicator.len     = 0;
+	d_block_seq_no.len         = 0;
+	d_block_indicator.len      = 0;
+	d_task_code.len            = 0;
+	d_slide_yn.len             = 0;
+	d_spec_stain_yn.len        = 0;
+	d_spec_stain_type_ind.len  = 0;
+	d_no_of_control_slides     = 0; //13.09.2006
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL FETCH SAMPLE_SAME_HEADER INTO 
+	:d_specimen_no,:d_category_code , :d_sample_id, :d_anatomy_site_code,
+	:d_sample_indicator,:d_block_seq_no,:d_block_indicator,:d_task_code,:d_slide_yn, 
+	:d_spec_stain_yn,:d_spec_stain_type_ind, 
+	:d_no_of_control_slides; //13.09.2006
+
+	if (NODATAFOUND)
+		return 0;
+
+	d_specimen_no.arr[d_specimen_no.len]                 = '\0';
+	d_category_code.arr[d_category_code.len]             = '\0';
+	d_sample_id.arr[d_sample_id.len]                     = '\0';
+	d_anatomy_site_code.arr[d_anatomy_site_code.len]     = '\0';
+	d_sample_indicator.arr[d_sample_indicator.len]       = '\0';
+	d_block_seq_no.arr[d_block_seq_no.len]               = '\0';
+	d_block_indicator.arr[d_block_indicator.len]         = '\0';
+	d_task_code.arr[d_task_code.len]                     = '\0';
+	d_slide_yn.arr[d_slide_yn.len]                       = '\0';
+	d_spec_stain_yn.arr[d_spec_stain_yn.len]             = '\0';
+	d_spec_stain_type_ind.arr[d_spec_stain_type_ind.len] = '\0';
+
+//13.09.2006
+	//l_no_con_slides_count2 = l_no_con_slides_count2 + d_no_of_control_slides; 
+
+	return 1;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at fetch_hdr_sample_same() occured....\n");
+	proc_exit();
+}
+
+/** Fetch Cursor (Single Organ - Same anatomy for all sample) **/
+
+int fetch_hdr_sample_diff()
+{
+	d_specimen_no.arr[0]         = '\0';
+	d_category_code.arr[0]       = '\0';
+	d_sample_id.arr[0]           = '\0';
+	d_anatomy_site_code.arr[0]   = '\0';
+	d_sample_indicator.arr[0]    = '\0';
+	d_block_seq_no.arr[0]        = '\0';
+	d_block_indicator.arr[0]     = '\0';
+	d_task_code.arr[0]           = '\0';
+	d_slide_yn.arr[0]            = '\0';
+	d_spec_stain_yn.arr[0]       = '\0';
+	d_spec_stain_type_ind.arr[0] = '\0';
+
+	d_specimen_no.len          = 0;
+	d_category_code.len        = 0;
+	d_sample_id.len            = 0;
+	d_anatomy_site_code.len    = 0;
+	d_sample_indicator.len     = 0;
+	d_block_seq_no.len         = 0;
+	d_block_indicator.len      = 0;
+	d_task_code.len            = 0;
+	d_slide_yn.len             = 0;
+	d_spec_stain_yn.len        = 0;
+	d_spec_stain_type_ind.len  = 0;
+	d_no_of_control_slides = 0; //13.09.2006
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	EXEC SQL FETCH SAMPLE_DIFF_HEADER INTO 
+	:d_specimen_no,:d_category_code , :d_sample_id, :d_anatomy_site_code,
+	:d_sample_indicator,:d_block_seq_no,:d_block_indicator, :d_task_code,:d_slide_yn, 
+	:d_spec_stain_yn, :d_spec_stain_type_ind,
+	:d_no_of_control_slides; //13.09.2006
+
+	if (NODATAFOUND)
+		return 0;
+
+	d_specimen_no.arr[d_specimen_no.len]                 = '\0';
+	d_category_code.arr[d_category_code.len]             = '\0';
+	d_sample_id.arr[d_sample_id.len]                     = '\0';
+	d_anatomy_site_code.arr[d_anatomy_site_code.len]     = '\0';
+	d_sample_indicator.arr[d_sample_indicator.len]       = '\0';
+	d_block_seq_no.arr[d_block_seq_no.len]               = '\0';
+	d_block_indicator.arr[d_block_indicator.len]         = '\0';
+	d_task_code.arr[d_task_code.len]                     = '\0';
+	d_slide_yn.arr[d_slide_yn.len]                       = '\0';
+	d_spec_stain_yn.arr[d_spec_stain_yn.len]             = '\0';
+	d_spec_stain_type_ind.arr[d_spec_stain_type_ind.len] = '\0';
+
+	return 1;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at fetch_hdr_sample_diff() occured....\n");
+	proc_exit();
+}
+
+/** Close Category Header Cursor **/
+
+close_hdr_no_sample()
+{
+	EXEC SQL CLOSE NO_SAMPLE_HEADER;
+}
+
+close_hdr_sample_same()
+{
+	EXEC SQL CLOSE SAMPLE_SAME_HEADER;
+}
+
+close_hdr_sample_diff()
+{
+	EXEC SQL CLOSE SAMPLE_DIFF_HEADER;
+}
+
+/** Print Detail Record **/
+void print_detl_rec()
+{
+	print_no_sample_dtl();
+	print_sample_same_dtl();
+	print_sample_diff_dtl();
+	print_total();
+}
+
+/** Print details for No Sample **/
+
+void print_no_sample_dtl()
+{
+	int still_rec_exist = 0;
+	
+	still_rec_exist = fetch_hdr_no_sample();
+	
+	strcpy(d_prv_category_code.arr, d_category_code.arr);
+
+	strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+
+//	Commented by Sai Dutt on 07.09.2005 as incrementing of l_tot_count1
+//  should be in the fetch_hdr_no_sample()
+//	l_tot_count1 += 1;
+
+//	Commented by Sai Dutt on 07.09.2005 as incrementing of l_tot_count1
+//  should be based on the previous value of d_prv_specimen_no.arr so first 
+//  the value of d_prv_specimen_no.arr made to 'xxxxxx'
+//	l_tot_count1 += 1;
+	strcpy(d_prv_specimen_no.arr, "xxxxxx");
+
+	while (still_rec_exist)
+	{
+		if (strcmp(d_prv_specimen_no.arr, d_specimen_no.arr) != 0)
+		{
+			l_tot_count1++;
+			strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+
+			//13.09.2006
+			l_no_con_slides_count1 = l_no_con_slides_count1 + d_no_of_control_slides; 
+
+		}
+		//13.09.2006
+		else if (strcmp(d_prv_sample_id.arr, d_sample_id.arr) != 0)
+		{
+			l_no_con_slides_count1 = l_no_con_slides_count1 + d_no_of_control_slides; 
+			strcpy(d_prv_sample_id.arr, d_sample_id.arr);
+//			sprintf(string_var, "2222 %s 22 %s 33 %s 44 %s ss %d dd %d", d_prv_specimen_no.arr, d_specimen_no.arr, d_prv_sample_id.arr, d_sample_id.arr, d_no_of_control_slides, l_no_con_slides_count3);
+//			disp_message(ERR_MESG, string_var);
+		}
+		
+		if ((strcmp(d_slide_yn.arr, "Y") == 0) && (strcmp(d_spec_stain_yn.arr, "Y") == 0))
+		{
+			l_spec_stain_count1++;
+
+			if (strcmp(d_spec_stain_type_ind.arr, "HC") == 0)
+			{
+				l_spec_stain_hc_count1 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IH") == 0)
+			{
+				l_spec_stain_ih_count1 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IF") == 0)
+			{
+				l_spec_stain_if_count1 += 1;
+			}
+
+		}
+		else if(strcmp(d_slide_yn.arr, "Y") == 0)
+		{
+			l_hne_slide_count1++;
+		}
+		
+		still_rec_exist = fetch_hdr_no_sample();
+
+		if(still_rec_exist == 0 )
+		{
+			chk_break();
+			fprintf(fp, "%-8.8s  %-6d  %6s  %-6d  %-7d  %-9d  %-8d%-8d%-8d\n", 
+			            "A", l_tot_count1, " ", l_hne_slide_count1,l_spec_stain_count1,
+						l_spec_stain_hc_count1, l_spec_stain_ih_count1, l_spec_stain_if_count1, l_no_con_slides_count1);
+
+//13.09.2006			fprintf(fp, "%-8.8s  %-6d  %6s  %-6d  %-7d  %-9d  %-9d  %-11d\n", 
+//13.09.2006			            "A", l_tot_count1, " ", l_hne_slide_count1,l_spec_stain_count1,
+//13.09.2006						l_spec_stain_hc_count1, l_spec_stain_ih_count1, l_spec_stain_if_count1);
+			fprintf(fp,"\n");
+			line_no += 1;
+		}
+	}
+
+}
+
+/** Print details for Sample with Same Anatomy site **/
+
+void print_sample_same_dtl()
+{
+	int still_rec_exist = 0;
+	
+	still_rec_exist = fetch_hdr_sample_same();
+	
+	strcpy(d_prv_category_code.arr, d_category_code.arr);
+	strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+	
+	flg = 'N';
+	spc_brk_flg = 'N';
+	
+//	Commented by Sai Dutt on 07.09.2005 as incrementing of l_tot_count2
+//  should be based on the previous value of d_prv_specimen_no.arr so first 
+//  the value of d_prv_specimen_no.arr made to 'xxxxxx'
+//	l_tot_count2 += 1;
+	strcpy(d_prv_specimen_no.arr, "xxxxxx");
+
+	while (still_rec_exist)
+	{
+		if (strcmp(d_prv_specimen_no.arr, d_specimen_no.arr) != 0)
+		{
+
+			l_tot_count2++;
+			strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+
+			strcpy(d_prv_sample_id.arr, d_sample_id.arr);	//08.09.2005
+			strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);	//08.09.2005
+
+
+			//13.09.2006
+			l_no_con_slides_count2 = l_no_con_slides_count2 + d_no_of_control_slides; 
+
+			spc_brk_flg = 'Y';
+		}
+		//13.09.2006
+		else if (strcmp(d_prv_sample_id.arr, d_sample_id.arr) != 0)
+		{
+			l_no_con_slides_count2 = l_no_con_slides_count2 + d_no_of_control_slides; 
+//			sprintf(string_var, "2222 %s 22 %s 33 %s 44 %s ss %d dd %d", d_prv_specimen_no.arr, d_specimen_no.arr, d_prv_sample_id.arr, d_sample_id.arr, d_no_of_control_slides, l_no_con_slides_count3);
+//			disp_message(ERR_MESG, string_var);
+		}
+
+		
+		if ((strcmp(d_slide_yn.arr, "Y") == 0) && (strcmp(d_spec_stain_yn.arr, "Y") == 0))
+		{
+			l_spec_stain_count2++;
+
+			if (strcmp(d_spec_stain_type_ind.arr, "HC") == 0)
+			{
+				l_spec_stain_hc_count2 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IH") == 0)
+			{
+				l_spec_stain_ih_count2 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IF") == 0)
+			{
+				l_spec_stain_if_count2 += 1;
+			}
+
+		}
+		else if(strcmp(d_slide_yn.arr, "Y") == 0)
+		{
+			l_hne_slide_count2++;
+		}
+		
+		/** For counting Number of Blocks **/
+
+		if (strcmp(d_block_indicator.arr, "BL") == 0 )
+		{
+
+/*	//08.09.2005
+
+			if (flg == 'N')
+			{
+				strcpy(d_prv_sample_id.arr, d_sample_id.arr);
+				strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);
+				l_block_count2 += 1;
+				flg = 'Y';
+			}
+	//08.09.2005
+*/
+			if ((spc_brk_flg == 'Y') ||
+			    (strcmp(d_prv_sample_id.arr, d_sample_id.arr) != 0) ||
+			    (strcmp(d_prv_block_seq_no.arr, d_block_seq_no.arr) != 0))
+			{
+				l_block_count2 += 1;
+				spc_brk_flg = 'N';
+			}
+
+			strcpy(d_prv_sample_id.arr, d_sample_id.arr);
+			strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);
+		}
+
+		still_rec_exist = fetch_hdr_sample_same();
+
+		if(still_rec_exist == 0 )
+		{
+			chk_break();
+			fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-8d%-8d%-8d\n", 
+			            "B", l_tot_count2, l_block_count2, l_hne_slide_count2,l_spec_stain_count2,
+						l_spec_stain_hc_count2, l_spec_stain_ih_count2, l_spec_stain_if_count2, l_no_con_slides_count2);
+
+//13.09.3006			fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-9d  %-11d\n", 
+//13.09.3006		            "B", l_tot_count2, l_block_count2, l_hne_slide_count2,l_spec_stain_count2,
+//13.09.3006						l_spec_stain_hc_count2, l_spec_stain_ih_count2, l_spec_stain_if_count2);
+			fprintf(fp,"\n");
+			line_no += 1;
+		}
+	}
+
+}
+
+/** Print details for Sample with Different Anatomy site **/
+
+void print_sample_diff_dtl()
+{
+	int still_rec_exist = 0;
+	
+	still_rec_exist = fetch_hdr_sample_diff();
+	
+
+	strcpy(d_prv_category_code.arr, d_category_code.arr);
+
+	strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+
+	flg = 'N';
+	spc_brk_flg = 'N';
+	
+//	Commented by Sai Dutt on 07.09.2005 as incrementing of l_tot_count3
+//  should be based on the previous value of d_prv_specimen_no.arr so first 
+//  the value of d_prv_specimen_no.arr made to 'xxxxxx'
+//	l_tot_count3 += 1;
+	strcpy(d_prv_specimen_no.arr, "xxxxxx");
+
+	while (still_rec_exist)
+	{
+
+		if (strcmp(d_prv_specimen_no.arr, d_specimen_no.arr) != 0)
+		{
+			l_tot_count3++;
+
+			strcpy(d_prv_specimen_no.arr, d_specimen_no.arr);
+
+			strcpy(d_prv_sample_id.arr, d_sample_id.arr);	//08.09.2005
+			strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);	//08.09.2005
+
+
+			//13.09.2006
+			l_no_con_slides_count3 = l_no_con_slides_count3 + d_no_of_control_slides; 
+
+//			sprintf(string_var, "1111111 %s 22 %s 33 %s 44 %s ss %d dd %d", d_prv_specimen_no.arr, d_specimen_no.arr, d_prv_sample_id.arr, d_sample_id.arr, d_no_of_control_slides, l_no_con_slides_count3);
+//			disp_message(ERR_MESG, string_var);
+
+			spc_brk_flg = 'Y';
+		}
+		//13.09.2006
+		else if (strcmp(d_prv_sample_id.arr, d_sample_id.arr) != 0)
+		{
+			l_no_con_slides_count3 = l_no_con_slides_count3 + d_no_of_control_slides; 
+//			sprintf(string_var, "2222 %s 22 %s 33 %s 44 %s ss %d dd %d", d_prv_specimen_no.arr, d_specimen_no.arr, d_prv_sample_id.arr, d_sample_id.arr, d_no_of_control_slides, l_no_con_slides_count3);
+//			disp_message(ERR_MESG, string_var);
+
+		}
+		
+
+		if ((strcmp(d_slide_yn.arr, "Y") == 0) && (strcmp(d_spec_stain_yn.arr, "Y") == 0))
+		{
+			l_spec_stain_count3++;
+
+			if (strcmp(d_spec_stain_type_ind.arr, "HC") == 0)
+			{
+				l_spec_stain_hc_count3 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IH") == 0)
+			{
+				l_spec_stain_ih_count3 += 1;
+			}
+			if (strcmp(d_spec_stain_type_ind.arr, "IF") == 0)
+			{
+				l_spec_stain_if_count3 += 1;
+			}
+
+		}
+		else if(strcmp(d_slide_yn.arr, "Y") == 0)
+		{
+			l_hne_slide_count3++;
+		}
+		
+		/** For counting Number of Blocks **/
+
+		if ( strcmp(d_block_indicator.arr, "BL") == 0 )
+		{
+
+
+/*	//08.09.2005
+
+			if (flg == 'N')
+			{
+				strcpy(d_prv_sample_id.arr, d_sample_id.arr);
+				strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);
+				l_block_count3 += 1;
+				flg = 'Y';
+			}
+
+	//08.09.2005
+*/
+
+			if ((spc_brk_flg == 'Y') ||
+			    (strcmp(d_prv_sample_id.arr, d_sample_id.arr) != 0) ||
+			    (strcmp(d_prv_block_seq_no.arr, d_block_seq_no.arr) != 0))
+			{
+				l_block_count3 += 1;
+				spc_brk_flg = 'N';
+			}
+
+			strcpy(d_prv_sample_id.arr, d_sample_id.arr);
+			strcpy(d_prv_block_seq_no.arr, d_block_seq_no.arr);
+		}
+
+		still_rec_exist = fetch_hdr_sample_diff();
+
+		if(still_rec_exist == 0 )
+		{
+			chk_break();
+
+			fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-8d%-8d%-8d\n", 
+			            "C", l_tot_count3, l_block_count3, l_hne_slide_count3,l_spec_stain_count3,
+						l_spec_stain_hc_count3, l_spec_stain_ih_count3, l_spec_stain_if_count3, l_no_con_slides_count3);
+			fprintf(fp,"\n");
+
+//13.09.2006			fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-9d  %-11d\n", 
+//13.09.2006			            "C", l_tot_count3, l_block_count3, l_hne_slide_count3,l_spec_stain_count3,
+//13.09.2006						l_spec_stain_hc_count3, l_spec_stain_ih_count3, l_spec_stain_if_count3);
+			fprintf(fp,"\n");
+			line_no += 1;
+		}
+	}
+
+}
+
+/** Print the Total **/
+
+void print_total()
+{
+	l_tot_count_g           = l_tot_count1 + l_tot_count2 + l_tot_count3;
+	l_block_count_g         = l_block_count1 + l_block_count2 + l_block_count3;
+	l_hne_slide_count_g     = l_hne_slide_count1 + l_hne_slide_count2 + l_hne_slide_count3;
+	l_spec_stain_count_g    = l_spec_stain_count1 + l_spec_stain_count2 + l_spec_stain_count3;
+	l_spec_stain_hc_count_g = l_spec_stain_hc_count1 + l_spec_stain_hc_count2 + l_spec_stain_hc_count3;
+	l_spec_stain_ih_count_g = l_spec_stain_ih_count1 + l_spec_stain_ih_count2 + l_spec_stain_ih_count3;
+	l_spec_stain_if_count_g = l_spec_stain_if_count1 + l_spec_stain_if_count2 + l_spec_stain_if_count3;
+	l_no_con_slides_count_g = l_no_con_slides_count1 + l_no_con_slides_count2 + l_no_con_slides_count3; //13.09.2006
+	fprintf(fp,"------------------------------------------------------------------------------\n");
+//13.09.2006
+/*	fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-8d%-8d%-8d\n", 
+			    "Total", l_tot_count_g, l_block_count_g, l_hne_slide_count_g,l_spec_stain_count_g,
+				l_spec_stain_hc_count_g, l_spec_stain_ih_count_g, l_spec_stain_if_count_g, l_no_con_slides_count_g);
+*/
+	fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-8d%-8d%-8d\n", 
+			    local_legend[2], l_tot_count_g, l_block_count_g, l_hne_slide_count_g,l_spec_stain_count_g,
+				l_spec_stain_hc_count_g, l_spec_stain_ih_count_g, l_spec_stain_if_count_g, l_no_con_slides_count_g); //added for globalisation
+
+//13.09.2006	fprintf(fp, "%-8.8s  %-6d  %-6d  %-6d  %-7d  %-9d  %-9d  %-11d\n", 
+//13.09.2006			    "Total", l_tot_count_g, l_block_count_g, l_hne_slide_count_g,l_spec_stain_count_g,
+//13.09.2006				l_spec_stain_hc_count_g, l_spec_stain_ih_count_g, l_spec_stain_if_count_g);
+	fprintf(fp,"------------------------------------------------------------------------------\n");
+	line_no += 2;
+
+
+}
+
+/** Print REPORT HEADER **/
+
+void print_rep_header()
+{
+	void get_section_desc();
+
+	char nd_option_desc[20],
+	     nd_category_fr_desc[61],
+		 nd_category_to_desc[61],
+		 nd_source_type_desc[61], //13.09.2006
+	     nd_source_fr_desc[61], //13.09.2006
+		 nd_source_to_desc[61]; //13.09.2006
+
+		 int rec_len;//added for globalisation
+
+	
+	get_section_desc();
+
+//	if(strcmp(nd_option.arr, "W") == 0)
+//	{
+//		strcpy(nd_option_desc, "WORKGROUP");
+//	}
+//	else if(strcmp(nd_option.arr,"C") == 0)
+//	{
+//		strcpy(nd_option_desc, "CATEGORY");
+		strcpy(nd_category_fr_desc, nd_category_fr.arr);
+		strcpy(nd_category_to_desc, nd_category_to.arr);
+		strcpy(nd_source_fr_desc, nd_source_fr.arr); //13.09.2006
+		strcpy(nd_source_to_desc, nd_source_to.arr); //13.09.2006
+//	}
+
+	print_header();
+
+	get_version_no();
+
+	fprintf(fp,"%s\n",d_version.arr);
+	fprintf(fp,"\n\n\n\n");
+	//fprintf(fp,"        ");
+	//fprintf(fp,"INPUT PARAMETERS :\n");
+	rec_len = strlen(local_legend[3]);//added for globalisation
+	print_space(30, rec_len,1);//added for globalisation
+	fprintf(fp,"%s :\n", local_legend[3]);//added for globalisation
+	//fprintf(fp,"        ");
+	//fprintf(fp,"------------------\n\n");
+	print_space(30, rec_len,1);//added for globalisation
+	print_space(30, rec_len,0);//added for globalisation
+	fprintf(fp,"\n\n");//added for globalisation
+	//fprintf(fp,"                   ");
+	//fprintf(fp,"DATE        FROM : %s\n", nd_spec_regd_date_fr.arr);
+
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_spec_regd_date_fr,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_spec_regd_date_fr1 := to_char(t_date,'DD/MM/YYYY');
+				:nd_spec_regd_date_fr1 :=sm_convert_date_2t(to_date(:nd_spec_regd_date_fr,'DD/MM/YYYY'),:language_id);
+				END;
+			END-EXEC;
+
+	rec_len = strlen(local_legend[4]);//added for globalisation
+	print_space(23, rec_len,1);//added for globalisation
+	fprintf(fp,"%s", local_legend[4]);//added for globalisation
+	rec_len = strlen(local_legend[5]);//added for globalisation
+	print_space(12, rec_len,1);//added for globalisation
+	fprintf(fp,"%s : %s\n", local_legend[5], nd_spec_regd_date_fr1.arr);//added for globalisation
+	//fprintf(fp,"                   ");
+	//fprintf(fp,"              TO : %s\n", nd_spec_regd_date_to.arr);
+          EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_spec_regd_date_to,'DD/MM/YYYY'), :language_id , t_date);
+				//:nd_spec_regd_date_to1 := to_char(t_date,'DD/MM/YYYY');
+				:nd_spec_regd_date_to1 :=sm_convert_date_2t(to_date(:nd_spec_regd_date_to,'DD/MM/YYYY'),:language_id);
+				END;
+			END-EXEC;
+	rec_len = strlen(local_legend[6]);//added for globalisation
+	print_space(35, rec_len,1);//added for globalisation
+	fprintf(fp,"%s : %s\n", local_legend[6], nd_spec_regd_date_to1.arr);//added for globalisation
+	fprintf(fp,"                   ");
+	//fprintf(fp,"DEPARTMENT       : %s - %s\n", nd_section_code.arr, nd_section_desc.arr);
+	fprintf(fp,"%-17.17s: %s - %s\n", local_legend[7], nd_section_code.arr, nd_section_desc.arr); //added for globalisation
+//	fprintf(fp,"                   ");
+//	fprintf(fp,"OPTION SELECTED  : %s\n", nd_option_desc);
+	
+//	if (strcmp(nd_option.arr, "C") == 0)
+//	{
+
+/* --Start -- Added by Sai Dutt on 13.09.2006 */
+	if (strcmp(nd_source_type.arr, "W") == 0)
+	  //strcpy(nd_source_type_desc , "Ward");
+	  strcpy(nd_source_type_desc , local_legend[8]); //added for globalisation
+	else if (strcmp(nd_source_type.arr, "C") == 0)
+	  //strcpy(nd_source_type_desc , "Clinic");
+	  strcpy(nd_source_type_desc , local_legend[9]); //added for globalisation
+	else if (strcmp(nd_source_type.arr, "E") == 0)
+	  //strcpy(nd_source_type_desc , "External");
+	  strcpy(nd_source_type_desc , local_legend[10]); //added for globalisation
+	else if (strcmp(nd_source_type.arr, "A") == 0)
+	  //strcpy(nd_source_type_desc , "All");
+	  strcpy(nd_source_type_desc , local_legend[11]); //added for globalisation
+
+		fprintf(fp,"                   ");
+		//fprintf(fp,"SOURCE TYPE      : %s\n", nd_source_type_desc);
+		fprintf(fp,"%-17.17s: %s\n", local_legend[12], nd_source_type_desc); //added for globalisation
+
+
+	if (strcmp(nd_source_fr_desc, "!!!!!!") == 0)
+	  //strcpy(nd_source_fr_desc , "LOWEST");
+	  strcpy(nd_source_fr_desc , local_legend[13]); //added for globalisation
+	if (strcmp(nd_source_to_desc, "~~~~~~") == 0)
+	  //strcpy(nd_source_to_desc , "HIGHEST");
+	  strcpy(nd_source_to_desc , local_legend[14]); //added for globalisation
+
+		fprintf(fp,"                   ");
+		//fprintf(fp,"SOURCE FROM      : %s\n", nd_source_fr_desc);
+		fprintf(fp,"%-17.17s: %s\n", local_legend[15], nd_source_fr_desc); //added for globalisation
+		fprintf(fp,"                   ");
+		//fprintf(fp,"SOURCE TO        : %s\n", nd_source_to_desc);
+		/* Commented by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08
+		fprintf(fp,"%-17.17s: %s\n", local_legend[16], nd_source_fr_desc); //added for globalisation */
+		fprintf(fp,"%-17.17s: %s\n", local_legend[16], nd_source_to_desc);   /* Added by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08 */
+/* --End   -- Added by Sai Dutt on 13.09.2006 */
+
+	if (strcmp(nd_category_fr_desc, "!!!") == 0)
+	  //strcpy(nd_category_fr_desc , "LOWEST");
+	  strcpy(nd_category_fr_desc , local_legend[13]); //added for globalisation
+	if (strcmp(nd_category_to_desc, "~~~") == 0)
+	  //strcpy(nd_category_to_desc , "HIGHEST");
+	  /* Commented by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08
+	  strcpy(nd_category_fr_desc , local_legend[14]); //added for globalisation */
+	  strcpy(nd_category_to_desc , local_legend[14]);						/* Added by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08 */
+
+		fprintf(fp,"                   ");
+		//fprintf(fp,"CATEGORY FROM    : %s\n", nd_category_fr_desc);
+		/* Commented by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08
+		fprintf(fp,"%-17.17s: %s\n", local_legend[17], nd_source_fr_desc); //added for globalisation */
+		fprintf(fp,"%-17.17s: %s\n", local_legend[17], nd_category_fr_desc); /* Added by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08 */
+		fprintf(fp,"                   ");
+		//fprintf(fp,"-CATEGORY TO      : %s\n", nd_category_to_desc);
+		/* Commented by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08
+		fprintf(fp,"%-17.17s: %s\n", local_legend[18], nd_source_to_desc); //added for globalisation */
+		fprintf(fp,"%-17.17s: %s\n", local_legend[18], nd_category_to_desc); /* Added by Durai Rajkumar against RL-ICN-Common-6334 on 05/11/08 */
+//	}
+
+	fprintf(fp,"\n");
+	fprintf(fp,"\f");
+}
+
+/** Print Header Informations **/
+
+void print_header()
+{
+	static int first = 1;
+	char buf[15];
+	int col;
+	
+	strcpy(rep_title2, "");
+
+	if (first)
+	{
+		memset(hdr_line1, ' ', REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+        memset(hdr_line4,' ',REP_WIDTH+1);
+		memset(hdr_line5,'-',REP_WIDTH);
+		hdr_line5[REP_WIDTH] = '\0';
+
+        strncpy(hdr_line1,"MDL : RL",8);
+        col = (int)(REP_WIDTH-strlen(d_acc_entity_name.arr))/2;
+        strncpy(hdr_line1+col,d_acc_entity_name.arr,strlen(d_acc_entity_name.arr));
+        EXEC SQL EXECUTE
+			DECLARE
+				t_date   date;
+			BEGIN
+				//t_date := GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+				//:d_sysdate1 := to_char(t_date,'DD/MM/YYYY HH24:MI'); //Added HH24:MI by srinivas
+				:d_sysdate1 :=sm_convert_datetime_2t(SYSDATE,:language_id);
+			END;
+		END-EXEC;
+		col = (REP_WIDTH-strlen(d_sysdate1.arr));
+        strcpy(hdr_line1+col,d_sysdate1.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,d_user.arr);
+	}
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP : RLRHISTS",14);
+    strcpy(rep_title1, local_legend[1] ); //added for globalisation
+	col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+    sprintf(buf,"%s : %4d",local_legend[19],page_no++);
+    //sprintf(buf,"PAGE : %4d",page_no++);
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+
+    col = (int)(REP_WIDTH-strlen(rep_title2))/2;
+    strcpy(hdr_line4+col,rep_title2);
+
+    if(first)
+        fprintf(fp,"%s\n",hdr_line1);
+    else
+	  { fprintf(fp,"\n");
+	    fprintf(fp,"%s\n",hdr_line1);
+	  }
+    fprintf(fp,"%s\n",hdr_line2);
+    fprintf(fp,"%s\n",hdr_line3);
+    fprintf(fp,"%s\n",hdr_line4);
+    fprintf(fp,"%s\n",hdr_line5);
+
+    first = 0;
+
+}
+
+/** Print Page Header info for all the Pages **/
+
+void print_page_header()
+{
+	print_header();
+	line_no += 5;
+}
+
+/** Print Column Heading **/
+
+void print_col_heading()
+{
+	//fprintf(fp,"Category  No. of  No. of  No. of  No. of   Histo      No of   No of   No of   \n");
+	fprintf(fp,"%-8.8s  %-6.6s  %-6.6s  %-6.6s  %-6.6s   %-9.9s  %-6.6s  %-6.6s  %-6.6s  \n",local_legend[20], 
+			local_legend[21], local_legend[21], local_legend[21], local_legend[21], local_legend[22], local_legend[21],
+			local_legend[21], local_legend[21]); //added for globalisation
+	//fprintf(fp,"          Cases   Blocks  H & E   Special  Chemistry  IHC     IMF     Control \n");
+	fprintf(fp,"          %-5.5s   %-6.6s  %-5.5s   %-7.7s  %-9.9s  %-6.6s  %-6.6s  %-7.7s \n",
+	local_legend[23], local_legend[24], local_legend[25], local_legend[26], local_legend[27], local_legend[28], local_legend[29], local_legend[30]); //added for globalisation
+	//fprintf(fp,"                          Slides  Stain                               Slides  \n");
+	fprintf(fp,"                          %-6.6s  %-6.6s                              %-6.6s  \n",
+	local_legend[31], local_legend[32], local_legend[31]); //added for globalisation
+	fprintf(fp,"------------------------------------------------------------------------------\n");
+
+//13.09.2006	fprintf(fp,"Category  No. of  No. of  No. of  No. of   Histo      Immuno-    Immmuno \n");
+//13.09.2006	fprintf(fp,"          Cases   Blocks  H & E   Special  Chemistry  Histo      Flouresence \n");
+//13.09.2006	fprintf(fp,"                          Slides  Stain               Chemistry\n");
+//13.09.2006	fprintf(fp,"------------------------------------------------------------------------------\n");
+	line_no += 4;
+}
+
+	
+/** Generate File Name **/
+
+gen_file_name()
+{
+	strcpy(nd_file_name.arr, WORKING_DIR);
+	nd_file_name.len = strlen(nd_file_name.arr);
+
+	strcat(nd_file_name.arr, OUTPUT_FILE_NAME);
+	nd_file_name.len = strlen(nd_file_name.arr);
+
+	if ((fp = fopen(nd_file_name.arr, "w")) == NULL)
+	{
+		sprintf(string_var,"Error while opening file %s\n", nd_file_name.arr);
+		disp_message(ERR_MESG,string_var);
+		proc_exit();
+	}
+
+}
+/** Get the Category Desc **/
+get_category_desc(category_cd)
+char *category_cd;
+{
+	
+	strcpy(d_category_where.arr, category_cd);
+	d_category_where.len = strlen(d_category_where.arr);
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL SELECT LONG_DESC
+	         INTO :d_category_desc
+			 FROM RL_CATEGORY_CODE_lang_vw
+			 WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+			 AND SECTION_CODE = :nd_section_code
+			 AND CATEGORY_CODE = :d_category_where
+			 and language_id = :language_id;
+
+	d_category_desc.arr[d_category_desc.len]   = '\0';
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at get_category_desc() occured....\n");
+	proc_exit();
+}
+
+/** Get The Workgroup desc **/
+get_workgroup_desc(work_grp)
+char *work_grp;
+{
+	strcpy(d_workgroup_where.arr, work_grp);
+	d_workgroup_where.len = strlen(d_workgroup_where.arr);
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL SELECT LONG_DESC 
+	         INTO :d_workgroup_desc
+			 FROM RL_OUTST_WORK_GROUP_lang_vw
+			 WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+			 AND SECTION_CODE = :nd_section_code
+			 AND OUTST_WORK_GROUP_CODE = :d_workgroup_where
+			 and language_id = :language_id;
+			 
+
+	d_workgroup_desc.arr[d_workgroup_desc.len] = '\0';
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at get_workgroup_desc() occured....\n");
+	proc_exit();
+
+}
+
+/** Get the Section Desc **/
+void get_section_desc()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL SELECT SHORT_NAME
+	         INTO :nd_section_desc 
+			 FROM RL_SECTION_CODE_lang_vw
+			 WHERE SECTION_CODE = :nd_section_code
+ 			 and language_id = :language_id;
+
+	nd_section_desc.arr[nd_section_desc.len]  = '\0';
+
+	return;
+
+err_exit:
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ORA_MESG, "Oracle error at get_section_desc occured....\n");
+	proc_exit();
+
+}
+
+/** To Prepare New page **/
+
+void prepare_new_page()
+{
+   fprintf(fp,"\n");
+   fprintf(fp,"\f");
+   line_no = 1;
+
+   print_page_header();
+   print_col_heading();
+
+}
+
+/** to print the last line of the report **/
+void end_report()
+{
+  fprintf(fp,"\n");
+  fprintf(fp,"\n");
+  //fprintf(fp, "Category A   : Single Specimen/Slide\n");
+  fprintf(fp, "%8.8s A   : %s\n", local_legend[20], local_legend[33]); //added for globalisation
+  //fprintf(fp, "Category B   : Single Organ\n");
+  fprintf(fp, "%8.8s B   : %s\n", local_legend[20], local_legend[34]); //added for globalisation
+  //fprintf(fp, "Category C   : Specimen with more than one tissue/organ\n");
+  fprintf(fp, "%8.8s C   : %s\n", local_legend[20], local_legend[35]); //added for globalisation
+  fprintf(fp,"\n");
+  fprintf(fp,"\n");
+  //fprintf(fp,"                      ******** End of Report *********");
+  fprintf(fp,"                      ******** %s *********", local_legend[36]); //added for globalisation
+  fprintf(fp,"\n");
+  fprintf(fp,"\f");
+}
+
+/** Check for Page Break **/
+
+chk_break()
+{
+	if ((line_no + 1) >= MAX_LINES)
+	{
+		prepare_new_page();
+	}
+}
+
+/** Get the version **/
+
+get_version_no()
+{
+     d_version_no.arr[0] = '\0';
+     d_version_no.len    =  0;
+
+     strcpy(d_version.arr,"VER : ");
+
+	 EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC;
+
+
+    if (l_tab_exists) 
+    {
+	    EXEC SQL SELECT VERSION_NO INTO :d_version_no 
+                 FROM   SM_INSTALLATION; 
+        d_version_no.arr[d_version_no.len] = '\0';
+    }
+    else
+	    strcpy(d_version_no.arr,"2.1");
+
+	    strcat(d_version.arr,d_version_no.arr);
+
+
+    if (OERROR)
+	{
+	    strcpy(d_version_no.arr,"2.1");
+	    strcat(d_version.arr,d_version_no.arr);
+    }
+
+}
+
+/****************************** added for globalisation *****************************/
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRHISTS.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRHISTS.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+	}
+ }
+
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(fp,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(fp,"%s","-");
+		}	
+	}
+}
+
+/*************************** added for globalisation*************************************/

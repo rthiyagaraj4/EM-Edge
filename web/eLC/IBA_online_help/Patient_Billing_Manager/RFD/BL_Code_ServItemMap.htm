@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_ServItemMap</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to define a Mapping Code and to associate either the Material Items or the Billing Services:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility ID</span> – Select a Facility from the list. The facilities associated to the logged in User gets listed. The mapping code defined with the Billing Services and the Material Items is relevant to the selected facility.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Indicator</span> – Select a Service Indicator from the list. The values are system defined – ‘Billing Service’ and ‘Material Item’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Service – Select Billing Service to associate Billing Services to the mapping code. The Billing Services associated to the mapping code are printed during bill generation.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Material Item – Select Material Item to associate Material Items to the mapping code. The Material Items associated to the mapping code are printed during bill generation.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Mapping Code</p>
+<p class="BoldRFD" style="font-weight: normal;">Using this tab, you can define Mapping Codes. A Mapping Code is pertinent to a selected set of Billing Services or Material Items. You can define a range of Mapping Codes for different age range. The coverage amount differs for the Mapping Codes of different age range. Mapping Code also varies for a combination of material items based on which the coverage amount differs. You can associate different Mapping Codes to the same Material Item.</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mapping Code</span> – Enter the Mapping Code in alphanumeric format of 10 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Level Applicable for Coverage</span> – Select the check box to define service or item level coverage for a Mapping Code. The check box is selected, by default. If the check box is selected, you can record coverage limit for mapping code through the ‘Setup Material Item Coverage Detail by Policy’ function in the Insurance Management module. The check box ‘Level Applicable for Coverage’ remains selected under the ‘Service/Items for Mapping Code’ tab when you associate Items or Billing Services to the Mapping Code. Clear the check box, if the level coverage is not applicable for Mapping Code. The coverage level is valid for OT related Material Items only where the Mapping Code is associated to the level of surgery.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Physician &amp; Diagnosis Applicable for Coverage</span> – Select the check box to define if the Physician and Diagnosis charge associated to the Mapping Code is applicable for coverage. The check box ‘Physician &amp; Diagnosis Applicable for Coverage’ remains selected under the ‘Service/Items for Mapping Code’ tab when you associate Items or Billing Services to the Mapping Code. This is valid for non-surgical items and the diagnosis recording is mandatory to recalculate the coverage amount. Clear the check box, if the coverage is not applicable for Physician and Diagnosis charges. &#160;The Physician &amp; Diagnosis coverage level is valid for Material Items only. You can specify the Term Set ID, Term Code and Physician ID in Insurance Management module only if the check box is selected.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You can either select the check box ‘Level Applicable for Coverage’ or ‘Physician &amp; Diagnosis Applicable for Coverage’.</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> – Enter the Long Description in alphanumeric format of 100 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> – Enter the Short Description in alphanumeric format of 40 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD" align="left"><span class="BoldNumberRFD">[Service/Items for Mapping Code]</span> – Click <span class="BoldNumberRFD">[Service/Items for Mapping Code]</span> to switch to the next tab to associate either Billing Services or Material Items to the mapping code.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Service/Items for Mapping Code</p>
+<p class="BoldRFD" style="font-weight: normal;">Using this tab, you can associate Material Items or Billing Services to the Mapping Codes.</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service/Item Code</span> – The Mapping Code defined and highlighted under the Mapping Code tab gets displayed. You cannot change the Service/Item Code.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Long Description recorded for the selected Service/Item Mapping Code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Code from the list. The values in the list differ based on the Service Indicator selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Billing Service or Material Item gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Level Applicable for Coverage</span> – The check box is either selected or cleared based on the setup in the ‘Mapping Code’ tab for respective Mapping Code. You cannot clear or select the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Physician &amp; Diagnosis Applicable for Coverage</span> – The check box is either selected or cleared based on the setup in the ‘Mapping Code’ tab for respective Mapping Code. You cannot clear or select the check box.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

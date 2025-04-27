@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OP_CodeSetup_VisitType</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to create a Visit Type record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Code</span> – Enter the Visit Type code in alphanumeric format of two characters maximum length. This code is used to identify the Visit Type of the Outpatient on Registering a Visit. The entered code has to be unique and cannot be changed after creation. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the long description of the Visit Type in alphanumeric format of 30 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> – Enter the short description of the Visit Type in alphanumeric format of 15 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> - Select the Visit Type Indicator from the list of valid values. These values are system defined and the list of values provided are:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">First</span> – Initial/new visit for a problem/treatment.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Follow-up</span> – Return/repeat visit as a consequence of the first visit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Routine</span> – Routine/one-time visit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Emergency</span> – A visit when a patient requires immediate medical attention; such visits are specific to Clinics, which are set up to handle such emergency situations.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Series</span> – A visit that is part of a recurring series of visits necessary for the healthcare unit/treatment.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Referral for Consult</span> – A visit to the Clinic against an existing encounter pertaining to an Inpatient/Outpatient Service Location.</p>
+</li>
+</ol>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Appt Duration (in minutes)</span> - Enter the Maximum Appointment Duration in numeric format of four digits maximum length. The value set here indicates the maximum appointment time that the patient can be given for the defined Visit Type when an appointment booking is made in the Appointment Scheduling module of Enterprise Management for time table of type ‘Free Format’.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">If Maximum Appointment duration value is set up here for a Visit Type and if the time table type for a particular day of a location is set up as ‘Free Format’ (Appointment Scheduling module), then while booking an appointment in Appointment Scheduling module, on entering the ‘From Time’ hyperlink of the appointment, the system calculates the ‘To Time’ by adding the value entered for the selected Visit Type.</span></p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Appt Slots</span> - Enter the Maximum Appointment Slots in numeric format of three digits maximum length. The value set indicates the Maximum Appointment Slots that the patient can be given when an Appointment Booking is made for a specific Visit Type in Appointment Scheduling module for time table of type ‘Slot’.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">If Maximum Appointment Slot value is set up for a Visit Type and if the time table type for a particular day of a location is set up as ‘Slot’, while booking an appointment, on selecting the ‘Visit Type’ of the appointment, the system takes the values of the appointment slots defined.</span></p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Orderable Criteria</span> – Select ‘Orderable Criteria’ from the list. The listed values are ‘Required’ and ‘Not Required’. This is used to identify if any Orderables have to be identified against the visit for an outpatient encounter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> – Select the check box to enable the record and clear the check box to disable the record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Applicable to Radiology</u></span> – Select the Applicable to Radiology check box to create Visit Type for booking radiology appointments. This check box is cleared, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Colour Indicator</u></span> – Select the required colour from the colour palette using <span style="font-weight: bold;"><b>[?]</b></span> function. By default, this field is blank.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

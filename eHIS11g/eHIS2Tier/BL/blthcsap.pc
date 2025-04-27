@@ -1,0 +1,432 @@
+
+/* Preprocessor Directives  */
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>   
+//#include <sqlca.h> 
+//#include <sqlda.h>
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <bl.h>
+#define ONLINE_PRINTING 1
+
+
+#include <winproc.h>
+
+/* Macros */
+
+#define NODATAFOUND sqlca.sqlcode==1403
+#define OERROR (sqlca.sqlcode < 0) 
+#define MAX_LINES 55
+
+/* Declarations */
+
+
+EXEC SQL BEGIN DECLARE SECTION;	
+
+	VARCHAR uid_pwd 	        	[91],	        	     
+		nd_facility_id			[3] ,
+		nd_facility			[3] ,
+		nd_appl_num			[21],
+		nd_appl_no			[11],     
+		nd_currency			[10],
+		nd_appl_date			[15],
+		nd_patient_id			[21],
+		nd_patient_name			[61],
+		nd_employee_no			[10] ,
+		nd_hcare_scheme			[45],
+		nd_payment_option		[40],
+		nd_customer_code		[15],
+		nd_customer_name		[41],    
+		nd_hcare_start_date		[15],
+		nd_hcare_expiry_date		[15],
+		nd_hcard_num			[41],
+		nd_remarks			[101],
+		nd_emp_patient_id		[21],
+		nd_session			[20],
+		l_msg				[50],
+		nd_pgm_date			[20];		
+	
+	char    nd_filename		        [100];
+
+	long  	nd_fmt_string			    ;
+
+	double	nd_subscription_amt		    ;		
+
+	int page_ct = 0;
+
+
+EXEC SQL END DECLARE SECTION;
+
+
+		FILE *f1;
+		int page = 0;
+		int line = 0;
+
+void proc_main(argc, argv)
+	int argc;
+	char *argv[];
+{    
+   void prt_line(int l, char spl_symbol[1]);
+   void dec_cursor();
+   void open_cursor();
+   void close_cursor();
+   int  fetch_cursor();
+  
+   void report_process();
+   void line_check();
+   
+
+/* INPUT ARGUMENT CHECK */
+
+      if(argc < 6) 
+     {
+	     disp_message(ORA_MESG, "Usage BLTHCSAP Uid/Passwd@DB Session Pgm-Date  Operating-Facility Appl-No");
+	     proc_exit();
+     }
+
+     strcpy(uid_pwd.arr, argv[1]);
+     uid_pwd.len = strlen(uid_pwd.arr);      	 
+
+     strcpy(nd_session.arr, argv[2]);
+     nd_session.len = strlen(nd_session.arr);      	  
+     strcpy(g_session_id,nd_session.arr);
+
+     strcpy(nd_pgm_date.arr, argv[3]);
+     nd_pgm_date.len = strlen(nd_pgm_date.arr);      	  
+     strcpy(g_pgm_date,nd_pgm_date.arr);
+
+     strcpy(nd_facility_id.arr, argv[4]);
+     nd_facility_id.len = strlen(nd_facility_id.arr);      	  
+
+
+     strcpy(nd_facility.arr,nd_facility_id.arr);
+     nd_facility.len = strlen(nd_facility.arr);      	  
+     strcpy(g_facility_id,nd_facility.arr);
+
+     strcpy(nd_appl_num.arr,argv[6]);
+     nd_appl_num.len = strlen(nd_appl_num.arr);    
+	 
+   
+/* DB LOGIN */
+
+    EXEC SQL CONNECT :uid_pwd;
+    if (OERROR) 
+    {
+    	disp_message (ORA_MESG, "USERID/PASSWORD failed to Connect");
+        proc_exit();  
+    }	  	
+  
+     set_meduser_role();
+
+/* OUTPUT FILE */
+	
+	strcpy(nd_filename,WORKING_DIR);   
+	strcat(nd_filename,argv[0]);        
+	strcat(nd_filename,".lis");
+	if((f1 = fopen(nd_filename, "w")) == NULL) 
+	{
+		disp_message (ERR_MESG, " Error opening output file ....");
+		proc_exit();
+        } 	  
+
+/* PROCESS */   
+
+
+    nd_currency.arr[0] = '\0';
+    nd_currency.len = 0;
+
+    EXEC SQL SELECT base_currency ,no_of_decimal INTO :nd_currency,:nd_fmt_string 
+	     FROM sy_acc_entity
+	     WHERE acc_entity_id = :nd_facility;
+   nd_currency.arr[nd_currency.len] = '\0';  
+
+   report_process(); 
+  
+   /* CLOSE FILE */
+
+   EXEC SQL COMMIT RELEASE; 
+   fclose(f1);   
+
+	
+   PrintDocument   
+   (
+		uid_pwd.arr,		//char	*PUidPwd;
+		nd_session.arr,			//char	*PSessionID;
+		nd_facility.arr,	//char	*PFacilityID;
+		"BL",				//char	*PModuleID;
+		"BLTHCSAP",			//char	*PDocumentID;
+		nd_filename,			//char	*POnlinePrintFileNames;
+		"O",				//char	*PLocationTypes;
+		"",				//char	*PLocationCodes;
+		1,					//int		PNumOfCopies;
+		1,					//int		PPageFrom;
+		99					//int		PPageTo;
+	);
+
+
+  
+
+
+   return;
+   
+}
+
+void line_check()
+{
+   if (line > MAX_LINES)   
+    {
+      fprintf(f1,"\f");	
+	  page_ct = 0;}
+}       
+	
+void prt_line(int line_length, char spl_symbol[1])
+{  
+ int i;  
+  for(i=1;i<=line_length;i=i+1)
+	 {fprintf(f1,spl_symbol);}
+}
+
+void dec_cursor()
+{   
+
+  EXEC SQL DECLARE Hcare_cursor CURSOR FOR   	 
+ 
+	SELECT	a.hcare_appl_num			appl_no,
+		TO_CHAR(a.hcare_appl_date,'DD/MM/YYYY')	appl_date,
+		a.patient_id			 patient_id,
+		b.short_name		 patient_name,
+		d.short_desc                hcare_scheme,
+		a.subscription_amt			subscription_amt,
+		DECODE(a.payment_option,'I','IMMEDIATE',
+					'R','CREDIT BILL',
+					'S','ONE TIME DEDUCTION FROM SALARY',
+					'L','INSTALMENTS')					
+							payment_option,
+		a.customer_code				customer_code,
+		TO_CHAR(a.hcare_start_date,'DD/MM/YYYY') hcare_start_date,
+		TO_CHAR(a.hcare_expiry_date,'DD/MM/YYYY') hcare_expiry_date,
+		c.hcard_num				hcard_num,
+		a.employee_id				employee_num,
+		NVL(SUBSTR(a.action_remarks,1,50),'~') 		remarks,
+		a.emp_patient_id			emp_patient_id
+	FROM 
+		bl_hcare_trn a,
+		mp_patient_mast   b,   
+		bl_patient_fin_dtls c,
+		bl_health_scheme   d
+	WHERE   a.hcare_appl_num 	= :nd_appl_num
+	AND	a.operating_facility_id = :nd_facility
+	AND	a.patient_id 		= b.patient_id
+	AND	c.patient_id 		= a.patient_id
+	AND a.scheme_id         = d.scheme_id
+	ORDER BY a.emp_patient_id DESC;	
+			/*DECODE(a.hcare_scheme,'R','REGULAR',  'S','SPECIAL')	 	*/
+
+ return;
+ }
+
+void open_cursor()
+{ 
+ EXEC SQL OPEN hcare_cursor;
+ if (sqlca.sqlcode < 0) 
+ {     disp_message (ORA_MESG, "Open HCare Cursor Failed");
+       proc_exit();
+ }
+
+ 
+ return;
+ }
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30], fstr_amt[30];
+
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);        
+        sprintf(str_amt,"%14s",s_amt);				
+		ltrim (str_amt);		
+		rtrim (str_amt);		
+		strcpy(fstr_amt,"(-)");
+		strcat(fstr_amt,str_amt);		
+		ltrim (fstr_amt);		
+		rtrim (fstr_amt);
+		sprintf(str_amt,"%15s",fstr_amt);		
+        fprintf(f1,"%15s ",str_amt);
+        }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+        fprintf(f1,"%15s ",str_amt);
+        }
+	}                        
+
+
+
+int fetch_cursor()
+{ 
+
+		nd_appl_no.arr[0] = '\0';
+		nd_appl_date.arr[0] = '\0';
+		nd_patient_id.arr[0] = '\0';
+		nd_patient_name.arr[0] = '\0';
+		nd_hcare_scheme.arr[0] = '\0';
+		nd_subscription_amt = 0;
+		nd_payment_option.arr[0] = '\0';
+		nd_customer_code.arr[0] = '\0';
+		nd_hcare_start_date.arr[0] = '\0';
+		nd_hcare_expiry_date.arr[0] = '\0';
+		nd_hcard_num.arr[0] = '\0';
+		nd_employee_no.arr[0] = '\0';
+		nd_remarks.arr[0] = '\0';
+		nd_emp_patient_id.arr[0] = '\0';
+
+		nd_appl_no.len = 0;
+		nd_appl_date.len = 0;
+		nd_patient_id.len = 0;
+		nd_patient_name.len = 0;
+		nd_hcare_scheme.len = 0;
+		nd_payment_option.len = 0;
+		nd_customer_code.len = 0;
+		nd_hcare_start_date.len = 0;
+		nd_hcare_expiry_date.len = 0;
+		nd_hcard_num.len = 0;
+		nd_employee_no.len = 0;
+		nd_remarks.len = 0;
+		nd_emp_patient_id.len = 0;
+
+  EXEC SQL FETCH hcare_cursor 
+	   INTO	:nd_appl_no		,
+		:nd_appl_date		,
+		:nd_patient_id		,
+		:nd_patient_name	,
+		:nd_hcare_scheme	,
+		:nd_subscription_amt	,
+		:nd_payment_option	,
+		:nd_customer_code	,
+		:nd_hcare_start_date	,
+		:nd_hcare_expiry_date	,
+		:nd_hcard_num		,
+		:nd_employee_no		,
+		:nd_remarks		,
+		:nd_emp_patient_id	;
+
+    if (NODATAFOUND)
+		return 0;
+
+    nd_appl_no.arr[nd_appl_no.len]			= '\0';
+    nd_appl_date.arr[nd_appl_date.len]			= '\0';
+    nd_patient_id.arr[nd_patient_id.len]		= '\0';
+    nd_patient_name.arr[nd_patient_name.len]		= '\0';
+    nd_hcare_scheme.arr[nd_hcare_scheme.len]		= '\0';    
+    nd_payment_option.arr[nd_payment_option.len]	= '\0';	
+    nd_customer_code.arr[nd_customer_code.len]		= '\0';
+    nd_hcare_start_date.arr[nd_hcare_start_date.len]	= '\0';
+    nd_hcare_expiry_date.arr[nd_hcare_expiry_date.len]	= '\0';
+    nd_hcard_num.arr[nd_hcard_num.len]			= '\0';
+    nd_employee_no.arr[nd_employee_no.len	]	= '\0';
+    nd_remarks.arr[nd_remarks.len]			= '\0';
+    nd_emp_patient_id.arr[nd_emp_patient_id.len]	= '\0';
+
+    nd_customer_name.arr[0]		= '\0';
+    nd_customer_name.len = 0;
+
+    EXEC SQL SELECT long_name INTO :nd_customer_name 
+	     FROM   ar_customer
+	     WHERE  cust_code = :nd_customer_code
+	     AND acc_entity_code in ( select acc_entity_code from sy_acc_entity
+		where acc_entity_id = :nd_facility);
+
+    nd_customer_name.arr[nd_customer_name.len]		= '\0';
+
+    return 1;
+
+ }
+
+
+void close_cursor()
+{ 
+ EXEC SQL CLOSE hcare_cursor;
+ return;
+ }
+
+
+void report_process()
+{        
+    int fetch_cursor_check;
+	dec_cursor();
+	open_cursor();	    	
+        fetch_cursor_check = fetch_cursor();        
+	
+	fprintf(f1,"\n");
+	fprintf(f1,"HMC Healthcare Programme\n");
+	fprintf(f1,"-----------------------------------------------------------------------");
+	fprintf(f1,"\n");
+	fprintf(f1,"Application No.		: %-10s\n"	,nd_appl_num.arr);
+	fprintf(f1,"Patient Id / Name	: %-10s %-41s\n"													,nd_patient_id.arr,nd_patient_name.arr);
+	fprintf(f1,"HMC Employee No.	: %-10s\n"		,nd_employee_no.arr);
+	fprintf(f1,"Healthcare Scheme	: %-10s\n"		,nd_hcare_scheme.arr);
+	/*
+	if (nd_fmt_string == 3)
+        {  
+	fprintf(f1,"Amount		        : %-15.3f\n"	,nd_subscription_amt);
+	}
+	else
+	{
+	fprintf(f1,"Amount                      : %-15.2f\n"	,nd_subscription_amt);
+	}
+        */
+        fprintf(f1,"Amount ( %-10s )	: ",nd_currency.arr);
+
+        print_formated(nd_subscription_amt);
+	fprintf(f1,"\n");
+
+	fprintf(f1,"Payment Option 	        : %-25s\n"	,nd_payment_option.arr);
+	fprintf(f1,"Customer		: %-40s\n"		,nd_customer_name.arr);
+	fprintf(f1,"Healthcare Start Date	: %-15s\n"	,nd_hcare_start_date.arr);
+
+	fprintf(f1,"Healthcare Expiry Date	: %-15s\n"												       		,nd_hcare_expiry_date.arr);       
+
+	line = line + 9 ;
+
+	if (strcmp(nd_remarks.arr,"~") != 0)
+	{
+	fprintf(f1,"Remarks			: %-65.65s\n"		,nd_remarks.arr);      
+	line = line +1 ; 	
+	}	 
+
+     fetch_cursor_check = fetch_cursor();        
+         
+  while(fetch_cursor_check)  
+	{
+
+	if ( page_ct == 0 )
+	{
+	fprintf(f1,"\nDependants\n");
+	fprintf(f1,"-----------------------------------------------------------------------\n");
+	fprintf(f1,"Patient Id  Name                                    Health Card No. \n");
+	fprintf(f1,"-----------------------------------------------------------------------\n");
+    }
+    
+	page_ct = 1;
+	 
+	fprintf(f1,"%-12.12s",nd_patient_id.arr);
+	fprintf(f1,"%-43.43s",nd_patient_name.arr);
+	fprintf(f1,"%-20.20s",nd_hcard_num.arr);	    
+	fprintf(f1,"\n");
+ 	line = line +1;
+	line_check();
+    fetch_cursor_check = fetch_cursor();	 	
+
+	}	
+	fprintf(f1,"\n-----------------------------------------------------------------------\n");
+
+	close_cursor();
+}

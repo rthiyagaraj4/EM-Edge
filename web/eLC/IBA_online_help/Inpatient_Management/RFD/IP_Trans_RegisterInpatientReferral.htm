@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>IP_Trans_RegisterInpatientReferral</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Referral Details</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed-side Referral</span> – Select the check box if a bedside referral is to be requested for the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral Type</span> – Select the referral type from the list of valid values. The listed types are Login Facility, Enterprise and External. This field is mandatory. On selecting the Bedside Referral check box, Login Facility gets displayed in the field and is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Healthcare Setting Type</span> – Select the healthcare setting type from the list to which the patient has to be referred to. This field is mandatory. Healthcare setting types are set up using Application Masters module. The values listed in this field are specific to healthcare setting types for IP Referral. If the Bedside Referral check box is selected, the healthcare facility type associated with the login facility is defaulted and disabled. If the referral type selected is Enterprise, all the healthcare setting types defined in the healthcare setting type master function is displayed here except for the one associated with the logged in facility. If the referral type selected is External, all the healthcare setting types to which External Referral Sources associated in the External Referral Source master function are displayed here.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referred To</span> – If the Referral Type is selected as the Enterprise, the entire active Facilities of the enterprise except the logged in Facility are listed. If the Referred Type is selected as External, all the external referral sources are listed. If the referred type is selected as Login Facility, the logged in facility name is made default. This field is mandatory. Select the required value. If the Bed Side Referral check box is selected, the referred source gets defaulted to the logged in facility name and disabled. Place the mouse on the <img src="../../image485.gif" style="border: none;" alt="image485.gif" width="16" height="16" border="0" /> icon to display the long name of the External or Referral Source recorded in ‘External/Referral Source’ function of Application Masters module. The <img src="../../image484.gif" style="border: none;" alt="image484.gif" width="16" height="16" border="0" /> &#160;icon appears on the screen if the long name for the External Referral Source is recorded in ‘External/Referral Source’ function of Application Masters module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> – Enter the Specialty in alphanumeric format of 30 characters maximum length or click [?] function to select the Specialty. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If Referral Type is ‘External’, the Specialty field is not mandatory.</p>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location Type</span> – Select the Location Type from the list. The pre-defined values are listed in the list. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – If the Referral Type is ‘External’, the location list gets disabled and you have to specify the location in alphanumeric format of 30 characters maximum length in the text box provided. If the referral type selected is ‘Enterprise’, the location type and the location can be identified, while the adjoining text box does not allow any data entry. The values for the location type field are ‘Clinic’, ‘Procedure Unit’ or ‘Day Care’. Depending on the Healthcare setting type, referred source, specialty and location type selected, corresponding locations are populated in the list. You can select the required value from the list. The same holds good if the referral type selected is ‘Login Facility’. This is a mandatory field. If ‘Bedside Referral’ is selected, this field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> – Select the required Service from the list. If the referral type is selected as ‘Login Facility’, the services are listed based on the Specialty, Location Type and Location chosen. If the referral type chosen is ‘Enterprise’, the services are listed based on the Healthcare Setting Type, Referred Source, Specialty, Location Type and Location chosen. If the referral type chosen is ‘External’, all the services set up in the ‘Service’ master function is available in the list. If ‘Bedside Referral’ is selected, this field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> – Enter the Practitioner name or select the practitioner using the <span class="BoldNumberRFD">[?]</span> function. The list values correspond to the selected ‘Referred Source’. This field is enabled only if the referral type is ‘Enterprise’ or ‘Login Facility’ and if the specialty is selected, or it is disabled. For the Referral type ‘External’ the practitioner name can be entered in the text box provided in alphanumeric format of 30 characters maximum length. If the check box ‘Bedside Referral’ is selected, the ‘Practitioner’ field becomes mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Tel No</span> - The telephone number of the Practitioner is displayed based on the value recorded for the respective Practitioner. This is a display field only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mobile No</span> - The mobile number of the Practitioner is displayed based on the value recorded for the respective Practitioner. This is a display field only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pager No</span> - The pager number of the Practitioner is displayed based on the value recorded for the respective Practitioner. This is a display field only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referred Date</span> – This is a display field. The Referred Date is defaulted to the system date/time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Preferred Date</span> – Enter Preferred Date in dd/mm/yyyy format or select the date from the Calendar icon. This field is mandatory. The user can enter preferred date greater than or equal to the system date. If the check box ‘Bedside Referral’ is selected, ‘Preferred Date’ field becomes mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Referral</span> – Enter the referral reason for the patient or select the reason from the <span class="BoldNumberRFD">[?]</span> function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> – Select the Referral Priority from the list. The values displayed are ‘Elective’, ‘Urgent’ and ‘Emergency’. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Referring Practitioner</u></span> – &#160;This field will be displayed only if you have selected the check box Bedside Referral in the same screen. Click [?] and select a practitioner from the lookup. &#160;The default practitioner displayed in this field is based on the following conditions:</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>a) Attending Practitioner</b></span> – The name of the attending practitioner will be displayed by default, if the value ‘Attending Practitioner’ is selected in the Default Referring Practitioner in Bedside Referral field of the IP Parameter screen.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>b) Logged-in Practitioner</b></span> - The name of the logged-in practitioner will be displayed by default, if the value ‘Login Practitioner’ is selected in the Default Referring Practitioner in Bedside Referral field of the IP Parameter screen and the logged-in user is a practitioner.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>c) Blank Value</b></span> – A blank value will be displayed by default, if the value ‘Login Practitioner’ is selected in the Default Referring Practitioner in Bedside Referral field of the IP Parameter screen and the logged-in user is a practitioner. In this case, you must select a value from the lookup.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />All the practitioners will be displayed in the “Referring Practitioner” lookup.</p>
+<ol start="18" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral Notes</span> - Enter the Referral Notes of the Patient in alphanumeric format of 1500 characters maximum length. To enter the referral notes, click <span class="BoldNumberRFD">[Referral Notes]</span>. Enter the referral notes and close the referral notes screen. The control shifts back to the main screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Record Referral Letter Note</u></span> – This button appears only if the ‘Enable Recording of Referral Letter Note with Referral Request’ check box is selected in IP Parameter. Click <span style="font-weight: bold;"><b>[Record Referral Letter Note]</b></span> to invoke the Record Referral Letter dialog where you can record new referral letter or search and modify the existing referral letters available for the patient. This button is disabled when the ‘Referral Type’ is selected as ‘External Facility’ and it is enabled only when the ‘Referral Type’ is selected as Login Facility or Enterprise.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

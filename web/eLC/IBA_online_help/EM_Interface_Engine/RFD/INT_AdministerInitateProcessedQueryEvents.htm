@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>INT_AdministerInitateProcessedQueryEvents</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">The following details are displayed:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Event Status</span> (indicated by a color) - The current status of the message is indicated by a colour. ‘Blue’ indicates unprocessed messages; ‘Green’ indicates successfully processed messages; ‘Red’ indicates erroneous messages and ‘Black’ indicates messages that are currently not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Message Status</span> – The Message Status is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Message ID</span> – The Message ID is displayed and hyperlinked.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Event</span> – The Event of which the message is a part is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Message Date</span> – The date of message generation is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The relevant facility is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – The Patient ID, which is displayed in the message.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode ID</span> – The Episode ID, which is displayed in the message.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> – The type of patient is indicated. ‘I’ indicates inpatient and ‘O’ indicates outpatient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit ID</span> – The Visit ID, which is displayed in the message.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accession Number</span> - The accession number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">External Accession Number</span> – The External accession number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Merged Patient ID</span> – The merged patient ID, which is displayed in the message.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Action Type</span> – ‘I’ indicates whether the message has been inserted and ‘U’ indicates whether the message has been updated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Last Processed Date</span> – The date when the message was last processed is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Not required reason</span> – The reason as to why the particular event is not communicated to the application.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Added ID</span> – The name of the user, who has done the HL7 transaction is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Added Date</span> – The date on which the transaction is carried out is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Added WS No.</span> – The workstation number from where the transaction was processed is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Modified ID</span> – The name of the person who has loaded the record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Modified Date</span> – The date on which the record was loaded for transaction is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Modified WS No</span> – The workstation number from where the record was loaded is displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Accession number is a combination of primary keys for the internal applications.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">External Accession Number is a combination of primary keys for the external applications.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click the hyperlinked ‘Message ID’ and a screen gets displayed. The following details are displayed:</p>
+<ol start="23" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – Depending on the message triggering event value, some of the messages need not be communicated to the application. In such cases, the ‘Not Required Reason’ is displayed by the system.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Depending on the privileges granted to the logged-in user, the following buttons are displayed:</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Replay]</span> to replay the messages.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Rebuild]</span> to rebuild the messages.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Message]</span> to view the message details.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Audit Log]</span> to view the audit logs for the event.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Debug Log]</span> to view the debug logs for the event.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Server Error]</span> to view the background job errors that are generated while formatting the outbound messages.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Communication Errors]</span> to view the communication process errors. Both solicited and unsolicited interface process errors are displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Click <span class="BoldNumberRFD">[Reset]</span> to clear the entered data.</p>
+</li>
+</ul>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

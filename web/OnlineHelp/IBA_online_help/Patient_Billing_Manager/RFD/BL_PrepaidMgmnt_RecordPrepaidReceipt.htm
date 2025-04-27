@@ -1,0 +1,331 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_PrepaidMgmnt_RecordPrepaidReceipt</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to record prepaid receipts:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer Group. The values that are defined through the 'Payer Group' function are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer. The values that are defined through the 'Payer' function are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> - System date and time is displayed as the document date and time, by default. You cannot change the value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipt Option</span> - Select a receipt option from the list. The system-defined values are 'Patient wise' and 'Consolidated by Payer'. Select 'Patient wise' to generate a receipt for each payer transaction. Select 'Consolidated by Payer' to generate a consolidated receipt for a Payer. The list box is enabled for selection only if the 'Deposit Type' is selected as 'Deposit Against Patient'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prepaid Program</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Prepaid Program. The values that are defined through the 'Prepaid Payment Setup Rule' function are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount Settled</span> - Enter the amount settled by the Payer in numeric format. The amount settled has to be same as the total settlement amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Counter</span> - The Cash Counter code and description to which the user has logged-in is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the narration in alphanumeric format. You can record any additional description.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Srl No</span> - The serial number is displayed automatically. You cannot update the value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Amt</span> - The amount settled is displayed as the document amount, by default. You can update the document amount, but it should not be greater than the total settlement amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a &#160;Settlement Type. The values defined through the 'Settlement Types' function are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Given</span> - Enter the amount collected from the Payer in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Returned</span> - The difference of [Cash Given - Doc Amt] is displayed automatically. You cannot update the value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque/Bank A/C No.</span> - Enter the cheque or the bank account numeric in alphanumeric format. You can enter the value only if the Settlement Type is selected as 'Cheque' or 'Bank Transfer'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> - Click the Calendar function to record the date of cheque settlement.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank</span> - Enter the name of the Bank where the transaction has to take place.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank/Card Co. Name</span> - Enter the name of the Bank or the Credit Card Company name in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Approval</span> - Select the check box if the transaction has to be approved online.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Batch No</span> - &#160;Enter the Batch number in alphanumeric format. This is valid for Credit Card transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approval Code</span> - Enter the Approval Code in alphanumeric format. This is valid for Credit Card transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Draft No</span> - Enter the sale draft number in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">TID No.</span> - Enter the transaction ID in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">CC Issued Bank</span> - Enter the name of the Bank that has issued the Credit Card.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> - The total settlement amount is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type Desc</span> - The description of the selected settlement type is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer's Name</span> - The name of the selected Payer is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer's Ref ID</span> - Enter the Payer's Reference ID in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nominee</span> - Enter the name of the nominee.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Deposit Against Patient</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The following tabs are displayed when the 'Deposit Type' is selected as 'Deposit Against Patient'. The patient details are recorded through the 'Patient Details for Settlement' tab and the settlement mode is recorded through the 'Settlement Details' tab.</span></p>
+<p class="BoldRFD">Patient Details for Settlement</p>
+<ol start="29" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Patient ID. The prepaid amount is settled for the respective patient. The name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register No.</span> - The register number recorded during patient registration through 'Patient Registration for Prepaid Program' function is displayed. You cannot &#160;update the register number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register Date</span> - The registration date recorded during patient registration through 'Patient Registration for Prepaid Program' function is displayed. You cannot &#160;update the register date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Protocol</span> - The protocol associated to the patient through 'Patient Registration for Prepaid Program' function is displayed. You cannot &#160;update the Protocol. The description of the associated Protocol is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment No.</span> - The Payment Number associated to the patient during registration is displayed. You cannot &#160;update the Payment Number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Due Date</span> - The due date associated to the patient record during registration through 'Patient Registration for Prepaid Program' function is displayed. &#160;You cannot update the due date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payable Amt</span> - The payable amount recorded for the respective patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settled Amount</span> - The amount settled for the respective patient record by the payer is displayed. The total amount for all the patient records are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> - The Payer Group associated to the patient is displayed. The description of the corresponding Payer Group is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> - The Payer associated to the patient is displayed. The description of the corresponding Payer is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy</span> - The Policy associated to the patient is displayed. The description of the corresponding Policy is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Settlement Details</p>
+<ol start="40">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Counter</span> - The Cash Counter to which the user has logged-in is displayed. You cannot update the value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> - Enter the narration in alphanumeric format. You can record additional remarks for the respective settlement.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">SrlNo</span> - The Serial Number is displayed automatically. You cannot enter or update the serial number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Amt</span> - The amount settled is displayed as the document amount. You can update the value, but it has to be equal to the settlement amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Settlement Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Given</span> - Enter the amount collected from the Payer in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Returned</span> - The difference of [Cash Given - Doc Amt] is displayed automatically. You cannot update the value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque/Bank A/C No.</span> - Enter the cheque or the bank account numeric in alphanumeric format. You can enter the value only if the Settlement Type is selected as 'Cheque' or 'Bank Transfer'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> - Click the Calendar function to record the date of cheque settlement.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank</span> - Enter the name of the Bank where the transaction has to take place.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank/Card Co. Name</span> - Enter the name of the Bank or the Credit Card Company name in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Approval</span> - Select the check box if the transaction has to be approved online.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Batch No</span> - &#160;Enter the Batch number in alphanumeric format. This is valid for Credit Card transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approval Code</span> - Enter the Approval Code in alphanumeric format. This is valid for Credit Card transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Draft No</span> - Enter the sale draft number in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">TID No.</span> - Enter the transaction ID in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">CC Issued Bank</span> - Enter the name of the Bank that has issued the Credit Card.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> - The total settlement amount is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type Desc</span> - The description of the selected settlement type is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer's Name</span> - The name of the selected Payer is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer's Ref ID</span> - Enter the Payer's Reference ID in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nominee</span> - Enter the name of the nominee.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Lookup for Search and Patient Selection</p>
+<p class="BoldRFD">Search Criteria</p>
+<p class="BoldRFD" style="font-weight: normal;">Either of Due Date, Register Date, Patient ID or the Register Number is mandatory to search for a specific patient record.</p>
+<p class="BoldRFD">Enter the following details to specify the search criteria:</p>
+<ol start="62" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Due Date [From - To]</span> - Click the Calendar function to select the due date range. The patient records with the due date matching the search criteria are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Patient ID. The records of the patient matching the search criteria are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register No.</span> - Enter the register number of the patient in alphanumeric format to search for a specific patient record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register Date [From - To]</span> - Click the Calendar function to select the register date range. The patient records with the register date matching the search criteria are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Protocol</span> - Click [List of Values] to select a Protocol. The patient records with the protocol specified are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment No [From - To]</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Payment Number. The patient records with the payment number matching the search criteria are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Option</span> - Select a value from the list. The system-defined values are 'All' and 'Pending Payments'. Select 'All' to query all the patient records. Select 'Pending Payments' to query the patient records with outstanding amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Search]</span> - Click <span class="BoldNumberRFD">[Search]</span> to query the patient records matching the search criteria. The patient records matching the search criteria are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to allocate the prepaid amount and settle the outstanding amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Allocate]</span> - Click <span class="BoldNumberRFD">[Allocate]</span> to allocate the amount against the patient record.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

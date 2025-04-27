@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>IP_CodeSetup_MedicalServiceGroup</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to create a new Medical Service Group record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Code</span> - Enter the Medical Service Group Code in alphanumeric format of two characters maximum length. A Medical Service Code is used to identify each Medical Service Group uniquely and cannot be changed after creation. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the long description of the Medical Service Group in alphanumeric format of 30 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter the short description of the Medical Service Group in alphanumeric format of 15 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> – Select the check box to enable the Medical Service Group.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Booking Related Setup</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Daily Booking</span> – Enter the Maximum Daily Booking for Inpatient/Daycare admissions for the Medical Service Group in numeric format of six digits maximum length. It indicates the maximum allowable bookings per day for the defined medical service group. This field is set to control the number of daily bookings that can be accepted by the facility for a medical service group. If the maximum daily booking exceeds the value set, the system alerts you with a warning, which cannot be overridden. If the field is not set, the system does not validate for the number of bookings made in a day.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Monthly Booking</span> – Enter the Maximum Monthly Booking for Inpatient/Daycare admissions for the Medical Service Group in numeric format of six digits maximum length. It indicates the maximum allowable bookings per month for the defined medical service group. This is to control the number of monthly bookings that are accepted by the facility. If the number of maximum monthly bookings exceeds the value set, the system gives a warning to you, which cannot be overridden. If this value is not specified, the system does not check the number of monthly bookings for the Medical Service Group. The value being set for Max Monthly booking must always be greater than the Max Daily Booking.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Generate Booking Number</span> - Select the check box if the system has to generate booking numbers automatically. if the check box is cleared, the booking number has to be entered manually during Create Booking for admission against the selected medical service group., The check box is cleared, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Next No</span> - Enter the Next No. in numeric format of 10 digits maximum length. This field is enabled only if the Generate Booking Number field is selected. The Next Serial Number indicates the next booking number the system generates. The value specified in this field is the first number generated by the system. Subsequently, this is automatically incremented by one by the system for every booking created. If the value is entered, it must be greater than zero.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No</span> - Enter the Max No. in numeric format of 10 characters maximum length. This field is enabled only if the Generate Booking Number field is selected. This is the maximum serial number to be generated by the system for the booking number. When the maximum number is reached, no further booking numbers are generated for the defined medical service group. At this stage, the System Administrator has to reset the Next No. appropriately. If the value is entered, it cannot be less than the Next No.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

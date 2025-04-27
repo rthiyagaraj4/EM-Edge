@@ -1,0 +1,1006 @@
+/*  ***************************OCS MEDICOM ver 1.0*****************************  */
+/*  File	: blrundep.pc														*/
+/*  Author : Irfan J.S.															*/
+/*  Date Created : 21/03/2000													*/
+/*  Modified by : VSK for SCF# 668 on 19/03/2001								*/
+/*  Ver 4.1																		*/
+/*  Purpose : To generate a report for unadjusted patient deposit.				*/
+/*  Input Parameters :															*/
+/*                     Command line inputs										*/
+/* 				         1. Usr_id/Password										*/
+/*                       2. Session id											*/
+/* 				         3. Program Date										*/
+
+/*                       Parameters from SY_PROG_PARAM table					*/
+/*                       4. Preferred range of Dates.							*/
+/*  Table Accessed : BL_RECEIPT_REFUND_HDRDTL_VW,BL_BILL_HDR							*/
+/*   Output File : blrundep.lis	
+/* **************************************************************************	*/  
+
+
+#include <stdio.h>
+#include <math.h>        
+#include <string.h>    
+#include <bl.h>
+   
+#define MAX_LINES 62
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 4.1\n"     
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+
+	VARCHAR uid_pwd		       [91];
+	
+	int  	page_no,
+			p_cnt,
+			line_no =0;
+			
+	double  d_doc_amt,d_dep_adj_amt,d_bill_amt,b_bill_amt,unadj_amt,grant_tot;
+	double  m_tot_doc_amt;
+	VARCHAR
+		
+        nd_session_id      	[16],
+        nd_pgm_date	    	[20],
+
+		nd_fm_patient_no	[21],			
+		nd_to_patient_no	[21],
+		nd_fm_episode_no	[9],
+		nd_to_episode_no	[9],
+		nd_cutoff_dt	    [11],  
+		nd_inc_cur_pat		[2],
+            d_short_name_full       [61],
+            nd_pat_name			[41],
+		nd_pat_name1		[41],
+		nd_operating_facility_id [3],
+
+		d_patient_no		[21],			
+		v_patient_no		[21],			
+		d_episode_id		[9],
+		v_episode_id		[9],
+		d_visit_id			[5],
+		d_episode_type      [2],
+
+	    d_acc_entity_name   [41],
+		d_user              [31],
+		d_sysdate           [17],
+		 l_pk_value		    [100],
+	    l_translated_value	[201],
+		p_language_id		[3],
+	    nd_facility_id	    [3];
+
+int i;
+	
+	char g_facility_id[3];
+
+    char filename[150];
+	char x_msg[200];
+	char loc_legend[999][201];
+	char l_mesg[200];
+
+char string_var[100];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+    void	get_params(),
+  			get_header_dtls(),
+			print_title(),
+			dclr_recpt_ref_cur(),
+			dclr_recpt_ref_cur_pd(),
+			dclr_bill_hdr_cur(),
+			dclr_bill_hdr_cur_pd(),
+			do_report();
+   
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrundep.lis");
+
+   if((f1 = fopen(filename, "w")) == NULL) {
+     disp_message(ERR_MESG,".... Error opening output file ....");
+     proc_exit();
+   } 
+
+   if(argc < 5) {
+     disp_message(ERR_MESG,"Usage iprdbdcw uid/passwd session_id pgm_date facility_id");
+     proc_exit();
+   }
+
+   strcpy(OUTPUT_FILE_NAME,"blrundep.lis");                                                    
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+    strcpy(nd_facility_id.arr,argv[4]);
+   	nd_facility_id.len = strlen(nd_facility_id.arr);
+   	strcpy(g_facility_id,nd_facility_id.arr);
+
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+		disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		proc_exit();
+    }
+
+
+   set_meduser_role();
+   strcpy(p_language_id.arr,l_language_id.arr);
+
+   fetch_legend_value();
+
+   get_params();
+
+   get_header_dtls();
+
+   print_title();
+
+   dclr_recpt_ref_cur();
+
+   dclr_recpt_ref_cur_pd();
+
+   dclr_bill_hdr_cur();
+
+   dclr_bill_hdr_cur_pd();
+
+   do_report();
+  
+   EXEC SQL COMMIT WORK RELEASE;
+
+   fclose(f1);
+   return;
+   
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at main() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}   
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+		
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+				   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4,
+				   PARAM5,
+				   PARAM6
+            INTO  :nd_operating_facility_id,
+				  :nd_fm_patient_no, 
+	        	  :nd_to_patient_no, 
+                  :nd_fm_episode_no,
+				  :nd_to_episode_no,
+				  :nd_cutoff_dt,
+				  :nd_inc_cur_pat
+            FROM SY_PROG_PARAM
+	    WHERE   PGM_ID = 'BLRUNDEP'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+   
+   nd_fm_patient_no.arr[nd_fm_patient_no.len]			= '\0';
+   nd_to_patient_no.arr[nd_to_patient_no.len]			= '\0';
+   nd_fm_episode_no.arr[nd_fm_episode_no.len]			= '\0';
+   nd_to_episode_no.arr[nd_to_episode_no.len]			= '\0';
+   nd_cutoff_dt.arr[nd_cutoff_dt.len]					= '\0';
+   nd_inc_cur_pat.arr[nd_inc_cur_pat.len]				= '\0';
+  
+   strcpy(g_facility_id, nd_operating_facility_id.arr);
+ 
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE SY_PROG_PARAM
+	   WHERE PGM_ID = 'BLRUNDEP'
+	         AND SESSION_ID = :nd_session_id
+		 AND PGM_DATE = :nd_pgm_date;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_params() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+ 
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT ACC_ENTITY_NAME, /* description of the institution */
+				   USER,
+				   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+		    INTO :d_acc_entity_name,
+				 :d_user,
+				 :d_sysdate
+            FROM SY_ACC_ENTITY
+			WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+ 
+
+/* function declares cursors */
+
+void dclr_recpt_ref_cur()
+{
+  //PD is removed
+  EXEC SQL DECLARE DCLR_RECPT_REF_CUR CURSOR FOR
+     SELECT     PATIENT_ID,
+				EPISODE_ID,
+				VISIT_ID,
+				EPISODE_TYPE,
+				NVL(SUM(DOC_AMT),0)
+     FROM       BL_RECEIPT_REFUND_HDRDTL_VW
+	 WHERE      PATIENT_ID  BETWEEN NVL(:nd_fm_patient_no,'!!!!!!!!!!!!!!!!!!!!') AND     NVL(:nd_to_patient_no,'~~~~~~~~~~~~~~~~~~~~') 
+	 AND        EPISODE_ID  BETWEEN NVL(:nd_fm_episode_no,0) AND NVL(:nd_to_episode_no,'99999999') 
+	 AND        RECPT_NATURE_CODE = 'AD'
+	 AND        TRUNC(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+	 AND        NVL(CANCELLED_IND,'N') != 'Y'
+	 HAVING     SUM(DOC_AMT) >= 0
+     GROUP BY   PATIENT_ID,EPISODE_ID,VISIT_ID,EPISODE_TYPE;
+
+	  EXEC SQL OPEN DCLR_RECPT_REF_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor DCLR_RECPT_REF_CUR",0,"");
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_bill_hdr_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+void dclr_recpt_ref_cur_pd()
+{
+  //PD is removed
+  EXEC SQL DECLARE DCLR_RECPT_REF_CUR_PD CURSOR FOR
+     SELECT     PATIENT_ID,
+				EPISODE_ID,
+				VISIT_ID,
+				EPISODE_TYPE,
+				NVL(SUM(DOC_AMT),0)
+     FROM       BL_RECEIPT_REFUND_HDRDTL_VW
+	 WHERE      PATIENT_ID  BETWEEN NVL(:nd_fm_patient_no,'!!!!!!!!!!!!!!!!!!!!') AND     NVL(:nd_to_patient_no,'~~~~~~~~~~~~~~~~~~~~') 
+	 //AND        EPISODE_ID  BETWEEN NVL(:nd_fm_episode_no,0) AND NVL(:nd_to_episode_no,'99999999') 
+	 AND        RECPT_NATURE_CODE = 'PD'
+	 AND        trunc(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+	 AND        NVL(CANCELLED_IND,'N') != 'Y'
+	 HAVING     SUM(DOC_AMT) >= 0
+     GROUP BY   PATIENT_ID,EPISODE_ID,VISIT_ID,EPISODE_TYPE;
+
+	  EXEC SQL OPEN DCLR_RECPT_REF_CUR_PD;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor DCLR_RECPT_REF_CUR_PD",0,"");
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_bill_hdr_cur_pd() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+/* function declares cursors */
+
+void dclr_bill_hdr_cur()
+{
+  // NVL(SUM(DEPOSIT_ADJ_AMT),0) + NVL(SUM(DEPOSIT_ADJ_AMT_PD),0)
+  // removed NVL(DEPOSIT_ADJ_AMT_PD,0))
+	 EXEC SQL DECLARE DCLR_BILL_HDR_CUR CURSOR FOR
+     SELECT     SUM(NVL(DEPOSIT_ADJ_AMT,0)) 
+     FROM       BL_BILL_HDR
+	 WHERE      EPISODE_TYPE = :d_episode_type
+	 AND		PATIENT_ID  = :d_patient_no
+	 AND        EPISODE_ID  = :d_episode_id
+	 AND        VISIT_ID = DECODE(:d_episode_type,'I',VISIT_ID,'D',VISIT_ID,:d_visit_id)
+	 AND        trunc(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+	 AND        NVL(BILL_STATUS,'Z') != 'C';
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+ return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_bill_hdr_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+void dclr_bill_hdr_cur_pd()
+{
+  // NVL(SUM(DEPOSIT_ADJ_AMT),0) + NVL(SUM(DEPOSIT_ADJ_AMT_PD),0)
+  // removed NVL(DEPOSIT_ADJ_AMT_PD,0))
+	 EXEC SQL DECLARE DCLR_BILL_HDR_CUR_PD CURSOR FOR
+     SELECT     SUM(NVL(DEPOSIT_ADJ_AMT_PD,0))	 
+     FROM       BL_BILL_HDR
+	 WHERE      EPISODE_TYPE = :d_episode_type
+	 AND		PATIENT_ID  = :d_patient_no
+	 //AND        EPISODE_ID  = :d_episode_id
+	 //AND        VISIT_ID = DECODE(:d_episode_type,'I',VISIT_ID,'D',VISIT_ID,:d_visit_id)
+	 AND        trunc(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+	 AND        NVL(BILL_STATUS,'Z') != 'C';
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+ return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_bill_hdr_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+
+/* prints the master-detail record until the cursor is empty */
+
+void do_report()
+{
+
+void print_page_header();
+void prepare_new_page();
+void print_detl_rec();
+void print_grant_tot();
+void end_report();
+
+int fetch_recpt_ref_cur();
+int fetch_recpt_ref_cur_pd();
+int fetch_bill_hdr_cur();
+int fetch_bill_hdr_cur_pd();
+int still_rec_left = 0;
+
+print_page_header();
+
+while(fetch_recpt_ref_cur())	
+{ 
+	unadj_amt  = 0.0;
+	d_bill_amt = 0.0;
+	b_bill_amt = 0.0;
+
+	if(line_no > MAX_LINES)  prepare_new_page();	
+
+	if(strcmp(v_patient_no.arr,d_patient_no.arr) != 0) 
+	{
+	  select_patient_name();
+	  strcpy(v_patient_no.arr,d_patient_no.arr); 		
+	  strcpy(v_episode_id.arr,d_episode_id.arr);
+	}
+	else
+	{
+		/*- Only for IP the below treatment is */ 
+		if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )	
+		{
+			if(strcmp(v_episode_id.arr,d_episode_id.arr) == 0)
+					continue;
+			else
+			        strcpy(v_episode_id.arr,d_episode_id.arr);
+		}
+		
+	}
+	 
+	if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )
+	{
+		if (nd_inc_cur_pat.arr[0] == 'N')
+		{ 
+		
+			select_p_flag();
+			if (p_cnt != 0)
+				 continue;		
+		}
+	}
+
+    EXEC SQL OPEN DCLR_BILL_HDR_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor DCLR_BILL_HDR_CUR",0,"");
+
+	fetch_bill_hdr_cur();
+
+    EXEC SQL CLOSE DCLR_BILL_HDR_CUR;
+
+	/* The below treatment is only for IP */
+    m_tot_doc_amt = 0.0;
+    if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )
+    {
+		//PD is removed
+		EXEC SQL SELECT NVL(SUM(DOC_AMT),0) INTO :m_tot_doc_amt
+		FROM       BL_RECEIPT_REFUND_HDRDTL_VW
+		WHERE      EPISODE_TYPE in ('I','D') 
+		AND	   PATIENT_ID  = :d_patient_no
+		AND        EPISODE_ID  = :d_episode_id
+		AND	   VISIT_ID    = VISIT_ID
+		AND        TRUNC(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+		AND        RECPT_NATURE_CODE = 'AD'
+		AND        NVL(CANCELLED_IND,'N') != 'Y';
+
+/* This assignment will make the whole amount be considered for 
+   document amount VSK 01/07/2000 */
+   		
+		d_doc_amt = m_tot_doc_amt;
+
+	    if (m_tot_doc_amt == d_dep_adj_amt)
+				continue;
+	}
+
+	unadj_amt = d_doc_amt - d_dep_adj_amt;
+
+    print_detl_rec();
+
+
+}
+
+while(fetch_recpt_ref_cur_pd())	
+{ 
+	unadj_amt  = 0.0;
+	d_bill_amt = 0.0;
+	b_bill_amt = 0.0;
+
+	if(line_no > MAX_LINES)  prepare_new_page();	
+
+	if(strcmp(v_patient_no.arr,d_patient_no.arr) != 0) 
+	{
+	  select_patient_name();
+	  strcpy(v_patient_no.arr,d_patient_no.arr); 		
+	  strcpy(v_episode_id.arr,d_episode_id.arr);
+	}
+	else
+	{
+		/*- Only for IP the below treatment is */ 
+		if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )	
+		{
+			if(strcmp(v_episode_id.arr,d_episode_id.arr) == 0)
+					continue;
+			else
+			        strcpy(v_episode_id.arr,d_episode_id.arr);
+		}
+		
+	}
+	 
+	if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )
+	{
+		if (nd_inc_cur_pat.arr[0] == 'N')
+		{ 
+		
+			select_p_flag();
+			if (p_cnt != 0)
+				 continue;		
+		}
+	}
+
+    EXEC SQL OPEN DCLR_BILL_HDR_CUR_PD;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor DCLR_BILL_HDR_CUR_PD",0,"");
+
+	fetch_bill_hdr_cur_pd();
+
+    EXEC SQL CLOSE DCLR_BILL_HDR_CUR_PD;
+
+	/* The below treatment is only for IP */
+    
+	m_tot_doc_amt = 0.0;
+    
+	if (d_episode_type.arr[0] == 'I' || d_episode_type.arr[0] == 'D' )
+    {
+		//PD is removed
+		EXEC SQL SELECT NVL(SUM(DOC_AMT),0) INTO :m_tot_doc_amt
+		FROM       BL_RECEIPT_REFUND_HDRDTL_VW
+		WHERE      EPISODE_TYPE in ('I','D') 
+		AND		PATIENT_ID  = :d_patient_no
+		//AND        EPISODE_ID  = :d_episode_id
+		//AND	    VISIT_ID    = VISIT_ID
+		AND        TRUNC(DOC_DATE) <= TO_DATE(:nd_cutoff_dt,'DD/MM/YYYY')
+		AND        RECPT_NATURE_CODE = 'PD'
+		AND        NVL(CANCELLED_IND,'N') != 'Y';
+	
+/* This assignment will make the whole amount be considered for 
+   document amount VSK 01/07/2000 */
+   		
+		d_doc_amt = m_tot_doc_amt;
+
+	    if (m_tot_doc_amt == d_dep_adj_amt)
+				continue;
+	}
+
+
+
+//sprintf(string_var, "AD amt  :  %lf    ----   Dep Adj Amt : %lf",d_doc_amt,d_dep_adj_amt);
+//disp_message(INFO_MESG,string_var);
+
+/*-- Even negative balance which are not adjusted should come */
+/*-- VSK 17/06/2000 */
+
+	unadj_amt = d_doc_amt - d_dep_adj_amt;
+
+    print_detl_rec();
+	
+}     
+
+
+
+if(line_no > MAX_LINES)  prepare_new_page();	
+print_grant_tot();
+end_report();
+
+}
+
+
+/* prepares for the new page */
+void prepare_new_page()
+{  line_no = 0;
+   print_page_header();
+}
+
+/* fetches the next record from fetch_inc_by_doc_cur  */
+/* returns 0 if the end of cursor is reached else returns 1. */
+
+int fetch_recpt_ref_cur()
+{
+  d_patient_no.arr[0]	= '\0';
+  d_patient_no.len		= 0;
+
+  d_episode_id.arr[0]	= '\0';
+  d_episode_id.len		= 0;
+
+  d_visit_id.arr[0]		= '\0';
+  d_visit_id.len		= 0;
+
+  d_episode_type.arr[0]	= '\0';
+  d_episode_type.len	= 0;
+
+  d_doc_amt    = 0.0;
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+ 
+  EXEC SQL FETCH DCLR_RECPT_REF_CUR INTO
+					:d_patient_no,			
+					:d_episode_id,
+					:d_visit_id,
+					:d_episode_type,
+					:d_doc_amt;
+					
+  if (NODATAFOUND)
+		return 0;
+
+  
+ d_patient_no.arr[d_patient_no.len]		        = '\0';
+ d_episode_id.arr[d_episode_id.len]				= '\0';
+ d_visit_id.arr[d_visit_id.len]				    = '\0';
+ d_episode_type.arr[d_episode_type.len]			= '\0';
+ 
+  return 1;
+
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_recpt_ref_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+int fetch_recpt_ref_cur_pd()
+{
+  d_patient_no.arr[0]	= '\0';
+  d_patient_no.len		= 0;
+
+  d_episode_id.arr[0]	= '\0';
+  d_episode_id.len		= 0;
+
+  d_visit_id.arr[0]		= '\0';
+  d_visit_id.len		= 0;
+
+  d_episode_type.arr[0]	= '\0';
+  d_episode_type.len	= 0;
+
+  d_doc_amt    = 0.0;
+  
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+ 
+  EXEC SQL FETCH DCLR_RECPT_REF_CUR_PD INTO
+					:d_patient_no,			
+					:d_episode_id,
+					:d_visit_id,
+					:d_episode_type,
+					:d_doc_amt;
+					
+  if (NODATAFOUND)
+		return 0;
+
+  
+ d_patient_no.arr[d_patient_no.len]		        = '\0';
+ d_episode_id.arr[d_episode_id.len]				= '\0';
+ d_visit_id.arr[d_visit_id.len]				    = '\0';
+ d_episode_type.arr[d_episode_type.len]			= '\0';
+ 
+  return 1;
+
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_recpt_ref_cur_pd() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+int fetch_bill_hdr_cur()
+{
+  
+  d_dep_adj_amt    = 0.0;
+     
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH DCLR_BILL_HDR_CUR INTO
+					:d_dep_adj_amt;
+					
+  return 1;
+
+  err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_recpt_ref_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+int fetch_bill_hdr_cur_pd()
+{
+  
+  d_dep_adj_amt    = 0.0;
+     
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH DCLR_BILL_HDR_CUR_PD INTO
+					:d_dep_adj_amt;
+					
+  return 1;
+
+  err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_recpt_ref_cur_pd() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+/* print the finishing line of the report */
+void end_report()
+{
+  //fprintf(f1,"------------------------------------------------------------------------------------\n");
+  fprintf(f1,"\n");
+  fprintf(f1,"                          ");
+  fprintf(f1,"****** End of Report *******");
+  fprintf(f1,"");
+}
+
+
+/* to print the detailed record */
+void print_detl_rec()
+{ char s_net_amt[19];
+
+if(unadj_amt != 0)
+{
+fprintf(f1,"%-20s  ",d_patient_no.arr);
+fprintf(f1,"%-20.20s   ",nd_pat_name.arr);
+fprintf(f1,"%-1s    ",d_episode_type.arr);
+fprintf(f1,"%-8s    ",d_episode_id.arr);
+fprintf(f1,"%-4s ",d_visit_id.arr);
+
+print_formated(s_net_amt,unadj_amt);
+fprintf(f1, "%18s",s_net_amt);
+grant_tot = grant_tot + unadj_amt;
+fprintf(f1,"\n");
+
+if(strlen(nd_pat_name1.arr) > 2)
+{
+ fprintf(f1,"%21s %s \n"," ",nd_pat_name1.arr);
+ line_no++;
+}
+
+line_no ++;
+
+}
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at print_detl_rec() occured....");
+   disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+/* to print the grant total */
+void print_grant_tot()
+{ char s_net_amt[19];
+
+if(grant_tot > 0)
+{
+fprintf(f1,"                                                                   -----------------\n");
+fprintf(f1,"                                              %11s    :     ",loc_legend[190]);
+print_formated(s_net_amt,grant_tot);
+fprintf(f1, "%18s",s_net_amt);
+fprintf(f1,"\n");
+fprintf(f1,"                                                                   =================\n");
+line_no = line_no + 3;
+}
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at print_tot_rec() occured....");
+   disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+select_p_flag()
+{
+	p_cnt = 0;
+
+	EXEC SQL SELECT COUNT(*) INTO :p_cnt 
+			 FROM IP_OPEN_EPISODE 
+			 WHERE PATIENT_ID = :d_patient_no;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  IP_OPEN_EPISODE",0,"");
+
+}
+
+select_patient_name()
+{
+	nd_pat_name.arr[0] = '\0';
+	nd_pat_name1.arr[0] = '\0';
+	nd_pat_name.len    = 0;
+	nd_pat_name1.len    = 0;
+	
+
+	EXEC SQL SELECT	substr(SHORT_NAME,1,20),
+	                decode(substr(short_name,21,60),NULL,' ',substr(short_name,31,60)) shortname2 ,
+                       short_name
+		     into  :nd_pat_name,
+				   :nd_pat_name1,
+                       :d_short_name_full
+			 FROM    MP_PATIENT_MAST
+			 WHERE   PATIENT_ID = :d_patient_no;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  MP_PATIENT_MAST",0,"");
+
+     nd_pat_name.arr[nd_pat_name.len]           = '\0';
+     nd_pat_name1.arr[nd_pat_name1.len]           = '\0';
+     d_short_name_full.arr[d_short_name_full.len]               = '\0';
+ 
+EXEC SQL EXECUTE
+ BEGIN
+ declare
+      str1   varchar2(100);
+     str2   varchar2(60);
+     
+    
+   BEGIN
+     blcommon.split_words(:d_short_name_full,30,'*',1,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_pat_name   :=str2;
+       END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',2,str1,str2);
+       IF str2 IS NOT NULL THEN
+         :nd_pat_name1  := str2;
+      END IF;
+    blcommon.split_words(:d_short_name_full,30,'*',3,str1,str2);
+        IF str2 IS NOT NULL THEN
+         :nd_pat_name1    := :nd_pat_name1 || str2;
+       end if;
+
+	 
+     
+ END;
+  END;
+       
+   END-EXEC;
+       nd_pat_name.arr[nd_pat_name.len]  = '\0';
+       nd_pat_name1.arr[nd_pat_name1.len]  = '\0';
+
+}  
+
+
+void print_title()
+{
+
+fprintf(f1,
+"MDL : %2s                  %-30s    %-11s\n",loc_legend[150],
+d_acc_entity_name.arr,d_sysdate.arr);
+fprintf(f1,"OPR : %-10s \n", d_user.arr);
+fprintf(f1,
+"REP : %-8s   %35s%s   %4s : %4d\n",
+loc_legend[40],loc_legend[50],nd_cutoff_dt.arr,loc_legend[30],++page_no);
+fprintf(f1,"----------------------------------------------------------------------------\n");
+fprintf(f1,"VER : 4.1\n");
+
+fprintf(f1,"\n\n\n\n        INPUT PARAMETERS :\n        ----------------\n\n");
+    
+if (nd_fm_patient_no.arr[0] == '\0') 
+	fprintf(f1,"\t\t        %10s       %4s : %6s\n",loc_legend[200],loc_legend[60],loc_legend[180]);
+	else
+	fprintf(f1,"\t\t        %10s       %4s : %-10s\n",loc_legend[200],loc_legend[60],nd_fm_patient_no.arr);
+
+if (nd_to_patient_no.arr[0] == '\0') 
+    fprintf(f1,"\t\t                         %2s   : %7s\n\n",loc_legend[70],loc_legend[210]);
+	else
+	fprintf(f1,"\t\t                         %2s   : %-10s\n\n",loc_legend[70],nd_to_patient_no.arr);
+
+if (nd_fm_episode_no.arr[0] == '\0')
+	fprintf(f1,"\t\t        %10s       %4s : %6s\n",loc_legend[220],loc_legend[60],loc_legend[180]);
+else
+	fprintf(f1,"\t\t        %10s       %4s : %s\n",loc_legend[220],loc_legend[60],nd_fm_episode_no.arr);
+
+if (nd_to_episode_no.arr[0] == '\0')
+	fprintf(f1,"\t\t                         %2s   : %7s\n\n",loc_legend[70],loc_legend[210]);
+else
+	fprintf(f1,"\t\t                         %2s   : %s\n\n",loc_legend[70],nd_to_episode_no.arr);
+
+	fprintf(f1,"\t\t        %12s          : %s\n\n",loc_legend[110],nd_cutoff_dt.arr);	
+
+	fprintf(f1,"\t\t   %26s : %s\n\n",loc_legend[80],nd_inc_cur_pat.arr);	
+
+	
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at print_title() occured....");
+   disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+
+
+/* to print page headers the header details */ 
+
+void print_page_header()
+
+{
+fprintf(f1,
+"\fMDL : %2s                  %-30s            %-11s\n",loc_legend[150],
+d_acc_entity_name.arr,d_sysdate.arr);
+fprintf(f1,"OPR : %-10s \n", d_user.arr);
+fprintf(f1,
+"REP : %-8s   %35s%s           %4s : %4d\n",
+loc_legend[40],loc_legend[50],nd_cutoff_dt.arr,loc_legend[30],++page_no);
+
+fprintf(f1,"------------------------------------------------------------------------------------\n");
+fprintf(f1,"%10s  %12s                 %7s  %7s   %5s            %6s \n",loc_legend[90],loc_legend[100],loc_legend[120],loc_legend[120],loc_legend[130],loc_legend[140]);
+fprintf(f1,"                                         %4s     %2s        %2s                      \n",loc_legend[160],loc_legend[170],loc_legend[170]);
+fprintf(f1,"------------------------------------------------------------------------------------\n");
+line_no  = 13;
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"print_page_header....");
+   disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+
+}
+
+
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+  if(l_amt < 0){
+     put_val(s_amt,-l_amt);
+     format_amt(s_amt);
+     strcat(s_amt,"-");
+   }
+ else {
+       put_val(s_amt,l_amt);
+       format_amt(s_amt);
+       strcat(s_amt," ");
+    }
+}
+
+fetch_legend_value()
+{
+	for(i=1;i<=900;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLRUNDEP.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}

@@ -1,0 +1,3015 @@
+
+
+var prev_set_objs = new Array();
+
+//Added by Ajay Hatwate for ML-MMOH-CRF-1930
+function updContTabForVC(obj){
+	if(document.getElementById('isVirtualCons')){
+		var fvc = obj.value.split("~");
+		var xmlDoc=""
+		var xmlHttp = new XMLHttpRequest()
+		var fac_id = document.getElementById('facilityid').value;
+		xmlStr = "<root><SEARCH visit_type_code=\""+fvc[0]+"\" facility_id=\""+fac_id+"\" action='isVirtualVisit' /></root>"
+		xmlDoc = new DOMParser().parseFromString(xmlStr, "text/xml")
+		xmlHttp.open("POST","../../eOP/jsp/OPIntermediate.jsp",false)
+		xmlHttp.send(xmlDoc)
+		responseText = xmlHttp.responseText
+		var response = trimString(xmlHttp.responseText);
+		document.getElementById('isVCEnbl').value = response;
+		document.getElementById('isVisitVirtualCons').value = response;
+		if(response =='E'){
+			document.getElementById('patgif').style.visibility = 'visible';
+		}else{
+			document.getElementById('patgif').style.visibility = 'hidden';
+		}
+}
+}
+ 
+function putPatientName(from)  {  
+   var logic = new String();   
+
+    logic = document.getElementById('name_drvn_logic').value;
+
+	var pat_name_as_multipart_yn = document.getElementById('pat_name_as_multipart_yn').value;
+
+    var derievedName = "";
+    derievedName = '';
+    var logicElements = new Array();
+
+    logicElements = logic.split('+');
+    var i=0;
+    for ( i=0;i<logicElements.length;i++)
+    {
+		if(logicElements[i] == '1N' && document.getElementById('first_name') != null)
+        {
+            if ( document.getElementById('first_name').value != '' ){
+			
+                derievedName = derievedName + document.getElementById('first_name').value;
+			}
+			
+        }
+        else if ( logicElements[i] == '2N' && document.getElementById('second_name') != null )
+        {
+		
+            if ( document.getElementById('second_name').value != '' )
+                derievedName = derievedName + document.getElementById('second_name').value;
+        }
+        else if ( logicElements[i] == '3N' && document.getElementById('third_name') != null)
+        {
+		
+            if ( document.getElementById('third_name').value != '' )
+                derievedName = derievedName + document.getElementById('third_name').value;
+        }
+        else if ( logicElements[i] == 'FN' && document.getElementById('family_name') != null)
+        {
+		
+	          if ( document.getElementById('family_name').value != '' ){
+                derievedName = derievedName + document.getElementById('family_name').value;
+			}
+		}
+        else if ( logicElements[i] == 'PR' && document.getElementById('name_prefix') != null)
+        {
+            if ( document.getElementById('name_prefix').value != '' )
+			{
+		
+                derievedName = derievedName + document.getElementById('name_prefix').value;
+		
+			}
+        }
+        else if ( logicElements[i] == 'SF' && document.getElementById('name_suffix') != null)
+        {
+		
+            if ( document.getElementById('name_suffix').value != '' )
+                derievedName = derievedName + document.getElementById('name_suffix').value;
+        }
+        else
+        {
+		
+            if ( logicElements[i] != '1N' &&  logicElements[i] != '2N' && logicElements[i] != '3N' && logicElements[i] != 'FN' && logicElements[i] != 'PR' && logicElements[i] != 'SF' )
+            {
+                var arLen = logicElements[i].length;
+		
+                var tempVal = logicElements[i].substring(1,arLen - 1);
+		
+				if(derievedName == "")  tempVal="";
+				
+                derievedName = derievedName + tempVal;
+		
+            }
+        }
+    }  
+		
+	
+		
+	//Code added by Gomathi.
+
+	/*
+	if(document.getElementById('name_prefix') != null)
+	{
+		if(document.getElementById('name_prefix').value == '')
+		{
+			
+			var s=derievedName.length;
+			var temp=derievedName.substring(s);
+			var temp1=derievedName.substring(0,s);
+			var n=temp1.charCodeAt(0);
+
+			if((n>=65 && n<=91)||(n>=97 && n<=123))
+			{
+				  derievedName=temp + temp1;
+			}
+			else
+			{		
+				 derievedName=temp;
+			} 
+		}
+	}  
+	*/
+		
+	var derievedName1 = derievedName.split(',');
+	if(derievedName1[1] == ' ')
+	{
+	  
+		derievedName = 	derievedName1[0];
+		
+	}
+		
+   parent.patient_main.document.getElementById('patient_name').value = derievedName;
+  
+//Brunei CRF for Long Names starts
+	if(document.getElementById('name_drvn_logic_long')){  
+		var longNamelogic = new String();
+		longNamelogic = document.getElementById('name_drvn_logic_long').value;
+
+		var pat_name_as_multipart_yn = document.getElementById('pat_name_as_multipart_yn').value;
+		var derivedName = '';
+		var logicElements = new Array();
+		logicElements = longNamelogic.split('+');
+		i=0;
+		
+		for ( i=0;i<logicElements.length;i++)
+		{
+			if(logicElements[i] == '1N' && document.getElementById('first_name') != null)
+			{
+				if ( document.getElementById('first_name').value != '' ){
+					derivedName = derivedName + document.getElementById('first_name').value;
+				}
+				
+			}
+			else if ( logicElements[i] == '2N' && document.getElementById('second_name') != null )
+			{
+				if ( document.getElementById('second_name').value != '' )
+					derivedName = derivedName + document.getElementById('second_name').value;
+			}
+			else if ( logicElements[i] == '3N' && document.getElementById('third_name') != null)
+			{
+				if ( document.getElementById('third_name').value != '' )
+					derivedName = derivedName + document.getElementById('third_name').value;
+			}
+			else if ( logicElements[i] == 'FN' && document.getElementById('family_name') != null)
+			{
+				  if ( document.getElementById('family_name').value != '' ){
+					derivedName = derivedName + document.getElementById('family_name').value;
+				}
+			}
+			else if ( logicElements[i] == 'PR' && document.getElementById('name_prefix') != null)
+			{
+				if ( document.getElementById('name_prefix').value != '' )
+				{
+					derivedName = derivedName + document.getElementById('name_prefix').value;
+					
+				}
+			}
+			else if ( logicElements[i] == 'SF' && document.getElementById('name_suffix') != null)
+			{
+				if ( document.getElementById('name_suffix').value != '' )
+					derivedName = derivedName + document.getElementById('name_suffix').value;
+			}
+			else
+			{
+				if ( logicElements[i] != '1N' &&  logicElements[i] != '2N' && logicElements[i] != '3N' && logicElements[i] != 'FN' && logicElements[i] != 'PR' && logicElements[i] != 'SF' )
+				{
+					var arLen = logicElements[i].length;
+					var tempVal = logicElements[i].substring(1,arLen - 1);
+					if(derivedName == "")  tempVal="";
+
+					derivedName = derivedName + tempVal;
+				}
+			}
+		}
+		var derivedName1 = derivedName.split(',');
+		if(derivedName1[1] == ' ')
+		{
+			derivedName = 	derivedName1[0];
+		}
+		
+	   document.getElementById('patient_name_long').value = derivedName;
+		
+   }
+	//Brunei CRF for Long Name ends
+
+}// End of FUNCTION
+
+function validateTIme(obj)
+{
+		
+			var val=obj.value;
+      	    var time,days;      
+	         var d = new Date();
+	       var curr_hour= d.getHours();
+           var curr_min= d.getMinutes();
+		 var hour,newborn_age_in_hrs;
+	
+	if(val != "")
+	{
+		if(validDate(val,"HM",localeName) == false)
+		{
+		
+			alert(getMessage("INVALID_TIME_FMT","SM"));
+			//obj.select();
+			Obj.value = "";
+			Obj.focus();
+		}
+       else{	
+		
+		var  arg=val.split(":");
+       if(arg[1]>=30) 
+	{
+	     arg[0]++;
+	   if(arg[0]<10)
+	   time="0"+arg[0]+":00";
+	   else
+	   time=arg[0]+":00";
+	   document.getElementById('b_time').value =time;
+	    
+	
+	}else
+	{      
+	  if(arg[0]<10)
+	   time=arg[0]+":00";
+	   else
+	   time=arg[0]+":00";
+          document.getElementById('b_time').value =time;
+	    
+	   
+	}
+	if(curr_min>=30)
+		{
+          curr_hour++;
+		}		
+	
+	days=document.getElementById('b_days').value;
+	days=days*24;
+	hour=curr_hour-arg[0]+days;
+	if(hour<=99)
+	document.getElementById('b_hours').value =hour;
+	}
+}
+}
+
+function putLocalLangPatientName(from){  
+
+	var language_direction= document.getElementById('language_direction').value;
+
+
+    var logic = new String();	   
+	logic = document.getElementById('name_drvn_logic_oth_lang').value;
+
+	var pat_name_as_multipart_yn = document.getElementById('pat_name_as_multipart_yn').value;
+    var derievedName = new String();
+    derievedName = '';
+    var logicElements = new Array();
+    logicElements = logic.split('+');
+    var i=0;	
+	for ( i=0;i<logicElements.length;i++)
+    {
+		       
+        if ( logicElements[i] == '1N' && document.getElementById('first_name_oth_lang')!= null)
+        {
+			
+        
+            if ( document.getElementById('first_name_oth_lang').value != '' ){
+				if(language_direction=='R'){
+					derievedName =  document.getElementById('first_name_oth_lang').value+derievedName ;
+				}else{
+					derievedName =  derievedName+ document.getElementById('first_name_oth_lang').value  ;
+				}
+			}
+			
+        }
+        else if ( logicElements[i] == '2N' && document.getElementById('second_name_oth_lang') != null )
+        {
+            if ( document.getElementById('second_name_oth_lang').value != '' ){
+				if(language_direction=='R'){
+					derievedName =  document.getElementById('second_name_oth_lang').value+derievedName ;
+				}else{
+					derievedName =  derievedName+ document.getElementById('second_name_oth_lang').value ;
+				}
+			}
+		
+        }
+        else if ( logicElements[i] == '3N' && document.getElementById('third_name_oth_lang') != null)
+        {
+            if ( document.getElementById('third_name_oth_lang').value != '' ){
+				if(language_direction=='R'){
+					derievedName =  document.getElementById('third_name_oth_lang').value+derievedName ;
+				}else{
+	                derievedName = derievedName+ document.getElementById('third_name_oth_lang').value ;
+				}
+			}
+		
+        }
+        else if ( logicElements[i] == 'FN' && document.getElementById('family_name_oth_lang') != null)
+        {
+            if ( document.getElementById('family_name_oth_lang').value != '' ){
+				if(language_direction=='R'){
+					derievedName =  document.getElementById('family_name_oth_lang').value+derievedName ;
+				}else{
+	                derievedName =  derievedName+ document.getElementById('family_name_oth_lang').value ;
+				}
+			}
+			
+        }
+        else if ( logicElements[i] == 'PR' && document.getElementById('name_prefix_oth_lang') != null)
+        {
+            if ( (document.getElementById('name_prefix_oth_lang')) && (document.getElementById('name_prefix_oth_lang').value != '') )
+            {
+                var prefix_loc_lang = document.getElementById('name_prefix_oth_lang').value;
+				if(language_direction=='R'){
+					derievedName =  prefix_loc_lang +derievedName;
+				}else{
+	                derievedName =   derievedName+prefix_loc_lang ;
+				}		
+            }
+        }
+        else if ( logicElements[i] == 'SF' && document.getElementById('name_suffix_oth_lang') != null)
+        {
+             if ( document.getElementById('name_suffix_oth_lang').value != '') 
+            {
+                var suffix_loc_lang = document.getElementById('name_suffix_oth_lang').value;
+				if(language_direction=='R'){
+					derievedName =   suffix_loc_lang+derievedName;
+				}else{
+					derievedName =   derievedName + suffix_loc_lang ;
+				}
+            }
+        }
+        else
+        {
+            if ( logicElements[i] != '1N' &&  logicElements[i] != '2N' && logicElements[i] != '3N' && logicElements[i] != 'FN' && logicElements[i] != 'PR' && logicElements[i] != 'SF' )
+            {
+                var arLen = logicElements[i].length;
+                var tempVal = logicElements[i].substring(1,arLen - 1);
+                if(derievedName == "")  tempVal="";
+				if(language_direction=='R'){
+					derievedName =  tempVal+derievedName;
+				}else{
+	                derievedName = derievedName + tempVal;
+				}
+            }
+		
+        }
+    
+    }
+
+	if(parent.patient_main.document.getElementById('patient_name_loc_lang'))
+	{
+		parent.patient_main.document.getElementById('patient_name_loc_lang').value = derievedName;
+	}
+	
+	// Brunei CRF for Local Lang Name starts
+	if(document.getElementById('name_drvn_logic_oth_lang_long')){
+		var localLongNamelogic = new String();	   
+		localLongNamelogic = document.getElementById('name_drvn_logic_oth_lang_long').value;
+
+		var pat_name_as_multipart_yn = document.getElementById('pat_name_as_multipart_yn').value;
+		var derivedName = new String();
+		derivedName = '';
+		var logicElements = new Array();
+		logicElements = localLongNamelogic.split('+');
+		var i=0;	
+		for ( i=0;i<logicElements.length;i++)
+		{
+				   
+			if ( logicElements[i] == '1N' && document.getElementById('first_name_oth_lang')!= null)
+			{
+				
+			
+				if ( document.getElementById('first_name_oth_lang').value != '' ){
+					if(language_direction=='R'){
+						derivedName =  document.getElementById('first_name_oth_lang').value+derivedName ;
+					}else{
+						derivedName =  derivedName+ document.getElementById('first_name_oth_lang').value  ;
+					}
+				}
+				
+			}
+			else if ( logicElements[i] == '2N' && document.getElementById('second_name_oth_lang') != null )
+			{
+				if ( document.getElementById('second_name_oth_lang').value != '' ){
+					if(language_direction=='R'){
+						derivedName =  document.getElementById('second_name_oth_lang').value+derivedName ;
+					}else{
+						derivedName =  derivedName+ document.getElementById('second_name_oth_lang').value ;
+					}
+				}
+			
+			}
+			else if ( logicElements[i] == '3N' && document.getElementById('third_name_oth_lang') != null)
+			{
+				if ( document.getElementById('third_name_oth_lang').value != '' ){
+					if(language_direction=='R'){
+						derivedName =  document.getElementById('third_name_oth_lang').value+derivedName ;
+					}else{
+						derivedName = derivedName+ document.getElementById('third_name_oth_lang').value ;
+					}
+				}
+			
+			}
+			else if ( logicElements[i] == 'FN' && document.getElementById('family_name_oth_lang') != null)
+			{
+				if ( document.getElementById('family_name_oth_lang').value != '' ){
+					if(language_direction=='R'){
+						derivedName =  document.getElementById('family_name_oth_lang').value+derivedName ;
+					}else{
+						derivedName =  derivedName+ document.getElementById('family_name_oth_lang').value ;
+					}
+				}
+				
+			}
+			else if ( logicElements[i] == 'PR' && document.getElementById('name_prefix_oth_lang') != null)
+			{
+				if ( (document.getElementById('name_prefix_oth_lang')) && (document.getElementById('name_prefix_oth_lang').value != '') )
+				{
+					var prefix_loc_lang = document.getElementById('name_prefix_oth_lang').value;
+					if(language_direction=='R'){
+						derivedName =  prefix_loc_lang +derivedName;
+					}else{
+						derivedName =   derivedName+prefix_loc_lang ;
+					}		
+				}
+			}
+			else if ( logicElements[i] == 'SF' && document.getElementById('name_suffix_oth_lang') != null)
+			{
+				 if ( document.getElementById('name_suffix_oth_lang').value != '') 
+				{
+					var suffix_loc_lang = document.getElementById('name_suffix_oth_lang').value;
+					if(language_direction=='R'){
+						derivedName =   suffix_loc_lang+derivedName;
+					}else{
+						derivedName =   derivedName + suffix_loc_lang ;
+					}
+				}
+			}
+			else
+			{
+				if ( logicElements[i] != '1N' &&  logicElements[i] != '2N' && logicElements[i] != '3N' && logicElements[i] != 'FN' && logicElements[i] != 'PR' && logicElements[i] != 'SF' )
+				{
+					var arLen = logicElements[i].length;
+					var tempVal = logicElements[i].substring(1,arLen - 1);
+					if(derivedName == "")  tempVal="";
+					if(language_direction=='R'){
+						derivedName =  tempVal+derivedName;
+					}else{
+						derivedName = derivedName + tempVal;
+					}
+				}
+			
+			}
+		
+		}
+
+		if(document.getElementById('patient_name_loc_lang_long'))
+		{
+			document.getElementById('patient_name_loc_lang_long').value = derivedName;
+		}	
+		
+	}
+	// Brunei CRF for Local Lang Name Ends
+	
+}// End of FUNCTION
+
+// ***********************************************************************
+
+function validateNationality(Nat_Id,Site,def_nat_id_pat_ser_grp,chk_routine,routine_name,nat_id_check_digit_id,validate_len_yn,validate_dup,onLoad,startWith)    { 
+if(onLoad){
+	/*if(document.getElementById('alt_id1_no'))
+		document.getElementById('alt_id1_no').value='';
+	if(document.getElementById('alt_id1_exp_date'))
+		document.getElementById('alt_id1_exp_date').value='';
+	if(document.getElementById('name_prefix'))
+		document.getElementById('name_prefix').value='';
+	if(document.getElementById('first_name'))
+		document.getElementById('first_name').value='';
+	if(document.getElementById('second_name'))
+		document.getElementById('second_name').value='';
+	if(document.getElementById('third_name'))
+		document.getElementById('third_name').value='';
+	if(document.getElementById('family_name'))
+		document.getElementById('family_name').value='';	
+	if(document.getElementById('family_name_prefix'))
+		document.getElementById('family_name_prefix').value='';	
+	if(document.getElementById('name_suffix'))
+		document.getElementById('name_suffix').value='';
+	//alert(document.getElementById('gender').value)
+
+	if(document.getElementById('sex'))
+		document.getElementById('sex').value='';
+	if(document.getElementById('date_of_birth')){
+		document.getElementById('date_of_birth').value='';
+		gotoNext(document.getElementById('date_of_birth'));
+		disableEnableYMDH(document.getElementById('date_of_birth'));
+	}
+	if(document.getElementById('nationality_code'))
+		document.getElementById('nationality_code').value='';
+	if(document.getElementById('nationality_desc'))
+		document.getElementById('nationality_desc').value='';	
+	if(document.getElementById('race_code'))
+		document.getElementById('race_code').value='';
+	if(document.getElementById('race_desc'))
+		document.getElementById('race_desc').value='';	
+	if(document.getElementById('religion_code'))
+		document.getElementById('religion_code').value='';
+	if(document.getElementById('relgn_desc'))
+		document.getElementById('relgn_desc').value='';
+	if(document.getElementById('r_addr_line1'))
+		document.getElementById('r_addr_line1').value='';
+	if(document.getElementById('r_addr_line2'))
+		document.getElementById('r_addr_line2').value='';
+	if(document.getElementById('r_addr_line3'))
+		document.getElementById('r_addr_line3').value='';
+	if(document.getElementById('r_addr_line4'))
+		document.getElementById('r_addr_line4').value='';
+	if(document.getElementById('r_town'))
+		document.getElementById('r_town').value='';
+	if(document.getElementById('r_town_code'))
+		document.getElementById('r_town_code').value='';
+	if(document.getElementById('r_area'))
+		document.getElementById('r_area').value='';
+	if(document.getElementById('r_area_code'))
+		document.getElementById('r_area_code').value='';
+	if(document.getElementById('r_region'))
+		document.getElementById('r_region').value='';
+	if(document.getElementById('r_region_code'))
+		document.getElementById('r_region_code').value='';
+	if(document.getElementById('r_postal_code1'))
+		document.getElementById('r_postal_code1').value='';
+	if(document.getElementById('r_country_code'))
+		document.getElementById('r_country_code').value='';
+	if(document.getElementById('r_country_desc'))
+		document.getElementById('r_country_desc').value='';
+	if(document.getElementById('doc_id1'))
+		document.getElementById('doc_id1').value='';
+	if(document.getElementById('doc_id1_desc'))
+		document.getElementById('doc_id1_desc').value='';
+	if(document.getElementById('doc_num1'))
+		document.getElementById('doc_num1').value='';
+	if(document.getElementById('doc_exp_dt1'))
+		document.getElementById('doc_exp_dt1').value='';
+	if(document.getElementById('place_of_issue1'))
+		document.getElementById('place_of_issue1').value='';
+	if(document.getElementById('issue_date1'))
+		document.getElementById('issue_date1').value='';
+	putPatientName('');	*/
+}
+
+//Added By Gaurav Against MMS-MEA-CRF-0004
+var nat_flag = new Boolean();
+//nat_flag = false;
+if(startWith == 'true') {
+	nat_flag = valNatId(Nat_Id.value,Nat_Id.name);
+	if (nat_flag == false) return nat_flag;
+}
+//Added By Gaurav Against MMS-MEA-CRF-0004
+var isAutoPopulateNOKDOBAppl = document.getElementById('isAutoPopulateNOKDOBAppl').value;//Added by Thamizh selvi on 1st Aug 2018 against ML-MMOH-CRF-1177
+var isNumber = new Boolean();
+isNumber = true;
+var ind = -1;
+var ext_system_interface_yn = "";
+if(document.forms[0].ext_system_interface_yn)
+	ext_system_interface_yn = document.forms[0].ext_system_interface_yn.value;
+if ( Nat_Id.value.length > 0 ) {	  
+	if ( !CheckSplCharsNatID(Nat_Id) )
+	{
+		return false;
+	}
+	if ( (nat_id_check_digit_id=='M11') && ( (ind = Nat_Id.value.indexOf('X')) != -1) )
+	{
+		if (ind < 12)           // X can be entered only at 13th position
+		{
+			msg = getMessage('INVALID_NAT_ID','MP');
+			msg = msg.replace("#",parent.frames[1].document.forms[0].nat_id_prompt.value);
+			//Nat_Id.select();
+			Nat_Id.value = '';
+			Nat_Id.focus();
+			alert(msg);
+			return false;
+			clear_populated_values();
+		}
+	}
+} else {
+	parent.frames[1].document.forms[0].nat_id_val.value='S';
+	parent.frames[1].document.forms[0].citizen[0].disabled = false;
+	parent.frames[1].document.forms[0].citizen[1].disabled = false;
+	parent.frames[1].document.forms[0].nationality_desc.disabled = false;
+	if(parent.frames[1].document.forms[0].nat_id_btn)
+		parent.frames[1].document.forms[0].nat_id_btn.disabled = false;	
+
+	if(parent.frames[1].document.forms[0].txtSmartcard_succ.value=='Y'){
+		clear_populated_values();
+		parent.frames[1].document.forms[0].txtSmartcard_succ.value='';
+	}
+}
+	//Maheshwaran K added for AAKH-CRF-0168 as on 22-10-2022
+	var isNatIdAltIdMandVisaType	= document.getElementById('isNatIdAltIdMandVisaType').value;
+	if(isNatIdAltIdMandVisaType=="true")
+		{
+		validateDftNationalId(trimString(Nat_Id.value));
+		//validateDftNationalId(trimString(Nat_Id.value),parent.frames[1].document.forms[0].citizen[0].checked,parent.frames[1].document.forms[0].citizen[1].checked);
+		}
+	//Ends  
+if ( isNumber )
+{
+	var nid = new String();
+    nid = trimString(Nat_Id.value);
+    Nat_Id.value = nid;
+
+    if(validate_len_yn == "Y")
+        if ( nid.length == Nat_Id.maxLength )   isNumber = true
+        else
+        {
+            isNumber = false
+
+        }
+	
+    if(isNumber && Nat_Id.value!='')
+    {
+		if ( validate_dup==null || validate_dup=='')
+		{
+			validate_dup = 'N';
+		}	
+		var calledFunction="";
+		if(document.getElementById('CalledFromFunction')){
+			calledFunction=document.getElementById('CalledFromFunction').value;
+		}
+		var HTMLVal = new String();
+        HTMLVal = "<html><body onKeyDown='lockKey()'><form name='form1' id='form1' method='post' action='../../eMP/jsp/checkNationality.jsp'><input type='hidden' name='isNatIdAltIdMandVisaType' id='isNatIdAltIdMandVisaType' value=\""+document.getElementById('isNatIdAltIdMandVisaType').value+"\"><input type='hidden' name='dftNationalId' id='dftNationalId' value=\""+document.getElementById('dftNationalId').value+"\"><input type='hidden' name='calledFunction' id='calledFunction' value=\""+calledFunction+"\"><input type='hidden' name='nat_id_no' id='nat_id_no' value=\""+Nat_Id.value+"\"><input type='hidden' name='group' id='group' value='N'><input type='hidden' name='Site' id='Site' value=\""+Site+"\"><input type='hidden' name='def_nat_id' id='def_nat_id' value=\""+def_nat_id_pat_ser_grp+"\"><input type='hidden' name='output' id='output' value='A'><input type='hidden' name='nat_id_name' id='nat_id_name' value=\""+Nat_Id.name+"\"><input type='hidden' name='output' id='output' value='A'><input type='hidden' name='validate_dup' id='validate_dup' value=\""+validate_dup+"\">";
+
+        //chk_routine,routine_name
+        if(document.getElementById('national_id_no_dup') !=null)
+        HTMLVal +="<input type='hidden' name='dup_nat_id' id='dup_nat_id' value=\""+document.getElementById('national_id_no_dup').value+"\">";
+        //added for ML-MMOH-SCF-3108 
+        if(document.getElementById('Birth_Date') !=null) 
+            HTMLVal +="<input type='hidden' name='Birth_Date' id='Birth_Date' value=\""+document.getElementById('Birth_Date').value+"\">"; //End ML-MMOH-SCF-3108
+		
+		if(document.getElementById('pat_ser_grp_code') !=null)
+        HTMLVal +="<input type='hidden' name='selected_id' id='selected_id' value=\""+pat_sergrp_id_types[document.getElementById('pat_ser_grp_code').selectedIndex]+"\">";
+        if(chk_routine == "Y")
+             HTMLVal +="<input type='hidden' name='routine_name' id='routine_name' value=\""+routine_name+"\">";
+		
+        if(ext_system_interface_yn !=''&& ext_system_interface_yn !='null')
+            HTMLVal +="<input type='hidden' name='ext_system_interface_yn' id='ext_system_interface_yn' value=\""+ext_system_interface_yn+"\">";
+
+		if(nat_id_check_digit_id !=''&& nat_id_check_digit_id !='null')
+            HTMLVal +="<input type='hidden' name='nat_id_check_digit_id' id='nat_id_check_digit_id' value=\""+nat_id_check_digit_id+"\">";
+
+        HTMLVal +="<input type='hidden' name='step' id='step' value='second'><input type='hidden' name='from_pat' id='from_pat' value='Y'>";
+		
+		/*Added by Thamizh selvi on 2nd Aug 2018 for ML-MMOH-CRF-1177 Start*/
+		if(isAutoPopulateNOKDOBAppl == 'true' && Nat_Id.name == 'contact1_new_nat_id_no')
+			HTMLVal +="<input type='hidden' name='populateDOBYn' id='populateDOBYn' value='Y'></form></body></html>";
+		else
+			HTMLVal +="</form></body></html>";
+		/*End*/
+		if (parent.frames[1].document.forms[0].nat_id_val)
+	        parent.frames[1].document.forms[0].nat_id_val.value='G';
+		parent.parent.messageFrame.document.write(HTMLVal);
+		
+		parent.parent.messageFrame.document.form1.submit();
+    }
+    else
+    {
+        if ( Nat_Id.value != '' )
+        {
+			var val = getMessage("NAT_ID_CHARS",'MP');
+            val = val.replace("@",document.getElementById('national_id_no').maxLength)
+            val = val.replace("#",document.getElementById('nat_id_prompt').value) 
+			alert(val);
+			Nat_Id.value=''; // smartcard
+			Nat_Id.focus();		
+			
+			clear_populated_values();
+		
+        }
+    }
+
+		if(document.forms[0].func_act){  
+				var func_act = document.forms[0].func_act.value;
+				if(func_act=="Visitreg" || func_act=="REF_SEARCH" || func_act=="DuplicateRegistration"){
+					setTimeout("disableToolBarButtons()", 1000);
+				}
+		}
+	
+		if(document.forms[0].appt_yn){
+			if(document.forms[0].appt_yn.value=="Appt"){
+				setTimeout("disableToolBarButtons()", 1000);
+			}
+		}
+}
+}
+//Maheshwaran K added for AAKH-CRF-0168 as on 22-10-2022
+function validateDftNationalId(Nat_Id)
+	{
+		if(trimString(document.getElementById('dftNationalId').value)==trimString(Nat_Id)) 
+			{
+			if(document.getElementById('alt2_gif'))
+				{
+					var age_not_consider_natid_altid	= parseInt(document.getElementById('age_not_consider_natid_altid').value);
+					var CurrentDate = getCurrentSysDate("DMY",localeName);
+					var dob			= document.getElementById('date_of_birth').value;
+					if(dob!="" && CurrentDate!=""){
+						var interval	= parseInt(daysBetween(dob,CurrentDate,"DMY",localeName));
+						if(age_not_consider_natid_altid > 0 && interval >= 0) {
+							if(interval <= age_not_consider_natid_altid){
+							if(isNatIdAltIdMandVisaType=="true"){				
+								document.getElementById('alt_id2_reqd_yn').value="Y"; 
+								document.getElementById('alt2_gif').style.visibility="visible";
+								document.getElementById('alt_id2_no').disabled=false;
+								}
+							}
+						}
+					}
+					else if(dob=="") {
+						document.getElementById('alt_id2_reqd_yn').value="Y"; 
+								document.getElementById('alt2_gif').style.visibility="visible";
+								document.getElementById('alt_id2_no').disabled=false;
+						
+					}
+				
+				}
+			}
+		else {
+			if(document.getElementById('visa_type').value=='V')
+				{
+					document.getElementById('alt_id2_reqd_yn').value="Y"; 
+					document.getElementById('alt2_gif').style.visibility="visible";	
+
+					
+				}
+			else {
+			if(document.getElementById('alt2_gif'))
+				{
+				document.getElementById('alt_id2_reqd_yn').value="N"; 
+				document.getElementById('alt2_gif').style.visibility="hidden";
+			//	document.forms[0].all.alt_id2_no.disabled=true;
+					}
+				}
+			
+			}		
+		
+	}
+// ***********************************************************************
+
+function validateFamilyNumber(Obj)  {  	
+
+    if ( document.getElementById('family_link_no').value == '' || document.getElementById('family_link_no').value.length == 0)
+    {
+        if ( document.getElementById('relationship_to_head').value != '' )
+        {
+            alert(getMessage("HEAD_PATID_BLANK",'MP'));	             
+        }
+
+    }
+}
+
+// ***********************************************************************
+
+function setTownDesc(Obj)   {
+document.getElementById('town_desc').value = '';
+
+    if ( Obj == document.getElementById('town_code') )
+        document.getElementById('town_desc').value = document.getElementById('town_code').options[document.getElementById('town_code').selectedIndex].text;
+    else if ( Obj == document.getElementById('town_desc_temp') )
+        document.getElementById('town_desc').value = Obj.value;
+}
+
+// ***********************************************************************
+
+
+// ***********************************************************************
+
+function checkAlternateIdForUnique(Obj,Id_No,Check,routine_chk,routine_name,alt_id_chk_digit_scheme,alt_id1_len_validation_yn,startWith,alt_id1_accept_alphanumeric_yn)    {
+
+//Added By Gaurav Against MMS-MEA-CRF-0004
+var nat_flag = new Boolean();
+//nat_flag = false;
+if(startWith == 'true') {  
+	nat_flag = valNatId(Obj.value,Obj.name);
+	if (nat_flag == false) return nat_flag;
+}
+//Added By Gaurav Against MMS-MEA-CRF-0004
+	var xmlDoc="";
+	var xmlHttp = new XMLHttpRequest();
+	var xmlStr ="<root><SEARCH "; 	
+
+	if (alt_id1_accept_alphanumeric_yn==null || alt_id1_accept_alphanumeric_yn=='undefined') 
+	alt_id1_accept_alphanumeric_yn = "Y";
+
+	var valLength = new String();
+    valLength = Obj.value;
+    valLength = valLength.length;
+    var dup_chk = true;
+    var chk_dig_mes = getMessage("ALT_ID_NO",'MP')
+	var sStyle = document.forms[0].sStyle.value;
+    if(Obj.value == '' || Obj.value == null)dup_chk = false
+    if(Id_No ==1){
+        if(document.getElementById('alt_id1_exp_date') !=null) {
+            if(valLength>0){
+				document.getElementById('alt_id1_exp_date').readOnly =false
+				document.getElementById('altidexpdt1').disabled =false;
+			}else{
+				document.getElementById('alt_id1_exp_date').readOnly =true;
+				document.getElementById('altidexpdt1').disabled =true;
+				document.getElementById('alt_id1_exp_date').value='';
+			}
+		}//Added by Dharma on 14th Apr 2015 against IN054980
+            if(document.getElementById('alt_id1_no_dup') != null && dup_chk){
+                if(document.getElementById('alt_id1_no_dup').value == Obj.value)
+                    dup_chk = false;
+            }
+     //   } //Commented by Dharma on 14th Apr 2015 against IN054980
+        chk_dig_mes = chk_dig_mes.replace('$',document.getElementById('alt_id1_prompt').innerText)
+    }
+    if(Id_No ==2){
+        if(document.getElementById('alt_id2_exp_date') !=null){
+            if(valLength>0){
+				document.getElementById('alt_id2_exp_date').readOnly =false
+				document.getElementById('altidexpdt2').disabled =false;
+			}else{
+				document.getElementById('alt_id2_exp_date').readOnly =true;
+				document.getElementById('altidexpdt2').disabled =true;
+				document.getElementById('alt_id2_exp_date').value='';
+			}
+        }
+
+        if(document.getElementById('alt_id2_no_dup') != null)
+            if(document.getElementById('alt_id2_no_dup').value == Obj.value)
+               dup_chk = false;
+
+        chk_dig_mes = chk_dig_mes.replace('$',document.getElementById('alt_id2_prompt').innerText)
+    }
+    if(Id_No ==3)
+    {
+        if(document.getElementById('alt_id3_exp_date') !=null)
+        {
+            if(valLength>0) 
+			{
+				document.getElementById('alt_id3_exp_date').readOnly =false
+				document.getElementById('altidexpdt3').disabled =false;
+			}
+            else            
+			{
+				document.getElementById('alt_id3_exp_date').readOnly =true;
+				document.getElementById('altidexpdt3').disabled =true;
+				document.getElementById('alt_id3_exp_date').value='';
+			}
+        }
+
+        if(document.getElementById('alt_id3_no_dup') != null)
+            if(document.getElementById('alt_id3_no_dup').value == Obj.value)
+                dup_chk = false;
+
+      chk_dig_mes = chk_dig_mes.replace('$',document.getElementById('alt_id3_prompt').innerText)
+    }
+    if(Id_No ==4)
+    {
+        if(document.getElementById('alt_id4_exp_date') !=null)
+        {
+            if(valLength>0) 
+			{
+				document.getElementById('alt_id4_exp_date').readOnly =false
+				document.getElementById('altidexpdt4').disabled =false;
+			}
+            else            
+			{
+				document.getElementById('alt_id4_exp_date').readOnly =true; 
+				document.getElementById('altidexpdt4').disabled =true;
+				document.getElementById('alt_id4_exp_date').value=''; 
+			}
+        }
+
+        if(document.getElementById('alt_id4_no_dup') != null)
+            if(document.getElementById('alt_id4_no_dup').value == Obj.value)
+               dup_chk = false;
+
+        chk_dig_mes = chk_dig_mes.replace('$',document.getElementById('alt_id4_prompt').innerText)
+    }
+	// added by dharma for GHL-CRF-524.1
+		var alt_id1_alphanum_validate_yn = "N";
+	if(document.getElementById('alt_id1_alphanum_validate_yn'))
+		alt_id1_alphanum_validate_yn= document.getElementById('alt_id1_alphanum_validate_yn').value;
+
+    if(((alt_id_chk_digit_scheme != '' && alt_id_chk_digit_scheme != 'null') || alt_id1_accept_alphanumeric_yn=='N') &&  alt_id1_alphanum_validate_yn == 'N' ) {
+        if(isNaN(Obj.value)){
+           dup_chk = false ;
+           alert( chk_dig_mes)
+
+        }
+    }
+    if ((Check == 'Y') && (dup_chk)){
+
+		if(alt_id1_len_validation_yn == 'Y') {
+
+			 if(valLength != Obj.maxLength) { 
+				if ( valLength > 0  )
+				{
+
+					var signal_for_go = parent.frames[1].document.forms[0].nat_id_val.value; 				
+
+					var msg = getMessage("ALT_ID_CHARS",'MP')
+					if(Id_No ==1)  msg =msg.replace('$',document.getElementById('alt_id1_prompt').innerText)
+					if(Id_No ==2)  msg =msg.replace('$',document.getElementById('alt_id2_prompt').innerText)
+					if(Id_No ==3)  msg =msg.replace('$',document.getElementById('alt_id3_prompt').innerText)
+					if(Id_No ==4)  msg =msg.replace('$',document.getElementById('alt_id4_prompt').innerText)
+					msg =msg.replace('@',Obj.maxLength)
+					alert(msg);
+					Obj.value='';
+					Obj.focus(); 					
+
+					/*
+					if (signal_for_go == 'S')
+					{
+						var val = parent.frames[1].getMessage("LENGTH_MIN_CHAR",'MP')
+						val = val.replace("@",Obj.maxLength)
+						alert(val);
+						Obj.value="";
+						Obj.focus();
+					}
+					else if (signal_for_go == 'G')
+					{  						
+						function aa()
+						{
+							checkAltIDLength(Obj,AltNum,Check);
+						}
+						setTimeout('aa()',500);							
+					}
+					else if (signal_for_go == 'T')
+					{
+						var val = parent.frames[1].getMessage("LENGTH_MIN_CHAR",'MP')
+						val = val.replace("@",Obj.maxLength);
+						alert(val);
+						Obj.select();
+						Obj.focus();
+					}
+					else if (signal_for_go == 'F')
+					{
+						Obj.value='';
+						parent.frames[1].document.forms[0].national_id_no.focus();
+
+					}
+					*/
+				}
+				else
+				{
+					for( i=0; i<prev_set_objs.length;i++)
+						{
+						   
+						   if(prev_set_objs[i].name == 'first_name' || prev_set_objs[i].name == 'second_name' || prev_set_objs[i].name == 'third_name' || prev_set_objs[i].name == 'family_name' )
+						   {
+							ChangeInitCase(prev_set_objs[i])
+							putPatientName(prev_set_objs[i])
+							}
+							 if( prev_set_objs[i].name == 'date_of_birth'){							
+								gotoNext( prev_set_objs[i])
+							 } 
+	
+							if(prev_set_objs[i].type == 'text')
+							{
+								prev_set_objs[i].readOnly = false;
+
+								if(prev_set_objs[i].name == 'first_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bf').disabled = false;
+								if(prev_set_objs[i].name == 'second_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bs').disabled = false;
+								if(prev_set_objs[i].name == 'third_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bt').disabled = false;
+								if(prev_set_objs[i].name == 'family_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bfam').disabled = false;
+								if(prev_set_objs[i].name == 'first_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bfo').disabled = false;
+								if(prev_set_objs[i].name == 'second_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bso').disabled = false;
+								if(prev_set_objs[i].name == 'third_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bto').disabled = false;
+								if(prev_set_objs[i].name == 'family_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bfamo').disabled = false;
+							}
+							else
+								prev_set_objs[i].disabled = false;
+						}
+						prev_set_objs= new Array();
+				}
+			 }
+		}
+
+		xmlStr+=" process_id=\"5\" ";
+		xmlStr+=" alt_id_no=\""+Obj.value+"\"";
+		xmlStr+=" id_no=\""+Id_No+"\"";
+
+        if(routine_chk == "Y")
+			xmlStr+=" curr_ds_id=\""+routine_name+"\"";	  
+
+        if(alt_id_chk_digit_scheme != null && alt_id_chk_digit_scheme!= "" && alt_id_chk_digit_scheme!= "null")
+			xmlStr+=" alt_id_chk_digit_scheme=\""+alt_id_chk_digit_scheme+"\"";	                  
+			xmlStr+=" operation=\""+document.getElementById('operation').value+"\"";
+        if(document.getElementById('first_time_only') !=null)
+        {
+             xmlStr+=" first_time_only=\""+document.getElementById('first_time_only').value+"\"";
+             if(document.getElementById('first_time_only').value =="Y")
+                 document.getElementById('first_time_only').value = 'N'
+        }
+			
+			xmlStr +=" /></root>";
+			xmlDoc = new DOMParser().parseFromString(xmlStr, "text/xml");
+			var url = "../../eMP/jsp/ServerValidationXML.jsp";
+			xmlHttp.open("POST", url, false);
+			xmlHttp.setRequestHeader("Content-type" ,"application/x-www-form-urlencoded");
+			xmlHttp.send(xmlDoc);
+			eval(xmlHttp.responseText);
+
+		/*
+        if ( valLength == Obj.maxLength ){            
+			xmlStr+=" process_id=\"5\" ";
+			xmlStr+=" alt_id_no=\""+Obj.value+"\"";
+			xmlStr+=" id_no=\""+Id_No+"\"";
+
+                if(routine_chk == "Y")
+					xmlStr+=" curr_ds_id=\""+routine_name+"\"";
+  
+
+                if(alt_id_chk_digit_scheme != null && alt_id_chk_digit_scheme!= "" && alt_id_chk_digit_scheme!= "null")
+					xmlStr+=" alt_id_chk_digit_scheme=\""+alt_id_chk_digit_scheme+"\"";
+                   
+                     
+					 xmlStr+=" operation=\""+document.getElementById("operation").value+"\"";
+                  if(document.getElementById("first_time_only") !=null)
+                  {
+                     xmlStr+=" first_time_only=\""+document.getElementById("first_time_only").value+"\"";
+                    if(document.getElementById("first_time_only").value =="Y")
+                    document.getElementById("first_time_only").value = 'N'
+                  }
+			
+			xmlStr +=" /></root>";
+			xmlDoc = new DOMParser().parseFromString(xmlStr, "text/xml");
+			var url = "../../eMP/jsp/ServerValidationXML.jsp";
+			xmlHttp.open("POST", url, false);
+			xmlHttp.setRequestHeader("Content-type" ,"application/x-www-form-urlencoded");
+			xmlHttp.send(xmlDoc);
+			eval(xmlHttp.responseText);
+        }else {
+            if ( valLength > 0  )
+            {
+				var signal_for_go = parent.frames[1].document.forms[0].nat_id_val.value;
+                if (signal_for_go == 'S')
+                {
+					var val = parent.frames[1].getMessage("LENGTH_MIN_CHAR",'MP')
+					val = val.replace("@",Obj.maxLength)
+					alert(val);
+					Obj.value="";
+					Obj.focus();
+                }
+                else if (signal_for_go == 'G')
+                {
+                    function aa()
+                    {
+                        checkAltIDLength(Obj,AltNum,Check);
+                    }
+                setTimeout('aa()',500);
+                }
+                else if (signal_for_go == 'T')
+                {
+                    var val = parent.frames[1].getMessage("LENGTH_MIN_CHAR",'MP')
+					val = val.replace("@",Obj.maxLength);
+					alert(val);
+					Obj.select();
+					Obj.focus();
+                }
+                else if (signal_for_go == 'F')
+                {
+                    Obj.value='';
+                    parent.frames[1].document.forms[0].national_id_no.focus();
+
+                }
+            }
+            else
+            {
+                for( i=0; i<prev_set_objs.length;i++)
+                    {
+                       
+                       if(prev_set_objs[i].name == 'first_name' || prev_set_objs[i].name == 'second_name' || prev_set_objs[i].name == 'third_name' || prev_set_objs[i].name == 'family_name' )
+                       {
+                        ChangeInitCase(prev_set_objs[i])
+                        putPatientName(prev_set_objs[i])
+                        }
+                         if( prev_set_objs[i].name == 'date_of_birth'){
+						//	 alert("Registration One===>");
+                            gotoNext( prev_set_objs[i])
+						 }
+
+//                        prev_set_objs[i].value='';
+                        if(prev_set_objs[i].type == 'text')
+                        {
+                            prev_set_objs[i].readOnly = false;
+
+                            if(prev_set_objs[i].name == 'first_name')    parent.f_query_add_mod.patient_sub.document.getElementById("bf").disabled = false;
+                            if(prev_set_objs[i].name == 'second_name')    parent.f_query_add_mod.patient_sub.document.getElementById("bs").disabled = false;
+                            if(prev_set_objs[i].name == 'third_name')    parent.f_query_add_mod.patient_sub.document.getElementById("bt").disabled = false;
+                            if(prev_set_objs[i].name == 'family_name')    parent.f_query_add_mod.patient_sub.document.getElementById("bfam").disabled = false;
+                            if(prev_set_objs[i].name == 'first_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById("bfo").disabled = false;
+                            if(prev_set_objs[i].name == 'second_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById("bso").disabled = false;
+                            if(prev_set_objs[i].name == 'third_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById("bto").disabled = false;
+                            if(prev_set_objs[i].name == 'family_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById("bfamo").disabled = false;
+                        }
+                        else
+                            prev_set_objs[i].disabled = false;
+                    }
+                    prev_set_objs= new Array();
+            }
+        }
+		*/
+    }else{
+			var calledFunction=document.forms[0].CalledFromFunction;
+            if(Obj.value !=  ''&& Obj.value != null ){
+                var process_id="5"
+				if(!dup_chk||calledFunction.value=="PatientRegistration"){
+					process_id='10'				
+				}
+				xmlStr+=" process_id=\""+process_id+"\"";
+				xmlStr+=" alt_id_no=\""+Obj.value+"\"";
+				xmlStr+=" id_no=\""+Id_No+"\"";
+
+				 if(routine_chk == "Y")
+				xmlStr+=" curr_ds_id=\""+routine_name+"\"";
+
+				 if(alt_id_chk_digit_scheme != null && alt_id_chk_digit_scheme!= "" && alt_id_chk_digit_scheme != "null")
+					xmlStr+=" alt_id_chk_digit_scheme=\""+alt_id_chk_digit_scheme+"\"";
+
+					xmlStr+=" operation=\""+document.getElementById('operation').value+"\"";
+				
+				if(document.getElementById('first_time_only') !=null){
+					xmlStr+=" first_time_only=\""+document.getElementById('first_time_only').value+"\"";
+					if(document.getElementById('first_time_only').value =="Y")
+                    document.getElementById('first_time_only').value = 'N'
+				}
+				xmlStr +=" /></root>";
+				xmlDoc = new DOMParser().parseFromString(xmlStr, "text/xml");
+				var url = "../../eMP/jsp/ServerValidationXML.jsp";
+				xmlHttp.open("POST", url, false);
+				xmlHttp.setRequestHeader("Content-type" ,"application/x-www-form-urlencoded");
+				xmlHttp.send(xmlDoc);
+				eval(xmlHttp.responseText);
+        }else{
+                for( i=0; i<prev_set_objs.length;i++){
+                   if(prev_set_objs[i] != null){
+                       if(prev_set_objs[i].name == 'first_name' || prev_set_objs[i].name == 'second_name' || prev_set_objs[i].name == 'third_name' || prev_set_objs[i].name == 'family_name'||prev_set_objs[i].name.indexOf('oth_lang') != -1){
+                        ChangeInitCase(prev_set_objs[i])
+                        putPatientName(prev_set_objs[i])
+                        if(prev_set_objs[i].name.indexOf('oth_lang') != -1)
+                           putLocalLangPatientName(prev_set_objs[i])
+                        }
+                         if( prev_set_objs[i].name == 'date_of_birth'){
+                            gotoNext( prev_set_objs[i])
+                            document.getElementById('age_or_dob').disabled = false;
+                         }
+//                        prev_set_objs[i].value='';
+                        if(prev_set_objs[i].type == 'text'){
+                            prev_set_objs[i].readOnly = false;
+                            if(prev_set_objs[i].name == 'first_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bf').disabled = false;
+                            if(prev_set_objs[i].name == 'second_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bs').disabled = false;
+                            if(prev_set_objs[i].name == 'third_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bt').disabled = false;
+                            if(prev_set_objs[i].name == 'family_name')    parent.f_query_add_mod.patient_sub.document.getElementById('bfam').disabled = false;
+                            if(prev_set_objs[i].name == 'first_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bfo').disabled = false;
+                            if(prev_set_objs[i].name == 'second_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bso').disabled = false;
+                            if(prev_set_objs[i].name == 'third_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bto').disabled = false;
+                            if(prev_set_objs[i].name == 'family_name_oth_lang')    parent.f_query_add_mod.patient_sub.document.getElementById('bfamo').disabled = false;
+                        }else
+                            prev_set_objs[i].disabled = false;
+                    }
+                }
+                prev_set_objs= new Array();
+            }
+        //}
+     }
+} // END OF THE FUNCTION
+
+
+// ***********************************************************************
+function checkExpiryDate(Obj,ExpDateNo) {
+var varLength = Obj.value ;
+varLength = varLength.length;
+var continue_yn = true
+if(Obj.name == 'alt_id1_exp_date')
+    if(document.getElementById('alt_exp_date_fromHCS').value == 'Y')
+        continue_yn = false
+if ( varLength > 0 )
+{		
+    if ( validDateObj(Obj,"DMY",localeName) && continue_yn)
+    {
+		var sStyle = document.forms[0].sStyle.value;
+        var HTMLVal = new String();
+		
+        HTMLVal = "<HTML><head><link rel='stylesheet' type ='text/css' href='../../eCommon/html/"+sStyle+"'></link></head><BODY class='message' onKeyDown='lockKey()'><form name='form1' id='form1' method='post' action='../../eMP/jsp/PatRegExpChk.jsp'><input name='expiry_date' id='expiry_date' type='hidden' value='"+Obj.value + "'><input name='expdateno' id='expdateno' type='hidden' value='"+ExpDateNo+"'><input name='function_id' id='function_id' type='hidden' value='PAT_REG'></form></BODY></HTML>";
+        parent.parent.messageFrame.document.open() ;
+        parent.parent.messageFrame.document.write(HTMLVal);
+        parent.parent.messageFrame.document.form1.submit();
+        SentToServer = true;
+    }
+    else
+    {
+        var continue_yn = true
+        if(Obj.name == 'alt_id1_exp_date')
+            if(document.getElementById('alt_exp_date_fromHCS').value == 'Y')
+                continue_yn = false
+
+        if(continue_yn)
+        {   
+            Obj.focus() ;
+            Obj.select()
+        }
+    }
+}
+
+}
+
+// ***********************************************************************
+
+function checkPatGenYN()    {
+	var arLength = PSGCodeArray.length;
+    var q = 0;
+
+	if(parent.frames[1].document.forms[0].bl_success) {
+		parent.frames[1].document.forms[0].bl_success.value = "N";
+	}
+
+	if(parent.patient_main.patient_id)
+		parent.patient_main.patient_id.readOnly = true;
+    while ( q <= arLength  )
+    {
+		
+    if ( PSGCodeArray[q] == document.getElementById('pat_ser_grp_code').value )
+    {
+        if ( PSGYNArray[q] == 'N' )
+        {
+            alert(getMessage("PAT_ID_SERIES",'MP'))
+			
+			if(parent.patient_main.document.forms[0].patient_id){
+			  parent.patient_main.document.forms[0].patient_id.readOnly = false;
+			  parent.patient_main.document.forms[0].patient_id.value = '';
+			  parent.patient_main.document.forms[0].patient_id.focus();
+			}
+            document.getElementById('pat_no_gen_yn').value  = 'N';
+        }
+        else
+        {
+            document.getElementById('pat_no_gen_yn').value  = 'Y';
+			if(parent.patient_main.document.forms[0].patient_id){
+	            parent.patient_main.document.forms[0].patient_id.readOnly = true;
+		        parent.patient_main.document.forms[0].patient_id.value = '';
+			}
+        }
+    }
+    q++;
+    }				
+    dispMandatoryImage()
+	dispMandatoryImageForOthNames()
+	if(document.PatRegForm){
+		gotoNext(document.PatRegForm.date_of_birth)
+	} 
+	
+	//Below line added for this CRF ML-MMOH-SCF-0719
+	if((document.forms[0].func_act && document.forms[0].func_act.value!="Visitreg") && (document.forms[0].func_act && document.forms[0].func_act.value!="")){	
+	
+	validateNationality(document.getElementById('national_id_no'),document.getElementById('Site').value,document.getElementById('nat_id_pat_ser_grp').value,document.getElementById('invoke_routine').value,document.getElementById('nat_data_source_id').value, document.getElementById("nat_id_check_digit_id").value,document.getElementById('nat_id_chk_len').value,'Y');
+	
+	} //End this CRF ML-MMOH-SCF-0719
+
+	var isNatIdOrAltIdMandVisaType	= document.getElementById('isNatIdOrAltIdMandVisaType').value;
+	var isNatIdOrAltId1MandRes	= document.getElementById('isNatIdOrAltId1MandRes').value;
+	var isNatIdAltIdMandVisaType	= document.getElementById('isNatIdAltIdMandVisaType').value;//Maheshwaran added for AAKH-CRF-0145 as on 22-04-2022
+
+	if(isNatIdOrAltIdMandVisaType=="true" || isNatIdAltIdMandVisaType=="true"  || isNatIdOrAltId1MandRes=="true"){
+		getVisibleMandNatAltIds();
+	}
+
+}
+
+// ***********************************************************************
+
+function checkPatSex()  {
+    var arLength = f_query_add_mod.patient_sub.NamePrefixArray.length;
+    var q = 0;
+    var res = new Boolean(false);
+        while ( q <= arLength  )
+        {
+			if ( (f_query_add_mod.patient_sub.document.getElementById('name_prefix').value!='')  && ( unescape(f_query_add_mod.patient_sub.NamePrefixArray[q]) == f_query_add_mod.patient_sub.document.getElementById('name_prefix').value ) )
+            {
+				if(f_query_add_mod.patient_sub.PrefixSexArray[q] != f_query_add_mod.patient_sub.document.getElementById('sex').value && f_query_add_mod.patient_sub.PrefixSexArray[q] != 'B')
+                {
+					var msg = f_query_add_mod.patient_sub.getMessage("PATIENT_SEX_MISMATCH",'MP');
+					if(localeName=='en')
+					{
+					msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_prefix_prompt.value);
+					}else
+					{
+					msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_prefix_oth_prompt.value);
+					}
+					LocalErrors = LocalErrors +msg	+ " <br>";
+                res = false;
+                }
+                else
+                    res = true;
+            }
+            q++;
+        }
+    return res;
+}
+
+function checkPatOthSex()  
+{
+    var arLength = f_query_add_mod.patient_sub.NamePrefixArray.length;
+    var q = 0;
+    var res = new Boolean(false);
+	while ( q <= arLength  )
+	{
+		if( (f_query_add_mod.patient_sub.document.getElementById('name_prefix_oth_lang').value!='') && (unescape(f_query_add_mod.patient_sub.NamePrefixLocArray[q]) == f_query_add_mod.patient_sub.document.getElementById('name_prefix_oth_lang').value) )
+		{
+			if(f_query_add_mod.patient_sub.PrefixSexArray[q] != f_query_add_mod.patient_sub.document.getElementById('sex').value && f_query_add_mod.patient_sub.PrefixSexArray[q] != 'B')
+			{
+				var msg = f_query_add_mod.patient_sub.getMessage("PATIENT_SEX_MISMATCH",'MP');
+				msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_prefix_oth_prompt.value);
+				LocalErrors = LocalErrors +msg	+ " <br>";
+				res = false;
+			}
+			else
+				res = true;
+		}
+            q++;
+    }
+    return res;
+}
+function checkPatSuffixSex()  {
+    var arLength = f_query_add_mod.patient_sub.NameSuffixArray.length;
+    var q = 0;
+    var res = new Boolean(false);
+        while ( q <= arLength  )
+        {
+			if ( (f_query_add_mod.patient_sub.document.getElementById('name_suffix').value!='')  && ( unescape(f_query_add_mod.patient_sub.NameSuffixArray[q]) == f_query_add_mod.patient_sub.document.getElementById('name_suffix').value ) )
+            {
+				if(f_query_add_mod.patient_sub.SuffixSexArray[q] != f_query_add_mod.patient_sub.document.getElementById('sex').value && f_query_add_mod.patient_sub.SuffixSexArray[q] != 'B')
+                {
+					var msg = f_query_add_mod.patient_sub.getMessage("PATIENT_SEX_MISMATCH",'MP');
+					if(localeName=='en')
+					{
+					msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_suffix_prompt.value);
+					}else
+					{
+					msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_suffix_oth_prompt.value);
+					}
+					LocalErrors = LocalErrors +msg	+ " <br>";
+                res = false;
+                }
+                else
+                    res = true;
+            }
+            q++;
+        }
+    return res;
+}
+function checkPatOthSuffixSex()  {
+    var arLength = f_query_add_mod.patient_sub.NameSuffixArray.length;
+    var q = 0;
+    var res = new Boolean(false);
+    while ( q <= arLength  )
+    {
+			if( (f_query_add_mod.patient_sub.document.getElementById('name_suffix_oth_lang').value!='') && (unescape(f_query_add_mod.patient_sub.NameSuffixLocArray[q]) == f_query_add_mod.patient_sub.document.getElementById('name_suffix_oth_lang').value) )
+            {
+				if(f_query_add_mod.patient_sub.SuffixSexArray[q] != f_query_add_mod.patient_sub.document.getElementById('sex').value && f_query_add_mod.patient_sub.SuffixSexArray[q] != 'B')
+                {
+					var msg = f_query_add_mod.patient_sub.getMessage("PATIENT_SEX_MISMATCH",'MP');
+					msg = msg.replace('$',f_query_add_mod.patient_sub.document.forms[0].name_suffix_oth_prompt.value);
+					LocalErrors = LocalErrors +msg	+ " <br>";
+					res = false;
+                }
+                else
+                    res = true;
+            }
+            q++;
+        }
+    return res;
+}
+
+async function searchBirthplace(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var tit="";				
+	if(target.name == 'place_of_birth_desc')
+	{
+		tit=getLabel("Common.birthPlace.label","common");
+		sql="Select birth_place_code code,long_desc description from Mp_birth_place_lang_vw where language_id='"+locale+"' and eff_status='E' and  upper(birth_place_code) like upper(?) and upper(long_desc) like upper(?) order by 2";
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'place_of_birth_desc')
+		{
+		document.forms[0].place_of_birth_code.value= arr[0];
+		//Below line commented for this SCF ML-MMOH-SCF-0860
+		/*Added by Sangeetha for ML-MMOH-SCF-0717
+		if(document.forms[0].txtSmart_fn_name.value != '03'){
+			document.forms[0].place_of_birth.disabled=true;
+		}*/
+		
+		//End this SCF ML-MMOH-SCF-0860
+
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].place_of_birth_code.value= '';
+		document.forms[0].place_of_birth.disabled=false;
+	}
+}
+
+			async function searchCountry(obj,target)
+            {
+                var retVal =    new String();
+                var argumentArray  = new Array() ;
+				var dataNameArray  = new Array() ;
+				var dataValueArray = new Array() ;
+				var dataTypeArray  = new Array() ;
+				var locale=document.forms[0].locale.value;
+				var tit="";				
+                
+                if(obj.name=="contry_code" || obj.name=="rel_contry_code" || obj.name=="nk_ma_country_code" || obj.name=="ma_country_code"){ //Modified by Suji keerthi for ML-MMOH-CRF-1527 US007 & US008
+					
+					 
+					if(target.name == 'nationality_desc' || target.name =="rel_nationality_desc"){ //Modified by Suji keerthi for ML-MMOH-CRF-1527 US007
+					tit=getLabel("Common.nationality.label","common");
+                    sql="Select country_code code,long_desc description from Mp_Country_lang_vw where language_id='"+locale+"' and eff_status='E' and  upper(country_code) like upper(?) and upper(long_desc) like upper(?) order by 2";
+					}
+					else{
+						tit=getLabel("Common.country.label","common");
+						sql="Select country_code code,long_name description from Mp_Country_lang_vw where language_id='"+locale+"' and eff_status='E' and upper(country_code) like upper(?) and upper(long_name) like upper(?) order by 2";
+					}
+				}
+				argumentArray[0] =sql;
+				argumentArray[1] = dataNameArray ;
+				argumentArray[2] = dataValueArray ;
+				argumentArray[3] = dataTypeArray ;
+				argumentArray[4] = "1,2";
+				argumentArray[5] = target.value;
+				argumentArray[6] = DESC_LINK  ;
+				argumentArray[7] = DESC_CODE ;
+				retVal = await CommonLookup( tit, argumentArray );
+				if(retVal != null && retVal != "" )
+                {
+					var ret1=unescape(retVal);
+					arr=ret1.split(",");
+					target.value=arr[1];
+					if(target.name == 'nationality_desc')
+						document.forms[0].nationality_code.value= arr[0];
+					else if(target.name == 'r_country_desc')
+						document.forms[0].r_country_code.value= arr[0];
+					else if(target.name == 'm_country_desc')
+						document.forms[0].m_country_code.value= arr[0];
+					else if(target.name == 'first_country_desc')
+						document.forms[0].first_country_code.value= arr[0];
+					else if(target.name == 'next_country_desc')
+						document.forms[0].next_country_code.value= arr[0];
+					else if(target.name == 'empyr_country_desc')
+						document.forms[0].empyr_country_code.value= arr[0];
+					else if(target.name == 'a_country_desc')
+						document.forms[0].a_country_code.value= arr[0];						
+					//Below added by Suji Keerthi for ML-MMOH-CRF-1527 US007 & US008
+					else if(target.name == 'rel_nationality_desc')
+						document.forms[0].rel_nationality_code.value= arr[0];
+					else if(target.name == 'nk_ma_country_desc')
+						document.forms[0].nkin_mail_country_code.value= arr[0];
+					else if(target.name == 'first_mail_country_desc')
+						document.forms[0].first_mail_country_code.value= arr[0];
+					//Ended by Suji Keerthi for ML-MMOH-CRF-1527 US007 & US008
+					/*Above line added for this CRF ML-MMOH-CRF-0860.2*/	
+				}
+				else{
+					target.value='';
+				}
+			}
+          
+			async function searchCode(obj,target)
+            {  
+                var retVal =    new String();
+                var tit="";				
+				var argumentArray  = new Array() ;
+				var dataNameArray  = new Array() ;
+				var dataValueArray = new Array() ;
+				var dataTypeArray  = new Array() ;
+				var locale=document.forms[0].locale.value;
+                if(obj.name=="postal_code")
+                {
+                    tit=getLabel("eMP.postalcode.label","MP");
+                    sql="select postal_code code, short_desc description from mp_postal_code_lang_vw where language_id='"+locale+"' and upper(postal_code) like upper(?) and upper(short_desc) like upper(?) and eff_status = 'E'";
+                }
+				if(obj.name=="town_code")
+                {
+                    tit=getLabel("Common.Town.label","common");
+                    sql="Select res_town_code code,long_Desc description from Mp_res_town_lang_vw where language_id='"+locale+"' and eff_status='E' and upper(res_town_code) like upper(?) and upper(long_Desc) like upper(?)";
+                }
+				if(obj.name=="region_code")
+                {
+                    tit=getLabel("eMP.region.label","MP");
+                    sql="Select region_code code,long_Desc description from Mp_region_lang_vw where language_id='"+locale+"' and eff_status='E' and upper(region_code) like upper(?) and upper(long_Desc) like upper(?)";
+                    
+                }
+				if(obj.name=="area_code")
+                {
+                    tit=getLabel("Common.area.label","common");
+                    sql="Select res_area_code code ,long_Desc description from Mp_res_area_lang_vw where language_id='"+locale+"' and eff_status='E' and upper(res_area_code) like upper(?) and upper(long_Desc) like upper(?)";
+                    
+                }
+				argumentArray[0] =sql;
+				argumentArray[1] = dataNameArray ;
+				argumentArray[2] = dataValueArray ;
+				argumentArray[3] = dataTypeArray ;
+				argumentArray[4] = "2,1";
+				argumentArray[5] = target.value;
+				argumentArray[6] = DESC_LINK  ;
+				argumentArray[7] = DESC_CODE ;
+                retVal = await CommonLookup( tit, argumentArray );
+				var arr=new Array();
+                if(retVal != null && retVal != "" )
+                {
+				
+                    var ret1=unescape(retVal);
+					arr=ret1.split(",");
+					target.value=arr[1];
+				
+					if (target.name=='r_postal_code'){
+						sendToServer(7, document.forms[0].r_postal_code);
+					}
+					else if(target.name=='m_postal_code'){
+						sendToServer(7, document.forms[0].m_postal_code);
+					}
+					else if(target.name=='next_postal_code'){
+						sendToServer(7, document.forms[0].next_postal_code);
+					}
+					else if(target.name=='first_postal_code'){
+						sendToServer(7, document.forms[0].first_postal_code);
+					}
+					else if(target.name=='employ_postal_code'){
+						sendToServer(7, document.forms[0].employ_postal_code);
+					}
+					else if(target.name=='r_area_code'){
+						document.forms[0].r_area.value= arr[0];
+						sendToServer(7, document.forms[0].r_area_code);
+					}
+					else if(target.name=='m_area_code'){
+						document.forms[0].m_area.value= arr[0];
+						sendToServer(7, document.forms[0].m_area_code);
+					}
+					else if(target.name=='contact1_res_area_code'){
+						document.forms[0].n_area.value= arr[0];
+						sendToServer(7, document.forms[0].contact1_res_area_code);
+					}
+					else if(target.name=='contact2_res_area_code'){
+						document.forms[0].f_area.value= arr[0];
+						sendToServer(7, document.forms[0].contact2_res_area_code);
+					}
+					else if(target.name=='contact3_res_area_code'){
+						document.forms[0].e_area.value= arr[0];
+						sendToServer(7, document.forms[0].contact3_res_area_code);
+					}
+					else if(target.name=='r_region_code'){
+						document.forms[0].r_region.value= arr[0];
+						sendToServer(7, document.forms[0].r_region_code);
+					}
+					else if(target.name=='m_region_code'){
+						document.forms[0].m_region.value= arr[0];
+						sendToServer(7, document.forms[0].m_region_code);
+					}
+					else if(target.name=='contact1_region_code'){
+						document.forms[0].n_region.value= arr[0];
+						sendToServer(7, document.forms[0].contact1_region_code);
+					}
+					else if(target.name=='contact2_region_code'){
+						document.forms[0].f_region.value= arr[0];
+						sendToServer(7, document.forms[0].contact2_region_code);
+					}
+					else if(target.name=='contact3_region_code'){
+						document.forms[0].e_region.value= arr[0];
+						sendToServer(7, document.forms[0].contact3_region_code);
+					}
+					else if(target.name=='r_town_code'){
+						document.forms[0].r_town.value= arr[0];
+						sendToServer(7, document.forms[0].r_town_code);
+					}
+					else if(target.name=='m_town_code'){
+						document.forms[0].m_town.value= arr[0];
+						sendToServer(7, document.forms[0].m_town_code);
+					}
+					else if(target.name=='contact1_res_town_code'){
+						document.forms[0].n_town.value= arr[0];
+						sendToServer(7, document.forms[0].contact1_res_town_code);
+					}
+					else if(target.name=='contact2_res_town_code'){
+						document.forms[0].f_town.value= arr[0];
+						sendToServer(7, document.forms[0].contact2_res_town_code);
+					}
+					else if(target.name=='contact3_res_town_code'){
+						document.forms[0].e_town.value= arr[0];
+						sendToServer(7, document.forms[0].contact3_res_town_code);
+					}
+		       }
+                else
+				{
+					if(obj.name=='postal_code'){
+                    target.value='';
+				}
+					else
+					{
+				 if(target.name=='r_area_code'){
+						document.forms[0].r_area.value= '';
+					 }
+					 else if(target.name=='m_area_code'){
+						document.forms[0].m_area.value= '';
+					 }
+					 else if(target.name=='contact1_res_area_code'){
+						document.forms[0].n_area.value= '';
+					 }
+  					 else if(target.name=='contact2_res_area_code'){
+						document.forms[0].f_area.value= '';
+					 }
+					 else if(target.name=='contact3_res_area_code'){
+						document.forms[0].e_area.value= '';
+					 }
+					 else if(target.name=='r_region_code'){
+					 document.forms[0].r_region.value='';
+					 }
+					 else if(target.name=='m_region_code'){
+						document.forms[0].m_region.value= '';
+					 }
+					 else if(target.name=='contact1_region_code'){
+						document.forms[0].n_region.value= '';
+					 }
+					 else if(target.name=='contact2_region_code'){
+						document.forms[0].f_region.value= '';
+					 }
+					 else if(target.name=='contact3_region_code'){
+						document.forms[0].e_region.value= '';
+					 }
+					 else if(target.name=='r_town_code'){
+						document.forms[0].r_town.value= '';
+					 }
+					 else if(target.name=='m_town_code'){
+						document.forms[0].m_town.value= '';
+					 }
+					 else if(target.name=='contact1_res_town_code'){
+						document.forms[0].n_town.value= '';
+					 }
+					 else if(target.name=='contact2_res_town_code'){
+						document.forms[0].f_town.value= '';
+					 }
+					 else if(target.name=='contact3_res_town_code'){
+						document.forms[0].e_town.value= '';
+					 }
+					}
+					target.value='';
+				}
+            }
+			function CheckBirthPlace()
+		    {
+			//Added by Sangeetha for ML-MMOH-SCF-0717
+			if(document.forms[0].txtSmart_fn_name.value != '03'){
+			if(document.forms[0].place_of_birth_desc.value!="")			
+			{			
+			document.forms[0].place_of_birth.disabled=true;
+			}
+			else
+			{
+			document.forms[0].place_of_birth.disabled=false;
+			}
+			}
+		}
+		function CheckBirthCode()
+		{
+			//Added by Sangeetha for ML-MMOH-SCF-0717
+			if(document.forms[0].txtSmart_fn_name.value != '03'){
+			if(document.forms[0].place_of_birth.value=="")
+			{
+			   document.forms[0].place_of_birth_desc.disabled=false;
+			    document.forms[0].birth_place.disabled=false;
+			}
+			else
+			{
+			document.forms[0].place_of_birth_desc.disabled=true;
+			   document.forms[0].birth_place.disabled=true;
+			}
+			}
+				
+		}
+		function focusBack(){
+			document.forms[0].pat_ser_grp_code.focus();
+		}
+  		function checkNRIC()
+		{
+		if(!(document.forms[0].national_id_no.value==""))
+				document.forms[0].image1.style.visibility='visible';
+ 
+		}
+		//The following function will be called on change of Occupation Class
+			function enableocpn_class(){
+				if(document.forms[0].occ_class.value!='')
+				{
+				document.forms[0].occu_of_per_desc.value = '';
+				document.forms[0].occu_of_per_desc.disabled = false;						
+				}
+				enableocpn();					
+			} 
+		//The following function will be called on change of Occupation 
+			function enableocpn(){
+					if(document.forms[0].occ_of_per.selectedIndex != 0){
+						document.forms[0].occu_of_per_desc.value = '';
+						document.forms[0].occu_of_per_desc.disabled = true;
+					}
+					else if (document.forms[0].occ_of_per.selectedIndex == 0)
+				{
+						document.forms[0].occu_of_per_desc.value = '';
+						document.forms[0].occu_of_per_desc.disabled = false;
+						
+				}
+			} 
+			function enableAltID(){
+			
+				document.forms[0].other_alt_Id_text.value="";
+				if(document.forms[0].other_alt_id.selectedIndex != 0){
+					document.forms[0].other_alt_Id_text.disabled = false;
+				}
+				else 
+					document.forms[0].other_alt_Id_text.disabled = true;
+			
+			}
+			function enableOtherAltIdText(val)
+			{
+			if(val != "")
+			{
+				
+				document.forms[0].contact1_oth_alt_id_no.disabled= false;
+				document.forms[0].contact1_oth_alt_id_no.value="";
+			}
+			else
+			{
+				document.forms[0].contact1_oth_alt_id_no.value="";
+				document.forms[0].contact1_oth_alt_id_no.disabled= true;
+			}
+			}
+			function enableFirstOtherAltIdText(val)
+			{
+			if(val != "")
+			{
+				
+				document.forms[0].notify_oth_alt_id_text.disabled= false;
+				document.forms[0].notify_oth_alt_id_text.value="";
+			}
+			else
+			{
+				document.forms[0].notify_oth_alt_id_text.value="";
+				document.forms[0].notify_oth_alt_id_text.disabled= true;
+			}
+		}
+
+function CheckForSpeclChars(event,alt_id){
+	 
+	
+	var alt_id1_accept_alphanumeric_yn = document.forms[0].alt_id1_accept_alphanumeric.value;
+    var strCheck = '';
+	if (alt_id1_accept_alphanumeric_yn=='Y')
+	{ 
+		        strCheck = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/';
+	}
+	else
+	{   
+	     /*below condition added by VenkateshS on 04-Aug-2013 against 43291*/
+	    if(alt_id=="Alt_Id1")	
+	    		strCheck = '0123456789';
+			else	 
+				strCheck='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/';
+	
+	}   
+	var whichCode = (window.Event) ? event.which : event.keyCode;
+    key = String.fromCharCode(whichCode);  // Get key value from key code
+    if (strCheck.indexOf(key) == -1) return false;  // Not a valid key
+	if( (event.keyCode >= 97) && (event.keyCode <= 122) )
+		return (event.keyCode -= 32);
+	return true ;
+}
+
+function ChangeToUpperCase(Object) {
+
+    var objectfield = Object ;
+	var fieldVal = 	objectfield.value;
+	var alt_id1_accept_alphanumeric_yn = document.forms[0].alt_id1_accept_alphanumeric.value;
+	// added by dharmaraj for GHL-CRF-0524.1
+	var alt_id1_alphanum_validate_yn = document.forms[0].alt_id1_alphanum_validate_yn.value;
+	var alt_id1_alphanum_validate_yn = document.forms[0].alt_id1_alphanum_validate_yn.value;
+	if(alt_id1_alphanum_validate_yn=='Y' && fieldVal!=""){
+		if(!isAlphaNumeric(fieldVal)){
+			var errMSg	= getMessage("ALPHA_NUMERIC_COMBINATION",'MP');
+			errMSg		= errMSg.replace("$",document.getElementById('alt_id1_prompt').innerText)
+			alert(errMSg);
+			objectfield.value = "";
+      nuhdeekField();
+			objectfield.focus();
+			return false;
+		}
+	}else{
+    var strCheck = '';
+	var msg = getMessage("NAT_ID_SPL_NOT_ALLOWED",'MP');
+	if (alt_id1_accept_alphanumeric_yn=='Y')
+	{
+		strCheck = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-';
+		/* There is no generic message. So using the existing one and replacing with reqrd text*/
+		msg = msg.replace("in National ID"," ");
+	}
+	else
+	{
+		strCheck = '0123456789';
+		/* There is no generic message. So using the existing one and replacing with reqrd text*/
+		msg = msg.replace("in National ID"," ");
+		msg = msg.replace("Special Characters"," Alphabets and Special Characters");
+	}
+	var n = fieldVal.length;
+	for (var i=0;i<n ;++i )
+	{
+		if (strCheck.indexOf(fieldVal.charAt(i)) == -1)
+		{
+			objectfield.value = "";
+			alert(msg);
+		
+			objectfield.focus();
+			return false;  
+			}
+		}
+	}
+	objectfield.value = objectfield.value.toUpperCase();
+}
+
+
+
+/*Added by Dharma on Apr 6th 2015 against HSA-CRF-0191 [IN:049772] Start*/
+function fnChkAlphaNumericForAltIds(Object,altIdNo,accept_alphanumeric,alphanum_validate_yn) {
+    var objectfield = Object ;
+	var fieldVal = 	objectfield.value;
+	var isAcceeptAlphaNumeric	= accept_alphanumeric;
+	var alt_id_no_label = "alt_id"+altIdNo+"_prompt";
+
+    var strCheck = '';
+	var msg = getMessage("NAT_ID_SPL_NOT_ALLOWED",'MP');
+	if(alphanum_validate_yn=='Y' && fieldVal!=""){ // added by dharma for GHL-CRF-0524.1
+		if(!isAlphaNumeric(fieldVal)){
+			var errMSg	= getMessage("ALPHA_NUMERIC_COMBINATION",'MP');
+			errMSg		= errMSg.replace("$",eval(document.getElementById("alt_id"+altIdNo+"_prompt").innerText))
+			alert(errMSg);
+			objectfield.value = "";
+      nuhdeekField();
+			objectfield.focus();
+			return false;
+		}
+	}else{
+		if (isAcceeptAlphaNumeric=='Y') {
+		strCheck = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-';
+		/* There is no generic message. So using the existing one and replacing with reqrd text*/
+		msg = msg.replace("in National ID"," ");
+		} else {
+		strCheck = '0123456789';
+		/* There is no generic message. So using the existing one and replacing with reqrd text*/
+		msg = msg.replace("in National ID"," ");
+		msg = msg.replace("Special Characters"," Alphabets and Special Characters");
+	}
+	var n = fieldVal.length;
+		for (var i=0;i<n ;++i )	{
+			if (strCheck.indexOf(fieldVal.charAt(i)) == -1) {
+			objectfield.value = "";
+			alert(msg);
+			objectfield.focus();
+			return false;  
+			}
+		}
+	}
+	objectfield.value = objectfield.value.toUpperCase();
+}
+/*Added by Dharma on Apr 6th 2015 against HSA-CRF-0191 [IN:049772] End*/
+
+
+
+function CheckSplCharsNatID(Obj){
+		var nat_id_accept_alphanumeric_yn = document.forms[0].nat_id_accept_alphanumeric_yn.value;
+        var str = Obj.value;
+        var specCharsExist = true;
+
+		if(nat_id_accept_alphanumeric_yn=="Y")
+			strCheck = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-';
+		else
+			strCheck = '0123456789X';
+		
+        for (i=0;i<str.length;i++){
+            if (strCheck.indexOf(str.charAt(i)) == -1) 
+			{
+				alert(getMessage("NAT_ID_SPL_NOT_ALLOWED",'MP')); 
+				nuhdeekField();
+				Obj.value = '';
+				Obj.focus();
+				return false;  
+			}
+        }
+        return specCharsExist;
+    }
+
+
+
+/*** Added for Language Lookup ***/
+
+
+async function searchLanguage(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var tit="";				
+	if(target.name == 'language_desc')
+	{
+		tit=getLabel("Common.Language.label","Common");
+		sql="Select MP_LANGUAGE_ID code,LONG_DESC description from MP_LANGUAGE_lang_vw where  LANGUAGE_ID='"+locale+"' and eff_status='E' and  upper(MP_LANGUAGE_ID) like upper(?) and upper(LONG_DESC) like upper(?) order by 2";
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'language_desc')
+		{
+			document.forms[0].language_code.value= arr[0];		
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].language_code.value='';
+	}
+}
+
+
+/** end language Lookup**/
+
+
+
+/*** Added for Facility Lookup ***/
+
+
+async function searchFacility(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var tit="";	
+	//var sql="";
+
+	if(target.name == 'pref_facility_desc')
+	{
+		tit=getLabel("Common.facility.label","common");
+		sql="SELECT facility_id code, facility_name description FROM sm_facility_param_lang_vw WHERE language_id = '"+locale+"' and Facility_Type = 'F' and  upper(facility_id) like upper(?) and upper(facility_name) like upper(?) order by 2";
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'pref_facility_desc')
+		{
+			document.forms[0].pref_facility_id.value= arr[0]; 		
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].pref_facility_id.value='';
+	}
+}
+
+
+/** end Facility Lookup**/
+
+
+/*** Added for MaritalStatus Lookup ***/
+
+
+async function searchMaritalStatus(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var tit="";	
+
+	if(target.name == 'mar_status_desc')
+	{
+		tit=getLabel("eMP.maritalstatus.label","mp");
+		sql="SELECT mar_status_code code, short_desc description FROM mp_marital_status_lang_vw WHERE language_id = '"+locale+"' and eff_status = 'E' and  upper(mar_status_code) like upper(?) and upper(short_desc) like upper(?) ORDER BY 2";
+
+		
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'mar_status_desc')
+		{
+		document.forms[0].mar_status_code.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].mar_status_code.value='';
+	}
+}
+
+
+/** end MaritalStatus Lookup**/
+
+
+
+/*** Added for Race Lookup ***/
+
+
+async function searchRace(obj,target,localName)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;		
+	var tit="";	
+	var locale = "";
+	if(localName == undefined || localName == "undefined") {
+		locale = document.forms[0].locale.value;
+	} else {
+		locale = localName;				
+	}	 
+	
+	if(target.name == 'race_desc' || target.name == 'rel_race_desc') //Modified by Suji Keerthi for ML-MMOH-CRF-1527 US007
+	{
+		tit=getLabel("Common.race.label","common");
+		//Below modified by Suji Keerthi for ML-MMOH-SCF-1922
+		sql="SELECT race_code code, long_desc description FROM mp_race_lang_vw WHERE language_id = '"+locale+"' and eff_status = 'E' and  upper(race_code) like upper(?) and upper(long_desc) like upper(?) ORDER BY 2"; 
+	}
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'race_desc')
+		{
+			document.forms[0].race_code.value= arr[0];
+			if(document.forms[0].ethnic_group_desc) 
+				document.forms[0].ethnic_group_desc.value='';
+			document.forms[0].ethnic_group.value='';
+		}
+		//Added by Suji Keerthi for ML-MMOH-CRF-1527 US007
+         if(target.name == 'rel_race_desc')
+		{
+        document.forms[0].rel_race_code.value= arr[0];
+		}
+		//Ended by Suji Keerthi for ML-MMOH-CRF-1527 US007
+	}
+	else{
+		target.value='';
+		document.forms[0].race_code.value='';
+		if(document.forms[0].ethnic_group_desc)
+			document.forms[0].ethnic_group_desc.value='';
+		document.forms[0].ethnic_group.value='';
+	}	
+}
+
+
+/** end Race Lookup**/
+
+
+
+
+/*** Added for Ethnic Lookup ***/
+
+
+async function searchEthnic(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var race_code=document.forms[0].race_code.value;
+	
+	var tit="";	
+
+	if(target.name == 'ethnic_group_desc')
+	{
+		tit=getLabel("eMP.ethnicity.label","mp");
+		sql="Select ethnic_group_code code,short_desc  description from mp_ethnic_group_lang_vw where language_id='"+locale+"' and race_code='"+race_code+"' and eff_status='E' and trunc(sysdate) between  nvl(trunc(eff_date_from),to_date('01/01/1472','dd/mm/rrrr')) and nvl(trunc(eff_date_to),to_date('31/12/5000','dd/mm/rrrr')) and  upper(race_code) like upper(?) and upper(long_desc) like upper(?) order by 2";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'ethnic_group_desc')
+		{
+		document.forms[0].ethnic_group.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].ethnic_group.value='';
+	}
+}
+
+
+/** end Ethinic Lookup**/
+
+
+/*** Added for Religion Lookup ***/
+
+
+async function searchReligion(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var locale=document.forms[0].locale.value;
+	var tit="";	
+
+	if(target.name == 'relgn_desc')
+	{
+		tit=getLabel("Common.religion.label","common");
+		sql="SELECT relgn_code code, short_desc  description FROM mp_religion_lang_vw WHERE language_id = '"+locale+"' and eff_status = 'E' and  upper(relgn_code) like upper(?) and upper(short_desc) like upper(?) ORDER BY 2";
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'relgn_desc')
+		{
+		document.forms[0].relgn_code.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].relgn_code.value='';
+	}
+}
+
+
+/** end Religion Lookup**/
+
+
+/*** Added for Relationship Lookup ***/
+
+
+async function searchRelationship(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	
+	var tit="";	
+
+	
+	{
+		tit=getLabel("Common.relationship.label","common");
+		sql="select relationship_code code,short_desc description from mp_relationship_lang_vw where language_id='"+localeName+"' and  upper(relationship_code) like upper(?) and upper(short_desc) like upper(?) and eff_status='E' order by 2";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'next_contact_relation_desc')
+		{
+		document.forms[0].next_contact_relation.value= arr[0];
+		}
+		else if(target.name == 'first_contact_relation_desc')
+		{
+		document.forms[0].first_contact_relation.value= arr[0];
+		}
+	}
+	else{
+		if(target.name == 'next_contact_relation_desc')
+		{
+		target.value='';
+		document.forms[0].next_contact_relation.value='';
+		}
+		else if(target.name == 'first_contact_relation_desc')
+		{
+		target.value='';
+		document.forms[0].first_contact_relation.value='';
+		}
+	}
+}
+
+
+/** end Relationship Lookup**/
+
+
+/*** Added for Relationship Lookup ***/
+
+
+async function searchRelationship1(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	
+	var tit="";	
+
+	if(target.name == 'relationship_to_head_desc')
+	{
+		tit=getLabel("Common.relationship.label","common");
+		sql="select relationship_code code,short_desc description from mp_relationship_lang_vw where language_id='"+localeName+"' and  upper(relationship_code) like upper(?) and upper(short_desc) like upper(?) and eff_status='E' order by 2";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'relationship_to_head_desc')
+		{
+		document.forms[0].relationship_to_head.value= arr[0];
+		getLevel();
+		getPatCategory();
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].relationship_to_head.value='';
+	}
+}
+
+
+/** end Relationship Lookup**/
+
+
+/*** Added for Education Lookup ***/
+
+
+async function searchEducation(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	
+	var tit="";	
+
+	if(target.name == 'education_level_desc')
+	{
+		tit=getLabel("eMP.EducationLevel.label","mp");
+		sql="Select educ_level_code code,short_desc  description from  mp_education_level_lang_vw where language_id='"+localeName+"' and eff_status = 'E' and  upper(educ_level_code) like upper(?) and upper(short_desc) like upper(?) order by short_desc";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'education_level_desc')
+		{
+		document.forms[0].education_level.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].education_level.value='';
+	}
+}
+
+
+/** end Education Lookup**/
+
+
+
+async function searchOccupationClass(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var tit="";	
+
+	if(document.forms[0].occ_of_per)
+		document.forms[0].occ_of_per.value='';
+
+	if(target.name == 'occ_class_desc')
+	{
+		tit=getLabel("eMP.OccupationClass.label","mp");
+		sql="select OCPN_CLASS_CODE code,long_desc description from mp_occupation_class_lang_vw where language_id='"+localeName+"' and EFF_STATUS='E' and  upper(OCPN_CLASS_CODE) like upper(?) and upper(long_desc) like upper(?) order by 2";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];		
+		if(target.name == 'occ_class_desc')
+		{
+			document.forms[0].occ_class.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].occ_class.value='';		
+	}
+}
+
+
+/** end Occupation Lookup**/
+
+function clearOccPer(object)
+{ 	
+	var select = object;
+	var length = select.length;
+	for(i=0;i<length;i++)
+		select.remove(0);
+	var option		=  document.forms[0].document.createElement('OPTION');
+	option.text		=  '---' +getLabel("Common.defaultSelect.label","Common")+ '---';
+	option.value	=  ""	;
+	option.selected	=  true;
+	select.add(option);
+		
+}
+
+async function searchCategory(obj,target)
+{  
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var tit="";	  	
+
+	if(document.forms[0].entitlement_by_pat_cat_yn != null && document.forms[0].entitlement_by_pat_cat_yn.value=='N' )
+	{
+		sql = "SELECT pat_cat_code code, short_desc description FROM mp_pat_category_lang_vw WHERE language_id = '"+localeName+"' and eff_status = 'E' and upper(pat_cat_code) like upper(?) and upper(short_desc) like upper(?)";
+	} else {
+		getPatCategory(document.forms[0].pat_cat_code.value);
+		if(document.forms[0].pat_cat_sql)
+			sql = document.forms[0].pat_cat_sql.value;
+		if(sql=="") {
+			alert(getMessage("NO_RECORD_FOUND_FOR_CRITERIA","Common"));
+			return;
+		} 
+	}
+	
+
+	if(target.name == 'pat_cat_desc')
+	{
+		tit=getLabel("Common.category.label","common");
+		//sql="SELECT pat_cat_code code, short_desc description FROM mp_pat_category_lang_vw WHERE language_id = '"+localeName+"' and eff_status = 'E' and upper(pat_cat_code) like upper(?) and upper(short_desc) like upper(?) ORDER BY 2";
+
+	}
+
+	argumentArray[0] = encodeURIComponent(sql);
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'pat_cat_desc')
+		{
+		document.forms[0].pat_cat_code.value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.forms[0].pat_cat_code.value='';
+	}
+	
+}
+
+
+/** end category Lookup**/
+
+async function searchDocumentType(obj,target)
+{
+		if(target.name == 'doc_id1_desc')
+		{
+			field_old_val = document.forms[0].doc_id1.value;
+		}
+		else if(target.name == 'doc_id2_desc')
+		{
+			field_old_val = document.forms[0].doc_id2.value;
+		}
+		else if(target.name == 'doc_id3_desc')
+		{
+			field_old_val = document.forms[0].doc_id3.value;
+		}
+		else if(target.name == 'doc_id4_desc')
+		{
+			field_old_val = document.forms[0].doc_id4.value;
+		}
+	
+
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	//var locale=document.forms[0].locale.value;
+	var tit="";	
+
+	
+	{
+		tit=getLabel("Common.documenttype.label","common");
+		/*Modified By Dharma on Feb 11th 2015 against ML-HSA-SCF-0192 [IN:053070] Start*/
+		//sql="Select doc_type code,initcap(short_desc) description from mp_document_type_lang_vw where language_id='"+localeName+"' and  EFF_STATUS='E' and  upper(doc_type) like upper(?) and upper(short_desc) like upper(?) order by 2";
+		sql="Select doc_type code,short_desc description from mp_document_type_lang_vw where language_id='"+localeName+"' and  EFF_STATUS='E' and  upper(doc_type) like upper(?) and upper(short_desc) like upper(?) order by 2";
+		/*Modified By Dharma on Feb 11th 2015 against ML-HSA-SCF-0192 [IN:053070] End*/
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'doc_id1_desc')
+		{
+		document.forms[0].doc_id1.value= arr[0];
+		}
+		else if(target.name == 'doc_id2_desc')
+		{
+		document.forms[0].doc_id2.value= arr[0];
+		}
+		else if(target.name == 'doc_id3_desc')
+		{
+		document.forms[0].doc_id3.value= arr[0];
+		}
+		else if(target.name == 'doc_id4_desc')
+		{
+		document.forms[0].doc_id4.value= arr[0];
+		}
+
+		if(field_old_val != arr[0])
+		{
+			if(target.name == 'doc_id1_desc')
+			{
+				document.getElementById('doc_exp_dt1').value="";
+				document.getElementById('place_of_issue1').value="";
+				document.getElementById('doc_num1').value = "";
+				document.getElementById('docexpdate1').value ="";
+				document.getElementById('issue_date1').value = "";
+			}
+			else if(target.name == 'doc_id2_desc')
+			{
+				document.getElementById('doc_exp_dt2').value="";
+				document.getElementById('place_of_issue2').value="";
+				document.getElementById('doc_num2').value = "";
+				document.getElementById('docexpdate2').value ="";
+				document.getElementById('issue_date2').value = "";
+			}
+			else if(target.name == 'doc_id3_desc')
+			{
+				document.getElementById('doc_exp_dt3').value="";
+				document.getElementById('place_of_issue3').value="";
+				document.getElementById('doc_num3').value = "";
+				document.getElementById('docexpdate3').value ="";
+				document.getElementById('issue_date3').value = "";
+			}
+			else if(target.name == 'doc_id4_desc')
+			{
+				document.getElementById('doc_exp_dt4').value="";
+				document.getElementById('place_of_issue4').value="";
+				document.getElementById('doc_num4').value = "";
+				document.getElementById('docexpdate4').value ="";
+				document.getElementById('issue_date4').value = "";			
+			}
+		}
+		enbl_disble(target);
+	}
+	else{
+		if(target.name == 'doc_id1_desc')
+		{
+		target.value='';
+		document.forms[0].doc_id1.value='';
+		}
+		else if(target.name == 'doc_id2_desc')
+		{
+		target.value='';
+		document.forms[0].doc_id2.value='';
+		}
+		else if(target.name == 'doc_id3_desc')
+		{
+		target.value='';
+		document.forms[0].doc_id3.value='';
+		}
+		else if(target.name == 'doc_id4_desc')
+		{
+		target.value='';
+		document.forms[0].doc_id4.value='';
+		}
+		enbl_disble(target);
+	}
+}
+
+
+/** end Education Lookup**/
+
+
+async function searchRelationshiplevel1(obj,target)
+{
+	var retVal =    new String();
+	var argumentArray  = new Array() ;
+	var dataNameArray  = new Array() ;
+	var dataValueArray = new Array() ;
+	var dataTypeArray  = new Array() ;
+	var relationship_to_head=document.forms[0].relationship_to_head.value;
+	var tit="";	
+
+	if(target.name == 'relationship_level1_desc')
+	{
+		tit=getLabel("Common.relationship.label","common");
+		sql="Select COMBINED_REL_LEVEL_CODE code, RELATIONSHIP_LEVEL_DESC description from MP_RELATIONSHIP_LEVEL_LANG_VW where relationship_code='"+relationship_to_head+"' and language_id='"+localeName+"' and  upper(COMBINED_REL_LEVEL_CODE) like upper(?) and upper(RELATIONSHIP_LEVEL_DESC) like upper(?)  order by 2";
+
+	}
+
+	argumentArray[0] =sql;
+	argumentArray[1] = dataNameArray ;
+	argumentArray[2] = dataValueArray ;
+	argumentArray[3] = dataTypeArray ;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = target.value;
+	argumentArray[6] = DESC_LINK  ;
+	argumentArray[7] = DESC_CODE ;
+
+	retVal = await CommonLookup( tit, argumentArray );
+	if(retVal != null && retVal != "" )
+	{
+		var ret1=unescape(retVal);
+		arr=ret1.split(",");
+		target.value=arr[1];
+		if(target.name == 'relationship_level1_desc')
+		{
+		document.getElementById('relationship_level1_code').value= arr[0];
+		}
+	}
+	else{
+		target.value='';
+		document.getElementById('relationship_level1_code').value='';
+	}
+}
+
+function clearCountryFields(Obj) {
+
+		if(Obj.name == 'first_country_desc') {
+			if(document.forms[0].first_country_desc)
+			{
+			if(document.forms[0].first_country_desc.value=='')
+				{
+				 document.forms[0].first_country_code.value='';
+				}
+		   }
+		}
+      if(Obj.name == 'empyr_country_desc') {
+	  if(document.forms[0].empyr_country_desc)
+	    {
+        if(document.forms[0].empyr_country_desc.value=='')
+			{
+			 document.forms[0].empyr_country_code.value='';
+			}
+		}
+	  }
+	  if(Obj.name == 'r_country_desc') {
+		 if(document.forms[0].r_country_desc)
+	    {
+	     if(document.forms[0].r_country_desc.value=='')
+			{
+			 document.forms[0].r_country_code.value='';
+			}
+		}
+	  }
+
+	  if(Obj.name == 'm_country_desc') {
+		if(document.forms[0].m_country_desc)
+	    {
+        if(document.forms[0].m_country_desc.value=='')
+			{			   
+			 document.forms[0].m_country_code.value='';
+			}
+		}
+	  }
+
+	  if(Obj.name == 'next_country_desc') {
+       if(document.forms[0].next_country_desc)
+	    { 
+        if(document.forms[0].next_country_desc.value=='')
+			{			
+			 document.forms[0].next_country_code.value='';
+			}
+		}
+	  }
+	  
+	  /*Below added by Suji keerthi for ML-MMOH-CRF-1527 US008*/
+      if(Obj.name == 'nk_ma_country_desc') {
+       if(document.forms[0].nk_ma_country_desc)
+	    { 
+        if(document.forms[0].nk_ma_country_desc.value=='')
+			{			
+			 document.forms[0].nkin_mail_country_code.value='';
+			}
+		}
+	  }
+
+	  if(Obj.name == 'first_mail_country_desc') {
+			if(document.forms[0].first_mail_country_desc)
+			{
+			if(document.forms[0].first_mail_country_desc.value=='')
+				{
+				 document.forms[0].first_mail_country_code.value='';
+				}
+		   }
+		}
+	  
+	  /*Ended by Suji keerthi for ML-MMOH-CRF-1527 US008
+	  
+	/*Below line added for ML-MMOH-CRF-0601*/
+	if(Obj.name == 'a_country_desc') {
+		if(document.forms[0].a_country_desc){ 
+			if(document.forms[0].a_country_desc.value==''){			
+				document.forms[0].a_country_code.value='';
+			}
+		}
+	}
+	//End ML-MMOH-CRF-0601
+}
+
+function clearRelation() {
+
+	if(document.forms[0].relationship_to_head_desc) {
+		if(document.forms[0].relationship_to_head_desc.value=='') {
+			document.forms[0].relationship_to_head_desc.value='';				
+			document.forms[0].relationship_to_head.value=''; 
+			document.getElementById('relnlabel').innerHTML="&nbsp";
+			document.getElementById('relntext').innerHTML="&nbsp";
+		}
+	} 	
+}
+
+function clearfields()
+{
+		if(document.forms[0].pref_facility_desc)
+		{
+		if(document.forms[0].pref_facility_desc.value=='')
+		{
+		document.forms[0].pref_facility_desc.value='';
+		document.forms[0].pref_facility_id.value='';
+		}
+		}
+
+		if(document.forms[0].mar_status_desc)
+		{
+		if(document.forms[0].mar_status_desc.value=='')
+		{
+		document.forms[0].mar_status_desc.value='';
+		document.forms[0].mar_status_code.value='';
+		}
+		}
+
+
+		if(document.forms[0].pat_cat_desc)
+		{
+		if(document.forms[0].pat_cat_desc.value=='')
+		{
+		document.forms[0].pat_cat_desc.value='';
+		document.forms[0].pat_cat_code.value='';
+		}
+		}
+
+		if(document.forms[0].ethnic_group_desc)
+		{
+		if(document.forms[0].ethnic_group_desc.value=='' || document.forms[0].race_desc.value=='')
+		{
+		document.forms[0].ethnic_group_desc.value='';
+		document.forms[0].ethnic_group.value='';
+		}
+		}
+		/*
+		if(document.forms[0].relationship_to_head_desc) {
+			if(document.forms[0].relationship_to_head_desc.value=='') {
+				document.forms[0].relationship_to_head_desc.value='';
+				if(document.forms[0].relationship_to_head.value=='') {
+					document.forms[0].relationship_to_head.value='';
+				}
+			}
+		}
+		*/
+
+		if(document.forms[0].race_desc){
+		if(document.forms[0].race_desc.value=='')
+		{
+		document.forms[0].race_code.value='';
+		}
+		}
+
+		if(document.forms[0].relgn_desc){
+		if(document.forms[0].relgn_desc.value=='')
+		{
+		document.forms[0].relgn_code.value='';
+		}
+		}
+
+		if(document.forms[0].education_level_desc){
+		if(document.forms[0].education_level_desc.value=='')
+		{
+		document.forms[0].education_level.value='';
+		}
+		}
+
+		if(document.forms[0].doc_id1_desc){
+		if(document.forms[0].doc_id1_desc.value=='')
+		{
+		document.forms[0].doc_id1.value='';
+		}
+		}
+
+		if(document.forms[0].doc_id2_desc){
+		if(document.forms[0].doc_id2_desc.value=='')
+		{
+		document.forms[0].doc_id2.value='';
+		}
+		}
+
+		if(document.forms[0].doc_id3_desc){
+		if(document.forms[0].doc_id3_desc.value=='')
+		{
+		document.forms[0].doc_id3.value='';
+		}
+		}
+
+		if(document.forms[0].doc_id4_desc){
+		if(document.forms[0].doc_id4_desc.value=='')
+		{
+		document.forms[0].doc_id4.value='';
+		}
+		}
+
+		if(document.forms[0].occ_class_desc){
+		if(document.forms[0].occ_class_desc.value=='')
+		{
+		document.forms[0].occ_class.value='';
+		document.forms[0].occ_of_per.value='';
+		
+		}
+		}
+		
+		if(document.forms[0].next_contact_relation_desc){
+		if(document.forms[0].next_contact_relation_desc.value=='')
+		{
+		document.forms[0].next_contact_relation.value='';
+		}
+		}
+
+		if(document.forms[0].first_contact_relation_desc){
+		if(document.forms[0].first_contact_relation_desc.value=='')
+		{
+		document.forms[0].first_contact_relation.value='';
+		}
+		}
+
+		if(document.forms[0].relationship_level1_desc){
+
+		if(document.forms[0].relationship_level1_desc.value=='')
+		{
+		document.forms[0].relationship_level1_code.value='';
+		}
+		}
+		/*
+		if(document.forms[0].relationship_to_head_desc){
+
+		if(document.forms[0].relationship_to_head_desc.value=='')
+		{
+		document.getElementById("relnlabel").innerHTML="&nbsp";
+		document.getElementById("relntext").innerHTML="&nbsp";
+		}
+		}
+		*/
+		
+		if(document.forms[0].language_desc && document.forms[0].language_desc.value==''){
+			if(document.forms[0].language_id){
+				document.forms[0].language_id.value='';		 
+			}else if(document.forms[0].language_code){
+				document.forms[0].language_code.value='';	
+			}
+		}
+		
+		
+}
+
+function getLevel() {
+
+	var xmlDoc="";
+	var xmlHttp = new XMLHttpRequest();
+	var xmlStr ="<root><SEARCH ";
+    
+        if(document.getElementById('relationship_to_head') != null)
+        {
+      
+
+			if(document.getElementById('relationship_to_head').value!="")
+            {
+                xmlStr+=" process_id=\"25\" ";
+				xmlStr+=" relationship_to_head=\""+document.getElementById('relationship_to_head').value+"\"";
+				xmlStr+=" CalledFromFunction=\""+document.getElementById('CalledFromFunction').value+"\"";
+				xmlStr+=" relation_level1_code=\""+document.getElementById('relation_level1_code').value+"\"";
+				xmlStr+=" relationship_level1_description=\""+document.getElementById('relationship_level1_description').value+"\"";
+				xmlStr +=" /></root>";
+				xmlDoc = new DOMParser().parseFromString(xmlStr, "text/xml");
+				
+				var url = "../../eMP/jsp/ServerValidationXML.jsp";
+				xmlHttp.open("POST", url, false);
+				xmlHttp.setRequestHeader("Content-type" ,"application/x-www-form-urlencoded");
+				xmlHttp.send(xmlDoc);
+				eval(xmlHttp.responseText);
+	
+			}
+			else
+			{
+			document.getElementById('relnlabel').innerHTML="&nbsp";
+			document.getElementById('relntext').innerHTML="&nbsp";
+			}
+        }
+    
+} 
+
+

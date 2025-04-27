@@ -1,0 +1,1135 @@
+package jsp_servlet._eam._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import java.util.*;
+import java.net.*;
+import java.text.*;
+import webbeans.eCommon.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __transportmodequeryresult extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eam/jsp/TransportModeQueryResult.jsp", 1720599226567L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n\n<!--\n\t\n\tCreated on \t\t:\t19/02/2005\n\tModule\t\t\t\t:\teAM - Deficiency\n\tFileName\t\t    :\tTransportModeQueryResult.jsp\t\n\tFunction\t\t:\tThis function is used to load query criteria screen for the function\n-->\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n<Script Language=\"JavaScript\" src=\"../../eCommon/js/ValidateControl.js\"></Script>\n<script src=\'../../eCommon/js/common.js\' language=\'javascript\'></script>\n<script language=\"javascript\" src=\"../js/FMFileTransportMode.js\"></script>\n\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n\n\t<P>\n\t<table align=\'right\'>\n\t<tr>\n\t";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\n\t</tr>\n\t</table>\n\t<br><br>\n\t</P>\n\n\t<table border=\"1\" width=\"100%\" cellspacing=\'0\' cellpadding=\'0\'>\n\t<th class=\'columnheader\'>";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="</th>\n\t<th class=\'columnheader\'>";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="</th>\n\t\n\t";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\n\t<th class=\'columnheader\'>";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="</th><!--Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617-->\n\t";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\n\t\n\t<!--Added By Ashwini on 21-Aug-2017 for\tML-MMOH-CRF-0708-->\n\t";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="</th>\n\t";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="\n\n\t<th class=\'columnheader\'>";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="</th>\n\n\t";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="\n\t<script>alert(getMessage(\'NO_RECORD_FOUND_FOR_CRITERIA\',\'Common\'));history.go(-1);</script>\n";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="\n\t<script >\n\tif (document.getElementById(\'next\'))\n\t\tdocument.getElementById(\'next\').style.visibility=\'hidden\';\n\t</script>\n";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="\n\t<script >\n\tif (document.getElementById(\'next\'))\n\t\tdocument.getElementById(\'next\').style.visibility=\'visible\';\n\t</script>\n<Script src=\\\"../../eCommon/js/showModalDialog.js\\\" language=\\\"JavaScript\\\"></Script>\n\n\n\n";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    private final static java.lang.String  _wl_block19 ="\n</td></tr>\n</table>\n<br>\n</BODY>\n</HTML>\n\n";
+    private final static byte[]  _wl_block19Bytes = _getBytes( _wl_block19 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+String sStyle	=
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block5Bytes, _wl_block5);
+
+	out.println("<HTML><head><link rel='stylesheet' type='text/css' href='../../eCommon/html/"+sStyle+"'></link></head><BODY  class='CONTENT' onLoad='' onMouseDown='CodeArrest()' onKeyDown = 'lockKey()'>");
+request.setCharacterEncoding("UTF-8");	
+	String strsql2="";
+	//String sql=" ";
+		StringBuffer sbQuery = new StringBuffer();	
+	//String strsql1=" ";
+
+	String whereClause = request.getParameter("whereclause");
+
+	Connection conn = null;
+	conn = webbeans.eCommon.ConnectionManager.getConnection(request);
+
+	Boolean isCnrmReqPatOutChngAppl	= eCommon.Common.CommonBean.isSiteSpecific(conn,"IP","AUTO_CNRM_TFR_REQ_PAT_OUT_CHNG");//Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617
+
+	Boolean isMedRepModeAppl	= eCommon.Common.CommonBean.isSiteSpecific(conn,"MR","CHCKLST_TRANS_MODE_MED_REPORT");//Added By Ashwini on 21-Aug-2017 for ML-MMOH-CRF-0708
+
+	String from = request.getParameter( "from" ) ;
+	String to = request.getParameter( "to" ) ;
+	int andCheck = 0;
+
+	if ( (whereClause == null || whereClause.equals("")) )
+	{
+	//	sql=" ";
+		String transport_mode		= request.getParameter("transport_mode");
+		String long_desc			= request.getParameter("long_desc");
+		String patient_related_yn   =
+		request.getParameter("patient_related_yn");
+		String file_related_yn   =
+		request.getParameter("file_related_yn");		
+		String specimen_related_yn   =
+		request.getParameter("specimen_related_yn");
+		String by_person_yn			= request.getParameter("by_person_yn");
+		String enabled				= request.getParameter("eff_status");
+		
+		String tfr_pat_out_yn			= request.getParameter("tfr_pat_out_yn");//Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617
+		
+		//Added By Ashwini on 21-Aug-2017 for ML-MMOH-CRF-0708
+		String application_mode			= request.getParameter("application_mode");
+		String collection_mode			= request.getParameter("collection_mode");
+		String notification_mode		= request.getParameter("notification_mode");
+		
+
+		if (!(transport_mode == null || transport_mode.equals("")) )
+		{
+			transport_mode=transport_mode.toUpperCase();
+			sbQuery.append(" where transport_mode like '"+transport_mode+"%'");
+			andCheck = 1;
+		} 
+	
+		if(!(long_desc == null || long_desc.equals("")) )
+		{
+			if ( andCheck == 1 )
+			{	
+				sbQuery.append(" and ");
+				sbQuery.append("upper(long_desc) like  upper('"+long_desc+"%')");
+			}
+			else
+			{
+				sbQuery.setLength(0);
+				sbQuery.append("where upper(long_desc) like  upper('"+long_desc+"%')");
+				andCheck = 1;
+			}
+		}
+		if ( !(patient_related_yn == null || patient_related_yn.equals("")) )
+		{
+			if ( patient_related_yn.equals("Y") )
+		    {
+				if ( andCheck == 0 )
+				{	
+					sbQuery.setLength(0);
+					sbQuery.append("where patient_related_yn='Y'");
+					andCheck = 1;}
+		
+				else
+					sbQuery.append(" and patient_related_yn='Y'  ");
+			}
+			if ( patient_related_yn.equals("N") )
+			{
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(" where  patient_related_yn='N'");
+					andCheck = 1;
+					}
+				else
+					sbQuery.append(" and patient_related_yn='N'");
+			}
+		}
+
+		 if ( !(file_related_yn == null || file_related_yn.equals("")) )
+		{
+			if ( file_related_yn.equals("Y") )
+		    {
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(	"where file_related_yn='Y'");
+					andCheck = 1;}
+		
+				else
+					sbQuery.append(	" and file_related_yn='Y'  ");
+			}
+			if ( file_related_yn.equals("N") )
+			{
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(" where  file_related_yn='N'");
+					andCheck = 1;}
+				else
+					sbQuery.append(" and file_related_yn='N'");
+			}
+		}
+		if ( !(specimen_related_yn == null || specimen_related_yn.equals("")) )
+		{
+			if ( specimen_related_yn.equals("Y") )
+		    {
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(	"where specimen_related_yn='Y'");
+					andCheck = 1;}
+		
+				else
+					sbQuery.append(" and specimen_related_yn='Y'  ");
+			}
+			if ( specimen_related_yn.equals("N") )
+			{
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(" where  specimen_related_yn='N'");
+					andCheck = 1;}
+				else
+					sbQuery.append(" and specimen_related_yn='N'");
+			}
+		}
+
+		if ( !(by_person_yn == null || by_person_yn.equals("")) )
+		{
+			if ( by_person_yn.equals("Y") )
+		    {
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append("where by_person_yn='Y'");
+					andCheck = 1;}
+		
+				else
+						sbQuery.append(" and by_person_yn='Y'  ");
+			}
+			if ( by_person_yn.equals("N") )
+			{
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append("where  by_person_yn='N'");
+					andCheck = 1;}
+				else
+					sbQuery.append("and by_person_yn='N'");
+			}
+		}
+		
+		/*Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617 Start*/
+		if(isCnrmReqPatOutChngAppl)
+		{
+			if ( !(tfr_pat_out_yn == null || tfr_pat_out_yn.equals("")) )
+			{
+				if ( tfr_pat_out_yn.equals("Y") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where ip_tfr_pat_out_yn='Y'");
+						andCheck = 1;}
+			
+					else
+							sbQuery.append(" and ip_tfr_pat_out_yn='Y'  ");
+				}
+				if ( tfr_pat_out_yn.equals("N") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where  ip_tfr_pat_out_yn='N'");
+						andCheck = 1;}
+					else
+						sbQuery.append("and ip_tfr_pat_out_yn='N'");
+				}
+			}
+		}/*End*/
+
+		/*Added By Ashwini on 21-Aug-2017 for ML-MMOH-CRF-0708*/
+		if(isMedRepModeAppl)
+		{
+			if ( !(application_mode == null || application_mode.equals("")) )
+			{
+				if ( application_mode.equals("Y") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where application_mode='Y'");
+						andCheck = 1;}
+			
+					else
+							sbQuery.append(" and application_mode='Y'  ");
+				}
+				if ( application_mode.equals("N") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where  application_mode='N'");
+						andCheck = 1;}
+					else
+						sbQuery.append("and application_mode='N'");
+				}
+			}
+
+			if ( !(collection_mode == null || collection_mode.equals("")) )
+			{
+				if ( collection_mode.equals("Y") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where collection_mode='Y'");
+						andCheck = 1;}
+			
+					else
+							sbQuery.append(" and collection_mode='Y'  ");
+				}
+				if ( collection_mode.equals("N") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where  collection_mode='N'");
+						andCheck = 1;}
+					else
+						sbQuery.append("and collection_mode='N'");
+				}
+			}
+
+			if ( !(notification_mode == null || notification_mode.equals("")) )
+			{
+				if ( notification_mode.equals("Y") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where notification_mode='Y'");
+						andCheck = 1;}
+			
+					else
+							sbQuery.append(" and notification_mode='Y'  ");
+				}
+				if ( notification_mode.equals("N") )
+				{
+					if ( andCheck == 0 )
+					{
+						sbQuery.setLength(0);
+						sbQuery.append("where  notification_mode='N'");
+						andCheck = 1;}
+					else
+						sbQuery.append("and notification_mode='N'");
+				}
+			}
+		}/*ML-MMOH-CRF-0708 End*/
+
+		if ( !(enabled == null || enabled.equals("")) )
+		{
+			if ( enabled.equals("E") )
+		    {
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append("where eff_status='E'");
+					andCheck = 1;}
+		
+				else
+					sbQuery.append(" and eff_status='E'  ");
+			}
+			if ( enabled.equals("D") )
+			{
+				if ( andCheck == 0 )
+				{
+					sbQuery.setLength(0);
+					sbQuery.append(" where  eff_status='D'");
+
+					andCheck = 1;}
+				else
+					sbQuery.append(" and eff_status='D'");
+			}
+		}
+		String ord[] = request.getParameterValues("orderbycolumns");
+		if ( !(ord == null || ord .equals("")) )
+		{
+			sbQuery.append(" order by ");
+
+			for ( int i=0;i < ord.length;i++ )
+			{
+			if ( i == ord.length - 1 )
+				sbQuery.append(ord[i]);
+			else
+				sbQuery.append(ord[i]+",");
+			}
+
+		}
+
+
+	}// end if whereClause
+	else 
+	{
+		sbQuery.setLength(0);
+		sbQuery.append(whereClause);
+		//sql = whereClause;
+
+	}
+
+	int start = 0 ;
+	int end = 0 ;
+	int i=1;
+
+	if ( from == null )
+		start = 1 ;
+	else
+		start = Integer.parseInt( from ) ;
+
+	if ( to == null )
+	  	end = 14 ;
+	else
+		end = Integer.parseInt( to ) ;
+
+	
+	Statement stmt=null;
+	ResultSet rs=null;
+	int maxRecord = 0;
+
+	try
+	{
+
+
+		
+		stmt = conn.createStatement();
+	
+
+		strsql2="select transport_mode, long_desc, short_desc,patient_related_yn,file_related_yn,specimen_related_yn,by_person_yn, ip_tfr_pat_out_yn, application_mode, collection_mode, notification_mode, eff_status from am_transport_mode "+  sbQuery.toString();
+		if(rs!=null)rs.close();
+		
+		rs = stmt.executeQuery(strsql2);
+
+		if ( start != 1 )
+
+		for( int j=1; j<start; i++,j++ )
+		{
+		  rs.next() ;
+		}
+
+		while ( i<=end && rs.next() )
+		{
+			if(maxRecord==0)
+			{
+
+
+            _bw.write(_wl_block6Bytes, _wl_block6);
+
+	if ( !(start <= 1) )
+	out.println("<td align ='right' id='prev'><A HREF='../jsp/TransportModeQueryResult.jsp?from="+(start-14)+"&to="+(end-14)+"&whereclause="+URLEncoder.encode(sbQuery.toString())+"'"+" text-decoration='none'>"+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.previous.label","common_labels")+"</A></td>");
+
+	//if ( !( (start+14) > maxRecord ) )
+	out.println("<td align ='right' id='next' style='visibility:hidden'><A HREF='../jsp/TransportModeQueryResult.jsp?from="+(start+14)+"&to="+(end+14)+"&whereclause="+URLEncoder.encode(sbQuery.toString())+"'"+" text-decoration='none'>"+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.next.label","common_labels")+"</A></td>");
+	
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+            if (_jsp__tag0(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag1(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag2(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag3(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag4(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag5(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag6(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block9Bytes, _wl_block9);
+ if(isCnrmReqPatOutChngAppl){ 
+            _bw.write(_wl_block10Bytes, _wl_block10);
+
+            if (_jsp__tag7(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block11Bytes, _wl_block11);
+ } 
+            _bw.write(_wl_block12Bytes, _wl_block12);
+ if(isMedRepModeAppl){ 
+            _bw.write(_wl_block10Bytes, _wl_block10);
+
+            if (_jsp__tag8(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag9(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag10(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block13Bytes, _wl_block13);
+ } 
+            _bw.write(_wl_block14Bytes, _wl_block14);
+
+            if (_jsp__tag11(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block15Bytes, _wl_block15);
+ }
+		
+
+		String classValue = "" ;
+			if ( i % 2 == 0 )
+				classValue = "QRYEVEN" ;
+			else
+				classValue = "QRYODD" ;
+
+			String transport_mode	=	rs.getString("transport_mode");
+			String long_desc		=	rs.getString("long_desc");
+			String short_desc		=	rs.getString("short_desc");
+			String patient_related_yn = rs.getString("patient_related_yn");
+			String file_related_yn = rs.getString("file_related_yn");
+			String specimen_related_yn = rs.getString("specimen_related_yn");
+			String by_person_yn		=	rs.getString("by_person_yn");
+			String tfr_pat_out_yn		=	rs.getString("ip_tfr_pat_out_yn");//Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617
+			String eff_status		=	rs.getString("eff_status");
+
+			//Added By Ashwini on 21-Aug-2017 for ML-MMOH-CRF-0708
+			String application_mode		=	rs.getString("application_mode");
+			String collection_mode		=	rs.getString("collection_mode");
+			String notification_mode	=	rs.getString("notification_mode");
+
+			if(transport_mode==null || transport_mode.equals("null")) transport_mode="&nbsp;";
+			if(long_desc==null || long_desc.equals("null")) long_desc="&nbsp;";
+			if(short_desc==null || short_desc.equals("null")) short_desc="&nbsp;";
+			
+			
+			out.println("<tr><td align='left' class='" + classValue + "'>");
+			out.println("<a href='../jsp/TransportModeAddModify.jsp?transport_mode="+transport_mode+ "&target=f_query_add_mod&operation=modify'>");
+			out.println(transport_mode+"</a></td><td class='" + classValue + "' >");
+			out.println(long_desc);
+			out.println("<td class='" + classValue + "' >");
+			out.println(short_desc);
+			out.println("</td><td class='" + classValue + "' align='center'>");
+			if (patient_related_yn.equals("Y") )
+				out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+			else
+				out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+			
+			out.println("</td><td class='" + classValue + "' align='center'>");
+			if (file_related_yn.equals("Y") )
+				out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+			else
+				out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+		   out.println("</td><td class='" + classValue + "' align='center'>");
+			if (specimen_related_yn.equals("Y") )
+				out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+			else
+				out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+		
+			out.println("</td><td class='" + classValue + "' align='center'>");
+			if (by_person_yn.equals("Y") )
+				out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+			else
+				out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+
+			/*Added by Thamizh selvi on 5th May 2017 for ML-MMOH-CRF-0617 Start*/
+			if(isCnrmReqPatOutChngAppl)
+			{
+				out.println("</td><td class='" + classValue + "' align='center'>");
+				if (tfr_pat_out_yn.equals("Y") )
+					out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+				else
+					out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+			}/*End*/
+
+			/*Added By Ashwini on 21-Aug-2017 for ML-MMOH-CRF-0708*/
+			if(isMedRepModeAppl)
+			{
+				out.println("</td><td class='" + classValue + "' align='center'>");
+				if (application_mode.equals("Y") )
+					out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+				else
+					out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+
+				out.println("</td><td class='" + classValue + "' align='center'>");
+				if (collection_mode.equals("Y") )
+					out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+				else
+					out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+
+				out.println("</td><td class='" + classValue + "' align='center'>");
+				if (notification_mode.equals("Y") )
+					out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+				else
+					out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+			}/*ML-MMOH-CRF-0708 End*/
+			
+			out.println("</td><td class='" + classValue + "' align='center'>");
+			if (eff_status.equals("E") )
+				out.println("<img src='../../eCommon/images/enabled.gif'></img>");
+			else
+				out.println("<img src='../../eCommon/images/RRnwd.gif'></img>");
+
+			out.println("</td></tr>");	
+			i++;
+			maxRecord++;
+		}//endwhile
+
+		if(maxRecord == 0)
+{
+            _bw.write(_wl_block16Bytes, _wl_block16);
+}
+
+if ( maxRecord < 14 || (!rs.next()) ) {
+
+            _bw.write(_wl_block17Bytes, _wl_block17);
+ 
+		} else {
+            _bw.write(_wl_block18Bytes, _wl_block18);
+}
+
+		if(rs!=null) rs.close();
+		if(stmt!=null)
+		stmt.close();
+
+	}
+	catch(Exception e)
+	{
+		out.println(e.toString());
+	}
+	finally 
+	{
+		
+		ConnectionManager.returnConnection(conn,request);
+		
+	}
+
+            _bw.write(_wl_block19Bytes, _wl_block19);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+
+    private boolean _jsp__tag0(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag0 = null ;
+        int __result__tag0 = 0 ;
+
+        if (__tag0 == null ){
+            __tag0 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag0);
+        }
+        __tag0.setPageContext(pageContext);
+        __tag0.setParent(null);
+        __tag0.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.FileTransportMode.label", java.lang.String .class,"key"));
+        __tag0.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag0;
+        __result__tag0 = __tag0.doStartTag();
+
+        if (__result__tag0!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag0== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag0.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag0);
+            return true;
+        }
+        _activeTag=__tag0.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag0);
+        __tag0.release();
+        return false;
+    }
+
+    private boolean _jsp__tag1(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag1 = null ;
+        int __result__tag1 = 0 ;
+
+        if (__tag1 == null ){
+            __tag1 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag1);
+        }
+        __tag1.setPageContext(pageContext);
+        __tag1.setParent(null);
+        __tag1.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.longdescription.label", java.lang.String .class,"key"));
+        __tag1.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag1;
+        __result__tag1 = __tag1.doStartTag();
+
+        if (__result__tag1!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag1== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag1.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag1);
+            return true;
+        }
+        _activeTag=__tag1.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag1);
+        __tag1.release();
+        return false;
+    }
+
+    private boolean _jsp__tag2(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag2 = null ;
+        int __result__tag2 = 0 ;
+
+        if (__tag2 == null ){
+            __tag2 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag2);
+        }
+        __tag2.setPageContext(pageContext);
+        __tag2.setParent(null);
+        __tag2.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.shortdescription.label", java.lang.String .class,"key"));
+        __tag2.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag2;
+        __result__tag2 = __tag2.doStartTag();
+
+        if (__result__tag2!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag2== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag2.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag2);
+            return true;
+        }
+        _activeTag=__tag2.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag2);
+        __tag2.release();
+        return false;
+    }
+
+    private boolean _jsp__tag3(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag3 = null ;
+        int __result__tag3 = 0 ;
+
+        if (__tag3 == null ){
+            __tag3 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag3);
+        }
+        __tag3.setPageContext(pageContext);
+        __tag3.setParent(null);
+        __tag3.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eAM.PatientRelated.label", java.lang.String .class,"key"));
+        __tag3.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${am_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag3;
+        __result__tag3 = __tag3.doStartTag();
+
+        if (__result__tag3!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag3== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag3.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag3);
+            return true;
+        }
+        _activeTag=__tag3.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag3);
+        __tag3.release();
+        return false;
+    }
+
+    private boolean _jsp__tag4(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag4 = null ;
+        int __result__tag4 = 0 ;
+
+        if (__tag4 == null ){
+            __tag4 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag4);
+        }
+        __tag4.setPageContext(pageContext);
+        __tag4.setParent(null);
+        __tag4.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eAM.FileRelated.label", java.lang.String .class,"key"));
+        __tag4.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${am_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag4;
+        __result__tag4 = __tag4.doStartTag();
+
+        if (__result__tag4!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag4== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag4.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag4);
+            return true;
+        }
+        _activeTag=__tag4.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag4);
+        __tag4.release();
+        return false;
+    }
+
+    private boolean _jsp__tag5(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag5 = null ;
+        int __result__tag5 = 0 ;
+
+        if (__tag5 == null ){
+            __tag5 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag5);
+        }
+        __tag5.setPageContext(pageContext);
+        __tag5.setParent(null);
+        __tag5.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eAM.SpecimenRelated.label", java.lang.String .class,"key"));
+        __tag5.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${am_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag5;
+        __result__tag5 = __tag5.doStartTag();
+
+        if (__result__tag5!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag5== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag5.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag5);
+            return true;
+        }
+        _activeTag=__tag5.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag5);
+        __tag5.release();
+        return false;
+    }
+
+    private boolean _jsp__tag6(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag6 = null ;
+        int __result__tag6 = 0 ;
+
+        if (__tag6 == null ){
+            __tag6 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag6);
+        }
+        __tag6.setPageContext(pageContext);
+        __tag6.setParent(null);
+        __tag6.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eAM.ByPerson.label", java.lang.String .class,"key"));
+        __tag6.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${am_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag6;
+        __result__tag6 = __tag6.doStartTag();
+
+        if (__result__tag6!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag6== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag6.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag6);
+            return true;
+        }
+        _activeTag=__tag6.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag6);
+        __tag6.release();
+        return false;
+    }
+
+    private boolean _jsp__tag7(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag7 = null ;
+        int __result__tag7 = 0 ;
+
+        if (__tag7 == null ){
+            __tag7 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag7);
+        }
+        __tag7.setPageContext(pageContext);
+        __tag7.setParent(null);
+        __tag7.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eAM.TfrPatientOut.label", java.lang.String .class,"key"));
+        __tag7.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${am_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag7;
+        __result__tag7 = __tag7.doStartTag();
+
+        if (__result__tag7!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag7== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag7.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag7);
+            return true;
+        }
+        _activeTag=__tag7.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag7);
+        __tag7.release();
+        return false;
+    }
+
+    private boolean _jsp__tag8(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag8 = null ;
+        int __result__tag8 = 0 ;
+
+        if (__tag8 == null ){
+            __tag8 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag8);
+        }
+        __tag8.setPageContext(pageContext);
+        __tag8.setParent(null);
+        __tag8.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.ApplicationMode.label", java.lang.String .class,"key"));
+        __tag8.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag8;
+        __result__tag8 = __tag8.doStartTag();
+
+        if (__result__tag8!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag8== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag8.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag8);
+            return true;
+        }
+        _activeTag=__tag8.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag8);
+        __tag8.release();
+        return false;
+    }
+
+    private boolean _jsp__tag9(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag9 = null ;
+        int __result__tag9 = 0 ;
+
+        if (__tag9 == null ){
+            __tag9 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag9);
+        }
+        __tag9.setPageContext(pageContext);
+        __tag9.setParent(null);
+        __tag9.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.CollectionMode.label", java.lang.String .class,"key"));
+        __tag9.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag9;
+        __result__tag9 = __tag9.doStartTag();
+
+        if (__result__tag9!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag9== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag9.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag9);
+            return true;
+        }
+        _activeTag=__tag9.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag9);
+        __tag9.release();
+        return false;
+    }
+
+    private boolean _jsp__tag10(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag10 = null ;
+        int __result__tag10 = 0 ;
+
+        if (__tag10 == null ){
+            __tag10 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag10);
+        }
+        __tag10.setPageContext(pageContext);
+        __tag10.setParent(null);
+        __tag10.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.NotificationMode.label", java.lang.String .class,"key"));
+        __tag10.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag10;
+        __result__tag10 = __tag10.doStartTag();
+
+        if (__result__tag10!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag10== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag10.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag10);
+            return true;
+        }
+        _activeTag=__tag10.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag10);
+        __tag10.release();
+        return false;
+    }
+
+    private boolean _jsp__tag11(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag11 = null ;
+        int __result__tag11 = 0 ;
+
+        if (__tag11 == null ){
+            __tag11 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag11);
+        }
+        __tag11.setPageContext(pageContext);
+        __tag11.setParent(null);
+        __tag11.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.enabled.label", java.lang.String .class,"key"));
+        __tag11.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag11;
+        __result__tag11 = __tag11.doStartTag();
+
+        if (__result__tag11!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag11== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag11.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag11);
+            return true;
+        }
+        _activeTag=__tag11.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag11);
+        __tag11.release();
+        return false;
+    }
+}

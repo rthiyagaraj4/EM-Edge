@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_RulesForDetailedBill_BillHeaderFooterFormat</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Bill Header/Footer Format</h1>
+<p class="BoldRFD" style="font-weight: normal;">The Bill Header/Footer Format tab enables you to define format for a bill header and footer. The format selected in the 'BL Parameters' function gets displayed. Option is also available to load the default format. &#160;System displays <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Hospital Details</a>, <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Patient Details</a>, <span class="dropspot"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Bill Details</a>, <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Customer Details</a></span> and <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Text Formatting</a> list values in the text field in each tab. Right-click to select a value from the list. Various formats with several values are displayed on selecting a value from the list. Double-click on a value to select it.</p>
+<div class="droptext" id="POPUP1004684906" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The format lists styles to format the legends in header, footer and body section of a receipt format.</p>
+</div>
+<div class="droptext" id="POPUP1004670326" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;"><span style="font-weight: normal;">The format lists legends related to Customers'. &#160;</span></p>
+<p class="boldrfd">&#160;</p>
+</div>
+<div class="droptext" id="POPUP1004695544" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The format lists legends for bill generation transactions. A Reference ID is generated for bills, if 'Print Bill Using' value is selected as 'Format2' in 'BL Parameters' function. The Cash Counter, Document Number, Document Type Code, Episode Type, Patient Category, Specialty and Year gets displayed for Bill Reference. The mentioned bill reference ID components are valid for Inpatient, Daycare, Outpatient, Emergency and External patient class. This is applicable for Title, Header, Bill Footer and Credit Bill Footer.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If Bill and Receipt is printed as a single document, Bill Reference ID is printed instead of Receipt Reference ID. If there is a Single Reference ID for multiple entries of receipts, the reference ID is printed as asterisks to indicate multiple entries.</p>
+</div>
+<div class="droptext" id="POPUP1004695181" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The format lists patient demographic details.</p>
+</div>
+<div class="droptext" id="POPUP1004685367" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The format lists complete information of the hospital and demographic details.</p>
+</div>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define a Bill Header and Footer Format:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outpatient/Emergency/Referral</p>
+<p class="BoldRFD">Title</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Load the default Setup</span> - Select the check box to load the pre-defined template. A confirmation message 'Existing Setup Will be Replaced, Continue?' is displayed on selecting the check box, . Click <span class="BoldNumberRFD">[Yes]</span> to load the default template or <span class="BoldNumberRFD">[No]</span> to cancel the process.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Original Bill</span> - Enter the legend for original bill in alphanumeric format. The value recorded is displayed in the bill during bill generation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Reprinted Bill</span> - Enter the legend for reprinted bills in alphanumeric format. The value recorded is displayed in the bill during bill reprints.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Line [1-4]</span> - Enter the values that has to appear in the title of the bill. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">Outpatient/Emergency/Referral</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Bill with Receipt</span> - Enter the legend to be printed for cash bill with receipts valid for outpatient/emergency/referral patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Bill</span> - Enter the legend to be printed for credit bills valid for outpatient/emergency/referral patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Without Receipt</span> - Enter the legend to be printed for bills without receipts valid for outpatient/emergency/referral patients.</p>
+</li>
+</ol>
+<p class="BoldRFD">Additional Line</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Bill</span> - Enter the additional legends that are to be printed for Cash bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Bill</span> - Enter the additional legends that are to be printed for Credit bills.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Header</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 14]</span> - Enter the details in the fields. The data recorded gets displayed in the header part of the bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Bill Footer</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter details in the corresponding fields. The data recorded gets displayed in the footer part of the bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Receipt/Refund details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Credit Bill Footer</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter details in the corresponding fields. The data recorded gets displayed in the footer part of the credit bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Insurance Bill Footer</p>
+<ol start="13" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter details in the corresponding fields. The data recorded gets displayed in the footer part of the insurance bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The option available is Policy Details. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on a value to select it. The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="NumberRFD"><span class="BoldNumberRFD">Inpatient/Daycare</span></p>
+<p class="BoldRFD">Title</p>
+<ol start="14">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Original Bill</span> - Enter the legend for original bill in alphanumeric format. The value recorded is displayed in the bill during bill generation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Reprinted Bill</span> - Enter the legend for reprinted bills in alphanumeric format. The value recorded is displayed in the bill during bill reprints.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Line [1-4]</span> - Enter the values that has to appear in the title of the bill. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Inpatient/Daycare</p>
+<ol start="17" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Bill with Receipt</span> - Enter the legend to be printed for cash bill with receipts valid for inpatient/daycare patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Bill</span> - Enter the legend to be printed for credit bills valid for inpatient/daycare patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Without Receipt</span> - Enter the legend to be printed for bills without receipts valid for inpatient/daycare patients.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Additional Line</p>
+<ol start="20">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Bill</span> - Enter the additional legends that are to be printed for Cash bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Bill</span> - Enter the additional legends that are to be printed for Credit bills.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Header</p>
+<ol start="22" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 13]</span> - Enter the details in the fields. The data recorded gets displayed in the header part of the bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;&#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Bill Footer</p>
+<ol start="23" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter the details in the fields. The data recorded gets displayed in the footer part of the bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Credit Bill Footer</p>
+<ol start="24" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter the details in the fields. The data recorded gets displayed in the footer part of the credit bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The options available are Hospital Details, Patient Details, Bill Details, Customer Details and Text Formatting. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on the value to select it. &#160;The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Insurance Bill Footer</p>
+<ol start="25" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">[Line 1- Line 4]</span> - Enter details in the corresponding fields. The data recorded gets displayed in the footer part of the insurance bills generated. You can also record the data using the pre-defined formats that are available. Right-click on each field to select a value from the pre-defined format. The option available is Policy Details. Select a value and the pre-defined values recorded for the selected value are listed. Double-click on a value to select it. The selected value is displayed in the respective field.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004685367');
+	TextPopupInit('a2','POPUP1004695181');
+	TextPopupInit('a3','POPUP1004695544');
+	TextPopupInit('a5','POPUP1004670326');
+	TextPopupInit('a4','POPUP1004684906');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

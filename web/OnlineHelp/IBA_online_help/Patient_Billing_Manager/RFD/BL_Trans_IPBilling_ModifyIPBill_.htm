@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Trans_IPBilling_ModifyIPBill</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">The following details are displayed:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rounding Option</span> – Select a Rounding Option from the list. The system defined value is “Rounded to Integer”.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Line</span> – The Print Line details for the services associated to the Service Group get displayed. The description for the selected Print Line is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Line Percentage</span> – Enter the discount percentage if a percentage discount is to be given. The percentage entered cannot exceed 100.00. The value entered cannot be negative.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross Amount</span> – The Gross Amount for the service gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Disc Amount</span> – The Service Discount Amount gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Line Disc %</span> - Enter the discount percentage for a service. The discount amount is computed and displayed based on the discount percentage recorded. If you record the 'Discount Amount' without entering the 'Print Line Disc%', system computes and displays the service level discount percentage automatically. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Amount</span> – The Amount cannot be entered if a discount percentage has been entered. In such a case, amount is computed and displayed. The system computes the discount amount as (Disc %/100.00) * (Gross - Serv Disc). The system also checks to see whether the discount amount entered is greater than the (Gross - Serv Disc). If you record the 'Print Line Disc%' without entering the 'Discount Amount', system computes and displays the service level discount amount automatically. This is a mandatory field. You can set discount on the entire bills where the bill outstanding amount is zero.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Net Amount</span> – The Net Amount is calculated as (Gross Amount - Discount Amount).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">GL Interface Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to view and select a valid G/L Interface code. If the code is valid, the short description is displayed for user verification. If print line level discount is entered, a valid G/L Interface code has to be entered to record the discount amount in General Ledger. The interface code has to begin with "D" only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rounding Option</span> – Select a Rounding Option from the list. The system defined value is “Rounded to Integer”.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross Amount</span> – The total Gross Amount for the services utilized by the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Overall Disc %</span> - Enter the value in numeric format to issue a bill level discount. The percentage entered cannot exceed 100.00. The value entered cannot be negative. An authorized user is permitted to issue a bill level discount. System computes and displays the overall discount amount automatically based on the discount percentage issued or vice versa.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Disc Amt</span> - The discount amount is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Overall Discount Amount</span> – The Amount cannot be entered if a discount percentage has been entered. System computes the overall discount amount automatically based on the discount percentage. Discount amount is computed as - (Disc %/100.00) * (Gross - Serv Disc - Man Disc). System also checks to see whether the discount amount entered is greater than the (Gross - Serv Disc - Man Disc). The overall discount percentage is computed automatically if you enter the overall discount amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prepay Adj Amt</span> - The amount adjusted against the prepayment accepted from the patient during the admission gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dep Adj Amt</span> - The amount adjusted against the deposit accepted from the patient during the admission gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Manual Discount</span> – The manual discount given (if any) to the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> – The total amount gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rounding Amt</span> - The total rounding amount is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Total Amount</span> – The total amount after the discount for the specific bill gets displayed.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The system will display all the bills generated for the patient for the selected episode including zero bills, negative bills and outstanding bill.</p>
+<p class="Note">The system will validate the gross bill amount with the discount amount even if the discount is already given. The system provides further discount for that bill if the discount amount is less than gross the bill amount.</p>
+<p class="Note">The bill outstanding amount will be negative if the outstanding amount of the discounted bill is zero.</p>
+<p class="Note">The system checks the total discount amount and the gross bill amount. If the discount amount is more than gross amount, the system displays an error message. The total bill discount amount cannot be more than gross bill amount. The negative outstanding bill amount will be refunded to the patient through Settle Bill Outstanding function only.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

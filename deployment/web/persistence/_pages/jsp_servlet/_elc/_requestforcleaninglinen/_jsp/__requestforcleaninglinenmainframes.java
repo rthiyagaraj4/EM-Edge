@@ -1,0 +1,144 @@
+package jsp_servlet._elc._requestforcleaninglinen._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+
+public final class __requestforcleaninglinenmainframes extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/elc/RequestForCleaningLinen/jsp/RequestForCleaningLinenMainFrames.jsp", 1709118357541L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "ISO-8859-1".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n<html>\n<script type=\"text/javascript\">\n  var cWidth = 700 ;\n  var dw = 1 ;\n  var timerRunning = false ;\n  var timerID ;\n\n  function slide()\n  {\n    if( timerRunning )\n      clearTimeout(timerID) ;\n    timerRunning = false ;\n    dw = -dw ;\n    timerRunning = true ;\n    timerID = self.setTimeout( \"ping()\", 10 ) ;\n  }\n\n  function grow()\n  {\n    dw = 1 ;\n    timerRunning = true ;\n    timerID = self.setTimeout( \"ping()\", 10 ) ;\n  }\n\n  function ping()\n  {\n    if( !timerRunning ) return ;\n    if( dw < 0 )\n    {\n      cWidth += 20 ;\n      if( cWidth <= 0 )\n      {\n        cWidth = 0 ;\n        if( timerRunning )\n          clearTimeout(timerID) ;\n        timerRunning = false ;\n      }\n      else\n      {\n        timerID = self.setTimeout( \"ping()\", 10 ) ;\n      }\n      document.getElementById( \'mainSet\' ).cols =  \'980, *\' ;\n    }\n    else if( dw > 0 )\n    {\n      cWidth -= 20 ;\n      if( cWidth >= 700 )\n      {\n        cWidth = 700 ;\n        if( timerRunning )\n          clearTimeout(timerID) ;\n        timerRunning = false ;\n      }\n      else\n      {\n        timerID = self.setTimeout( \"ping()\", 10 ) ;\n      }\n\t  document.getElementById( \'mainSet\' ).cols = cWidth + \', *\' ;\n    }\n    else\n    {\n      if( timerRunning )\n        clearTimeout(timerID) ;\n      timerRunning = false ;\n    }\n  }\n\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n\t\n\n\t<iframe name=\"WriteOffLinen\" id=\"WriteOffLinen\" noresize=\"noresize\" src=\" ";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="/eLC/RequestForCleaningLinen/jsp/RequestForCleaningLinenTabsMain.jsp?flag=";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="&dirtyFlag=";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="&cutoffTime=";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="&delParamDate=";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="&userFlag=";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="&requestDate=";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="&vo.functionId=";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="&vo.moduleId=";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\" /></iframe><iframe name=\"RHSFrame\" id=\"RHSFrame\" noresize=\"noresize\" src=\" ";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="/eLC/core/jsp/RHSTabsMainWards.jsp\"  /></iframe>\n\t\n</html>\n\n";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+String dirtyFlag=request.getParameter("dirtyFlag");
+String flag=request.getParameter("flag");
+String cutoffTime=request.getParameter("cutoffTime");
+String requestDate=request.getParameter("requestDate");
+String delParamDate=request.getParameter("delParamDate");
+String userFlag=request.getParameter("userFlag");
+String functionId=request.getParameter("functionId");
+String moduleId=request.getParameter("moduleId");
+
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            out.print( String.valueOf(flag));
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(dirtyFlag));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            out.print( String.valueOf(cutoffTime));
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            out.print( String.valueOf(delParamDate));
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(userFlag));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+            out.print( String.valueOf(requestDate));
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(functionId));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+            out.print( String.valueOf(moduleId));
+            _bw.write(_wl_block10Bytes, _wl_block10);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block11Bytes, _wl_block11);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

@@ -1,0 +1,1722 @@
+#include <stdio.h>
+//#include <math.h>
+#include <string.h>
+#include <bl.h>
+   
+#define MAX_LINES 55  
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 4.1\n"     
+#define ESC 0x1B    
+                    
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR uid_pwd					[91],
+			nd_session_id        	[16],
+			nd_pgm_date	    	    [20],
+			p_language_id           [3],
+
+			//input parameters through from SY_PROG_PARAM 
+			nd_fm_trans_date        [25],
+            nd_to_trans_date        [25],
+            nd_fm_nat_code	        [5],
+            nd_to_nat_code 	        [5],
+			nd_fm_region_cd			[6],
+			nd_to_region_cd			[6],
+			nd_fm_res_area_cd		[6],	
+			nd_to_res_area_cd		[6],
+			nd_fm_doc_cd			[16],
+			nd_to_doc_cd			[16],
+			nd_report_option	    [2],
+			d_nat_code              [5],  
+            d_nationality           [31],
+			d_prev_nat_code         [21],      
+			nd_operating_facility_id [3],
+			date_convert			 [17],
+			nd_temp_date		     [17],
+			nd_loc_date			     [17],
+
+			//for header routine
+			d_acc_entity_name        [41],
+			d_user                   [21],
+			d_sysdate                [17],
+			l_prev_region_code		 [7],
+			l_prev_region_desc		 [101],
+			l_prev_res_area_code	 [7],
+			l_prev_area_desc		 [101],
+			l_prev_nationality_code  [10],
+			l_prev_nat_desc			 [21],
+			l_prev_episode_type      [2],
+			l_prev_res_area_desc	 [101],
+
+			l_current_region_code	 [7],		
+			l_current_res_area_code	 [7],
+			l_current_nationality_code[10],
+			l_current_episode_type	 [2],
+
+			r_region_code			 [10],
+			r_region_desc			 [101],
+			r_res_area_code			 [10],	
+			r_res_area_desc			 [101],
+			r_nationality_code		 [10],
+			r_episode_type			 [2],
+			l_temp_nat_code			 [6],
+			l_pk_value		         [100],
+		    l_translated_value	     [201],
+			
+		    nd_facility_id	    [3];
+
+			int		r_episode_id;   	
+			int		r_visit_id;   	
+			int		i;
+
+			char g_facility_id[3];
+
+			char filename[150];
+			char x_msg[200];
+			char loc_legend[999][201];
+			char l_mesg[200];
+			char    string_var[150];	
+			char    aMesg[200];
+			int     l_rec_count			= 0;
+			
+			double r_revenue				= 0.00;
+			int l_nat_revenue			= 0;
+			double l_nat_total_revenue	= 0.00;
+
+			double l_total_report_revenue	= 0.00;
+			int l_rep_no_of_adm			= 0;
+			int l_rep_no_of_visit		= 0;
+			int l_rep_no_patient_days	= 0;
+			double l_rep_ip_revenue		= 0.00;
+			double l_rep_op_revenue		= 0.00;
+			double l_rep_rf_revenue		= 0.00;
+			int l_rep_patient_days		= 0;
+
+			double l_total_region_revenue= 0.00;
+			int l_reg_no_of_adm			= 0;
+			int l_reg_no_of_visit		= 0;
+			int l_reg_no_patient_days	= 0;
+			double l_reg_ip_revenue		= 0.00;
+			double l_reg_op_revenue		= 0.00;
+			double l_reg_rf_revenue		= 0.00;
+			int l_reg_patient_days		= 0;
+
+			double l_total_area_revenue	= 0.00;
+			int l_area_no_of_adm		= 0;
+			int l_area_no_of_visit		= 0;
+			int l_area_no_patient_days	= 0;
+			double l_area_ip_revenue		= 0.00;
+			double l_area_op_revenue		= 0.00;
+			double l_area_rf_revenue		= 0.00;
+			double l_area_patient_days	= 0.00;
+
+			int l_nat_no_of_adm			= 0;
+			int l_nat_no_of_visit		= 0;
+			int l_nat_no_patient_days	= 0;
+			double l_nat_ip_revenue		= 0.00;
+			double l_nat_op_revenue		= 0.00;
+			double l_nat_rf_revenue		= 0.00;
+
+			int l_nat_patient_days		= 0;
+
+			int l_nationality_count		= 0;
+
+			char l_fmt_report_revenue[20];
+			char l_fmt_rep_ip_revenue[20];
+			char l_fmt_rep_op_revenue[20];
+			char l_fmt_rep_rf_revenue[20];
+
+
+			char l_fmt_total_region_revenue[20];
+			char l_fmt_reg_ip_revenue[20];
+			char l_fmt_reg_op_revenue[20];
+			char l_fmt_reg_rf_revenue[20];
+
+			char l_fmt_total_area_revenue[20];
+			char l_fmt_area_ip_revenue[20];
+			char l_fmt_area_op_revenue[20];
+			char l_fmt_area_rf_revenue[20];
+
+			char l_fmt_nat_total_revenue[20];
+			char l_fmt_nat_op_revenue[20];
+			char l_fmt_nat_ip_revenue[20];
+			char l_fmt_nat_rf_revenue[20];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+int  line_no=0, 
+	 page_no=0;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+	void	get_params(),
+  			get_header_dtls(),
+  			do_report();
+ 
+	if(argc < 5) 
+	{
+		disp_message(ERR_MESG,"Usage BLRREVST uid/passwd session_id pgm_date facility_id");
+		proc_exit();
+	}
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+    
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+	strcpy(nd_facility_id.arr,argv[4]);
+   	nd_facility_id.len = strlen(nd_facility_id.arr);
+   	strcpy(g_facility_id,nd_facility_id.arr);
+
+    strcpy(g_pgm_id,"BLRREVST");
+    strcpy(g_pgm_date,argv[3]);
+
+
+	strcpy(filename,WORKING_DIR);
+	strcat(filename,"blrrevst.lis");
+
+	if((f1 = fopen(filename, "w")) == NULL) 
+	{
+		disp_message(ERR_MESG,".... Error opening output file ....");
+		proc_exit();
+	} 
+
+
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL CONNECT :uid_pwd;  
+
+   set_meduser_role();
+   
+   strcpy(p_language_id.arr,l_language_id.arr);
+   p_language_id.len = l_language_id.len;
+
+   
+   get_params();
+   get_header_dtls();
+	    
+   fetch_legend_value();
+   ip_op_revenue_cur();
+
+   do_report();
+	    
+
+   delete_prog_param();
+
+   fclose(f1);
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK RELEASE;
+
+   return;
+   
+   err_exit:
+	   EXEC SQL WHENEVER SQLERROR CONTINUE;
+	   EXEC SQL ROLLBACK WORK RELEASE;
+	   disp_message(ERR_MESG,"Oracle error at main() occured....");
+	   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+	   proc_exit();
+}   
+
+
+// get the parameters from the SY_PROG_PARM table and
+// delete the record after reading it.
+void get_params()
+{
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+				   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4,
+				   PARAM5,
+				   PARAM6,
+				   PARAM7,
+				   PARAM8,
+				   PARAM9,
+				   PARAM10,
+				   PARAM11
+            INTO   :nd_operating_facility_id,
+				   :nd_fm_trans_date,
+	               :nd_to_trans_date,
+	               :nd_fm_nat_code,
+	               :nd_to_nat_code,
+				   :nd_fm_region_cd,
+				   :nd_to_region_cd,
+				   :nd_fm_res_area_cd,
+				   :nd_to_res_area_cd,
+				   :nd_fm_doc_cd,
+				   :nd_to_doc_cd,
+				   :nd_report_option
+			FROM   SY_PROG_PARAM
+			WHERE  PGM_ID		= 'BLRREVST'
+		    AND	   SESSION_ID	= TO_NUMBER(:nd_session_id)
+		    AND    PGM_DATE		= :nd_pgm_date;
+
+    nd_fm_trans_date.arr[nd_fm_trans_date.len]   = '\0';
+    nd_to_trans_date.arr[nd_to_trans_date.len]   = '\0';
+    nd_fm_nat_code.arr[nd_fm_nat_code.len]	     = '\0';
+    nd_to_nat_code.arr[nd_to_nat_code.len]	     = '\0';
+	nd_fm_region_cd.arr[nd_fm_region_cd.len]	 = '\0';
+	nd_to_region_cd.arr[nd_to_region_cd.len]	 = '\0';
+	nd_fm_res_area_cd.arr[nd_fm_res_area_cd.len] = '\0';
+	nd_to_res_area_cd.arr[nd_to_res_area_cd.len] = '\0';
+	nd_fm_doc_cd.arr[nd_fm_doc_cd.len]	         = '\0';
+	nd_to_doc_cd.arr[nd_to_doc_cd.len]			 = '\0';
+	nd_report_option.arr[nd_report_option.len]	 = '\0';
+
+	strcpy(g_facility_id,nd_operating_facility_id.arr);
+
+    //delete the parameter record
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DELETE SY_PROG_PARAM
+	 		  WHERE PGM_ID		= 'BLRREVST'
+	            AND SESSION_ID	= :nd_session_id
+		        AND PGM_DATE	= :nd_pgm_date;
+
+	return;
+
+  err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ERR_MESG,"Oracle error at get_params() occured....");
+	disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+	proc_exit();
+}
+ 
+
+//get the header details
+void get_header_dtls()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+				    USER,
+				    TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+		      INTO :d_acc_entity_name,
+			  	   :d_user,
+				   :d_sysdate
+              FROM SY_ACC_ENTITY_lang_vw
+			  WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			  and language_id=:p_language_id;
+
+	d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+	d_user.arr[d_user.len]                       = '\0';
+	d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+	return;
+
+	err_exit:
+	   EXEC SQL WHENEVER SQLERROR CONTINUE;
+	   EXEC SQL ROLLBACK WORK RELEASE;
+	   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....");
+	   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+	   proc_exit();
+}
+ 
+ip_op_revenue_cur()
+{
+    
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	  EXEC SQL DECLARE ip_op_revenue_cur
+	  			CURSOR 
+				   FOR
+				SELECT  NVL(C.REGION_CODE,'Nil'),
+ 						NVL(C.SHORT_DESC,'Not Specified'),
+      					NVL(B.RES_AREA_CODE,'Nil'),
+ 						NVL(D.SHORT_dESC,'Not Specified'),
+      					NVL(B.NATIONALITY_CODE,'Nil')	,
+ 						A.EPISODE_TYPE		,
+						A.EPISODE_ID		,
+						A.VISIT_ID			,
+  						ROUND(SUM(nvl(A.ORG_NET_CHARGE_AMT,0)),2)
+				  FROM  BL_PATIENT_CHARGES_FOLIO	A,
+ 						MP_PATIENT_MAST     		B,
+    					MP_REGION_lang_vw			C,
+      					MP_RES_AREA_lang_vw			D,
+						BL_BLNG_PRT_GRP_HDR 		E
+				 WHERE  TRUNC(A.TRX_DATE,'MI')  
+			   BETWEEN  TO_DATE(:nd_fm_trans_date,'DD/MM/YYYY HH24:MI')
+   				   AND	TO_DATE(:nd_to_trans_date,'DD/MM/YYYY HH24:MI')
+                   AND  A.TRX_FINALIZE_IND = 'Y'       
+				   AND	C.language_id=:p_language_id  
+				   AND  C.language_id=D.language_id
+				   //AND  NVL(A.TRX_STATUS,'Z')  !=  'C'   
+			       AND	( NVL(PACKAGE_IND,'X')      = 'S' 
+						  OR (NVL(PACKAGE_TRX_IND,'X')  = 'Y' AND NVL(PACKAGE_IND,'X')= 'P')  
+				   		  OR (AVAILED_IND IN('U','Y'))) 
+				   AND  NVL(A.PHYSICIAN_ID,'!!!!!!!!!!!!!!!') 
+			   BETWEEN  nvl(:nd_fm_doc_cd,'!!!!!!!!!!!!!!!')
+				   AND  nvl(:nd_to_doc_cd,'~~~~~~~~~~~~~~~')
+				   AND  A.EPISODE_TYPE = DECODE(:nd_report_option,'I','I','O','O','D','D','E','E','R','R', 'B',A.EPISODE_TYPE)	//31/10/2004
+				   AND  A.PATIENT_ID   			=	B.PATIENT_ID
+				   AND  B.RES_AREA_CODE  		=	D.RES_AREA_CODE(+)
+       			   AND  D.REGION_CODE      	      = 	C.REGION_CODE(+)
+				   AND  NVL(B.NATIONALITY_CODE,'!!!!')
+			   BETWEEN  nvl(:nd_fm_nat_code,'!!!!')
+				   AND  nvl(:nd_to_nat_code,'~~~~')
+				   AND  NVL(B.RES_AREA_CODE,'!!!!!!')
+			   BETWEEN  nvl(:nd_fm_res_area_cd,'!!!!!!')
+				   AND  nvl(:nd_to_res_area_cd,'~~~~~~')
+				   AND  NVL(D.REGION_CODE,'!!!!!!')
+		           BETWEEN :nd_fm_region_cd  AND  :nd_to_region_cd 
+				   AND  A.PRT_GRP_HDR_CODE		=	E.PRT_GRP_HDR_CODE 
+				   AND  NVL(E.INCOME_YN,'N')	=  'Y'
+				   AND  A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+				 GROUP
+					BY  C.REGION_CODE		,
+ 						C.SHORT_DESC		,
+      					B.RES_AREA_CODE		,
+ 						D.SHORT_dESC		,
+      					B.NATIONALITY_CODE	,
+ 						A.EPISODE_TYPE		,
+						A.EPISODE_ID		,
+						A.VISIT_ID			
+				 ORDER
+					BY	C.REGION_CODE,
+						B.RES_AREA_CODE,
+						B.NATIONALITY_CODE,
+						A.EPISODE_TYPE;
+	     
+
+	   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	   EXEC SQL OPEN ip_op_revenue_cur;
+	   return;
+
+		  	err_exit:
+  	
+		   EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+		   disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+		   disp_message(ERR_MESG,"Oracle error at ip_op_revenue_cur() occured....");
+		   		   EXEC SQL ROLLBACK WORK RELEASE;
+		   proc_exit();
+}
+
+
+//prints the master-detail record until the cursor is empty
+void do_report()
+{
+  void print_rep_header();
+  void print_page_header();
+  void prepare_new_page();
+  int  fetch_ip_op_revenue_cur();	
+
+  print_rep_header();
+  
+  prepare_new_page();
+  
+  
+  while(fetch_ip_op_revenue_cur())
+  {
+	l_rec_count = l_rec_count + 1;
+
+	//sprintf(aMesg,"Rec Count : %-6d",l_rec_count);
+	//disp_message(ERR_MESG,aMesg);
+
+	//for the first record in the cursor the full row will  be 
+	//printed.
+	if (l_rec_count==1) 
+	{
+		l_prev_region_code.arr[0]	  = '\0';
+		l_prev_region_desc.arr[0]	  = '\0';	
+		l_prev_res_area_code.arr[0]	  = '\0';
+		l_prev_area_desc.arr[0]		  = '\0';	
+		l_prev_nationality_code.arr[0]= '\0';
+		l_prev_episode_type.arr[0]	  = '\0';	
+
+		strcpy(l_prev_region_code.arr,r_region_code.arr);
+		strcpy(l_prev_region_desc.arr,r_region_desc.arr);
+		strcpy(l_prev_res_area_code.arr,r_res_area_code.arr);
+		strcpy(l_prev_res_area_desc.arr,r_res_area_desc.arr);
+		strcpy(l_prev_nationality_code.arr,r_nationality_code.arr);
+		strcpy(l_prev_episode_type.arr,r_episode_type.arr);	
+		
+		print_region_record();
+		print_area_record();
+		calc_region_revenue();
+		calc_region_no_adm_visit();
+		calc_region_patient_days();
+
+		calc_area_revenue();
+		calc_area_no_adm_visit();
+		calc_area_patient_days();
+
+		calc_nat_revenue();
+		get_nationality_desc();
+		calc_nat_no_adm_visit();
+		calc_nat_patient_days();
+		
+	}
+
+	if (l_rec_count > 1)
+	{
+		//if previous region code is current region code then
+		//region code should not be printed, and the check has 
+		//to be continue for area level
+		if (strcmp(l_prev_region_code.arr,r_region_code.arr) == 0)
+		{
+			calc_region_revenue();
+			calc_region_no_adm_visit();
+			calc_region_patient_days();
+
+			//if previous residence area code is current res area 
+			//code then, residence area code should not be printed
+			if (strcmp(l_prev_res_area_code.arr,r_res_area_code.arr) == 0)
+			{
+				calc_area_revenue();
+				calc_area_no_adm_visit();
+				calc_area_patient_days();
+
+				//if previous residence code is current residence code
+				//then nationality has to be checked.
+				if (strcmp(l_prev_nationality_code.arr,r_nationality_code.arr) == 0)
+				{
+					calc_nat_revenue();
+					calc_nat_no_adm_visit();
+					calc_nat_patient_days();
+				}	
+				//else nationality
+				else
+				{
+					print_nat_record();
+					swap_nat_variables();
+					calc_nat_revenue();
+					calc_nat_no_adm_visit();
+					calc_nat_patient_days();
+				}
+			}
+			//else residence area code and rest of the fields has 
+			//to be printed.
+			else
+			{
+				print_nat_record();
+				print_area_total();
+				print_area_record();
+
+				swap_area_vaiables();
+				calc_area_revenue();
+				calc_area_no_adm_visit();
+				calc_area_patient_days();
+
+				swap_nat_variables();
+				calc_nat_revenue();
+				calc_nat_no_adm_visit();
+				calc_nat_patient_days();
+			}
+			//disp_message(ERR_MESG,"OUT IF AREA");					
+			
+		}
+		//if previous not equal to current the new value is 
+		//assigned to previous and rest of line other than 
+		//region code  is printed.
+		else
+		{
+			print_nat_record();
+			print_area_total();
+			print_region_total();
+			print_region_record();
+			print_area_record();
+
+			swap_region_vaiables();
+			calc_region_revenue();
+			calc_region_no_adm_visit();
+			calc_region_patient_days();
+
+			swap_area_vaiables();
+			calc_area_revenue();
+			calc_area_no_adm_visit();
+			calc_area_patient_days();
+
+			swap_nat_variables();
+			calc_nat_revenue();
+			calc_nat_no_adm_visit();
+			calc_nat_patient_days();
+		}
+		//disp_message(ERR_MESG,"OUT IF REGION");					
+
+	}//l_rec_count <> 1 if condition
+
+  }
+  print_nat_record();
+  print_area_total();
+  print_region_total();
+  print_report_total();
+  print_report_end();  
+  EXEC SQL CLOSE ip_op_revenue_cur;	
+}
+
+/* prepares for the new page */
+void prepare_new_page()
+{
+   //fprintf(f1,"");
+   print_page_header();
+}
+
+// returns 0 if the end of cursor is reached else returns 1
+int fetch_ip_op_revenue_cur()
+{
+	//disp_message(ERR_MESG,"F1");
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	EXEC SQL FETCH ip_op_revenue_cur 
+			  INTO	 :r_region_code,
+					 :r_region_desc,
+					 :r_res_area_code,
+					 :r_res_area_desc,
+					 :r_nationality_code,
+					 :r_episode_type,
+					 :r_episode_id,
+					 :r_visit_id,
+					 :r_revenue;
+
+		//sprintf(aMesg,"Revenue : %-10d",r_revenue);
+		//disp_message(ERR_MESG,aMesg);
+
+	 if (NODATAFOUND)
+		return 0;
+
+	 r_region_code.arr[r_region_code.len]='\0';
+	 r_region_desc.arr[r_region_desc.len]='\0';
+	 r_res_area_code.arr[r_res_area_code.len]='\0';
+	 r_res_area_desc.arr[r_res_area_desc.len]='\0';
+	 r_nationality_code.arr[r_nationality_code.len]='\0';
+	 r_episode_type.arr[r_episode_type.len]='\0';
+	
+    return 1;
+	
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at fetch_ip_op_revenue_cur() occured....");
+		sprintf(aMesg,"Error: %-100s",sqlca.sqlerrm.sqlerrmc);
+		disp_message(ERR_MESG,aMesg);
+		disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+		proc_exit();
+}
+
+//Print the finishing line of the report 
+void end_report()
+{
+  fprintf(f1,"\n\n");
+  fprintf(f1,"                                                   ");
+  fprintf(f1,"** End of Report **");
+  fprintf(f1,"");
+}  
+
+//to print the header page for the report  
+void print_rep_header()    
+{
+
+    fprintf(f1,"%c&l1O",ESC);   /* To Print Landscape           */
+    fprintf(f1,"%c(s14H",ESC); 	/* To set the font size			*/
+
+	init_date_temp_var();
+	 strcpy(date_convert.arr,d_sysdate.arr);
+     fun_change_loc_date();
+
+	if (strcmp(nd_report_option.arr,"B") == 0)
+	{
+		//fprintf(f1,"\f%-5.5s : %2.2s%45.45s%s%39.39s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+        fprintf(f1,"%-5.5s : %2.2s%45.45s%s%39.39s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%23.23s%5.5s%1s%5.5s%1s%-47.47s%12.12s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[260],"/",loc_legend[290],"/",loc_legend[200]," ",loc_legend[30],++page_no);
+ 		fprintf(f1,"---------------------------------------------------------------------------------------------------------------------------------------\n");
+	}
+	else if (strcmp(nd_report_option.arr,"I")==0)
+	{
+		//fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%6.6s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[170]," ",loc_legend[30],++page_no);
+		fprintf(f1,"------------------------------------------------------------------------------------------------\n");
+	}
+	else if (strcmp(nd_report_option.arr,"D")==0)
+	{
+		//fprintf(f1,"\f%-5.5s : %2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+		fprintf(f1,"%-5.5s : %2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%6.6s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[180]," ",loc_legend[30],++page_no);
+		fprintf(f1,"------------------------------------------------------------------------------------------------\n");
+	}
+
+	else if (strcmp(nd_report_option.arr,"O")==0)
+	{
+
+		//fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+		fprintf(f1,"%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%6.6s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[190]," ",loc_legend[30],++page_no);
+		fprintf(f1,"------------------------------------------------------------------------------------------------\n");
+	}
+	else if (strcmp(nd_report_option.arr,"E")==0)
+	{
+
+		//fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+		fprintf(f1,"%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%6.6s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[50]," ",loc_legend[30],++page_no);
+		fprintf(f1,"------------------------------------------------------------------------------------------------\n");
+	}
+
+	else if (strcmp(nd_report_option.arr,"R")==0)
+	{
+
+		//fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);commented by saikiran
+		fprintf(f1,"%-5.5s : %2.2s%28.28s%s%25.25s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%6.6s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[200]," ",loc_legend[30],++page_no);
+		fprintf(f1,"------------------------------------------------------------------------------------------------\n");
+	}
+	fprintf(f1,"\n\n\n\n\n        %-20.20s :\n        ----------------\n\n",loc_legend[520]);
+
+
+	if (strcmp(nd_fm_trans_date.arr,"!!!!")==0) 
+		fprintf(f1,"\t\t%20.20s\t%10.10s\t\t %10.10s\n",loc_legend[80],loc_legend[60],loc_legend[420]);
+	else
+	 {
+	 init_date_temp_var();
+	 strcpy(date_convert.arr,nd_fm_trans_date.arr);
+     fun_change_loc_date();
+	    fprintf(f1,"\t\t%20.20s\t%10.10s\t\t    %10.10s\n",loc_legend[80],loc_legend[60],date_convert.arr);
+	 }
+
+	if (strcmp(nd_to_trans_date.arr,"~~~~")==0)
+	    fprintf(f1,"\t\t      \t\t        %10.10s\t\t   %6.6s\n",loc_legend[70],loc_legend[430]);
+	else
+	 {
+	 init_date_temp_var();
+	 strcpy(date_convert.arr,nd_to_trans_date.arr);
+     fun_change_loc_date();
+	    fprintf(f1,"\t\t      \t\t        %10.10s\t\t   %11.11s\n\n",loc_legend[70],date_convert.arr);
+	 }
+
+	if (strcmp(nd_fm_nat_code.arr,"!!!!")==0) 
+	
+	    fprintf(f1,"\t\t%20.20s\t%10.10s\t\t    %-10.10s\n",loc_legend[90],loc_legend[60],loc_legend[420]);
+	else
+	    fprintf(f1,"\t\t%20.20s\t%10.10s\t\t    %-10.10s\n",loc_legend[90],loc_legend[60],nd_fm_nat_code.arr);
+
+	if (strcmp(nd_to_nat_code.arr,"~~~~")==0)
+	
+	    fprintf(f1,"\t\t      \t\t        %10.10s\t\t    %-10.10s\n\n",loc_legend[70],loc_legend[430]);
+	else
+	    fprintf(f1,"\t\t      \t\t        %10.10s\t\t    %-10.10s\n\n",loc_legend[70],nd_to_nat_code.arr);
+
+	if (strcmp(nd_fm_region_cd.arr,"!!!!!")==0)
+	
+	    fprintf(f1,"\t\t%15s\t        %10.10s\t\t    %-10.10s\n",loc_legend[100],loc_legend[60],loc_legend[420]);
+	else
+	    fprintf(f1,"\t\t%15s\t        %10.10s\t\t    %-10.10s\n",loc_legend[100],loc_legend[60],nd_fm_region_cd.arr);
+
+	if (strcmp(nd_to_region_cd.arr,"~~~~~")==0)     
+	
+	    fprintf(f1,"\t\t        \t\t%10.10s\t\t    %-10.10s\n\n",loc_legend[70],loc_legend[430]);
+	else
+	    fprintf(f1,"\t\t        \t\t%10.10s\t\t    %-10.10s\n\n",loc_legend[70],nd_to_region_cd.arr);
+
+	if (strcmp(nd_fm_res_area_cd.arr,"!!!!!!")==0)
+	
+	    fprintf(f1,"\t\t%23.23s\t%10.10s \t\t    %-10.10s\n",loc_legend[130],loc_legend[60],loc_legend[420]);
+	else
+        fprintf(f1,"\t\t%23.23s\t%10.10s \t\t    %-10.10s\n",loc_legend[130],loc_legend[60],nd_fm_res_area_cd.arr);
+
+	if (strcmp(nd_to_res_area_cd.arr,"~~~~~~")==0)
+	
+	    fprintf(f1,"\t\t      \t\t        %10.10s \t\t    %-10.10s\n\n",loc_legend[70],loc_legend[430]);
+	else
+	    fprintf(f1,"\t\t      \t\t        %10.10s \t\t    %-10.10s\n\n",loc_legend[70],nd_to_res_area_cd.arr);
+
+	if (strcmp(nd_fm_doc_cd.arr,"!!!!!!")==0) 
+	
+	    fprintf(f1,"\t\t%15.15s\t\t%10.10s\t\t    %-10.10s\n",loc_legend[140],loc_legend[60],loc_legend[420]);
+	else
+	    fprintf(f1,"\t\t%15.15s\t\t%10.10s\t\t    %-10.10s\n",loc_legend[140],loc_legend[60],nd_fm_doc_cd.arr);
+
+	if (strcmp(nd_to_doc_cd.arr,"~~~~~~")==0) 
+	
+	    fprintf(f1,"\t\t        \t\t%10.10s\t\t    %-10.10s\n\n",loc_legend[70],loc_legend[430]);
+	else
+	    fprintf(f1,"\t\t        \t\t%10.10s\t\t    %-10.10s\n\n",loc_legend[70],nd_to_doc_cd.arr);
+
+    if (strcmp(nd_report_option.arr,"B")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %3.3s",loc_legend[110],loc_legend[280]);
+	}
+	else if (strcmp(nd_report_option.arr,"O")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %10.10s",loc_legend[110],loc_legend[380]);
+	}
+	else if (strcmp(nd_report_option.arr,"E")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %9.9s",loc_legend[110],loc_legend[390]);
+	}
+
+	else if  (strcmp(nd_report_option.arr,"I")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %9.9s",loc_legend[110],loc_legend[360]);
+	}
+	else if  (strcmp(nd_report_option.arr,"D")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %7.7s",loc_legend[110],loc_legend[370]);
+	}
+
+	else if  (strcmp(nd_report_option.arr,"R")==0)
+	{
+		fprintf(f1,"\t\t%16.16s           \t\t            %8.8s",loc_legend[110],loc_legend[400]);
+	}
+
+	
+  
+	return;  
+
+	err_exit:
+		EXEC SQL WHENEVER SQLERROR CONTINUE;
+		EXEC SQL ROLLBACK WORK RELEASE;
+		disp_message(ERR_MESG,"Oracle error at print_title() occured....");
+		disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   
+		proc_exit();
+}
+  
+
+/* to print page headers the header details */ 
+void print_page_header()
+{   
+     init_date_temp_var();
+	 strcpy(date_convert.arr,d_sysdate.arr);
+     fun_change_loc_date();
+
+	if (strcmp(nd_report_option.arr,"B") == 0)  
+	{ 
+		
+		fprintf(f1,"\f%-5.5s : %2.2s%43.43s%s%53.53s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10s \n",loc_legend[550], d_user.arr);
+//		fprintf(f1,"%-5.5s : %-8.8s%24.24s%5.5s%1s%5.5s%1s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[260],"/",loc_legend[290],"/",loc_legend[200]," ",loc_legend[30],++page_no);COMMENTED BY SAIKIRAN
+		fprintf(f1,"%-5.5s : %-8.8s%24.24s%5.5s%1s%7.7s%1s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[260],"/",loc_legend[290],"/",loc_legend[200]," ",loc_legend[30],++page_no);
+																											      
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------\n");
+		/*fprintf(f1,"%6s%6s%4s%3s%11s%15s%5s %3s    %5s %7s%1s%5s    %5s %7s%4s     %10s   %5s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[250],loc_legend[260],loc_legend[270]," ",loc_legend[240],loc_legend[290],loc_legend[300]," ",loc_legend[310],loc_legend[320]);
+		fprintf(f1,"      %6.6s    %3.3s           %15.15s%3.3s   %4.4s                %1s%6.6s                %4.4s             %5.5s             \n"," "," "," ",loc_legend[330],loc_legend[340]," ",loc_legend[350]," "," ");*/
+		fprintf(f1,"%10.10s%2.2s%8.8s%2.2s%15.15s%10.10s%7.7s %5.5s %7.7s%9.9s%1s%7.7s    %7.7s %9.9s%2.2s%-12.12s   %-15.15s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[250],loc_legend[260],loc_legend[270]," ",loc_legend[240],loc_legend[290],loc_legend[300]," ",loc_legend[310],loc_legend[320]);
+		fprintf(f1,"      %7.7s    %3.3s           %15.15s %7.7s %6.6s                %1s%8.8s                %4.4s             %5.5s             \n"," "," "," ",loc_legend[330],loc_legend[340]," ",loc_legend[350]," "," ");
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------------\n");
+	}
+	else if (strcmp(nd_report_option.arr,"I")==0)
+	{
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%42.42s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10.10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[170]," ",loc_legend[30],++page_no);
+		fprintf(f1,"-------------------------------------------------------------------------------------------------------------\n");
+		fprintf(f1,"%10.10s%8.8s%8.8s%5.5s%15.15s%14.14s%7.7s %7.7s%4.4s%5.5s %6.6s%4.4s%12.12s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[330]," ",loc_legend[250],loc_legend[340]," ",loc_legend[440]);
+//fprintf(f1,"%6s%12s%4s%9s%11s%17s%5s %3s%7s%3s %4s%10s%10s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[330]," ",loc_legend[250],loc_legend[340]," ",loc_legend[440]);
+		fprintf(f1,"-------------------------------------------------------------------------------------------------------------\n");
+	}
+	else if (strcmp(nd_report_option.arr,"D")==0)
+	{
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%42.42s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10.10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[180]," ",loc_legend[30],++page_no);
+		fprintf(f1,"-------------------------------------------------------------------------------------------------------------\n");
+		//fprintf(f1,"%6s%12s%4s%9s%11s%17s%5s %3s%7s%3s %4s%10s%10s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[330]," ",loc_legend[250],loc_legend[340]," ",loc_legend[450]);
+		fprintf(f1,"%10.10s%8.8s%8.8s%5.5s%15.15s%14.14s%7.7s %7.7s%4.4s%5.5s %6.6s%5.5s%12.12s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[330]," ",loc_legend[250],loc_legend[340]," ",loc_legend[450]);
+		fprintf(f1,"-------------------------------------------------------------------------------------------------------------\n");
+	}
+    
+	else if (strcmp(nd_report_option.arr,"O")==0)
+	{
+
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%42.42s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10.10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[190]," ",loc_legend[30],++page_no);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+		//fprintf(f1,"%10.10s%11.11s%8.8s%9.9s%15.15s%15.15s%7.7s %8.8s%6.6s%14.14s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[350]," ",loc_legend[460]); commented by saikiran
+		fprintf(f1,"%10.10s%8.8s%8.8s%11.11s%15.15s%15.15s%6.6s %8.8s%8.8s%14.14s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[350]," ",loc_legend[460]);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+	}
+
+	else if (strcmp(nd_report_option.arr,"R")==0)
+	{
+
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%41.41s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10.10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%22.22s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[200]," ",loc_legend[30],++page_no);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+		fprintf(f1,"%10.10s%8.8s%8.8s%6.6s%14.14s%19.19s     %9.9s%12.12s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," "," ",loc_legend[310]);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+	}    
+
+	else if (strcmp(nd_report_option.arr,"E")==0)
+	{
+
+		fprintf(f1,"\f%-5.5s : %2.2s%28.28s%s%42.42s%s\n",loc_legend[540],loc_legend[150]," ",d_acc_entity_name.arr," ",date_convert.arr);
+		fprintf(f1,"%-5.5s : %-10.10s \n",loc_legend[550], d_user.arr);
+		fprintf(f1,"%-5.5s : %-8.8s%10.10s%-47.47s%23.23s%-4.4s : %4d\n",loc_legend[560],loc_legend[40]," ",loc_legend[50]," ",loc_legend[30],++page_no);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+		fprintf(f1,"%10.10s%8.8s%8.8s%8.8s%18.18s%16.16s%5.5s %8.8s%9.9s%14.14s\n",loc_legend[210]," ",loc_legend[220]," ",loc_legend[230]," ",loc_legend[240],loc_legend[350]," ",loc_legend[480]);
+		fprintf(f1,"----------------------------------------------------------------------------------------------------------\n");
+	}
+
+	line_no = 7;
+}
+
+calc_nat_no_adm_visit()
+{
+	if (strcmp(r_episode_type.arr,"I")==0)
+	{
+			++l_nat_no_of_adm;
+	
+	}
+	else if (strcmp(r_episode_type.arr,"D")==0)		//31/10/2004
+	{
+			++l_nat_no_of_adm;
+	}
+	else if (strcmp(r_episode_type.arr,"O")==0)
+	{
+			++l_nat_no_of_visit;
+	}
+	else if (strcmp(r_episode_type.arr,"E")==0)		//31/10/2004
+	{
+			++l_nat_no_of_visit;
+	}
+
+	return;
+}
+
+
+calc_nat_patient_days()
+{
+
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0))
+	{
+			EXEC SQL SELECT CEIL(NVL(DISCHARGE_DATE_TIME,SYSDATE) - ADMISSION_dATE_TIME)  
+					   INTO :l_nat_patient_days
+					   FROM IP_EPISODE
+					  WHERE episode_id = :r_episode_id
+					  AND  FACILITY_ID = :nd_operating_facility_id;
+
+					  if (l_nat_patient_days < 1) 
+					  {
+						  l_nat_patient_days = 1;
+					  }	
+
+
+					  l_nat_no_patient_days = l_nat_patient_days + l_nat_no_patient_days;
+
+			return;	
+			err_exit:
+				EXEC SQL WHENEVER SQLERROR CONTINUE;
+				EXEC SQL ROLLBACK WORK RELEASE;
+				disp_message(ERR_MESG,"Oracle error at calc_nat_patient_days occured");
+				disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+				proc_exit();
+	}
+	
+	return;
+
+}
+
+calc_nat_revenue()
+{
+
+	//sprintf(aMesg,"Revenue Ip IP %16.2f - %16.2f - %16.2f",r_revenue,l_nat_ip_revenue,l_nat_op_revenue);
+	//disp_message(ERR_MESG,aMesg);
+
+	if (strcmp(r_episode_type.arr,"I")==0) 
+	{
+		l_nat_ip_revenue	= l_nat_ip_revenue + r_revenue;	
+	}
+	else if (strcmp(r_episode_type.arr,"D")==0) 
+	{
+		l_nat_ip_revenue	= l_nat_ip_revenue + r_revenue;
+	}
+
+	else if (strcmp(r_episode_type.arr,"O")==0) 
+	{
+		l_nat_op_revenue = l_nat_op_revenue + r_revenue;
+	}
+	
+	else if (strcmp(r_episode_type.arr,"E")==0) 
+	{
+		l_nat_op_revenue = l_nat_op_revenue + r_revenue;
+	}
+
+	else if (strcmp(r_episode_type.arr,"R")==0) 
+	{
+		l_nat_rf_revenue = l_nat_rf_revenue + r_revenue;
+	}
+
+
+	return;
+}
+
+calc_area_tot_revenue()
+{
+	l_total_area_revenue = l_total_area_revenue + r_revenue;
+	return;
+}
+
+calc_area_no_adm_visit()
+{
+	if (strcmp(r_episode_type.arr,"I")==0)
+	{
+			++l_area_no_of_adm;
+	
+	}
+	else if (strcmp(r_episode_type.arr,"D")==0)	//31/10/2004
+	{
+			++l_area_no_of_adm;
+	
+	}
+	else if (strcmp(r_episode_type.arr,"O")==0) 
+	{
+			++l_area_no_of_visit;
+	}
+	else if (strcmp(r_episode_type.arr,"E")==0)		//31/10/2004
+	{
+			++l_area_no_of_visit;
+	}
+
+
+	return;
+}
+
+
+calc_area_patient_days()
+{
+
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0))
+	{
+			EXEC SQL SELECT CEIL(NVL(DISCHARGE_DATE_TIME,SYSDATE) - ADMISSION_dATE_TIME) 
+					   INTO :l_area_patient_days
+					   FROM IP_EPISODE
+					  WHERE episode_id = :r_episode_id
+					  and   FACILITY_ID = :nd_operating_facility_id;
+
+					  if (l_area_patient_days < 1) 
+					  {
+						  l_area_patient_days = 1;
+					  }	
+			
+					  l_area_no_patient_days = l_area_patient_days + l_area_no_patient_days;
+
+			return;	
+			err_exit:
+				EXEC SQL WHENEVER SQLERROR CONTINUE;
+				EXEC SQL ROLLBACK WORK RELEASE;
+				disp_message(ERR_MESG,"Oracle error at calc_nat_patient_days occured");
+				disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+				proc_exit();
+
+	}
+	
+
+	return;
+
+}
+
+calc_area_revenue()
+{
+
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0))
+	{
+
+		//sprintf(aMesg,"area revenue + revenue = %16.2f + %16.2f ",l_area_ip_revenue,r_revenue);
+		//disp_message(ERR_MESG,aMesg);
+
+		l_area_ip_revenue	= l_area_ip_revenue + r_revenue;
+	
+		//sprintf(aMesg,"Total %16.2f ",l_area_ip_revenue);
+		//disp_message(ERR_MESG,aMesg);
+
+
+	}
+	else if ((strcmp(r_episode_type.arr,"O")==0) || (strcmp(r_episode_type.arr,"E")==0) )
+	{
+		l_area_op_revenue = l_area_op_revenue + r_revenue;
+	}
+	
+	else if ((strcmp(r_episode_type.arr,"R")==0) )
+	{
+		l_area_rf_revenue = l_area_rf_revenue + r_revenue;
+	}
+	
+	return;
+}
+
+calc_region_no_adm_visit()
+{
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0))
+	{
+			++l_reg_no_of_adm;
+			//for grand total
+			++l_rep_no_of_adm;
+	
+	}
+	else if ((strcmp(r_episode_type.arr,"O")==0) || (strcmp(r_episode_type.arr,"E")==0))
+	{
+			++l_reg_no_of_visit;
+			//for grand total
+			++l_rep_no_of_visit;
+	}
+
+	
+	return;
+}
+
+
+calc_region_patient_days()
+{
+
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0) )
+	{
+			EXEC SQL SELECT CEIL(NVL(DISCHARGE_DATE_TIME,SYSDATE) - ADMISSION_dATE_TIME)
+					   INTO :l_reg_patient_days
+					   FROM IP_EPISODE
+					  WHERE episode_id = :r_episode_id
+					  AND   FACILITY_ID = :nd_operating_facility_id;
+
+					  if (l_reg_patient_days < 1) 
+					  {
+						  l_reg_patient_days = 1;
+					  }	
+
+					 l_reg_no_patient_days = l_reg_patient_days + l_reg_no_patient_days;
+					 l_rep_no_patient_days = l_reg_patient_days + l_rep_no_patient_days;
+					 return;	
+			err_exit:
+				EXEC SQL WHENEVER SQLERROR CONTINUE;
+				EXEC SQL ROLLBACK WORK RELEASE;
+				disp_message(ERR_MESG,"Oracle error at calc_nat_patient_days occured");
+				disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+				proc_exit();
+	}
+	return;
+
+}
+
+calc_region_tot_revenue()
+{
+	l_total_region_revenue = l_total_region_revenue + r_revenue;
+	return;
+}
+
+calc_region_revenue()
+{
+	if ((strcmp(r_episode_type.arr,"I")==0) || (strcmp(r_episode_type.arr,"D")==0) )
+	{
+		l_reg_ip_revenue	= l_reg_ip_revenue + r_revenue;
+		//for report total
+		l_rep_ip_revenue	= l_rep_ip_revenue + r_revenue;
+	}
+	else if ((strcmp(r_episode_type.arr,"O")==0) || (strcmp(r_episode_type.arr,"E")==0))
+	{
+		l_reg_op_revenue = l_reg_op_revenue + r_revenue;
+		//for report total
+		l_rep_op_revenue = l_rep_op_revenue + r_revenue;
+	}
+
+	else if ((strcmp(r_episode_type.arr,"R")==0) )
+	{
+		l_reg_rf_revenue = l_reg_rf_revenue + r_revenue;
+		//for report total
+		l_rep_rf_revenue = l_rep_rf_revenue + r_revenue;
+	}
+
+	
+	return;
+}
+   
+swap_region_vaiables()
+{
+	strcpy(l_prev_region_code.arr,r_region_code.arr);
+	strcpy(l_prev_region_desc.arr,r_region_desc.arr);
+	l_total_region_revenue	= 0;
+	l_reg_no_of_adm			= 0;
+	l_reg_no_of_visit		= 0;
+	l_reg_no_patient_days	= 0;
+	l_reg_ip_revenue		= 0;
+	l_reg_op_revenue		= 0;
+	l_reg_rf_revenue		= 0;
+
+	return;
+}
+
+swap_area_vaiables()
+{
+	strcpy(l_prev_res_area_code.arr,r_res_area_code.arr);
+	strcpy(l_prev_area_desc.arr,r_res_area_desc.arr);
+
+	l_total_area_revenue	= 0;
+	l_area_no_of_adm		= 0;
+	l_area_no_of_visit		= 0;
+	l_area_no_patient_days	= 0;
+	l_area_ip_revenue		= 0;
+	l_area_op_revenue		= 0;
+	l_area_rf_revenue		= 0;
+
+	return;
+}
+
+swap_nat_variables()
+{
+	strcpy(l_prev_nationality_code.arr,r_nationality_code.arr);
+	l_prev_nationality_code.arr[strlen(l_prev_nationality_code.arr)]='\0';
+	get_nationality_desc();
+
+	l_nat_no_of_adm			= 0;
+	l_nat_no_of_visit		= 0;
+	l_nat_no_patient_days	= 0;
+	l_nat_ip_revenue		= 0;
+	l_nat_op_revenue		= 0;
+	l_nat_rf_revenue        = 0;
+
+	return;
+}
+
+print_region_record()
+{
+	//sprintf(aMesg,"Region Code : %-6s",r_region_code.arr);
+	//disp_message(ERR_MESG,aMesg);
+
+	if (strcmp(r_region_code.arr,"Nil")==0)
+	{
+		fprintf(f1,"\n%6s %-15.15s\n"," ",r_region_desc.arr); 
+	}
+	else
+	{
+		//fprintf(f1,"\n%6s %-15.15s\n",r_region_code.arr,r_region_desc.arr); commented by saikiran
+		  fprintf(f1,"\n%4s%-5s %-15.15s\n","",r_region_code.arr,r_region_desc.arr);
+	}
+
+	line_no = line_no + 2;
+	check_page_end();
+}
+
+print_area_record()
+{
+	if (strcmp(nd_report_option.arr,"B")==0)
+	{
+		if (strcmp(r_res_area_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%12s%6s %-15.15s\n"," "," ",r_res_area_desc.arr);
+		}
+		else
+		{
+			//fprintf(f1,"%12s%6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr);commented by saikiran
+			fprintf(f1,"%16s%-6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr);
+		}
+	}
+	else if ((strcmp(nd_report_option.arr,"I")==0) || (strcmp(nd_report_option.arr,"D")==0))
+	{
+		//fprintf(f1,"%18s%6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr);commneted by saikiran
+		fprintf(f1,"%22s%-6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr);
+
+	}
+	else if ((strcmp(nd_report_option.arr,"O")==0) || (strcmp(nd_report_option.arr,"E")==0) || (strcmp(nd_report_option.arr,"R")==0))
+	{ 
+		//fprintf(f1,"%21s%6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr); commented by saikiran
+		fprintf(f1,"%22s%-6s %-15.15s\n"," ",r_res_area_code.arr,r_res_area_desc.arr);
+	
+	}
+	line_no = line_no + 1;
+	check_page_end();
+}
+
+print_nat_record()
+{
+
+	if (strcmp(nd_report_option.arr,"B")==0)
+	{
+		l_nat_total_revenue = 	l_nat_ip_revenue + l_nat_op_revenue + l_nat_rf_revenue;
+		sprintf(l_fmt_nat_total_revenue,"%18.2f",l_nat_total_revenue);
+		format_amt(l_fmt_nat_total_revenue);
+		
+		sprintf(l_fmt_nat_op_revenue,"%16.2f",l_nat_op_revenue);
+		format_amt(l_fmt_nat_op_revenue);
+		
+		sprintf(l_fmt_nat_rf_revenue,"%16.2f",l_nat_rf_revenue);
+		format_amt(l_fmt_nat_rf_revenue);
+
+		sprintf(l_fmt_nat_ip_revenue,"%16.2f",l_nat_ip_revenue);
+		format_amt(l_fmt_nat_ip_revenue);
+		
+		if (strcmp(l_prev_nationality_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%19s%-4s %-20s %8d %4d %16s %4d %16s %16s %18s\n"," "," ",
+								l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,
+								l_fmt_nat_ip_revenue,l_nat_no_of_visit,l_fmt_nat_op_revenue,l_fmt_nat_rf_revenue, l_fmt_nat_total_revenue);
+		}
+		else
+		{ 
+			//fprintf(f1,"%19s%-4s %-20s %8d %4d %16s %4d %16s %16s %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,l_fmt_nat_ip_revenue,l_nat_no_of_visit,l_fmt_nat_op_revenue,l_fmt_nat_rf_revenue, l_fmt_nat_total_revenue);
+				fprintf(f1,"%26s%-4s %-20s%-5d %-5d %14s %4d %22s %11s %17s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,l_fmt_nat_ip_revenue,l_nat_no_of_visit,l_fmt_nat_op_revenue,l_fmt_nat_rf_revenue, l_fmt_nat_total_revenue);
+		}		
+
+		++line_no;
+	}
+	else if ((strcmp(nd_report_option.arr,"I")==0) || (strcmp(nd_report_option.arr,"D")==0))
+	{
+
+		sprintf(l_fmt_nat_ip_revenue,"%16.2f",l_nat_ip_revenue);
+		format_amt(l_fmt_nat_ip_revenue);
+
+		if (strcmp(l_prev_nationality_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%31s%-4s %-20.20s     %12d %13d  %18s\n"," "," ",l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,l_fmt_nat_ip_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%35s%-4s %-20s     %8d %13d  %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,l_fmt_nat_ip_revenue);
+		  //fprintf(f1,"%31s%-4s %-20s     %8d %13d  %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_adm,l_nat_no_patient_days,l_fmt_nat_ip_revenue);
+		}
+		++line_no;
+	}
+	else if ((strcmp(nd_report_option.arr,"O")==0) || (strcmp(nd_report_option.arr,"E")==0) )
+	{
+
+		sprintf(l_fmt_nat_op_revenue,"%16.2f",l_nat_op_revenue);
+		format_amt(l_fmt_nat_op_revenue);
+
+		if (strcmp(l_prev_nationality_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%37s %-4s %-20s  %17d    %18s\n"," "," ",l_prev_nat_desc.arr,l_nat_no_of_visit,l_fmt_nat_op_revenue);
+		}
+		else
+		{
+		fprintf(f1,"%40s %-4s %-20s  %14d    %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_visit,l_fmt_nat_op_revenue);
+		//	fprintf(f1,"%37s %-4s %-20s  %17d    %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_visit,l_fmt_nat_op_revenue);commented by saikiran
+			//fprintf(f1,"%37s %-4s %-20s  %13d    %18s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_nat_no_of_visit,l_fmt_nat_op_revenue);
+		}
+
+		++line_no;
+	}
+	else if ((strcmp(nd_report_option.arr,"R")==0))
+	{
+
+		sprintf(l_fmt_nat_rf_revenue,"%16.2f",l_nat_rf_revenue);
+		format_amt(l_fmt_nat_rf_revenue);
+
+		if (strcmp(l_prev_nationality_code.arr,"Nil")==0)
+		{
+			 fprintf(f1,"%37s %-4s %-20s      %22s\n"," "," ",l_prev_nat_desc.arr, l_fmt_nat_rf_revenue);
+ 		}
+		else
+		{
+			//fprintf(f1,"%37s %-4s %-20s      %22s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_fmt_nat_rf_revenue);commented by saikrian
+			fprintf(f1,"%34s %-4s %-20s      %25s\n"," ",l_prev_nationality_code.arr,l_prev_nat_desc.arr,l_fmt_nat_rf_revenue);
+		}
+
+		++line_no;
+	}
+
+	check_page_end();
+}
+
+print_area_total()
+{
+	if (strcmp(nd_report_option.arr,"B")==0)
+	{
+
+		l_total_area_revenue = 	l_area_ip_revenue + l_area_op_revenue + l_area_rf_revenue;
+		sprintf(l_fmt_total_area_revenue,"%18.2f",l_total_area_revenue);
+		format_amt(l_fmt_total_area_revenue);
+		
+		sprintf(l_fmt_area_op_revenue,"%16.2f",l_area_op_revenue);
+		format_amt(l_fmt_area_op_revenue);
+
+		sprintf(l_fmt_area_ip_revenue,"%16.2f",l_area_ip_revenue);
+		format_amt(l_fmt_area_ip_revenue);
+		
+		sprintf(l_fmt_area_rf_revenue,"%16.2f",l_area_rf_revenue);
+		format_amt(l_fmt_area_rf_revenue);
+
+
+		fprintf(f1,"%46s------------------------------------------------------------------------------------------\n"," ");
+
+		if (strcmp(l_prev_res_area_code.arr,"Nil")==0)
+		{
+//			fprintf(f1,"%12.12s%18.18s %-6.6s %4.4s %5.5s %4d %4d %16s %4d %16s %16s %18s\n\n"," ",loc_legend[490]," "," "," ",l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue,l_area_no_of_visit,l_fmt_area_op_revenue,l_fmt_area_rf_revenue, l_fmt_total_area_revenue);COMMENTED BY SAIKIRAN
+			fprintf(f1,"%12.12s%18.18s %-6.6s %4.4s %5.5s %4d %7d %16s %4d %23s %11s %17s\n\n"," ",loc_legend[490]," "," "," ",l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue,l_area_no_of_visit,l_fmt_area_op_revenue,l_fmt_area_rf_revenue, l_fmt_total_area_revenue);
+        }
+		else  if (l_area_no_patient_days ==0) //added by saikiran
+		{
+				fprintf(f1,"%12s%18.18s %-6s %4s %2s %6d %5d %18s %4d   %20s %11s %17s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr," "," ",l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue,l_area_no_of_visit,l_fmt_area_op_revenue,l_fmt_area_rf_revenue, l_fmt_total_area_revenue);
+		            }                               
+			else
+			{	//fprintf(f1,"%12s%18.18s %-6s %4s %5s %4d %4d %16s %4d %16s %16s %18s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr," "," ",l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue,l_area_no_of_visit,l_fmt_area_op_revenue,l_fmt_area_rf_revenue, l_fmt_total_area_revenue);COMMENTED BY SAIKIRAN
+				fprintf(f1,"%12s%18.18s %-6s %4s %5s%4d %8d %15s %4d %22s %11s %17s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr," "," ",l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue,l_area_no_of_visit,l_fmt_area_op_revenue,l_fmt_area_rf_revenue, l_fmt_total_area_revenue);
+ 				              
+			}
+	     }
+	else if ((strcmp(nd_report_option.arr,"I")==0) || (strcmp(nd_report_option.arr,"D")==0))
+	{
+		sprintf(l_fmt_area_ip_revenue,"%16.2f",l_area_ip_revenue);
+		format_amt(l_fmt_area_ip_revenue);
+
+		fprintf(f1,"%59s--------------------------------------------------\n"," ");
+
+		if (strcmp(l_prev_res_area_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%18s%18s %-6s %-15s      %8d %13d  %18s\n\n"," ",loc_legend[490]," ",l_prev_area_desc.arr,l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%18s%18.18s %-6s %-15s      %8d %13d  %18s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr,l_prev_area_desc.arr,l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue);
+		  //fprintf(f1,"%18s%14s %-6s %-15s      %8d %13d  %18s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr,l_prev_area_desc.arr,l_area_no_of_adm,l_area_no_patient_days,l_fmt_area_ip_revenue);
+		}
+	}
+	else if ((strcmp(nd_report_option.arr,"O")==0) || (strcmp(nd_report_option.arr,"E")==0))
+	{
+		sprintf(l_fmt_area_op_revenue,"%16.2f",l_area_op_revenue);
+		format_amt(l_fmt_area_op_revenue);
+
+		fprintf(f1,"%67s---------------------------------------\n"," ");
+		
+		if (strcmp(l_prev_res_area_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%21s%18.18s %-6s %-15s %4s  %13d    %18s\n\n"," ",loc_legend[490]," ",l_prev_area_desc.arr," ",l_area_no_of_visit,l_fmt_area_op_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%21s%18.18s %-6s %-15s %4s  %13d    %18s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr,l_prev_area_desc.arr," ",l_area_no_of_visit,l_fmt_area_op_revenue);
+		}
+	}
+	else if ((strcmp(nd_report_option.arr,"R")==0))
+	{
+		sprintf(l_fmt_area_rf_revenue,"%16.2f",l_area_rf_revenue);
+		format_amt(l_fmt_area_rf_revenue);
+
+		fprintf(f1,"%67s---------------------------------------\n"," ");
+		
+		if (strcmp(l_prev_res_area_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%21s%18.18s %-6s %-15s %4s      %18s\n\n"," ",loc_legend[490]," ",l_prev_area_desc.arr," ",l_fmt_area_rf_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%21s%18.18s %-6s %-15s %4s      %18s\n\n"," ",loc_legend[490],l_prev_res_area_code.arr,l_prev_area_desc.arr," ",l_fmt_area_rf_revenue);
+		}
+	}
+
+	line_no = line_no + 3;
+	check_page_end();
+}
+
+print_region_total()
+{
+	if (strcmp(nd_report_option.arr,"B")==0)
+	{
+		l_total_region_revenue = 	l_reg_ip_revenue + l_reg_op_revenue + l_reg_rf_revenue;
+		sprintf(l_fmt_total_region_revenue,"%18.2f",l_total_region_revenue);
+		format_amt(l_fmt_total_region_revenue);
+		
+		sprintf(l_fmt_reg_op_revenue,"%16.2f",l_reg_op_revenue);
+		format_amt(l_fmt_reg_op_revenue);
+
+		sprintf(l_fmt_reg_ip_revenue,"%16.2f",l_reg_ip_revenue);
+		format_amt(l_fmt_reg_ip_revenue);
+
+		sprintf(l_fmt_reg_rf_revenue,"%16.2f",l_reg_rf_revenue);
+		format_amt(l_fmt_reg_rf_revenue);
+
+		fprintf(f1,"%46s==========================================================================================\n"," ");	
+		if (strcmp(l_prev_region_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %2s%3s%4d %4d %16s %4d %16s %16s %18s\n\n",loc_legend[500]," ",l_prev_region_desc.arr," "," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue,l_reg_no_of_visit,l_fmt_reg_op_revenue,l_fmt_reg_rf_revenue, l_fmt_total_region_revenue);
+		}
+
+		else  if (l_area_no_patient_days ==0) //added by saikiran
+		{
+				fprintf(f1,"%-20.20s %-6s %-15s %2s%3s%3d %5d %18s %4d %22s %11s %17s\n\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," "," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue,l_reg_no_of_visit,l_fmt_reg_op_revenue,l_fmt_reg_rf_revenue, l_fmt_total_region_revenue);
+
+		            }                               
+			else
+			{	
+	            fprintf(f1,"%-20.20s %-6s %-15s %2s%3s%3d %8d %15s %4d %22s %11s %17s\n\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," "," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue,l_reg_no_of_visit,l_fmt_reg_op_revenue,l_fmt_reg_rf_revenue, l_fmt_total_region_revenue);
+
+			}
+	     } 
+
+
+
+/*		else
+		{
+			//fprintf(f1,"%-20.20s %-6s %-15s %2s%3s%4d %4d %16s %4d %16s %16s %18s\n\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," "," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue,l_reg_no_of_visit,l_fmt_reg_op_revenue,l_fmt_reg_rf_revenue, l_fmt_total_region_revenue);COMMENTED BY SAIKIRAN
+			fprintf(f1,"%-20.20s %-6s %-15s %2s%3s%4d %7d %16s %4d %20s %12s %18s\n\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," "," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue,l_reg_no_of_visit,l_fmt_reg_op_revenue,l_fmt_reg_rf_revenue, l_fmt_total_region_revenue);
+			
+	
+		}
+	}commented by saikiran*/
+	else if ((strcmp(nd_report_option.arr,"I")==0) || (strcmp(nd_report_option.arr,"D")==0))
+	{
+		sprintf(l_fmt_reg_ip_revenue,"%16.2f",l_reg_ip_revenue);
+		format_amt(l_fmt_reg_ip_revenue);
+
+		fprintf(f1,"%59s==================================================\n"," ");
+		if (strcmp(l_prev_region_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %17s    %8d %13d  %18s\n\n",loc_legend[500]," ",l_prev_region_desc.arr," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %17s    %8d %13d  %18s\n\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," ",l_reg_no_of_adm,l_reg_no_patient_days,l_fmt_reg_ip_revenue);
+		}
+	}
+	else if ((strcmp(nd_report_option.arr,"O")==0) || (strcmp(nd_report_option.arr,"E")==0))
+	{
+		sprintf(l_fmt_reg_op_revenue,"%16.2f",l_reg_op_revenue);
+		format_amt(l_fmt_reg_op_revenue);
+
+		fprintf(f1,"%67s=======================================\n"," ");
+
+		if (strcmp(l_prev_region_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %25s%13d    %18s\n",loc_legend[500]," ",l_prev_region_desc.arr," ",l_reg_no_of_visit,l_fmt_reg_op_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %25s%13d    %18s\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," ",l_reg_no_of_visit,l_fmt_reg_op_revenue);
+		}
+
+	}    
+
+	else if ((strcmp(nd_report_option.arr,"R")==0) )
+	{
+		sprintf(l_fmt_reg_rf_revenue,"%16.2f",l_reg_rf_revenue);
+		format_amt(l_fmt_reg_rf_revenue);
+
+		fprintf(f1,"%67s=======================================\n"," ");
+
+		if (strcmp(l_prev_region_code.arr,"Nil")==0)
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %25s    %18s\n",loc_legend[500]," ",l_prev_region_desc.arr," ",l_fmt_reg_rf_revenue);
+		}
+		else
+		{
+			fprintf(f1,"%-20.20s %-6s %-15s %25s    %18s\n",loc_legend[500],l_prev_region_code.arr,l_prev_region_desc.arr," ",l_fmt_reg_rf_revenue);
+		}
+
+	}
+	line_no = line_no + 2;
+	check_page_end();
+}
+
+print_report_total()
+{
+	if (strcmp(nd_report_option.arr,"B")==0)
+	{
+		l_total_report_revenue = 	l_rep_ip_revenue + l_rep_op_revenue + l_rep_rf_revenue;
+
+		sprintf(l_fmt_report_revenue,"%18.2f",l_total_report_revenue);
+		format_amt(l_fmt_report_revenue);
+		
+		sprintf(l_fmt_rep_op_revenue,"%16.2f",l_rep_op_revenue);
+		format_amt(l_fmt_rep_op_revenue);
+
+		sprintf(l_fmt_rep_ip_revenue,"%16.2f",l_rep_ip_revenue);
+		format_amt(l_fmt_rep_ip_revenue);
+
+		sprintf(l_fmt_rep_rf_revenue,"%16.2f",l_rep_rf_revenue);
+		format_amt(l_fmt_rep_rf_revenue);
+		
+		fprintf(f1,"%46s==========================================================================================\n"," ");
+ 		//fprintf(f1,"%-15.15s      %6s %6s%4s %9s %4d %4d %16s %4d %16s %16s %18s\n\n",loc_legend[510]," "," "," "," ",l_rep_no_of_adm,l_rep_no_patient_days,l_fmt_rep_ip_revenue,l_rep_no_of_visit,l_fmt_rep_op_revenue,l_fmt_rep_rf_revenue, l_fmt_report_revenue); COMMENTED BY SAIKIRAN
+		if (l_rep_no_patient_days ==0)
+		{
+		    fprintf(f1,"%-15.15s      %6s %6s%4s %9s %4d %5d %18s %4d %22s %11s %17s\n\n",loc_legend[510]," "," "," "," ",l_rep_no_of_adm,l_rep_no_patient_days,l_fmt_rep_ip_revenue,l_rep_no_of_visit,l_fmt_rep_op_revenue,l_fmt_rep_rf_revenue, l_fmt_report_revenue); 
+			}
+		else
+		{
+		fprintf(f1,"%-15.15s      %6s %6s%4s %9s%4d %7d %16s %4d %22s %11s %17s\n\n",loc_legend[510]," "," "," "," ",l_rep_no_of_adm,l_rep_no_patient_days,l_fmt_rep_ip_revenue,l_rep_no_of_visit,l_fmt_rep_op_revenue,l_fmt_rep_rf_revenue, l_fmt_report_revenue); 
+		}
+		}
+	else if ((strcmp(nd_report_option.arr,"I")==0) || (strcmp(nd_report_option.arr,"D")==0))
+	{
+
+		sprintf(l_fmt_rep_ip_revenue,"%16.2f",l_rep_ip_revenue);
+		format_amt(l_fmt_rep_ip_revenue);
+
+		fprintf(f1,"%59s==================================================\n"," ");
+		fprintf(f1,"%-15.15s      %6s%34s    %8d %13d  %18s\n\n",loc_legend[510]," "," ",l_rep_no_of_adm,l_rep_no_patient_days,l_fmt_rep_ip_revenue);
+	}
+	else if ((strcmp(nd_report_option.arr,"O")==0) || (strcmp(nd_report_option.arr,"E")==0))
+	{
+		sprintf(l_fmt_rep_op_revenue,"%16.2f",l_rep_op_revenue);
+		format_amt(l_fmt_rep_op_revenue);
+
+		fprintf(f1,"%67s=======================================\n"," ");
+		fprintf(f1,"%-15.15s      %6s%42s%13d    %18s\n",loc_legend[510]," "," ",l_rep_no_of_visit,l_fmt_rep_op_revenue);
+	}
+	else if ((strcmp(nd_report_option.arr,"R")==0))
+	{
+		sprintf(l_fmt_rep_rf_revenue,"%16.2f",l_rep_rf_revenue);
+		format_amt(l_fmt_rep_rf_revenue);
+
+		fprintf(f1,"%67s=======================================\n"," ");
+		fprintf(f1,"%-15.15s      %6s%42s    %18s\n",loc_legend[510]," "," ",l_fmt_rep_rf_revenue);
+	}
+	line_no = line_no + 3;
+	check_page_end();
+}
+
+print_report_end()
+{
+  line_no = line_no + 3;
+  //check_page_end;
+  fprintf(f1,"\n\n\n\t\t\t\t\t%s",loc_legend[530]);
+  return;
+}
+
+delete_prog_param()
+{
+   EXEC SQL DELETE SY_PROG_PARAM
+			 WHERE PGM_ID		= 'BLRREVST'
+	           AND SESSION_ID	= :nd_session_id
+		       AND PGM_DATE		= :nd_pgm_date;
+   return;
+}
+
+get_nationality_desc()
+{
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL SELECT COUNT(COUNTRY_CODE)
+			   INTO :l_nationality_count
+			   FROM mp_country_his_vw 
+              WHERE country_code = :r_nationality_code;
+
+	if (l_nationality_count==0)
+	{
+		strcpy(l_prev_nat_desc.arr ,"Not Specified");	
+		return;
+	}
+	else 
+	{
+		EXEC SQL SELECT NVL(NATIONALITY,'Not Specified')
+				   INTO :l_prev_nat_desc
+				   FROM mp_country_his_vw
+				  WHERE country_code = :r_nationality_code;
+
+		l_prev_nat_desc.arr [l_prev_nat_desc.len]  = '\0';
+		return;
+	}
+
+  err_exit:
+
+	EXEC SQL WHENEVER SQLERROR CONTINUE;
+	EXEC SQL ROLLBACK WORK RELEASE;
+	disp_message(ERR_MESG,"Error occured at get_nationlity_desc()....");
+	sprintf(aMesg,sqlca.sqlerrm.sqlerrmc);
+	disp_message(ERR_MESG,aMesg);
+	proc_exit();
+}
+
+check_page_end()
+{
+	if ((line_no + 7) >= MAX_LINES)
+	{
+	    prepare_new_page();
+	}	
+	return;
+}
+
+fetch_legend_value()
+{
+
+	for(i=1;i<=900;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLRREVST.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+get_local_date()
+{
+	
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+	
+	BEGIN
+//		get_locale_date.convert_to_locale_date(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);
+
+//		:nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+
+	   :nd_loc_date :=  	sm_convert_date_2t(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI:SS'),:p_language_id);  
+
+	END;
+
+	END-EXEC;
+
+		if (OERROR)
+        err_mesg("SELECTING Date failed",0,"");
+
+
+}
+
+
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+}
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

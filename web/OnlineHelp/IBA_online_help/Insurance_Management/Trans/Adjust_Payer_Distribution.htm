@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Adjust Payer Distribution</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Insurance Management\nTrans\nAdjust Payer Distribution");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Adjust Payer Distribution</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Adjust</span> the Payer’s payable amount for the services availed by a patient.</p>
+<p class="Text">The Adjust Payer Distribution function enables you to adjust the payer’s payable amount. You can transfer the gross amount from a Payer to Patient. You can also issue discount on a specific service. Based on the adjustment and the discount issued, the new amount to be paid by the payer is calculated. The total gross adjustment has to be zero for the services associated to the patient. You cannot adjust the amount for Cash patients using this function. Latest adjustments are highlighted in <img src="../../image441.gif" style="border: none;" alt="image441.gif" width="12" height="13" border="0" /> color and initial adjustments are highlighted in <img src="../../image442.gif" style="border: none;" alt="image442.gif" width="9" height="13" border="0" /> color. The amount transferred from Payer to Patient gets displayed in invoice generated to indicate the changes. Two separate receipts are generated to indicate the adjusted amount and the original patient payable amount for the services based on the coverage criteria. The service details and the adjusted amount are printed in the adjustment report. Report generation hierarchy is based on the priority set in the 'BL Parameters' function. The Adjustment Receipt is a detailed receipt with the service details. You can reallocate the amount before bill generation. You can reallocate the amount for the services only if the bill is already generated.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You can reallocate the amount, if the financial details are modified after bill generation.</p>
+<h2>Adjusting Payer Distribution</h2>
+<p class="From">From the Transactions, double-click Adjust Payer Distribution Function.</p>
+<p class="Text">The Adjust Payer Distribution screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Select an Episode Type from the list. The system-defined values are Inpatient, Outpatient, Emergency and Daycare.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Patient ID. The values are populated in Ward/Clinic, Transaction date, Sex, Age and Doctor on selecting the Patient ID. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The admission/transfer number is displayed, if there is a single encounter. If there are multiple encounters, the values get listed. Click <span class="BoldButton">[List of Values]</span> to select an admission/transfer number. <a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/IN_Trans_AdjustPayerDist_RFD1.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Search]</span> to query the details based on the search criteria. The legend changes to <span class="BoldButton">[As On: dd/mm/yyyy hh:mm:ss]</span> on clicking <span class="BoldButton">[Search]</span>.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The service details associated to the patient are displayed. <a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/IN_Trans_AdjustPayerDist_RFD2.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the adjustment amount. <a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/IN_Trans_AdjustPayerDist_RFD3.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">The adjustment details are displayed indicating the old value and the new value after adjustment.<a href="javascript:void(0);" id="a4" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/IN_Trans_AdjustPayerDist_RFD4.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Process]</span> to adjust the payer distribution details.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Enter Req-IP UC Items','../../Patient_Billing_Manager/Transactions/IP_Under_Charges/Enter_Req-IP_UC_Items.htm','Enter Request-IP','../../Patient_Billing_Manager/Transactions/IP_Direct_Charges/Enter_Request-IP.htm','Enter Requests-OP','../../Patient_Billing_Manager/Transactions/OP_Direct_Charges/Enter_Requests-OP.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Discharge Bill Cum Receipt','../../Patient_Billing_Manager/Transactions/IP_Cashier/Discharge_Bill_Cum_Receipt.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div><script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a1');
+        FilePopupInit('a2');
+        FilePopupInit('a3');
+        FilePopupInit('a4');
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

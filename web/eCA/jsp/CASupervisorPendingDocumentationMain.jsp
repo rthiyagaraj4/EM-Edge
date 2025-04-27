@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<%
+/*
+--------------------------------------------------------------------------------------------------------------
+Date		Edit History	Name		          Rev.Date		 Rev.Name		        Description
+--------------------------------------------------------------------------------------------------------------
+03/08/2020	IN073540		chandrashekar raju											AAKH-CRF-0122.3
+
+---------------------------------------------------------------------------------------------------------------
+*/
+%>
+<%@page import="java.sql.*,webbeans.eCommon.*,java.util.*" contentType="text/html;charset=UTF-8" %>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%>
+
+<% 
+	request.setCharacterEncoding("UTF-8");
+	String sStyle =(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+	java.util.Properties property = (java.util.Properties) session.getAttribute( "jdbc" ) ;
+	String locale = (String) property.getProperty("LOCALE");
+	String function_id ="SQ";
+	
+%>
+<head>
+	<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css'></link>
+        <script language='javascript' src='../../eCommon/js/ValidateControl.js'></script>
+		<script language='javascript' src='../../eCommon/js/common.js'></script>
+		<title></title>
+</head>
+  
+<frameset rows="20%,*%,20%" id='coderSearchFrame' name='coderSearchFrame' frameborder='no' noresize>
+	<frame name="queryCriteriaFrame" id="queryCriteriaFrame"   noresize scrolling='no' src="../../eCA/jsp/CACoderPendingDocQueryCritia.jsp?&function_id=<%=function_id%>"></frame>
+	<frame name="queryResultFrame" id="queryResultFrame"   noresize scrolling='auto' src="../../eCommon/html/blank.html"></frame>
+	<frame name="queryDocsButtons" id="queryDocsButtons"   noresize scrolling='auto' src="../../eCommon/html/blank.html"></frame>
+	<frame name='messageFrame' id='messageFrame' src='../../eCommon/jsp/error.jsp' frameborder=0 >
+</frameset>
+ 
+</html>
+

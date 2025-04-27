@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>PH_AdminSetup_PHPFF_OP</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Outpatient Tab</h1>
+<p class="BoldRFD" style="font-weight: normal;">The parameter values applicable to outpatients are specified in the tab. Prescription rules for Refill of drugs, default dispensing locations for routine and stat orders, dispensing rules for advance and past orders, Dispense Location controls are entered for the logged in facility.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Stock Rules</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Consider Stock</span> – Select the check box to verify stock status before ordering.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Without Stock</span> – Select the check box to allow ordering without stock. The check box is enabled only when ‘Consider Stock’ is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Order Routing Defaults</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Routine Orders</span> – Select the default dispensing location to route routine orders of Outpatients. The locations are defined in ‘Dispense Location’ function. The dispensing locations of type ‘Pharmacy’ and catering to both Outpatient/Inpatients and exclusively to Outpatients are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Stat Orders</span> - Select the default dispensing location to route stat orders of Outpatients. The locations are defined in ‘Dispense Location’ function. The dispensing locations of type ‘Pharmacy’ and catering to both Outpatient/Inpatients and exclusively to Outpatients are listed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Dispensing Rules</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Dispensing in Advance</span> – Select the check box to allow dispensing of drugs in advance of prescription start date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Days Ahead</span> – Specify the number of days in advance the drugs can be dispensed from the prescription start date. Enter the period in numeric format of three digits maximum length. This field is enabled only when ‘Allow Dispensing in Advance’ is selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Dispensing past Orders</span> - Select the check box to allow dispensing of past orders (prescriptions) that have exceeded the medication end date and time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Up to No. of Days</span> - Specify the number of days in numeric format of two digits maximum length up to which an expired prescription order can be dispensed. The system validates expired prescriptions for dispensing based on the end date and time of the prescription. This field is enabled only when ‘Allow Dispensing Past Orders’ is selected. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Dispense Location Controls</p>
+<p class="BoldRFD">Stages</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The prompts specified for various dispensing stages in ‘PH Parameter’ are displayed. You have to specify applicability of these stages for Outpatient Dispensing Location.</span></p>
+<ol start="15" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Registration</span> - Select the check box to indicate prescription registration is required. If the check box is selected, ‘Registration’ is applicable for outpatients Dispense Locations.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fill</span> – Select the check box to indicate drug ‘Fill’ is required. If selected, it is applicable for Outpatient-Dispense Location in the function ‘Dispense Location’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Stages</span> – Select the fill stage from the list. The values listed are ‘Before Allocate’ and ‘After Allocate’. The set value is defaulted in ‘Dispense Location’ function. If ‘filling’ is not applicable, ‘Not Applicable’ is displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">Before Allocate – The Drugs are filled and batches are allocated.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">After Allocate – Allocate batches and fill the drugs.</p>
+</li>
+</ol>
+<ol start="18" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Verification</span> – Select the value from the list. The values listed are ‘Separate before Allocate’ and ‘Combined with Allocate’. The set values are made default in ‘Dispense Location’ function.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">Separate Before Allocate – The drugs are verified before allocation.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">Combine with Allocate – Drug verification and allocation performed at the same time.</p>
+</li>
+</ol>
+<ol start="19" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Delivery</span> - Select the check box to indicate delivery stage is applicable. If the check box is selected, ‘Delivery’ is applicable for outpatient-Dispense Location in the function ‘Dispense Location’.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The ‘Stages’ values are set only once and cannot be changed later on saving the record.</p>
+<p class="Note">&#160;</p>
+<p class="BoldRFD">Outputs</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="20" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bal. Medication Sheet on Partial Disp</span> - Select the check box to indicate printing of balance medication sheet for partial dispensed orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Label Format</span> - Select the value from the list. The values listed are Drug wise and Combined.</p>
+</li>
+</ol>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="text-indent: 12px; margin-left: 12px;">Drug Wise – When the drug is dispensed, the Label formats are printed for each drug.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="text-indent: 12px; margin-left: 12px;">Combined –When the drug is dispensed, the Label formats are printed for the entire prescription.</p>
+</li>
+</ul>
+<ol start="23" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Default Language</u></span> – Select the default language from the drop-down list.</p>
+</li>
+</ol>
+<ol start="20" type="1">
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">The selected language is displayed, as default, in the Print / Edit Label dialogue window and the Dispense label is &#160;printed in the same language. However, if the language ‘Arabic’ is selected, the Dispense label will be printed in both Arabic and English language. The Patient Name, Dosage Details and Cautionary Instructions will be printed in Arabic and the rest of the details will be printed in English.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">If ‘None’ is selected , the Dispense label will be printed according to the default language in the Print / Edit Label dialogue window or based on the logged-in user’s language.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD" style="margin-left: 24px;">Note: By default, ‘None’ is selected as the default Language</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Drug Return</p>
+<ol start="24" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Medication Return</span> – Select the check box to allow returning of dispensed medication.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Within [] days</span> – Enter the period within which the medications should be returned from the date of dispensing in numeric format of four &#160;digits. This field is enabled only if you select Allow Medication Return. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Undelivered Drugs</p>
+<ol start="27" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Retention Period before Return to Stock [] days</span> – Specify the number of days to return undelivered drugs held by the dispensing location to the Stores. Enter the period in numeric format of two digits maximum length.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

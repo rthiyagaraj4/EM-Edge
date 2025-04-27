@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+<script Language="JavaScript">
+	function getCardData()
+	{	
+		var ecr_counter = "1";
+		var application_id = "11";
+		var machine_port = "COM1";
+		var baud_rate = "19200";
+		var cash_given = "0.01";	
+		
+		var ccData = "";
+		
+		ecr_counter = document.getElementById("ecr_counter").value;
+		application_id = document.getElementById("application_id").value;
+		machine_port = document.getElementById("machine_port").value;
+		baud_rate = document.getElementById("baud_rate").value;
+		cash_given = document.getElementById("cash_given").value;	
+
+		if (ecr_counter=="") {
+			ecr_counter = "1";
+			document.getElementById("ecr_counter").value = "1";
+		}
+
+		if (ecr_counter=="") {
+			ecr_counter = "1";
+			document.getElementById("ecr_counter").value = "1";
+		}
+
+		if (application_id=="") {
+			application_id = "11";
+			document.getElementById("application_id").value = "11";
+		}
+
+		if (machine_port==""){
+			machine_port = "COM1";
+			document.getElementById("machine_port").value = "COM1";
+		}
+
+		if (baud_rate==""){
+			baud_rate = "19200";
+			document.getElementById("baud_rate").value = "19200";
+		}
+
+		if (cash_given==""){
+			cash_given = "0.01";
+			document.getElementById("cash_given").value = "0.01";
+		}
+
+		
+		
+		//ccData ="Transaction_type=debit$!^Amount=0.01$!^ECR_counter=1$!^Application_id=11$!^Refund_rrn=null$!^Menu=null$!^Printer=null$!^Printer_speed=null$!^Machine_port=COM1$!^BoudRate=19200";
+
+		ccData ="Transaction_type=debit$!^Amount="+cash_given+"$!^ECR_counter="+ecr_counter+"$!^Application_id="+application_id+"$!^Refund_rrn=null$!^Menu=null$!^Printer=null$!^Printer_speed=null$!^Machine_port="+machine_port+"$!^BoudRate="+baud_rate;
+
+		alert(ccData);
+
+
+		var summary = document.CreditCardReader.Capture(ccData);
+		var arr = "";
+
+		alert(summary);		
+		
+	}
+</script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+</HEAD>
+
+<BODY>
+	<table border='1' cellpadding='3' cellspacing='0' align = 'center' width='800'>	
+		<tr>
+			<td width="25%" class="label">ECR Counter (1) </td>
+			<td width="25%" class="fields"><input type='text' name='ecr_counter' id='ecr_counter' id='ecr_counter' size='14' maxlength='10' value = '1' style='text-align:left'> </td>
+			<td width="25%" class="label">Application ID (11)</td>
+			<td width="25%" class="fields"><input type='text' name='application_id' id='application_id' id='application_id' size='14' maxlength='10' value = '11' style='text-align:left'> </td>			
+		</tr>
+		<tr>
+			<td width="25%" class="label">Port (COM1)</td>
+			<td width="25%" class="fields"><input type='text' name='machine_port' id='machine_port' id='machine_port' size='14' maxlength='10' value = 'COM1' style='text-align:left'> </td>
+			<td width="25%" class="label">Baud Rate (19200)</td>
+			<td width="25%" class="fields"><input type='text' name='baud_rate' id='baud_rate' id='baud_rate' size='14' maxlength='10' value = '19200'  style='text-align:left'> </td>			
+		</tr>
+		<tr>			
+			<td width="25%" class="label">Amount (0.01)</td>
+			<td width="25%" class="fields"><input type='text' name='cash_given' id='cash_given' id='cash_given' size='14' maxlength='10' value = '0.01' style='text-align:right'> </td>	
+			<td align=right COLSPAN='2' >
+				<applet code="CreditCardApplet.class" name="CreditCardReader"
+					codebase="../CreditCard" archive="CreditCardApplet.jar" width="5" height="5">
+					<PARAM name="button_width" value="50" />
+					<PARAM name="button_height" value="50" />
+					<PARAM name="button_label" value="Credit Card" />	
+					<PARAM name="input_data" value="Transaction_type=debit$!^Amount=0.01$!^ECR_counter=1$!^Application_id=11$!^Refund_rrn=null$!^Menu=null$!^Printer=null$!^Printer_speed=null$!^Machine_port=COM1$!^BoudRate=19200" />
+					<PARAM name="application_id" value="SPECTRA" />	
+					<param name="separate_jvm" value="true" />
+					Sorry, Your browser does not support Java applet!
+				</applet>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input class='button' type='button'  name='Credit Card' id='Credit Card' value='Credit Card' onClick="getCardData();"> 
+			</td>
+			
+		</tr>
+	</table>	
+</BODY>
+</HTML>
+

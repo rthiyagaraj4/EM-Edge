@@ -1,0 +1,2277 @@
+package jsp_servlet._eca._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import webbeans.eCommon.*;
+import eCommon.Common.*;
+import java.util.*;
+import eCA.*;
+import eCommon.*;
+import java.net.*;
+import eCommon.XSSRequestWrapper;
+import java.util.*;
+import com.ehis.util.*;
+import com.ehis.persist.*;
+import eCommon.Common.*;
+import java.lang.*;
+import java.util.*;
+
+public final class __camenstrualhistdtlbottom extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eca/jsp/CAMenstrualHistDtlBottom.jsp", 1742180253350L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/GetPersistenceBean.jsp", 1717476031037L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="\n\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\n<html>\n<head>\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\t\n<link rel=\'stylesheet\' type=\'text/css\' href=\"../../eCommon/html/CommonCalendar.css\"></link>\n\t<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\' type=\'text/css\'></link>\n\t<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script><script language=\'javascript\' src=\'../../eCommon/js/common.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCommon/js/DateUtils.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCommon/js/ValidateControl.js\'></script>\n\t<script type=\'text/javascript\' src=\"../../eCommon/js/CommonCalendar.js\"></script>\t\t\n\t<script language=\'javascript\' src=\'../../eCommon/js/FieldFormatMethods.js\'></script>\n\t<Script language =\"JavaScript\" src =\'../../eCommon/js/CommonLookup.js\'></Script>\n\t<script language=\'javascript\' src=\'../../eCA/js/CAMenstrualHistDtlTrans.js\'></script>\n</head>\n<body onMouseDown=\"CodeArrest()\" onKeyDown=\"lockKey()\">\n";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\n<form name=\'MenstrualHistDtlBottomForm\' id=\'MenstrualHistDtlBottomForm\'>\n";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="\n    <table width=\'100%\' align=\'center\'>\n        <tr>\n            <td class=\'columnheader\' colspan=\"4\">\n                ";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\n            </td>\n        </tr>\n        <tr>\n            <td width=\"100%\" class=\"Border\" align=\'center\' colspan=\"4\">\n                <table border=\"0\" width=\'100%\' align=\'center\'>\n                    <tr>\n                        <td class=\"label\">";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="</td>\n                        <td ><input type=textbox size=11 maxlength=10  id=\'lmpDate\' name=\'lmpDate\' id=\'lmpDate\' value=\"";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="\" onblur=\'return Check_Date(this,\"DMY\",\"";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\"),loadLmpDate();\' OnKeyPress=\'return CheckForNumsAndColon(event)\' ><input type=\'image\' src=\"../../eCommon/images/CommonCalendar.gif\" onclick=\"return showCalendarValidate(\'lmpDate\');\" style=\'cursor:pointer\'><img src=\'../../eCommon/images/mandatory.gif\'></td>\n\t\t\t\t\t\t<td><span class=\'label\' style=\'color: red; white-space: nowrap; display: inline;\'>Note: EDD and Gestation (POA) are auto-calculated based on LMP date according to Naegele\'s Rule.</span></td>\n                    </tr>\n                        <tr>\n                    <td></td>\n                    </tr>\n                    <tr>\n                        <td class=\'label\'>";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="</td>\n                        <td><input type=\'text\' id=\'eddDate\' name=\'eddDate\' id=\'eddDate\' size=\'8\'   value=\"";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="\"  disabled></td>\n                        <td  class=\"label\">\n                            ";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="\n                            <input type=\'text\' id=\'gestationPoaWeek\' name=\'gestationPoaWeek\' id=\'gestationPoaWeek\' size=\'6\'  maxlength=\'2\' value=\"";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="\"     onblur=\"\" disabled>\n                            ";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="\n                            <input type=\'text\' id=\'gestationPoaDays\' name=\'gestationPoaDays\' id=\'gestationPoaDays\' size=\'6\'  maxlength=\'2\' value=\"";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="\n                        </td>\n                    </tr>\n                        <tr>\n                    <td></td>\n                    </tr>\n                    <tr>\n                        <td class=\'label\'>";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    private final static java.lang.String  _wl_block19 ="</td>\n                       <td>\n \t\t\t\t\t\t ";
+    private final static byte[]  _wl_block19Bytes = _getBytes( _wl_block19 );
+
+    private final static java.lang.String  _wl_block20 ="  \n \t\t\t\t\t\t<input type=\"text\" id=\"lmpDeliveryMiscarrageType\" name=\"lmpDeliveryMiscarrageType\" id=\"lmpDeliveryMiscarrageType\"  value=\"";
+    private final static byte[]  _wl_block20Bytes = _getBytes( _wl_block20 );
+
+    private final static java.lang.String  _wl_block21 ="\"  disabled>\n                        <input type=\"hidden\" id=\"lmpDeliveryMiscarrageType\" name=\"lmpDeliveryMiscarrageType\" id=\"lmpDeliveryMiscarrageType\" value=\"D\" />\n    \t\t\t\t\t";
+    private final static byte[]  _wl_block21Bytes = _getBytes( _wl_block21 );
+
+    private final static java.lang.String  _wl_block22 ="\n    \t\t\t\t\t<select id=\'lmpDeliveryMiscarrageType\' name=\'lmpDeliveryMiscarrageType\' id=\'lmpDeliveryMiscarrageType\' onchange=\'toggleDeliveryMiscarrageDate();\' disabled>\n       \t\t\t\t\t <option value=\'\'>-------";
+    private final static byte[]  _wl_block22Bytes = _getBytes( _wl_block22 );
+
+    private final static java.lang.String  _wl_block23 ="--------</option>\n        \t\t\t\t<option value=\'D\' ";
+    private final static byte[]  _wl_block23Bytes = _getBytes( _wl_block23 );
+
+    private final static java.lang.String  _wl_block24 =" >\n           \t\t\t\t ";
+    private final static byte[]  _wl_block24Bytes = _getBytes( _wl_block24 );
+
+    private final static java.lang.String  _wl_block25 ="\n        \t\t\t\t</option>\n        \t\t\t\t<option value=\'M\' ";
+    private final static byte[]  _wl_block25Bytes = _getBytes( _wl_block25 );
+
+    private final static java.lang.String  _wl_block26 =" >\n            \t\t\t";
+    private final static byte[]  _wl_block26Bytes = _getBytes( _wl_block26 );
+
+    private final static java.lang.String  _wl_block27 ="\n        \t\t\t\t</option>\n    \t\t\t\t\t</select>\n    \t\t\t\t\t";
+    private final static byte[]  _wl_block27Bytes = _getBytes( _wl_block27 );
+
+    private final static java.lang.String  _wl_block28 ="\n\t\t\t\t\t\t</td>\n                         <td class=\"label\">";
+    private final static byte[]  _wl_block28Bytes = _getBytes( _wl_block28 );
+
+    private final static java.lang.String  _wl_block29 ="&nbsp;&nbsp;&nbsp;\n                         ";
+    private final static byte[]  _wl_block29Bytes = _getBytes( _wl_block29 );
+
+    private final static java.lang.String  _wl_block30 ="\n                          <input type=textbox size=\'11\' maxlength=\'10\'  id=\'lmpDeliveryMiscarrageDate\' name=\'lmpDeliveryMiscarrageDate\' id=\'lmpDeliveryMiscarrageDate\' value=\"";
+    private final static byte[]  _wl_block30Bytes = _getBytes( _wl_block30 );
+
+    private final static java.lang.String  _wl_block31 ="\" onblur=\'return Check_Date1(this,\"DMY\",\"";
+    private final static byte[]  _wl_block31Bytes = _getBytes( _wl_block31 );
+
+    private final static java.lang.String  _wl_block32 ="\"),dateValidation();\' OnKeyPress=\'return CheckForNumsAndColon1(event)\'><input type=\'image\' src=\"../../eCommon/images/CommonCalendar.gif\" onclick=\"if (!document.getElementById(\'lmpDeliveryMiscarrageDate\').disabled) { return showCalendarValidate1(\'lmpDeliveryMiscarrageDate\'); } else { return false; }\" ><img src=\'../../eCommon/images/mandatory.gif\' id=\'mandatoryIcon\' style=\'display:none\'>                        \n                        ";
+    private final static byte[]  _wl_block32Bytes = _getBytes( _wl_block32 );
+
+    private final static java.lang.String  _wl_block33 ="\n                         <input type=textbox size=\'11\' maxlength=\'10\'  id=\'lmpDeliveryMiscarrageDate\' name=\'lmpDeliveryMiscarrageDate\' id=\'lmpDeliveryMiscarrageDate\' value=\"";
+    private final static byte[]  _wl_block33Bytes = _getBytes( _wl_block33 );
+
+    private final static java.lang.String  _wl_block34 ="\"),dateValidation();\' OnKeyPress=\'return CheckForNumsAndColon1(event)\' disabled><input type=\'image\' src=\"../../eCommon/images/CommonCalendar.gif\" onclick=\"if (!document.getElementById(\'lmpDeliveryMiscarrageDate\').disabled) { return showCalendarValidate1(\'lmpDeliveryMiscarrageDate\'); } else { return false; }\" ><img src=\'../../eCommon/images/mandatory.gif\' id=\'mandatoryIcon\' style=\'display:none\'>                        \n                        ";
+    private final static byte[]  _wl_block34Bytes = _getBytes( _wl_block34 );
+
+    private final static java.lang.String  _wl_block35 ="\n                         </td>   \n                    </tr>\n                    <tr>\n                    <td></td>\n                    </tr>\n                    <tr>\n                        <td class=\'label\'>";
+    private final static byte[]  _wl_block35Bytes = _getBytes( _wl_block35 );
+
+    private final static java.lang.String  _wl_block36 ="</td>\n                        <td colspan=\"3\"><textarea id=\"remarkLmp\" name=\'remarkLmp\' rows=\'2\' cols=\'80\' maxlength=\'150\' onblur=\"remarksvalidation();\">";
+    private final static byte[]  _wl_block36Bytes = _getBytes( _wl_block36 );
+
+    private final static java.lang.String  _wl_block37 ="</textarea></td>\n                    </tr>\n                    <tr>\n                    <td></td>\n                     <td colspan=\"4\" style=\"text-align: center;\">\n                            <input type=\'button\' name=\'record\' id=\'record\' value=\'";
+    private final static byte[]  _wl_block37Bytes = _getBytes( _wl_block37 );
+
+    private final static java.lang.String  _wl_block38 ="\' class=\'button\' onClick=\'apply();\'>\n                            <input type=\'button\' name=\'clear\' id=\'clear\' value=\'";
+    private final static byte[]  _wl_block38Bytes = _getBytes( _wl_block38 );
+
+    private final static java.lang.String  _wl_block39 ="\' class=\'button\' onClick=\'clearAll();\'>\n                            ";
+    private final static byte[]  _wl_block39Bytes = _getBytes( _wl_block39 );
+
+    private final static java.lang.String  _wl_block40 ="\n    \t\t\t\t\t\t<input type=\'button\' name=\'markAsError\' id=\'markAsError\' value=\'";
+    private final static byte[]  _wl_block40Bytes = _getBytes( _wl_block40 );
+
+    private final static java.lang.String  _wl_block41 ="\' class=\'button\' onClick=\'markAsErrorRecord();\'>\n                            ";
+    private final static byte[]  _wl_block41Bytes = _getBytes( _wl_block41 );
+
+    private final static java.lang.String  _wl_block42 ="\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n ";
+    private final static byte[]  _wl_block42Bytes = _getBytes( _wl_block42 );
+
+    private final static java.lang.String  _wl_block43 ="\n \n \n";
+    private final static byte[]  _wl_block43Bytes = _getBytes( _wl_block43 );
+
+    private final static java.lang.String  _wl_block44 ="\n\n<table width=\'100%\' align=\'center\'>\n    <tr>\n        <td colspan=\"5\" class=\"columnheader\">\n            ";
+    private final static byte[]  _wl_block44Bytes = _getBytes( _wl_block44 );
+
+    private final static java.lang.String  _wl_block45 ="\n        </td>\n    </tr>\n        <tr>\n        <td></td>\n      </tr>\n    <tr>\n        <td class=\"label\" style=\"width: 15%; white-space: nowrap;\">\n            ";
+    private final static byte[]  _wl_block45Bytes = _getBytes( _wl_block45 );
+
+    private final static java.lang.String  _wl_block46 ="\n        </td>\n        <td class=\"label\" style=\"width: 20%; white-space: nowrap;\">\n            <input type=\"text\" id=\"scanGestationWeeks\" name=\"scanGestationWeeks\" id=\"scanGestationWeeks\" size=\"4\"  class=\"NUMBER\" maxlength=\'2\'   onblur=\'unSureDate(this);\' value=\"";
+    private final static byte[]  _wl_block46Bytes = _getBytes( _wl_block46 );
+
+    private final static java.lang.String  _wl_block47 ="\" onKeyPress=\"return isValidInteger(this);\">\n            ";
+    private final static byte[]  _wl_block47Bytes = _getBytes( _wl_block47 );
+
+    private final static java.lang.String  _wl_block48 ="\n            <input type=\"text\" id=\"scanGestationDays\" name=\"scanGestationDays\" id=\"scanGestationDays\" size=\"4\"  class=\"NUMBER\" maxlength=\'2\'  onblur=\'unSureDate(this);\' value=\"";
+    private final static byte[]  _wl_block48Bytes = _getBytes( _wl_block48 );
+
+    private final static java.lang.String  _wl_block49 ="\n            <img src=\"../../eCommon/images/mandatory.gif\" alt=\"Mandatory\" class=\"mandatory\">\n        </td>\n        <td class=\"label\" style=\"width: 10%; padding-left: 20px;\">\n            ";
+    private final static byte[]  _wl_block49Bytes = _getBytes( _wl_block49 );
+
+    private final static java.lang.String  _wl_block50 ="&nbsp;&nbsp;&nbsp;\n            <input type=\"text\" id=\"unsureDate\" name=\"unsureDate\" id=\"unsureDate\" size=\"8\" value=\"";
+    private final static byte[]  _wl_block50Bytes = _getBytes( _wl_block50 );
+
+    private final static java.lang.String  _wl_block51 ="\" disabled>\n        </td>\n        <td style=\"width: 35%;\">\n            <span class=\"label\" style=\"color: red; white-space: nowrap;\">\n                Note: LMP date, REDD, and Gestation (POG) are auto-calculated based on Scan Gestation according to Naegele\'s Rule.\n            </span>\n        </td>\n    </tr>\n     <tr>\n        <td></td>\n      </tr>\n    <tr style=\"padding-top: 10px;\">\n        <td class=\"label\">\n            ";
+    private final static byte[]  _wl_block51Bytes = _getBytes( _wl_block51 );
+
+    private final static java.lang.String  _wl_block52 ="\n        </td>\n        <td>\n            <input type=\"text\" id=\"redd\" name=\"redd\" id=\"redd\" size=\"8\" value=\"";
+    private final static byte[]  _wl_block52Bytes = _getBytes( _wl_block52 );
+
+    private final static java.lang.String  _wl_block53 ="\" disabled>\n        </td>\n        <td colspan=\"3\">\n            <table width=\"100%\">\n                <tr>\n                    <td class=\"label\" style=\"width: 25%;\">\n                        ";
+    private final static byte[]  _wl_block53Bytes = _getBytes( _wl_block53 );
+
+    private final static java.lang.String  _wl_block54 ="\n                        <input type=\"text\" id=\"gestationPogWeeks\" name=\"gestationPogWeeks\" id=\"gestationPogWeeks\" size=\"6\" value=\"";
+    private final static byte[]  _wl_block54Bytes = _getBytes( _wl_block54 );
+
+    private final static java.lang.String  _wl_block55 ="\" disabled>\n                        ";
+    private final static byte[]  _wl_block55Bytes = _getBytes( _wl_block55 );
+
+    private final static java.lang.String  _wl_block56 ="\n                        <input type=\"text\" id=\"gestationPogDays\" name=\"gestationPogDays\" id=\"gestationPogDays\" size=\"6\" value=\"";
+    private final static byte[]  _wl_block56Bytes = _getBytes( _wl_block56 );
+
+    private final static java.lang.String  _wl_block57 ="\n                    </td>\n                    <td style=\"width: 25%;\"></td>\n                </tr>\n            </table>\n        </td>\n    </tr>\n     <tr>\n        <td></td>\n      </tr>\n    <tr style=\"padding-top: 10px;\">\n        <td class=\"label\" style=\"white-space: nowrap;\">\n            ";
+    private final static byte[]  _wl_block57Bytes = _getBytes( _wl_block57 );
+
+    private final static java.lang.String  _wl_block58 ="\n        </td>\n          <td>\n\t\t\t";
+    private final static byte[]  _wl_block58Bytes = _getBytes( _wl_block58 );
+
+    private final static java.lang.String  _wl_block59 ="\n          <input type=\"text\" id=\"unsureDeliveryMiscarrageType\" name=\"unsureDeliveryMiscarrageType\" id=\"unsureDeliveryMiscarrageType\"  value=\"";
+    private final static byte[]  _wl_block59Bytes = _getBytes( _wl_block59 );
+
+    private final static java.lang.String  _wl_block60 ="\"  disabled>\n          <input type=\"hidden\" id=\"unsureDeliveryMiscarrageType\" name=\"unsureDeliveryMiscarrageType\" id=\"unsureDeliveryMiscarrageType\" value=\"D\" />\n          \n        ";
+    private final static byte[]  _wl_block60Bytes = _getBytes( _wl_block60 );
+
+    private final static java.lang.String  _wl_block61 ="\n    \t<select id=\'unsureDeliveryMiscarrageType\' name=\'unsureDeliveryMiscarrageType\' id=\'unsureDeliveryMiscarrageType\' onchange=\'toggleUnSureDeliveryMiscarrageDate();\' disabled>\n       \t <option value=\'\'>-------";
+    private final static byte[]  _wl_block61Bytes = _getBytes( _wl_block61 );
+
+    private final static java.lang.String  _wl_block62 ="--------</option>\n        <option value=\'D\' ";
+    private final static byte[]  _wl_block62Bytes = _getBytes( _wl_block62 );
+
+    private final static java.lang.String  _wl_block63 =" >\n        ";
+    private final static byte[]  _wl_block63Bytes = _getBytes( _wl_block63 );
+
+    private final static java.lang.String  _wl_block64 ="\n        </option>\n        <option value=\'M\' ";
+    private final static byte[]  _wl_block64Bytes = _getBytes( _wl_block64 );
+
+    private final static java.lang.String  _wl_block65 =" >\n         ";
+    private final static byte[]  _wl_block65Bytes = _getBytes( _wl_block65 );
+
+    private final static java.lang.String  _wl_block66 ="\n        </option>\n    \t</select>\n    \t";
+    private final static byte[]  _wl_block66Bytes = _getBytes( _wl_block66 );
+
+    private final static java.lang.String  _wl_block67 ="\n\t\t</td>\n        <td class=\"label\" style=\"width: 25%; white-space: nowrap;\">\n            ";
+    private final static byte[]  _wl_block67Bytes = _getBytes( _wl_block67 );
+
+    private final static java.lang.String  _wl_block68 ="&nbsp;&nbsp;&nbsp;\n\t\t\t";
+    private final static byte[]  _wl_block68Bytes = _getBytes( _wl_block68 );
+
+    private final static java.lang.String  _wl_block69 ="\n            <input type=\'textbox\' size=\'11\' maxlength=\'10\' id=\'unsureDeliveryMiscarrageDate\' name=\'unsureDeliveryMiscarrageDate\' id=\'unsureDeliveryMiscarrageDate\' value=\"";
+    private final static byte[]  _wl_block69Bytes = _getBytes( _wl_block69 );
+
+    private final static java.lang.String  _wl_block70 ="\" onblur=\'return Check_Date2(this,\"DMY\",\"";
+    private final static byte[]  _wl_block70Bytes = _getBytes( _wl_block70 );
+
+    private final static java.lang.String  _wl_block71 ="\"),dateValidation1();\' OnKeyPress=\'return CheckForNumsAndColon(event);\'><input type=\'image\' src=\"../../eCommon/images/CommonCalendar.gif\" onclick=\"if (!document.getElementById(\'unsureDeliveryMiscarrageDate\').disabled) { return showCalendarValidate1(\'unsureDeliveryMiscarrageDate\'); } else { return false; }\" ><img src=\'../../eCommon/images/mandatory.gif\' id=\'mandatoryIcons\' style=\'display:none\'>\n       ";
+    private final static byte[]  _wl_block71Bytes = _getBytes( _wl_block71 );
+
+    private final static java.lang.String  _wl_block72 ="\n        <input type=\'textbox\' size=\'11\' maxlength=\'10\' id=\'unsureDeliveryMiscarrageDate\' name=\'unsureDeliveryMiscarrageDate\' id=\'unsureDeliveryMiscarrageDate\' value=\"";
+    private final static byte[]  _wl_block72Bytes = _getBytes( _wl_block72 );
+
+    private final static java.lang.String  _wl_block73 ="\"),dateValidation1();\' OnKeyPress=\'return CheckForNumsAndColon(event);\' disabled><input type=\'image\' src=\"../../eCommon/images/CommonCalendar.gif\" onclick=\"if (!document.getElementById(\'unsureDeliveryMiscarrageDate\').disabled) { return showCalendarValidate1(\'unsureDeliveryMiscarrageDate\'); } else { return false; }\" ><img src=\'../../eCommon/images/mandatory.gif\' id=\'mandatoryIcons\' style=\'display:none\'>\n       ";
+    private final static byte[]  _wl_block73Bytes = _getBytes( _wl_block73 );
+
+    private final static java.lang.String  _wl_block74 ="\n        </td>\n        <td></td>\n    </tr>\n     <tr>\n        <td></td>\n      </tr>\n    <tr style=\"padding-top: 10px;\">\n        <td class=\"label\">\n            ";
+    private final static byte[]  _wl_block74Bytes = _getBytes( _wl_block74 );
+
+    private final static java.lang.String  _wl_block75 ="\n        </td>\n        <td colspan=\"4\">\n            <textarea  id=\"remarkUnsure\" name=\"remarkUnsure\" rows=\"2\" cols=\"80\" maxlength=\"150\" style=\"width: 40%;\" onblur=\"remarksvalidation1();\">";
+    private final static byte[]  _wl_block75Bytes = _getBytes( _wl_block75 );
+
+    private final static java.lang.String  _wl_block76 ="</textarea>\n        </td>\n    </tr>\n     <tr>\n        <td></td>\n      </tr>\n      <tr>\n      <td></td>\n   \t\t<td colspan=\"4\" style=\"text-align: center;\">\n    \t<input type=\'button\' name=\'record\' id=\'record\' value=\'";
+    private final static byte[]  _wl_block76Bytes = _getBytes( _wl_block76 );
+
+    private final static java.lang.String  _wl_block77 ="\' class=\'button\' onClick=\'apply1();\'>\n    \t<input type=\'button\' name=\'clear\' id=\'clear\' value=\'";
+    private final static byte[]  _wl_block77Bytes = _getBytes( _wl_block77 );
+
+    private final static java.lang.String  _wl_block78 ="\' class=\'button\' onClick=\'clear1();\'>\n    ";
+    private final static byte[]  _wl_block78Bytes = _getBytes( _wl_block78 );
+
+    private final static java.lang.String  _wl_block79 ="\n    <input type=\'button\' name=\'markAsError\' id=\'markAsError\' value=\'";
+    private final static byte[]  _wl_block79Bytes = _getBytes( _wl_block79 );
+
+    private final static java.lang.String  _wl_block80 ="\' class=\'button\' onClick=\'markAsErrorRecord();\'>\n    ";
+    private final static byte[]  _wl_block80Bytes = _getBytes( _wl_block80 );
+
+    private final static java.lang.String  _wl_block81 ="\n\t</td>\n\n      </tr>\n              \n</table>\n";
+    private final static byte[]  _wl_block81Bytes = _getBytes( _wl_block81 );
+
+    private final static java.lang.String  _wl_block82 ="\n\n\n\t<input type=\'hidden\'  name=\'lmp_Date\' id=\'lmp_Date\' value=\"";
+    private final static byte[]  _wl_block82Bytes = _getBytes( _wl_block82 );
+
+    private final static java.lang.String  _wl_block83 ="\">\n    <input type=\'hidden\' name=\'edd_Date\' id=\'edd_Date\' value=\"";
+    private final static byte[]  _wl_block83Bytes = _getBytes( _wl_block83 );
+
+    private final static java.lang.String  _wl_block84 ="\">\n    <input type=\'hidden\' name=\'gestation_poa_week\' id=\'gestation_poa_week\' value=\"";
+    private final static byte[]  _wl_block84Bytes = _getBytes( _wl_block84 );
+
+    private final static java.lang.String  _wl_block85 ="\">\n    <input type=\'hidden\' name=\'gestation_poa_days\' id=\'gestation_poa_days\' value=\"";
+    private final static byte[]  _wl_block85Bytes = _getBytes( _wl_block85 );
+
+    private final static java.lang.String  _wl_block86 ="\">\n    <input type=\'hidden\' name=\'scan_gestation_weeks\' id=\'scan_gestation_weeks\' value=\"";
+    private final static byte[]  _wl_block86Bytes = _getBytes( _wl_block86 );
+
+    private final static java.lang.String  _wl_block87 ="\">\n    <input type=\'hidden\' name=\'scan_gestation_days\' id=\'scan_gestation_days\' value=\"";
+    private final static byte[]  _wl_block87Bytes = _getBytes( _wl_block87 );
+
+    private final static java.lang.String  _wl_block88 ="\">\n    <input type=\'hidden\' name=\'gestation_pog_weeks\' id=\'gestation_pog_weeks\' value=\"";
+    private final static byte[]  _wl_block88Bytes = _getBytes( _wl_block88 );
+
+    private final static java.lang.String  _wl_block89 ="\">\n    <input type=\'hidden\' name=\'gestation_pog_days\' id=\'gestation_pog_days\' value=\"";
+    private final static byte[]  _wl_block89Bytes = _getBytes( _wl_block89 );
+
+    private final static java.lang.String  _wl_block90 ="\">\n    <input type=\'hidden\' name=\'lmp_delivery_miscarrage_type\' id=\'lmp_delivery_miscarrage_type\' value=\"";
+    private final static byte[]  _wl_block90Bytes = _getBytes( _wl_block90 );
+
+    private final static java.lang.String  _wl_block91 ="\">\n    <input type=\'hidden\' name=\'unsure_delivery_miscarrage_type\' id=\'unsure_delivery_miscarrage_type\' value=\"";
+    private final static byte[]  _wl_block91Bytes = _getBytes( _wl_block91 );
+
+    private final static java.lang.String  _wl_block92 ="\">\n    <input type=\'hidden\' name=\'lmp_Delivery_Miscarrage_Date\' id=\'lmp_Delivery_Miscarrage_Date\' value=\"";
+    private final static byte[]  _wl_block92Bytes = _getBytes( _wl_block92 );
+
+    private final static java.lang.String  _wl_block93 ="\">\n    <input type=\'hidden\' name=\'unsure_Delivery_Miscarrage_Date\' id=\'unsure_Delivery_Miscarrage_Date\' value=\"";
+    private final static byte[]  _wl_block93Bytes = _getBytes( _wl_block93 );
+
+    private final static java.lang.String  _wl_block94 ="\">\n    <input type=\'hidden\'  name=\'remark_Unsure\' id=\'remark_Unsure\' value=\"";
+    private final static byte[]  _wl_block94Bytes = _getBytes( _wl_block94 );
+
+    private final static java.lang.String  _wl_block95 ="\">\n   <input type=\'hidden\'  name=\'remark_Lmp\' id=\'remark_Lmp\' value=\"";
+    private final static byte[]  _wl_block95Bytes = _getBytes( _wl_block95 );
+
+    private final static java.lang.String  _wl_block96 ="\">\n    <input type=\'hidden\' name=\'redd_date\' id=\'redd_date\' value=\"";
+    private final static byte[]  _wl_block96Bytes = _getBytes( _wl_block96 );
+
+    private final static java.lang.String  _wl_block97 ="\">\n    <input type=\'hidden\'  name=\'unsure_date\' id=\'unsure_date\' value=\"";
+    private final static byte[]  _wl_block97Bytes = _getBytes( _wl_block97 );
+
+    private final static java.lang.String  _wl_block98 ="\">\n     <input type=\"hidden\"  id=\"selectedValue\" name=\"selectedValue\" id=\"selectedValue\" value=\"";
+    private final static byte[]  _wl_block98Bytes = _getBytes( _wl_block98 );
+
+    private final static java.lang.String  _wl_block99 ="\">\n\t<input type=\"hidden\" name=\"patient_id\" id=\"patient_id\" value=\"";
+    private final static byte[]  _wl_block99Bytes = _getBytes( _wl_block99 );
+
+    private final static java.lang.String  _wl_block100 ="\">\n\t<input type=\"hidden\" name=\"option_id\" id=\"option_id\" value=\"";
+    private final static byte[]  _wl_block100Bytes = _getBytes( _wl_block100 );
+
+    private final static java.lang.String  _wl_block101 ="\">\n\t<input type=\'hidden\'   id=\'mode1\' name=\'mode1\' id=\'mode1\' value=\'";
+    private final static byte[]  _wl_block101Bytes = _getBytes( _wl_block101 );
+
+    private final static java.lang.String  _wl_block102 ="\'>\n\t<input type=\"hidden\" id=\"cutOffBackdate\"  name=\"cutOffBackdate\" id=\"cutOffBackdate\" value=\"";
+    private final static byte[]  _wl_block102Bytes = _getBytes( _wl_block102 );
+
+    private final static java.lang.String  _wl_block103 ="\" />\n\t<input type=\"hidden\" id=\"cutOffDeliveryDate\" name=\"cutOffDeliveryDate\" id=\"cutOffDeliveryDate\" value=\"";
+    private final static byte[]  _wl_block103Bytes = _getBytes( _wl_block103 );
+
+    private final static java.lang.String  _wl_block104 ="\" />\n\t<input type=\"hidden\" id=\"cutOffDeliveryLmp\" name=\"cutOffDeliveryLmp\" id=\"cutOffDeliveryLmp\" value=\"";
+    private final static byte[]  _wl_block104Bytes = _getBytes( _wl_block104 );
+
+    private final static java.lang.String  _wl_block105 ="\" />\n\t<input type=\"hidden\" id=\"cutOffMiscarriageLmp\" name=\"cutOffMiscarriageLmp\" id=\"cutOffMiscarriageLmp\" value=\"";
+    private final static byte[]  _wl_block105Bytes = _getBytes( _wl_block105 );
+
+    private final static java.lang.String  _wl_block106 ="\" />\n\t<input type=\"hidden\" id=\"enableMarkAsErrorYN\" name=\"enableMarkAsErrorYN\" id=\"enableMarkAsErrorYN\" value=\"";
+    private final static byte[]  _wl_block106Bytes = _getBytes( _wl_block106 );
+
+    private final static java.lang.String  _wl_block107 ="\" />\n\t<input type=\"hidden\" id=\"delivery_miscarrage_type_value\" name=\"delivery_miscarrage_type_value\" id=\"delivery_miscarrage_type_value\" value=\"";
+    private final static byte[]  _wl_block107Bytes = _getBytes( _wl_block107 );
+
+    private final static java.lang.String  _wl_block108 ="\" />\n\t<input type=\"hidden\" id=\"selected_Values\" name=\"selected_Values\" id=\"selected_Values\" value=\"";
+    private final static byte[]  _wl_block108Bytes = _getBytes( _wl_block108 );
+
+    private final static java.lang.String  _wl_block109 ="\" />\n\t<input type=\"hidden\" id=\"delivery_miscarrage_date_value\" name=\"delivery_miscarrage_date_value\" id=\"delivery_miscarrage_date_value\" value=\"";
+    private final static byte[]  _wl_block109Bytes = _getBytes( _wl_block109 );
+
+    private final static java.lang.String  _wl_block110 ="\" />\n\t<input type=\"hidden\" id=\"srl_no\" name=\"srl_no\" id=\"srl_no\" value=\"";
+    private final static byte[]  _wl_block110Bytes = _getBytes( _wl_block110 );
+
+    private final static java.lang.String  _wl_block111 ="\" />\n\t<input type=\"hidden\" id=\"encounter_id\" name=\"encounter_id\" id=\"encounter_id\" value=\"";
+    private final static byte[]  _wl_block111Bytes = _getBytes( _wl_block111 );
+
+    private final static java.lang.String  _wl_block112 ="\"/>\n\t<input type=\"hidden\" id=\"episode_id\" name=\"episode_id\" id=\"episode_id\" value=\"";
+    private final static byte[]  _wl_block112Bytes = _getBytes( _wl_block112 );
+
+    private final static java.lang.String  _wl_block113 ="\" />\n\t<input type=\"hidden\" id=\"pervious_lmp_date\" name=\"pervious_lmp_date\" id=\"pervious_lmp_date\" value=\"";
+    private final static byte[]  _wl_block113Bytes = _getBytes( _wl_block113 );
+
+    private final static java.lang.String  _wl_block114 ="\" />\n\t<input type=\"hidden\" id=\"pervious_remark_lmp\" name=\"pervious_remark_lmp\" id=\"pervious_remark_lmp\" value=\"";
+    private final static byte[]  _wl_block114Bytes = _getBytes( _wl_block114 );
+
+    private final static java.lang.String  _wl_block115 ="\" />\n\t<input type=\"hidden\" id=\"pervious_scan_gestation_weeks\" name=\"pervious_scan_gestation_weeks\" id=\"pervious_scan_gestation_weeks\" value=\"";
+    private final static byte[]  _wl_block115Bytes = _getBytes( _wl_block115 );
+
+    private final static java.lang.String  _wl_block116 ="\" />\n\t<input type=\"hidden\" id=\"pervious_scan_gestation_days\" name=\"pervious_scan_gestation_days\" id=\"pervious_scan_gestation_days\" value=\"";
+    private final static byte[]  _wl_block116Bytes = _getBytes( _wl_block116 );
+
+    private final static java.lang.String  _wl_block117 ="\" />\n\t<input type=\"hidden\" id=\"pervious_remark_unsure\" name=\"pervious_remark_unsure\" id=\"pervious_remark_unsure\" value=\"";
+    private final static byte[]  _wl_block117Bytes = _getBytes( _wl_block117 );
+
+    private final static java.lang.String  _wl_block118 ="\" />\n\t<input type=\"hidden\" id=\"called_form\" name=\"called_form\" id=\"called_form\" value=\"";
+    private final static byte[]  _wl_block118Bytes = _getBytes( _wl_block118 );
+
+    private final static java.lang.String  _wl_block119 ="\" />\n\t<input type=\"hidden\" id=\"function_id\" name=\"function_id\" id=\"function_id\" value=\"";
+    private final static byte[]  _wl_block119Bytes = _getBytes( _wl_block119 );
+
+    private final static java.lang.String  _wl_block120 ="\" />\n\t<input type=\"hidden\" id=\"finalize_yn\" name=\"finalize_yn\" id=\"finalize_yn\" value=\"";
+    private final static byte[]  _wl_block120Bytes = _getBytes( _wl_block120 );
+
+    private final static java.lang.String  _wl_block121 ="\" />\n\t<input type=\"hidden\" id=\"module_id\" name=\"module_id\" id=\"module_id\" value=\"";
+    private final static byte[]  _wl_block121Bytes = _getBytes( _wl_block121 );
+
+    private final static java.lang.String  _wl_block122 ="\" />\n\t<input type=\"hidden\" id=\"multibirthvalue\" name=\"multibirthvalue\" id=\"multibirthvalue\" value=\"";
+    private final static byte[]  _wl_block122Bytes = _getBytes( _wl_block122 );
+
+    private final static java.lang.String  _wl_block123 ="\" />\n\t<input type=\"hidden\" id=\"delivery_miscarrage_date_validation\" name=\"delivery_miscarrage_date_validation\" id=\"delivery_miscarrage_date_validation\" value=\"";
+    private final static byte[]  _wl_block123Bytes = _getBytes( _wl_block123 );
+
+    private final static java.lang.String  _wl_block124 ="\" />\n\t<input type=\"hidden\" id=\"eventStatus_validation\" name=\"eventStatus_validation\" id=\"eventStatus_validation\" value=\"";
+    private final static byte[]  _wl_block124Bytes = _getBytes( _wl_block124 );
+
+    private final static java.lang.String  _wl_block125 ="\" />\n\t<input type=\"hidden\" id=\"exisiting_delivery_miscarrage_date_value\" name=\"exisiting_delivery_miscarrage_date_value\" id=\"exisiting_delivery_miscarrage_date_value\" value=\"";
+    private final static byte[]  _wl_block125Bytes = _getBytes( _wl_block125 );
+
+    private final static java.lang.String  _wl_block126 ="\" />\n    <input type=\"hidden\" id=\"exisiting_delivery_miscarrage_type_value\" name=\"exisiting_delivery_miscarrage_type_value\" id=\"exisiting_delivery_miscarrage_type_value\" value=\"";
+    private final static byte[]  _wl_block126Bytes = _getBytes( _wl_block126 );
+
+    private final static java.lang.String  _wl_block127 ="\" />\n\t <input type=\"hidden\" id=\"eventStatus\" name=\"eventStatus\" id=\"eventStatus\" value=\"";
+    private final static byte[]  _wl_block127Bytes = _getBytes( _wl_block127 );
+
+    private final static java.lang.String  _wl_block128 ="\" />\n\t\n</form>\n<Script>\nvar module_id =  document.getElementById(\'module_id\').value;\nvar eventStatus =  document.getElementById(\"eventStatus\").value;\n\nif(module_id!=\"REGISTER_NEWBORN\" && module_id!=\"MAINTAIN_BIRTH\"){\nunSurucheckFields();\n}\n\nif (module_id == \"REGISTER_NEWBORN\" || module_id == \"MAINTAIN_BIRTH\") {\n    var unsureDeliveryMiscarrageDate = document.getElementById(\'unsureDeliveryMiscarrageDate\');\n    if(unsureDeliveryMiscarrageDate){\n    unsureDeliveryMiscarrageDate.disabled = true;\n    }// Disable the date input field\n}\n\nif ((module_id === \"REGISTER_NEWBORN\" || module_id === \"MAINTAIN_BIRTH\") && eventStatus === \"A\") {\n\tvar unsureDeliveryMiscarrageDate = document.getElementById(\'unsureDeliveryMiscarrageDate\');\n    var mandatoryIcons = document.getElementById(\'mandatoryIcons\');\n    if(mandatoryIcons){\n    mandatoryIcons.style.display = \'inline\';\n    }\n    if(unsureDeliveryMiscarrageDate){\n    unsureDeliveryMiscarrageDate.disabled = false; // Disable the date input field\n    }\n}\n</Script>\n<Script>\nvar module_id =  document.getElementById(\'module_id\').value;\nif(module_id!=\"REGISTER_NEWBORN\" && module_id!=\"MAINTAIN_BIRTH\"){\ncheckFields();\n}\n\nif (module_id == \"REGISTER_NEWBORN\" || module_id == \"MAINTAIN_BIRTH\") {\n    var lmpDeliveryMiscarrageDate = document.getElementById(\'lmpDeliveryMiscarrageDate\');\n    if(lmpDeliveryMiscarrageDate){\n    lmpDeliveryMiscarrageDate.disabled = true; // Disable the date input field\n    }\n}\n\nif ((module_id === \"REGISTER_NEWBORN\" || module_id === \"MAINTAIN_BIRTH\") && eventStatus === \"A\") {\n    var lmpDeliveryMiscarrageDate = document.getElementById(\'lmpDeliveryMiscarrageDate\');\n    var mandatoryIcon = document.getElementById(\'mandatoryIcon\');\n    if(mandatoryIcon){\n    mandatoryIcon.style.display = \'inline\';\n    }\n    \n    if(lmpDeliveryMiscarrageDate){\n    lmpDeliveryMiscarrageDate.disabled = false;  // Disable the date input field\n    }\n}\n</Script>\n</body>\n</html>\n\n";
+    private final static byte[]  _wl_block128Bytes = _getBytes( _wl_block128 );
+	
+	/** START FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	public Object getBean(String sessionid,String userid,String ws_no,java.sql.Timestamp session_creation_date,Properties jdbc_props){
+		return PersistenceHelper.getBean(sessionid,userid,ws_no,session_creation_date,jdbc_props);
+	}
+	
+	public Object getObjectFromBean(String id,String ClassName,javax.servlet.http.HttpSession session){
+		return PersistenceHelper.getObjectFromBean( id,ClassName,session);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpSession session){
+		PersistenceHelper.putObjectInBean(id,obj,session);
+	}
+
+	/** END FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	/** START FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+	public Object getBeanObject(String id,String ClassName,javax.servlet.http.HttpServletRequest request){
+		return PersistenceHelper.getBeanObject(id,ClassName,request);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.putObjectInBean(id,obj,request);
+	}
+
+	public void cleanBeanObject(String id,String className,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.	cleanBeanObject(id,className,request);
+	} 
+	/** END FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+
+	/** START TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+	public void cleanAll(javax.servlet.http.HttpSession session){
+		PersistenceHelper.cleanAll(session);
+	}
+	/** END TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+
+/* 
+--------------------------------------------------------------------------------------------------------------------
+Date       		Edit History    	 Name      			Rev.Date		Rev.Name		Description
+--------------------------------------------------------------------------------------------------------------------			 	
+ 29/04/2024     58928	     Krishna pranay	         30/04/204         Ramesh Goli       	ML-MMOH-CRF-1759.2
+ 01/10/2024     68508     krishna pranay             13/10/2024  Ashwini Ragupathi  ML-MMOH-CRF-1759							
+--------------------------------------------------------------------------------------------------------------------
+*/
+
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block4Bytes, _wl_block4);
+
+    String locale = ((String)session.getAttribute("LOCALE"));
+    String sStyle = (session.getAttribute("PREFERRED_STYLE") != null) || (session.getAttribute("PREFERRED_STYLE") != "") ? (String)session.getAttribute("PREFERRED_STYLE") : "IeStyle.css";
+    request.setCharacterEncoding("UTF-8");
+    request = new XSSRequestWrapper(request); //MOHE-SCF-0153
+    response.addHeader("X-XSS-Protection", "1; mode=block"); //MMS-ME-SCF-0079
+    response.addHeader("X-Content-Type-Options", "nosniff"); //MMS-ME-SCF-0085
+
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block6Bytes, _wl_block6);
+
+String eventStatus = "",eventStatus_validation="",exisiting_delivery_miscarrage_type_value="",exisiting_delivery_miscarrage_date_value="",new_delivery_miscarrage_type_value="",new_delivery_miscarrage_date_value="";
+    String lmp_Date="";
+	String edd_Date="";
+	String seld="";
+	String remark_unsure="";
+	String pervious_scan_gestation_days= "";
+	String pervious_scan_gestation_weeks= "";
+
+	String selm="";
+	Integer gestation_poa_week = null;
+	Integer gestation_poa_days = null;
+	Integer scan_gestation_weeks = null;
+	Integer scan_gestation_days = null;
+	Integer gestation_pog_weeks = null;
+	Integer gestation_pog_days = null;
+	String lmp_Delivery_Miscarrage_Type="";
+	String unsure_delivery_miscarrage_type="";
+	String lmp_Delivery_Miscarrage_Date="",delivery_miscarrage_date_validation="";
+	String unsure_delivery_miscarrage_date="";
+	String remark_lmp="";
+	String redd_date="";
+	String  gestation_poa="";
+	Integer cutOffBackdate = null;        
+	Integer cutOffDeliveryDate = null;   
+	Integer cutOffDeliveryLmp = null;    
+	Integer cutOffMiscarriageLmp = null; 
+	String pervious_remark_lmp="";
+	String enableMarkAsErrorYN="N";
+	String scan_gestation="";
+	String delivery_miscarrage_date_value="";
+	String Lmp_Date_Value="";
+	String unsure_date="";
+	String gestation_pog="";
+	String srl_no="";
+	String event="";
+	String pervious_lmp_date="";
+	String 	selectedValue="";
+	 String selected_Values="";
+	 String scan_gestation_value	="";
+	 String delivery_miscarrage_type_value="";
+	 String unsure_date_value	="";
+	 String pervious_remark_unsure="";
+   	String edd_value	="";
+	 String mode="";
+	  String redd_value="";
+	  String remarks_value="";
+     String gestation_poa_value="";
+     String gestation_pog_value="";
+	 String facility_id=(String) session.getValue("facility_id");
+    String option_id = request.getParameter("option_id") == null ? "" : request.getParameter("option_id");
+    String	mode1 =  request.getParameter("mode1")==null?"":request.getParameter("mode1");
+	String patient_id = request.getParameter("patient_id") == null ? "" : request.getParameter("patient_id");
+	String encounter_id = request.getParameter("encounter_id") == null ? "" : request.getParameter("encounter_id");
+	String episode_id = request.getParameter("episode_id") == null ? "" : request.getParameter("episode_id");
+	String finalize_yn = request.getParameter("finalize_yn") == null ? "" : request.getParameter("finalize_yn");
+	String module_id = request.getParameter("module_id") == null ? "" : request.getParameter("module_id");
+	String multibirthvalue = request.getParameter("multibirthvalue") == null ? "" : request.getParameter("multibirthvalue");
+
+	String called_form = request.getParameter("called_form") == null ? "" : request.getParameter("called_form");
+	String function_id = request.getParameter("function_id") == null ? "" : request.getParameter("function_id");
+
+    String ca_bean_id = "@CAMenstrualHistDtlTransBean";
+    String ca_bean_name = "eCA.CAMenstrualHistDtlTransBean";
+    CAMenstrualHistDtlTransBean bean = (CAMenstrualHistDtlTransBean)getBeanObject(ca_bean_id, ca_bean_name, request);
+    ArrayList resArrayValidate = bean.getPatientPASValidation(patient_id);
+    if (resArrayValidate.size() > 0) { 
+    	for (int i = 0; i < resArrayValidate.size(); i++) {
+            String[] validated = (String[]) resArrayValidate.get(i);
+            delivery_miscarrage_date_validation		= CommonBean.checkForNull(validated[10]);
+		 eventStatus_validation		= CommonBean.checkForNull(validated[14]);
+
+    	}
+    }
+    
+    
+    ArrayList resArray2 = bean.getPatientActiveValidation(patient_id);
+    if (resArray2.size() > 0) { 
+    	for (int j = 0; j < resArray2.size(); j++) {
+            String[] record2 = (String[]) resArray2.get(j);
+            
+            new_delivery_miscarrage_type_value		= CommonBean.checkForNull(record2[9]);
+            new_delivery_miscarrage_date_value			= CommonBean.checkForNull(record2[10]);
+
+    	}
+    }
+    
+    ArrayList resArray = bean.getPatientBottomValidation(patient_id);
+    if (resArray.size() > 0) { 
+    	for (int i = 0; i < resArray.size(); i++) {
+            String[] record = (String[]) resArray.get(i);
+            selected_Values	= CommonBean.checkForNull(record[1]);
+            Lmp_Date_Value			= CommonBean.checkForNull(record[2]);
+            edd_value		= CommonBean.checkForNull(record[3]);
+            gestation_poa_value		= CommonBean.checkForNull(record[4]); 
+            scan_gestation_value			= CommonBean.checkForNull(record[5]); 
+            unsure_date_value				= CommonBean.checkForNull(record[6]);
+            redd_value					= CommonBean.checkForNull(record[7]);
+            gestation_pog_value			= CommonBean.checkForNull(record[8]);
+            delivery_miscarrage_type_value		= CommonBean.checkForNull(record[9]);
+            delivery_miscarrage_date_value			= CommonBean.checkForNull(record[10]);
+    		 remarks_value		= CommonBean.checkForNull(record[11]);
+    		 eventStatus		= CommonBean.checkForNull(record[14]);
+
+    	 if((delivery_miscarrage_type_value == null ||delivery_miscarrage_type_value.equals("")) && (delivery_miscarrage_date_value == null || delivery_miscarrage_date_value.equals("")) && "A".equals(eventStatus)|| ("MAINTAIN_BIRTH".equals(module_id) && "Y".equals(finalize_yn) && "C".equals(eventStatus)) || ("Y".equals(multibirthvalue) && "N".equals(finalize_yn) && "C".equals(eventStatus)))
+          {
+          	selectedValue = request.getParameter("selectedValue") == null ? "": request.getParameter("selectedValue");
+           }
+    	 else
+    	 {
+           	selectedValue = request.getParameter("selectedValue") == null ? "L": request.getParameter("selectedValue");
+
+    	 }
+    	}
+    }
+    else
+    {
+    	 finalize_yn = request.getParameter("finalize_yn") == null ? "" : request.getParameter("finalize_yn");
+    	 module_id = request.getParameter("module_id") == null ? "" : request.getParameter("module_id");
+
+	    if ("MAINTAIN_BIRTH".equals(module_id) && "Y".equals(finalize_yn)) {
+      	selectedValue = request.getParameter("selectedValue") == null ? "": request.getParameter("selectedValue");
+	    }else{
+	      selectedValue = request.getParameter("selectedValue") == null ? "L": request.getParameter("selectedValue");
+	    }
+    }
+    
+    ArrayList masterArray = bean.getMenstrualHistoryMaster(facility_id);
+    
+ 	if(masterArray.size()>0){
+		for(int i=0;i<masterArray.size();i++){
+			ArrayList array = (ArrayList)masterArray.get(i);
+	  		cutOffBackdate = Integer.parseInt((String) array.get(0)); 
+			cutOffDeliveryDate = Integer.parseInt((String) array.get(1)); 
+			cutOffDeliveryLmp = Integer.parseInt((String) array.get(2)); 
+			  cutOffMiscarriageLmp = Integer.parseInt((String) array.get(3)); 
+			enableMarkAsErrorYN=(String)array.get(4);
+		}
+}
+	 
+
+	  	if(mode1.equals("modify")){
+	    option_id = request.getParameter("option_id") == null ? "": request.getParameter("option_id");
+	    lmp_Date = request.getParameter("lmp_Date") == null ? "": request.getParameter("lmp_Date");
+	    pervious_lmp_date=lmp_Date;
+	    edd_Date = request.getParameter("edd_Date") == null ? "": request.getParameter("edd_Date");
+	    gestation_poa = request.getParameter("gestation_poa") == null ? "" : request.getParameter("gestation_poa");
+	    srl_no = request.getParameter("srl_no") == null ? "" : request.getParameter("srl_no");
+    	if (gestation_poa != null && gestation_poa.length() > 0){
+	    String[] parts = gestation_poa.split(" ");
+		  	gestation_poa_week = Integer.parseInt(parts[0]); 
+		  	gestation_poa_days = Integer.parseInt(parts[2]); 
+    	}
+    	
+		  	lmp_Delivery_Miscarrage_Type = request.getParameter("lmp_Delivery_Miscarrage_Type") == null ? "" : request.getParameter("lmp_Delivery_Miscarrage_Type");
+		    lmp_Delivery_Miscarrage_Date = request.getParameter("lmp_Delivery_Miscarrage_Date") == null ? "" : request.getParameter("lmp_Delivery_Miscarrage_Date");
+		    remark_lmp = request.getParameter("remark_lmp") == null ? "" : request.getParameter("remark_lmp");
+		    pervious_remark_lmp=remark_lmp;
+	    scan_gestation = request.getParameter("scan_gestation") == null ? "" : request.getParameter("scan_gestation");
+	    	if (scan_gestation != null && scan_gestation.length() > 0){
+   			String[] part1 = scan_gestation.split(" ");
+		  	scan_gestation_weeks = Integer.parseInt(part1[0]); 
+		  	scan_gestation_days = Integer.parseInt(part1[2]); 
+		    pervious_scan_gestation_weeks=String.valueOf(scan_gestation_weeks);
+		
+		    pervious_scan_gestation_days=String.valueOf(scan_gestation_days);
+	
+
+	    	}
+	    unsure_date = request.getParameter("unsure_date") == null ? "" : request.getParameter("unsure_date");
+	    redd_date = request.getParameter("redd_date") == null ? "" : request.getParameter("redd_date");
+	    unsure_delivery_miscarrage_type = request.getParameter("unsure_delivery_miscarrage_type") == null ? "" : request.getParameter("unsure_delivery_miscarrage_type");
+
+	    unsure_delivery_miscarrage_date = request.getParameter("unsure_delivery_miscarrage_date") == null ? "" : request.getParameter("unsure_delivery_miscarrage_date");
+
+	    remark_unsure = request.getParameter("remark_unsure") == null ? "" : request.getParameter("remark_unsure");
+	    pervious_remark_unsure=remark_unsure;
+
+	    gestation_pog = request.getParameter("gestation_pog") == null ? "" : request.getParameter("gestation_pog");
+
+	    if (gestation_pog != null && gestation_pog.length() > 0){
+	  		 String[] part2 = gestation_pog.split(" ");
+		  	gestation_pog_weeks = Integer.parseInt(part2[0]); 
+		 
+		  	gestation_pog_days = Integer.parseInt(part2[2]); 
+    	}
+	     encounter_id = request.getParameter("encounter_id") == null ? "" : request.getParameter("encounter_id");
+		 episode_id = request.getParameter("episode_id") == null ? "" : request.getParameter("episode_id");
+		 called_form = request.getParameter("called_form") == null ? "" : request.getParameter("called_form");
+		 module_id = request.getParameter("module_id") == null ? "" : request.getParameter("module_id");
+		 eventStatus = "A";
+
+		 ArrayList resArray1 = bean.getPatientActiveValidation(patient_id);
+		    if (resArray1.size() > 0) { 
+		    	for (int i = 0; i < resArray1.size(); i++) {
+		            String[] record1 = (String[]) resArray1.get(i);
+		            
+		            exisiting_delivery_miscarrage_type_value		= CommonBean.checkForNull(record1[9]);
+		            exisiting_delivery_miscarrage_date_value			= CommonBean.checkForNull(record1[10]);
+
+		    	}
+		    }
+		    
+	    } else {
+		mode = "insert";
+	}
+
+            _bw.write(_wl_block7Bytes, _wl_block7);
+if(selectedValue.equals("L")){
+            _bw.write(_wl_block8Bytes, _wl_block8);
+
+            if (_jsp__tag0(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block9Bytes, _wl_block9);
+
+            if (_jsp__tag1(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block10Bytes, _wl_block10);
+            out.print( String.valueOf(lmp_Date));
+            _bw.write(_wl_block11Bytes, _wl_block11);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block12Bytes, _wl_block12);
+
+            if (_jsp__tag2(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block13Bytes, _wl_block13);
+            out.print( String.valueOf(edd_Date));
+            _bw.write(_wl_block14Bytes, _wl_block14);
+
+            if (_jsp__tag3(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block15Bytes, _wl_block15);
+            out.print( String.valueOf((gestation_poa_week != null ? gestation_poa_week : "")));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+
+            if (_jsp__tag4(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block17Bytes, _wl_block17);
+            out.print( String.valueOf((gestation_poa_days != null ? gestation_poa_days : "")));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+
+            if (_jsp__tag5(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block18Bytes, _wl_block18);
+
+            if (_jsp__tag6(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block19Bytes, _wl_block19);
+if(module_id.equals("REGISTER_NEWBORN") || module_id.equals("MAINTAIN_BIRTH")){ 
+            _bw.write(_wl_block20Bytes, _wl_block20);
+
+            if (_jsp__tag7(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block21Bytes, _wl_block21);
+}else{ 
+            _bw.write(_wl_block22Bytes, _wl_block22);
+
+            if (_jsp__tag8(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+            out.print( String.valueOf( "D".equals(lmp_Delivery_Miscarrage_Type) ? "selected" : "" ));
+            _bw.write(_wl_block24Bytes, _wl_block24);
+
+            if (_jsp__tag9(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block25Bytes, _wl_block25);
+            out.print( String.valueOf( "M".equals(lmp_Delivery_Miscarrage_Type) ? "selected" : "" ));
+            _bw.write(_wl_block26Bytes, _wl_block26);
+
+            if (_jsp__tag10(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block27Bytes, _wl_block27);
+}
+            _bw.write(_wl_block28Bytes, _wl_block28);
+
+            if (_jsp__tag11(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block29Bytes, _wl_block29);
+if(module_id.equals("REGISTER_NEWBORN") || module_id.equals("MAINTAIN_BIRTH")){ 
+            _bw.write(_wl_block30Bytes, _wl_block30);
+            out.print( String.valueOf(lmp_Delivery_Miscarrage_Date));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+}else{ 
+            _bw.write(_wl_block33Bytes, _wl_block33);
+            out.print( String.valueOf(lmp_Delivery_Miscarrage_Date));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block34Bytes, _wl_block34);
+} 
+            _bw.write(_wl_block35Bytes, _wl_block35);
+
+            if (_jsp__tag12(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block36Bytes, _wl_block36);
+            out.print( String.valueOf(remark_lmp));
+            _bw.write(_wl_block37Bytes, _wl_block37);
+
+            if (_jsp__tag13(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block38Bytes, _wl_block38);
+
+            if (_jsp__tag14(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block39Bytes, _wl_block39);
+if(mode1.equals("modify") && enableMarkAsErrorYN.equals("Y")){ 
+            _bw.write(_wl_block40Bytes, _wl_block40);
+
+            if (_jsp__tag15(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block41Bytes, _wl_block41);
+} 
+            _bw.write(_wl_block42Bytes, _wl_block42);
+}
+            _bw.write(_wl_block43Bytes, _wl_block43);
+ if(selectedValue.equals("U")) { 
+            _bw.write(_wl_block44Bytes, _wl_block44);
+
+            if (_jsp__tag16(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block45Bytes, _wl_block45);
+
+            if (_jsp__tag17(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block46Bytes, _wl_block46);
+            out.print( String.valueOf((scan_gestation_weeks != null ? scan_gestation_weeks : "")));
+            _bw.write(_wl_block47Bytes, _wl_block47);
+
+            if (_jsp__tag18(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block48Bytes, _wl_block48);
+            out.print( String.valueOf((scan_gestation_days != null ? scan_gestation_days : "")));
+            _bw.write(_wl_block47Bytes, _wl_block47);
+
+            if (_jsp__tag19(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block49Bytes, _wl_block49);
+
+            if (_jsp__tag20(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block50Bytes, _wl_block50);
+            out.print( String.valueOf(unsure_date));
+            _bw.write(_wl_block51Bytes, _wl_block51);
+
+            if (_jsp__tag21(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block52Bytes, _wl_block52);
+            out.print( String.valueOf(redd_date));
+            _bw.write(_wl_block53Bytes, _wl_block53);
+
+            if (_jsp__tag22(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block54Bytes, _wl_block54);
+            out.print( String.valueOf((gestation_pog_weeks != null ? gestation_pog_weeks : "")));
+            _bw.write(_wl_block55Bytes, _wl_block55);
+
+            if (_jsp__tag23(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block56Bytes, _wl_block56);
+            out.print( String.valueOf((gestation_pog_days != null ? gestation_pog_days : "")));
+            _bw.write(_wl_block55Bytes, _wl_block55);
+
+            if (_jsp__tag24(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block57Bytes, _wl_block57);
+
+            if (_jsp__tag25(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block58Bytes, _wl_block58);
+if(module_id.equals("REGISTER_NEWBORN") || module_id.equals("MAINTAIN_BIRTH")){ 
+            _bw.write(_wl_block59Bytes, _wl_block59);
+
+            if (_jsp__tag26(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block60Bytes, _wl_block60);
+}else{ 
+            _bw.write(_wl_block61Bytes, _wl_block61);
+
+            if (_jsp__tag27(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block62Bytes, _wl_block62);
+            out.print( String.valueOf( "D".equals(unsure_delivery_miscarrage_type) ? "selected" : "" ));
+            _bw.write(_wl_block63Bytes, _wl_block63);
+
+            if (_jsp__tag28(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block64Bytes, _wl_block64);
+            out.print( String.valueOf( "M".equals(unsure_delivery_miscarrage_type) ? "selected" : "" ));
+            _bw.write(_wl_block65Bytes, _wl_block65);
+
+            if (_jsp__tag29(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block66Bytes, _wl_block66);
+} 
+            _bw.write(_wl_block67Bytes, _wl_block67);
+
+            if (_jsp__tag30(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block68Bytes, _wl_block68);
+if(module_id.equals("REGISTER_NEWBORN") || module_id.equals("MAINTAIN_BIRTH")){ 
+            _bw.write(_wl_block69Bytes, _wl_block69);
+            out.print( String.valueOf(unsure_delivery_miscarrage_date));
+            _bw.write(_wl_block70Bytes, _wl_block70);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block71Bytes, _wl_block71);
+}else{ 
+            _bw.write(_wl_block72Bytes, _wl_block72);
+            out.print( String.valueOf(unsure_delivery_miscarrage_date));
+            _bw.write(_wl_block70Bytes, _wl_block70);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block73Bytes, _wl_block73);
+} 
+            _bw.write(_wl_block74Bytes, _wl_block74);
+
+            if (_jsp__tag31(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(remark_unsure));
+            _bw.write(_wl_block76Bytes, _wl_block76);
+
+            if (_jsp__tag32(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block77Bytes, _wl_block77);
+
+            if (_jsp__tag33(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block78Bytes, _wl_block78);
+ if(mode1.equals("modify") && enableMarkAsErrorYN.equals("Y")) { 
+            _bw.write(_wl_block79Bytes, _wl_block79);
+
+            if (_jsp__tag34(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block80Bytes, _wl_block80);
+ } 
+            _bw.write(_wl_block81Bytes, _wl_block81);
+ } 
+            _bw.write(_wl_block82Bytes, _wl_block82);
+            out.print( String.valueOf(lmp_Date));
+            _bw.write(_wl_block83Bytes, _wl_block83);
+            out.print( String.valueOf(edd_Date));
+            _bw.write(_wl_block84Bytes, _wl_block84);
+            out.print( String.valueOf(gestation_poa_week != null ? gestation_poa_week.toString() : ""));
+            _bw.write(_wl_block85Bytes, _wl_block85);
+            out.print( String.valueOf(gestation_poa_days != null ? gestation_poa_days.toString() : ""));
+            _bw.write(_wl_block86Bytes, _wl_block86);
+            out.print( String.valueOf(scan_gestation_weeks != null ? scan_gestation_weeks.toString() : ""));
+            _bw.write(_wl_block87Bytes, _wl_block87);
+            out.print( String.valueOf(scan_gestation_days != null ? scan_gestation_days.toString() : ""));
+            _bw.write(_wl_block88Bytes, _wl_block88);
+            out.print( String.valueOf(gestation_pog_weeks != null ? gestation_pog_weeks.toString() : ""));
+            _bw.write(_wl_block89Bytes, _wl_block89);
+            out.print( String.valueOf(gestation_pog_days != null ? gestation_pog_days.toString() : ""));
+            _bw.write(_wl_block90Bytes, _wl_block90);
+            out.print( String.valueOf(lmp_Delivery_Miscarrage_Type));
+            _bw.write(_wl_block91Bytes, _wl_block91);
+            out.print( String.valueOf(unsure_delivery_miscarrage_type));
+            _bw.write(_wl_block92Bytes, _wl_block92);
+            out.print( String.valueOf(lmp_Delivery_Miscarrage_Date));
+            _bw.write(_wl_block93Bytes, _wl_block93);
+            out.print( String.valueOf(unsure_delivery_miscarrage_date));
+            _bw.write(_wl_block94Bytes, _wl_block94);
+            out.print( String.valueOf(remark_unsure));
+            _bw.write(_wl_block95Bytes, _wl_block95);
+            out.print( String.valueOf(remark_lmp));
+            _bw.write(_wl_block96Bytes, _wl_block96);
+            out.print( String.valueOf(redd_date));
+            _bw.write(_wl_block97Bytes, _wl_block97);
+            out.print( String.valueOf(unsure_date));
+            _bw.write(_wl_block98Bytes, _wl_block98);
+            out.print( String.valueOf( selectedValue ));
+            _bw.write(_wl_block99Bytes, _wl_block99);
+            out.print( String.valueOf( patient_id ));
+            _bw.write(_wl_block100Bytes, _wl_block100);
+            out.print( String.valueOf( option_id ));
+            _bw.write(_wl_block101Bytes, _wl_block101);
+            out.print( String.valueOf(mode1));
+            _bw.write(_wl_block102Bytes, _wl_block102);
+            out.print( String.valueOf( cutOffBackdate ));
+            _bw.write(_wl_block103Bytes, _wl_block103);
+            out.print( String.valueOf( cutOffDeliveryDate ));
+            _bw.write(_wl_block104Bytes, _wl_block104);
+            out.print( String.valueOf( cutOffDeliveryLmp ));
+            _bw.write(_wl_block105Bytes, _wl_block105);
+            out.print( String.valueOf( cutOffMiscarriageLmp ));
+            _bw.write(_wl_block106Bytes, _wl_block106);
+            out.print( String.valueOf( enableMarkAsErrorYN ));
+            _bw.write(_wl_block107Bytes, _wl_block107);
+            out.print( String.valueOf( new_delivery_miscarrage_type_value ));
+            _bw.write(_wl_block108Bytes, _wl_block108);
+            out.print( String.valueOf(selected_Values ));
+            _bw.write(_wl_block109Bytes, _wl_block109);
+            out.print( String.valueOf(new_delivery_miscarrage_date_value ));
+            _bw.write(_wl_block110Bytes, _wl_block110);
+            out.print( String.valueOf(srl_no ));
+            _bw.write(_wl_block111Bytes, _wl_block111);
+            out.print( String.valueOf(encounter_id));
+            _bw.write(_wl_block112Bytes, _wl_block112);
+            out.print( String.valueOf(episode_id));
+            _bw.write(_wl_block113Bytes, _wl_block113);
+            out.print( String.valueOf(pervious_lmp_date ));
+            _bw.write(_wl_block114Bytes, _wl_block114);
+            out.print( String.valueOf(pervious_remark_lmp ));
+            _bw.write(_wl_block115Bytes, _wl_block115);
+            out.print( String.valueOf(pervious_scan_gestation_weeks ));
+            _bw.write(_wl_block116Bytes, _wl_block116);
+            out.print( String.valueOf(pervious_scan_gestation_days ));
+            _bw.write(_wl_block117Bytes, _wl_block117);
+            out.print( String.valueOf(pervious_remark_unsure ));
+            _bw.write(_wl_block118Bytes, _wl_block118);
+            out.print( String.valueOf(called_form));
+            _bw.write(_wl_block119Bytes, _wl_block119);
+            out.print( String.valueOf(function_id));
+            _bw.write(_wl_block120Bytes, _wl_block120);
+            out.print( String.valueOf(finalize_yn));
+            _bw.write(_wl_block121Bytes, _wl_block121);
+            out.print( String.valueOf(module_id));
+            _bw.write(_wl_block122Bytes, _wl_block122);
+            out.print( String.valueOf(multibirthvalue));
+            _bw.write(_wl_block123Bytes, _wl_block123);
+            out.print( String.valueOf(delivery_miscarrage_date_validation));
+            _bw.write(_wl_block124Bytes, _wl_block124);
+            out.print( String.valueOf(eventStatus_validation));
+            _bw.write(_wl_block125Bytes, _wl_block125);
+            out.print( String.valueOf(exisiting_delivery_miscarrage_date_value));
+            _bw.write(_wl_block126Bytes, _wl_block126);
+            out.print( String.valueOf(exisiting_delivery_miscarrage_type_value));
+            _bw.write(_wl_block127Bytes, _wl_block127);
+            out.print( String.valueOf(eventStatus));
+            _bw.write(_wl_block128Bytes, _wl_block128);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+
+    private boolean _jsp__tag0(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag0 = null ;
+        int __result__tag0 = 0 ;
+
+        if (__tag0 == null ){
+            __tag0 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag0);
+        }
+        __tag0.setPageContext(pageContext);
+        __tag0.setParent(null);
+        __tag0.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.LastMenstrualPeriod.label", java.lang.String .class,"key"));
+        __tag0.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag0;
+        __result__tag0 = __tag0.doStartTag();
+
+        if (__result__tag0!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag0== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag0.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag0);
+            return true;
+        }
+        _activeTag=__tag0.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag0);
+        __tag0.release();
+        return false;
+    }
+
+    private boolean _jsp__tag1(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag1 = null ;
+        int __result__tag1 = 0 ;
+
+        if (__tag1 == null ){
+            __tag1 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag1);
+        }
+        __tag1.setPageContext(pageContext);
+        __tag1.setParent(null);
+        __tag1.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.LMP.label", java.lang.String .class,"key"));
+        __tag1.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag1;
+        __result__tag1 = __tag1.doStartTag();
+
+        if (__result__tag1!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag1== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag1.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag1);
+            return true;
+        }
+        _activeTag=__tag1.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag1);
+        __tag1.release();
+        return false;
+    }
+
+    private boolean _jsp__tag2(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag2 = null ;
+        int __result__tag2 = 0 ;
+
+        if (__tag2 == null ){
+            __tag2 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag2);
+        }
+        __tag2.setPageContext(pageContext);
+        __tag2.setParent(null);
+        __tag2.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.EDD.label", java.lang.String .class,"key"));
+        __tag2.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag2;
+        __result__tag2 = __tag2.doStartTag();
+
+        if (__result__tag2!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag2== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag2.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag2);
+            return true;
+        }
+        _activeTag=__tag2.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag2);
+        __tag2.release();
+        return false;
+    }
+
+    private boolean _jsp__tag3(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag3 = null ;
+        int __result__tag3 = 0 ;
+
+        if (__tag3 == null ){
+            __tag3 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag3);
+        }
+        __tag3.setPageContext(pageContext);
+        __tag3.setParent(null);
+        __tag3.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.GestationPOA.label", java.lang.String .class,"key"));
+        __tag3.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag3;
+        __result__tag3 = __tag3.doStartTag();
+
+        if (__result__tag3!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag3== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag3.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag3);
+            return true;
+        }
+        _activeTag=__tag3.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag3);
+        __tag3.release();
+        return false;
+    }
+
+    private boolean _jsp__tag4(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag4 = null ;
+        int __result__tag4 = 0 ;
+
+        if (__tag4 == null ){
+            __tag4 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag4);
+        }
+        __tag4.setPageContext(pageContext);
+        __tag4.setParent(null);
+        __tag4.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.weeks.label", java.lang.String .class,"key"));
+        __tag4.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag4;
+        __result__tag4 = __tag4.doStartTag();
+
+        if (__result__tag4!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag4== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag4.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag4);
+            return true;
+        }
+        _activeTag=__tag4.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag4);
+        __tag4.release();
+        return false;
+    }
+
+    private boolean _jsp__tag5(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag5 = null ;
+        int __result__tag5 = 0 ;
+
+        if (__tag5 == null ){
+            __tag5 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag5);
+        }
+        __tag5.setPageContext(pageContext);
+        __tag5.setParent(null);
+        __tag5.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.days.label", java.lang.String .class,"key"));
+        __tag5.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag5;
+        __result__tag5 = __tag5.doStartTag();
+
+        if (__result__tag5!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag5== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag5.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag5);
+            return true;
+        }
+        _activeTag=__tag5.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag5);
+        __tag5.release();
+        return false;
+    }
+
+    private boolean _jsp__tag6(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag6 = null ;
+        int __result__tag6 = 0 ;
+
+        if (__tag6 == null ){
+            __tag6 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag6);
+        }
+        __tag6.setPageContext(pageContext);
+        __tag6.setParent(null);
+        __tag6.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.DeliveryMiscarrage.label", java.lang.String .class,"key"));
+        __tag6.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag6;
+        __result__tag6 = __tag6.doStartTag();
+
+        if (__result__tag6!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag6== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag6.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag6);
+            return true;
+        }
+        _activeTag=__tag6.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag6);
+        __tag6.release();
+        return false;
+    }
+
+    private boolean _jsp__tag7(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag7 = null ;
+        int __result__tag7 = 0 ;
+
+        if (__tag7 == null ){
+            __tag7 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag7);
+        }
+        __tag7.setPageContext(pageContext);
+        __tag7.setParent(null);
+        __tag7.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.delivery.label", java.lang.String .class,"key"));
+        __tag7.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag7;
+        __result__tag7 = __tag7.doStartTag();
+
+        if (__result__tag7!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag7== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag7.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag7);
+            return true;
+        }
+        _activeTag=__tag7.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag7);
+        __tag7.release();
+        return false;
+    }
+
+    private boolean _jsp__tag8(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag8 = null ;
+        int __result__tag8 = 0 ;
+
+        if (__tag8 == null ){
+            __tag8 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag8);
+        }
+        __tag8.setPageContext(pageContext);
+        __tag8.setParent(null);
+        __tag8.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.defaultSelect.label", java.lang.String .class,"key"));
+        __tag8.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag8;
+        __result__tag8 = __tag8.doStartTag();
+
+        if (__result__tag8!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag8== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag8.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag8);
+            return true;
+        }
+        _activeTag=__tag8.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag8);
+        __tag8.release();
+        return false;
+    }
+
+    private boolean _jsp__tag9(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag9 = null ;
+        int __result__tag9 = 0 ;
+
+        if (__tag9 == null ){
+            __tag9 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag9);
+        }
+        __tag9.setPageContext(pageContext);
+        __tag9.setParent(null);
+        __tag9.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.delivery.label", java.lang.String .class,"key"));
+        __tag9.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag9;
+        __result__tag9 = __tag9.doStartTag();
+
+        if (__result__tag9!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag9== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag9.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag9);
+            return true;
+        }
+        _activeTag=__tag9.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag9);
+        __tag9.release();
+        return false;
+    }
+
+    private boolean _jsp__tag10(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag10 = null ;
+        int __result__tag10 = 0 ;
+
+        if (__tag10 == null ){
+            __tag10 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag10);
+        }
+        __tag10.setPageContext(pageContext);
+        __tag10.setParent(null);
+        __tag10.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.miscarrage.label", java.lang.String .class,"key"));
+        __tag10.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag10;
+        __result__tag10 = __tag10.doStartTag();
+
+        if (__result__tag10!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag10== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag10.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag10);
+            return true;
+        }
+        _activeTag=__tag10.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag10);
+        __tag10.release();
+        return false;
+    }
+
+    private boolean _jsp__tag11(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag11 = null ;
+        int __result__tag11 = 0 ;
+
+        if (__tag11 == null ){
+            __tag11 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag11);
+        }
+        __tag11.setPageContext(pageContext);
+        __tag11.setParent(null);
+        __tag11.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.deliveryMiscarrageDate.label", java.lang.String .class,"key"));
+        __tag11.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag11;
+        __result__tag11 = __tag11.doStartTag();
+
+        if (__result__tag11!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag11== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag11.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag11);
+            return true;
+        }
+        _activeTag=__tag11.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag11);
+        __tag11.release();
+        return false;
+    }
+
+    private boolean _jsp__tag12(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag12 = null ;
+        int __result__tag12 = 0 ;
+
+        if (__tag12 == null ){
+            __tag12 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag12);
+        }
+        __tag12.setPageContext(pageContext);
+        __tag12.setParent(null);
+        __tag12.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.remarks.label", java.lang.String .class,"key"));
+        __tag12.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag12;
+        __result__tag12 = __tag12.doStartTag();
+
+        if (__result__tag12!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag12== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag12.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag12);
+            return true;
+        }
+        _activeTag=__tag12.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag12);
+        __tag12.release();
+        return false;
+    }
+
+    private boolean _jsp__tag13(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag13 = null ;
+        int __result__tag13 = 0 ;
+
+        if (__tag13 == null ){
+            __tag13 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag13);
+        }
+        __tag13.setPageContext(pageContext);
+        __tag13.setParent(null);
+        __tag13.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.record.label", java.lang.String .class,"key"));
+        __tag13.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag13;
+        __result__tag13 = __tag13.doStartTag();
+
+        if (__result__tag13!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag13== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag13.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag13);
+            return true;
+        }
+        _activeTag=__tag13.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag13);
+        __tag13.release();
+        return false;
+    }
+
+    private boolean _jsp__tag14(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag14 = null ;
+        int __result__tag14 = 0 ;
+
+        if (__tag14 == null ){
+            __tag14 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag14);
+        }
+        __tag14.setPageContext(pageContext);
+        __tag14.setParent(null);
+        __tag14.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.clear.label", java.lang.String .class,"key"));
+        __tag14.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag14;
+        __result__tag14 = __tag14.doStartTag();
+
+        if (__result__tag14!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag14== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag14.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag14);
+            return true;
+        }
+        _activeTag=__tag14.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag14);
+        __tag14.release();
+        return false;
+    }
+
+    private boolean _jsp__tag15(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag15 = null ;
+        int __result__tag15 = 0 ;
+
+        if (__tag15 == null ){
+            __tag15 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag15);
+        }
+        __tag15.setPageContext(pageContext);
+        __tag15.setParent(null);
+        __tag15.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.markAsError.label", java.lang.String .class,"key"));
+        __tag15.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag15;
+        __result__tag15 = __tag15.doStartTag();
+
+        if (__result__tag15!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag15== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag15.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag15);
+            return true;
+        }
+        _activeTag=__tag15.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag15);
+        __tag15.release();
+        return false;
+    }
+
+    private boolean _jsp__tag16(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag16 = null ;
+        int __result__tag16 = 0 ;
+
+        if (__tag16 == null ){
+            __tag16 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag16);
+        }
+        __tag16.setPageContext(pageContext);
+        __tag16.setParent(null);
+        __tag16.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.UltraSoundScan.label", java.lang.String .class,"key"));
+        __tag16.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag16;
+        __result__tag16 = __tag16.doStartTag();
+
+        if (__result__tag16!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag16== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag16.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag16);
+            return true;
+        }
+        _activeTag=__tag16.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag16);
+        __tag16.release();
+        return false;
+    }
+
+    private boolean _jsp__tag17(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag17 = null ;
+        int __result__tag17 = 0 ;
+
+        if (__tag17 == null ){
+            __tag17 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag17);
+        }
+        __tag17.setPageContext(pageContext);
+        __tag17.setParent(null);
+        __tag17.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.ScanGestation.label", java.lang.String .class,"key"));
+        __tag17.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag17;
+        __result__tag17 = __tag17.doStartTag();
+
+        if (__result__tag17!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag17== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag17.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag17);
+            return true;
+        }
+        _activeTag=__tag17.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag17);
+        __tag17.release();
+        return false;
+    }
+
+    private boolean _jsp__tag18(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag18 = null ;
+        int __result__tag18 = 0 ;
+
+        if (__tag18 == null ){
+            __tag18 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag18);
+        }
+        __tag18.setPageContext(pageContext);
+        __tag18.setParent(null);
+        __tag18.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.weeks.label", java.lang.String .class,"key"));
+        __tag18.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag18;
+        __result__tag18 = __tag18.doStartTag();
+
+        if (__result__tag18!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag18== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag18.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag18);
+            return true;
+        }
+        _activeTag=__tag18.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag18);
+        __tag18.release();
+        return false;
+    }
+
+    private boolean _jsp__tag19(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag19 = null ;
+        int __result__tag19 = 0 ;
+
+        if (__tag19 == null ){
+            __tag19 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag19);
+        }
+        __tag19.setPageContext(pageContext);
+        __tag19.setParent(null);
+        __tag19.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.days.label", java.lang.String .class,"key"));
+        __tag19.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag19;
+        __result__tag19 = __tag19.doStartTag();
+
+        if (__result__tag19!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag19== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag19.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag19);
+            return true;
+        }
+        _activeTag=__tag19.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag19);
+        __tag19.release();
+        return false;
+    }
+
+    private boolean _jsp__tag20(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag20 = null ;
+        int __result__tag20 = 0 ;
+
+        if (__tag20 == null ){
+            __tag20 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag20);
+        }
+        __tag20.setPageContext(pageContext);
+        __tag20.setParent(null);
+        __tag20.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.LMP.label", java.lang.String .class,"key"));
+        __tag20.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag20;
+        __result__tag20 = __tag20.doStartTag();
+
+        if (__result__tag20!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag20== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag20.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag20);
+            return true;
+        }
+        _activeTag=__tag20.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag20);
+        __tag20.release();
+        return false;
+    }
+
+    private boolean _jsp__tag21(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag21 = null ;
+        int __result__tag21 = 0 ;
+
+        if (__tag21 == null ){
+            __tag21 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag21);
+        }
+        __tag21.setPageContext(pageContext);
+        __tag21.setParent(null);
+        __tag21.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.REDD.label", java.lang.String .class,"key"));
+        __tag21.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag21;
+        __result__tag21 = __tag21.doStartTag();
+
+        if (__result__tag21!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag21== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag21.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag21);
+            return true;
+        }
+        _activeTag=__tag21.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag21);
+        __tag21.release();
+        return false;
+    }
+
+    private boolean _jsp__tag22(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag22 = null ;
+        int __result__tag22 = 0 ;
+
+        if (__tag22 == null ){
+            __tag22 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag22);
+        }
+        __tag22.setPageContext(pageContext);
+        __tag22.setParent(null);
+        __tag22.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.GestationPOG.label", java.lang.String .class,"key"));
+        __tag22.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag22;
+        __result__tag22 = __tag22.doStartTag();
+
+        if (__result__tag22!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag22== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag22.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag22);
+            return true;
+        }
+        _activeTag=__tag22.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag22);
+        __tag22.release();
+        return false;
+    }
+
+    private boolean _jsp__tag23(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag23 = null ;
+        int __result__tag23 = 0 ;
+
+        if (__tag23 == null ){
+            __tag23 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag23);
+        }
+        __tag23.setPageContext(pageContext);
+        __tag23.setParent(null);
+        __tag23.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.weeks.label", java.lang.String .class,"key"));
+        __tag23.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag23;
+        __result__tag23 = __tag23.doStartTag();
+
+        if (__result__tag23!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag23== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag23.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag23);
+            return true;
+        }
+        _activeTag=__tag23.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag23);
+        __tag23.release();
+        return false;
+    }
+
+    private boolean _jsp__tag24(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag24 = null ;
+        int __result__tag24 = 0 ;
+
+        if (__tag24 == null ){
+            __tag24 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag24);
+        }
+        __tag24.setPageContext(pageContext);
+        __tag24.setParent(null);
+        __tag24.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.days.label", java.lang.String .class,"key"));
+        __tag24.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag24;
+        __result__tag24 = __tag24.doStartTag();
+
+        if (__result__tag24!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag24== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag24.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag24);
+            return true;
+        }
+        _activeTag=__tag24.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag24);
+        __tag24.release();
+        return false;
+    }
+
+    private boolean _jsp__tag25(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag25 = null ;
+        int __result__tag25 = 0 ;
+
+        if (__tag25 == null ){
+            __tag25 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag25);
+        }
+        __tag25.setPageContext(pageContext);
+        __tag25.setParent(null);
+        __tag25.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.DeliveryMiscarrage.label", java.lang.String .class,"key"));
+        __tag25.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag25;
+        __result__tag25 = __tag25.doStartTag();
+
+        if (__result__tag25!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag25== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag25.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag25);
+            return true;
+        }
+        _activeTag=__tag25.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag25);
+        __tag25.release();
+        return false;
+    }
+
+    private boolean _jsp__tag26(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag26 = null ;
+        int __result__tag26 = 0 ;
+
+        if (__tag26 == null ){
+            __tag26 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag26);
+        }
+        __tag26.setPageContext(pageContext);
+        __tag26.setParent(null);
+        __tag26.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.delivery.label", java.lang.String .class,"key"));
+        __tag26.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag26;
+        __result__tag26 = __tag26.doStartTag();
+
+        if (__result__tag26!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag26== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag26.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag26);
+            return true;
+        }
+        _activeTag=__tag26.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag26);
+        __tag26.release();
+        return false;
+    }
+
+    private boolean _jsp__tag27(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag27 = null ;
+        int __result__tag27 = 0 ;
+
+        if (__tag27 == null ){
+            __tag27 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag27);
+        }
+        __tag27.setPageContext(pageContext);
+        __tag27.setParent(null);
+        __tag27.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.defaultSelect.label", java.lang.String .class,"key"));
+        __tag27.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag27;
+        __result__tag27 = __tag27.doStartTag();
+
+        if (__result__tag27!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag27== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag27.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag27);
+            return true;
+        }
+        _activeTag=__tag27.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag27);
+        __tag27.release();
+        return false;
+    }
+
+    private boolean _jsp__tag28(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag28 = null ;
+        int __result__tag28 = 0 ;
+
+        if (__tag28 == null ){
+            __tag28 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag28);
+        }
+        __tag28.setPageContext(pageContext);
+        __tag28.setParent(null);
+        __tag28.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.delivery.label", java.lang.String .class,"key"));
+        __tag28.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag28;
+        __result__tag28 = __tag28.doStartTag();
+
+        if (__result__tag28!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag28== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag28.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag28);
+            return true;
+        }
+        _activeTag=__tag28.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag28);
+        __tag28.release();
+        return false;
+    }
+
+    private boolean _jsp__tag29(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag29 = null ;
+        int __result__tag29 = 0 ;
+
+        if (__tag29 == null ){
+            __tag29 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag29);
+        }
+        __tag29.setPageContext(pageContext);
+        __tag29.setParent(null);
+        __tag29.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.miscarrage.label", java.lang.String .class,"key"));
+        __tag29.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag29;
+        __result__tag29 = __tag29.doStartTag();
+
+        if (__result__tag29!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag29== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag29.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag29);
+            return true;
+        }
+        _activeTag=__tag29.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag29);
+        __tag29.release();
+        return false;
+    }
+
+    private boolean _jsp__tag30(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag30 = null ;
+        int __result__tag30 = 0 ;
+
+        if (__tag30 == null ){
+            __tag30 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag30);
+        }
+        __tag30.setPageContext(pageContext);
+        __tag30.setParent(null);
+        __tag30.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.deliveryMiscarrageDate.label", java.lang.String .class,"key"));
+        __tag30.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag30;
+        __result__tag30 = __tag30.doStartTag();
+
+        if (__result__tag30!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag30== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag30.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag30);
+            return true;
+        }
+        _activeTag=__tag30.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag30);
+        __tag30.release();
+        return false;
+    }
+
+    private boolean _jsp__tag31(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag31 = null ;
+        int __result__tag31 = 0 ;
+
+        if (__tag31 == null ){
+            __tag31 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag31);
+        }
+        __tag31.setPageContext(pageContext);
+        __tag31.setParent(null);
+        __tag31.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.remarks.label", java.lang.String .class,"key"));
+        __tag31.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag31;
+        __result__tag31 = __tag31.doStartTag();
+
+        if (__result__tag31!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag31== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag31.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag31);
+            return true;
+        }
+        _activeTag=__tag31.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag31);
+        __tag31.release();
+        return false;
+    }
+
+    private boolean _jsp__tag32(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag32 = null ;
+        int __result__tag32 = 0 ;
+
+        if (__tag32 == null ){
+            __tag32 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag32);
+        }
+        __tag32.setPageContext(pageContext);
+        __tag32.setParent(null);
+        __tag32.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.record.label", java.lang.String .class,"key"));
+        __tag32.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag32;
+        __result__tag32 = __tag32.doStartTag();
+
+        if (__result__tag32!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag32== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag32.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag32);
+            return true;
+        }
+        _activeTag=__tag32.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag32);
+        __tag32.release();
+        return false;
+    }
+
+    private boolean _jsp__tag33(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag33 = null ;
+        int __result__tag33 = 0 ;
+
+        if (__tag33 == null ){
+            __tag33 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag33);
+        }
+        __tag33.setPageContext(pageContext);
+        __tag33.setParent(null);
+        __tag33.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.clear.label", java.lang.String .class,"key"));
+        __tag33.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag33;
+        __result__tag33 = __tag33.doStartTag();
+
+        if (__result__tag33!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag33== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag33.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag33);
+            return true;
+        }
+        _activeTag=__tag33.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag33);
+        __tag33.release();
+        return false;
+    }
+
+    private boolean _jsp__tag34(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag34 = null ;
+        int __result__tag34 = 0 ;
+
+        if (__tag34 == null ){
+            __tag34 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag34);
+        }
+        __tag34.setPageContext(pageContext);
+        __tag34.setParent(null);
+        __tag34.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.markAsError.label", java.lang.String .class,"key"));
+        __tag34.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag34;
+        __result__tag34 = __tag34.doStartTag();
+
+        if (__result__tag34!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag34== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag34.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag34);
+            return true;
+        }
+        _activeTag=__tag34.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag34);
+        __tag34.release();
+        return false;
+    }
+}

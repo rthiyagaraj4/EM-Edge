@@ -1,0 +1,816 @@
+package jsp_servlet._eor._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.util.*;
+import eOR.*;
+import eOR.Common.*;
+import eCommon.Common.*;
+import com.ehis.persist.*;
+import eCommon.Common.*;
+import java.lang.*;
+import java.util.*;
+
+public final class __resultentryvalidate extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eor/jsp/ResultentryValidate.jsp", 1743590509191L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/GetPersistenceBean.jsp", 1717476031037L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 =" \n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n\t\t\t";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+	
+	/** START FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	public Object getBean(String sessionid,String userid,String ws_no,java.sql.Timestamp session_creation_date,Properties jdbc_props){
+		return PersistenceHelper.getBean(sessionid,userid,ws_no,session_creation_date,jdbc_props);
+	}
+	
+	public Object getObjectFromBean(String id,String ClassName,javax.servlet.http.HttpSession session){
+		return PersistenceHelper.getObjectFromBean( id,ClassName,session);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpSession session){
+		PersistenceHelper.putObjectInBean(id,obj,session);
+	}
+
+	/** END FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	/** START FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+	public Object getBeanObject(String id,String ClassName,javax.servlet.http.HttpServletRequest request){
+		return PersistenceHelper.getBeanObject(id,ClassName,request);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.putObjectInBean(id,obj,request);
+	}
+
+	public void cleanBeanObject(String id,String className,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.	cleanBeanObject(id,className,request);
+	} 
+	/** END FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+
+	/** START TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+	public void cleanAll(javax.servlet.http.HttpSession session){
+		PersistenceHelper.cleanAll(session);
+	}
+	/** END TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+
+int tempLength=0;int tempVertLength = 0;	int tempLengthNew=0;
+			int tempVertLengthNew1 = 0;	
+			int tempVertLengthNew = 0;	
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            webbeans.eCommon.XMLStringParser XMLobj= null;{
+                XMLobj=(webbeans.eCommon.XMLStringParser)pageContext.getAttribute("XMLobj");
+                if(XMLobj==null){
+                    XMLobj=new webbeans.eCommon.XMLStringParser();
+                    pageContext.setAttribute("XMLobj",XMLobj);
+
+                }
+            }
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+
+	request.setCharacterEncoding("UTF-8");
+	String bean_id = request.getParameter( "bean_id" ) ;
+	String validate = request.getParameter( "validate" ) ;
+	String localeName=(String)session.getAttribute("LOCALE");
+	
+	if ( bean_id == null || bean_id.equals( "" ) )
+		return ;
+
+	if ( validate == null || validate.equals( "" ) )
+		return ;
+
+	ResultEntryBean beanObj = (ResultEntryBean)getBeanObject( bean_id, "eOR.ResultEntryBean" , request) ;
+	beanObj.setLanguageId(localeName);
+	
+	Hashtable hash = (Hashtable)XMLobj.parseXMLString( request ) ;
+	
+    hash = (Hashtable)hash.get( "SEARCH" ) ;	
+	if ( validate.equals( "SYNC_CULTURE_TEST" ) ) {
+		String index				= (String)hash.get("index");
+		HashMap map					= new HashMap();
+		HashMap descMap				= new HashMap();
+
+		int colCount = 0;
+
+		/*map.put("antibiotic_organism_reqd_yn",(String)hash.get("antibiotic_organism_reqd_yn"));
+		map.put("remarks",(String)hash.get("remarks"));
+		String chart_result_type 	= (String)hash.get("chart_result_type") ;
+		map.put("chart_result_type",chart_result_type);
+		map.put("vertical_heading",(String)hash.get("vertical_heading"));
+		map.put("horizontal_heading",(String)hash.get("horizontal_heading"));
+
+		if (((String)hash.get("antibiotic_organism_reqd_yn")).equals("Y")) {
+
+			String antibiotic_length 	= (String)hash.get("antibiotic_length") ;
+			int anti_length				= Integer.parseInt(antibiotic_length);
+			map.put("antibiotic_length",antibiotic_length);
+			String chart_no_columns		= (String)hash.get("chart_no_columns");
+			colCount					= Integer.parseInt(chart_no_columns);
+			map.put("chart_no_columns",chart_no_columns);
+
+			for(int i = 0; i < anti_length; i++) {
+				map.put("antibiotic"+i,(String)hash.get("antibiotic"+i));
+				map.put("antibiotic_desc"+i,(String)hash.get("antibiotic_desc"+i));
+				map.put("discr_msr_id"+i,(hash.get("discr_msr_id"+i) != null)?(String)hash.get("discr_msr_id"+i):"");
+				map.put("result_type"+i,(String)hash.get("result_type"+i));
+				for (int j = 0; j < colCount; j++) {
+					map.put(i+""+j,(String)hash.get("anti"+i+""+j));
+				}
+			}
+
+			for(int i = 0; i < colCount; i++) {
+				map.put("organism"+i,(String)hash.get("organism"+i));
+			}
+
+		}*/
+
+		map.put("antibiotic_organism_reqd_yn",(String)hash.get("antibiotic_organism_reqd_yn"));
+		map.put("remarks",(String)hash.get("remarks"));
+		map.put("vertical_heading",(String)hash.get("vertical_heading"));
+		map.put("horizontal_heading",(String)hash.get("horizontal_heading"));
+		map.put("chart_result_type",(String)hash.get("chart_result_type"));
+		String chart_result_type 	= (String)hash.get("chart_result_type") ;
+		//map.put("chart_result_type",chart_result_type);
+
+		if (((String)hash.get("antibiotic_organism_reqd_yn")).equals("Y")) {
+
+			String antibiotic_length 	= (String)hash.get("antibiotic_length") ;
+			map.put("antibiotic_length",antibiotic_length);
+			String chart_no_columns		= (String)hash.get("chart_no_columns");
+			map.put("chart_no_columns",chart_no_columns);
+			int anti_length				= Integer.parseInt(antibiotic_length);
+			colCount				= Integer.parseInt(chart_no_columns);
+
+
+			for(int i = 0; i < anti_length; i++) {
+				map.put("antibiotic"+i,(String)hash.get("antibiotic"+i));
+				map.put("antibiotic_desc"+i,(String)hash.get("antibiotic_desc"+i));
+				map.put("discr_msr_id"+i,(hash.get("discr_msr_id"+i) != null)?(String)hash.get("discr_msr_id"+i):"");
+				map.put("result_type"+i,(String)hash.get("result_type"+i));
+				for (int j = 0; j < colCount; j++) {
+					map.put(i+""+j,(String)hash.get("anti"+i+""+j));
+					if (((String)hash.get("result_type"+i)).equals("N")) {
+						map.put("num_uom"+i+""+j,(String)hash.get("num_uom"+i+""+j));
+					}
+					if (((String)hash.get("result_type"+i)).equals("I")) {
+						map.put("unitofmeasure"+i+""+j,(String)hash.get("unitofmeasure"+i+""+j));
+					}
+					
+				}
+			}
+
+			for(int i = 0; i < colCount; i++) {
+				map.put("organism"+i,(String)hash.get("organism"+i));
+			}
+		}
+
+		HashMap parentMap			= beanObj.getCultureTestRecord();
+		parentMap.put(""+index,map);
+
+		beanObj.setCultureTestRecord(parentMap);
+
+
+
+		
+
+		ArrayList antibioticValues	= beanObj.getAntibioticDetails(chart_result_type);
+
+		//if (organismDetails == null) organismDetails = new ArrayList();
+		if (antibioticValues == null) antibioticValues = new ArrayList();	
+		StringBuffer previewText = new StringBuffer();	
+		if (map.containsKey("chart_no_columns") && (!((String)map.get("chart_no_columns")).equals(""))) {
+
+			colCount = Integer.parseInt((String)map.get("chart_no_columns"));
+		}		
+		if (map.containsKey("remarks") && (!((String)map.get("remarks")).equals(""))) {
+			
+			previewText.append("Remarks: " + (String)map.get("remarks") + "\n\n");			
+		}
+
+		if (map.containsKey("antibiotic_organism_reqd_yn") && (((String)map.get("antibiotic_organism_reqd_yn")).equals("Y"))) {
+
+			previewText.append("\n"+(String)map.get("vertical_heading")+": ");//+"     \t"	
+			int count = 0;
+
+			for(int i = 0; i < colCount; i++) {			
+				if (!((map.containsKey("organism"+i)) && ((String)map.get("organism"+i)).equals(""))) {
+					if (i % 3 == 0) {
+						if (i != 0) {
+							//previewText += "\n";
+
+							for (int indx = 0; indx < (((String)map.get("horizontal_heading")).length() + 2); indx++) {
+								//previewText.append(" ");
+							}
+						}
+
+					}
+					String organismDesc = beanObj.getOrganismDesc((String)map.get("organism"+i),chart_result_type);
+					//String tempOrganism	= (String)map.get("organism"+i);
+					previewText.append(i+1 + "=" + organismDesc.trim() + " ,");				
+					count++;
+				}
+
+			}
+			//previewText.append(previewText.substring(0,(previewText.length()-1)));
+			String tempPreviewText="";
+			tempPreviewText=previewText.toString();
+			previewText.setLength(0);			
+			previewText.append(tempPreviewText.substring(0,(tempPreviewText.length()-1)));	
+			int maxLength = 0;
+			int largelengths=0;
+
+			String antibiotic_length 	= (String)map.get("antibiotic_length") ;
+			int anti_length				= Integer.parseInt(antibiotic_length);
+			int[] anti_lengths=new int[anti_length];
+			for(int i = 0; i < anti_length; i++) {
+				if (map.containsKey("antibiotic" + i)) {
+					for (int j = 0; j < count; j++) {
+						if (map.containsKey("result_type"+i)) {
+							int tempMaxLength	= 0;
+							if (((String)map.get("result_type"+i)).equals("L")) {
+								tempMaxLength	= 12;//6
+							} else if (((String)map.get("result_type"+i)).equals("N")) {
+								tempMaxLength	= 17;
+							} else if (((String)map.get("result_type"+i)).equals("D")) {
+								tempMaxLength	= 12;
+							} else if (((String)map.get("result_type"+i)).equals("E")) {
+								tempMaxLength	= 18;
+							} else if (((String)map.get("result_type"+i)).equals("T")) {
+								tempMaxLength	= 7;
+							} else if (((String)map.get("result_type"+i)).equals("C")) {
+								tempMaxLength	= 3;
+							}
+							if (tempMaxLength > maxLength) {
+								maxLength = tempMaxLength;
+							}
+						}
+					}
+				}
+			}
+			String tempmaximum="";
+			int tempmaximumlength=0;
+				for(int i = 0; i < anti_length; i++) {
+				 if (map.containsKey("antibiotic" + i)) {					
+					if (map.containsKey("result_type"+i)) {
+						int tempMaxLength	= 0;
+						if (map.containsKey("maximum"+i)) {
+						tempmaximum=(String)map.get("maximum"+i) ;
+							if (tempmaximum.equals(""))
+								tempmaximumlength=0;
+							else
+								tempmaximumlength=Integer.parseInt(tempmaximum);						
+						}
+						if (((String)map.get("result_type"+i)).equals("L")) {
+								tempMaxLength	= 12;//6
+							} else if (((String)map.get("result_type"+i)).equals("N")) {
+								if(tempmaximumlength==0)
+									tempMaxLength	= 21;
+								else
+									tempMaxLength	= tempmaximumlength;
+							} else if (((String)map.get("result_type"+i)).equals("D")) {
+								tempMaxLength	= 12;
+							} else if (((String)map.get("result_type"+i)).equals("E")) {
+								tempMaxLength	= 18;
+							} else if (((String)map.get("result_type"+i)).equals("T")) {
+								tempMaxLength	= 7;
+							} else if (((String)map.get("result_type"+i)).equals("C")) {
+								tempMaxLength	= 3;
+							}else if (((String)map.get("result_type"+i)).equals("I")) {
+								if(tempmaximumlength==0)
+									tempMaxLength	= 20;
+								else
+									tempMaxLength	= tempmaximumlength;
+							}
+							anti_lengths[i]=tempMaxLength;						
+					}
+				 }
+				}
+				for(int i = 0; i < anti_lengths.length; i++) {						
+						 if(anti_lengths[i]>largelengths)
+						 {
+						   largelengths=anti_lengths[i];						   
+						 }
+				}
+			
+			previewText.append("\n\n---------------------------");			
+			for (int i = 0; i < colCount; i++) {
+				for (int j = 0; j < maxLength; j++) {
+					previewText.append("-");
+				}
+				//previewText += "----------------";
+			}
+			//...............................
+			
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            _bw.write(_wl_block3Bytes, _wl_block3);
+
+			int firstlable=((String)map.get("horizontal_heading")).length();			
+					
+			int tempAntBlenght=0;
+			int largeHeader=0;
+			int largelableNew=0;
+			int[] a=new int[anti_length];	   
+			 for(int i = 0; i < anti_length; i++) {
+			if (map.containsKey("antibiotic" + i)) {				
+				String tempAntiBiotic = (String)map.get("antibiotic_desc" + i);
+				 a[i]=tempAntiBiotic.length();	
+				 tempAntBlenght=tempAntiBiotic.length();								
+				}
+			}	  
+		 for (int i=0;i<a.length;i++){			 
+			 if(a[i]>largeHeader)
+			 {
+			   largeHeader=a[i];
+			}
+		}		
+		
+		if(firstlable>largeHeader){				
+				tempLength=2+firstlable+(firstlable-largeHeader);
+				tempVertLength=1+firstlable;
+				tempVertLengthNew=1+(firstlable-largeHeader);
+		}
+		
+		else{
+			tempVertLength=2+tempAntBlenght+(largeHeader-firstlable);
+			tempLength=2+tempAntBlenght+(largeHeader-firstlable);
+			tempVertLengthNew=1+(largeHeader-firstlable);
+		}
+			
+
+
+			//..............................
+			previewText.append("\n"+(String)map.get("horizontal_heading"));			
+			//previewText += "\n"+(String)map.get("vertical_heading")+"     \t";
+			//previewText += "\n"+(String)map.get("vertical_heading");//+"     \t"
+			//int tempVertLength = 16 - ((String)map.get("vertical_heading")).length();
+			/*for (int i = 0; i < tempVertLength; i++) {
+				previewText.append(" ");				
+			}*/
+			if(firstlable>largeHeader){
+				previewText.append(" ");
+			}
+			else if(firstlable==largeHeader)
+			{
+				previewText.append(" ");
+			}
+			else
+			{		
+				for (int i = 0; i < tempVertLengthNew; i++) {
+				previewText.append(" ");			
+				}
+			}
+			//previewText.append("\t");			
+			for (int i = 0; i < count; i++) {								
+				previewText.append((i+1));				
+				//int tempHeaderLength = maxLength - (Integer.toString(i+1)).length();
+				int tempHeaderLengthspace = largelengths - (Integer.toString(i+1)).length();
+
+				for (int j = 0; j < tempHeaderLengthspace+10; j++) {
+					//previewText += "";
+					previewText.append(" ");
+				}//previewText.append("\t");		
+			}
+             
+			previewText.append("\n---------------------------");			
+			for (int i = 0; i < colCount; i++) {
+				//previewText += "----------------";
+				for (int j = 0; j < maxLength; j++) {
+					previewText.append("-");					
+				}
+			}
+			previewText.append("\n");
+			
+			for(int i = 0; i < anti_length; i++) {
+				if (map.containsKey("antibiotic" + i)) {					
+					String tempAntiBiotic = (String)map.get("antibiotic_desc" + i);
+					//String [] record = (String[])antibioticValues.get(i);
+					//if (record[1].equals(tempAntiBiotic))
+					//	tempAntiBiotic			= record[0];
+					//int tempLength = 16 - tempAntiBiotic.length();
+
+					boolean continueFlag = false;
+
+					for (int j = 0; j < count; j++) {
+						if (map.containsKey(i+""+j)) {
+							if ( (((String)map.get(i+""+j))!=null && (!((String)map.get(i+""+j)).equals(""))) || ((String)map.get("discr_msr_id"+i)).equals("")) {
+								continueFlag = true;
+								break;
+							}
+						}
+					}
+
+					if (continueFlag) {
+						if ( i != 0 && ((String)map.get("discr_msr_id"+i)).equals("")) {
+							
+							previewText.append("---------------------------");				
+							for (int indx = 0; indx < colCount; indx++) {
+								//previewText += "----------------";
+								for (int j = 0; j < maxLength; j++) {
+									previewText.append("-");
+								}
+							}
+							previewText.append("\n");
+						}
+						//previewText.append(" ");
+						previewText.append(tempAntiBiotic);
+						if(firstlable>largeHeader)
+						{
+							largelableNew=firstlable;
+						}
+						else
+						{
+							largelableNew=largeHeader;
+						}
+						
+							if(a[i]>largelableNew)
+							{
+								tempVertLengthNew1=1+(a[i]-largelableNew);
+							}
+							else
+							{
+								tempVertLengthNew1=1+(largelableNew-a[i]);
+							}
+							for (int m=0;m<tempVertLengthNew1;m++){	
+								previewText.append(" ");}
+
+						/*for (int in = 0; in < tempLength; in++) {
+							previewText.append(" ");
+							
+						}*/
+						//previewText.append("\t");
+						
+
+						for (int j = 0; j < count; j++) {
+							if (map.containsKey(i+""+j)) {
+								tempAntiBiotic	= (String)map.get(i+""+j);
+								//tempLength = maxLength - tempAntiBiotic.length();
+								int tempdataLengthspace=0;
+								if(largelengths>((tempAntiBiotic).length()))
+									tempdataLengthspace= largelengths - ((tempAntiBiotic).length());
+								
+								previewText.append(tempAntiBiotic);							
+								if (map.containsKey("result_type"+i) && ((String)map.get("result_type"+i)).equals("L")) {
+									ArrayList resultTypeList = beanObj.getPreviewListResultTypeDetails((String)map.get("discr_msr_id"+i),tempAntiBiotic);									
+									if (resultTypeList != null && resultTypeList.size() > 0) {
+
+										String [] strResultType		= (String[])resultTypeList.get(0);
+										String antiBioticDesc		= strResultType[0];
+										String antiDesc				= "";
+										if(antiBioticDesc.length()>0)
+											antiDesc				= antiBioticDesc.substring(0,1);
+										if(antiDesc==null) antiDesc = "\t";
+
+										previewText.append("("+antiDesc+")");
+										descMap.put(tempAntiBiotic+antiDesc,antiBioticDesc);
+										tempdataLengthspace= tempdataLengthspace - ((antiDesc.length()+2));
+									}
+								} else if (map.containsKey("result_type"+i) && ((String)map.get("result_type"+i)).equals("N")) {
+									if ((!((String)map.get(i+""+j)).equals("")) && map.containsKey("num_uom"+i+""+j)) {
+										previewText.append(" " + (String)map.get("num_uom"+i+""+j));
+										tempdataLengthspace= tempdataLengthspace - (((" " + (String)map.get("num_uom"+i+""+j))).length());
+										//tempLength = maxLength - (tempAntiBiotic.length() + ((String)map.get("num_uom"+i+""+j)).length() + 1);
+									}
+								}
+								else if (map.containsKey("result_type"+i) && ((String)map.get("result_type"+i)).equals("I")) {
+									if ((!((String)map.get(i+""+j)).equals("")) && map.containsKey("unitofmeasure"+i+""+j)) {
+										previewText.append(" " + (String)map.get("unitofmeasure"+i+""+j));
+										tempdataLengthspace= tempdataLengthspace - (((" " + (String)map.get("unitofmeasure"+i+""+j))).length());
+									}
+								}
+								for (int in = 0; in < tempdataLengthspace+10; in++) {
+									previewText.append(" ");
+								}//previewText.append("\t");							
+							}
+						}
+
+						previewText.append("\n\n");
+						if (((String)map.get("discr_msr_id"+i)).equals("")) {
+							previewText.append("---------------------------");				
+							for (int indx = 0; indx < colCount; indx++) {
+								//previewText += "----------------";
+								for (int j = 0; j < maxLength; j++) {
+									previewText.append("-");
+								}
+							}
+							previewText.append("\n");
+							
+						}
+					}
+				}
+			}
+
+			previewText.append("\n---------------------------");			
+			for (int i = 0; i < colCount; i++) {
+				//previewText += "----------------";
+				for (int j = 0; j < maxLength; j++) {
+					previewText.append("-");					
+				}
+			}
+			if (descMap.size() > 0) {
+				//for(int i = 0; i < anti_length; i++) {
+				//	descMap		= beanObj.getPreviewListResultTypeDetails((String)map.get("discr_msr_id"+i),descMap);
+				//}
+				Set set			= descMap.keySet();
+				Iterator itr	= set.iterator();
+				previewText.append("\n");
+				int breakCounter = 0;
+				while(itr.hasNext()) {
+					String key	= (String)itr.next();
+					String key_code = "";
+					if(key!=null && key.length()>0) {
+						 key_code  = key.substring(key.length()-1);
+						if(key_code==null) key_code = "";
+					   previewText.append(key.substring(0,key.length()-1)  + "("+ key_code +")" + "="+ (String)descMap.get(key) + ";");
+					}
+					if (breakCounter == 3) previewText.append("\n");
+					breakCounter++;
+				}
+				//previewText += "\nS=Sensitive; R=Resistant; I=Intermediate;\nMR=Mild Resistant; MS=Mild Sensitive;\n S1=S+; S2=S++; S3=S+++;";
+				previewText.append("\n---------------------------");
+				for (int i = 0; i < colCount; i++) {
+					//previewText += "----------------";
+					for (int j = 0; j < maxLength; j++) {
+						previewText.append("-");
+					}
+				} 
+			}
+		}	
+		
+		//boolean check = beanObj.setResultData(index, previewText);
+		beanObj.setResultData(index, previewText.toString());	
+
+	} else if ( validate.equals( "PREVIEW_CULTURE_TEST" ) ) {
+		//String index				= (String)hash.get("index");
+		HashMap map					= new HashMap();
+
+
+
+		map.put("antibiotic_organism_reqd_yn",(String)hash.get("antibiotic_organism_reqd_yn"));
+		map.put("remarks",(String)hash.get("remarks"));
+		map.put("vertical_heading",(String)hash.get("vertical_heading"));
+		map.put("horizontal_heading",(String)hash.get("horizontal_heading"));
+		map.put("chart_result_type",(String)hash.get("chart_result_type"));
+
+		if (((String)hash.get("antibiotic_organism_reqd_yn")).equals("Y")) {
+
+			String antibiotic_length 	= (String)hash.get("antibiotic_length") ;
+			map.put("antibiotic_length",antibiotic_length);
+			String chart_no_columns		= (String)hash.get("chart_no_columns");
+			map.put("chart_no_columns",chart_no_columns);
+			int anti_length				= Integer.parseInt(antibiotic_length);
+			int colCount				= Integer.parseInt(chart_no_columns);
+
+
+			for(int i = 0; i < anti_length; i++) {
+				map.put("antibiotic"+i,(String)hash.get("antibiotic"+i));
+				map.put("maximum"+i,(String)hash.get("maximum"+i));
+				map.put("antibiotic_desc"+i,(String)hash.get("antibiotic_desc"+i));
+				map.put("discr_msr_id"+i,(hash.get("discr_msr_id"+i) != null)?(String)hash.get("discr_msr_id"+i):"");
+				map.put("result_type"+i,(String)hash.get("result_type"+i));
+				for (int j = 0; j < colCount; j++) {
+					map.put(i+""+j,(String)hash.get("anti"+i+""+j));
+					if (((String)hash.get("result_type"+i)).equals("N")) {
+						map.put("num_uom"+i+""+j,(String)hash.get("num_uom"+i+""+j));
+					}
+					if (((String)hash.get("result_type"+i)).equals("I")) {
+						map.put("unitofmeasure"+i+""+j,(String)hash.get("unitofmeasure"+i+""+j));
+					}
+				}
+			}
+
+			for(int i = 0; i < colCount; i++) {
+				map.put("organism"+i,(String)hash.get("organism"+i));
+			}
+		}
+
+		beanObj.setPreviewCultureTestRecord(map);
+	} else if ( validate.equals( "LOAD_ORGANISM_VALUES" ) ) {
+		String organism_string = (String)hash.get("organism_string") ;
+		String index = (String)hash.get("index") ;
+		out.println( "clearList('document','"+index+"') ; " ) ;
+
+		ArrayList organismDetails = beanObj.getOrganismDetails(organism_string) ;
+		for( int i=0 ; i< organismDetails.size() ; i++ ) {
+			String[] record = (String[])organismDetails.get(i);
+			out.println( "addOrganismList(\"" + record[1] + "\",\"" + record[0] + "\",\"" + index + "\") ; " ) ;
+		}
+	}  else if ( validate.equals( "LOAD_ANTIBIOTIC_VALUES" ) ) {
+		String organism_id 			= (String)hash.get("organism_id") ;
+		String orgIndex				= (String)hash.get("orgIndex");
+		String antibiotic_length	= (String)hash.get("antibiotic_length");
+		if (antibiotic_length == null) antibiotic_length = "0";
+		int columnIndex				= Integer.parseInt(antibiotic_length);
+
+		//String chart_result_type 	= "";
+		String discr_msr_id			= "";
+		String result_type			= "";
+
+		ArrayList organismDiscreteDetails	= beanObj.getOrganismDiscreteDetails(organism_id);
+
+		if (organismDiscreteDetails != null && organismDiscreteDetails.size() > 0) {
+			String [] record	= (String[])organismDiscreteDetails.get(0);
+			//chart_result_type	= beanObj.checkForNull(record[0]);
+			discr_msr_id		= beanObj.checkForNull(record[1]);
+			result_type			= beanObj.checkForNull(record[2]);
+		}
+
+		if (result_type.equals("N")) {
+			for (int i = 0; i < columnIndex; i++) {
+				String[] record1 = new String[8];
+				record1 = beanObj.getNumericResultTypeDetails(discr_msr_id,"","");
+
+				for(int j=0; j<record1.length; j++)
+					if(record1[j]== null) record1[j]="";
+
+				//double max_val	= 0;
+				//double min_val	= 0;
+				//if (!record1[2].equals("")) max_val	= Double.parseDouble(record1[2]);
+				//if (!record1[1].equals("")) min_val	= Double.parseDouble(record1[1]);
+
+				out.println("document.result_culture_test.anti"+i+orgIndex+"_td.innerHTML=\"<input type='text' name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"' value='' size='5' class='NUMBER' onblur=''  >\"");
+			}
+		} else if (result_type.equals("L")) {
+			for (int i = 0; i < columnIndex; i++) {
+				ArrayList listItems = beanObj.getListResultTypeDetails(discr_msr_id);
+
+				StringBuffer option_string	= new StringBuffer();
+				int selectedCount		= 0;
+				//out.println("<select name='result_"+i+"' id='result_"+i+"' onchange='onListChange("+i+")' "+disabled+" "+disabled1+">");
+				option_string.append("<option>-- "+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.defaultSelect.label","common_labels")+" --</option>");
+				if(listItems!=null)
+					for(int k=0; k<listItems.size(); k++) {
+						String[] listValues = new String[4];
+						listValues = (String[])listItems.get(k);
+						if(listValues[1]!=null && listValues[1].equalsIgnoreCase("Y")) {
+							option_string.append("<option value='"+listValues[2]+"' selected>"+listValues[0]+"</option>");
+							selectedCount++;
+						} else {
+							option_string.append("<option value='"+listValues[2]+"'>"+listValues[0]+"</option>");
+						}
+					}
+				option_string.append("</select>\"");
+
+				out.println("document.result_culture_test.anti"+i+orgIndex+"_td.innerHTML=\"<select name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"'  onChange='antibioticClick(this)' >"+option_string.toString());
+				if (selectedCount > 0) {
+					out.println("antibioticClick(document.result_culture_test.anti"+i+orgIndex+")");
+				}
+
+			}
+		} else if (result_type.equals("D")) {
+			for (int i = 0; i < columnIndex; i++) {
+				out.println("document.result_culture_test.anti"+i+orgIndex+"_td.innerHTML=\"<input type='text' name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"' value=''>\"");
+			}
+		} else if (result_type.equals("E")) {
+			for (int i = 0; i < columnIndex; i++) {
+				out.println("document.result_culture_test.anti"+i+orgIndex+"_td.innerHTML=\"<input type='text' name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"' value=''>\"");
+			}
+		} else if (result_type.equals("T")) {
+			for (int i = 0; i < columnIndex; i++) {
+				out.println("document.result_culture_test.anti"+i+orgIndex+"_td.innerHTML=\"<input type='text' name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"' value=''>\"");
+			}
+		} else if (result_type.equals("C")) {
+			for (int i = 0; i < columnIndex; i++) {
+				out.println("document.result_culture_test.result_culture_test"+i+orgIndex+"_td.innerHTML=\"<input type='checkbox' name='anti"+i+orgIndex+"' id='anti"+i+orgIndex+"' value='N'>\"");
+			}
+		}
+	}
+	/*else if(validate.equals("CONVERT_XML"))
+	{
+		
+		// String qry_string			= (String)hash.get("qry_string");
+		 String index					= (String)hash.get("index");
+		 String htmlString				= beanObj.checkForNull((String)hash.get("htmlString"),"");
+ 		 htmlString						= htmlString.replaceAll(">>","\"");
+    		 if(htmlString!=null && htmlString.length() > 0){
+			 //set it in the bean
+				beanObj.setResultHtmlData(index, htmlString);
+ 		 }
+
+	}	*/
+	else if( validate.equals( "NOTE_EVENT_STATUS" )){
+		String facility_id = (String)session.getAttribute("facility_id");
+		String accession_num = (String)hash.get("accession_num");
+		String event_status = beanObj.getNoteStatus(facility_id,accession_num);
+		String auto_complete_note_yn = beanObj.getAutoCompleteNoteYN();
+		
+		if((auto_complete_note_yn.equals("N")) && (event_status.equals("4") || event_status.equals("5") || event_status.equals("9"))) //IN032816
+		out.println("event_status = 'RECORD_COMPLETE' ;");
+		else if(event_status.equals("9") && auto_complete_note_yn.equals("Y"))//IN032816
+		out.println("event_status = 'RECORD_COMPLETE' ;");//IN032816
+		else
+		out.println("event_status = 'RECORD_PARTIAL' ;");
+	}
+	else if( validate.equals( "CHART_RECORDING" ))
+	{
+	
+		String orderId			 = (String)hash.get("orderId");
+		String order_line_num	 = (String)hash.get("order_line_num");
+		
+		String chart_status		 = beanObj.getChartStatus(orderId,order_line_num);
+		
+		if(chart_status.equals("Y"))
+		out.println("chart_status = 'CHART_RECORDED' ;");
+		else
+		out.println("chart_status = 'NOT_RECORDED' ;");
+	}
+	else if( validate.equals( "GET_RECORD_MODE" ))
+	{
+		String orderId			 = (String)hash.get("orderId");
+		String order_line_num	 = (String)hash.get("order_line_num");		
+		String record_mode		 = beanObj.returnMode(orderId,order_line_num);		
+		out.println("record_mode = '"+record_mode+"' ;");		
+	}
+	putObjectInBean(bean_id,beanObj,request);
+
+            _bw.write(_wl_block2Bytes, _wl_block2);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

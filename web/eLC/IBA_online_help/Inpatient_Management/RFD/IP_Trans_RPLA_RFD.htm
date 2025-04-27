@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>IP_Trans_RPLA_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to record Leave/Abscond for the patient:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Record</span> – Select the required value from the list. The listed values are ‘Leave’ and ‘Abscond’. If leave has been granted to the patient, select ‘Leave’ or if the patient is missing from the Nursing Unit, select ‘Abscond’. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> – Select the practitioner authorizing the leave using the <span class="BoldNumberRFD">[?]</span> function. This field is mandatory. The treating Practitioner is displayed, by default. The lookup function displays the Practitioners belonging to the Specialty of the Nursing Unit. The attending Practitioner is displayed and disabled for absconding Inpatients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admission Date/Time</span> – The Admission Date and Time of the Inpatient is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Leave Details</p>
+<p class="BoldRFD" style="font-weight: normal;">If the Nursing Unit specifies releasing bed on leave, the pseudo beds must be created for the Nursing Unit, or the occupying bed is not released.</p>
+<p class="BoldRFD" style="font-weight: normal;">If ‘Release Bed on Leave’ is specified in the IP Parameter, two fields get displayed, namely, ‘Release Bed’ and ‘Pseudo Bed.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Date/Time-To Date/Time</span> – Enter the leave duration by specifying the From and To date and time in the format of dd/mm/yyyy hh:mm. The entered ‘From’ date and time cannot be less than the admission date and time. The ‘To’ date entered must be within the permissible leave duration set in the IP Parameter (Max Allowable Leave Period [] hrs). The From Date is displayed as the current date and the To Date is displayed as specified in the IP Parameter, by default. Leave period entry is mandatory. Based on the action specified for exceeding maximum leave, the system either displays an error message or a warning message. The current system date and time is displayed as From Date for abscond patients. The To Date is not displayed for absconding Inpatients. The ‘To’ date is made default to the current system date and time and displayed as read-only text for patients who are absent.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> – Enter the Remarks for Inpatient leave in alphanumeric format of 500 characters maximum length. This field is mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Informed Details</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Informed To</span> – Select the required value from the list. Select the person who must be informed about the discharge of the Inpatient. The listed values are ‘Next of Kin’, ‘First to Notify’ and ‘Others’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> – Enter the Name of the person who is informed about the patients discharge in alphanumeric characters of length 20 characters. This field is enabled only if a value is selected in ‘Informed To’ field. On selecting the ‘Informed To’ field as ‘Next of Kin’ or ‘First to Notify’, the name of the person is displayed as recorded while registering the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date Time</span> – Once the ‘Informed To’ field is selected, this field is enabled and becomes a mandatory field. Enter the date or select the date using the calendar function.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

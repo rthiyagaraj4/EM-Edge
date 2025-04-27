@@ -1,0 +1,377 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>AS_Setup_SetupParamforFacSetup</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Setup Parameter Tab</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Unit Time for Booking (in Hrs:Min)</span> - Enter the minimum time for identifying the Booking slots in Operation Theatre. The booked time for an operation is a multiple of this Unit of Time. The working hours of the Operating Room is divided into a number of equal sized time slabs each equal to the Unit Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Enable Multi Facility OT Booking</u></span> - Select this checkbox to enable multi facility OT booking from OT and CA modules. By default this checkbox is not selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">Booking Time</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Multi Facility</span> – Select this check box to allow the user to perform transactions across facilities.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Working Days Start</span> - Enter the Start Time and End Time of a working day for creating an Operating Room. Based on the details entered, OT Booking screen displays the time slots for Working days.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Holiday Start</span> - Enter the Start Time and the End Time of a holiday for creating an Operating Room. Based on the details entered, OT Booking screen displays the time slots for holiday.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Restrict Theatre Booking</span> - Select the check box if the system has to check if the logged in user has rights to book an operating theatre. The system restricts the logged in user to proceed with the booking if the booking rights are not set for that user.</p>
+</li>
+</ol>
+<p class="BoldRFD">OT Notification (Within a Day)</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Section From-To Time</span> - Enter the From-To time for Section1, Section2 and Section3. These timings are defaulted in the Notification List by OR function for listing operations booked between these timings. The timings are maintained in Date Time format to validate day crossovers.</p>
+</li>
+</ol>
+<p class="BoldRFD">Booking Numbering</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Next No.</span> - Enter the next Booking Serial Number to be assigned by the system. The Booking Serial Number is a system-generated number common across all Operation Theatres. At the start of operations, the next serial number specified is the first Booking Serial Number generated by the system. This number is incremented by 1 automatically by the system, for every booking. The number must be greater than zero. If the check box to prefix the date is selected in Setup Parameter function, then the Booking Number is a combination of the date of Booking and the Next OT Booking Serial Number. Also, in this case, the system automatically sets the Booking Serial Number to 1 as the first booking made at the start of a new year.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No.</span> - Enter the maximum serial number for booking. After the system reaches the maximum serial number, no further Booking Numbers are generated. At this stage, the System Administrator should reset the Next number appropriately. This number cannot be less than the 'Next Number' entered.</p>
+</li>
+</ol>
+<p class="BoldRFD">Waitlist Numbering</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Next No.</span> - Enter the next Waitlist Number to be assigned by the system. This number is incremented by one automatically by the system for every Waitlist.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No.</span> - Enter the maximum waitlist number for waitlisting. After the system has reaches the maximum waitlist number, no further Waitlist numbers are generated. At this stage, the System Administrator should reset the maximum number. This number cannot be less than the Waitlist Next Number.</p>
+</li>
+</ol>
+<p class="BoldRFD">Operation Numbering IP/DC</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Next No</span> - Enter the Next Operation Serial Number that the system generates for Inpatients or Day Care patients. For operations, the next serial number specified is the first Operation Serial Number generated by the system. This number is incremented by one automatically by the system, for every Operation registered. The number must be greater than zero. If the check box to prefix the date is selected in Setup Parameter function, the Operation Number is a combination of the booking date and the Next Operation Serial Number. Also, in this case, the system automatically sets the Operation Serial Number to 1 as the first registration made at the start of a new year.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No</span> - Enter the maximum operation number for inpatients or daycare patients. &#160;When the maximum serial number is reached, no further Operation Numbers are generated. At this stage the System Administrator should reset the Next number appropriately. This number cannot be less than the Next Number.</p>
+</li>
+</ol>
+<p class="BoldRFD">Operation numbering OP/EM</p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Next No</span> - Enter the Next Operation Serial Number that the system generates for Outpatients or Emergency Patients. For operations, the next serial number specified is the first Operation Serial Number generated by the system. This number is incremented by one automatically by the system, for every Operation registered. The number must be greater than zero. If the check box to prefix the date is selected in Setup Parameter function, the Operation Number is a combination of the booking date and the Next Operation Serial Number. Also, in this case, the system automatically sets the Operation Serial Number to 1 as the first registration made at the start of a new year.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No</span> - Enter the maximum operation serial number for outpatients or emergency patients. &#160;When the maximum serial number is reached, no further Operation Numbers are generated. At this stage the System Administrator should reset the Next number appropriately. This number cannot be less than the Next Number.</p>
+</li>
+</ol>
+<p class="BoldRFD">Turnaround Time</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Turnaround time</span> – Select this check box to enable the Start OT Status and End OT status drop-down lists.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start OT Status</span> – Select the Start OT Status from the drop-down list. The listed values are ‘Call’, ‘Check-in to OR’, ‘Check-Out from OR’ and ‘Depart’. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End OT status</span> - Select the End OT status from the drop-down list. The listed values are ‘Call’, ‘Check-in to OR’, ‘Check-Out from OR’ and ‘Depart’. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the value selected in &#160;the Start OT Status and End OT Status are not sequential, the system invokes an error message ‘Please configure the status in the right order’.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Other Details Tab</p>
+<p class="BoldRFD">&#160;Booking/Waitlist</p>
+<ol start="19">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Waitlist warning limit Days</span> - Enter the number of days after which the waitlist should be shown in red in the Booking screen Waitlist tab. This indicates that the schedule is waitlisted for more than the acceptable number of days. All the waitlisted operations appear in the 'Waitlist' tab in the Booking function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Warn for Unscheduled cases only</span> - Select the check box to indicate that the waitlist warning is for Unscheduled cases only.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Initiate IP Booking</span> - Select the check box to indicate that the IP Booking function should be initiated after completing the OT Booking.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Create Diary Schedule By?</span> - Select Surgeon or Theatre to create the diary schedule.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Booking Cut-off Time for Elective Cases</span> - Enter cut-off time for booking elective cases. You cannot book elective cases beyond the time specified in this field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Allow merge of pending orders into existing booking</u></span> – Select this checkbox to allow you to choose one or more pending orders and perform a new booking or amend a booking to merge the operations. By default this checkbox is not selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Timelimit for existing booking selection (In days)</u></span> –Enter the maximum number of days in future within which existing bookings for a patient will be automatically retrieved by the system. The default value is ‘365’. You can enter values ranging from 1 to 365. This text box is enabled only if the parameter ‘Allow merge of pending orders into existing booking' is checked, otherwise this text box will be disabled and greyed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Include Blocked Slot in Available Slot Count</u></span> – Select this checkbox to allow configuring whether a blocked slot will be included or excluded in the available slot count. By default this check box is not selected</p>
+</li>
+</ol>
+<p class="BoldRFD">Booking Verification</p>
+<ol start="27" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Outpatients while finalizing?</span> - Select the action from the list to be taken when an Outpatient booking is being finalized. The listed values are Stop, Warn and Allow. If 'Allow' is selected, booking is allowed to be finalized without any alert. If 'Warn' is selected, a warning alert is given while finalizing the booking and if 'Stop' is selected, the booking cannot be finalized.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Emergency Patients while finalizing?</span> - Select the action from the list to be taken when a booking of an Emergency Patient is being finalized. The listed values are Stop, Warn and Allow. If 'Allow' is selected, booking is allowed to be finalized without any alert. If 'Warn' is selected, a warning alert is given while finalizing the booking and if 'Stop' is selected, the booking cannot be finalized.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">PAC Review Orderable</span> - Select the order catalog using the [?] function based on which the Pre Anaesthesia orderable is generated. Order catalogs created with Order Category 'Miscellaneous' in the Order Entry and Result Reporting module are displayed for selection.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>No. of Swab Counts Required (Including Initial and Final Count)</u></span> - Select the number of swab counts required during the operation. The number of swab counts can be 1, 2, 3, 4, 5 or 6. The number of swab counts selected is displayed in the OT Slate function.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /> When an order for an operation is placed, two orders are generated. One is the Operation order and the other is an Anaesthesia order. While placing an order in the Clinician Access module, you have to select the 'Anaesthesia Required' check box to include the Anaesthesia order.</p>
+<ol start="31" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Swab Counts Required (Mandatory)</span> - Select the number of swab counts required during the operation. This is a mandatory field. The number of swab counts can be 1, 2, 3 or ALL. The number of swab counts selected is displayed in the OT Slate function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Re Arrange Sequence (Mandatory)</span> - Select the check box to mandatorily enter the 'Reason' for changing the sequence of the patient in Booking Verification function and clear the check box to change the sequence of the patient without entering the reason.</p>
+</li>
+</ol>
+<p class="BoldRFD">Documentation Completion Status Check</p>
+<ol start="33" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Surgeon Doc</span> - Select the check box to indicate that the surgeon notes have to be mandatorily entered in the OT Slate function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Doc</span> - Select the check box to indicate that the nursing notes have to be mandatorily entered in the OT Slate function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Intra Anaesthesia Doc</span> - Select the check box to indicate that the intra Anaesthesia document has to be marked as complete in the Anaesthesia function.</p>
+</li>
+</ol>
+<p class="BoldRFD">Slate</p>
+<ol start="36" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Show last Antibiotic Admin Time</span> - Select the check box if the Last Antibiotic Administered Time has to be displayed in OT Slate.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Slate Login Reqd?</span> - Select the check box to enter the login ID and password to record details in the OT Slate function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Cases for Past [] Days</span> - Enter the number of days allowed to include the past cases in numeric format of two digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check-In Backdate Limit [ ] Days</span> - Enter the number of days in numeric values of three digits maximum length. Based on the 'Check-In Backdate Limit' value recorded, you can back date the surgery date in direct check-in function. The Surgery Date will display the current system date and it is disabled if 'Check-In Backdate Limit' value zero or left blank.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Display Hospital Personnel Assigned During Booking/Check-In</u></span> – Select this check box to display the surgeon, assistant surgeon and anaesthetist details in the Record Surgeon Notes and Record Nursing Notes screens during Booking Verification or Check-In.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default User Role</span> - Select Default User Role in the Slate section under Other Details tab in the Setup Parameters For Facility screen to display a Roles for User function in the Setup menu.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Link Operation and Notes in Record Surgeon Notes</u></span> – Select this check box to link the operation and notes details in the Record Surgeon Notes. If you select this check box the error message ‘‘Cancellation not allowed as Personnel details exists against this operation’ gets displayed when you try to cancel the operation in Record Surgeon Notes screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Multiple Check In Allowed</u></span> – Select this check box to allow multiple check in OT slate. By default, this check box is selected.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If you clear this check box, the error message "Notes already exists against this operation. Are you sure you wish to proceed?" gets displayed if one or more Notes exist for the selected operation in the Record Surgeon Notes screen. By default, this check box is selected.</p>
+<p class="Note">&#160;</p>
+<p class="BoldRFD">Interfaces</p>
+<ol start="44" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">External Link</span> - Select this check box to display the icon in the OT Slate and Patient Banner invoked from the OT Slate screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interface to Patient Billing</span> - Select the check box to interface the Theatre Management module to Patient Billing Manager module. Clear the check box to disable the Patient Billing Manager module association to the Operation Theatre module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interface to Oral Health</span> – Select the check box to interface Oral Health to Operation Theatre module. On selecting the check box, the text box ‘Oral Health OT Procedure’ is enabled for selection.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interface to inventory</span> - Select the check box if interface to inventory is required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Doc Type</span> - Enter the sales document type at the enterprise level or select the sales document type using the <span class="BoldNumberRFD">[?]</span> function. The values are populated from the 'Document Type' function of Inventory Management module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Request Doc Type</span> - Enter the request document type or select the request document type using the <span class="BoldNumberRFD">[?]</span> function. The values are populated from the 'Document Type' function of Inventory Management module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">CSSD Items Requested By</span> - Select the CSSD Items Requested By using <span class="BoldNumberRFD">[?]</span> function. The list of stores created and defined in the &#160;Sterile Stock module is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Requested On</span> - Select the Requested On using <span class="BoldNumberRFD">[?]</span> function. The list of stores created and defined in the Inventory module is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Request Type</span> – By default, ‘Normal’ is displayed and disabled.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="NumberRFD"><span class="BoldNumberRFD">Invoke Dental Chart</span></p>
+<ol start="53" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Oral Health OT Procedure</span> – Select a value using <span class="BoldNumberRFD">[?]</span> function. The selected procedure is selected as dental OT procedure.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD"><span class="BoldNumberRFD">Instruments/CSSD Path</span></p>
+<ol start="54" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Instrument/CSSD Image Location</span> – Enter the location of the Instrument/CSSD Images in the server in alphanumeric format.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Billing Setup Tab</p>
+<p class="NumberRFD">The Billing Setup tab is enabled when the field 'Interface to Billing' is selected at the facility level.</p>
+<p class="numberrfd">&#160;</p>
+<p class="BoldRFD">Operation Services</p>
+<ol start="55">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Sub Services</span> - Select the 'Billing Sub Services' check box to control the Billing for surgical accessories. The check box is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admin Function for Charging</span> - Select the check box to enable the admin function to display the charges individually. If this check box is cleared, the admin function is not enabled. This check box is selected, by default.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Room Service Usage</p>
+<ol start="57" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Holding Area Usage?</span> - Select the check box, to charge the usage of the holding area. If 'Bill Holding Area Usage' is selected, capturing 'End Time' in the function 'Holding Area' function is mandatory before performing 'Check-in to OR' stage. The check box is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Operation Room Usage?</span> - Select the check box to charge the usage of the Operating Room. This check box is selected, by default. If 'Bill Operation Room Usage' is selected, 'Check-Out from OR' stage is mandatory before 'Checking in to Recovery Room'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Recovery Room Usage?</span> - Select the check box to charge the usage of the Recovery Room. This check box is selected by default. If 'Bill Recovery Room Usage' is selected, the 'Recovery Room' details must be captured mandatorily in 'Check-in to Recovery Room' function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Charges Applicable from Check-In Date Time</u></span> - Select this check box to consider the Check-In Date Time when the Completed check box is selected and Record button is clicked in Administrative Function for All Charges screen. If this check box is cleared, the System Date/Time will be considered.</p>
+</li>
+</ol>
+<p class="BoldRFD">Bill Finalization Stages</p>
+<ol start="61" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Holding Area</span> - Select the billing finalization stage for holding area from the list. The listed values are 'During Checking-Out Individual Rooms' and 'Before Check-Out/Documentation Completion'. This field is enabled if 'Bill Holding Area Usage' check box is selected. Select 'During Checking-Out Individual Rooms' from the list to charge the holding area usage in 'Check In/Out From Holding area/Document' function in OT Slate. Select 'Before Check-out/Documentation Completion' from the list to charge the holding area usage in 'Administrative Function for All Charges' function in OT Slate.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operating Room</span> - Select the billing finalization stage for Operating Room from the list. The listed values are 'During Checking-Out Individual Rooms' and 'Before Check-Out/Documentation Completion'. This field is enabled if 'Bill Operating Room Usage' check box is selected. Select 'During Checking-Out Individual Rooms' from the list to charge the Operating Room usage in 'Check In/Out From Holding area/Document' function in OT Slate. Select 'Before Check-out/Documentation Completion' from the list to charge the Operating Room usage in 'Administrative Function for All Charges' function in OT Slate.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Recovery Room</span> - Select the billing finalization stage for Recovery Room from the list. The listed values are 'During Checking-Out Individual Rooms' and 'Before Check-Out/Documentation Completion'. This field is enabled if 'Bill Recovery Room Usage' check box is selected. Select 'During Checking-Out Individual Rooms' from the list to charge the Recovery Room usage in 'Check In/Out From Holding area/Document' function in OT Slate. Select 'Before Check-out/Documentation Completion' from the list to charge the Recovery Room usage in 'Administrative Function for All Charges' function in OT Slate.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operations/Procedures</span> – Select the values from the list to define the Operation/Procedure charges in the finalisation stage. The listed values are ‘Admin Function’ and ‘Record Surgeon Notes’.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Surgical Accessories</p>
+<ol start="65" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accessory Type</span> - The Accessory Types are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Surgeon Notes</span> - Select the check box against the Accessory Type to enter the Surgeon Notes in the selected finalization stage. The Surgeon Notes check box is disabled for Accessory Type 'Equipment', 'Instruments/CSSD Packs' and 'Consumable Packs'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Notes</span> - Select the check box against the Accessory Type to enter the Nursing Notes in the selected finalization stage.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admin</span> - Select the check box against the Accessory Type to finalize the billing in the finalization &#160;stage selected. The Admin check box is enabled on selecting the 'Admin Function for Charging' check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Finalization Stage</span> - Select the finalization stage from the list to enter the data for the selected surgical accessories. The listed values are 'Record Surgeon Notes', 'Record Nursing Notes' and 'Admin' Function.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

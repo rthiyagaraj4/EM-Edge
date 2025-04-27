@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>RL_Masters_TestCodes_Validations</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Validations</p>
+<p class="BoldRFD" style="font-weight: normal;">This tab allows you to define validations for the test.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Technical</span> - Technical Review check box is enabled if the test result is of numeric type. Select the Technical Review check box, if the numeric result requires validation. If the result value of the test is out of the specified range, the validation fails and the specimen is directed to the technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box if the test requires pathologist review for the technical review done.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Range [Low-High]</span> - Enter the acceptable lower limit and higher limit value to validate numeric result while performing technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Comment</span> - Select the Comment check box to view the result in 1st and 2nd level review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the result comments.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Result Cmnt</span> - Select the Result Comment check box, if the test result comment requires validation. You can specify which result comment requires review while defining Result Comments for the test. If the validation fails for a result comment, the specimen is directed to the technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the result comments.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Delta Numeric Result</span> - Delta Numeric Result tab is enabled if the test result is of numeric type. Select the Delta Numeric Result check box, if the test requires delta check during validation. If the previous result for the test is within the time and the variation between the current numeric result and the previous result is more than the specified absolute or percentage value, the validation fails and the specimen is directed to technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box if the test requires pathologist review for the delta numeric check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid Period</span> - Enter a Valid Period for which the previous result is valid to perform delta check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> - Select the required unit for the entered Valid Period from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - Enter a valid value to indicate whether Delta Check is based on absolute value or on percentage.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Value</span> - Enter the permissible difference between the previous and the current result for the patient based on the type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Delta Result Comment</span> - Select the Delta Result Comment check box to carry out the delta check for the test during the result comment validation. If the previous result for the test is within the period and the variation between the current result comment and the previous result comment is more than the specified absolute or percentage value, the validation fails and the specimen is directed to technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the delta result check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid Period</span> - Enter a Valid Period value for which the previous result is valid to perform delta check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> - Select the required unit for the entered Valid Period from the Units list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Delta Sensitivity</span> - Select the Delta Sensitivity check box to carry out the delta check for the test during test validation. If the previous result for the test is within the period and the variation between the current sensitivity and the previous sensitivity is more than the specified absolute or percentage value, the validation fails and the specimen is directed to technical review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the delta sensitivity check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid Period</span> - Enter a Valid Period value for which the previous result is valid to perform delta check.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> - Select the required unit for the entered Valid Period from the Units list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Quality</span> - The Quality tab is enabled if the test result is of numeric type. Select the Quality check box to carry out the quality check for the test during test result validation. The values defined through the 'Quality' function get listed. A quality code can have various quality tests and a valid range of low and high values. You can provide the results of quality check through the worklist. If the quality result is out of range and the elapse period is more than the allowed period, the test is rejected. The specimen is directed to the technical review, if the validation fails.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the numeric result value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid Period</span> - Enter a Valid Period value for which the quality check is valid.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> - Select the required unit for the entered Valid Period from the Units list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">One in N Count</span> - Select the 'One in N Count' check box to calculate the number of times the validations are done.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select the Path Review check box, if the test requires pathologist review for the numeric result value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Count</span> - Enter the number of count for review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Path Review</span> - Select required value from the Path Review list to specify whether the test desires 'Normal' or 'Abnormal' Pathologist Review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Range [Low -High]</span> - Enter the acceptable lower limit and upper limit value to validate numeric result while performing pathological review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical Check</span> - Select the 'Critical Check' check box to check whether the numeric result of the test is out of critical range specified. If the result is out of critical range, a warning message is attached to the result of the test and an sms alert is sent to the concerned personnel while releasing the result. Critical checking is available only for the Laboratory sections that have selected this option while setting up 'Department Details' masters and when a result is processed from the abnormal review.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Range [Low-High]</span> - Enter the acceptable lower limit and upper limit value to validate numeric result while performing critical check.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Report Range</p>
+<ol start="33">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Low</span> - Enter the default Low value to be printed on the report.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">High</span> - Enter the default High value to be printed on the report.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Report Range Comment</u></span> - Enter the required report range with &gt; or &lt; signs in the Report Range Comment field. You can enter up to 40 characters maximum. If the Report Range (Low, High) values are not available in the Validation tab or Age/Sex Ranges tab, the Report Range Comment value gets printed in the report.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

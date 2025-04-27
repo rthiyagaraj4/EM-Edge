@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Upload Material Sale Price</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nCodeSetup\nUpload Material Sale Price");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Upload Material Sale Price</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Upload</span> the price for the material items to the database.</p>
+<p class="Text">The Upload Material Sale Price function is used to upload the prices for the material items from an excel file in the local machine to the database. The excel file with the item and price details are saved in the database with a file extension as ‘.csv’. Using <span class="BoldButton">[Validate Data]</span>, you can validate the material items in the excel file stored in the database. The application checks for consistency and generates a report on clicking <span class="BoldButton">[Validate Data]</span>. The prices stored in the database for the selected items are considered towards bill computation when the ‘Basis’ is selected as ‘Base Price’ in the ‘Setup/Amend Charge Factors for Materials linked Services’ function. To upload the details in the excel file, click <span class="BoldButton">[Upload Price]</span>. The file name has to be the same and the existing file is overwritten in the database on uploading the contents. The prices in the excel file against the material items are considered when the Basis is selected as ‘Base Price’ in <a href="Setup_Amend_Charge_Factors_for_Materials_Linked_Services.htm">Setup/Amend Charge Factors for Materials Linked Services</a> function. You can also use the function <a href="Material_Item_Billing_Details__.htm">Material Item Billing Details</a> to define the prices for a material item.</p>
+<h2>Uploading Material Sale Price</h2>
+<p class="From">From the Masters &gt; Interfaced Modules Financial Dtls, double-click Upload Material Sale Price function.</p>
+<p class="Text">The Upload Material Sale Price screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields found in the following tab pages:</p>
+</li>
+</ol>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Upload Item Base Prices</a></p>
+<div class="droptext" id="POPUP1004695689" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">The Upload Item Base Prices tab enables you to upload the prices for the items in an excel sheet to the database. On validating, the items already saved in the excel file in the database are checked for consistency and a report is generated, if an error is encountered.</span></p>
+<p class="BoldRFD">Enter the following details to upload base prices for material items:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility ID</span> - Select the Facility from the list. The facilities associated to the logged in User get listed. The base prices defined are valid for the material items in the selected facility. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Effective From</span> – Click Calendar function to select a date. The prices for the material items are valid from the date selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Validate Data]</span> – Click <span class="BoldNumberRFD">[Validate Data]</span> to validate the details in the excel file already saved in the database. The Price Id is generated on clicking <span class="BoldNumberRFD">[Validate Data]</span>.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Upload Price]</span> - Click <span class="BoldNumberRFD">[Upload Price]</span> to upload the file along with the Price Id to the database.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">The data is populated into the database on clicking</span> <span class="BoldNumberRFD">[Upload Price]</span><span style="font-weight: normal;">.</span></p>
+</div>
+<p><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Upload Item Base Prices by Trade/Batch</a></p>
+<div class="droptext" id="POPUP1004682616" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">The Upload Item Base Prices by Trade/Batch enables you to upload the item base prices by trade or batch. The Price ID generated is applicable to the Trade name or a Batch of the items created initially.</span></p>
+<p class="BoldRFD">Enter the following details to upload the price:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility ID</span> - Select the Facility from the list. The facilities associated to the logged in User get displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Effective From</span> – Click Calendar function to select a date. The price defined in the excel file for the batch items or trade names are valid from the date selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Price Id</span> – The Price ID for the trade/batch is generated automatically when <span class="BoldNumberRFD">[Validate Data]</span> is clicked.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Validate Data]</span> – Click <span class="BoldNumberRFD">[Validate Data]</span> to validate the details in the excel file already saved in the database. The Price Id is generated on clicking <span class="BoldNumberRFD">[Validate Data]</span>.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Upload Price]</span> - Click <span class="BoldNumberRFD">[Upload Price]</span> to upload the base prices defined for a Batch/Trade Name to the database.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">The data for the batch items or the trade items get populated into the database on clicking</span> <span class="BoldNumberRFD">[Upload Price]</span><span style="font-weight: normal;">.</span></p>
+</div>
+<ol start="2">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> or press <span class="BoldButton">[F10]</span> to save or <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to search for the existing records within the facility.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Facility','../../System_Manager/SMAdminSetup/Facility.htm','Item','../../Materials_Base/CodeSetup/Item.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics2.gif" border="0" height="26" width="131" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004695689');
+	TextPopupInit('a2','POPUP1004682616');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

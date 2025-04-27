@@ -1,0 +1,117 @@
+<!--
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+-->
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="../../eCommon/html/IeStyle.css"></link>
+	<Script>
+		function resetform() {
+		//alert(parent.parent.frames[0].name);
+			//parent.frames[1].document.forms[0].reset();
+			//parent.frames[2].location.href="../../eCommon/html/blank.html";
+		   var register_button_yn = "";
+		   var soundex = "";
+		   var func_act = "";
+		   if (parent.frames[1].document.forms[0].register_button_yn)
+				register_button_yn = parent.frames[1].document.forms[0].register_button_yn.value;
+		   if (parent.frames[1].document.forms[0].soundex_dflt)
+		   {
+				soundex = parent.frames[1].document.forms[0].soundex_dflt.value;
+				if (soundex==null) soundex="";
+			}
+		   if (parent.frames[1].document.forms[0].func_act)
+				func_act = parent.frames[1].document.forms[0].func_act.value;	
+
+		   if (parent.frames[1].document.forms[0].soundex_dflt)
+		   {
+			   parent.frames[1].document.forms[0].reset();
+			   parent.frames[1].document.forms[0].Mode.disabled = true;
+			   parent.frames[1].document.forms[0].Patient_Id.focus();
+		   }
+		   else
+				parent.frames[1].location.href = '../../eMP/jsp/ViewBirthRegisterCriteria.jsp?function_id='+parent.frames[1].document.forms[0].function_id.value;
+
+			if (parent.frames[1].document.forms[0].apply_oth_name)											parent.frames[1].formatFlds(parent.frames[1].document.forms[0].apply_oth_name);
+
+			/*if(parent.frames[1].document.forms[0].First_Name)
+				parent.frames[1].document.forms[0].First_Name.style.textAlign = "left";
+			if(parent.frames[1].document.forms[0].Second_Name)
+				parent.frames[1].document.forms[0].Second_Name.style.textAlign = "left";
+			if(parent.frames[1].document.forms[0].Third_Name)
+				parent.frames[1].document.forms[0].Third_Name.style.textAlign = "left";
+			if(parent.frames[1].document.forms[0].Family_Name)
+				parent.frames[1].document.forms[0].Family_Name.style.textAlign = "left";*/
+						
+		   if (parent.frames[1].document.forms[0].newborn_suffix)
+			   parent.frames[1].document.forms[0].newborn_suffix.disabled=true;
+		   if (parent.frames[1].document.forms[0].soundex_dflt)
+			   parent.frames[2].location.href = "../../eMP/jsp/SearchToolbar.jsp?register_button_yn="+register_button_yn+"&func_act="+func_act+"";
+			else
+				parent.frames[2].location.href = "../../eMP/jsp/ViewBirthSearchToolbar.jsp";
+
+		   //parent.frames[2].location.href = "../../eMP/jsp/SearchToolbar.jsp";
+		   parent.frames[3].location.href = '../../eCommon/html/blank.html';
+		   if (parent.frames[1].document.forms[0].Soundex)
+		   {
+			   parent.frames[1].document.forms[0].Soundex.value = soundex;
+			   parent.frames[1].tab_click('search_tab');
+			}
+			if (parent.frames[1].document.forms[0].searchby)
+			{
+				var soundexval = "";
+				if (parent.frames[1].document.forms[0].Soundex)
+					soundexval = parent.frames[1].document.forms[0].Soundex.value
+				if (parent.frames[1].document.forms[0].soundex_val)
+					soundexval = parent.frames[1].document.forms[0].soundex_val.value
+				
+				if (soundexval=='')
+				{
+					parent.frames[1].document.forms[0].searchby.disabled=false;
+					parent.frames[1].document.forms[0].searchby.value = "S";
+				}
+				else
+				{
+					parent.frames[1].document.forms[0].searchby.value = "";
+					parent.frames[1].document.forms[0].searchby.disabled=true;
+				}
+			}
+				
+			//parent.frames[3].location.href="/eCIS/mp/jsp/PatientError.jsp?err_num= ";
+			//parent.frames[1].document.Patient_Search_Form.next.disabled=true;
+			//parent.frames[1].document.Patient_Search_Form.previous.disabled=true;
+
+		}
+	</Script>
+</head>
+<body class="COMMON_TOOLBAR" leftmargin=0 topmargin=0>
+	<table border=0 cellpadding=0 cellspacing=0 width="100%">
+		<tr>
+			<td class="COMMON_TOOLBAR" width="50%">
+<!--
+				<img src="/eCIS/common/images/Rreset.gif"
+					onClick="resetform()"	alt="Reset"
+					onMouseOver="src='/eCIS/common/images/RRreset.gif'"
+					onMouseOut="src='/eCIS/common/images/Rreset.gif'">
+				<img src="/eCIS/common/images/Rhome.gif"
+					alt="Home"
+					onClick="parent.close();"
+					onMouseOver="src='/eCIS/common/images/RRhome.gif'"
+					onMouseOut="src='/eCIS/common/images/Rhome.gif'">
+-->
+					<input type='button' onclick="resetform()" value='Reset' class='BUTTON'></input>
+					<input type='button' onclick="parent.close();" value='Home' class='BUTTON'></input>
+			</td>
+			<td class="COMMON_TOOLBAR" align="right" width="50%">
+				<!-- <input type='button' onclick="parent.print();parent.messageFrame.location.href='../../eCommon/jsp/error.jsp'" value='Print' class='BUTTON'></input>
+				<input type='button' onclick="alert('Help is under construction')" value='Help' class='BUTTON'></input> -->
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
+

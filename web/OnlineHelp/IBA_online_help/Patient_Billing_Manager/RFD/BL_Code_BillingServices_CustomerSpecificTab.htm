@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BillingServices_CustomerSpecificTab</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Customer Specific Price Tab</h1>
+<p class="BoldRFD" style="font-weight: normal;">The Customer Specific tab enables you to set up prices for various Customers in the facility.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define the price:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select a Facility from the list. The facilities associated to the user get listed. The prices defined for the patient category is applicable only in the facility selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to associate a Customer to the facility. The values are listed only if the ‘Customer’ is defined initially under the ‘Accounting Entity Setup’ menu in the Masters. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Customer is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> - Click Calendar function to select a date. The Customer Specific Prices are applicable for the Billing Class in the Facility from the date selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> - Click Calendar function to select the date upto when the discount percentage defined for the patient category is valid.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Blng Class</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a valid Billing Class. The Billing Classes defined under the ‘Billing Rule’ menu in the Masters gets listed. The service price for the patient category can be defined only when a valid Billing Class is selected. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Billing Class is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">R/F</span> – The values are system defined. Select 'R' for rate based and 'F' for factor based service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Rate</span> – Enter the base price to be charged for the Inpatients. The Inpatients associated to the relevant Customer and admitted in the respective Facility are charged based on the quantity of the service used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DC Rate</span> – Enter the base price to be charged for the Daycare patients. The Daycare patients associated with the relevant Customer and the respective Facility will be charged an amount based on the quantity of the service used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP Rate</span> - Enter the base price to be charged for the Outpatients. The charge towards the service is calculated accordingly based on the quantity of the service used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Emg. Rate</span> - Enter the base price to be charged for the Emergency cases. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext. Rate</span> - Enter the base price to be charged for the External or the Referral patients. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min. Charge</span> - Enter the minimum charge towards the service. The charge towards the service is calculated accordingly based on the quantity used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Charge</span> – Enter the maximum charge towards the service. This is applicable only when the Cost Indicator is set. This identifies the maximum amount charged towards the service when the Cost Indicator is set. You cannot charge a service price beyond the limit specified.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> – Select a value from the list to identify the reimbursable type. The system-defined values are – ‘Full’, ‘Partial’ and ‘NA’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Full – Select Full to refund the entire amount paid by the patient towards the service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Partial – Select Partial to refund only a fraction of the amount paid towards the service. A part of the amount is deducted for the service availed and the remaining amount is refunded to the patient/payer. You have to specify the amount to be reimbursed in the field ‘Reimbursable Amount’ under the ‘General’ tab. The Charge is specified only if the ‘Charge Type’ is set to ‘Charge’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable – Select NA, if the service is not reimbursable.</p>
+</li>
+</ol>
+<ol start="17">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allowed</span> – Select the check box, if the Billing Service is reimbursable for the selected patient class. Clear the check box, if the respective Billing Class is non-reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reimbursable Amt</span> – Enter the amount, which can be reimbursed to the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – Select the check box, if the respective Billing Service is reimbursable for the selected patient class. The override option for the patient class takes precedence over the override check box in the header field. If the service is not reimbursable and the check box is selected for the patient class, it indicates that the Billing Service is reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Base Qty</span> – Enter the Base Quantity towards the service. The charge is calculated based on the quantity used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross/Net Applicability</span> – Select either ‘Gross’ or ‘Net’ from the list.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Gross – Select Gross to charge the Gross amount for the service. The charge towards the service is calculated based on the discount and the price defined for the patient category associated to the Billing Class.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Net – Select Net to charge the Net amount for the service. The service charge is calculated based on the price towards the patient category associated to the Billing Class. The discount amount for the service is not considered during bill generation.</p>
+</li>
+</ol>
+<ol start="19">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check for Cost Availability</span> – Select the check box, if the Cost Amount is applicable. Clear the check box, if the Cost Amount is not applicable towards the service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply Discnt</span> – Select the check box, if a discount is applicable to the selected Billing Class. If selected, the Discounts tab is enabled. Enter the percentage of discounts for a patient category associated to the Billing Class.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Discounts</p>
+<p class="BoldRFD" style="font-weight: normal;">The Discounts tab enables you to define the percentage of discounts applicable to the patient category associated to the Billing class and the Billing Group.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define discounts:</p>
+<ol start="21">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> - The Customer selected under the Prices tab gets displayed, by default. The description for the Customer gets displayed in the adjacent text box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Class</span> - The Billing Class associated to the Customer under the Prices tab is displayed, by default. The description for the selected Billing Class gets displayed in the adjacent text box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> – The From date selected to indicate from when the Customer Specific Prices are applicable for a Customer gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> – The To date upto when the prices are considered valid gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Indicator</span> – Select a value from the list to issue discount for the Billing Service. The system-defined values are ‘Amount’ and ‘%’. Select Amount to specify the amount that has to be issued as a discount amount on the Billing Service. Select Percentage to specify the percentage of amount that has to be issued as a discount amount on the Billing Service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> – Click Calendar function to select a date. The Customer Specific Prices are applicable for the Billing Class in the Facility from the date selected. The date set has to be greater than the system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> - Click Calendar function to select the date upto when the discount percentage defined for the patient category is valid.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DC %</span> - Enter the value to issue discount towards the service for Daycare patients. This is applicable only to the Daycare patients associated to a relevant Customer and a Billing Class for the specified period. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP %</span> - Enter the value to issue discount towards the service for Inpatients. This is applicable only to the Inpatients associated to a relevant Customer and a Billing Class for the specified period. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP %</span> - Enter the value to issue discount towards the service for Outpatients. This is applicable only to the Outpatients associated to a relevant Customer and Billing Class for the specified period. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">EXT %</span> - Enter the value to issue discount towards the service for External or Referral patients. This is applicable only to the External or the Referral patients associated to a relevant Customer and a Billing Class for the specified period. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">EMG %</span> - Enter the value to issue discount towards the service for Emergency patients. This is applicable only to the Emergency patients associated to a relevant Customer and a Billing Class for the specified period. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

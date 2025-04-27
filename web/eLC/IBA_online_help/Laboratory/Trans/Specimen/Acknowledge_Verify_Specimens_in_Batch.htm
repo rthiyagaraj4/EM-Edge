@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Acknowledge/Verify Specimens in Batch</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Laboratory\nTrans\nSpecimen\nAcknowledge/Verify Specimens in Batch");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Acknowledge/Verify Specimens in Batch</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Verify</span> and <span class="RedItalic">Acknowledge</span> the registered specimens in Batch.</p>
+<p class="Text">This function allows you to acknowledge/verify the specimen by batch. This function is applicable for Laboratory, BD and BT modules. Based on the setup in the Authorized Users, the User will be allowed to verify the requests for a Department.</p>
+<h2>Acknowledge/Verify Specimens in Batch</h2>
+<p class="From">From Laboratory &gt; Transactions &gt; Specimen menu, select the Acknowledge/Verify Specimens in Batch function.</p>
+<p class="Text">The Acknowledge/Verify Specimens in Batch screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">By default, the logged in user department and the list of specimens to be verified for that department gets displayed. &#160;If a department is suspended, it will not get listed in the list.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Scan the barcode of the specimen number and the specimen number gets displayed in the Specimen Number field. If you enter the specimen number manually, on tabbing out the system prompts an error message 'Enter Category code first' in case if the department has the 'Usage of Category No' check box selected in Departmental Parameter for Facility screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Once the specimen barcode is scanned, the system selects the 'Verify Y/N' checkbox by default. For a specific specimen number, if the Category code and number is not present, then the system clears the 'Verify Y/N checkbox'.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The Priority check box is displayed next to the 'Verify Y/N column'. When you select the Priority check box, the system considers it as a priority specimen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Assign To name from the LOV. Only the user who are Pathologists or Lab technicians and are linked to the particular department are allowed for selection. This field is optional.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The Category Number gets generated automatically by the system when ‘Generate Category No’ check box is selected in Departmental Parameter for Facility screen. Otherwise, you need to enter the Category number manually. First, you need to enter the Category Code, Category Year and Category number.</p>
+</li>
+</ol>
+<p class="Number"><img src="../../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /></p>
+<p class="Note">• If the category number is entered manually, the system checks for duplicates for a given combination of Category code, category year and category number.</p>
+<p class="Note">• For automatic generation of category number, a sequence mentioned in the Category code master setup is followed.</p>
+<p class="Note">• The Category field will not be displayed for departments where the ‘Usage of Category No’ check box is not selected in the Departmental Parameter for Facility screen.</p>
+<ol start="7">
+<li class="p-Number">
+<p class="Number">On clicking any record, the tests placed for the specimen gets displayed at the bottom of the screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span style="font-weight: bold;"><b>[Specimen]</b></span> button to invoke the specimen Registration screen where you can add new tests if required and verify the specimen. If additional tests are added in the Registration screen, it gets displayed in the Test field under Investigations legend.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Verify Y/N check box against the record or select the 'Verify All' check box if you want to verify all the records at a time. Click <span style="font-weight: bold;"><b>[Verify]</b></span> button to verify the specimens. The system prints the barcode after verifying.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />To enable the Category Code in Acknowledge/Verify function, create a Category Codes in Masters and in Administration setup under Departmental Parameter for Facility select ‘Usage of Category No’ check box.</p>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

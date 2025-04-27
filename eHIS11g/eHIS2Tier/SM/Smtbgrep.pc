@@ -1,0 +1,587 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.6                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : SMTBGREP                                     */
+/* DESCRIPTION		     : Test Results report 							*/
+/* AUTHOR                : S. Sheelvant                                 */
+/* DATE WRITTEN          : 11-SEP-1998                                  */
+/* MODIFIED BY           : C. DINESH 									*/
+/* MODIFIED ON			 : 12-DEC-1998			 						*/
+/* Modification History													*/
+/* =====================================================================*/
+/* Date			WhoDoneIt		Remarks									*/
+/* =====================================================================*/
+/* Jan 10,05	Sundar			While invokging spawnlp command,        */
+/*								for RLRCOLBL, workstation id was added  */
+/*								This  has been removed.					*/
+/* Apr 25,06	Sai Dutt		Added validate_uid_pwd() To get pwd     */
+/*								from sy_user if the user changes his    */
+/*								pwd after submiting  the request.       */
+/* Aug 07,08	pramodini		Validate_uid_pwd() moved inside while   */
+/*								loop									*/
+/* Sept 25 13   Srinivasarao V  Modified get_sleep_secs procedure       */		
+/************************************************************************/
+
+#include <stdio.h>   
+#include <string.h>
+#include <windows.h>       
+#include <winuser.h>
+
+#define NODATAFOUND				(sqlca.sqlcode == 1403)
+#define OERROR 					(sqlca.sqlcode < 0)
+#define LAST_ROW 				(sqlca.sqlcode == 1403)
+#define NOT_FOUND 				(sqlca.sqlerrd[2] == 0)
+#define TABLE_ALREADY_EXISTS	(sqlca.sqlcode == -955)
+#define RESOURCE_BUSY			(sqlca.sqlcode == -54)
+
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+#define RESTART_INTERVAL 2
+#define RESTART_TIME 500
+#define INIT_MESG ""
+
+
+EXEC SQL BEGIN DECLARE SECTION;    
+
+   VARCHAR uid_pwd[132],
+           d_curr_pgm_name                  [15],
+		   nd_operating_facility_id			[3],
+           nd_facility_id		 			[3],
+           nd_file_name                     [151],
+		   d_user_id_pwd					[50],
+		   d_next_start_date				[30],
+		   today							[20],
+		   d_sleep_secs						[10],
+		   d_cmd_line						[200],
+		   d_machine_name				    [40],
+		   d_started_by_id					[21],
+		   prg_start_date					[30],
+		   er_msg                           [71],
+		   sy_user_id						[30],
+           sy_session_id					[30],
+           sy_req_date						[30],
+		   sy_online_report_name			[10],
+		   sy_ws_no							[30],
+		   sy_rowid							[50],
+		   sy_pgm_id						[50],
+		   sy_cmd_line_arg				    [1000], //changed from 300 to 1000
+		   sy_uid_pwd						[300], // 24.04.2006 Added by Sai Dutt
+		   sy_error_msg 					[2000], // 24.04.2006 Added by Sai Dutt
+
+		   BVServicedRequestID				[32]; 
+
+
+
+	int v_count = 0;
+
+
+   int     no_of_dtl_recs = 0,
+		   d_time_interval =0,
+		   d_starting_time =0,
+           er_msg_type = 0;
+
+	int l_restart_time = 0;
+
+/***** ADDED ON 05/11/2002 BACKGROUND PROCESS MONITOR **********/
+	int p_count = 0;
+/***** UPTO HERE ADDED ON 05/11/2002 BACKGROUND PROCESS MONITOR **********/
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include<winproc.h>
+
+DWORD sleep_sec = 0;
+DWORD thread1 = 0;
+HANDLE hw1, hw2;
+char string_var[500];
+char g_pgm_id[10];
+char prg_name [10];
+char sep = " ";
+
+int err_flag = 0;
+
+int request_count = 0;
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+     
+   int rec_found = 0;
+
+   if (argc < 5)
+   {
+      ins_message(ERR_MESG,"Usage : smtbgrep uid/password start_date");
+      proc_exit();
+   }
+
+   strcpy(d_user_id_pwd.arr,argv[1]);
+
+   strcpy(g_pgm_id,"SMTBGREP");
+   strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+   d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+   strcpy(prg_start_date.arr,argv[3]);
+   
+   prg_start_date.len = strlen(argv[3]);
+
+    strcpy(nd_facility_id.arr, argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+
+	BVServicedRequestID.arr[0]	= '\0';
+    BVServicedRequestID.len		= 0;
+
+	strcpy(BVServicedRequestID.arr,argv[6]);
+	BVServicedRequestID.len = strlen(BVServicedRequestID.arr);
+
+
+   if(sql_connect(argv[1]) == -1)
+   {
+      ins_message(ORA_MESG,"Error in connecting to Oracle");
+      proc_exit();
+   }
+
+
+   set_meduser_role();  
+
+
+   rec_found = get_sleep_secs();
+
+   if(rec_found)
+   {
+
+      process_rec();
+   }
+
+
+   EXEC SQL COMMIT WORK RELEASE;
+   if (OERROR)
+     ins_message(ORA_MESG,"ROLLBACK WORK RELEASE failed");
+   return;
+}
+/*------------------------------------------------------*/
+get_sleep_secs()
+{
+    d_sleep_secs.arr[0] = '\0';
+	d_machine_name.arr[0] = '\0';
+	d_started_by_id.arr[0] = '\0';
+	d_next_start_date.arr[0]='\0';
+
+	d_sleep_secs.len		= 0;
+	d_machine_name.len		= 0;
+	d_started_by_id.len		= 0;
+	d_next_start_date.len	= 0;
+
+	_flushall();
+
+
+/********* added on 28.06.2003 *************/
+
+    EXEC SQL
+     SELECT processing_interval
+	   INTO :d_sleep_secs
+	   FROM SY_PROG_ID
+	  WHERE PGM_ID = 'SMTBGREP';
+
+/*************** upto here **************/
+
+
+    EXEC SQL  SELECT	floor((sysdate-started_date)*24*60),
+						machine_name,
+						started_by_id,
+						to_char(sysdate,'ddmmyyyyhh24miss'),
+						to_number(to_char(sysdate,'hh24mi'))
+				INTO	:d_time_interval,
+						:d_machine_name,
+						:d_started_by_id,
+						:d_next_start_date,
+						:d_starting_time
+				FROM	SY_BG_PROCESS_CONTROL
+				WHERE	OPERATING_FACILITY_ID = :nd_facility_id
+				AND     PGM_ID = 'SMTBGREP'
+				AND		STARTED_DATE IS NOT NULL
+				AND		SERVICED_REQUESTS = :BVServicedRequestID; ///added on 25.09.2013 against issue reported by Siriraj.
+
+////////// 28.06.2003 commented  	AND		STARTED_DATE = TO_DATE(:prg_start_date,	'DDMMYYHH24MISS');
+
+    d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+	d_machine_name.arr[d_machine_name.len] = '\0';
+	d_started_by_id.arr[d_started_by_id.len] = '\0';
+	d_next_start_date.arr[d_next_start_date.len]='\0';
+
+    
+
+	if(NOT_FOUND) 
+	{
+		  return FALSE;
+	}
+	if (OERROR)
+        ins_message(ORA_MESG,"Error Found in get_sleep_secs");
+	else 
+	{
+		d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+        sleep_sec = (DWORD) atol(d_sleep_secs.arr);
+	    return TRUE;
+	}    
+}
+/*----------------------------------------------------------*/
+process_rec()
+{  
+   int i = 0;
+   int j = 0,corr_stat = 0;
+   int sy_prg_param_found =0;
+   int record_exist = 0;
+   int termstat;
+
+   char test[11],group_test[11];
+
+   _flushall();
+
+   request_count = 1;
+
+   declare_curs();
+
+  
+   while (get_sleep_secs())
+   { 
+  
+		insert_process_monitor();
+
+	   _flushall();
+
+		request_count = 1;         
+
+		open_curs();
+
+		while (fetch_curs())
+		{
+			/* validate_uid_pwd function moved here by pramodini on 07.08.08*/
+			validate_uid_pwd();
+
+			_spawnlp(_P_WAIT, sy_pgm_id.arr, sy_cmd_line_arg.arr, NULL);
+
+			request_count++;
+			
+			delete_bg_rec();
+
+			EXEC SQL COMMIT WORK;
+
+			if (request_count > 11)
+				break;
+
+		   if(!get_sleep_secs())
+				break;
+
+
+		}
+		close_curs();
+
+		 _flushall();
+  		  fflush(NULL);	 
+		  fflush(stdin);
+
+         if (sleep_sec)
+             Sleep(sleep_sec);
+
+			 
+    }
+
+}
+/*------------------------------------------------------------*/
+
+sql_connect(l_nd_ap_uid_pwd)
+char l_nd_ap_uid_pwd[];
+{
+  strcpy(uid_pwd.arr,l_nd_ap_uid_pwd);
+  uid_pwd.len = strlen(uid_pwd.arr);
+
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+/*-----------------------------------------------------*/
+ins_message(int msg_type,char msg[])
+{
+   er_msg.arr[0] = '\0';
+   er_msg.len = 0;
+   
+   er_msg_type = 0;
+
+   strcpy(er_msg.arr,msg);
+   er_msg.len = strlen(msg);
+ 
+   er_msg_type = msg_type;
+
+   EXEC SQL INSERT INTO SY_PROG_MSG
+          (OPERATING_FACILITY_ID,PGM_ID,MSG_TYPE,MSG_NUM,MSG_DESC,MSG_DATE_TIME,SESSION_ID,PGM_DATE)
+   VALUES 
+          (:nd_operating_facility_id,'SMTBGREP',:er_msg_type,NULL,substr(:er_msg,1,70),SYSDATE,:sy_session_id,
+		   :sy_req_date);
+
+   err_flag = 1;
+
+   EXEC SQL COMMIT WORK;
+
+}
+/*------------------------------------------------------------*/
+insert_process_monitor()
+{
+	
+	p_count = 0;
+
+
+	EXEC SQL SELECT COUNT(1)
+			 INTO :p_count
+			 FROM RL_ANALYZER_PROGRAMS_LOG
+			 WHERE OPERATING_FACILITY_ID = DECODE(:nd_facility_id,'*A',OPERATING_FACILITY_ID,
+										:nd_facility_id)
+			 AND   analyzer_name = 'SMTBGREP';
+
+	if (p_count == 0)
+	{
+		EXEC SQL INSERT INTO RL_ANALYZER_PROGRAMS_LOG
+					(operating_facility_id,
+					 analyzer_name, 
+					 machine_name, 
+					 last_run_at,
+					 ADDED_AT_WS_NO, 
+					 ADDED_FACILITY_ID, 
+					 MODIFIED_AT_WS_NO,
+					 MODIFIED_FACILITY_ID)
+				 VALUES
+					(:nd_facility_id,
+				     'SMTBGREP', 
+					 :d_machine_name, 
+					 SYSDATE,
+					 sys_context('USERENV','IP_ADDRESS'),
+					 :nd_operating_facility_id,
+					 sys_context('USERENV','IP_ADDRESS'),
+					 :nd_operating_facility_id);
+
+	}
+	else
+	{
+		EXEC SQL UPDATE RL_ANALYZER_PROGRAMS_LOG
+				 SET last_run_at = SYSDATE,
+						machine_name = :d_machine_name
+				 WHERE OPERATING_FACILITY_ID = DECODE(:nd_facility_id,'*A',OPERATING_FACILITY_ID,
+																		:nd_facility_id)
+				 AND   analyzer_name = 'SMTBGREP';	
+
+	}
+
+	EXEC SQL COMMIT WORK;
+
+	if (OERROR)
+        ins_message(ORA_MESG,"Error Found in insert_process_monitor");
+
+}
+/*------------------------------------------------------------*/
+declare_curs()
+{
+//disp_message(ERR_MESG,"in declare curs");
+
+	EXEC SQL DECLARE bg_report_curs CURSOR FOR
+///////28.06.2003			SELECT ws_no, cmd_line_arg, online_report_name, rowid
+			SELECT operating_facility_id, ws_no, cmd_line_arg, rowid, UPPER(pgm_id),
+			SUBSTR(cmd_line_arg, INSTR(cmd_line_arg,' ', 1, 1) + 1, INSTR(cmd_line_arg,' ', 1, 2) - INSTR(cmd_line_arg,' ', 1, 1)) uid_pwd
+			FROM SY_REPORT_GENERATE_REQUEST
+		    WHERE OPERATING_FACILITY_ID = DECODE(:nd_facility_id,'*A',OPERATING_FACILITY_ID,
+                          											:nd_facility_id)
+			AND     (:BVServicedRequestID = '*A'
+	        OR (:BVServicedRequestID = 'L' AND ( (pgm_id LIKE 'RLR%' ) 
+						OR   (pgm_id LIKE 'BTR%' )
+						OR   (pgm_id LIKE 'BDR%' ) )
+		   )
+			OR (:BVServicedRequestID = 'M' AND pgm_id LIKE 'MP%')
+			OR (:BVServicedRequestID = '*BD' AND pgm_id LIKE 'BDR%')
+			OR (:BVServicedRequestID = '*RL' AND pgm_id LIKE 'RLR%')
+			OR (:BVServicedRequestID = 'BD_U' AND pgm_id LIKE 'BDRLBPRN' 
+					AND NVL(INSTR(CMD_LINE_ARG,  'BDRUNTLB', 1), 0) > 0)
+			OR (:BVServicedRequestID = 'BD_B' AND pgm_id LIKE 'BDRLBPRN' 
+					AND NVL(INSTR(CMD_LINE_ARG,  'BDRUNTLB', 1), 0) = 0)
+			OR (:BVServicedRequestID = '*BT' AND pgm_id LIKE 'BTR%')
+			)
+///	OR (:BVServicedRequestID = '*BT' AND pgm_id LIKE 'BTR%')
+///// 30.06.2003		    AND pgm_id  IN ('RLRSPCLB','RLRCOLBL')
+		    AND UPPER(pgm_id)  NOT IN (SELECT pgm_id  FROM SY_PROG_ID)
+		    AND request_status IS NULL
+		    AND cmd_line_arg IS NOT NULL		// Ravi Shankar, 19/08/2016, IN-61369
+			ORDER BY request_date, print_seq_no;			// order by clause added on 04/03/2009
+//			ORDER BY request_date;			//order by clause added on 16.10.08
+
+	/********** 28.06.2003
+			WHERE report_generate_date < SYSDATE
+			ORDER BY added_date, priority_indicator;   
+	************/  
+		
+	
+	if (OERROR)
+	{
+        ins_message(ORA_MESG,"Error Found in declare_curs....>");
+
+		sprintf(string_var,"Error Found in declare_curs %s",sqlca.sqlerrm.sqlerrmc);
+        ///ins_message(ORA_MESG,"Error Found in declare_curs");
+		ins_message(ORA_MESG,string_var);
+	}
+}
+/*------------------------------------------------------------*/
+open_curs()
+{ 
+	
+	EXEC SQL OPEN bg_report_curs;
+
+	if (OERROR)
+        ins_message(ORA_MESG,"Error Found in open_curs");
+
+}
+/*------------------------------------------------------------*/
+close_curs()
+{
+	
+	EXEC SQL CLOSE bg_report_curs;
+
+	if (OERROR)
+        ins_message(ORA_MESG,"Error Found in close_curs");
+
+}
+/*------------------------------------------------------------*/
+/*-- Start -- Added by Sai Dutt on 24.04.2006 to get pwd from from sy_user if the --
+  ------------user changes his pwd after submiting the request.--*/
+validate_uid_pwd()
+{
+
+  sy_error_msg.arr[0]			    = '\0';
+
+  EXEC SQL EXECUTE 
+  DECLARE
+    lv_user_id               VARCHAR2(60);
+    lv_password              VARCHAR2(500);
+    lv_actual_password       VARCHAR2(500);
+    lv_conn_string           VARCHAR2(500);
+	lv_replace_sy_uid_pwd    VARCHAR2(2000);
+	lv_sy_cmd_line_arg		 VARCHAR2(2000);
+  BEGIN 
+    lv_sy_cmd_line_arg := :sy_cmd_line_arg;
+    IF INSTR(:sy_uid_pwd, '/', 1) > 0 AND INSTR(:sy_uid_pwd, '@', 1) > 0 THEN
+      lv_user_id := SUBSTR(:sy_uid_pwd, 1, INSTR(:sy_uid_pwd, '/', 1) -1 );
+      lv_password := SUBSTR(:sy_uid_pwd, INSTR(:sy_uid_pwd, '/', 1) + 1,  INSTR(:sy_uid_pwd, '@', 1) - INSTR(:sy_uid_pwd, '/', 1) - 1);
+      lv_conn_string := SUBSTR(:sy_uid_pwd, INSTR(:sy_uid_pwd, '@', 1) + 1 );
+
+      IF upper(lv_user_id) <> 'APPLUSER' THEN   
+        SELECT App_Password.Decrypt(password)
+        INTO   lv_actual_password
+        FROM   sy_user
+        WHERE  user_id = lv_user_id
+        AND    facility_id = :nd_operating_facility_id;
+	  
+	    :sy_error_msg := '1';
+        IF lv_password <> lv_actual_password THEN
+          lv_replace_sy_uid_pwd := lv_user_id ||'/'|| lv_actual_password ||'@'|| lv_conn_string;
+		
+		  SELECT REPLACE(lv_sy_cmd_line_arg, :sy_uid_pwd, lv_replace_sy_uid_pwd)
+		  INTO   :sy_cmd_line_arg
+		  FROM   DUAL;
+
+        END IF;
+      END IF;
+	END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      :sy_error_msg := lv_user_id||'-'||:nd_operating_facility_id|| '- User Id does not exists in the User Setup';
+    WHEN OTHERS THEN
+      :sy_error_msg := 'Problem in User Master' ||SQLERRM;
+  END; 
+  END-EXEC; 
+
+
+      if(OERROR)
+         ins_message(ORA_MESG,"User Id doesnot exists in User Setup or Ora Error");
+
+  sy_uid_pwd.arr[sy_uid_pwd.len]					   = '\0'; 
+  sy_error_msg.arr[sy_error_msg.len]				   = '\0'; 
+  sy_cmd_line_arg.arr[sy_cmd_line_arg.len]			   = '\0'; 
+  if (strlen(sy_error_msg.arr) > 1 )
+  {
+    ins_message(ORA_MESG, sy_error_msg.arr);
+  }
+
+}
+/*-- Start -- Added by Sai Dutt on 24.04.2006 to get pwd from from sy_user if the --
+  ------------user changes his pwd after submiting the request.--*/
+
+/*------------------------------------------------------------*/
+fetch_curs()
+{
+	
+////// 28.06.2003 commented	sy_online_report_name.arr[0] 		= '\0';
+	nd_operating_facility_id.arr[0] 	= '\0';  //// 28.06.2003 added
+	sy_cmd_line_arg.arr[0]			    = '\0';
+	sy_ws_no.arr[0]						= '\0';
+	sy_rowid.arr[0]						= '\0';
+	sy_pgm_id.arr[0]					= '\0';
+	sy_uid_pwd.arr[0]					= '\0'; // 24.04.2006 Added by Sai Dutt
+
+/////  28.06.2003 	sy_online_report_name.len			= 0;
+	nd_operating_facility_id.len		= 0;
+	sy_cmd_line_arg.len					= 0;
+	sy_ws_no.len						= 0;
+	sy_rowid.len						= 0;
+	sy_pgm_id.len						= 0;
+	sy_uid_pwd.len						= 0; // 24.04.2006 Added by Sai Dutt
+
+
+
+	EXEC SQL FETCH bg_report_curs INTO	
+				:nd_operating_facility_id, 		
+				:sy_ws_no, 
+                :sy_cmd_line_arg,
+				:sy_rowid,
+				:sy_pgm_id,
+				:sy_uid_pwd;
+			
+
+      if(OERROR)
+         ins_message(ORA_MESG,"Select failed on table SY_REPORT_GENERATE_REQUEST");
+
+////// 28.06.2003      sy_online_report_name.arr[sy_online_report_name.len] = '\0';
+
+      nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+      sy_cmd_line_arg.arr[sy_cmd_line_arg.len]			   = '\0';
+	  sy_ws_no.arr[sy_ws_no.len]						   = '\0';
+	  sy_rowid.arr[sy_rowid.len]						   = '\0';
+	  sy_pgm_id.arr[sy_pgm_id.len]						   = '\0';
+	  sy_uid_pwd.arr[sy_uid_pwd.len]					   = '\0'; // 24.04.2006 Added by Sai Dutt
+
+	/* Commented by pramodini on 07.08.08 
+	Issue:
+		Currently fetch_curs() is executing the loop 11 times though there is no data or data is less than 12 records also. 
+
+	Reason:
+		validate_uid_pwd() is being called inside fetch_curs(); since fetch_curs() loop condition checks for LAST_ROW and 
+	this was always getting value 1; this is because of validate_uid_pwd() has a select statment which will always return a row 
+	(sqlca.sqlcode = 0); hence in turn it returns 1 for LAST_ROW .
+
+	Resolution:
+		validate_uid_pwd() function is commented in fetch_curs() and moved within the main loop.
+
+	//validate_uid_pwd();                        */
+
+    return (LAST_ROW?0:1);
+
+}
+/*------------------------------------------------------------*/
+delete_bg_rec()
+{
+	EXEC SQL DELETE FROM SY_REPORT_GENERATE_REQUEST
+			 WHERE rowid = :sy_rowid;
+
+      if(OERROR)
+         ins_message(ORA_MESG,"delete failed on table SY_REPORT_GENERATE_REQUEST");
+
+}
+/*------------------------------------------------------------*/

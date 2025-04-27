@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login Screen</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+
+<link rel="stylesheet" href="../css/Style.css" type="text/css" />
+<script src="../jquery-1.5.2.min.js"></script> 
+
+<script src="../js/loginIpad.js" language="javascript"></script>
+<script>
+	
+</script>
+<style>
+/*.content div div p { 
+background-color: #ccc; 
+height: 50px; 
+border: 1px solid #333; 
+margin: 0px; 
+} */
+.dvtest {
+	postion: fixed;
+	height: 20px;
+	width: 40px;
+	border: 1px solid;
+	oveflow: auto;
+	-webkit-overflow-scrolling: touch;
+}
+</style>
+
+<script>
+	function login() {
+		loginAppl();
+	
+	}
+	
+	
+</script>
+</head>
+<body>
+	<!-- begin first page -->
+
+				<form id='login_form' name='login_form' id='login_form' method="post"
+					action="../jsp/IpadBasePage.jsp">
+	<div class="center">
+   
+		<div class="login" id="loginFrame" style = "display:block">
+			<div class="loginFieldsBg">
+
+
+					<input class="name" id='name' name='name' id='name' type="text" placeholder ="Username" /><br /> <input class="password" type='password' id='password' name='password' id='password' placeholder ="Password" /><br /> <input
+						type="button" value="Login" class="loginID" data-inline="true"
+						onclick="submit_user_pwd()" /> <input type="hidden" name="mode" id="mode"
+						value="begin"> <input type="hidden"
+						name="responsibility_id" id="responsibility_id" id="responsibility_id" value="">
+					<input type="hidden" name="responsibility_name" id="responsibility_name"
+						id="responsibility_name" value=""> <input type="hidden"
+						name="facility_id" id="facility_id" id="facility_id" value=""> <input type="hidden" name="login_user" id="login_user" id="login_user" value="null">
+					<input type="hidden" name="facility_name" id="facility_name" id="facility_name"
+						value=""> <input type="hidden" name="level" id="level" id="level"
+						value="1"> <input type="hidden" name="clientIP" id="clientIP"
+						id="clientIP" value=""> <input type="hidden" name="user" id="user"
+						id="user" value=""> <input type="hidden" name="compname" id="compname"
+						value="IPAD" id="compname"> <input type="hidden"
+						name="domain" id="domain" id="domain" value=""> <input type="hidden"
+						name="error_num" id="error_num" id="error_num" value="0"> <input type="hidden" name="locale" id="locale" id="locale" value="en">
+			
+
+
+			</div>
+		</div>
+       
+        <div class="login" id="AccessFrame" style = "display:none">
+        <div style="height:auto">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" >
+				<tr>
+					<td align="center" valign="top"><table width="349" border="0"
+							cellspacing="0" cellpadding="0" id = "tbRes">
+							<tr>
+								<td align="left" valign="top" bgcolor="#FFFFFF"><img
+									src="../images/Responsibility.png" width="349" height="45"></td>
+							</tr>
+							<tr>
+								<td class="tdframe" align="left" valign="top" bgcolor="#FFFFFF"
+									id="tdRes"></td>
+							</tr>
+						</table>
+					</td>
+					<td width="1%" align="left" valign="top"><img
+						src="../images/did.png" width="10" height="505">
+					</td>
+					<td align="center" valign="top">
+					<table width="349" border="0"
+							cellspacing="0" cellpadding="0" id = "tbFac">
+							<tr>
+								<td align="left" valign="top" bgcolor="#FFFFFF"><img
+									src="../images/Facility.PNG" width="349" height="45"></td>
+								
+							</tr>
+							<tr>
+								<td class="tdframe" align="left" valign="top" bgcolor="#FFFFFF"
+									id="tdFac" style = "height:auto"></td>
+									
+							</tr>
+						</table>
+				
+					</td>
+				</tr>
+				</table>
+				
+				   <table style = "width:100%" border="0" cellspacing="0" cellpadding="0" id="AccessFrame1" >
+				<tr>
+		      
+				 
+				            <td  style = "width:25%">&nbsp;</td>
+				             <td style = "width:25%">&nbsp;</td>
+							<td   style = "width:10%" align="right" valign="top"><input type="button"
+								id="accessfra" value="Ok" class="loginID" 
+								onclick="login()" /></td>
+								
+							<td  style = "width: 10%" align="left" valign="top"><input type="button"
+								value="Cancel" id="loginfra" class="loginID" 
+								onclick="failedlogin()" /></td>
+						   	
+								
+								
+					
+				  
+				</tr>
+			 
+			</table>
+         </div> 
+      
+		</div>
+		<!-- 
+         <div class="login1" id="AccessFrame1" style = "display:none">
+        <table border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td width="60%">&nbsp;</td>
+					<td width="5%" align="right" valign="top"><input type="button"
+						id="accessfra" value="Ok" class="loginID" 
+						onclick="login()" /></td>
+					<td width="5%" align="left" valign="top"><input type="button"
+						value="Cancel" id="loginfra" class="loginID" 
+						onclick="failedlogin()" /></td>
+						<td width="30%">&nbsp;</td>
+				</tr>
+			</table>
+        
+</div> 
+      -->   
+</div>
+	</form>
+	<!-- end first page -->
+
+</body>
+

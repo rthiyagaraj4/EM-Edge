@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+<!-- lookup Definitions -->
+
+<!--			 Start of LC (Linen Control) tags					-->
+<!--	                LODGE COMPLAINT BEANS                       -->
+	<bean name="lodgeComplaintDAO"
+		class="com.iba.ehis.lc.lodgeComplaint.pojo.dao.LodgeComplaintDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="lodgeComplaintAssembler" />
+		</property>
+	</bean>
+	<bean name="lodgeComplaintAssembler"
+		class="com.iba.ehis.lc.lodgeComplaint.util.LodgeComplaintAssembler">
+	</bean>
+	<bean name="lodgeComplaintFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="lodgeComplaintDAO" />
+		</property>
+		
+	</bean>
+	<bean name="lodgeComplaintDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="lodgeComplaintFacade" />
+		</property>
+	</bean>
+<!--	                LINEN TYPE BEANS                         	-->
+	<bean name="linenTypeDAO"
+		class="com.iba.ehis.lc.linenType.pojo.dao.LinenTypeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="linenTypeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="linenTypeDAO" />
+		</property>
+	</bean>
+	<bean name="linenTypeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="linenTypeFacade" />
+		</property>
+	</bean>
+	
+	<!--	                LINEN ITEM BEANS                         	-->
+	<bean name="linenItemDAO"
+		class="com.iba.ehis.lc.linenItem.pojo.dao.LinenItemDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="linenItemAssembler" />
+		</property>
+	</bean>
+	<bean name="linenItemAssembler"
+		class="com.iba.ehis.lc.linenItem.util.LinenItemAssembler">
+	</bean>
+	<bean name="linenItemFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="linenItemDAO" />
+		</property>
+	</bean>
+	<bean name="linenItemDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="linenItemFacade" />
+		</property>
+	</bean>
+	
+	<!--	                SETUP PARAMETER BEANS                         	-->
+	<bean name="setupParameterDAO"
+		class="com.iba.ehis.lc.setupParameter.pojo.dao.SetupParameterDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="setupParameterAssembler" />
+		</property>
+	</bean>
+	<bean name="setupParameterAssembler"
+		class="com.iba.ehis.lc.setupParameter.util.SetupParameterAssembler">
+	</bean>
+	<bean name="setupParameterFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="setupParameterDAO" />
+		</property>
+	</bean>
+	<bean name="setupParameterDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="setupParameterFacade" />
+		</property>
+	</bean>
+	<!--	                REASON BEANS                         	-->
+	<bean name="reasonDAO"
+		class="com.iba.ehis.lc.reason.pojo.dao.ReasonDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="reasonAssembler" />
+		</property>
+	</bean>
+	<bean name="reasonAssembler"
+		class="com.iba.ehis.lc.reason.util.ReasonAssembler">
+	</bean>
+	<bean name="reasonFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="reasonDAO" />
+		</property>
+	</bean>
+	<bean name="reasonDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="reasonFacade" />
+		</property>
+	</bean>
+	<!--	                LAUNDRY USER BEANS                         	-->
+	<bean name="laundryUserDAO"
+		class="com.iba.ehis.lc.laundryUser.pojo.dao.LaundryUserDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="laundryUserAssembler" />
+		</property>
+	</bean>
+	<bean name="laundryUserAssembler"
+		class="com.iba.ehis.lc.laundryUser.util.LaundryUserAssembler">
+	</bean>
+	<bean name="laundryUserFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="laundryUserDAO" />
+		</property>
+	</bean>
+	<bean name="laundryUserDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="laundryUserFacade" />
+		</property>
+	</bean>
+	
+	<!--	                STANDARD STOCK BEANS                         	-->
+	<bean name="standardStockDAO"
+		class="com.iba.ehis.lc.standardStock.pojo.dao.StandardStockDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="standardStockAssembler" />
+		</property>
+	</bean>
+	<bean name="standardStockAssembler"
+		class="com.iba.ehis.lc.standardStock.util.StandardStockAssembler">
+	</bean>
+	<bean name="standardStockFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="standardStockDAO" />
+		</property>
+	</bean>
+	<bean name="standardStockDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="standardStockFacade" />
+		</property>
+	</bean>
+	<!--	                AGENCY CODE BEANS                         	-->
+	<bean name="agencyCodeDAO"
+		class="com.iba.ehis.lc.agencyCode.pojo.dao.AgencyCodeDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean name="agencyCodeFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="agencyCodeDAO" />
+		</property>
+	</bean>
+	<bean name="agencyCodeDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="agencyCodeFacade" />
+		</property>
+	</bean>
+
+<!--			LC TRANSACTION    			-->
+<!--		 REQUEST FOR LINEN BEANS    	-->
+	
+	<bean name="requestForLinenDAO"
+		class="com.iba.ehis.lc.requestForLinen.pojo.dao.RequestForLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="requestForLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="requestForLinenAssembler"
+		class="com.iba.ehis.lc.requestForLinen.util.RequestForLinenAssembler">
+	</bean>
+	<bean name="requestForLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="requestForLinenDAO" />
+		</property>
+	</bean>
+	<bean name="requestForLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="requestForLinenFacade" />
+		</property>
+	</bean>
+	<!--	                REQUEST FOR LINEN VIEW BEANS                         	-->
+	
+	<bean name="requestForLinenViewDAO"
+		class="com.iba.ehis.lc.requestForLinen.pojo.dao.RequestForLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="requestForLinenViewAssembler" />
+		</property>
+	</bean>
+	<bean name="requestForLinenViewAssembler"
+		class="com.iba.ehis.lc.requestForLinen.util.RequestForLinenViewAssembler">
+	</bean>
+	<bean name="requestForLinenViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="requestForLinenViewDAO" />
+		</property>
+	</bean>
+	<bean name="requestForLinenViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="requestForLinenViewFacade" />
+		</property>
+	</bean>
+
+	<!--	                ISSUE OF LINEN BEANS                         	-->
+	
+	<bean name="issueOfLinenDAO"
+		class="com.iba.ehis.lc.issueOfLinen.pojo.dao.IssueOfLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="issueOfLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="issueOfLinenAssembler"
+		class="com.iba.ehis.lc.issueOfLinen.util.IssueOfLinenAssembler">
+	</bean>
+	<bean name="issueOfLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="issueOfLinenDAO" />
+		</property>
+	</bean>
+	<bean name="issueOfLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="issueOfLinenFacade" />
+		</property>
+	</bean>
+	<!--	                ISSUE OF LINEN VIEW BEANS                         	-->
+	
+	<bean name="issueOfLinenViewDAO"
+		class="com.iba.ehis.lc.issueOfLinen.pojo.dao.IssueOfLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="issueOfLinenViewAssembler" />
+		</property>
+	</bean>
+	<bean name="issueOfLinenViewAssembler"
+		class="com.iba.ehis.lc.requestForLinen.util.RequestForLinenViewAssembler">
+	</bean>
+	<bean name="issueOfLinenViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="issueOfLinenViewDAO" />
+		</property>
+	</bean>
+	<bean name="issueOfLinenViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="issueOfLinenViewFacade" />
+		</property>
+	</bean>
+	<!--	                REQUEST FOR CLEANING LINEN BEANS                         	-->
+	
+	<bean name="requestForCleaningLinenDAO"
+		class="com.iba.ehis.lc.requestForCleaningLinen.pojo.dao.RequestForCleaningLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="requestForCleaningLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="requestForCleaningLinenAssembler"
+		class="com.iba.ehis.lc.requestForCleaningLinen.util.RequestForCleaningLinenAssembler">
+	</bean>
+	<bean name="requestForCleaningLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="requestForCleaningLinenDAO" />
+		</property>
+	</bean>
+	<bean name="requestForCleaningLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="requestForCleaningLinenFacade" />
+		</property>
+	</bean>
+	<!--	                REQUEST FOR CLEANING LINEN VIEW BEANS                         	-->
+	
+	<bean name="requestForCleaningLinenViewDAO"
+		class="com.iba.ehis.lc.requestForCleaningLinen.pojo.dao.RequestForCleaningLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="requestForCleaningLinenViewAssembler" />
+		</property>
+	</bean>
+	<bean name="requestForCleaningLinenViewAssembler"
+		class="com.iba.ehis.lc.requestForCleaningLinen.util.RequestForCleaningLinenViewAssembler">
+	</bean>
+	<bean name="requestForCleaningLinenViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="requestForCleaningLinenViewDAO" />
+		</property>
+	</bean>
+	<bean name="requestForCleaningLinenViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="requestForCleaningLinenViewFacade" />
+		</property>
+	</bean>
+		<!--	                DELIVER CLEANED LINEN BEANS                         	-->
+	
+	<bean name="deliverCleanedLinenDAO"
+		class="com.iba.ehis.lc.deliverCleanedLinen.pojo.dao.DeliverCleanedLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="deliverCleanedLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="deliverCleanedLinenAssembler"
+		class="com.iba.ehis.lc.deliverCleanedLinen.util.DeliverCleanedLinenAssembler">
+	</bean>
+	<bean name="deliverCleanedLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="deliverCleanedLinenDAO" />
+		</property>
+	</bean>
+	<bean name="deliverCleanedLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="deliverCleanedLinenFacade" />
+		</property>
+	</bean>
+	<!--	                DELIVER CLEANED LINEN VIEW BEANS                         	-->
+	
+	<bean name="deliverCleanedLinenViewDAO"
+		class="com.iba.ehis.lc.deliverCleanedLinen.pojo.dao.DeliverCleanedLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="deliverCleanedLinenViewAssembler" />
+		</property>
+	</bean>
+	
+
+	<bean name="deliverCleanedLinenViewAssembler"
+		class="com.iba.ehis.lc.deliverCleanedLinen.util.DeliverCleanedLinenViewAssembler">
+	</bean>
+	<bean name="deliverCleanedLinenViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="deliverCleanedLinenViewDAO" />
+		</property>
+	</bean>
+	<bean name="deliverCleanedLinenViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="deliverCleanedLinenViewFacade" />
+		</property>
+	</bean>
+	<!--	                Enter CLEANED LINEN BEANS                         	-->
+	
+	<bean name="enterCleanedLinenDAO"
+		class="com.iba.ehis.lc.enterCleanedLinen.pojo.dao.EnterCleanedLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="enterCleanedLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="enterCleanedLinenAssembler"
+		class="com.iba.ehis.lc.enterCleanedLinen.util.EnterCleanedLinenAssembler">
+	</bean>
+	<bean name="enterCleanedLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="enterCleanedLinenDAO" />
+		</property>
+	</bean>
+	<bean name="enterCleanedLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="enterCleanedLinenFacade" />
+		</property>
+	</bean>
+
+<!--                  STOCK STATUS BEANS                        -->
+        
+        <bean name="stockStatusDAO"
+                class="com.iba.ehis.lc.queryStockStatus.pojo.dao.QueryStockStatusDAOImpl">
+                <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+                </property>
+                <property name="appAssembler">
+                        <ref bean="queryStockStatusAssembler" />
+                </property>
+        </bean>
+        <bean name="queryStockStatusAssembler"
+                class="com.iba.ehis.lc.queryStockStatus.util.QueryStockStatusAssembler">
+        </bean>
+        <bean name="stockStatusFacade"
+                class="com.iba.ehis.core.pojo.business.AppFacade">
+                <property name="masterDAO">
+                        <ref bean="stockStatusDAO" />
+                </property>
+        </bean>
+        <bean name="stockDelegator"
+                class="com.iba.ehis.core.pojo.business.AppDelegator">
+                <property name="facade">
+                        <ref bean="stockStatusFacade" />
+                </property>
+        </bean>
+  <!--                  STOCK STATUS LINEN BEANS                  -->
+        
+        <bean name="stockStatusLinenDAO"
+                class="com.iba.ehis.lc.queryStockStatus.pojo.dao.QueryStockStatusDAOImpl">
+                <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+                </property>
+                <property name="appAssembler">
+                        <ref bean="queryStockStatusLinenAssembler" />
+                </property>
+        </bean>
+        <bean name="queryStockStatusLinenAssembler"
+                class="com.iba.ehis.lc.queryStockStatus.util.QueryLinenStockStatusAssembler">
+        </bean>
+        <bean name="stockStatusLinenFacade"
+                class="com.iba.ehis.core.pojo.business.AppFacade">
+                <property name="masterDAO">
+                        <ref bean="stockStatusLinenDAO" />
+                </property>
+        </bean>
+        <bean name="stockLinenDelegator"
+                class="com.iba.ehis.core.pojo.business.AppDelegator">
+                <property name="facade">
+                        <ref bean="stockStatusLinenFacade" />
+                </property>
+        </bean>
+	 <!-- WriteOffLinen BEANS   -->                                      	
+	<bean name="writeOffLinenDAO"
+		class="com.iba.ehis.lc.writeOffLinen.pojo.dao.WriteOffLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="writeOffAssembler" />
+		</property>
+	</bean>
+	<bean name="writeOffAssembler"
+		class="com.iba.ehis.lc.writeOffLinen.util.WriteOffLinenAssembler">
+	</bean>
+	<bean name="writeOffLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="writeOffLinenDAO" />
+		</property>
+	</bean>
+	<bean name="writeOffLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="writeOffLinenFacade" />
+		</property>
+	</bean>
+	<!-- SEND LINEN FOR MENDING BEANS    	-->
+	
+	<bean name="sendLinenForMendingDAO"
+		class="com.iba.ehis.lc.sendLinenForMending.pojo.dao.SendLinenForMendingDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="sendLinenForMendingAssembler" />
+		</property>
+	</bean>
+	<bean name="sendLinenForMendingAssembler"
+		class="com.iba.ehis.lc.sendLinenForMending.util.SendLinenForMendingAssembler">
+	</bean>
+	<bean name="sendLinenForMendingFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="sendLinenForMendingDAO" />
+		</property>
+	</bean>
+	<bean name="sendLinenForMendingDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="sendLinenForMendingFacade" />
+		</property>
+	</bean>
+	<!--	      SEND LINEN FOR MENDING  VIEW BEANS                         	-->
+	
+	<bean name="sendLinenForMendingViewDAO"
+		class="com.iba.ehis.lc.sendLinenForMending.pojo.dao.SendLinenForMendingDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="sendLinenForMendingViewAssembler" />
+		</property>
+	</bean>
+	<bean name="sendLinenForMendingViewAssembler"
+		class="com.iba.ehis.lc.sendLinenForMending.util.SendLinenForMendingViewAssembler">
+	</bean>
+	<bean name="sendLinenForMendingViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="sendLinenForMendingViewDAO" />
+		</property>
+	</bean>
+	<bean name="sendLinenForMendingViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="sendLinenForMendingViewFacade" />
+		</property>
+	</bean>
+	<!--	                ISSUE OF LINEN  AFTER MENDING BEANS                      	-->
+	
+	<bean name="issueLinenAfterMendingDAO"
+		class="com.iba.ehis.lc.issueLinenAfterMending.pojo.dao.IssueLinenAfterMendingDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="issueLinenAfterMendingAssembler" />
+		</property>
+	</bean>
+	<bean name="issueLinenAfterMendingAssembler"
+		class="com.iba.ehis.lc.issueLinenAfterMending.util.IssueLinenAfterMendingAssembler">
+	</bean>
+	<bean name="issueLinenAfterMendingFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="issueLinenAfterMendingDAO" />
+		</property>
+	</bean>
+	<bean name="issueLinenAfterMendingDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="issueLinenAfterMendingFacade" />
+		</property>
+	</bean>
+	<!--	               ISSUE OF LINEN  AFTER MENDING VIEW BEANS                 	-->
+	
+	<bean name="issueLinenAfterMendingViewDAO"
+		class="com.iba.ehis.lc.issueLinenAfterMending.pojo.dao.IssueLinenAfterMendingDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="issueLinenAfterMendingViewAssembler" />
+		</property>
+	</bean>
+	<bean name="issueLinenAfterMendingViewAssembler"
+			class="com.iba.ehis.lc.sendLinenForMending.util.SendLinenForMendingViewAssembler">
+	</bean>
+	<bean name="issueLinenAfterMendingViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="issueLinenAfterMendingViewDAO" />
+		</property>
+	</bean>
+	<bean name="issueLinenAfterMendingViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="issueLinenAfterMendingViewFacade" />
+		</property>
+	</bean>
+
+	<!--	TRASACTION: RETURN OF LINEN TO LAUNDRY ON 28/11/2007 -->
+
+	<bean name="returnofLinentoLaundryDAO"
+		class="com.iba.ehis.lc.returnofLinentoLaundry.pojo.dao.ReturnofLinentoLaundryDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="returnofLinentoLaundryAssembler" />
+		</property>
+	</bean>
+	<bean name="returnofLinentoLaundryAssembler"
+		class="com.iba.ehis.lc.returnofLinentoLaundry.util.ReturnofLinentoLaundryAssembler">
+	</bean>
+	<bean name="returnofLinentoLaundryFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="returnofLinentoLaundryDAO" />
+		</property>
+	</bean>
+	<bean name="returnofLinentoLaundryDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="returnofLinentoLaundryFacade" />
+		</property>
+	</bean>
+<!--	                LOAN LINEN BEANS                         	-->
+	
+	<bean name="loanLinenDAO"
+		class="com.iba.ehis.lc.loanLinen.pojo.dao.LoanLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="loanLinenAssembler" />
+		</property>
+	</bean>
+	<bean name="loanLinenAssembler"
+		class="com.iba.ehis.lc.loanLinen.util.LoanedLinenAssembler">
+	</bean>
+	<bean name="loanLinenFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="loanLinenDAO" />
+		</property>
+	</bean>
+	<bean name="loanLinenDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="loanLinenFacade" />
+		</property>
+	</bean>
+	<!--	                LOAN LINEN VIEW BEANS                         	-->
+	
+	<bean name="loanLinenViewDAO"
+		class="com.iba.ehis.lc.loanLinen.pojo.dao.LoanLinenDAOImpl">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+		<property name="appAssembler">
+			<ref bean="loanLinenViewAssembler" />
+		</property>
+	</bean>
+	<bean name="loanLinenViewAssembler"
+		class="com.iba.ehis.lc.loanLinen.util.LoanedLinenViewAssembler">
+	</bean>
+	<bean name="loanLinenViewFacade"
+		class="com.iba.ehis.core.pojo.business.AppFacade">
+		<property name="masterDAO">
+			<ref bean="loanLinenViewDAO" />
+		</property>
+	</bean>
+	<bean name="loanLinenViewDelegator"
+		class="com.iba.ehis.core.pojo.business.AppDelegator">
+		<property name="facade">
+			<ref bean="loanLinenViewFacade" />
+		</property>
+	</bean>
+	<!--    TRASACTION: RECEIVE LOANED LINEN -->
+
+        <bean name="receiveLoanedLinenDAO"
+                class="com.iba.ehis.lc.receiveLoanedLinen.pojo.dao.ReceiveLoanedLinenDAOImpl">
+                <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+                </property>
+                <property name="appAssembler">
+                        <ref bean="receiveLoanedLinenAssembler" />
+                </property>
+        </bean>
+        <bean name="receiveLoanedLinenAssembler"
+                class="com.iba.ehis.lc.receiveLoanedLinen.util.ReceiveLoanedLinenAssembler">
+        </bean>
+        <bean name="receiveLoanedLinenFacade"
+                class="com.iba.ehis.core.pojo.business.AppFacade">
+                <property name="masterDAO">
+                        <ref bean="receiveLoanedLinenDAO" />
+                </property>
+        </bean>
+        <bean name="receiveLoanedLinenDelegator"
+                class="com.iba.ehis.core.pojo.business.AppDelegator">
+                <property name="facade">
+                        <ref bean="receiveLoanedLinenFacade" />
+                </property>
+        </bean>
+        
+<!--                    Receive Loaned Linen BEANS                              -->
+                
+        <bean name="receiveLoanedLinenViewDAO"
+                class="com.iba.ehis.lc.receiveLoanedLinen.pojo.dao.ReceiveLoanedLinenDAOImpl">
+                <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+                </property>
+                <property name="appAssembler">
+                        <ref bean="receiveLoanedLinenViewAssembler" />
+                </property>
+        </bean>
+        <bean name="receiveLoanedLinenViewAssembler"
+                class="com.iba.ehis.lc.receiveLoanedLinen.util.ReceiveLoanedLinenViewAssembler">
+        </bean>
+        <bean name="receiveLoanedLinenViewFacade"
+                class="com.iba.ehis.core.pojo.business.AppFacade">
+                <property name="masterDAO">
+                        <ref bean="receiveLoanedLinenViewDAO" />
+                </property>
+        </bean>
+        <bean name="receiveLoanedLinenViewDelegator"
+                class="com.iba.ehis.core.pojo.business.AppDelegator">
+                <property name="facade">
+                        <ref bean="receiveLoanedLinenViewFacade" />
+                </property>
+        </bean>
+
+<!--                    Receive Linen At Laundry Beans                          -->
+        <bean name="receiveLinenAtLaundryDAO"
+                class="com.iba.ehis.lc.receiveLinenAtLaundry.pojo.dao.ReceiveLinenAtLaundryDAOImpl">
+                <property name="sessionFactory">
+                        <ref bean="sessionFactory" />
+                </property>
+                <property name="appAssembler">
+                        <ref bean="receiveLinenAtLaundryAssembler" />
+                </property>
+        </bean>
+        <bean name="receiveLinenAtLaundryFacade"
+                class="com.iba.ehis.core.pojo.business.AppFacade">
+                <property name="masterDAO">
+                        <ref bean="receiveLinenAtLaundryDAO" />
+                </property>
+                
+        </bean>
+        <bean name="receiveLinenAtLaundryAssembler"
+                class="com.iba.ehis.lc.receiveLinenAtLaundry.util.ReceiveLinenAtLaundryAssembler">
+        </bean>
+        <bean name="receiveLinenAtLaundryDelegator"
+                class="com.iba.ehis.core.pojo.business.AppDelegator">
+                <property name="facade">
+                        <ref bean="receiveLinenAtLaundryFacade" />
+                </property>
+        </bean>
+<!--			 End of LC tags			-->
+</beans>

@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_RuleForAddlServ_AddlServChargeRule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to define the additional service charge rule:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the Facility from the list. The facilities associated to the logged in user gets listed. The service charge rule defined is valid within the facility selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rule Code</span> – Enter the Rule Code in alphanumeric format of five characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> – Enter the Long Description for the rule code in alphanumeric format of 40 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> – Enter the Short Description for the rule code in alphanumeric format of five characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Effective From</span> – Click Calendar function to select the date. The rule code is valid within the selected facility from the date selected. The date selected has to be greater than the current system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">To</span> – Click Calendar function to select the date. The service charge is valid within the facility until the date selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rule Type</span> – Select a value from the list. The values are system defined – Main and Sub. Select Main, if the rule code is a main rule type. You can associate any number of Sub Rule Types to the Main Rule Type. Select Sub, if the Rule Type is a Sub rule code. On selecting the Rule Type as ‘Sub’, additional field gets displayed to associate the Sub Rule Type to a Main Rule Type. Select a Main Rule to which the Sub Rule Type has to be associated. A Main Rule Type can have multiple Sub Rule Types associated to it. The sub rule types associated to the main rule types appear under Associated Charges menu on the screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Coverage</span> – Select the check box, if the Payer Coverage is applicable for the rule code. Clear the check box, if the Payer Coverage is not applicable for the selected rule code.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Additional Charge</span> – Enter the additional charge that has to be charged on associating the respective rule code to the patient bills. Select either ‘%’ or ‘Value/Unit’. The percentage of the additional charge is charged as the tax amount. &#160;The value or the unit specified is charged as the additional amount on the total bill amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply On</span> – Select a value from the list. The values are system defined – ‘Gross Charge’, ‘Net Charge’, ‘Main Rule’ and ‘Sub Rule’. Select ‘Gross Charge’, if the additional amount has to be charged on the gross amount during bill generation. Select ‘Net Charge’, if the additional amount has to be charged on the net amount during bill generation. Select ‘Main Rule’ to charge the additional amount on the main rule. Select ‘Sub Rule’ to charge the additional amount on the sub rule.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">GL Interface Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the GL Interface Code. A interface code associated to a rule code cannot be associated to another rule. The values defined using the ‘Chart of Accounts’ function under the ‘GL Setup’ menu gets listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Text to Print in Bill</span> – Enter the text in alphanumeric format with a maximum of 50 characters. The value recorded gets displayed on the bill generated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Payer Coverage</u></span> - select this checkbox to define payer coverage for facility. By default this checkbox is cleared.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

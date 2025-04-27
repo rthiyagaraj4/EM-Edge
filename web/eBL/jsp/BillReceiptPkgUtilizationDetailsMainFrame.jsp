@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<%@ page import= "webbeans.eCommon.*,java.util.*,java.sql.*,java.text.*" %>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%>
+
+<HTML>
+<HEAD>
+</HEAD>
+<%
+		String sStyle =		(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+		<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css'/>	
+		<script language='javascript' src='../../eBL/js/PkgUtilization.js'></script>
+		<script language="javascript" src="../../eCommon/js/common.js"></script>
+		<script src='../../eCommon/js/ValidateControl.js' language='javascript'></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+<%		   			
+			String params = request.getQueryString() ;
+			if(params==null || params.equals("")) params="";
+			String url = "../../eCommon/jsp/commonToolbar.jsp?" ;
+			String patientId = request.getParameter("patient_id");
+			String episodeId =request.getParameter("episodeId");
+			String noOfDecimal = request.getParameter("noOfDecimal");
+			System.out.println("suganya"+params);
+			String source = url + params  ;
+
+%>		
+		<iframe name='PkgPatIdFrame' id='PkgPatIdFrame' src='BillReceiptPkgUtilizationPatientId.jsp?<%=params%>' frameborder=0 scrolling='auto' noresize style='height:0vh;width:100vw'></iframe> 
+			<iframe name='PkgPatientHdr' id='PkgPatientHdr' src='../../eCommon/html/blank.html' frameborder=0 scrolling='no' noresize style='height:9vh;width:100vw'></iframe>
+			<iframe name='PkgDtlsFrame' id='PkgDtlsFrame' src='../../eCommon/html/blank.html' frameborder=0 scrolling='auto' noresize style='height:38vh;width:100vw'></iframe>
+			<iframe name='PkgUtilizationPatientHdr' id='PkgUtilizationPatientHdr' src='../../eCommon/html/blank.html' frameborder=0 scrolling='auto' noresize style='height:6vh;width:100vw'></iframe>
+			<iframe name='PkgServDtlsFrame' id='PkgServDtlsFrame' src='../../eCommon/html/blank.html' frameborder=0 scrolling='auto' noresize style='height:42vh;width:100vw'></iframe>
+
+	
+</HTML>
+

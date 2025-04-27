@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Compute Bed Charges</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript" src="../../../ehlpdhtm.js"></script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nTransactions\nIP Direct Charges\nCompute Bed Charges");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Compute Bed Charges</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Compute</span> the bed charges for the Inpatients admitted in the facility. The charges are calculated for the Inpatients who are currently admitted in the facility.</p>
+<p class="Text">Compute Bed Charges function is used to compute the bed charges for the Inpatients admitted in the facility until the current date. The computation is done from the date the bed charge was calculated previously. When a patient is transferred from one bed type to another, the highest charge for the bed class is considered. The bed charges are computed based on the bed charging rules defined in the BL Parameters function under the tab Inpatient/Daycare. The charges are computed either from the admission date/time of the patient to the facility or from the time, the bed is allocated to the inpatient in the facility. The bed charge computation differs based on the value selected for 'Check Out Basis'. You can define the bed charge to be computed based on the time or rate. The bed charge computation rule differs based on the value selected for 'Check Out Basis' in the 'BL Parameter' function.</p>
+<h2>Compute Bed Charges</h2>
+<p class="From">From the Transactions &gt; IP Direct Charges, double-click Compute Bed Charges function.</p>
+<p class="Text">The Compute Bed Charges screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">The last date and time until when the bed charges were computed get displayed. You cannot update the date and time.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the number of days in numeric format with a maximum of two digits upto when the bed charges are to be computed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The current date and time for bed charge computation is calculated and displayed based on the last bed charge and the number of days entered. System displays the date and time and you cannot update the entry.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Run Process]</span> to compute the bed charges or click <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A confirmation screen pops-up. Click <span class="BoldButton">[Yes]</span> to compute the bed charges or <span class="BoldButton">[No]</span> to cancel the process.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Discharge Bill Cum Receipt','../IP_Cashier/Discharge_Bill_Cum_Receipt.htm');return false;" title="See Also"><img src="../../../ss_btn_see_also2.gif" border="0" height="26" width="82" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

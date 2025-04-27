@@ -1,0 +1,192 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<!--(==============================================================)-->
+<!--(Document created with RoboEditor. )============================-->
+<!--(==============================================================)-->
+
+<head>
+
+<title>CA_AS_Relationship</title>
+
+<!--(Meta)==========================================================-->
+
+<meta http-equiv=content-type content="text/html; charset=windows-1252">
+<meta name=generator content="RoboHELP by eHelp Corporation - www.ehelp.com">
+<meta name=generator-major-version content=0.1>
+<meta name=generator-minor-version content=1>
+<meta name=filetype content=kadov>
+<meta name=filetype-version content=1>
+<meta name=page-count content=1>
+<meta name=layout-height content=878>
+<meta name=layout-width content=722>
+
+
+<!--(Links)=========================================================-->
+
+<link rel="StyleSheet" href="../../default.css">
+
+
+
+</head>
+
+<!--(Body)==========================================================-->
+
+
+<body>
+
+<p class=BoldRFD>Enter the following details to create a Relationship record:</p>
+
+<p class=BoldRFD>&nbsp;</p>
+
+<ol>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Relationship 
+ ID</span> - Enter the Relationship ID in alphanumeric format of 20 characters 
+ maximum length. The Relationship ID must be unique and cannot be changed 
+ after creating. This field is mandatory.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Relationship 
+ Name</span> - Enter the Relationship Name in alphanumeric format of 60 
+ characters maximum length. This field is mandatory.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Sequence 
+ No</span> - Enter the Sequence Number in numeric format of four digits 
+ maximum length. This value should be unique.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Nature</span> 
+ - Select the Nature of the Relationship as Lifetime or Encounter Specific. 
+ By default, Encounter Specific is selected.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Enabled</span> 
+ – Select the check box to enable the Relationship record. </p></li>
+</ol>
+
+<p class=BoldRFD>&nbsp;</p>
+
+<p class=BoldRFD>Direct/Indirect Settings</p>
+
+<p class=BoldRFD
+	style="font-weight: normal;">The Direct/Indirect setting is applicable 
+ based on the Relationship. The condition that is applied is as follows:</p>
+
+<ul>
+	
+	<li class=kadov-p-CBulletRFD><p class=BulletRFD>If the nature selected 
+ is 'Lifetime', 'Allow direct' field is internally set to be enabled, whereas 
+ fields under the legend ‘Relationship’ are internally disabled. The Expiry 
+ Rule is optional in this case. Select the check box to enable the 'Expiry 
+ Rule Applicable', if it is enabled the Expiry Rule is selected from the 
+ list box which contains the values 'Day after effect' or 'Hour after effect', 
+ which is mandatory and enter the expiry period in numeric format of six 
+ digits maximum length. If the 'Expiry Rule Applicable' is disabled no 
+ rule is applicable. This indicates that all relationships set up as ‘Lifetime’ 
+ is user assigned.</p></li>
+	
+	<li class=kadov-p-CBulletRFD><p class=BulletRFD>If the nature selected 
+ is 'Encounter Specific', select the 'Allow direct' check box to enable 
+ or clear to disable the flags under the ‘Relationship’ legend.</p></li>
+	
+	<li class=kadov-p-CBulletRFD><p class=BulletRFD>If 'Allow Direct' field 
+ is enabled, all flags under the ‘Relationship’ legend are internally set 
+ to be disabled. The 'Expiry Rule Applicable' is set enabled internally. 
+ Select the appropriate expiry rule applicable from the list of values 
+ with an expiry period.</p></li>
+	
+	<li class=kadov-p-CBulletRFD><p class=BulletRFD>If the 'Allow Direct' 
+ is disabled, the flags under the ‘Relationship’ legend are enabled. Select 
+ the check box to enable or clear the check box to disable the flags. The 
+ 'Expiry Rule Applicable' is selected and set enabled internally to select 
+ the appropriate ‘Expiry Rule’ applicable from the list of values with 
+ an expiry period. </p></li>
+</ul>
+
+<p class=BoldRFD
+	style="font-weight: normal;">All Direct Relationships are available 
+ to assign relationships to other practitioners using the task ‘Assign 
+ Relationship’ provided in the Clinician Access module. All Indirect Relationships 
+ are assigned by the system to the various practitioners that are identified 
+ in various transactions of Enterprise Management. The details of when the system assigns 
+ an indirect relationship to a practitioner are detailed below.</p>
+
+<p class=BoldRFD>&nbsp;</p>
+
+<p class=BoldRFD>Relationship</p>
+
+<ol start=6
+	style="list-style: decimal;"
+	type=1>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>IP 
+ Enc</span> - Select the check box if applicable. The relationship defined 
+ with this flag is assigned to the ‘Attending Practitioner’ identified 
+ in the ‘Admit Patient’ function or the ‘Assign Bed/Mark Patient Arrival’ 
+ functions in the Inpatient and Day Care Management module.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>IP 
+ Admit</span> - Select the check box if applicable. The relationship defined 
+ with this flag is assigned to the ‘Admitting Practitioner’ identified 
+ in the ‘Admit Patient’ function in the Inpatient and Day Care Management 
+ module.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>OP 
+ Visit</span> - Select the check box if applicable. The relationship defined 
+ with this flag is assigned to the ‘Attending Practitioner’ identified 
+ in the ‘Register Visit’ function in the Outpatient Management module. 
+ </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Accident 
+ &amp; Emergency</span> - Select the check box if applicable. The relationship 
+ defined with this flag is assigned to the ‘Attending Practitioner’ identified 
+ in the ‘Register Attendance’ function in the Accident &amp; Emergency 
+ module. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Day 
+ Care</span> - Select the check box if applicable. The relationship defined 
+ with this flag is assigned to the ‘Admitting Practitioner’ identified 
+ in the ‘Admit Patient’ function in the Inpatient and Day Care Management 
+ module for day care patients. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Referral 
+ Reln</span> - Select the check box if applicable. The relationship defined 
+ with this flag is assigned to the ‘Practitioner’ identified in the ‘Refer 
+ Patient’ function in the Clinician Access module. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Nurse 
+ Relation</span> - Select the check box if applicable. The relationship 
+ defined with this flag is assigned to any nurse picking up a patient from 
+ the Patient List in the Clinician Access module.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Default</span> 
+ - This flag can be selected against each of the relations mentioned above. 
+ This indicates that the relation set is defaulted by the system if there 
+ are multiple relationships defined for each of the flags. </p></li>
+</ol>
+
+<p class=BoldRFD>&nbsp;</p>
+
+<p class=BoldRFD>Expiry Rule </p>
+
+<ol start=14
+	style="list-style: decimal;"
+	type=1>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Expiry 
+ Based</span> - Select the check box if the Relationship is expiry based. 
+ This field is selected and disabled if the Nature chosen is Encounter 
+ specific. If the Nature chosen is Lifetime, the check box is optional.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Rule</span> 
+ - Select a valid rule from the list. The value for this field is selected 
+ only if the Expiry Based check box is selected. This field is mandatory, 
+ if the ‘Expiry Based’ check box is selected. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Expiry 
+ Period</span> - Enter the period in numeric format of six digits maximum 
+ length. This field is mandatory if the ‘Expiry Based’ check box is selected.</p></li>
+</ol>
+
+</body>
+
+</html>

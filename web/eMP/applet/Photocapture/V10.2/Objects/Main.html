@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+</HEAD>
+
+<BODY>
+<script>
+	function capturePhoto() {
+		var retVal =    new String();
+		var dialogHeight= "30" ;
+		var dialogWidth = "58" ;
+		var features    = "dialogHeight:" + dialogHeight + "; dialogWidth:" + dialogWidth +"; status=no;" ;
+		var arguments   = "" ;
+		retVal = window.showModalDialog("ImageCaptureModal.html",arguments,features);
+		//alert( retVal );
+	}
+</script>
+<a href="javascript:capturePhoto()"> Click to Capture Photo </a>
+</BODY>
+</HTML>

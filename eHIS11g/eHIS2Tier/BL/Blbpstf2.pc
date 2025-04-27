@@ -1,0 +1,1770 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLBPSTFL.PC                                  */
+/* AUTHOR                : S. SRIRAM                                    */
+/* Converted to windows  : Prasad B G S 3/7/96                          */
+/* DATE WRITTEN          : 19-AUG-1993                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */
+/*                                                                      */
+/*  FUNCTION             :                                                */ 
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES              INPUT/OUTPUT             */
+/*                                                                      */
+/*                                                                      */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */ 
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>          
+#include "gl.h"
+#include "bl.h"    
+               
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define ROW_COUNT            (sqlca.sqlerrd[2])
+#define VIEW_LOG_FILE 1
+
+/*
+#define DEBUG 0
+*/
+
+EXEC SQL BEGIN DECLARE SECTION;
+    VARCHAR hosp_name                                  [120],
+			date_time                                  [20],
+			user_id                                    [40],
+			uid_pwd      							  [132],
+			nd_session_id                              [16],
+			nd_pgm_date                                [25],
+			d_curr_pgm_name                            [15],
+			nd_post_upto_date                          [11],	  
+			nd_doc_type				       [8],
+			nd_doc_num				       [30],
+			nd_doc_date				       [31],
+			cpatdoctypecode			       [7],
+			cpatdocnum                     [30],
+			cpatdocdate				       [13],
+			nd_pre_doc_type			       [8],
+			nd_pre_doc_num			       [30],
+			nd_pre_doc_date			       [31],
+			nd_cust_code			       [9],
+			nd_pre_cust_code		               [9],
+			nd_post_year				[5],
+			nd_post_month				[3];
+
+
+   VARCHAR bl_pat_trx_doc_ref                          [21],
+		   bl_pat_trx_doc_ref_line_num                 [5],
+		   bl_pat_trx_doc_ref_seq_num                  [5],
+		   bl_pat_trx_date                             [13],
+		   bl_pat_episode_type                         [2],
+		   bl_pat_patient_id                           [21],
+		   bl_pat_episode_id                           [9],
+		   bl_pat_visit_id                             [5],
+		   bl_pat_billed_flag                          [2],
+		   bl_pat_settlement_ind                       [2],
+		   nd_reason_text			       [51],
+		   nd_cash_counter_code                        [7],
+		   nd_shift_id				       [2],
+		   d_orig_dept_code                            [7],
+		   d_bed_class_code                            [3],
+		   bl_pat_prt_grp_hdr_code                     [3],
+		   bl_pat_prt_grp_line_code                    [3],
+		   bl_pat_package_ind                          [2],
+		   bl_pat_package_service_code                 [11],
+		   bl_pat_blng_serv_code                       [11],
+		   bl_pat_package_trx_ind                      [2],
+		   bl_pat_serv_locn_code                       [5],
+		   bl_pat_serv_item_code                       [21],
+		   bl_pat_serv_item_desc                       [41],
+		   bl_pat_rate_charge_flag                     [2],
+		   bl_pat_base_qty                             [23],
+		   bl_pat_base_rate                            [23],
+		   bl_pat_serv_qty                             [23],
+		   bl_pat_base_charge_amt                      [23],
+		   bl_pat_org_gross_charge_amt                 [23],
+		   bl_pat_org_disc_amt                         [23],
+		   bl_pat_org_net_charge_amt                   [23],
+		   bl_pat_upd_gross_charge_amt                 [23],
+		   bl_pat_upd_disc_amt                         [23],
+		   bl_pat_upd_net_charge_amt                   [23],
+		   bl_pat_adj_gross_charge_amt                 [23],
+		   bl_pat_adj_disc_amt                         [23],
+		   bl_pat_adj_net_charge_amt                   [23],
+		   bl_pat_module_id                            [3],
+		   bl_pat_source_doc_ref                       [21],
+		   bl_pat_source_doc_date                      [13],
+		   bl_pat_service_date                         [13],
+		   bl_pat_acct_dept_code                       [7],
+		   bl_pat_orig_dept_code                       [7],
+		   bl_pat_physician_id                         [16],
+		   bl_pat_blng_grp_id                          [3],
+		   bl_pat_blng_class_code                      [3],
+		   bl_pat_day_type_code                        [3],
+		   bl_pat_time_type_code                       [3],
+		   bl_pat_disc_perc                            [6],
+		   bl_pat_addl_factor_num                      [6],
+		   bl_pat_bed_class_code                       [3],
+		   bl_pat_bill_type_code                       [3],
+		   bl_pat_folio_remarks                        [51],
+		   bl_pat_df_service_ind                       [2],
+		   bl_pat_df_upd_flag                          [2],
+		   bl_pat_doc_type_code                        [7],
+		   bl_pat_doc_number                           [23],
+		   bl_pat_bill_doc_type_code                   [7],
+		   bl_pat_bill_doc_num                         [9],
+		   bl_pat_bill_doc_date                        [13],
+		   bl_pat_trx_finalize_ind                     [2],
+		   bl_pat_finalized_by_id                      [21],
+		   bl_pat_finalized_date                       [13],
+		   bl_pat_trx_posted_ind                       [2],
+		   bl_pat_posted_by_id                         [21],
+		   bl_pat_posted_date                          [13],
+		   bl_pat_last_adjusted_by_id                  [21],
+		   bl_pat_last_adjusted_date                   [13],
+		   bl_pat_added_by_id                          [21],
+		   bl_pat_modified_by_id                       [21],
+		   bl_pat_added_date                           [13],
+		   bl_pat_modified_date                        [13],
+
+		   bl_pat_rowid                                [31],
+
+		   bl_pat_concat_code                          [16],
+
+		   bl_store_trx_date                           [13],
+		   bl_store_episode_type                       [2],
+		   bl_store_patient_id                         [21],
+		   bl_store_episode_id                         [9],
+		   bl_store_visit_id                           [5],
+
+		   bl_store_trx_doc_ref                        [21],
+
+		   store_concat_code                           [16],
+		   store_acct_dept_code                        [7];
+
+VARCHAR    bl_dept_main_acc1_code                      [7],
+		   bl_dept_main_acc2_code                      [5],
+		   bl_dept_dept_code                           [7],
+		   bl_dept_subledger_group_code                [4],
+		   bl_dept_subledger_line_code                 [9],
+		   bl_dept_product_group_code                  [4],
+		   bl_dept_product_line_code                   [5],
+
+		   bl_pkg1_main_acc1_code                      [7],
+		   bl_pkg1_main_acc2_code                      [5],
+		   bl_pkg1_dept_code                           [7],
+		   bl_pkg1_subledger_group_code                [4],
+		   bl_pkg1_subledger_line_code                 [9],
+		   bl_pkg1_product_group_code                  [4],
+		   bl_pkg1_product_line_code                   [5],
+
+		   bl_pkg2_main_acc1_code                      [7],
+		   bl_pkg2_main_acc2_code                      [5],
+		   bl_pkg2_dept_code                           [7],
+		   bl_pkg2_subledger_group_code                [4],
+		   bl_pkg2_subledger_line_code                 [9],
+		   bl_pkg2_product_group_code                  [4],
+		   bl_pkg2_product_line_code                   [5],
+		   nd_operating_facility_id					[3],
+		   nd_ws_no									[31],
+
+		   bl_acc_int_code                          [7];
+
+VARCHAR    d_hdr_upd_rowid							[20],
+           d_lin_upd_rowid            				[20];
+
+    int    bl_pat_serv_mth,
+		   bl_pat_serv_yr;
+
+    int    bl_mth,
+		   bl_yr,
+		   cur_mth,
+		   cur_yr,
+		   nd_month,
+		   nd_year;
+
+   double  bl_tot_gross_charge_amt = 0,
+		   bl_tot_disc_amt = 0,
+		   bl_tot_net_charge_amt = 0;
+
+    char   d_ip_gl_yn,
+			nd_cash_control_use_flag,
+		   d_op_gl_yn,
+		   d_rf_gl_yn;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int rec_ctr = 0, err_ctr = 0;
+char msg_str[132];
+
+char prv_trx_ref[21];
+
+int skip_rec;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+   if (argc < 7)
+   {
+		int i = 0;
+		disp_message(ERR_MESG,"Not enough Parameters for running this program");
+		proc_exit();
+   }
+ 
+   strcpy(g_pgm_id,"BLBPSTFL");
+
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   EXEC SQL CONNECT :uid_pwd;
+   if(OERROR)
+   {
+		disp_message(ERR_MESG,"Error in connecting to Oracle");
+		proc_exit();
+   }
+
+   set_meduser_role();
+
+   strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+   d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+   strcpy(g_session_id,nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+   strcpy(g_pgm_date,nd_pgm_date.arr);
+
+   strcpy(nd_operating_facility_id.arr,argv[5]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr);
+   strcpy(g_facility_id,nd_operating_facility_id.arr);
+
+   strcpy(nd_ws_no.arr,argv[6]);
+   nd_ws_no.len = strlen(nd_ws_no.arr);
+
+   start_prog_msg();
+
+   fetch_prog_param();
+   declare_cur();
+
+   cash_control_use_chec();
+     
+   bl_tot_gross_charge_amt = 0;
+   bl_tot_disc_amt = 0;
+   bl_tot_net_charge_amt = 0;
+
+   prv_trx_ref[0] = '\0';
+   open_cur();
+   skip_rec = 0;
+   
+   while(fetch_cur())
+   {
+        upd_reasons_in_pack_folio_for_unposting();
+
+        if (nd_reason_text.arr[0] != '\0')
+			continue;
+           
+		if(skip_rec && !strcmp(prv_trx_ref, bl_pat_trx_doc_ref.arr))
+			continue;
+
+		if(strcmp(prv_trx_ref, bl_pat_trx_doc_ref.arr)) 
+		{
+
+			/* Check if all records for the trx_doc_ref can be locked    */
+			/* If not the skip all those trx_doc_ref                     */
+			strcpy(prv_trx_ref,bl_pat_trx_doc_ref.arr);
+
+			if(!lock_trx_ref())
+				skip_rec = 1;
+			else 
+				skip_rec = 0;
+
+			if(skip_rec)
+				continue;
+		}
+
+		strcpy(prv_trx_ref,bl_pat_trx_doc_ref.arr);
+
+		/************ ADDED NK 01/02/94 **************
+		if(bl_pat_package_trx_ind.arr[0] == 'Y')
+			updt_pkg_inc();
+
+		if(bl_pat_package_trx_ind.arr[0] == 'N')
+			updt_srv_inc();
+
+		*********************************************/
+
+		//if(bl_pat_package_trx_ind.arr[0] == 'N') 
+		if(bl_pat_package_trx_ind.arr[0] == 'Y') 
+		{
+			/*if (!lock_record())
+				continue;
+			*/
+
+			if (!rec_ctr)
+			{
+				EXEC SQL SAVEPOINT LAST_DOC_REF;
+    
+				if(OERROR)
+					err_mesg("SAVEPOINT LAST_DOC_REF failed",0,""); 
+			}
+
+			rec_ctr++;
+
+			if ((rec_ctr == 1)||(strcmp(bl_store_trx_doc_ref.arr,bl_pat_trx_doc_ref.arr)))
+			{
+				trx_ref_break();
+			}
+			
+			if ((rec_ctr == 1)||(strcmp(store_concat_code.arr,bl_pat_concat_code.arr)))
+			{
+				concat_break();
+			}
+
+			if ((rec_ctr == 1)||(strcmp(store_acct_dept_code.arr,bl_pat_acct_dept_code.arr)))
+			{
+				dept_break();
+			}
+			
+			bl_tot_gross_charge_amt += atof(bl_pat_adj_gross_charge_amt.arr);
+			bl_tot_disc_amt += atof(bl_pat_adj_disc_amt.arr);
+			bl_tot_net_charge_amt += atof(bl_pat_adj_net_charge_amt.arr);
+		}
+        
+		strcpy(nd_pre_doc_type.arr,nd_doc_type.arr);
+	    nd_pre_doc_type.len = strlen(nd_pre_doc_type.arr);
+        strcpy(nd_pre_doc_num.arr,nd_doc_num.arr);
+	    nd_pre_doc_num.len = strlen(nd_pre_doc_num.arr);
+        strcpy(nd_pre_doc_date.arr,nd_doc_date.arr);
+	    nd_pre_doc_date.len = strlen(nd_pre_doc_date.arr);
+        strcpy(nd_pre_cust_code.arr,nd_cust_code.arr);
+	    nd_pre_cust_code.len = strlen(nd_pre_cust_code.arr);
+    }
+
+    if (rec_ctr)
+    {
+		if (!err_ctr)
+		{
+			create_bl_gl_dist_dept();
+			create_bl_gl_dist_trx_ref();
+			upd_pat_chg_folio();
+			
+			EXEC SQL COMMIT WORK;
+			if (OERROR)
+				err_mesg("COMMIT failed",0,""); 
+		}
+		else
+			continue_to_next_ref();
+    }
+     
+    end_prog_msg();
+
+    EXEC SQL UPDATE BL_PARAMETERS 
+				SET LAST_FOLIO_POST_DATE	= TO_DATE(:nd_post_upto_date,'DD/MM/YYYY'),
+					MODIFIED_BY_ID			= USER,  
+					MODIFIED_DATE			= SYSDATE, 	
+					MODIFIED_AT_WS_NO		= :nd_ws_no,  
+					MODIFIED_FACILITY_ID	= :nd_operating_facility_id  
+			  WHERE NVL(LAST_FOLIO_POST_DATE,TO_DATE(:nd_post_upto_date,'DD/MM/YYYY')) <=  TO_DATE(:nd_post_upto_date,'DD/MM/YYYY')
+				AND OPERATING_FACILITY_ID	= :nd_operating_facility_id;
+
+	EXEC SQL COMMIT WORK RELEASE;
+    
+	if (OERROR)
+		err_mesg("COMMIT WORK RELEASE failed REA",0,"");
+
+    return;
+}
+
+
+cash_control_use_chec()
+{
+   nd_cash_control_use_flag = 'N'; 		
+   
+   EXEC SQL SELECT NVL(CASH_CTRL_RCPT_IN_USE_YN,'N') INTO :nd_cash_control_use_flag 
+   FROM BL_PARAMETERS
+   WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+      if(OERROR) 
+        err_mesg("SELECT failed on table BL_PARAMETERS",0,""); 
+}
+
+fetch_prog_param()
+{
+
+    nd_post_upto_date.arr[0]               = '\0';
+    nd_post_upto_date.len        = 0;
+
+    nd_month = 0;
+    nd_year  = 0;
+
+  EXEC SQL SELECT PARAM1,PARAM2,PARAM3
+	      INTO :nd_month,:nd_year,:nd_post_upto_date
+	      FROM SY_PROG_PARAM
+	      WHERE PGM_ID     = :d_curr_pgm_name
+	       AND SESSION_ID = :nd_session_id
+	       AND PGM_DATE   = :nd_pgm_date
+	       AND OPERATING_FACILITY_Id = :nd_operating_facility_id; 
+
+   if (OERROR)
+	err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+	err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_post_upto_date.arr[nd_post_upto_date.len]  = '\0';
+
+   if (nd_month == 0 || nd_year == 0 )
+	 err_mesg("",1,"BL9005");
+
+    d_ip_gl_yn = '\0';
+    d_op_gl_yn = '\0';
+    d_rf_gl_yn = '\0';
+
+   EXEC SQL SELECT CURRENT_PROC_ACC_MONTH,
+		   CURRENT_PROC_ACC_YEAR,
+		   TO_NUMBER(TO_CHAR(SYSDATE,'MM')),
+		   TO_NUMBER(TO_CHAR(SYSDATE,'YYYY')),
+		   NVL(IP_GL_REQD_YN,'N'),
+		   NVL(OP_GL_REQD_YN,'N'),
+		   NVL(RF_GL_REQD_YN,'N')
+	    INTO   :bl_mth,
+		   :bl_yr,
+		   :cur_mth,
+		   :cur_yr,
+		   :d_ip_gl_yn,
+		   :d_op_gl_yn,
+		   :d_rf_gl_yn
+	    FROM   BL_PARAMETERS
+	    WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table BL_PARAMETERS",0,"");
+
+    if( (cur_yr > bl_yr) || (cur_yr==bl_yr && cur_mth > bl_mth) ) {
+	nd_month = cur_mth;
+	nd_year  = cur_yr;
+    }
+    else {
+	nd_month = bl_mth;
+	nd_year  = bl_yr;
+    }
+
+/*   HANDLED IN FORM BY VSK 20/01/2001 FOR BLENH PURPOSE
+
+EXEC SQL DELETE SY_PROG_PARAM
+	     WHERE PGM_ID     = :d_curr_pgm_name
+	       AND SESSION_ID = :nd_session_id
+	       AND PGM_DATE   = :nd_pgm_date
+	       AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+   if (OERROR)
+	 err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");*/   
+}
+
+declare_cur()
+{
+
+     EXEC SQL DECLARE BL_PAT_CHG_FOLIO_CUR CURSOR FOR
+	       SELECT A.TRX_DOC_REF,
+		      A.TRX_DOC_REF_LINE_NUM,
+		      A.TRX_DOC_REF_SEQ_NUM,
+		      TO_CHAR(A.TRX_DATE,'DD/MM/YYYY'),
+		      NVL(A.EPISODE_TYPE,'R'),
+		      A.PATIENT_ID,
+		      NVL(A.EPISODE_ID,0),
+		      NVL(A.VISIT_ID,0),
+		      A.BILLED_FLAG,
+		      A.SETTLEMENT_IND,
+		      A.PRT_GRP_HDR_CODE,
+		      A.PRT_GRP_LINE_CODE,
+		      A.PACKAGE_IND,
+		      A.PACKAGE_SERVICE_CODE,
+		      A.BLNG_SERV_CODE,
+		      A.PACKAGE_TRX_IND,
+		      A.SERV_LOCN_CODE,
+		      A.SERV_ITEM_CODE,
+		      A.SERV_ITEM_DESC,
+		      A.RATE_CHARGE_FLAG,
+		      A.BASE_QTY,
+		      ROUND(A.BASE_RATE,6),
+		      A.SERV_QTY,
+		      ROUND(A.BASE_CHARGE_AMT,6),
+		      A.ORG_GROSS_CHARGE_AMT,
+		      A.ORG_DISC_AMT,
+		      A.ORG_NET_CHARGE_AMT,
+		      A.UPD_GROSS_CHARGE_AMT,
+		      A.UPD_DISC_AMT,
+		      A.UPD_NET_CHARGE_AMT,
+		      A.ADJ_GROSS_CHARGE_AMT,
+		      A.ADJ_DISC_AMT,  
+		      A.ADJ_NET_CHARGE_AMT,
+		      A.MODULE_ID,  
+		      A.SOURCE_DOC_REF,
+		      TO_CHAR(A.SOURCE_DOC_DATE,'DD/MM/YYYY'),
+		      TO_CHAR(A.SERVICE_DATE,'DD/MM/YYYY'),
+		      TO_NUMBER(TO_CHAR(A.SERVICE_DATE,'MM')),
+		      TO_NUMBER(TO_CHAR(A.SERVICE_DATE,'YYYY')),
+		      NVL(A.ACCT_DEPT_CODE,'0000'),
+		      NVL(A.ORIG_DEPT_CODE,'0000'),
+		      NVL(A.PHYSICIAN_ID,'000000000000000'),
+		      A.BLNG_GRP_ID,
+		      A.BLNG_CLASS_CODE,
+		      A.DAY_TYPE_CODE,
+		      A.TIME_TYPE_CODE,
+		      A.DISC_PERC,
+		      A.ADDL_FACTOR_NUM,
+		      NVL(A.BED_CLASS_CODE,'XX') BED_CLASS_CODE,
+		      A.BILL_TYPE_CODE,
+		      A.FOLIO_REMARKS,
+		      A.DF_SERVICE_IND,
+		      A.DF_UPD_FLAG,
+		      A.DOC_TYPE_CODE,
+		      A.DOC_NUMBER,
+		      A.BILL_DOC_TYPE_CODE,
+		      A.BILL_DOC_NUM,
+		      TO_CHAR(A.BILL_DOC_DATE,'DD/MM/YYYY'),
+		      A.TRX_FINALIZE_IND,
+		      A.FINALIZED_BY_ID,
+		      TO_CHAR(A.FINALIZED_DATE,'DD/MM/YYYY'),
+		      A.TRX_POSTED_IND,
+		      A.POSTED_BY_ID,
+		      TO_CHAR(A.POSTED_DATE,'DD/MM/YYYY'),
+		      A.LAST_ADJUSTED_BY_ID,
+		      TO_CHAR(A.LAST_ADJUSTED_DATE,'DD/MM/YYYY'),
+		      A.ADDED_BY_ID,
+		      A.MODIFIED_BY_ID,
+		      TO_CHAR(A.ADDED_DATE,'DD/MM/YYYY'),
+		      TO_CHAR(A.MODIFIED_DATE,'DD/MM/YYYY'),
+		      A.PACKAGE_IND||A.PACKAGE_SERVICE_CODE||A.BLNG_SERV_CODE,
+		      B.CASH_CTRL_DOC_TYPE_CODE,        
+		      B.CASH_CTRL_DOC_NUMBER,           
+		      B.CASH_CTRL_DOC_DATE,
+		      B.CASH_COUNTER_CODE,
+		      B.SHIFT_ID,
+		      A.PACKAGE_BILL_DOC_TYPE,
+		      A.PACKAGE_BILL_DOC_NUM,
+		      A.PACKAGE_BILL_DATE,
+		      A.CUST_CODE
+		 FROM BL_PACKAGE_CHARGES_FOLIO A,
+		      BL_BILL_HDR B
+		WHERE A.TRX_POSTED_IND = 'N'   
+		  AND A.TRX_DATE <= TO_DATE(:nd_post_upto_date||' 23:59','DD/MM/YYYY HH24:MI')
+		  AND NVL(A.TRX_FINALIZE_IND,'N') = 'Y' 
+		  AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  AND A.OPERATING_FACILITY_ID = B.OPERATING_FACILITY_ID
+		  AND A.PACKAGE_BILL_DOC_TYPE = B.PACKAGE_BILL_DOC_TYPE
+		  AND A.PACKAGE_BILL_DOC_NUM = B.PACKAGE_BILL_DOC_NUM 
+		  AND TRUNC(A.PACKAGE_BILL_DATE) = TRUNC(B.PACKAGE_BILL_DATE)
+		  AND TRX_FINALIZE_IND = 'Y'
+		  ORDER BY A.TRX_DOC_REF,A.PACKAGE_IND,
+			 A.PACKAGE_SERVICE_CODE,
+			 A.BLNG_SERV_CODE,
+			 A.ACCT_DEPT_CODE;
+
+     EXEC SQL DECLARE BL_TYPE_BLNG_SERV_CUR CURSOR FOR
+	       SELECT BL_PKG_CTRL_ACC_INT_CODE
+		 FROM BL_BILL_TYPE
+		WHERE BILL_TYPE_CODE = :bl_pat_bill_type_code
+		AND   ACC_ENTITY_CODE IN ( SELECT acc_entity_code FROM sy_acc_entity
+					   WHERE acc_entity_id = :nd_operating_facility_id);
+
+     EXEC SQL DECLARE BL_TYPE_SERV_GRP_CUR CURSOR FOR
+	        SELECT BL_PKG_CTRL_ACC_INT_CODE
+		 FROM BL_BILL_TYPE
+		WHERE BILL_TYPE_CODE = :bl_pat_bill_type_code
+		AND   ACC_ENTITY_CODE IN ( SELECT acc_entity_code FROM sy_acc_entity
+			   WHERE acc_entity_id = :nd_operating_facility_id);
+
+
+     EXEC SQL DECLARE BL_BILL_TYPE_CUR CURSOR FOR
+	       SELECT BL_RECV_ACC_INT_CODE
+		 FROM BL_BILL_TYPE
+		WHERE BILL_TYPE_CODE = :bl_pat_bill_type_code
+		AND   ACC_ENTITY_CODE IN ( SELECT acc_entity_code FROM sy_acc_entity
+					   WHERE acc_entity_id = :nd_operating_facility_id);
+
+
+     EXEC SQL DECLARE BL_GL_ACCOUNT_CUR CURSOR FOR
+	       SELECT MAIN_ACC1_CODE,
+		      MAIN_ACC2_CODE,
+		      DECODE(DEPT_CODE,'X',:store_acct_dept_code,DEPT_CODE),
+		      SUBLEDGER_GROUP_CODE,
+		      SUBLEDGER_LINE_CODE,
+		      PRODUCT_GROUP_CODE,
+		      PRODUCT_LINE_CODE
+		 FROM BL_GL_ACCOUNT
+		WHERE ACC_INT_CODE = :bl_acc_int_code
+		AND   ACC_ENTITY_CODE IN ( SELECT acc_entity_code FROM sy_acc_entity
+			   WHERE acc_entity_id = :nd_operating_facility_id);
+
+
+    EXEC SQL DECLARE LOCK_TRX_REF_CUR CURSOR FOR
+	     SELECT ROWID
+	       FROM BL_PACKAGE_CHARGES_FOLIO
+	      WHERE TRX_DOC_REF  = :bl_pat_trx_doc_ref
+		  AND   NVL(TRX_POSTED_IND,'N') = 'N'
+	      AND   TRX_DATE <= TO_DATE(:nd_post_upto_date||' 23:59','DD/MM/YYYY HH24:MI')
+	      AND   NVL(TRX_FINALIZE_IND,'N') = 'Y'
+	      AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  FOR   UPDATE OF TRX_DOC_REF NOWAIT;
+}
+
+open_cur()
+{
+     EXEC SQL OPEN BL_PAT_CHG_FOLIO_CUR;
+
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_PAT_CHG_FOLIO_CUR",0,"");
+}
+
+fetch_cur()
+{
+bl_pat_trx_doc_ref.arr[0]                                         = '\0';
+bl_pat_trx_doc_ref_line_num.arr[0]                                = '\0';
+bl_pat_trx_doc_ref_seq_num.arr[0]                                 = '\0';
+bl_pat_trx_date.arr[0]                                            = '\0';
+bl_pat_episode_type.arr[0]                                        = '\0';
+bl_pat_patient_id.arr[0]                                          = '\0';
+bl_pat_episode_id.arr[0]                                          = '\0';
+bl_pat_visit_id.arr[0]                                            = '\0';
+bl_pat_billed_flag.arr[0]                                         = '\0';
+bl_pat_settlement_ind.arr[0]                                      = '\0';
+bl_pat_prt_grp_hdr_code.arr[0]                                    = '\0';
+bl_pat_prt_grp_line_code.arr[0]                                   = '\0';
+bl_pat_package_ind.arr[0]                                         = '\0';
+bl_pat_package_service_code.arr[0]                                = '\0';
+bl_pat_blng_serv_code.arr[0]                                      = '\0';
+bl_pat_package_trx_ind.arr[0]                                     = '\0';
+bl_pat_serv_locn_code.arr[0]                                      = '\0';
+bl_pat_serv_item_code.arr[0]                                      = '\0';
+bl_pat_serv_item_desc.arr[0]                                      = '\0';
+bl_pat_rate_charge_flag.arr[0]                                    = '\0';
+bl_pat_base_qty.arr[0]                                            = '\0';
+bl_pat_base_rate.arr[0]                                           = '\0';
+bl_pat_serv_qty.arr[0]                                            = '\0';
+bl_pat_base_charge_amt.arr[0]                                     = '\0';
+bl_pat_org_gross_charge_amt.arr[0]                                = '\0';
+bl_pat_org_disc_amt.arr[0]                                        = '\0';
+bl_pat_org_net_charge_amt.arr[0]                                  = '\0';
+bl_pat_upd_gross_charge_amt.arr[0]                                = '\0';
+bl_pat_upd_disc_amt.arr[0]                                        = '\0';
+bl_pat_upd_net_charge_amt.arr[0]                                  = '\0';
+bl_pat_adj_gross_charge_amt.arr[0]                                = '\0';
+bl_pat_adj_disc_amt.arr[0]                                        = '\0';
+bl_pat_adj_net_charge_amt.arr[0]                                  = '\0';
+bl_pat_module_id.arr[0]                                           = '\0';
+bl_pat_source_doc_ref.arr[0]                                      = '\0';
+bl_pat_source_doc_date.arr[0]                                     = '\0';
+bl_pat_service_date.arr[0]                                        = '\0';
+bl_pat_acct_dept_code.arr[0]                                      = '\0';
+bl_pat_orig_dept_code.arr[0]                                      = '\0';
+bl_pat_physician_id.arr[0]                                        = '\0';
+bl_pat_blng_grp_id.arr[0]                                         = '\0';
+bl_pat_blng_class_code.arr[0]                                     = '\0';
+bl_pat_day_type_code.arr[0]                                       = '\0';
+bl_pat_time_type_code.arr[0]                                      = '\0';
+bl_pat_disc_perc.arr[0]                                           = '\0';
+bl_pat_addl_factor_num.arr[0]                                     = '\0';
+bl_pat_bed_class_code.arr[0]                                      = '\0';
+bl_pat_bill_type_code.arr[0]                                      = '\0';
+bl_pat_folio_remarks.arr[0]                                       = '\0';
+bl_pat_df_service_ind.arr[0]                                      = '\0';
+bl_pat_df_upd_flag.arr[0]                                         = '\0';
+bl_pat_doc_type_code.arr[0]                                       = '\0';
+bl_pat_doc_number.arr[0]                                          = '\0';
+bl_pat_bill_doc_type_code.arr[0]                                  = '\0';
+bl_pat_bill_doc_num.arr[0]                                        = '\0';
+bl_pat_bill_doc_date.arr[0]                                       = '\0';
+bl_pat_trx_finalize_ind.arr[0]                                    = '\0';
+bl_pat_finalized_by_id.arr[0]                                     = '\0';
+bl_pat_finalized_date.arr[0]                                      = '\0';
+bl_pat_trx_posted_ind.arr[0]                                      = '\0';
+bl_pat_posted_by_id.arr[0]                                        = '\0';
+bl_pat_posted_date.arr[0]                                         = '\0';
+bl_pat_last_adjusted_by_id.arr[0]                                 = '\0';
+bl_pat_last_adjusted_date.arr[0]                                  = '\0';
+bl_pat_added_by_id.arr[0]                                         = '\0';
+bl_pat_modified_by_id.arr[0]                                      = '\0';
+bl_pat_added_date.arr[0]                                          = '\0';
+bl_pat_modified_date.arr[0]                                       = '\0';
+bl_pat_concat_code.arr[0]                                         = '\0';
+cpatdoctypecode.arr[0]			       			  = '\0';
+cpatdocnum.arr[0]                              			  = '\0';
+cpatdocdate.arr[0]				       		  = '\0';
+
+
+bl_pat_trx_doc_ref.len                                            = 0;
+bl_pat_trx_doc_ref_line_num.len                                   = 0;
+bl_pat_trx_doc_ref_seq_num.len                                    = 0;
+bl_pat_trx_date.len                                               = 0;
+bl_pat_episode_type.len                                           = 0;
+bl_pat_patient_id.len                                             = 0;
+bl_pat_episode_id.len                                             = 0;
+bl_pat_visit_id.len                                               = 0;
+bl_pat_billed_flag.len                                            = 0;
+bl_pat_settlement_ind.len                                         = 0;
+bl_pat_prt_grp_hdr_code.len                                       = 0;
+bl_pat_prt_grp_line_code.len                                      = 0;
+bl_pat_package_ind.len                                            = 0;
+bl_pat_package_service_code.len                                   = 0;
+bl_pat_blng_serv_code.len                                         = 0;
+bl_pat_package_trx_ind.len                                        = 0;
+bl_pat_serv_locn_code.len                                         = 0;
+bl_pat_serv_item_code.len                                         = 0;
+bl_pat_serv_item_desc.len                                         = 0;
+bl_pat_rate_charge_flag.len                                       = 0;
+bl_pat_base_qty.len                                               = 0;
+bl_pat_base_rate.len                                              = 0;
+bl_pat_serv_qty.len                                               = 0;
+bl_pat_base_charge_amt.len                                        = 0;
+bl_pat_org_gross_charge_amt.len                                   = 0;
+bl_pat_org_disc_amt.len                                           = 0;
+bl_pat_org_net_charge_amt.len                                     = 0;
+bl_pat_upd_gross_charge_amt.len                                   = 0;
+bl_pat_upd_disc_amt.len                                           = 0;
+bl_pat_upd_net_charge_amt.len                                     = 0;
+bl_pat_adj_gross_charge_amt.len                                   = 0;
+bl_pat_adj_disc_amt.len                                           = 0;
+bl_pat_adj_net_charge_amt.len                                     = 0;
+bl_pat_module_id.len                                              = 0;
+bl_pat_source_doc_ref.len                                         = 0;
+bl_pat_source_doc_date.len                                        = 0;
+bl_pat_service_date.len                                           = 0;
+bl_pat_acct_dept_code.len                                         = 0;
+bl_pat_orig_dept_code.len                                         = 0;
+bl_pat_physician_id.len                                           = 0;
+bl_pat_blng_grp_id.len                                            = 0;
+bl_pat_blng_class_code.len                                        = 0;
+bl_pat_day_type_code.len                                          = 0;
+bl_pat_time_type_code.len                                         = 0;
+bl_pat_disc_perc.len                                              = 0;
+bl_pat_addl_factor_num.len                                        = 0;
+bl_pat_bed_class_code.len                                         = 0;
+bl_pat_bill_type_code.len                                         = 0;
+bl_pat_folio_remarks.len                                          = 0;
+bl_pat_df_service_ind.len                                         = 0;
+bl_pat_df_upd_flag.len                                            = 0;
+bl_pat_doc_type_code.len                                          = 0;
+bl_pat_doc_number.len                                             = 0;
+bl_pat_bill_doc_type_code.len                                     = 0;
+bl_pat_bill_doc_num.len                                           = 0;
+bl_pat_bill_doc_date.len                                          = 0;
+bl_pat_trx_finalize_ind.len                                       = 0;
+bl_pat_finalized_by_id.len                                        = 0;
+bl_pat_finalized_date.len                                         = 0;
+bl_pat_trx_posted_ind.len                                         = 0;
+bl_pat_posted_by_id.len                                           = 0;
+bl_pat_posted_date.len                                            = 0;
+bl_pat_last_adjusted_by_id.len                                    = 0;
+bl_pat_last_adjusted_date.len                                     = 0;
+bl_pat_added_by_id.len                                            = 0;
+bl_pat_modified_by_id.len                                         = 0;
+bl_pat_added_date.len                                             = 0;
+bl_pat_modified_date.len                                          = 0;
+bl_pat_concat_code.len                                            = 0;
+
+
+     EXEC SQL FETCH BL_PAT_CHG_FOLIO_CUR
+	       INTO :bl_pat_trx_doc_ref,
+		    :bl_pat_trx_doc_ref_line_num,
+		    :bl_pat_trx_doc_ref_seq_num,
+		    :bl_pat_trx_date,
+		    :bl_pat_episode_type,
+		    :bl_pat_patient_id,
+		    :bl_pat_episode_id,
+		    :bl_pat_visit_id,
+		    :bl_pat_billed_flag,
+		    :bl_pat_settlement_ind,
+		    :bl_pat_prt_grp_hdr_code,
+		    :bl_pat_prt_grp_line_code,
+		    :bl_pat_package_ind,
+		    :bl_pat_package_service_code,
+		    :bl_pat_blng_serv_code,
+		    :bl_pat_package_trx_ind,
+		    :bl_pat_serv_locn_code,
+		    :bl_pat_serv_item_code,
+		    :bl_pat_serv_item_desc,
+		    :bl_pat_rate_charge_flag,
+		    :bl_pat_base_qty,
+		    :bl_pat_base_rate,
+		    :bl_pat_serv_qty,
+		    :bl_pat_base_charge_amt,
+		    :bl_pat_org_gross_charge_amt,
+		    :bl_pat_org_disc_amt,
+		    :bl_pat_org_net_charge_amt,
+		    :bl_pat_upd_gross_charge_amt,
+		    :bl_pat_upd_disc_amt,
+		    :bl_pat_upd_net_charge_amt,
+		    :bl_pat_adj_gross_charge_amt,
+		    :bl_pat_adj_disc_amt,
+		    :bl_pat_adj_net_charge_amt,
+		    :bl_pat_module_id,
+		    :bl_pat_source_doc_ref,
+		    :bl_pat_source_doc_date,
+		    :bl_pat_service_date,
+		    :bl_pat_serv_mth,
+		    :bl_pat_serv_yr,
+		    :bl_pat_acct_dept_code,
+		    :bl_pat_orig_dept_code,
+		    :bl_pat_physician_id,
+		    :bl_pat_blng_grp_id,
+		    :bl_pat_blng_class_code,
+		    :bl_pat_day_type_code,
+		    :bl_pat_time_type_code,
+		    :bl_pat_disc_perc,
+		    :bl_pat_addl_factor_num,
+		    :bl_pat_bed_class_code,
+		    :bl_pat_bill_type_code,
+		    :bl_pat_folio_remarks,
+		    :bl_pat_df_service_ind,
+		    :bl_pat_df_upd_flag,
+		    :bl_pat_doc_type_code,
+		    :bl_pat_doc_number,
+		    :bl_pat_bill_doc_type_code,
+		    :bl_pat_bill_doc_num,
+		    :bl_pat_bill_doc_date,
+		    :bl_pat_trx_finalize_ind,
+		    :bl_pat_finalized_by_id,
+		    :bl_pat_finalized_date,
+		    :bl_pat_trx_posted_ind,
+		    :bl_pat_posted_by_id,
+		    :bl_pat_posted_date,
+		    :bl_pat_last_adjusted_by_id,
+		    :bl_pat_last_adjusted_date,
+		    :bl_pat_added_by_id,
+		    :bl_pat_modified_by_id,
+		    :bl_pat_added_date,
+		    :bl_pat_modified_date,
+		    :bl_pat_concat_code,
+		    :nd_doc_type,
+		    :nd_doc_num,
+		    :nd_doc_date,
+		    :nd_cash_counter_code,
+		    :nd_shift_id,
+	    	    :cpatdoctypecode,
+            	    :cpatdocnum,
+	    	    :cpatdocdate,
+		    :nd_cust_code;
+
+      if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_PAT_CHG_FOLIO_CUR",0,"");
+
+cpatdoctypecode.arr[cpatdoctypecode.len] = '\0';
+cpatdocnum.arr[cpatdocnum.len] = '\0';     
+cpatdocdate.arr[cpatdocdate.len] = '\0';	
+nd_cust_code.arr[nd_cust_code.len]					= '\0';
+nd_cash_counter_code.arr[nd_cash_counter_code.len]                      = '\0';
+nd_shift_id.arr[nd_shift_id.len]                      			= '\0';
+bl_pat_trx_doc_ref.arr[bl_pat_trx_doc_ref.len]                           = '\0';
+bl_pat_trx_doc_ref_line_num.arr[bl_pat_trx_doc_ref_line_num.len]         = '\0';
+bl_pat_trx_doc_ref_seq_num.arr[bl_pat_trx_doc_ref_seq_num.len]           = '\0';
+bl_pat_trx_date.arr[bl_pat_trx_date.len]                                 = '\0';
+bl_pat_episode_type.arr[bl_pat_episode_type.len]                         = '\0';
+bl_pat_patient_id.arr[bl_pat_patient_id.len]                             = '\0';
+bl_pat_episode_id.arr[bl_pat_episode_id.len]                             = '\0';
+bl_pat_visit_id.arr[bl_pat_visit_id.len]                                 = '\0';
+bl_pat_billed_flag.arr[bl_pat_billed_flag.len]                           = '\0';
+bl_pat_settlement_ind.arr[bl_pat_settlement_ind.len]                     = '\0';
+bl_pat_prt_grp_hdr_code.arr[bl_pat_prt_grp_hdr_code.len]                 = '\0';
+bl_pat_prt_grp_line_code.arr[bl_pat_prt_grp_line_code.len]               = '\0';
+bl_pat_package_ind.arr[bl_pat_package_ind.len]                           = '\0';
+bl_pat_package_service_code.arr[bl_pat_package_service_code.len]         = '\0';
+bl_pat_blng_serv_code.arr[bl_pat_blng_serv_code.len]                     = '\0';
+bl_pat_package_trx_ind.arr[bl_pat_package_trx_ind.len]                   = '\0';
+bl_pat_serv_locn_code.arr[bl_pat_serv_locn_code.len]                     = '\0';
+bl_pat_serv_item_code.arr[bl_pat_serv_item_code.len]                     = '\0';
+bl_pat_serv_item_desc.arr[bl_pat_serv_item_desc.len]                     = '\0';
+bl_pat_rate_charge_flag.arr[bl_pat_rate_charge_flag.len]                 = '\0';
+bl_pat_base_qty.arr[bl_pat_base_qty.len]                                 = '\0';
+bl_pat_base_rate.arr[bl_pat_base_rate.len]                               = '\0';
+bl_pat_serv_qty.arr[bl_pat_serv_qty.len]                                 = '\0';
+bl_pat_base_charge_amt.arr[bl_pat_base_charge_amt.len]                   = '\0';
+bl_pat_org_gross_charge_amt.arr[bl_pat_org_gross_charge_amt.len]         = '\0';
+bl_pat_org_disc_amt.arr[bl_pat_org_disc_amt.len]                         = '\0';
+bl_pat_org_net_charge_amt.arr[bl_pat_org_net_charge_amt.len]             = '\0';
+bl_pat_upd_gross_charge_amt.arr[bl_pat_upd_gross_charge_amt.len]         = '\0';
+bl_pat_upd_disc_amt.arr[bl_pat_upd_disc_amt.len]                         = '\0';
+bl_pat_upd_net_charge_amt.arr[bl_pat_upd_net_charge_amt.len]             = '\0';
+bl_pat_adj_gross_charge_amt.arr[bl_pat_adj_gross_charge_amt.len]         = '\0';
+bl_pat_adj_disc_amt.arr[bl_pat_adj_disc_amt.len]                         = '\0';
+bl_pat_adj_net_charge_amt.arr[bl_pat_adj_net_charge_amt.len]             = '\0';
+bl_pat_module_id.arr[bl_pat_module_id.len]                               = '\0';
+bl_pat_source_doc_ref.arr[bl_pat_source_doc_ref.len]                     = '\0';
+bl_pat_source_doc_date.arr[bl_pat_source_doc_date.len]                   = '\0';
+bl_pat_service_date.arr[bl_pat_service_date.len]                         = '\0';
+bl_pat_acct_dept_code.arr[bl_pat_acct_dept_code.len]                     = '\0';
+bl_pat_orig_dept_code.arr[bl_pat_orig_dept_code.len]                     = '\0';
+bl_pat_physician_id.arr[bl_pat_physician_id.len]                         = '\0';
+bl_pat_blng_grp_id.arr[bl_pat_blng_grp_id.len]                           = '\0';
+bl_pat_blng_class_code.arr[bl_pat_blng_class_code.len]                   = '\0';
+bl_pat_day_type_code.arr[bl_pat_day_type_code.len]                       = '\0';
+bl_pat_time_type_code.arr[bl_pat_time_type_code.len]                     = '\0';
+bl_pat_disc_perc.arr[bl_pat_disc_perc.len]                               = '\0';
+bl_pat_addl_factor_num.arr[bl_pat_addl_factor_num.len]                   = '\0';
+bl_pat_bed_class_code.arr[bl_pat_bed_class_code.len]                     = '\0';
+bl_pat_bill_type_code.arr[bl_pat_bill_type_code.len]                     = '\0';
+bl_pat_folio_remarks.arr[bl_pat_folio_remarks.len]                       = '\0';
+bl_pat_df_service_ind.arr[bl_pat_df_service_ind.len]                     = '\0';
+bl_pat_df_upd_flag.arr[bl_pat_df_upd_flag.len]                           = '\0';
+bl_pat_doc_type_code.arr[bl_pat_doc_type_code.len]                       = '\0';
+bl_pat_doc_number.arr[bl_pat_doc_number.len]                             = '\0';
+bl_pat_bill_doc_type_code.arr[bl_pat_bill_doc_type_code.len]             = '\0';
+bl_pat_bill_doc_num.arr[bl_pat_bill_doc_num.len]                         = '\0';
+bl_pat_bill_doc_date.arr[bl_pat_bill_doc_date.len]                       = '\0';
+bl_pat_trx_finalize_ind.arr[bl_pat_trx_finalize_ind.len]                 = '\0';
+bl_pat_finalized_by_id.arr[bl_pat_finalized_by_id.len]                   = '\0';
+bl_pat_finalized_date.arr[bl_pat_finalized_date.len]                     = '\0';
+bl_pat_trx_posted_ind.arr[bl_pat_trx_posted_ind.len]                     = '\0';
+bl_pat_posted_by_id.arr[bl_pat_posted_by_id.len]                         = '\0';
+bl_pat_posted_date.arr[bl_pat_posted_date.len]                           = '\0';
+bl_pat_last_adjusted_by_id.arr[bl_pat_last_adjusted_by_id.len]           = '\0';
+bl_pat_last_adjusted_date.arr[bl_pat_last_adjusted_date.len]             = '\0';
+bl_pat_added_by_id.arr[bl_pat_added_by_id.len]                           = '\0';
+bl_pat_modified_by_id.arr[bl_pat_modified_by_id.len]                     = '\0';
+bl_pat_added_date.arr[bl_pat_added_date.len]                             = '\0';
+bl_pat_modified_date.arr[bl_pat_modified_date.len]                       = '\0';
+bl_pat_concat_code.arr[bl_pat_concat_code.len]                           = '\0';
+nd_doc_type.arr[nd_doc_type.len]  		                         = '\0';
+nd_doc_num.arr[nd_doc_num.len]  		                         = '\0';
+nd_doc_date.arr[nd_doc_date.len]  		                         = '\0';
+
+
+     return(LAST_ROW?0:1);
+}
+
+fetch_bl_gl_account_trx_ref()
+{
+
+     EXEC SQL OPEN BL_BILL_TYPE_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_BILL_TYPE_CUR",0,"");
+
+     bl_acc_int_code.arr[0]     = '\0';
+     bl_acc_int_code.len        = '\0';
+ 
+     EXEC SQL FETCH BL_BILL_TYPE_CUR
+	       INTO :bl_acc_int_code;
+
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_BILL_TYPE_CUR",0,"");
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s not found in BL_BILL_TYPE",
+			  bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+	   return;
+     }
+
+     bl_acc_int_code.arr[bl_acc_int_code.len] = '\0';
+
+     EXEC SQL OPEN BL_GL_ACCOUNT_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_GL_ACCOUNT_CUR - 2",0,"");
+
+     bl_pkg2_main_acc1_code.arr[0]            = '\0';
+     bl_pkg2_main_acc2_code.arr[0]            = '\0';
+     bl_pkg2_dept_code.arr[0]                 = '\0';
+     bl_pkg2_subledger_group_code.arr[0]      = '\0';
+     bl_pkg2_subledger_line_code.arr[0]       = '\0';
+     bl_pkg2_product_group_code.arr[0]        = '\0';
+     bl_pkg2_product_line_code.arr[0]         = '\0';
+
+     bl_pkg2_main_acc1_code.len                = 0;
+     bl_pkg2_main_acc2_code.len                = 0;
+     bl_pkg2_dept_code.len                     = 0;
+     bl_pkg2_subledger_group_code.len          = 0;
+     bl_pkg2_subledger_line_code.len           = 0;
+     bl_pkg2_product_group_code.len            = 0;
+     bl_pkg2_product_line_code.len             = 0;
+
+     EXEC SQL FETCH BL_GL_ACCOUNT_CUR
+	       INTO :bl_pkg2_main_acc1_code,
+		    :bl_pkg2_main_acc2_code,
+		    :bl_pkg2_dept_code,
+		    :bl_pkg2_subledger_group_code,
+		    :bl_pkg2_subledger_line_code,
+		    :bl_pkg2_product_group_code,
+		    :bl_pkg2_product_line_code;
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_GL_ACCOUNT_CUR - 2",0,"");
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s %s not found in BL_GL_ACCOUNT",
+			bl_acc_int_code.arr,
+			bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+     }
+
+bl_pkg2_main_acc1_code.arr[bl_pkg2_main_acc1_code.len] = '\0';
+bl_pkg2_main_acc2_code.arr[bl_pkg2_main_acc2_code.len] = '\0';
+bl_pkg2_dept_code.arr[bl_pkg2_dept_code.len] = '\0';
+bl_pkg2_subledger_group_code.arr[bl_pkg2_subledger_group_code.len] = '\0';
+bl_pkg2_subledger_line_code.arr[bl_pkg2_subledger_line_code.len] = '\0';
+bl_pkg2_product_group_code.arr[bl_pkg2_product_group_code.len] = '\0';
+bl_pkg2_product_line_code.arr[bl_pkg2_product_line_code.len] = '\0';
+
+}
+
+fetch_bl_gl_account_pkg()
+{
+
+     EXEC SQL OPEN BL_TYPE_SERV_GRP_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_TYPE_SERV_GRP_CUR",0,"");
+
+     bl_acc_int_code.arr[0]     = '\0';
+     bl_acc_int_code.len        = '\0';
+
+     EXEC SQL FETCH BL_TYPE_SERV_GRP_CUR
+	       INTO :bl_acc_int_code;
+
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_TYPE_SERV_GRP_CUR",0,"");
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s - %s not found in BL_TYPE_SERV_GRP",
+			  bl_pat_blng_grp_id.arr,
+			  bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+	   return;
+     }
+
+     bl_acc_int_code.arr[bl_acc_int_code.len] = '\0';
+
+     EXEC SQL OPEN BL_GL_ACCOUNT_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_GL_ACCOUNT_CUR",0,"");
+
+     bl_pkg1_main_acc1_code.arr[0]            = '\0';
+     bl_pkg1_main_acc2_code.arr[0]            = '\0';
+     bl_pkg1_dept_code.arr[0]                 = '\0';
+     bl_pkg1_subledger_group_code.arr[0]      = '\0';
+     bl_pkg1_subledger_line_code.arr[0]       = '\0';
+     bl_pkg1_product_group_code.arr[0]        = '\0';
+     bl_pkg1_product_line_code.arr[0]         = '\0';
+
+     bl_pkg1_main_acc1_code.len                = 0;
+     bl_pkg1_main_acc2_code.len                = 0;
+     bl_pkg1_dept_code.len                     = 0;
+     bl_pkg1_subledger_group_code.len          = 0;
+     bl_pkg1_subledger_line_code.len           = 0;
+     bl_pkg1_product_group_code.len            = 0;
+     bl_pkg1_product_line_code.len             = 0;
+
+     EXEC SQL FETCH BL_GL_ACCOUNT_CUR
+	       INTO :bl_pkg1_main_acc1_code,
+		    :bl_pkg1_main_acc2_code,
+		    :bl_pkg1_dept_code,
+		    :bl_pkg1_subledger_group_code,
+		    :bl_pkg1_subledger_line_code,
+		    :bl_pkg1_product_group_code,
+		    :bl_pkg1_product_line_code;
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_GL_ACCOUNT_CUR",0,"");
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s %s - %s not found in BL_GL_ACCOUNT",
+		       bl_acc_int_code.arr,
+		       bl_pat_blng_grp_id.arr,
+		       bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+     }
+
+bl_pkg1_main_acc1_code.arr[bl_pkg1_main_acc1_code.len] = '\0';
+bl_pkg1_main_acc2_code.arr[bl_pkg1_main_acc2_code.len] = '\0';
+bl_pkg1_dept_code.arr[bl_pkg1_dept_code.len] = '\0';
+bl_pkg1_subledger_group_code.arr[bl_pkg1_subledger_group_code.len] = '\0';
+bl_pkg1_subledger_line_code.arr[bl_pkg1_subledger_line_code.len] = '\0';
+bl_pkg1_product_group_code.arr[bl_pkg1_product_group_code.len] = '\0';
+bl_pkg1_product_line_code.arr[bl_pkg1_product_line_code.len] = '\0';
+
+     EXEC SQL OPEN BL_TYPE_BLNG_SERV_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_TYPE_BLNG_SERV_CUR",0,"");
+
+     EXEC SQL FETCH BL_TYPE_BLNG_SERV_CUR
+	       INTO :bl_acc_int_code;
+
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_TYPE_BLNG_SERV_CUR",0,"");
+
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s - %s not found in BL_TYPE_BLNG_SERV",
+			  bl_pat_blng_serv_code.arr,
+			  bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+	   return;
+     }
+
+     bl_acc_int_code.arr[bl_acc_int_code.len] = '\0';
+
+     EXEC SQL OPEN BL_GL_ACCOUNT_CUR;
+     if (OERROR)
+	 err_mesg("OPEN failed on cursor BL_GL_ACCOUNT_CUR - 3",0,"");
+
+     bl_dept_main_acc1_code.arr[0]            = '\0';
+     bl_dept_main_acc2_code.arr[0]            = '\0';
+     bl_dept_dept_code.arr[0]                 = '\0';
+     bl_dept_subledger_group_code.arr[0]      = '\0';
+     bl_dept_subledger_line_code.arr[0]       = '\0';
+     bl_dept_product_group_code.arr[0]        = '\0';
+     bl_dept_product_line_code.arr[0]         = '\0';
+
+     bl_dept_main_acc1_code.len                = 0;
+     bl_dept_main_acc2_code.len                = 0;
+     bl_dept_dept_code.len                     = 0;
+     bl_dept_subledger_group_code.len          = 0;
+     bl_dept_subledger_line_code.len           = 0;
+     bl_dept_product_group_code.len            = 0;
+     bl_dept_product_line_code.len             = 0;
+
+     EXEC SQL FETCH BL_GL_ACCOUNT_CUR
+	       INTO :bl_dept_main_acc1_code,
+		    :bl_dept_main_acc2_code,
+		    :bl_dept_dept_code,
+		    :bl_dept_subledger_group_code,
+		    :bl_dept_subledger_line_code,
+		    :bl_dept_product_group_code,
+		    :bl_dept_product_line_code;
+     if (OERROR)
+	 err_mesg("FETCH failed on cursor BL_GL_ACCOUNT_CUR - 3",0,"");
+
+     if (ROW_COUNT == 0)
+     {
+	   sprintf(msg_str,"Record for %s %s - %s not found in BL_GL_ACCOUNT",
+			 bl_acc_int_code.arr,
+			 bl_pat_blng_serv_code.arr,
+			 bl_pat_bill_type_code.arr);
+	   loc_log_msg(msg_str);
+     }
+
+bl_dept_main_acc1_code.arr[bl_dept_main_acc1_code.len] = '\0';
+bl_dept_main_acc2_code.arr[bl_dept_main_acc2_code.len] = '\0';
+bl_dept_dept_code.arr[bl_dept_dept_code.len] = '\0';
+bl_dept_subledger_group_code.arr[bl_dept_subledger_group_code.len] = '\0';
+bl_dept_subledger_line_code.arr[bl_dept_subledger_line_code.len] = '\0';
+bl_dept_product_group_code.arr[bl_dept_product_group_code.len] = '\0';
+bl_dept_product_line_code.arr[bl_dept_product_line_code.len] = '\0';
+
+}
+
+create_bl_gl_dist_dept()
+{
+ 
+
+    if( (bl_store_episode_type.arr[0] == 'I' && d_ip_gl_yn == 'N') ||
+        (bl_store_episode_type.arr[0] == 'D' && d_ip_gl_yn == 'N') ||
+	(bl_store_episode_type.arr[0] == 'O' && d_op_gl_yn == 'N') ||
+        (bl_store_episode_type.arr[0] == 'E' && d_op_gl_yn == 'N') ||
+	(bl_store_episode_type.arr[0] == 'R' && d_rf_gl_yn == 'N'))
+	return;
+
+	nd_post_month.arr[0] = '\0';
+	nd_post_month.len = 0;
+
+        nd_post_year.arr[0] = '\0';
+	nd_post_year.len = 0;
+
+        exec sql select nvl(acc_per_year, to_char(to_date(:bl_store_trx_date,'DD/MM/YYYY'),'YYYY')),
+        nvl(acc_per_month,to_char(to_date(:bl_store_trx_date,'DD/MM/YYYY'),'MM'))  
+	into :nd_post_year, :nd_post_month
+	from sy_acc_period_defn
+	where to_date(:bl_store_trx_date,'DD/MM/YYYY') 
+	between acc_per_start_date and acc_per_end_date;	
+
+	nd_post_month.arr[nd_post_month.len] = '\0';
+	nd_post_year.arr[nd_post_year.len] = '\0';
+
+    if(bl_tot_disc_amt != 0) {
+
+	EXEC SQL INSERT INTO BL_GL_DISTRIBUTION
+		  ( 
+		    MAIN_ACC1_CODE,
+		    MAIN_ACC2_CODE,
+		    DEPT_CODE,
+		    SUBLEDGER_GROUP_CODE,
+		    SUBLEDGER_LINE_CODE,
+		    PRODUCT_GROUP_CODE,
+		    PRODUCT_LINE_CODE,
+		    POST_YEAR,           /*  accepted */
+		    POST_MONTH,           /*  accepted */
+		    TRX_DATE,            /* from pat */
+		    TRX_DOC_REF,            /* from pat */
+		    TRX_DOC_REF_LINE_NUM,/*   0    */
+		    TRX_DOC_REF_SEQ_NUM,/*   0    */
+		    EPISODE_TYPE,       /* from pat */
+		    PATIENT_ID,       /* from pat */
+		    EPISODE_ID,       /* from pat */
+		    VISIT_ID,       /* from pat */
+		    SOURCE_DOC_REF,     /*   NULL       */
+		    SOURCE_DOC_DATE,    /*   NULL       */
+		    NARRATION,          /*   NULL       */
+		    TRX_TYPE_CODE,      /*   F          */
+		    DISTRIBUTION_AMT,   /*   net      */
+		    GL_INTERFACE_BY_ID, /* NULL */
+		    GL_INTERFACE_DATE, /* NULL */
+		    GL_INTERFACE_FLAG,	  /*   N  */
+		    ADDED_BY_ID,                    
+		    MODIFIED_BY_ID,                 
+		    ADDED_DATE    ,
+		    MODIFIED_DATE,                  
+		    ADDED_AT_WS_NO,                 
+		    ADDED_FACILITY_ID,              
+		    MODIFIED_AT_WS_NO,              
+		    MODIFIED_FACILITY_ID,
+		    OPERATING_FACILITY_ID,
+		    CASH_CTRL_DOC_TYPE,             
+		    CASH_CTRL_DOC_NUMBER,           
+		    CASH_CTRL_DOC_DATE ,
+		    CUST_CODE                       
+	       )
+	   VALUES
+	      (
+		   :bl_pkg1_main_acc1_code,
+		   :bl_pkg1_main_acc2_code,
+		   :bl_pkg1_dept_code,
+		   :bl_pkg1_subledger_group_code,
+		   :bl_pkg1_subledger_line_code,
+		   :bl_pkg1_product_group_code,
+		   :bl_pkg1_product_line_code,
+		   /*
+		   :nd_year,
+		   :nd_month,
+		   */
+		   NVL(:nd_post_year, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'YYYY')),
+		   NVL(:nd_post_month, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'MM')),
+		   TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),
+		   :bl_store_trx_doc_ref,
+		   0,
+		   0,
+		   :bl_store_episode_type,
+		   :bl_store_patient_id,
+		   :bl_store_episode_id,
+		   :bl_store_visit_id,
+		   NULL,
+		   NULL,
+		   NULL,
+		   'F',
+		   :bl_tot_disc_amt,
+		   NULL,
+		   NULL,
+		   'N',
+		   USER,
+		   USER,                 
+		   SYSDATE,
+		   SYSDATE,                  
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_operating_facility_id,
+		   :nd_pre_doc_type,
+		   :nd_pre_doc_num,
+		   :nd_pre_doc_date,
+	           :nd_pre_cust_code 		 );
+    
+	if (OERROR)
+	     err_mesg("INSERT failed on table BL_GL_DISTRIBUTION - 2",0,"");
+    }
+
+    EXEC SQL INSERT INTO BL_GL_DISTRIBUTION
+	      (
+		MAIN_ACC1_CODE,
+		MAIN_ACC2_CODE,
+		DEPT_CODE,
+		SUBLEDGER_GROUP_CODE,
+		SUBLEDGER_LINE_CODE,
+		PRODUCT_GROUP_CODE,
+		PRODUCT_LINE_CODE,
+		POST_YEAR,           /*  accepted */
+		POST_MONTH,           /*  accepted */
+		TRX_DATE,            /* from pat */
+		TRX_DOC_REF,            /* from pat */
+		TRX_DOC_REF_LINE_NUM,/*   0    */
+		TRX_DOC_REF_SEQ_NUM,/*   0    */
+		EPISODE_TYPE,       /* from pat */
+		PATIENT_ID,       /* from pat */
+		EPISODE_ID,       /* from pat */
+		VISIT_ID,       /* from pat */
+		SOURCE_DOC_REF,     /*   NULL       */
+		SOURCE_DOC_DATE,    /*   NULL       */
+		NARRATION,          /*   NULL       */
+		TRX_TYPE_CODE,      /*   F          */
+		DISTRIBUTION_AMT,   /*   tot_gross * -1     */
+		GL_INTERFACE_BY_ID, /* NULL */
+		GL_INTERFACE_DATE, /* NULL */
+		GL_INTERFACE_FLAG,  /*   N  */
+	    ADDED_BY_ID,                    
+		    MODIFIED_BY_ID,                 
+		    ADDED_DATE    ,
+		    MODIFIED_DATE,                  
+		    ADDED_AT_WS_NO,                 
+		    ADDED_FACILITY_ID,              
+		    MODIFIED_AT_WS_NO,              
+		    MODIFIED_FACILITY_ID,
+		    OPERATING_FACILITY_ID    ,
+   		    CASH_CTRL_DOC_TYPE,             
+		    CASH_CTRL_DOC_NUMBER,           
+		    CASH_CTRL_DOC_DATE  ,
+		    CUST_CODE                      
+
+	   )
+       VALUES
+	  (
+	       :bl_dept_main_acc1_code,
+	       :bl_dept_main_acc2_code,
+	       :bl_dept_dept_code,
+	       :bl_dept_subledger_group_code,
+	       :bl_dept_subledger_line_code,
+	       :bl_dept_product_group_code,
+	       :bl_dept_product_line_code,
+	       /*
+	       :nd_year,
+	       :nd_month,
+	       */
+	       nvl(:nd_post_year, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'YYYY')),
+	       nvl(:nd_post_month, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'MM')),
+	       TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),
+	       :bl_store_trx_doc_ref,
+	       0,
+	       0,
+	       :bl_store_episode_type,
+	       :bl_store_patient_id,
+	       :bl_store_episode_id,
+	       :bl_store_visit_id,
+	       NULL,
+	       NULL,
+	       NULL,
+	       'F',
+	       -1 * :bl_tot_gross_charge_amt,
+	       NULL,
+	       NULL,
+	       'N',
+		   USER,
+		   USER,                 
+		   SYSDATE,
+		   SYSDATE,                  
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_operating_facility_id,
+		   :nd_pre_doc_type,
+		   :nd_pre_doc_num,
+		   :nd_pre_doc_date,
+		   :nd_pre_cust_code           		 );
+
+
+       if (OERROR)
+	 err_mesg("INSERT failed on table BL_GL_DISTRIBUTION",0,"");
+
+}
+
+create_bl_gl_dist_trx_ref()
+{
+
+    if( (bl_store_episode_type.arr[0] == 'I' && d_ip_gl_yn == 'N') ||
+        (bl_store_episode_type.arr[0] == 'D' && d_ip_gl_yn == 'N') ||
+	(bl_store_episode_type.arr[0] == 'O' && d_op_gl_yn == 'N') ||
+	(bl_store_episode_type.arr[0] == 'E' && d_op_gl_yn == 'N') ||
+	(bl_store_episode_type.arr[0] == 'R' && d_rf_gl_yn == 'N'))
+
+	return;
+
+	nd_post_month.arr[0] = '\0';
+	nd_post_month.len = 0;
+
+        nd_post_year.arr[0] = '\0';
+	nd_post_year.len = 0;
+
+        exec sql select nvl(acc_per_year, to_char(to_date(:bl_store_trx_date,'DD/MM/YYYY'),'YYYY')),
+        nvl(acc_per_month,to_char(to_date(:bl_store_trx_date,'DD/MM/YYYY'),'MM'))  
+	into :nd_post_year, :nd_post_month
+	from sy_acc_period_defn
+	where to_date(:bl_store_trx_date,'DD/MM/YYYY') 
+	between acc_per_start_date and acc_per_end_date;	
+
+	nd_post_month.arr[nd_post_month.len] = '\0';
+	nd_post_year.arr[nd_post_year.len] = '\0';
+
+    EXEC SQL INSERT INTO BL_GL_DISTRIBUTION
+	      (
+		MAIN_ACC1_CODE,
+		MAIN_ACC2_CODE,
+		DEPT_CODE,
+		SUBLEDGER_GROUP_CODE,
+		SUBLEDGER_LINE_CODE,
+		PRODUCT_GROUP_CODE,
+		PRODUCT_LINE_CODE,
+		POST_YEAR,           /*  accepted */
+		POST_MONTH,           /*  accepted */
+		TRX_DATE,            /* from pat */
+		TRX_DOC_REF,            /* from pat */
+		TRX_DOC_REF_LINE_NUM,/*   0    */
+		TRX_DOC_REF_SEQ_NUM,/*   0    */
+		EPISODE_TYPE,       /* from pat */
+		PATIENT_ID,       /* from pat */
+		EPISODE_ID,       /* from pat */
+		VISIT_ID,       /* from pat */
+		SOURCE_DOC_REF,     /*   NULL       */
+		SOURCE_DOC_DATE,    /*   NULL       */
+		NARRATION,          /*   NULL       */
+		TRX_TYPE_CODE,      /*   F          */
+		DISTRIBUTION_AMT,   /*   bl_tot_disc_amt, */
+		GL_INTERFACE_BY_ID, /* NULL */
+		GL_INTERFACE_DATE, /* NULL */
+		GL_INTERFACE_FLAG,   /*   NULL*/
+		    ADDED_BY_ID,                    
+		    MODIFIED_BY_ID,                 
+		    ADDED_DATE    ,
+		    MODIFIED_DATE,                  
+		    ADDED_AT_WS_NO,                 
+		    ADDED_FACILITY_ID,              
+		    MODIFIED_AT_WS_NO,              
+		    MODIFIED_FACILITY_ID,
+		    OPERATING_FACILITY_ID,
+		    CASH_CTRL_DOC_TYPE,             
+		    CASH_CTRL_DOC_NUMBER,           
+		    CASH_CTRL_DOC_DATE ,
+		    CUST_CODE                       
+    
+	   )
+
+       VALUES
+	  (
+	       :bl_pkg2_main_acc1_code,
+	       :bl_pkg2_main_acc2_code,
+	       :bl_pkg2_dept_code,
+	       :bl_pkg2_subledger_group_code,
+	       :bl_pkg2_subledger_line_code,
+	       :bl_pkg2_product_group_code,
+	       :bl_pkg2_product_line_code,
+	       /*
+	       :nd_year,
+	       :nd_month,
+	       */
+	       NVL(:nd_post_year, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'YYYY')),
+	       nvl(:nd_post_month, TO_CHAR(TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),'MM')),
+	       TO_DATE(:bl_store_trx_date,'DD/MM/YYYY'),
+	       :bl_store_trx_doc_ref,
+	       0,
+	       0,
+	       :bl_store_episode_type,
+	       :bl_store_patient_id,
+	       :bl_store_episode_id,
+	       :bl_store_visit_id,
+	       NULL,
+	       NULL,
+	       NULL,
+	       'F',
+	       :bl_tot_net_charge_amt,
+	       NULL,
+	       NULL,
+	       'N',
+		   USER,
+		   USER,                 
+		   SYSDATE,
+		   SYSDATE,                  
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_ws_no,                 
+		   :nd_operating_facility_id,              
+		   :nd_operating_facility_id,
+		   :nd_pre_doc_type,
+		   :nd_pre_doc_num,
+		   :nd_pre_doc_date,
+		   :nd_pre_cust_code);
+
+
+       if (OERROR)
+	 err_mesg("INSERT failed on table BL_GL_DISTRIBUTION - 3",0,"");
+}
+
+continue_to_next_ref()
+{
+    EXEC SQL ROLLBACK WORK TO SAVEPOINT LAST_DOC_REF;
+    if (OERROR)
+	 err_mesg("ROLLBACK TO LAST_DOC_REF failed",0,""); 
+}
+
+upd_pat_chg_folio()
+{
+     EXEC SQL UPDATE BL_PACKAGE_CHARGES_FOLIO
+		   SET   DF_UPD_FLAG = DECODE(DF_SERVICE_IND,'D','Y',DF_UPD_FLAG),
+		         TRX_POSTED_IND = 'Y',
+		         POSTED_BY_ID   =  USER,
+		         POSTED_DATE    =  SYSDATE,
+			 MODIFIED_BY_ID =  USER,                 
+		         MODIFIED_DATE  =  SYSDATE        ,         
+		         MODIFIED_AT_WS_NO    = :nd_ws_no,              
+		         MODIFIED_FACILITY_ID = :nd_operating_facility_id,
+			 UNPOSTED_REASON      = NULL			 
+	       WHERE TRX_DOC_REF    = :bl_store_trx_doc_ref
+		   AND   NVL(TRX_POSTED_IND,'N') = 'N'
+	       AND   TRX_DATE <= TO_DATE(:nd_post_upto_date||' 23:59','DD/MM/YYYY HH24:MI')
+	       AND   NVL(TRX_FINALIZE_IND,'N') = 'Y'
+	       AND   OPERATING_FACILITY_ID = :nd_operating_facility_id;		   
+
+     if (OERROR)
+	 err_mesg("UPDATE failed on table BL_PACKAGE_CHARGES_FOLIO",0,"");
+}
+
+lock_trx_ref()
+{
+    EXEC SQL OPEN LOCK_TRX_REF_CUR;
+
+   if (RESOURCE_BUSY)
+   {
+	 sprintf(msg_str,"Patient Charges folio rec %s-%s-%s is busy",
+		    bl_pat_trx_doc_ref.arr,
+		    bl_pat_trx_doc_ref_line_num.arr,
+		    bl_pat_trx_doc_ref_seq_num.arr);
+	 lock_msg(msg_str);
+	 return (0);
+   }
+   else if (OERROR)
+	 err_mesg("OPEN failed on cursor LOCK_TRX_REF_CUR",0,"");
+
+   return 1;
+}
+
+loc_log_msg(str)
+char str[];
+{
+  if (strlen(str) > 70)
+      str[70] = '\0';
+  if (err_ctr == 0)
+       continue_to_next_ref();
+  log_err_mesg(str,0,"");
+  err_ctr++;
+}
+
+lock_msg(str)
+char str[];
+{
+  if (strlen(str) > 70)
+      str[70] = '\0';
+  log_err_mesg(str,0,"");
+}
+
+
+trx_ref_break()
+{
+
+     if (rec_ctr != 1)
+     {
+	  dept_break();
+	  if (!err_ctr)
+	  {
+	      create_bl_gl_dist_trx_ref();
+	      upd_pat_chg_folio();
+	      err_ctr = 0;
+	   }
+	   EXEC SQL COMMIT WORK;
+	   if (OERROR)
+	      err_mesg("COMMIT failed",0,""); 
+    }
+    err_ctr = 0;
+    bl_tot_gross_charge_amt = 0;
+    bl_tot_disc_amt = 0;
+    bl_tot_net_charge_amt = 0;
+
+    EXEC SQL SAVEPOINT LAST_DOC_REF;
+
+    if (OERROR)
+	err_mesg("SAVEPOINT LAST_DOC_REF failed",0,""); 
+
+    if (bl_pat_df_service_ind.arr[0] == 'D')
+    {
+	    if (bl_pat_df_upd_flag.arr[0] != 'Y')
+	    {
+		/*
+		 if (bl_dpf_post(bl_pat_doc_type_code.arr,
+				 bl_pat_doc_number.arr))
+		 {
+			sprintf(msg_str,"Error in DPF posting for %s - %s",
+				     bl_pat_doc_type_code.arr,
+				     bl_pat_doc_number.arr);
+			loc_log_msg(msg_str,0,"");
+		  }
+		*/
+	     }
+    }
+	  /*
+	  fetch_bl_gl_account_trx_ref();
+	  */
+	  strcpy(bl_store_trx_doc_ref.arr,bl_pat_trx_doc_ref.arr);
+	  bl_store_trx_doc_ref.len = strlen(bl_store_trx_doc_ref.arr);
+
+	  strcpy(bl_store_trx_date.arr,bl_pat_trx_date.arr);
+	  bl_store_trx_date.len = strlen(bl_store_trx_date.arr);
+
+	  strcpy(bl_store_episode_type.arr,bl_pat_episode_type.arr);
+	  bl_store_episode_type.len = strlen(bl_store_episode_type.arr);
+
+	  strcpy(bl_store_patient_id.arr,bl_pat_patient_id.arr);
+	  bl_store_patient_id.len = strlen(bl_store_patient_id.arr);
+
+	  strcpy(bl_store_episode_id.arr,bl_pat_episode_id.arr);
+	  bl_store_episode_id.len = strlen(bl_store_episode_id.arr);
+
+	  strcpy(bl_store_visit_id.arr,bl_pat_visit_id.arr);
+	  bl_store_visit_id.len = strlen(bl_store_visit_id.arr);
+
+	  strcpy(store_concat_code.arr,bl_pat_concat_code.arr);
+	  store_concat_code.len = strlen(store_concat_code.arr);
+
+	  strcpy(store_acct_dept_code.arr,bl_pat_acct_dept_code.arr);
+	  store_acct_dept_code.len = strlen(store_acct_dept_code.arr);
+	  fetch_bl_gl_account_trx_ref();
+	 if (rec_ctr != 1)
+	     fetch_bl_gl_account_pkg();
+}
+
+
+concat_break()
+{
+       dept_break();
+       fetch_bl_gl_account_pkg();
+       strcpy(store_concat_code.arr,bl_pat_concat_code.arr);
+       store_concat_code.len = strlen(store_concat_code.arr);
+}
+
+dept_break()
+{
+    if (store_acct_dept_code.arr[0] != '\0')
+    {
+       if (!err_ctr)
+       {
+	 if (rec_ctr != 1)
+	 {
+	     create_bl_gl_dist_dept();
+	     bl_tot_gross_charge_amt = 0;
+	     bl_tot_disc_amt         = 0;
+	 }
+       }
+     }
+     strcpy(store_acct_dept_code.arr,bl_pat_acct_dept_code.arr);
+     store_acct_dept_code.len = strlen(store_acct_dept_code.arr);
+}
+
+
+
+upd_reasons_in_pack_folio_for_unposting()
+{
+     nd_reason_text.arr[0]  =  '\0';
+	 nd_reason_text.len = 0;
+     
+     /* 
+		   This is a folio posting program and hence Bills records need not be 
+		   updated with Unposted Reason - 27/01/2004 Harish.	
+
+	 if (nd_cash_counter_code.arr[0] == '\0')
+        strcpy(nd_reason_text.arr,"No cash counter code is available in this record");     
+     else if (nd_shift_id.arr[0] == '\0')
+           strcpy(nd_reason_text.arr,"No Shift Id is available for this record");     
+     else if (nd_doc_type.arr[0] == '\0' && nd_cash_control_use_flag == 'Y')
+              strcpy(nd_reason_text.arr,"No Cash Control Document Type is available for this record");     
+	 else if (nd_doc_num.arr[0] == '\0'  && nd_cash_control_use_flag == 'Y')
+                  strcpy(nd_reason_text.arr,"No Cash Control Document Number is available for this record");     
+	 else if (nd_doc_date.arr[0] == '\0' && nd_cash_control_use_flag == 'Y')
+                     strcpy(nd_reason_text.arr,"No Cash Control Document Date is available for this record");     
+
+     else */
+	 
+	 if (bl_pat_orig_dept_code.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No original Dept code is available for this record");     		
+     else if (bl_pat_physician_id.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Physician Id is available for this record");     		
+     else if (bl_pat_blng_class_code.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Billing Class Code is available for this record");     		
+     else if (bl_pat_service_date.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Service Date is available for this record");     		
+     else if (bl_pat_blng_serv_code.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Billing Service Code is available for this record");     		
+     else if (bl_pat_episode_type.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Episode Type is available for this record");     		
+     else if (bl_pat_settlement_ind.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Settlement Indicator is available for this record");     		
+     else if (bl_pat_blng_grp_id.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Billing Group Id  is available for this record");     		
+	 else if (bl_pat_bill_type_code.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Bill Type Code is available for this record");     		
+
+     else if (bl_pat_patient_id.arr[0] == '\0')
+                       strcpy(nd_reason_text.arr,"No Patient Id  is available for this record");     		
+
+     if (nd_reason_text.arr[0] != '\0')
+     {
+		/*  
+			This is a folio posting program and hence Bills records need not be 
+			updated with Unposted Reason - 27/01/2004 Harish.	
+		
+		     SQL UPDATE  BL_BILL_HDR
+					SET  UNPOSTED_REASON		= :nd_reason_text,
+						 BILL_POSTED_FLAG		= 'N',  
+						 MODIFIED_BY_ID         = user,
+						 MODIFIED_DATE          = SYSDATE,
+						 MODIFIED_AT_WS_NO      = :nd_ws_no,
+						 MODIFIED_FACILITY_ID   = :nd_operating_facility_id
+				 WHERE	 OPERATING_FACILITY_ID	= :nd_operating_facility_id
+				   AND   DOC_TYPE_CODE			= :cpatdoctypecode
+				   AND   DOC_NUM				= :cpatdocnum ;
+
+		if (OERROR)
+			err_mesg("UPDATE failed on table BL_BILL_HDR",0,"");*/
+
+
+		EXEC SQL UPDATE BL_PACKAGE_CHARGES_FOLIO
+					SET UNPOSTED_REASON = :nd_reason_text,
+						TRX_POSTED_IND = 'N',
+		    			MODIFIED_BY_ID			= user,
+	            		MODIFIED_DATE			= SYSDATE,
+	            		MODIFIED_AT_WS_NO		= :nd_ws_no,
+		    			MODIFIED_FACILITY_ID	= :nd_operating_facility_id
+				  WHERE TRX_DOC_REF				= :bl_store_trx_doc_ref
+				    AND TRX_DOC_REF_LINE_NUM	= TRX_DOC_REF_LINE_NUM 
+					AND OPERATING_FACILITY_ID	= :nd_operating_facility_id
+					AND TRX_DOC_REF_SEQ_NUM		= TRX_DOC_REF_SEQ_NUM  
+					AND NVL(TRX_POSTED_IND,'X') = 'N'
+					AND TRX_DATE <= TO_DATE(:nd_post_upto_date||' 23:59','DD/MM/YYYY HH24:MI')
+					AND NVL(TRX_FINALIZE_IND,'N')= 'Y'
+					AND	(EPISODE_TYPE not in ('O','E') 
+						 OR 
+						(EPISODE_TYPE in ('O','E') AND NVL(AVAILED_IND,'N') NOT IN ('Y','U','C')));
+
+     if (OERROR)
+	 err_mesg("UPDATE failed on table BL_PACKAGE_CHARGES_FOLIO",0,"");
+
+
+	
+    }
+}
+

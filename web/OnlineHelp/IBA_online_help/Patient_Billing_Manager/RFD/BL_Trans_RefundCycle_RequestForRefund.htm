@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Trans_RefundCycle_RequestForRefund</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to raise a request for refund:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Request No</span>. - Enter the value for request number, if the document sequence number setting is set as Manual. The document type is set as manual in the ‘Document Type Details’ function in the Financials Base Manager module. If the check box ‘System Generated Document Number’ is selected in the function ‘Document Type Details’ in the Financials Base Manager module, the document number is generated automatically by the system. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund Requests Selection Criteria</span> - The filed contains pre-defined values. The values in the list are “All”, “Refund against Bill &amp; DCP”, “Refundable Deposit”, and “Patient Deposit”. The system will default with the value as “All”. If Refund Request is required to be made for a specific nature, select the specific nature from the list and raise the request.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All – List of records, where the refund is not issued is displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Refund against Bill &amp; DCP - Only the records meeting the criteria are displayed. The refund is issued at the time of discharge and to the deferred Cash patients.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Refundable deposit - Only the patient records, where the deposits are to be refunded are displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Patient Deposit - Select Patient Deposit is the deposit is to be reimbursed to the patient.</p>
+</li>
+</ol>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to process the refund request for the selected documents. Clear the check box, if the refund request is not valid for the selected documents.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">The document number, document date, refund amount and the nature of the bill get displayed</span>.</p>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient number</span> - The patient number for the associated to the selected document number gets displayed. The name of the respective patient gets displayed. The episode type, episode ID and visit ID are displayed for the documents to be refunded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Control Voucher No./Date</span> – Enter the Control Voucher number and date. This field is mandatory, if the ‘Control Voucher Entry Mode’ is selected as ‘During Refund Request Entry’ under the ‘Refund Processing’ tab in the BL Parameters function. If the ‘Control Voucher Entry Mode’ is selected as ‘During Approval of Refund Request’, this field is not mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Refund Details</p>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payee’s Name</span> - Enter the name of the payee to whom the refund has to be issued for the selected document type. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">NRIC No</span> - The NRIC number associated to the selected Patient ID gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payee Acc. No</span> - Enter the account number of the payee in numeric format of 20 digits maximum length. The amount issued as refund is deposited in the respective account.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payee Bank/Branch</span> - Select the Bank/Branch name from the list. The values defined using the Banks and Branches function get listed. The amount issued as a refund is deposited to the payee’s account in the selected Bank or associated Branch.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter the remarks in alphanumeric format of 50 characters maximum length.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Mailing Address</p>
+<ol start="11">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Click to copy from patient</span> - Click the link to copy the patient mailing address. The address details get populated in the respective fields. You can copy the address, if the patient’s address is same as the payee’s address.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Line 1 - 4</span> - Enter the address in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Post Box</span> - Enter the Post Box number in alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Postal Code</span> - Enter the Postal Code in alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Country</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Country. The description for the selected Country gets displayed. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Contact Details</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Tel No</span> - Enter the telephone number in numeric format of 20 digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mobile No</span> - Enter the mobile number in numeric format of 20 digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Fax No</span> - Enter the fax number in numeric format of 20 digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Email</span> - Enter the e-mail ID of the payee in alphanumeric format of 30 characters maximum length.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File	: rlrdifrs.pc
+   Author : S.Sheelvant 
+   Date Created : 21/09/1997
+   Last Modified : 07/06/1998
+
+*  Ver 1.10.01
+   Modified by   : HAMEED
+
+*  Purpose : To insert rows into rl_diff_disp_result, rl_diff_ind_result,
+		     rl_diff_film_result and
+	         update rl_diff_result_hdr.	
+
+*  Input Parameters : 
+                      Command line inputs
+			          1. Usr_id/Password
+                      2. Patient Id
+		              3. Specimen No.
+  
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <string.h>
+#include <gl.h>
+#include <math.h>
+
+#define MAX_LINES 56
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+#define INIT_MESG "Fetching details..."
+#define ONLINE_PRINTING 1
+/*
+#define DEBUG 1 */
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+       /* increased the length all varchar variables by one to take care */
+       /* for null termination */
+	VARCHAR nd_operating_facility_id  [3],
+	    uid_pwd		                  [91],
+        nd_specimen_no                [21],
+		nd_patient_id                 [21],
+		nd_flag                       [2],
+
+		d_rowid                       [31],
+
+        d_ind_test_code               [11],
+		d_ind_test_rslt               [16],
+
+        d_film_test_code              [11],
+		d_comm_code1           [6],
+        d_comm_desc1           [41],
+		d_comm_code2           [6],
+        d_comm_desc2           [41],
+		d_comm_code3           [6],
+        d_comm_desc3           [41],
+		d_comm_code4           [6],
+        d_comm_desc4           [41],
+
+        d_disp_test_code       [11],
+		d_disp_test_rslt       [16],
+
+		d_nrbc_code            [11],
+		d_nrbc_rslt            [11],
+		d_toxin_code           [11],
+		d_toxin_rslt           [16],
+
+        d_ind_seq_no		   [6],
+		d_film_seq_no		   [6],
+		d_disp_seq_no		   [6],
+		
+		m_ind_test_code        [11],
+		m_disp_test_code       [11],
+		m_film_test_code       [11],
+		l_disp_test_result	   [16],
+		l_ind_test_result	   [16],
+		l_status			   [2];
+
+	int l_count = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+char string_var[100];
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+   char filename[150] ;
+   if(argc < 4)
+   {
+      disp_message(ORA_MESG,"Usage rlrdifrs uid_pwd patient_id specimen_no\n");
+      proc_exit();
+   }
+
+   strcpy(filename,WORKING_DIR) ;
+   strcat(filename,"rlrdifrs.lis") ;
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_operating_facility_id.arr, argv[5]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr);
+
+   strcpy(nd_patient_id.arr,argv[6]);
+   nd_patient_id.len = strlen(nd_patient_id.arr);
+
+   strcpy(nd_specimen_no.arr,argv[7]);
+   nd_specimen_no.len = strlen(nd_specimen_no.arr);
+
+   
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+
+   set_meduser_role();
+
+   l_status.arr[0]		= '\0';
+   l_status.len			= 0;
+
+   EXEC SQL SELECT NVL(status, 'O')
+			INTO :l_status
+			FROM RL_DIFF_RESULT_HDR
+			WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+			AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+	if (NODATAFOUND);
+
+	l_status.arr[l_status.len]		= '\0';
+
+
+	if(strcmp(l_status.arr, "H") != 0)
+	{
+	   delete_disp_tests();
+
+////13.04.2006	   delete_ind_tests();
+
+	   dclr_ind_tests();
+	   insert_ind_tests();
+
+	   delete_film_tests();
+	   dclr_film_tests();
+	   insert_film_tests();
+	}
+
+   dclr_disp_tests();
+   
+   insert_disp_tests();
+
+   update_diff_result_hdr();
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK;
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}
+
+delete_disp_tests()
+{
+   int fetch_cur_disp_tests();
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE CUR_DISP_TESTS CURSOR FOR
+		    SELECT DISP_TEST_CODE 
+		      FROM RL_DIFF_DISP_RESULT
+               WHERE PATIENT_ID = :nd_patient_id
+		       AND SPECIMEN_NO = :nd_specimen_no
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+               FOR UPDATE OF DISP_TEST_CODE;
+   EXEC SQL OPEN CUR_DISP_TESTS;
+   while(fetch_cur_disp_tests())
+   {
+       EXEC SQL DELETE FROM RL_DIFF_DISP_RESULT
+		 WHERE CURRENT OF CUR_DISP_TESTS;
+   }
+   EXEC SQL CLOSE CUR_DISP_TESTS;
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at delete_disp_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_cur_disp_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH CUR_DISP_TESTS INTO :m_disp_test_code;
+                 
+  if (NODATAFOUND)
+    return 0;
+
+  m_disp_test_code.arr[m_disp_test_code.len] = '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_cur_disp_tests() occured....\n");
+   proc_exit();
+}
+
+delete_film_tests()
+{
+   int fetch_cur_film_tests();
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE CUR_FILM_TESTS CURSOR FOR
+		    SELECT FILM_TEST_CODE 
+		      FROM RL_DIFF_FILM_RESULT
+               WHERE PATIENT_ID = :nd_patient_id
+		       AND SPECIMEN_NO = :nd_specimen_no
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+               FOR UPDATE OF FILM_TEST_CODE;
+   EXEC SQL OPEN CUR_FILM_TESTS;
+   while(fetch_cur_film_tests())
+   {
+       EXEC SQL DELETE FROM RL_DIFF_FILM_RESULT
+		 WHERE CURRENT OF CUR_FILM_TESTS;
+   }
+   EXEC SQL CLOSE CUR_FILM_TESTS;
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at delete_film_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_cur_film_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH CUR_FILM_TESTS INTO :m_film_test_code;
+                 
+  if (NODATAFOUND)
+    return 0;
+
+  m_film_test_code.arr[m_film_test_code.len] = '\0';
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_cur_film_tests() occured....\n");
+   proc_exit();
+}
+
+delete_ind_tests()
+{
+   int fetch_cur_ind_tests();
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE CUR_IND_TESTS CURSOR FOR
+		    SELECT IND_TEST_CODE 
+		      FROM RL_DIFF_IND_RESULT
+              WHERE PATIENT_ID = :nd_patient_id
+		      AND SPECIMEN_NO = :nd_specimen_no
+              AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+			  FOR UPDATE OF IND_TEST_CODE;
+   EXEC SQL OPEN CUR_IND_TESTS;
+   while(fetch_cur_ind_tests())
+   {
+       EXEC SQL DELETE FROM RL_DIFF_IND_RESULT
+		 WHERE CURRENT OF CUR_IND_TESTS;
+   }
+   EXEC SQL CLOSE CUR_IND_TESTS;
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}
+
+int fetch_cur_ind_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH CUR_IND_TESTS INTO :m_ind_test_code;
+                 
+  if (NODATAFOUND)
+    return 0;
+
+  m_ind_test_code.arr[m_ind_test_code.len] = '\0';
+
+  
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_cur_ind_tests() occured....\n");
+   proc_exit();
+}
+
+dclr_ind_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL DECLARE IND_TESTS_CUR CURSOR FOR
+            SELECT A.IND_TEST_CODE, A.SEQ_NO, B.NUMERIC_RESULT
+	          FROM RL_DIFF_IND_TESTS A, RL_TEST_RESULT B
+             WHERE B.PATIENT_ID = :nd_patient_id 
+	           AND B.SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+   			   AND B.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	           AND B.TEST_CODE   = A.IND_TEST_CODE 
+	         ORDER BY B.TEST_SEQ_NO ;
+
+  EXEC SQL OPEN IND_TESTS_CUR;
+
+  
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_ind_tests() occured....\n");
+   proc_exit();
+}
+
+
+dclr_disp_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL DECLARE DISP_TESTS_CUR CURSOR FOR
+            SELECT A.DISP_TEST_CODE, A.SEQ_NO, 
+			       DECODE(NVL(A.DISP_RESULT_TYPE,'N'),'N',B.NUMERIC_RESULT,
+											          'R',B.RESULT_COMMENT_CODE1)
+	          FROM RL_DIFF_DISP_TESTS A, RL_TEST_RESULT B
+             WHERE B.PATIENT_ID = :nd_patient_id 
+	           AND B.SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+			   AND B.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	           AND B.TEST_CODE   = A.DISP_TEST_CODE 
+	         ORDER BY B.TEST_SEQ_NO ;
+
+  EXEC SQL OPEN DISP_TESTS_CUR;
+
+  
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_disp_tests() occured....\n");
+   proc_exit();
+}
+
+
+dclr_film_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL DECLARE FILM_TESTS_CUR CURSOR FOR
+           SELECT A.FILM_TEST_CODE,A.SEQ_NO,
+		   B.RESULT_COMMENT_CODE1,B.RESULT_COMMENT_DESC1,
+		   B.RESULT_COMMENT_CODE2,B.RESULT_COMMENT_DESC2,
+		   B.RESULT_COMMENT_CODE3,B.RESULT_COMMENT_DESC3,
+		   B.RESULT_COMMENT_CODE4,B.RESULT_COMMENT_DESC4
+	      FROM RL_DIFF_FILM_TESTS A, RL_TEST_RESULT B
+           WHERE B.PATIENT_ID = :nd_patient_id 
+	       AND B.SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+		   AND B.OPERATING_FACILITY_ID = :nd_operating_facility_id
+	       AND B.TEST_CODE   = A.FILM_TEST_CODE 
+	     ORDER BY B.TEST_SEQ_NO ;
+
+  EXEC SQL OPEN FILM_TESTS_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_film_tests() occured....\n");
+   proc_exit();
+}
+
+insert_ind_tests()
+{  
+   int fetch_ind_tests();
+
+   l_ind_test_result.arr[0]	= '\0';
+   l_ind_test_result.len		= 0;
+
+   l_count = 0;
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   while(fetch_ind_tests())
+   {
+
+      EXEC SQL SELECT COUNT(*)
+			   INTO :l_count
+			   FROM RL_DIFF_IND_RESULT
+			   WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+			   AND ind_test_code = :d_ind_test_code
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+	  if (l_count == 0)
+	  {
+	  EXEC SQL INSERT INTO RL_DIFF_IND_RESULT
+				 (OPERATING_FACILITY_ID,PATIENT_ID,SPECIMEN_NO,IND_TEST_CODE,IND_TEST_RESULT,SEQ_NO)
+			   VALUES
+				 (:nd_operating_facility_id,:nd_patient_id,TO_NUMBER(:nd_specimen_no),:d_ind_test_code,:d_ind_test_rslt,
+				  TO_NUMBER(:d_ind_seq_no) );
+	  }
+	  else
+	  {
+/****
+		  EXEC SQL SELECT ind_test_result
+			   INTO :l_ind_test_result
+			   FROM RL_DIFF_IND_RESULT
+			   WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+			   AND ind_test_code = :d_ind_test_code
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+			if (NODATAFOUND);
+
+			l_ind_test_result.arr[l_ind_test_result.len]	= '\0';
+
+		if (strlen(l_ind_test_result.arr)  == 0)
+		{
+****************/
+
+		    EXEC SQL UPDATE RL_DIFF_IND_RESULT
+		             SET ind_test_result = :d_ind_test_rslt
+					 WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+					 AND ind_test_code = :d_ind_test_code
+					 AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+////		}
+
+
+	 }
+   }
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at insert_ind_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_ind_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH IND_TESTS_CUR INTO :d_ind_test_code,:d_ind_seq_no,:d_ind_test_rslt;
+                 
+   
+  if (NODATAFOUND)
+    return 0;
+
+  d_ind_test_code.arr[d_ind_test_code.len] = '\0';
+  d_ind_seq_no.arr[d_ind_seq_no.len] = '\0';
+  d_ind_test_rslt.arr[d_ind_test_rslt.len] = '\0';
+
+  # ifdef DEBUG
+     printf ("d_ind_test_code = %s\n",d_ind_test_code.arr);
+     printf ("d_ind_test_rslt = %s\n",d_ind_test_rslt.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_ind_tests() occured....\n");
+   proc_exit();
+}
+
+
+insert_disp_tests()
+{  
+   int fetch_disp_tests();
+
+   l_disp_test_result.arr[0]	= '\0';
+   l_disp_test_result.len		= 0;
+
+   l_count = 0;
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   while(fetch_disp_tests())
+   {
+
+      EXEC SQL SELECT COUNT(*)
+			   INTO :l_count
+			   FROM RL_DIFF_DISP_RESULT
+			   WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+			   AND disp_test_code = :d_disp_test_code
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+	  if (l_count == 0)
+	  {
+
+		EXEC SQL INSERT INTO RL_DIFF_DISP_RESULT
+			       (OPERATING_FACILITY_ID,PATIENT_ID,SPECIMEN_NO,DISP_TEST_CODE,DISP_TEST_RESULT,SEQ_NO)
+			     VALUES
+			       (:nd_operating_facility_id,:nd_patient_id,TO_NUMBER(:nd_specimen_no),:d_disp_test_code,:d_disp_test_rslt,
+			        TO_NUMBER(:d_disp_seq_no) );
+	  }
+	  else
+	  {
+
+		  EXEC SQL SELECT disp_test_result
+			   INTO :l_disp_test_result
+			   FROM RL_DIFF_DISP_RESULT
+			   WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+			   AND disp_test_code = :d_disp_test_code
+			   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+			if (NODATAFOUND);
+
+			l_disp_test_result.arr[l_disp_test_result.len]	= '\0';
+
+		if (strlen(l_disp_test_result.arr)  == 0)
+		{
+
+		    EXEC SQL UPDATE RL_DIFF_DISP_RESULT
+		             SET disp_test_result = :d_disp_test_rslt
+					 WHERE specimen_no = TO_NUMBER(:nd_specimen_no)
+					 AND disp_test_code = :d_disp_test_code
+					 AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+		}
+
+
+	 }
+
+   }
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at insert_disp_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_disp_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH DISP_TESTS_CUR INTO :d_disp_test_code,:d_disp_seq_no,:d_disp_test_rslt;
+                 
+   
+  if (NODATAFOUND)
+    return 0;
+
+  d_disp_test_code.arr[d_disp_test_code.len] = '\0';
+  d_disp_seq_no.arr[d_disp_seq_no.len]		 = '\0';
+  d_disp_test_rslt.arr[d_disp_test_rslt.len] = '\0';
+
+  # ifdef DEBUG
+     printf ("d_disp_test_code = %s\n",d_disp_test_code.arr);
+     printf ("d_disp_test_rslt = %s\n",d_disp_test_rslt.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_disp_tests() occured....\n");
+   proc_exit();
+}
+
+insert_film_tests()
+{  
+   int fetch_film_tests();
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   while(fetch_film_tests())
+   {
+      EXEC SQL INSERT INTO RL_DIFF_FILM_RESULT
+			(OPERATING_FACILITY_ID,PATIENT_ID,SPECIMEN_NO,
+		     FILM_TEST_CODE,
+			 COMMENT_CODE1,COMMENT_DESC1,
+			 COMMENT_CODE2,COMMENT_DESC2,
+			 COMMENT_CODE3,COMMENT_DESC3,
+			 COMMENT_CODE4,COMMENT_DESC4, 
+             SEQ_NO           
+			)
+            VALUES
+			(:nd_operating_facility_id,:nd_patient_id,TO_NUMBER(:nd_specimen_no),
+			 :d_film_test_code,
+			 :d_comm_code1,:d_comm_desc1,
+			 :d_comm_code2,:d_comm_desc2,
+			 :d_comm_code3,:d_comm_desc3,
+			 :d_comm_code4,:d_comm_desc4,
+             TO_NUMBER(:d_film_seq_no)
+			);
+   }
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at insert_film_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_film_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH FILM_TESTS_CUR INTO :d_film_test_code,:d_film_seq_no,
+				     :d_comm_code1,:d_comm_desc1,
+				     :d_comm_code2,:d_comm_desc2,
+				     :d_comm_code3,:d_comm_desc3,
+				     :d_comm_code4,:d_comm_desc4;
+   
+  if (NODATAFOUND)
+    return 0;
+  d_film_test_code.arr[d_film_test_code.len] = '\0';
+  d_film_seq_no.arr[d_film_seq_no.len] = '\0';
+  d_comm_code1.arr[d_comm_code1.len]         = '\0';
+  d_comm_code2.arr[d_comm_code2.len]         = '\0';
+  d_comm_code3.arr[d_comm_code3.len]         = '\0';
+  d_comm_code4.arr[d_comm_code4.len]         = '\0';
+  d_comm_desc1.arr[d_comm_desc1.len]         = '\0';
+  d_comm_desc2.arr[d_comm_desc2.len]         = '\0';
+  d_comm_desc3.arr[d_comm_desc3.len]         = '\0';
+  d_comm_desc4.arr[d_comm_desc4.len]         = '\0';
+
+  # ifdef DEBUG
+     printf ("d_film_test_code = %s\n",d_film_test_code.arr);
+     printf ("d_film_seq_no = %s\n",d_film_seq_no.arr);
+     printf ("d_comm_code1 = %s\n",d_comm_code1.arr);
+     printf ("d_comm_desc1 = %s\n",d_comm_desc1.arr);
+     printf ("d_comm_code2 = %s\n",d_comm_code2.arr);
+     printf ("d_comm_desc2 = %s\n",d_comm_desc2.arr);
+     printf ("d_comm_code3 = %s\n",d_comm_code3.arr);
+     printf ("d_comm_desc3 = %s\n",d_comm_desc3.arr);
+     printf ("d_comm_code4 = %s\n",d_comm_code4.arr);
+     printf ("d_comm_desc4 = %s\n",d_comm_desc4.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_film_tests() occured....\n");
+   proc_exit();
+}
+
+
+update_diff_result_hdr()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   d_nrbc_code.arr[0]  = '\0';
+   d_nrbc_code.len     = 0;
+   d_toxin_code.arr[0] = '\0';
+   d_toxin_code.len    = 0;
+   
+   EXEC SQL SELECT NRBC_CODE,TOXIN_CODE 
+	      INTO :d_nrbc_code,:d_toxin_code  
+	      FROM RL_DIFF_REF_HDR;
+   if (NODATAFOUND)
+       goto err_exit;
+   d_nrbc_code.arr[d_nrbc_code.len] = '\0';
+   d_toxin_code.arr[d_toxin_code.len] = '\0';
+   d_nrbc_rslt.arr[0] = '\0';
+   d_nrbc_rslt.len    = 0;
+
+   EXEC SQL SELECT NUMERIC_RESULT INTO :d_nrbc_rslt
+	        FROM RL_TEST_RESULT 
+		    WHERE SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+              AND TEST_CODE = :d_nrbc_code
+			  AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+/*
+             WHERE PATIENT_ID = :nd_patient_id
+	           AND SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+	           AND TEST_CODE = :d_nrbc_code;
+*/
+   if (NODATAFOUND)
+       goto err_exit;
+
+   d_nrbc_rslt.arr[d_nrbc_rslt.len] = '\0';
+   
+   d_toxin_rslt.arr[0]	= '\0';
+   d_toxin_rslt.len		= 0;
+
+   EXEC SQL SELECT NUMERIC_RESULT INTO :d_toxin_rslt
+	        FROM RL_TEST_RESULT 
+            WHERE SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+              AND TEST_CODE = :d_toxin_code
+			  AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+		  /*
+            WHERE PATIENT_ID = :nd_patient_id
+	          AND SPECIMEN_NO = TO_NUMBER(:nd_specimen_no)
+              AND TEST_CODE = :d_toxin_code;
+		  */
+
+   if (NODATAFOUND)
+          ;
+
+   d_toxin_rslt.arr[d_toxin_rslt.len]	= '\0';
+
+   d_rowid.arr[0] = '\0';
+   d_rowid.len    = 0;
+   EXEC SQL SELECT ROWID INTO :d_rowid
+	        FROM RL_DIFF_RESULT_HDR
+            WHERE PATIENT_ID = :nd_patient_id
+	        AND SPECIMEN_NO = :nd_specimen_no
+			AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+            FOR UPDATE OF NRBC_RESULT;
+   d_rowid.arr[d_rowid.len] = '\0';
+
+
+   EXEC SQL UPDATE RL_DIFF_RESULT_HDR
+	       SET NRBC_CODE    = :d_nrbc_code,
+		   TOXIN_CODE   = :d_toxin_code,
+		   NRBC_RESULT  = :d_nrbc_rslt,
+		   TOXIN_RESULT = :d_toxin_rslt
+           WHERE ROWID = :d_rowid;
+
+   if (NODATAFOUND)
+       goto err_exit;
+
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at update_diff_result_hdr() occured....\n");
+   proc_exit();
+}
+/******************commented on 13.04.2006
+insert_ind_tests()
+{  
+   int fetch_ind_tests();
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   while(fetch_ind_tests())
+   {
+      EXEC SQL INSERT INTO RL_DIFF_IND_RESULT
+			     (OPERATING_FACILITY_ID,PATIENT_ID,SPECIMEN_NO,IND_TEST_CODE,IND_TEST_RESULT,SEQ_NO)
+               VALUES
+			     (:nd_operating_facility_id,:nd_patient_id,TO_NUMBER(:nd_specimen_no),:d_ind_test_code,:d_ind_test_rslt,
+			      TO_NUMBER(:d_ind_seq_no) );
+   }
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at insert_ind_tests() occured....\n");
+   proc_exit();
+}
+
+int fetch_ind_tests()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH IND_TESTS_CUR INTO :d_ind_test_code,:d_ind_seq_no,:d_ind_test_rslt;
+                 
+   
+  if (NODATAFOUND)
+    return 0;
+
+  d_ind_test_code.arr[d_ind_test_code.len] = '\0';
+  d_ind_seq_no.arr[d_ind_seq_no.len] = '\0';
+  d_ind_test_rslt.arr[d_ind_test_rslt.len] = '\0';
+
+  # ifdef DEBUG
+     printf ("d_ind_test_code = %s\n",d_ind_test_code.arr);
+     printf ("d_ind_test_rslt = %s\n",d_ind_test_rslt.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_ind_tests() occured....\n");
+   proc_exit();
+}
+
+**********13.04.2006 ***********************/

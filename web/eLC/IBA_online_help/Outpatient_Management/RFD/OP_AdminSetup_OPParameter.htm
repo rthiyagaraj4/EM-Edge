@@ -1,0 +1,287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OP_AdminSetup_OPParameter</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<p class="BoldRFD">Enter the following details to define OP Parameter:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Visit Controls</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No. of days for visit revising/canceling</span> - Enter the maximum number of days the details of a visit can be revised or the visit itself can be cancelled after the visit registration has taken place, in numeric format of six digits maximum length. The period is considered based on the date and not on the date/time. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Backdate Days</span> - This field is displayed only if Patient Billing Manager module is not installed. Enter the number of days in numeric format of two digits maximum length. Backdated Visit Registration can be performed for the patients who have visited the hospital but not registered within the number of days defined in this field</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Visit Regn for Emergency Series Patients</span> – Select the check box to allow Visit Registration for patients registered under Emergency Patient Series in Master Patient Index module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Visit Registration for Wait List Invitations without Appointments</span> – Select the check box to allow visit registration for patients registered under Wait List Invitation without appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Invitation No.</span> – This tab is enabled if ‘Allow Visit Registration for Wait List Invitations without Appointments’ check box is selected. The listed values are ‘Display’ and ‘Accept’. Select the required value from the list. If ‘Display’ is selected, Invitation Number is displayed in Patient Appointment records. If ‘Accept’ is selected, Invitation List dialog box gets displayed and you can enter the Invitation Number to view the Patient Appointment records.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override Practitioner for Appointment Case</span> - Select the check box to override Practitioner while registering a visit.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Action on Register Visit when Resource Schedule is blocked</u></span> - &#160;This drop-down list is used to define the action to be taken while registering a patient’s visit for a practitioner’s blocked schedule. You can select one of below three options, based on which the system action will vary on the Register Visit screen.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>• No action</b></span> – You can go ahead and register the visit with no restrictions about the blocked schedule.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>• Warning</b></span> – A warning message “Resource schedule is blocked. Do you want to continue?” will be displayed. You can either click [OK] and register the visit, or click [Cancel] and not register the visit.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>• Stop</b></span> – A message “Resource schedule is blocked. Cannot proceed” will be displayed, and you will not be able to register the visit.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /></p>
+<p class="NumberRFD" style="margin-left: 40px; color: #800080;">• You need to set the Check- in at Identification field in Clinic setup as “Resource”. Only then, the field Practitioner will be mandatory in the Register Visit screen. Else, the system alerts about the blocked schedule will be displayed only when you &#160;assign or &#160;re-assign practitioner.</p>
+<p class="NumberRFD" style="margin-left: 40px; color: #800080;">• The conditions for the actions will be applied only for the first time during Register visit or Assign Practitioner or Reassign Practitioner or Revise Visit. If practitioner is not changed in the Reassign Practitioner or Revise Visit, then these conditions will not be applied for any system actions.</p>
+<p class="NumberRFD" style="margin-left: 40px;">&#160;</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Visit Registration for Inpatient</span> - Select the check box to allow visit registration for Inpatients. Clear the check box to indicate that the visit registration for Inpatient is not allowed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoke Visit Registration/Manage Patient Queue from CA</span> - Select the check box to allow visit registration or manage patient queue for patient from Clinician Access (CA) module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Close Patient Chart on Close Consultation/Check Out</span> - Select the check box to close the Patient Chart which is usually displayed on Close Consultation. If the check box is selected, the patient chart is closed and the control goes to the Recently Accessed Patient List in Clinician Access (CA) module after closing consultation. &#160;If the check box is cleared, the patient chart is displayed on Close Consultation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Details Template</span> – Select the check box to enable the ‘Visit Details Template’ function in the OP Code Setup. If the check box is cleared, you cannot access this function in the OP Code Setup.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Visit Completion</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max No. of days for visit completion</span> - Enter the maximum number of days the Visit Disposition, Notes, Procedures, Diagnosis, etc. can be recorded after the recording took place in numeric format of six digits maximum length. This value has to be greater than the parameter value set for ‘Max No. of days for revising/canceling’ the visit. The period is considered based on the date and not on the time. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prompt for Register Referral on Close Consultation</span> - Select the check box to prompt for Register Referral during Close consultation or OP Check out. Clear the check box if Registering Referral for the patient is not required during Close Consultation or OP Checkout. The system controls the prompt of Register Referral based on this setup during Close Consultation or OP Check out.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Disposition Type for Close Consultation/Check Out</u></span> – Select the required Disposition value from the drop-down list. The selected value appears as default value in the Disposition Type field in the below completed visits functionalities:</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">• OP Check Out</p>
+<p class="NumberRFD" style="margin-left: 40px;">• AE Check Out</p>
+<p class="NumberRFD" style="margin-left: 40px;">• OP Close Consultation</p>
+<p class="NumberRFD" style="margin-left: 40px;">• AE Close Consultation</p>
+<p class="NumberRFD" style="margin-left: 40px;">• OP Close Consultation and Chart</p>
+<p class="NumberRFD" style="margin-left: 40px;">• AE Close Consultation and Chart</p>
+<p class="NumberRFD" style="margin-left: 40px;">This value is populated based on the value selected in the ‘Disposition Type’ screen in Application Masters module.</p>
+<ol start="15" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Close Patient Chart on Close Consultation/Check Out</u></span> - Select this check box to close the patient chart on close consultation or check out activities.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outpatient Episodes</p>
+<p class="BoldRFD" style="font-weight: normal;">An Outpatient Episode comprises of one or more outpatient visits to a specific Medical Service/Sub-service/Clinic over a period of relatively continuous care.</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">V</span><span style="text-decoration: underline;"><u>isit Type Deviation Rule</u></span> - This is a one time setup. Once any of the below option is selected, it cannot be changed again for that facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span style="text-decoration: underline;"><u>Service Based</u></span> - If this option is selected, visit types are based on service selected during visit registration/appointment booking.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span style="text-decoration: underline;"><u>Practitioner Based</u></span> - If this option is selected, visit types are based on practitioner and the visit type rule defined as per the practitioners.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">&#160;Insurance Group</span> - If this option is selected, the visit types are based on the insurance group during visit registration/appointment.</p>
+</li>
+</ol>
+<ol start="17" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">D</span><span style="text-decoration: underline;"><u>efault Rule ID</u></span> – If 'Visit Type Deviation Rule' is selected as 'Practitioner Based', then this option appears. &#160;By default, this field displays 'Select’. Select the required Rule ID from the drop down list values. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override Visit Type Control on Episode</span> - The generation of Episode ID can either be system controlled or manually controlled based on this parameter. On selecting the check box, you are given an option to override the episode build up, if the patient re-visits the same clinic for the same service. There is no visit type control on episode. All the episodes are closed based on the parameter set under 'Minimum days elapsed from Last Visit'. If the check box is cleared, the system considers the 'Visit Type Control' parameter and closes the episode based on the duration and number of follow up visits defined for the clinic and service. The check box is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Duration for Follow-up Visit</span> - This field gets enabled only if the 'Override Visit Type control on Episode' check box is cleared. Enter the duration for follow up visit in numeric format of six digits maximum length. This is applicable for the Clinic and Service for which the setup is not done in 'Visit Type' code master. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Minimum days elapsed from last visit</u></span> - &#160;Follow up: Enter the number of days to be elapsed after a patient’s visit, to consider the next visit as a follow-up visit.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Episode Closure By</u></span> – Enter the criteria to be considered for closing a patient’s episode. You can select one of the following options:</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">• No shows – Patients’ episodes will be closed based on the number of “no shows” recorded against their booked appointments.</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Days – Patient’s episodes will be closed based on the number of days elapsed after the last follow-up</p>
+<ol start="22" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No of Follow-up Visits Allowed</span> - This field gets enabled only if the 'Override Visit Type control on Episode' check box is cleared. Enter the duration of the number of follow up visits in numeric format of six digits maximum length. This is applicable for the Clinic and Service for which the setup is not done in 'Visit Type' code master. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Minimum days elapsed from Last visit</p>
+<p class="BoldRFD" style="font-weight: normal;">This parameter is used to define the closure rule for all open episodes.</p>
+<ol start="23" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Follow-up</span> - This field gets enabled only when the 'Override Visit Type control on Episode' check box is selected. Enter the number of days that must elapse from the date of the last visit in numeric format of six digits maximum length, if the patient has been advised a follow up visit to close forcibly an open episode using a background function. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No Follow-up</span> - This field gets enabled only when the 'Override Visit Type control on Episode' check box is cleared. Enter the number of days that must elapse from the date of the last visit in numeric format of six digits maximum length, if the patient has no follow up advised to close forcibly an open episode using a background function. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Queue Management</p>
+<p class="BoldRFD" style="font-weight: normal;">Patient queues are used to manage the Patient flow in the Facility and to balance workloads. The Queue Management function is used at various stages of interaction of the Patient with the Facility. The following sets of parameters related to Queue Management are maintained:</p>
+<ol start="25" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refresh Interval (Min)</span> – Enter the Refreshing Interval in minutes for the Queue Management screen in numeric format of four digits maximum length. Based on the time interval set here the system automatically refreshes the Manage Patient Queue screen. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">On-time Appointment Status</span> - If check-in is at least [] min before appointment time -Enter the value in minutes for On-time appointment status in numeric format of six digits maximum length. If the check-in time has passed the sum of appointment time and the entered grace time, then the check-in is considered to be a late arrival.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No-show Appointment Status</span> - If check-in is not within [] min after appointment time - Enter the value in minutes for No show Appointment status in numeric format of six digits maximum length. An appointment case is considered to be a no show when the current time passes the sum of appointment time and this grace period.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign Queue Number By</span> - Select System or Manual from the list. If 'System' is selected from the list, then the system will automatically generate the Queue Number. If ‘Manual’ is selected then you can define Queue Number through Mark Arrival function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Arrived and Consultation Started Patients</span> – Select the check box to display the legend ‘Include Arrived and Consultation Started Patients’ in ‘Cancel Visit’ function. Clear the check box if the legend ‘Include Arrived and Consultation Started Patients’ and the field will not be displayed in ‘Cancel Visit’ function. The check box is cleared, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Calculate Wait Time based on Status</u></span> – Select the required value from the drop-down list. The list values include Checked-In and Arrived At Nursing Station. Based on the selected value, the patient Waiting Time is calculated in the Manage Patient Queue. By default, the value ‘Checked-In’ is displayed. The ‘Calculate Wait Time based on Status’ configuration done in OP Parameter will apply for all Clinics. If the setup is done in Clinic screen, then Clinic setup will take precedence. At any point of time, the wait time will be calculated based on the latest configuration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Colour Legend to Identify Patient if Wait time Exceeds –</u></span> Enter the allowed waiting for the patients in minutes in the text box. If the patient waiting time exceeds the allowed waiting time, the wait time is displayed in blue or orange colour in the Manage Patient Queue, Record Vital Signs and OP Check Out screens.</p>
+</li>
+</ol>
+<ol start="32" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD" style="margin-left: 0px;"><span style="text-decoration: underline;"><u>Action when unsettled/unbilled amount for the encounter</u></span> – Defines the action to be taken while marking arrival or starting consultation for a patient, if the patient has any unsettled or unbilled amount in that encounter. You can select one of the three options from the drop-down list.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 36px;"><span style="font-weight: bold;"><b>• No Action</b></span> – The system will not display any warning or error, and you can proceed with the Mark Arrival and Start Consultation activities for the patient without interruption.</p>
+<p class="NumberRFD" style="margin-left: 36px;"><span style="font-weight: bold;"><b>• Warning</b></span> – The system will display a warning message “Unsettled/Unbilled amount exists for the encounter. Do you want to continue?” both when marking arrival and starting consultation for the patient. You can click OK and still proceed with the activities.</p>
+<p class="NumberRFD" style="margin-left: 36px;"><span style="font-weight: bold;"><b>• Stop</b></span> – The system will display an error message, “Unsettled/Unbilled amount exists for the encounter. Cannot proceed.” You cannot mark arrival or start consultation for the patient.</p>
+<p class="Note"><span style="font-weight: bold;"><b><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /></b></span>These messages will be displayed when you try to select the Arrived and Start Consultation options for a patient in the 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../Transaction/Manage_Patient_Queue.htm',600,300);return false;">Manage Patient Queue</a> &#160;screen.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Auto Completion of Incomplete Visits</p>
+<ol start="33" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Disposition Type</span> – Select the Disposition Type from the list of valid values. The Disposition Type values are displayed from the ‘Disposition Type’ master function in Application Masters module. The Disposition Type values are displayed if 'Use at Visit Conclusion' and 'Use for Maternal Death' check boxes are not selected in 'Disposition Type' master function in Application Masters module. The Disposition Type selected is defaulted while closing the incomplete visits automatically. If no value is defined here, the Disposition Type is defaulted to 'Select' in the OP Check out function. This is a mandatory field, if disposition details have to be captured as part of minimum data set.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Vital Signs/Nursing Measures</p>
+<ol start="34" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Group</span> – Select the Vital Signs from the list. The Vital Signs selected are considered as nursing measures during patient visit if you fail to set Vital Signs at the ‘Clinic’ and ‘Visit Type for clinic’ level. This field is mandatory.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Billing Parameters</p>
+<ol start="35" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interfaced to Billing Module</span> - Select the check box if the Patient Billing Manager module is interfaced. The visit charges are automatically generated during registration and updated in the Patient Billing Manager module. Clear the check box if the Patient Billing Manager module is not interfaced. The check box is cleared, by default.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a1');
+//]]>
+</script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

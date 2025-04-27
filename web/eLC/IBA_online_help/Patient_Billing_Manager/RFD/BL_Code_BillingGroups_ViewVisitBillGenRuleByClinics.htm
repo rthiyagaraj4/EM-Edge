@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_BillingGroups_ViewVisitBillGenRuleByClinics</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>View Visit Bill Generation Rule by Clinics</h1>
+<p class="BoldRFD" style="font-weight: normal;">The View Visit Bill Generation Rule by Clinics tab enables you to view the bill generation rule defined for a Clinic using the function Outpatient Visit Bill Rule Setup.</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The Visit Bill generation rule defined for the relevant Clinic in the Facility gets displayed. The Visit Bill Generation Rule defined using the function ‘Outpatient Visit Bill Rule Setup’ under ‘Interfaced Modules Financial Dtls’ function in the Masters gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Clinic</span> – The name of the Clinic associated to the Facility for which the rule is defined gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Clinic is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Generate Visit Bill</span> – Generate Visit Bill is either selected or cleared based on the parameter set up using the function ‘Outpatient Visit Bill Rule Setup’. If the check box is selected, the bill is generated during visit registration to the respective Clinic. If the check box is cleared, you cannot generate a Visit Bill during Visit Registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settle Bill Amount</span> – Settle Bill Amount is either selected or cleared based on the parameter set up using the function ‘Outpatient Visit Bill Rule Setup’. If the check box is selected, the bill amount for the visit registration has to be settled during registration in the Outpatient Clinic. If the check box is cleared, it is not mandatory to settle the bill amount during Visit Registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Option</span> - Print Option gets displayed based on the values selected in the ‘Outpatient Visit Bill Rule Setup function. Print Option is enabled only when ‘Settle Bill Amount’ is selected. The values are system defined – ‘Print Visit Bill-Cum-Receipt – Automatically’, ‘Print Visit Receipt – Automatically’ and ‘Do not print’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Print Visit Bill-Cum-Receipt – Automatically – Select Print Visit Bill-Cum-Receipt – Automatically to generate &#160;the Bill Cum Receipt automatically for the respective Visit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Print Visit Receipt – Automatically – Select Print Visit Receipt – Automatically to generate a receipt automatically for the visit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Do not print – Select Do Not Print and the bill or receipt is not generated for a visit registration.</p>
+</li>
+</ol>
+<ol start="7">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Generate Zero Visit Bill</span> – Generate Zero Visit Bill is either selected or cleared based on the parameter set up using the function ‘Outpatient Visit Bill Rule Setup’. If the check box is selected, a bill with zero amount is generated for the Billing Group. If the check box is cleared, no bill is generated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Zero Visit Bill</span> – Print Zero Visit Bill is selected or cleared based on the parameter set up using the function ‘Outpatient Visit Bill Rule Setup’. Print Zero Visit Bill option is enabled only if the ‘Generate Zero Visit Bill’ generation is selected. If the check box is selected, the bills with zero amount are printed during visit registration. If the check box is cleared, the zero visit bills are not printed for the Billing Group.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

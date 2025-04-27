@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BillingServices_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define a Billing Service:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> – Enter the Billing Service code in alphanumeric format of 10 characters maximum length. The minimum character length is one and the maximum length is 10 characters. The Billing Service code is a combination of the Service Groups/Classification code, that is, the initial characters of the Billing Service code has to begin with the Service Groups/Classification code. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Group</span> – The Service Group field gets populated automatically when the Billing Service code is set. The Service Group code associated to the first two characters of the Billing Service code is displayed. The Service Groups defined using the Service Groups/Classification function gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Classification</span> - The Service Classification field gets populated automatically based on the Billing Service code selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the Long Description in alphanumeric format of 40 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter a Short Description for the Billing Service in alphanumeric format of 15 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">UOM</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to associate Unit of Measure to the Billing Service. The selected Billing Service is charged accordingly based on the Unit of Measure associated to the patient records during transaction functions. The values defined using the function Unit of Measure under the ‘Materials Setup’ menu in the Application Masters module get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reimbursable</span> – Select the check box, if the service is reimbursable. You can reimburse the amount paid by the patient towards the service, if the check box is selected. The check box is selected, by default. Clear the check box and you cannot reimburse the amount for the selected service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reimbursable Type</span> – Select a value from the list. The values for Reimbursable Type are pre-defined:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Full – Select Full to refund the entire amount paid by the patient towards the service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Partial – Select Partial to refund only a fraction of the service amount. A part of the amount is deducted for the service availed and the remaining amount is refunded to the patient/payer. You have to specify the amount to be reimbursed in the field ‘Reimbursable Amount’ under the ‘General’ tab. The Charge is specified only, if the ‘Charge Type’ is set to ‘Charge’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable – Select Not Applicable, if the service is not reimbursable.</p>
+</li>
+</ol>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">S</span><span style="text-decoration: underline;"><u>AC Code</u></span> - Enter SAC Code in the alphanumeric format of 20 characters maximum length. You cannot enter special characters. You can define single SAC Code for more than one billing service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – Select the check box to override the reimbursable or the non-reimbursable amount for Cash patients. If the Override check box is selected and the ‘Reimbursable’ check box is cleared, the selected service is reimbursable. The reimbursable amount cannot be overridden, if the check box is cleared.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Charge Type</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Billing Service can be Rate based or Charge based.</span></p>
+<p class="BoldRFD">&#160;</p>
+<ol start="11">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rate</span> – Select Rate, if the Billing Service is Rate based. This indicates that the charges for the services are pre-defined. The charge for the services utilized is computed during bill generation based on the pre-defined charges.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge</span> – Select Charge, if the Billing Service is Charge based. This indicates that the charges are not pre-defined and the charges vary depending on the quantity of service used. Price setup is defined based on the following pre-defined Multi-Pricing groups:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Customer Specific Prices</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Group Specific Prices</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Price Class Specific Prices</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Standard Price</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /> The multi-pricing concept works based on the priority level. On selecting a service, the system checks, if the Customer Specific Price is defined for a service. If the Customer Specific price is defined for a selected service, the charge is calculated based on the price definition for each patient class for a specified date range and the associated facility.</p>
+<p class="Note">If the Customer Specific Price is not defined, the system checks for Billing Group Specific Price. If the Billing Group Specific Price is defined, the charge is calculated based on the price definition for each patient class for a specified date range and the associated facility.</p>
+<p class="Note">If the Customer Specific Price and the Billing Group Specific Price are not defined, system checks for Price Class Specific Price. If the Price Class Specific Price is defined, the charge is calculated based on the price definition for each patient class for a specified date range and the associated facility.</p>
+<p class="Note">If the Customer Specific Price, Billing Group Specific Price and Price Class Specific Price are not defined, the charge is computed based on the Standard Price defined. An error message gets displayed, if the Standard Price is not defined for the selected service.</p>
+<p class="Note">If the Charge Type is set to Charge, the Multi-Pricing groups cannot be defined; only the Account Department/Location can be set. To define and set the above mentioned Multi-Pricing groups, select Rate under the Charge Type category.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

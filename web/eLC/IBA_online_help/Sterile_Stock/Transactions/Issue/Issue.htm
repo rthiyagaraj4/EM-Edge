@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Issue</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Sterile Stock\nTransactions\nIssue\nIssue");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Issue</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Issue</span> the trays requested by other stores.</p>
+<p class="Text">The owner store issues trays requested by other stores in this function. The system validates the following conditions while issuing the requested trays.</p>
+<ul type="disc">
+<li class="p-Text">
+<p class="Text">The logged in user should have rights to Issue from the Owner store</p>
+</li>
+<li class="p-Text">
+<p class="Text">Both the requesting and owner stores must have access to the requesting group, alternate group and issue group.</p>
+</li>
+</ul>
+<p class="Text">Only the sterilized trays currently available with the owner store are issued.</p>
+<h2>Issuing Trays</h2>
+<p class="From">From SS Transactions &gt; Issue, select the Issue function.</p>
+<p class="Text">The Issue screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Create]</span> to invoke the Pending Issues screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">All the requests which are pending for issue are displayed. Click on the ‘Doc No’ hyperlink to select the request for issuing or enter the 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">criteria</a> and click <span class="BoldButton">[Search]</span> to select a specific record.</p>
+<div class="droptext" id="POPUP356559868" style="display: none;">
+<p class="BoldRFD">Enter the following criteria to select the record to issue the requested tray:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc No.</span> – Enter the request document number in numeric format of eight digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type</span> – Select the request document type from the list. The values listed are defined in the ‘SS Document Type’ function for the Transaction Type ‘Request Group’ and the default value displayed is specified in the function ‘SS Parameter for Facility’ for request group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> - Enter the request document generation date in the format of dd/mm/yyyy or select the date using the Calendar function. The entered date must not be less than the processing month/year specified in ‘SS Parameter for Facility’ function and not greater than current system date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Requested By Store</span> – Select the requested by store from the list. The stores are listed based on the access rights of the user and applicable transaction.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Requested On Store</span> - Select the owner store from the list. The stores are listed based on the access rights of the user and applicable transaction.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the Doc No hyperlink, the request group details such as Req Doc Type, Req Doc No, Issue Store, Receiving Store, Authorized By, Doc Type, Doc No, Doc Date and Doc Refare displayed in the Issue screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Issue Group from the drop-down list. All the valid requested Issue Groups and its alternate groups that are associated with both the Requesting and Issuing Stores are displayed in the <span style="font-weight: bold;"><b>Issue Group</b></span> drop-down list. Select the Tray number, Bin Location, Expiry Date and the Issue Cost of the selected Tray are displayed. The associated available tray numbers based on the quantity requested are populated in the Tray No. drop-down list excluding the tray numbers that are already chosen for the same Issue Group earlier.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Patient ID or select the <span style="font-weight: bold;"><b>Patient ID</b></span> using the [?] function to issue the tray for a patient. On selecting the Patient ID, the Patient name is displayed in the <span style="font-weight: bold;"><b>Patient Name</b></span> field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select <span style="font-weight: bold;"><b>Del</b></span> check box for the Request Groups that you wish to delete.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click ‘<span style="font-weight: bold;"><b>Req Group</b></span>’ hyperlink to issue the trays. The Request Group, Authorized Group and Issue Group details are displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the request document type, the request details are displayed. The displayed details are Request Document Type, Request Document Number, Issue Store, Receiving Store, Authorized By, Document Type, Document Number, Document Date, Document Reference, Request Group, Issue Group, and Authorized Group.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the Request Group hyperlink, the Request Group, Authorized Group and Issue Group details are displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Tray number or select the Tray number using the <span class="BoldButton">[?]</span> function. All the Sterilized Trays of the selected group is displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Tray No hyperlink to select the tray.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the Tray number, the Bin Location, Expiry Date and the Issue Cost of the selected Tray are displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Patient ID or select the Patient ID using the <span class="BoldButton">[?]</span> function to issue the tray for a patient. On selecting the Patient ID, the Patient name is displayed in the Patient Name field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Modify]</span> to record the selected tray details or <span class="BoldButton">[Cancel]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On clicking <span class="BoldButton">[Modify]</span>, the Tray number and the Patient ID is updated in the right hand side of the screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the ‘Del’ check box to exclude the record.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to record the tray details and issue the tray to the requesting store or <span class="BoldButton">[Reset]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A document number is generated on issuing the tray.</p>
+</li>
+</ol>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);"  title="Related Topics"><img src="../../../ss_btn_related_topics2.gif" border="0" height="23" width="101" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);"  title="See Also"><img src="../../../ss_btn_see_also2.gif" border="0" height="23" width="65" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP356559868');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

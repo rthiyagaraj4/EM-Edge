@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>FM_Trans_GenerateOPPullingList</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to generate the main and supplementary lists:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pulling List Type</span> - Select the Pulling List Type from the list. The values listed are Main and Supplementary. The value ‘Main’ is displayed, by default. The Main list can be generated only once.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt Date</span> - The Appointment Date is displayed based on the FM Parameter Setup. This field is mandatory. In FM Parameter function, the value specified for ‘No of Days up to which to check for appointments in File Inquiry [ ]’ is considered for generation of pulling list. The current system Date and the parameter value are added to arrive at the appointment Date value in this function. The list is generated for the calculated Date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gender</span> - Select the Gender from the list. The values contained in the list are Male, Female, Unknown and All. The value 'All' is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> - Select the Location from the list. The listed values are Clinic, Daycare Unit and Procedure Unit.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Location Code - Enter the From and To Location Code in alphanumeric format of four characters maximum length or use <span class="BoldNumberRFD">[?]</span> function to query the Location Codes. Specify the code range to limit the generation of pulling list. This field is optional. The Location Code must correspond to the selected location.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Class</span> - Select the Resource Class from the list. The listed values are Practitioner, Equipment, Room and Other.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Type</span> - Select the Resource Type from the list. The listed values correspond to the selected Resource Class. Specify the Resource Type range to restrict the generation of list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource ID</span> - Enter the Resource ID in alphanumeric format of 15 characters maximum length or use <span class="BoldNumberRFD">[?]</span> function to query the Resource ID. Specify the Resource ID range. The Resource ID must correspond to the selected Resource Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Pulling Label</span> - Select the Print Pulling Label check box to print the generated label. On generating the label, the label is routed to the specified Printer for printing.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Identification Label</span> - Select the Print Identification Label check box to print the Identification Label.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Tel. No in Pulling List</span> - Select the Print Tel No in Pulling List check box to include Telephone Number of the patients in the Pulling List. This field is enabled only when Print Pulling List is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bar Code</span> - Select the Print Bar code check box to print Bar Code. This field is enabled only when Print Pulling List is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order By</span> - This field is disabled if Print Pulling List check box is cleared. If Print Pulling List is applicable, select the list values. The values displayed are Terminal Digits and Appt. time (Appointment Time). The generated list is order based on the value specified. On selecting the required order by value, you can specify Ascending or Descending value from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Patient File Request Slip</span> – Select the ‘Print Patient File Request Slip’ check box to print the Patient file request slip for Appointment. The Patient file request slip is printed on confirming the appointment.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

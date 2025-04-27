@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Stock Transfer</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Inventory Management\nTransactions\nStock Transfer");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Stock Transfer</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Record</span> the details of stock transferred from one Store to another.</p>
+<p class="Text">The Items to be transferred should exist in both transferring Store and the transferred Store. As a result of Stock Transfer, the stock moves from one stocking point to another. In the system as a whole there is no net effect on the stock levels. In the transferring Store, the stock levels are reduced. In the receiving Store, the stock levels are increased.</p>
+<h2>Recording Stock Transfer Details</h2>
+<p class="From">From the ST Transactions &gt; Transfer, select the Stock Transfer function.</p>
+<p class="Text">The Stock Transfer screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Create]</span> to invoke the Create screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Modify Document Details screen is displayed, by default or click ‘Document’ hyperlink to modify the 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/st_trans_stock_adjustment_doc_details.htm',400,300);return false;">document details</a>.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On entering the Document Details, click <span class="BoldButton">[OK]</span> to record the Stock Transfer details or <span class="BoldButton">[Reset]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Item to transfer to the selected Store in alphanumeric format of 60 characters maximum length or select the Item using <span class="BoldButton">[?]</span> function. Click the Information icon <img src="../Images/Information_icon.jpg" style="border: none;" alt="Information_icon.jpg" width="16" height="16" border="0" /> near the item name to view either 'Remarks' or 'Specification' or both for the selected item in a popup or as a tool tip. The Information icon <img src="../Images/Information_icon.jpg" style="border: none;" alt="Information_icon.jpg" width="16" height="16" border="0" /> will be available only if either 'Remarks' or 'Specification' or both exists for that item. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You can click the information icon <img src="../Images/Information_icon.jpg" style="border: none;" alt="Information_icon.jpg" width="16" height="16" border="0" /> next to the Item for viewing the ‘Item Remarks’.</p>
+<ol start="5">
+<li class="p-Number">
+<p class="Number">On selecting the Item, the Unit of Measure and the available stock quantity, Cost of the Item is displayed. The Cost of the Item is calculated as rechargeable fractional units for multiple patients.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Quantity of the Item, which needs to be transferred to the selected Store in numeric format of six digits maximum length. The entered quantity must not be greater than the available quantity of the Item or an error message will be displayed. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On entering the Quantity, the Transfer Quantity is displayed by default. You cannot change the Transfer Quantity.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Edit/View]</span> to transfer the first expiring batch in the slot. The Item Batch details are displayed. The Quantity entered is displayed as the Transfer Quantity. Select the ‘To Store Master Bin Location’ from the list. The Bin Locations associated to the selected ‘To Store’ are displayed in the list.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Batch Search]</span> to view the Batch details. The selected Item Batch details are displayed. Select the check box to select the Batch and click <span class="BoldButton">[Close]</span> to exit from the batch search screen. If batch details are selected using [Edit/View], the selected Batch details are refreshed on selecting the new batch.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the batch, the batch details are displayed in the Batch Entry area.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select ‘To Store Master Bin Location’ from the list and enter the transfer quantity.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Add]</span> to add the Item for transfer or <span class="BoldButton">[Cancel]</span> to cancel the selected Item details.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Stock Level]</span> to view the ‘From’ and ‘To’ stock details.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The selected Item details are displayed in the Item Details frame on the left hand side. Click ‘Item Details’ hyperlink to modify the Item transfer details. Click the <span style="font-weight: bold;"><b>Information icon</b></span> <img src="../Images/Information_icon.jpg" style="border: none;" alt="Information_icon.jpg" width="16" height="16" border="0" /> near the item name to view either 'Remarks' or 'Specification' or both for the selected item in a popup or as a tool tip. The Information icon <img src="../Images/Information_icon.jpg" style="border: none;" alt="Information_icon.jpg" width="16" height="16" border="0" /> will be available only if either 'Remarks' or 'Specification' or both exists for that item. Click <span class="BoldButton">[Modify]</span> to modify the entered details or <span class="BoldButton">[Cancel]</span> to cancel the modified changes.</p>
+</li>
+<li class="p-Number">
+<p class="Number">You can select the ‘Delete’ check box to delete the selected record. The Delete check box is selected or cleared by default based on the setup done in Kit Template screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to finalize the Item transfer details or <span class="BoldButton">[Reset]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The ‘Confirm Finalize’ dialog is displayed. Click <span class="BoldButton">[Yes]</span> to finalize the Item transfer details or <span class="BoldButton">[No]</span> to finalize the Item transfer details in the query mode.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The ‘Confirm Printing’ dialog is displayed based on the attribute set for the Document Type. Click <span class="BoldButton">[Yes]</span> to print the Item transfer details or <span class="BoldButton">[No]</span> to cancel the action.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Query]</span> to invoke the Query screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The unauthorized Item transfer details are displayed based on the default criteria or enter the 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">search criteria</a> and click <span class="BoldButton">[Search]</span> to select a specific record.</p>
+<div class="droptext" id="POPUP347470504" style="display: none;">
+<p class="BoldRFD">Enter the following criteria to query unauthorized Stock Transfer details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type</span> – Select the Document Type from the list. The values listed are defined in the function ‘ST Document Type’ and the default value displayed is specified in the function ‘ST Facility Parameter’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc No.</span> – Enter the Document Number in numeric format of eight digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> - Enter the date in date format of dd/mm/yyyy or select the required date using the Calendar function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Store</span> – Select the ‘From Store’ from the list. Only those stores are displayed to which you have access and ‘Stock Transfer’ transaction function is applicable.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">To Store</span> – Select the ‘To Store’ from the list. Only those stores are displayed to which you have access and ‘Stock Transfer’ transaction function is applicable.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Item Class</span> – Select the required Item Class value from the list.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">On searching, the unauthorized Item transfer details are displayed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click ‘Doc Type’ hyperlink to authorize the Item transfer details.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to finalize the Item transfer details or <span class="BoldButton">[Delete]</span> to delete the selected record.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On clicking <span class="BoldButton">[Apply]</span>, the ‘Confirm Finalize’ dialog is displayed. Click <span class="BoldButton">[Yes]</span> to finalize the Item transfer details or <span class="BoldButton">[No]</span> to finalize the Item transfer details in the query mode.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On selecting the ‘Delete’ check box, ‘Confirm Delete’ dialog is displayed. Click <span class="BoldButton">[Yes]</span> to delete the record or <span class="BoldButton">[No]</span> to cancel the action.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Sale transaction is processed if the remaining quantity is changed to the patient.</p>
+<p class="Note">If the patient is not charged for the remaining quantity, then the remaining quantity should be written off through the stock adjustment transaction. The Minimum Stock Level or Reorder Level of the selected item is displayed next to the Item field while performing the transaction. Based on selection of Display Min Level &amp; ROL check box in User Access for Store, this functionality will be enabled.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Document Type','../Administration/Document_Type.htm','Goods Received Note','../../Materials_Base/Transactions/Goods_Received_Note.htm','Store','../Code_Setup/Store.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP347470504');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

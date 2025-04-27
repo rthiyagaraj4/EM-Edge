@@ -1,0 +1,686 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                   */
+/************************************************************************/
+/* PROGRAM NAME          : ARRORPT1.PC                                  */
+/* AUTHOR                : YESHODA ERAPPA                                    */
+/* DATE WRITTEN          : 10-APR-1993                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */
+/*                                                                                                       */
+/*  FUNCTION             :                                               */
+/*                                                                      */
+/*  TABLE DETAILS                                                        */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                      */
+/*         1.        AR_CASHIER               Query/Update             */
+/*         2.        SY_PROG_CONTROL           Update/Lookup            */
+/*         3.        SY_PROG_MESG                Insert                 */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include "gl.h"
+char string_var[100];
+
+/*
+#define OERROR (sqlca.sqlcode < 0)
+*/
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define DEST_NAME "arrorpt1.lis"
+
+#define MAX_LINES 13
+
+#define  ESC 0x1B
+
+#define LENGTH_WORDS 50 
+
+
+/*
+#define DEBUG 1
+*/
+
+
+char string_var[100];
+int split_text(char *str1,int number1,char *str2,int number);  
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR uid_pwd      [132],
+           hosp_name    [120],
+           date_time    [20],
+		   cur_str      [8],
+		   sub_cur_str	[8],
+           user_id      [20],
+           nd_pgm_date  [35],
+		      d_curr_pgm_name  [15];
+
+   VARCHAR nd_facility_id   [3],
+           nd_session_id    [16],
+           nd_fm_doc_type   [7],
+           nd_to_doc_type   [7],
+           nd_fm_doc_num    [10],
+           nd_to_doc_num    [10],
+		   nd_rep_option    [2],
+           nd_fm_doc_date   [12],
+           nd_to_doc_date   [12];
+
+   VARCHAR d_bl_doc_type_code     [7],
+           d_bl_doc_num           [10],
+           d_bl_doc_date          [12],
+           d_bl_cust_code         [9],
+           d_bl_doc_ref           [16],
+           d_bl_bank_desc         [31],
+           d_bl_cheque_num        [11],
+           d_bl_cheque_date       [12],
+           d_bl_rowid             [31],
+           d_bl_narration         [51],
+		   d_added_by_id          [31],
+		   cond_amount                   [500],
+		   d_print_flag          [2],
+           d_ar_cust_long_name    [101];  /* CRF-0120 */
+
+   double  d_bl_amt_local;
+
+   char amt_in_words	 [10][133],
+           corder_str    [81];
+   int nd_no_of_decimal;
+   VARCHAR  p_language_id[4];
+
+EXEC SQL END DECLARE SECTION;
+ 
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *fp; 
+int lctr = 0,pctr =0;
+int no_of_lines;  
+int inc ;
+int nstart ;
+
+
+
+char filename[150];
+
+void proc_main(argc,argv)
+char *argv[];   
+int argc;
+{
+	strcpy(filename,WORKING_DIR);
+	strcpy(OUTPUT_FILE_NAME,argv[5]);
+	strcat(filename,OUTPUT_FILE_NAME);
+
+	//strcat(filename,"arrorpt1.lis");
+
+   if (argc < 6)
+   {
+    int i = 0;
+      disp_message(ERR_MESG,"Not enough Parameters for running this program");
+      proc_exit();
+   }
+
+   strcpy(g_pgm_id,"ARRORPT1");
+
+   strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+   d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   if(sql_connect() == -1)
+   {
+      disp_message(ERR_MESG,"Error in connecting to Oracle");
+      proc_exit();
+   }
+
+   /***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+   strcpy(g_pgm_date,argv[3]);
+
+ 
+   
+
+#ifdef DEBUG
+  disp_message(ERR_MESG,"After connecting to oracle...\n");
+#endif
+   /***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+   strcpy(g_facility_id,argv[4]);
+  set_meduser_role();
+   strcpy(p_language_id.arr,l_language_id.arr);
+
+   nd_fm_doc_type.arr[0]    = '\0';
+   nd_fm_doc_num.arr[0]     = '\0';
+   nd_fm_doc_date.arr[0]    = '\0';
+   nd_to_doc_type.arr[0]    = '\0';
+   nd_to_doc_num.arr[0]     = '\0';
+   nd_to_doc_date.arr[0]    = '\0';
+   nd_facility_id.arr[0] = '\0';
+   nd_rep_option.arr[0] = '\0';
+
+
+   nd_fm_doc_type.len       = 0;
+   nd_fm_doc_num.len        = 0;
+   nd_fm_doc_date.len       = 0;
+   nd_to_doc_type.len       = 0;
+   nd_to_doc_num.len        = 0;
+   nd_to_doc_date.len       = 0;
+   nd_facility_id.len       = 0;
+   nd_rep_option.len        = 0;
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID ,PARAM1,PARAM2,PARAM3,PARAM4,PARAM5,PARAM6,PARAM7
+              INTO :nd_facility_id, :nd_fm_doc_type, :nd_fm_doc_num, :nd_fm_doc_date,
+                   :nd_to_doc_type, :nd_to_doc_num, :nd_to_doc_date ,:nd_rep_option
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'ARRORPT1'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_fm_doc_type.arr[nd_fm_doc_type.len]    = '\0';
+   nd_fm_doc_num.arr[nd_fm_doc_num.len]      = '\0';
+   nd_fm_doc_date.arr[nd_fm_doc_date.len]    = '\0';
+   nd_to_doc_type.arr[nd_to_doc_type.len]    = '\0';
+   nd_to_doc_num.arr[nd_to_doc_num.len]      = '\0';
+   nd_to_doc_date.arr[nd_to_doc_date.len]    = '\0';
+   nd_facility_id.arr[nd_facility_id.len]    = '\0';
+   nd_rep_option.arr[nd_rep_option.len]      = '\0';
+
+
+/* #ifdef DEBUG */
+   sprintf(string_var,"fr type is <%d> - <%s>\n",nd_fm_doc_type.len ,nd_fm_doc_type.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"to type is <%d> - <%s>\n",nd_to_doc_type.len ,nd_to_doc_type.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"fr num  is <%d> - <%s>\n",nd_fm_doc_num.len ,nd_fm_doc_num.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"to num  is <%d> - <%s>\n",nd_to_doc_num.len ,nd_to_doc_num.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"fr dt   is <%d> - <%s>\n",nd_fm_doc_date.len ,nd_fm_doc_date.arr);
+   disp_message(INFO_MESG,string_var);
+   sprintf(string_var,"to dt   is <%d> - <%s>\n",nd_to_doc_date.len ,nd_to_doc_date.arr);
+   disp_message(INFO_MESG,string_var);
+/* #endif */
+
+   start_prog_msg();
+
+   fetch_detls();
+
+   open_files();
+   
+   declare_cursors();
+
+   while(fetch_rec())
+   {
+  
+        fetch_cust_dets();
+        print_page_head();
+        print_rec();
+        update_rec();
+		fprintf(fp,"\f");
+   }
+
+   fclose(fp);
+
+   EXEC SQL DELETE FROM SY_PROG_PARAM
+                  WHERE PGM_ID     = 'ARRORPT1'
+                    AND SESSION_ID = :nd_session_id
+                    AND PGM_DATE   = :nd_pgm_date;
+   if (OERROR)   
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+
+
+
+   end_prog_msg();
+
+/*
+   end_prog_control();
+*/
+
+   EXEC SQL COMMIT WORK RELEASE;
+   return;
+}
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+fetch_detls()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"In fetch det\n");
+#endif
+   hosp_name.arr[0]      = '\0';
+   date_time.arr[0]      = '\0';
+   cur_str.arr[0]        = '\0';
+   sub_cur_str.arr[0]    = '\0';
+   user_id.arr[0]        = '\0';
+
+   hosp_name.len      = 0;
+   date_time.len      = 0;
+   cur_str.len        = 0;
+   sub_cur_str.len    = 0;
+   user_id.len        = 0;
+
+   EXEC SQL SELECT ACCOUNTING_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY'), BASE_CURRENCY,
+                   USER,BASE_CURRENCY_DEC , NO_OF_DECIMAL
+              INTO :hosp_name, :date_time, :cur_str, :user_id,
+			       :sub_cur_str, :nd_no_of_decimal
+              FROM SY_ACC_ENTITY
+			  where   ACC_ENTITY_ID = :nd_facility_id;
+;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+   hosp_name.arr[hosp_name.len]           = '\0';
+   date_time.arr[date_time.len]           = '\0';
+   cur_str.arr[cur_str.len]               = '\0';
+   sub_cur_str.arr[sub_cur_str.len]       = '\0';
+   user_id.arr[user_id.len]               = '\0';
+
+}
+
+open_files()
+{
+   char		text_mesg[101];
+
+   //strcpy(filename,WORKING_DIR);
+   //strcat(filename,DEST_NAME);
+
+   if ((fp = fopen(filename,"w")) == NULL)
+   {
+        sprintf(text_mesg,"Error While Opening File %s",filename);
+        err_mesg(text_mesg,0,"");
+
+		//err_mesg("\nError while opening File arrrmltr.lis\n",0,"");
+        proc_exit();
+   }
+
+#ifdef DEBUG
+   disp_message(INFO_MESG,"After opening file\n");
+#endif
+}
+
+declare_cursors() 
+{
+#ifdef DEBUG
+   disp_message(INFO_MESG,"Inside declare cursors\n");
+#endif
+
+
+   EXEC SQL DECLARE AR_CASHIER_CUR CURSOR FOR
+             SELECT DOC_TYPE_CODE,
+                    DOC_NUM,
+                    TO_CHAR(DOC_DATE,'DD/MM/YYYY'),
+                    CUST_CODE,
+                    DOC_REF,
+                    NVL(AMT_LOCAL,0),
+                    BANK_DESC,
+                    CHEQUE_NUM,
+                    TO_CHAR(CHEQUE_DATE,'DD/MM/YYYY'),
+                    NARRATION,
+                    ROWID,
+					NVL(PRINT_FLAG,'N'),
+					ADDED_BY_ID
+               FROM AR_CASHIER
+              WHERE  DOC_TYPE_CODE >= NVL(:nd_fm_doc_type,'      ')
+                AND DOC_TYPE_CODE <= NVL(:nd_to_doc_type,'~~~~~~')
+                AND DOC_NUM       >= NVL(:nd_fm_doc_num,0)
+                AND DOC_NUM       <= NVL(:nd_to_doc_num,99999999)
+                AND NVL(DOC_DATE,SYSDATE)      >= 
+                    NVL(TO_DATE(:nd_fm_doc_date,'DD/MM/YYYY'),to_date('00010101','YYYYDDMM'))
+                AND NVL(DOC_DATE,SYSDATE)      <= 
+                    NVL(TO_DATE(:nd_to_doc_date,'DD/MM/YYYY'),to_date('47123112','YYYYDDMM'))
+              ORDER BY DOC_TYPE_CODE,DOC_NUM;
+
+    EXEC SQL OPEN AR_CASHIER_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor AR_CASHIER_CUR",0,"");
+
+    EXEC SQL DECLARE AR_CUSTOMER_CUR CURSOR FOR
+              SELECT DECODE(CHINESE_REPORTING_FLAG,'Y',
+                     LONG_NAME_CHINESE,LONG_NAME)
+                FROM AR_CUSTOMER
+               WHERE CUST_CODE = :d_bl_cust_code;
+
+}  
+
+fetch_rec()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside fetch rec\n");
+#endif
+   d_bl_doc_type_code.arr[0] = '\0';
+   d_bl_doc_num.arr[0]       = '\0';
+   d_bl_doc_date.arr[0]      = '\0';
+   d_bl_cust_code.arr[0]     = '\0';
+   d_bl_doc_ref.arr[0]       = '\0';
+   d_bl_bank_desc.arr[0]     = '\0';
+   d_bl_cheque_num.arr[0]    = '\0';
+   d_bl_cheque_date.arr[0]   = '\0';
+   d_bl_narration.arr[0]     = '\0';
+   d_bl_rowid.arr[0]         = '\0';
+   d_print_flag.arr[0]       = '\0';
+   d_added_by_id.arr[0]      = '\0';
+
+   d_bl_doc_type_code.len    = 0;
+   d_bl_doc_num.len          = 0;
+   d_bl_doc_date.len         = 0;
+   d_bl_cust_code.len        = 0;
+   d_bl_doc_ref.len          = 0;
+   d_bl_bank_desc.len        = 0;
+   d_bl_cheque_num.len       = 0;
+   d_bl_cheque_date.len      = 0;
+   d_bl_narration.len        = 0;
+   d_bl_rowid.len            = 0;
+   d_print_flag.len          = 0;
+   d_bl_amt_local            = 0;
+   d_added_by_id.len         = 0;
+
+   no_of_lines  = 0;
+   inc          = 0;
+   nstart       = 0;
+
+
+
+   EXEC SQL FETCH AR_CASHIER_CUR
+             INTO :d_bl_doc_type_code,
+                  :d_bl_doc_num,
+                  :d_bl_doc_date,
+                  :d_bl_cust_code,
+                  :d_bl_doc_ref,
+                  :d_bl_amt_local,
+                  :d_bl_bank_desc,
+                  :d_bl_cheque_num,
+                  :d_bl_cheque_date,
+                  :d_bl_narration,
+                  :d_bl_rowid,
+				  :d_print_flag,
+				  :d_added_by_id;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor AR_CASHIER_CUR",0,"");
+
+    d_bl_doc_type_code.arr[d_bl_doc_type_code.len] = '\0';
+    d_bl_doc_num.arr[d_bl_doc_num.len]             = '\0';
+    d_bl_doc_date.arr[d_bl_doc_date.len]           = '\0';
+    d_bl_cust_code.arr[d_bl_cust_code.len]         = '\0';
+    d_bl_doc_ref.arr[d_bl_doc_ref.len]             = '\0';
+    d_bl_bank_desc.arr[d_bl_bank_desc.len]         = '\0';
+    d_bl_cheque_num.arr[d_bl_cheque_num.len]       = '\0';
+    d_bl_cheque_date.arr[d_bl_cheque_date.len]     = '\0';
+    d_bl_narration.arr[d_bl_narration.len]         = '\0';
+    d_bl_rowid.arr[d_bl_rowid.len]                 = '\0';
+	d_print_flag.arr[d_print_flag.len]             = '\0';
+	d_added_by_id.arr[d_added_by_id.len]           = '\0';
+
+    if (LAST_ROW)
+        return(0);
+    else
+        return(1);
+}
+
+fetch_cust_dets()
+{
+#ifdef DEBUG
+  disp_message(INFO_MESG,"Inside fetch cust dets\n");
+#endif
+
+    EXEC SQL OPEN AR_CUSTOMER_CUR;
+
+    if (OERROR)
+         err_mesg("OPEN failed on cursor AR_CUSTOMER_CUR",0,"");
+
+    d_ar_cust_long_name.arr[0]          = '\0';
+    d_ar_cust_long_name.len             = 0;
+
+    EXEC SQL FETCH AR_CUSTOMER_CUR
+              INTO :d_ar_cust_long_name;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor AR_CUSTOMER_CUR",0,"");
+
+     d_ar_cust_long_name.arr[d_ar_cust_long_name.len] = '\0';
+
+}
+
+print_rec()
+{
+   char out_str[10][133];
+   char s_amt[20];
+   int  length_str[10];
+   int  i = 0,no_of_lines = 0;
+
+#ifdef DEBUG
+  disp_message(INFO_MESG,"inside print rec\n");
+#endif
+
+
+fprintf(fp ,"RECEIVED FROM   %-8s - %-40s\n\n",
+     d_bl_cust_code.arr, d_ar_cust_long_name.arr);
+
+fprintf(fp, "THE SUM OF %-8s :", cur_str.arr);
+print_formated(d_bl_amt_local);
+fprintf(fp, "\n");
+
+
+no_of_lines = print_in_words(d_bl_amt_local,LENGTH_WORDS,sub_cur_str.arr,amt_in_words,nd_no_of_decimal);
+	
+	strcpy(cond_amount.arr,cur_str.arr);
+	strcat (cond_amount.arr," ");
+
+    
+
+	for (i =0;i<no_of_lines;i++)
+   	 { 
+	    if (i==0) 
+		  strcat(cond_amount.arr,amt_in_words[i]);
+		else
+		  {
+		     strcat(cond_amount.arr,amt_in_words[i]);
+		   }
+      }
+
+
+
+	if (d_bl_amt_local != 0) 
+	{
+        inc = 0;
+        nstart = 0;
+
+      while (inc < strlen(cond_amount.arr))
+     {
+       corder_str[0] = '\0'; 
+       inc = nstart + inc;
+       nstart = split_text(cond_amount.arr,80,corder_str,inc);  
+       inc = inc + 1;
+       fprintf(fp,"%s",corder_str);
+       fprintf(fp,"\n");
+     }
+	}
+
+
+
+fprintf(fp, "\n\n");
+
+
+fprintf(fp, "IN RESPECT OF %-50s\n\n", d_bl_narration.arr);
+
+fprintf(fp, "                                PAYMENT DETAILS\n\n");
+
+fprintf(fp, " SETTLEMENT TYPE :  ");
+
+
+
+if  ((strcmp(d_bl_cheque_num.arr , "\0") == 0) ||  (strcmp(d_bl_cheque_date.arr , "\0") == 0))
+{
+
+
+ fprintf(fp, " CASH\n\n\n\n");
+}
+else
+{
+
+
+fprintf(fp, " CHEQUE\n\n");
+
+fprintf(fp, " %-10s    %-10s   %-30s\n\n" , d_bl_cheque_num.arr , d_bl_cheque_date.arr,d_bl_bank_desc.arr);
+
+}
+
+
+
+fprintf(fp, " CASHIER : %-30s\n\n", d_added_by_id.arr);
+
+fflush(fp); 
+
+}
+
+update_rec()
+{
+
+
+       EXEC SQL SELECT ROWID
+                 INTO   :d_bl_rowid
+                 FROM   AR_CASHIER
+                 WHERE  DOC_TYPE_CODE  = :d_bl_doc_type_code 
+				 AND	DOC_NUM = :d_bl_doc_num
+                 AND    NVL(PRINT_FLAG,'N') = 'N'
+                 FOR    UPDATE OF PRINT_FLAG NOWAIT;
+
+        if(OERROR)
+           err_mesg("Lock failed on table AR_CASHIER",0,"");
+
+
+
+    EXEC SQL UPDATE AR_CASHIER
+                SET PRINT_FLAG = 'Y'
+              WHERE  DOC_TYPE_CODE  = :d_bl_doc_type_code and
+					 DOC_NUM = :d_bl_doc_num;
+
+     if (OERROR)
+         err_mesg("UPDATE failed on table AR_CASHIER",0,"");
+
+    EXEC SQL COMMIT WORK;
+    if (OERROR)
+         err_mesg("COMMIT failed",0,""); 
+}
+
+
+
+print_page_head()
+{
+
+ 
+
+if (strcmp(d_print_flag.arr, "Y") == 0)
+{
+
+  if (nd_rep_option.arr[0] == 'P' )        
+    fprintf(fp, "%c(s4H", ESC);
+fprintf(fp , "  ** DUPLICATE ** ");
+  if (nd_rep_option.arr[0] == 'P' )        
+    fprintf(fp, "%c(s12H", ESC);
+fprintf(fp , "\n\n");
+
+  
+fprintf(fp , "                               OFFICIAL RECEIPT                NO: %-6s/%-8s\n\n",
+   d_bl_doc_type_code.arr, d_bl_doc_num.arr);
+
+
+}
+else
+{
+
+fprintf(fp , "\n\n\n\n");
+fprintf(fp , "                               OFFICIAL RECEIPT                NO: %-6s/%-8s\n\n",
+   d_bl_doc_type_code.arr, d_bl_doc_num.arr);
+
+}
+
+
+
+fprintf(fp,"                                                             DATE:%10s\n\n",
+  d_bl_doc_date.arr);
+
+
+#ifdef DEBUG
+    disp_message(INFO_MESG,"completed print_page_head\n");
+    fflush(fp);
+#endif
+}
+
+
+ltrim(l_str)
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+
+
+rtrim(l_str)
+char *l_str;
+{
+  while (*l_str != '\0') *l_str++;
+  l_str--;
+  while (*l_str == ' ') *l_str--;
+  *(l_str+1) = '\0';
+}
+
+
+
+
+print_formated(loc_amount)
+double loc_amount;
+{
+   char out_str[30],out_str1[30];
+  
+   if (nd_no_of_decimal == 3)
+     sprintf(out_str,"%10.3f",loc_amount);
+   else 
+     sprintf(out_str,"%10.2f",loc_amount);
+
+   format_amt(out_str,nd_no_of_decimal);
+
+   if (loc_amount >= 0 )
+     fprintf(fp,"%15s ",out_str);
+   else
+     fprintf(fp,"%15s- ",out_str);
+
+
+}

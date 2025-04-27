@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Process Month End</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Accounts Receivable\nPeriod End\nProcess Month End");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Process Month End</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Process</span> the transactions in the Accounts Receivable module. The documents have to be posted before executing this function.</p>
+<p class="Text">This function is used to process the transactions for a given month. On successful completion of process, parameter month is incremented to next month. When last month of the year is reached, a year end process is executed instead of the month end process. System performs certain 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">validations</a> before processing a month end.</p>
+<div class="droptext" id="POPUP241250481" style="display: none;">
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">For a selected period, all the transactions are posted to General Ledger.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">When interface option is set to “Batch”, General Ledger distributions and the export to General Ledger module has to be complete. On successful completion of process, the system increments the financial month by 1.</p>
+</li>
+</ul>
+</div>
+<h2>Month End Process</h2>
+<p class="From">From the Period End, double-click Process Month End function.</p>
+<p class="Text">The Process Month End screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">The Current Accounting Period set in the ‘AR Parameters’ gets displayed, by default. You cannot update the Current Accounting Period.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select a value from the list to process the records. The options are “Online”, “Batch” and "No Interface". Select one of the options from the list. This indicates whether the interface method to General Ledger is “Online”, “Batch” for the next financial period. Select "No Interface", if the Accounts Receivable module is not interfaced to the General Ledger.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Run Process]</span> to execute the month end process.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A confirmation screen pops-up. Click <span class="BoldButton">[Yes]</span> to process the month end or <span class="BoldButton">[No]</span> to cancel the process.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A log file with the output is generated. Click <span class="BoldButton">[OK]</span> to view the log file or <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /> The month end can be processed only when the unposted or uninterfaced transactions are posted. The credit note, debit note, adjustment, receipt, payment, invoice transactions have to be posted. If the details are not posted, you cannot process a month end.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Export Trans to GL','Export_Trans_to_GL.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP241250481');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

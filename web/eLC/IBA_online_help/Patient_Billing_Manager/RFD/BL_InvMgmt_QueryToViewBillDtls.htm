@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_InvMgmt_QueryToViewBillDtls</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to query the invoice or the bill details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the Facility from the list. You can query the invoice or the bill details generated for the outstanding bills of the patients associated to the selected Customer in the facility.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer. The invoice or the bill details generated for the outstanding bills of the patients associated to the selected Customer gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Policy Type. The invoice or the bill details generated for the outstanding bills of the patients associated to the selected Customer gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Patient ID. The ID of the patient’s associated to the selected Customer and the Policy Type get listed. The age, gender, patient name and the national ID gets displayed on selecting the Patient ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discharge Date [From – To]</span> – Click Calendar function to select the date range. The search is filtered based on the discharge date selected. The patients discharged during the selected date range are displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Episode Type</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Select an Episode Type to query for the respective Episode Types with the outstanding bill details or the invoices generated.</span></p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All – Select ‘All’ to query the bill details and the invoices of all the Episode Types in the selected facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Outpatient – Select ‘Outpatient’ to query the bill details and the invoices of the Outpatients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Emergency – Select ‘Emergency’ to query the bill details and the invoices of the Emergency patients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Daycare – Select ‘Daycare’ to query the bill details and the invoices of the Daycare patients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Inpatient – Select ‘Inpatient’ to query the bill details and the invoices of the Inpatients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">External – Select ‘External’ to query the bill details and the invoices of the External patients in the facility.</p>
+</li>
+</ul>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode ID</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Episode ID of the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Refresh]</span> – Click <span class="BoldNumberRFD">[Refresh]</span> to query the details. The records matching the search criteria get displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Encounter Details for Invoices</p>
+<p class="BoldRFD" style="font-weight: normal;">The encounter details of the selected patient in the facility get displayed. The Episode ID, Visit ID for an Outpatient/Emergency/External patient gets displayed along with the admission and the discharge date.</p>
+<ol start="8" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[View]</span> – Click <span class="BoldNumberRFD">[View]</span> to view the additional information captured while generating the invoice. You cannot update the details, but only view the details captured.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Invoice/Debit Note/Credit Note Details</p>
+<p class="BoldRFD" style="font-weight: normal;">The invoices generated for the selected patient gets listed. The transaction type selected while generating the Debit or the Credit Notes using the functions ‘Generate Debit Note/Credit Note – OP/EM’ or ‘Generate Debit Note/Credit Note – IP/DC’ gets displayed. The Document Type, respective document number and the amount against which the invoice or credit or the debit note was generated gets displayed. The invoices which are cancelled are indicated using <img src="../../image119.gif" style="border: none;" alt="image119.gif" height="14" width="14" border="0" /> &#160;color. Click <span class="BoldNumberRFD">[D]</span> to view the service details for which the amount is overdue and against which the invoice, the credit notes, or the debit notes are generated.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Payment Details</p>
+<p class="BoldRFD" style="font-weight: normal;">The amount settled against the invoice generated gets displayed. The amount settled, the receipt type and the number generated for the respective settlement gets displayed. The date when the receipt was generated for the settlement is also displayed. You can also view the total amount settled.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Bill Details</p>
+<p class="BoldRFD" style="font-weight: normal;">You can view the bills generated for the patient transactions in the facility using the Bill Details tab. The Bill Type and Number, the bill generation date is listed with the total outstanding amount for which the bill is generated. If an invoice is generated against the outstanding bill, the amount for which the invoice is generated also is displayed. You can also view the discount given against an invoice, if any. The invoice document type and the number, amount for which the invoice is generated and the invoice generation date are listed. The service details for a selected record can be viewing by clicking <span class="BoldNumberRFD">[D]</span>.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

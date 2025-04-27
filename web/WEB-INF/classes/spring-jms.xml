@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+		"http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-autowire="byName">
+	<bean id="jmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+		<property name="connectionFactory">
+			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL">
+					<value>tcp://indbgl-w00062:61616</value>
+				</property>
+				<property name="closeTimeout" value="30000"></property>
+				<!--				<property name="redeliveryPolicy" ref="redeliveryPolicy" />-->
+			</bean>
+		</property>
+	</bean>
+
+	<!--  Sample entry for configuring the redelivery policy - DEFAULT IS 5 -->
+	<!--	
+		<bean id="redeliveryPolicy" class="org.apache.activemq.RedeliveryPolicy">
+			<property name="maximumRedeliveries" value="2" />
+		</bean>
+	-->
+
+	<!--	QUEUES	-->
+	<bean id="communicationQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="IBACOMMUNICATIONQUEUE" />
+	</bean>
+
+	<bean id="defaultQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="IBA.DEFAULT.QUEUE" />
+	</bean>
+
+	<bean id="printerQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg value="IBA.PRINTER.QUEUE" />
+	</bean>
+
+	<!--	 Spring JMS Template -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate" singleton="false">
+		<property name="connectionFactory">
+			<ref local="jmsFactory" />
+		</property>
+		<property name="defaultDestinationName" value="IBA.DEFAULT.QUEUE"></property>
+		<property name="explicitQosEnabled" value="true"></property>
+	</bean>
+
+	<bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="jmsFactory" />
+	</bean>
+
+	<bean id="baseMDP" class="com.iba.framework.core.pojo.business.BaseMDP" abstract="true">
+		<property name="connectionFactory" ref="jmsFactory" />
+		<property name="destinationName" value="IBA.DEFAULT.QUEUE" />
+		<property name="sessionTransacted" value="true"></property>
+		<property name="transactionManager" ref="jmsTransactionManager"></property>
+	</bean>
+
+</beans>

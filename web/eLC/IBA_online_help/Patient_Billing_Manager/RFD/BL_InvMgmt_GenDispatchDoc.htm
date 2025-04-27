@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_InvMgmt_GenDispatchDoc</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to generate Dispatch Document:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cut-off Date</span> – Click Calendar function to select a Cut-off Date. System displays the current date, by default. The outstanding bills and the invoice notes associated to a Payer Group, Payer and Policy Type combination gets listed until the date selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer Group. The values defined using the ‘Customer Group’ function under the AR Setup menu gets displayed. The invoices generated for the outstanding bills of the patients associated to the selected Payer Group get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer. The values defined using the ‘Customer’ function under the AR Setup menu gets displayed. The invoices generated for the outstanding bills of the patients associated to the selected Payer get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Policy Type. The outstanding bill details associated to the selected Policy Type gets listed. You can select the required invoices to generate the dispatch document for the selected invoices.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Episode Type</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Select an Episode Type to search for the respective Episode Types with the outstanding bill details. You can select from the list of outstanding bills of an Episode Type associated to the Customer to generate the invoices for the selected Episode Type.</span></p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All – Select ‘All’ to search and to select the invoices of all the Episode Types in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Outpatient – Select ‘Outpatient’ to search and to select the invoices of the Outpatients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Emergency – Select ‘Emergency’ to search and to select the invoices of the Emergency patients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Daycare – Select ‘Daycare’ to search and to select the invoices of the Daycare patients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Inpatient – Select ‘Inpatient’ to search and to select the invoices of the Inpatients in the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">External – Select ‘External’ to search and to select the invoices of the External patients in the facility.</p>
+</li>
+</ul>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Breakdown By Policy Type</span> – Select the check box to breakdown the invoices or the debit notes based on the Policy Types. Clear the check box, if the breakdown is not required.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Dispatch Letter Format Parameters</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Body Header – Select the check box, if the ‘Dispatch Letter Body Header’ defined using the ‘Invoice Process Parameters’ function has to be printed in the dispatch document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Body Footer – Select the check box, if the ‘Dispatch Letter Body Footer’ defined using the ‘Invoice Process Parameters’ function has to be printed in the dispatch document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Foot Note – Select the check box, if the ‘Dispatch Letter Foot Note’ defined using the ‘Invoice Process Parameters’ function has to be printed in the dispatch document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Print Text – Select the check box to print text in the dispatch document. Clear the check box, if the text is not to be printed in the dispatch document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Foreign Currency – Select the check box to print Foreign Currency in the dispatch document. Clear the check box, if the Foreign Currency is not to be printed in the dispatch document.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Signatory – Select the check box, if the details of the authorised signatory have to be included in the dispatch document.</p>
+</li>
+</ul>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Contact Address]</span> – Click <span class="BoldNumberRFD">[Contact Address]</span> to view or to record the contact address of the Customer.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Letter Format]</span> – Click <span class="BoldNumberRFD">[Letter Format]</span> to define the Letter Format for the dispatch document. The format defined using ‘Invoice Process Parameters’ function gets displayed. You can update the letter format to dispatch the document.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Refresh]</span> – Click <span class="BoldNumberRFD">[Refresh]</span> to enter the new the details.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Invoice/Debit Note</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select All</span> – Select the check box to print dispatch documents for the invoices and the debit notes listed based on the search criteria selected. Clear the check box to print the dispatch document for the selected records.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> – Select the check box to print the dispatch document for the selected records. Clear the check box, if the dispatch document is not to be printed for the selected record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoice Number</span> – The invoices generated for outstanding bills of the patients associated to the selected Payer Group, Payer and Policy Type combination get listed. An invoice number is automatically generated while generating the invoice for the outstanding bills using the functions ‘Generate Invoice – OP/EM’, ‘Generate Invoice – IP/DC’, ‘Generate Debit Note/Credit Note – OP/EM’ or ‘Generate Debit Note/Credit Note – IP/DC’. You can select the records to print the dispatch document for the selected records.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Date</span> – The date when the invoice document was generated gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Trx Type</span> – The transaction type selected while generating the invoice gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type Code</span> – If the Policy Type is selected while searching for the records, respective Policy Type gets displayed. If the Policy Type is not selected, the Policy Types associated to the Payer and the Payer Group gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Due Date</span> – The Due Date defined to clear the payment gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross Amt</span> – The Gross Amount for each of the Invoice gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Markup Amt</span> - The Markup Amount for each of the Invoice gets displayed. The markup amount indicates the amount, which is remaining after the deduction of amount for the services from the total agreed amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Amt</span> – The Discount Amount for each invoice is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payable Amt</span> – The Amount payable by the Payer Group for the selected invoice is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – The name of the patient who has utilized the services and owes the amount to the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode ID</span> – The Episode ID against which the invoice is generated for the outstanding bills get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dispatch Document Ref</span> – The original document reference associated to the records while generating the invoice gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dispatch Date</span> – The date when the invoice was dispatched to the Payer gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Printed</span> - The check box is selected if the invoice records are printed.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

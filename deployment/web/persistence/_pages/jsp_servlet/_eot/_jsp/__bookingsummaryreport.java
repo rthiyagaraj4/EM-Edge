@@ -1,0 +1,569 @@
+package jsp_servlet._eot._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import webbeans.eCommon.ConnectionManager;
+import eOT.*;
+import eOT.Common.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __bookingsummaryreport extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eot/jsp/BookingSummaryReport.jsp", 1722937044000L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n<html>\n<head>\n<title></title>\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\' type=\'text/css\'/>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../../eCommon/html/CommonCalendar.css\" />\n<script language=\"javascript\" src=\"../../eCommon/js/common.js\"></script>\n<script language=\"JavaScript\" src=\"../../eCommon/js/CommonLookup.js\"></script>\n<script language=\"JavaScript\" src=\"../../eOT/js/OtReports.js\" ></script>\n<script language=\"JavaScript\" src=\"../../eOT/js/OTReportsLkupSQL.js\" ></script>\n<script language=\"JavaScript\" src=\"../../eCommon/js/CommonCalendar.js\"></script>\n<script language=\"JavaScript\" src=\"../../eCommon/js/ValidateControl.js\"></script>\n<script language=\"Javascript\" src=\"../../eCommon/js/DateUtils.js\"></script>\n<script language=\"Javascript\" src=\"../../eOT/js/OTCommon.js\"></script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n<script>\n\tvar operationRoom_value=getLabel(\"eOT.OperationRoom.Label\",\"OT\");\n\tvar speciality_value=getLabel(\"Common.speciality.label\",\"common\");\n\tvar nursingUnit_value=getLabel(\"Common.nursingUnit.label\",\"common\");\n\tvar surgeon_title=getLabel(\"Common.Surgeon.label\",\"Common\");\n\t\n</script>\n</head>\n<body OnMouseDown=\'CodeArrest()\' onKeyDown = \'lockKey()\'>\n<!--<form name=\'OtReportOptionsForm\' id=\'OtReportOptionsForm\' action=\"../../eCommon/jsp/report_options.jsp\" target=\"messageFrame\"> Commented against IN057876 -->\n<form name=\'OtReportOptionsForm\' id=\'OtReportOptionsForm\' action=\"../../eOT/jsp/OTReportsIntermediate.jsp\"  target=\"messageFrame\">\n  <table border=\'0\' cellpadding=\'3\' align=\'center\' cellspacing=\'0\' width=\'100%\'>\n  <tr>\n    <td class=\'label\' width=\'21%\' >";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="</td>\n    <td class=\'fields\' width=\'42%\' ><input type=\'text\' class=\'fields\' name=\'param1_disp\' id=\'param1_disp\' size=\'8\'  value=\'";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\' onBlur=\"isValidDate(this);\">\n      <img src=\'../../eCommon/images/CommonCalendar.gif\'onClick=\"return showCalendar(\'param1_disp\');\"><img src=\'../../eCommon/images/mandatory.gif\'></img> \n      <!-- Added against IN057876 -->\n      \n      <input type=\'hidden\' name=\'param1\' id=\'param1\' value=\'";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\'></td>\n    <td class=\'label\' width=\'17%\' >";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="</td>\n    <td class=\'fields\' width=\'20%\' ><input type=\'hidden\' name=\'param8\' id=\'param8\' value=\'\'>\n      <input type=\'hidden\' name=\'param9\' id=\'param9\' value=\'\'>\n      <input type=\'text\' class=\'fields\' name=\'from_oper_room_desc\' id=\'from_oper_room_desc\' size=\'20\' title=\'";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\' param1 = \'param8\'  param2 = \'param9\' key =\'OPER_ROOM\' onBlur=\"if(this.value!=\'\')callCommonLookup(this); else param8.value=\'\'\">\n      <input type=\'button\' class=\'button\' value=\'?\' name=\'OperRoomLookUp\' id=\'OperRoomLookUp\' onClick=\"callCommonLookup(from_oper_room_desc);\"></td>\n  </tr>\n  <tr>\n    <td class=\'label\' width=\'21%\' >";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="</td>\n    <td class=\'fields\' width=\'42%\'><input type=\'hidden\' name=\'param17\' id=\'param17\'>\n      <input type=\'hidden\' name=\'param16\' id=\'param16\'>\n      <input type=\'text\' name=\'param16_desc\' id=\'param16_desc\' size=\'20\' title=\'";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="\' param1 = \'param16\'  param2 = \'param17\' key =\'SURGEON\' onBlur=\"if(this.value!=\'\')callCommonLookup(this); else param16.value=\'\'\">\n      <input type=\'button\' class=\'button\' value=\'?\' name=\'SurgeonLookUp\' id=\'SurgeonLookUp\' onClick=\"callCommonLookup(param16_desc);\" ></td>\n    <td class=\'label\' width=\'17%\' >";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="</td>\n    <td class=\'fields\' width=\'20%\'><input type=\'hidden\' name=\'param15\' id=\'param15\'>\n      <input type=\'hidden\' name=\'param14\' id=\'param14\'>\n      <input type=\'text\' name=\'from_speciality_desc\' id=\'from_speciality_desc\' size=\'20\' title=\'";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="\' param1 = \'param14\'  param2 = \'param15\' key =\'SPECIALITY\' onBlur=\"if(this.value!=\'\')callCommonLookup(this); else param14.value=\'\';\">\n      <input type=\'button\' class=\'button\' value=\'?\' name=\'SpecialityLookUp\' id=\'SpecialityLookUp\'  onClick=\"callCommonLookup(from_speciality_desc);\"></td>\n  </tr>\n  <tr>\n    <td class=\'label\' width=\'21%\' >";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="</td>\n    <td class=\'fields\' width=\'42%\'><input type=\'hidden\' name=\'param10\' id=\'param10\' >\n      <input type=\'hidden\' name=\'param11\' id=\'param11\' >\n      \n      <!-- ML-MMOH-CRF-0752.3-US001 -->\n      \n      <input type=\'text\' name=\'from_ward_desc\' id=\'from_ward_desc\' size=\'60\' title=\'";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="\' param1 = \'param10\'  param2 = \'param11\' key =\'WARD\' onBlur=\"if(this.value!=\'\')callCommonLookup(this); else param10.value=\'\' \">\n      <input type=\'button\' class=\'button\' value=\'?\' name=\'WardLookUp\' id=\'WardLookUp\'   onClick=\"callCommonLookup(from_ward_desc);\"></td>\n    <td class=\'label\' width=\'17%\' >";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    private final static java.lang.String  _wl_block19 ="</td>\n    <td class=\'fields\' width=\'20%\' ><input type=\'hidden\' name=\'param19\' id=\'param19\' >\n      <select name=\"param12\" id=\"param12\">\n        <option value=\"*ALL\" class=\'fields\'>\n        ";
+    private final static byte[]  _wl_block19Bytes = _getBytes( _wl_block19 );
+
+    private final static java.lang.String  _wl_block20 ="\n        </option>\n        ";
+    private final static byte[]  _wl_block20Bytes = _getBytes( _wl_block20 );
+
+    private final static java.lang.String  _wl_block21 ="\n        <option value=\'";
+    private final static byte[]  _wl_block21Bytes = _getBytes( _wl_block21 );
+
+    private final static java.lang.String  _wl_block22 ="\'> ";
+    private final static byte[]  _wl_block22Bytes = _getBytes( _wl_block22 );
+
+    private final static java.lang.String  _wl_block23 =" </option>\n        ";
+    private final static byte[]  _wl_block23Bytes = _getBytes( _wl_block23 );
+
+    private final static java.lang.String  _wl_block24 ="\n      </select></td>\n  </tr>\n\n  <input type=\"hidden\" name=\"facility_id\" id=\"facility_id\"\tvalue=\"";
+    private final static byte[]  _wl_block24Bytes = _getBytes( _wl_block24 );
+
+    private final static java.lang.String  _wl_block25 ="\">\n  <input type=\"hidden\" name=\"p_facility_id\" id=\"p_facility_id\"\tvalue=\"";
+    private final static byte[]  _wl_block25Bytes = _getBytes( _wl_block25 );
+
+    private final static java.lang.String  _wl_block26 ="\">\n  <input type=\"hidden\" name=\"p_user_id\" id=\"p_user_id\"\tvalue=\"";
+    private final static byte[]  _wl_block26Bytes = _getBytes( _wl_block26 );
+
+    private final static java.lang.String  _wl_block27 ="\">\n  <input type=\"hidden\" name=\"p_user_name\" id=\"p_user_name\"\tvalue=\"";
+    private final static byte[]  _wl_block27Bytes = _getBytes( _wl_block27 );
+
+    private final static java.lang.String  _wl_block28 ="\">\n  <input type=\"hidden\" name=\"user_id\" id=\"user_id\"\tvalue=\"";
+    private final static byte[]  _wl_block28Bytes = _getBytes( _wl_block28 );
+
+    private final static java.lang.String  _wl_block29 ="\">\n  <input type=\"hidden\" name=\"p_module_id\" id=\"p_module_id\"  value=\"OT\">\n  <input type=\"hidden\" name=\"p_report_id\" id=\"p_report_id\" value=\"OTRBKSUM\">\n  <input type=\"hidden\" name=\"pgm_id\" id=\"pgm_id\" value=\"OTRBKSUM\">\n  <input type=\"hidden\" name=\"sql_text_5\" id=\"sql_text_5\" value=\"";
+    private final static byte[]  _wl_block29Bytes = _getBytes( _wl_block29 );
+
+    private final static java.lang.String  _wl_block30 ="\" disabled>\n  <input type=\"hidden\" name=\"no_of_mandatory_fields\" id=\"no_of_mandatory_fields\" value=\"1\" disabled>\n  <input type=\"hidden\" name=\"mandatory_fm_1\" id=\"mandatory_fm_1\" value=\"param1##";
+    private final static byte[]  _wl_block30Bytes = _getBytes( _wl_block30 );
+
+    private final static java.lang.String  _wl_block31 ="\" disabled>\n  <input type=\"hidden\" name=\"no_of_comparison_fields\" id=\"no_of_comparison_fields\" value=\"4\" disabled>\n  <input type=\"hidden\" name=\"compare_fm_1\" id=\"compare_fm_1\" value=\"param8##\" disabled>\n  <input type=\"hidden\" name=\"compare_to_1\" id=\"compare_to_1\" value=\"param9\" disabled>\n  <input type=\"hidden\" name=\"compare_fm_2\" id=\"compare_fm_2\" value=\"param14##\" disabled>\n  <input type=\"hidden\" name=\"compare_to_2\" id=\"compare_to_2\" value=\"param15\" disabled>\n  <input type=\"hidden\" name=\"compare_fm_3\" id=\"compare_fm_3\" value=\"param10##\" disabled>\n  <input type=\"hidden\" name=\"compare_to_3\" id=\"compare_to_3\" value=\"param11\" disabled>\n  <input type=\"hidden\" name=\"compare_fm_4\" id=\"compare_fm_4\" value=\"param16##\" disabled>\n  <input type=\"hidden\" name=\"compare_to_4\" id=\"compare_to_4\" value=\"param17\" disabled>\n  <input type=\'hidden\' name=\'locale\' id=\'locale\' value=\"";
+    private final static byte[]  _wl_block31Bytes = _getBytes( _wl_block31 );
+
+    private final static java.lang.String  _wl_block32 ="\">\n  <input type=\"hidden\" name=\"p_language_id\" id=\"p_language_id\"\tvalue=\"";
+    private final static byte[]  _wl_block32Bytes = _getBytes( _wl_block32 );
+
+    private final static java.lang.String  _wl_block33 ="\" >\n  \n  <!-- Added against IN057876 -->\n  <input type=\'hidden\' name=\'reportParams\' id=\'reportParams\' value=\"param1#param8#param9#from_oper_room_desc#param17#param16#param16_desc#param15#param14#from_speciality_desc#param10#param11#param19#param12#facility_id#p_facility_id#p_user_id#p_user_name#user_id#p_module_id#p_report_id#pgm_id#locale#p_language_id#param7_desc#param7\">\n  <input type=\"hidden\" name=\"param7_desc\" id=\"param7_desc\"\tvalue=\"\" >\n  <input type=\"hidden\" name=\"param7\" id=\"param7\"\tvalue=\"\" >\n  </table>\n</form>\n</body>\n</html>\n\n";
+    private final static byte[]  _wl_block33Bytes = _getBytes( _wl_block33 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+ String locale = (String)session.getAttribute("LOCALE"); 
+            _bw.write(_wl_block1Bytes, _wl_block1);
+ request.setCharacterEncoding("UTF-8");
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+
+	locale=locale.toLowerCase();
+//	String surgerytype = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.SurgeryType.label","common_labels");
+	String operationRoom_title = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eOT.OperationRoom.Label","ot_labels");
+	String surgeon_title = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.Surgeon.label","common_labels");
+	String nursingUnit_title = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.Ward.label","common_labels");
+	String speciality_title = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.speciality.label","common_labels");
+	String bookingdate = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.BookingDate.label","common_labels");
+
+	String facility_id = (String)session.getValue("facility_id");
+	String user_id = (String)session.getValue("login_user");
+	String surgery_date = "";
+		
+	//Code altered by Selvam for PHASE 3 Delivery
+	//String  sql_ward = "SELECT A.NURSING_UNIT_CODE CODE, A.SHORT_DESC DESCRIPTION FROM IP_NURSING_UNIT_LANG_VW A WHERE A.LANGUAGE_ID='"+locale+"' AND FACILITY_ID = '"+facility_id+"' AND UPPER(A.SHORT_DESC) LIKE UPPER(?) AND UPPER(A.NURSING_UNIT_CODE) LIKE UPPER(?) ORDER BY 2";
+	String  sql_ward = "SELECT A.NURSING_UNIT_CODE CODE, A.LONG_DESC DESCRIPTION FROM IP_NURSING_UNIT_LANG_VW A WHERE A.LANGUAGE_ID='"+locale+"' AND FACILITY_ID = '"+facility_id+"' AND UPPER(A.SHORT_DESC) LIKE UPPER(?) AND UPPER(A.NURSING_UNIT_CODE) LIKE UPPER(?) ORDER BY 2";
+
+	//String sql_surgery_type = "SELECT NATURE_CODE, SHORT_DESC FROM OT_NATURE_OF_SURGERY ORDER BY 2";
+	String sql_surgery_type = "SELECT NATURE_CODE, SHORT_DESC FROM OT_NATURE_OF_SURGERY_LANG_VW WHERE LANGUAGE_ID='"+locale+"'  ORDER BY 2";
+
+	Connection con = null;
+	PreparedStatement pstmt = null;
+	ResultSet rst = null;
+	try{
+		con = ConnectionManager.getConnection(request);
+		pstmt = con.prepareStatement(OTRepository.getOTKeyValue("SQL_OT_SYSDATE_SELECT1")) ;
+		rst = pstmt.executeQuery();
+		while(rst.next()){
+
+			//Buddhist date conversion (Thai Locale)
+			//surgery_date = rst.getString("CURRENT_DATE");
+			surgery_date=com.ehis.util.DateUtils.convertDate(rst.getString("CURRENT_DATE"),"DMY","en",locale);
+			
+		}
+		pstmt.close();
+		rst.close();
+
+		pstmt = con.prepareStatement(sql_surgery_type);
+		rst = pstmt.executeQuery();
+
+
+            _bw.write(_wl_block5Bytes, _wl_block5);
+
+String sStyle =
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+            if (_jsp__tag0(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(surgery_date));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+            out.print( String.valueOf(DateUtils.convertDate(surgery_date,"DMY",locale,"en")));
+            _bw.write(_wl_block10Bytes, _wl_block10);
+
+            if (_jsp__tag1(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block11Bytes, _wl_block11);
+            out.print( String.valueOf(operationRoom_title));
+            _bw.write(_wl_block12Bytes, _wl_block12);
+
+            if (_jsp__tag2(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block13Bytes, _wl_block13);
+            out.print( String.valueOf(surgeon_title));
+            _bw.write(_wl_block14Bytes, _wl_block14);
+
+            if (_jsp__tag3(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block15Bytes, _wl_block15);
+            out.print( String.valueOf(speciality_title));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+
+            if (_jsp__tag4(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block17Bytes, _wl_block17);
+            out.print( String.valueOf(nursingUnit_title));
+            _bw.write(_wl_block18Bytes, _wl_block18);
+
+            if (_jsp__tag5(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block19Bytes, _wl_block19);
+
+            if (_jsp__tag6(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block20Bytes, _wl_block20);
+ while(rst.next()){ 
+            _bw.write(_wl_block21Bytes, _wl_block21);
+            out.print( String.valueOf(rst.getString(1)));
+            _bw.write(_wl_block22Bytes, _wl_block22);
+            out.print( String.valueOf(rst.getString(2)));
+            _bw.write(_wl_block23Bytes, _wl_block23);
+   }//end of while-loop
+		}catch(Exception e){
+			System.err.println("Err Msg BookingSummaryReport.jsp "+e.getMessage());
+		}finally{
+			if(rst!=null)rst.close();
+			if(pstmt!=null)pstmt.close();
+			if(con!=null)
+			ConnectionManager.returnConnection(con,request); 
+		}
+            _bw.write(_wl_block24Bytes, _wl_block24);
+            out.print( String.valueOf(facility_id));
+            _bw.write(_wl_block25Bytes, _wl_block25);
+            out.print( String.valueOf(facility_id));
+            _bw.write(_wl_block26Bytes, _wl_block26);
+            out.print( String.valueOf(user_id));
+            _bw.write(_wl_block27Bytes, _wl_block27);
+            out.print( String.valueOf(user_id));
+            _bw.write(_wl_block28Bytes, _wl_block28);
+            out.print( String.valueOf(user_id));
+            _bw.write(_wl_block29Bytes, _wl_block29);
+            out.print( String.valueOf(sql_surgery_type));
+            _bw.write(_wl_block30Bytes, _wl_block30);
+            out.print( String.valueOf(bookingdate));
+            _bw.write(_wl_block31Bytes, _wl_block31);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(locale));
+            _bw.write(_wl_block33Bytes, _wl_block33);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+
+    private boolean _jsp__tag0(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag0 = null ;
+        int __result__tag0 = 0 ;
+
+        if (__tag0 == null ){
+            __tag0 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag0);
+        }
+        __tag0.setPageContext(pageContext);
+        __tag0.setParent(null);
+        __tag0.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.BookingDate.label", java.lang.String .class,"key"));
+        __tag0.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag0;
+        __result__tag0 = __tag0.doStartTag();
+
+        if (__result__tag0!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag0== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag0.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag0);
+            return true;
+        }
+        _activeTag=__tag0.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag0);
+        __tag0.release();
+        return false;
+    }
+
+    private boolean _jsp__tag1(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag1 = null ;
+        int __result__tag1 = 0 ;
+
+        if (__tag1 == null ){
+            __tag1 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag1);
+        }
+        __tag1.setPageContext(pageContext);
+        __tag1.setParent(null);
+        __tag1.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.OperatingRoom.label", java.lang.String .class,"key"));
+        __tag1.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag1;
+        __result__tag1 = __tag1.doStartTag();
+
+        if (__result__tag1!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag1== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag1.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag1);
+            return true;
+        }
+        _activeTag=__tag1.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag1);
+        __tag1.release();
+        return false;
+    }
+
+    private boolean _jsp__tag2(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag2 = null ;
+        int __result__tag2 = 0 ;
+
+        if (__tag2 == null ){
+            __tag2 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag2);
+        }
+        __tag2.setPageContext(pageContext);
+        __tag2.setParent(null);
+        __tag2.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.Surgeon.label", java.lang.String .class,"key"));
+        __tag2.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag2;
+        __result__tag2 = __tag2.doStartTag();
+
+        if (__result__tag2!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag2== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag2.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag2);
+            return true;
+        }
+        _activeTag=__tag2.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag2);
+        __tag2.release();
+        return false;
+    }
+
+    private boolean _jsp__tag3(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag3 = null ;
+        int __result__tag3 = 0 ;
+
+        if (__tag3 == null ){
+            __tag3 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag3);
+        }
+        __tag3.setPageContext(pageContext);
+        __tag3.setParent(null);
+        __tag3.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.speciality.label", java.lang.String .class,"key"));
+        __tag3.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag3;
+        __result__tag3 = __tag3.doStartTag();
+
+        if (__result__tag3!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag3== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag3.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag3);
+            return true;
+        }
+        _activeTag=__tag3.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag3);
+        __tag3.release();
+        return false;
+    }
+
+    private boolean _jsp__tag4(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag4 = null ;
+        int __result__tag4 = 0 ;
+
+        if (__tag4 == null ){
+            __tag4 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag4);
+        }
+        __tag4.setPageContext(pageContext);
+        __tag4.setParent(null);
+        __tag4.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.nursingUnit.label", java.lang.String .class,"key"));
+        __tag4.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag4;
+        __result__tag4 = __tag4.doStartTag();
+
+        if (__result__tag4!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag4== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag4.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag4);
+            return true;
+        }
+        _activeTag=__tag4.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag4);
+        __tag4.release();
+        return false;
+    }
+
+    private boolean _jsp__tag5(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag5 = null ;
+        int __result__tag5 = 0 ;
+
+        if (__tag5 == null ){
+            __tag5 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag5);
+        }
+        __tag5.setPageContext(pageContext);
+        __tag5.setParent(null);
+        __tag5.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.SurgeryType.label", java.lang.String .class,"key"));
+        __tag5.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag5;
+        __result__tag5 = __tag5.doStartTag();
+
+        if (__result__tag5!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag5== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag5.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag5);
+            return true;
+        }
+        _activeTag=__tag5.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag5);
+        __tag5.release();
+        return false;
+    }
+
+    private boolean _jsp__tag6(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag6 = null ;
+        int __result__tag6 = 0 ;
+
+        if (__tag6 == null ){
+            __tag6 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag6);
+        }
+        __tag6.setPageContext(pageContext);
+        __tag6.setParent(null);
+        __tag6.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.all.label", java.lang.String .class,"key"));
+        __tag6.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag6;
+        __result__tag6 = __tag6.doStartTag();
+
+        if (__result__tag6!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag6== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag6.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag6);
+            return true;
+        }
+        _activeTag=__tag6.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag6);
+        __tag6.release();
+        return false;
+    }
+}

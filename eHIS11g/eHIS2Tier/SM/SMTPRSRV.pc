@@ -1,0 +1,1305 @@
+/************************************************************************************
+*    
+*	Name			SMTPRSRV.PC
+*
+*	Author			MEDICOM R&D Team, Muscat.
+*
+*	Purpose			MEDICOM Print Server
+*					to handle server based print routing.
+*
+*   =================================================================================
+*	Input Parameters		 					Remarks
+*   =================================================================================
+*	1. DB Connect String (User/Password@DBName)	Mandatory
+*	2. Date Time								Mandatory
+*	3. Session Id								Mandatory
+*	4. Facility ID								Mandatory
+*	5. Priority ID								Mandatory
+*	6. Serviced Request ID						Mandatory
+*
+*   =================================================================================
+*	Modification History  
+*   =================================================================================
+*	Date			Person		Remarks
+*   =================================================================================
+*
+*	20/4/2003	    Aparna k	Upgraded for EH
+*
+*	May 10, 2003	K S Sundar	1. Standardized
+*								2. Additional parameters (Priority ID and 
+*								   Serviced Request ID) are handled for 
+*								   selecting appropriate print request.
+*								3. Program restarting is disabled as it is not required.
+*
+*   July 8 2003    Aparna K     Error while printing corrected when parameters passed
+*								facility ID as '*A'  - for ALL
+*								priority as 0 - For ALL
+*								serviced request as '*A'  -- for ALL
+*								Changed the cursor to get print requests with decode 
+*								function.
+*
+*	Sep 17,2003		K S Sundar	Calls to RegisterError modified to pass
+*								additional arguments.
+*
+*	Sep 05,2004		N K Nanjayan In ProcessPendingRequests function
+*								 Version check has been included.
+*								 Based on the MEDICOM version 
+*								 Working directory is fetched.
+*
+*	Dec 12,2005		S. Sundar	 For enabling explicit printing,
+*								 we read print_server_id, printer_name and dest_queue_name
+*								 from sy_report_print_request. If columns are NOT NULL,
+*								 instead of calling WSPrintDocument, we directly call SMTPRINT
+*								 to print.
+*	OCT 7,2016		Ravi Shankar	against GHL-SCF-1120
+************************************************************************************/
+
+/*
+* Include header files.
+*/
+
+# include <windows.h>
+# include <winuser.h>
+# include <winspool.h>
+# include <malloc.h>
+# include <assert.h>
+# include <stdio.h>
+# include <dos.h>
+# include <crtdbg.h>
+# include <stdlib.h>
+# include <conio.h>
+# include <string.h>
+# include <time.h>
+# include <sys/stat.h>
+# include <debug.h>
+# include <process.h>
+
+/*
+* Define constants.
+*/
+
+# define MAXNUM 750
+# define COLLATE 1
+# define OERROR			(sqlca.sqlcode < 0)
+# define RESOURCE_BUSY  (sqlca.sqlcode == 54)
+# define NODATAFOUND sqlca.sqlcode==1403
+
+# if defined (WIN32)
+	#define IS_WIN32 TRUE
+# else
+	#define IS_WIN32 FALSE
+# endif
+
+# define IS_NT		IS_WIN32 && (BOOL) (GetVersion() < 0x80000000)
+# define IS_WIN32S	IS_WIN32 && (BOOL) (!(IS_NT) && (LOBYTE(LOWORD(GetVersion())) < 4 ))
+# define IS_WIN95	(BOOL) (!(IS_NT) && !(IS_WIN32S)) && IS_WIN32
+
+void	ProcessPendingRequests(void);		
+void	PurgeOldRequests(void);
+int		RestartProgram(void);					
+
+HWND		hwnd;
+WNDCLASS	wndclass;
+
+char GVErrorMessage[200];
+char GVArguments[512];
+char GVPgmName[64];
+char GVCmd[1024];
+int  GVSpawnReturnCode = 1;
+int  GVIsPrintSuccess = 0;
+int  GVIsTracing;
+int  RestartInterval;				// Assign BVRestartInterval
+
+/*
+* Declare SQL bind variables.
+*/
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar		BVComputerName[16];			// For Program Tracing
+
+	int		 BVElapsedTime;				// To get the elapsed time since last start of the program.
+	char	 BVMachineName[16];
+	varchar	 bv_cmd_line [200];			// Command line string
+	varchar	 BVStartedByID [21];
+	varchar	 bv_next_start_time [15];
+
+	varchar  BVUidPwd[132];				// i/p parameter
+	varchar	 BVModuleID [2];		
+	varchar  BVDateTime[22];			// i/p parameter
+	varchar  BVSessionID[20];			// i/p parameter		
+	varchar	 BVFacilityID [2];			// i/p parameter
+	varchar	 BVPriorityID [4];			// i/p parameter
+	varchar	 BVServicedRequestID[32];	// i/p parameter
+
+	varchar	 BVDocumentID [8];		/* Required for RegisterError */
+	varchar	 BVModuleID1[2];		/* Required for RegisterError */
+
+	varchar  BVRowID[31];
+
+	varchar	 BVRequestFacilityID [2];			// Added by Aparna -- Cursor parameter 
+	varchar	 BVWorkstationID[64];
+	varchar  BVOnlinePrintFileName[152];
+	varchar  BVOnlinePrintName[10];
+	varchar  BVLocationType[4];			
+	varchar  BVLocationCode[8];			
+	varchar  BVPrintDate[22];
+	varchar  BVWs_No[31];				
+	varchar  BVPrinter_ID[31];				
+	varchar  BVPrinter_Name[61];				
+	varchar  BVDest_Queue_Name[61];				
+	varchar  BVPgmID[22];
+	varchar  BVParameterID[50];
+	varchar  BVRestartInterval[8]; 
+	varchar  BVErrorText[200];
+
+	varchar  BV_Error_Text[501];
+    varchar  BVReport_Output_Dir[120];
+    varchar  BVerror_text[501];
+	varchar  BVUserId[31];
+   	varchar	 BVNewVersionYN[2];   	// TO check the MEDICOM version
+
+
+	
+	long	 BVSleepTime;
+	int      BVNoOfPendingRequests;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+/* 
+* Main Window program
+*/
+int WINAPI WinMain(HINSTANCE  hInstance,HINSTANCE  hPrevInstance,
+    LPSTR  lpCmdLine,int  nShowCmd)
+{
+	char LVFunctionName[30];
+	char LVSeparator[3]= " " ;
+	char *LVUidPwd,*LVDateTime, *LVSessionID,*LVFacilityID, *LVPriorityID, *LVServicedRequestID;
+	int  LVContinue=1;
+   	char LVMachineName[20];
+	DWORD LVMachineNo = 20;
+	struct _stat LVFileStat;
+	int LVResult;
+	char *LVStrBuf;
+	   
+	/*
+	* Initialize Parameters.
+	*/
+	BVUidPwd.arr[0]				= '\0';
+	BVSessionID.arr[0]			= '\0';
+	BVDateTime.arr[0]			= '\0';
+	BVFacilityID.arr[0]			= '\0';
+	BVPriorityID.arr[0]			= '\0';
+	BVServicedRequestID.arr[0]	= '\0';
+
+	BVUidPwd.len				= 0;
+	BVDateTime.len				= 0;
+	BVSessionID.len				= 0;
+	BVFacilityID.len			= 0;
+	BVPriorityID.len			= 0;
+	BVServicedRequestID.len		= 0;
+
+	/*
+	* Load parameters into local variables.
+	*/
+	LVUidPwd			= strtok(lpCmdLine,LVSeparator);
+	LVDateTime			= strtok(NULL,LVSeparator);
+	LVSessionID			= strtok(NULL,LVSeparator);
+	LVFacilityID		= strtok(NULL,LVSeparator);
+	LVPriorityID		= strtok(NULL,LVSeparator);
+	LVServicedRequestID	= strtok(NULL,LVSeparator);
+	
+	/*
+	* Exit if any mandatory parameter is missing.
+	*/
+	if(LVUidPwd==NULL || LVDateTime==NULL || LVSessionID==NULL || LVFacilityID==NULL || LVPriorityID==NULL || LVServicedRequestID==NULL )
+	{
+		exit(0);
+	}
+	
+	/*
+	* Assign parameters to bind variables.
+	*/
+	strcpy(BVUidPwd.arr,LVUidPwd);
+	BVUidPwd.len = strlen(BVUidPwd.arr);
+
+	strcpy(BVDateTime.arr,LVDateTime);
+	BVDateTime.len = strlen(BVDateTime.arr);
+
+	strcpy(BVSessionID.arr,LVSessionID);
+	BVSessionID.len = strlen(BVSessionID.arr);
+
+	strcpy(BVFacilityID.arr,LVFacilityID);
+	BVFacilityID.len = strlen(BVFacilityID.arr);
+
+	strcpy(BVPriorityID.arr,LVPriorityID);
+	BVPriorityID.len = strlen(BVPriorityID.arr);
+
+	strcpy(BVServicedRequestID.arr,LVServicedRequestID);
+	BVServicedRequestID.len = strlen(BVServicedRequestID.arr);
+	
+	/*
+	* BVDocumentID and BVModuleID1 - Required for RegisterError().
+	* Not input parameters.
+	*/
+	strcpy(BVDocumentID.arr,"SMTPRSRV");			
+	BVDocumentID.len = strlen(BVDocumentID.arr);	
+	strcpy(BVModuleID1.arr,"SM");			
+	BVModuleID1.len = strlen(BVModuleID1.arr);	
+
+	/*
+	* Create Window
+	*/
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc    = NULL;
+	wndclass.cbClsExtra		= 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.hInstance		= hInstance;
+	wndclass.hIcon			= NULL;  //LoadIcon ( NULL, IDI_APPLICATION );
+	wndclass.hCursor		= NULL;  //LoadCursor ( NULL, IDC_ARROW);
+//	wndclass.hbrBackground	= GetStockObject (WHITE_BRUSH);
+	wndclass.hbrBackground	= (HBRUSH) GetStockObject (LTGRAY_BRUSH);
+	wndclass.lpszMenuName	= NULL;
+	wndclass.lpszClassName	= "Printing Pc";
+	RegisterClass ( &wndclass );
+
+	hwnd = CreateWindow("Print Server",(LPSTR)NULL,
+                         WS_POPUP | WS_DLGFRAME,170,190,300,100,
+                         (HWND)NULL,(HMENU)NULL,(HANDLE)hInstance,
+						 (LPSTR) lpCmdLine);
+
+	/*
+	* Connect to database.
+	*/
+	EXEC SQL CONNECT :BVUidPwd;	
+	if(sqlca.sqlcode < 0)
+	{
+		MessageBox(hwnd,"Unable to connect to oracle.","Error",MB_OK|MB_ICONSTOP);
+		exit(0);
+	}
+
+	set_meduser_role();
+
+	/*
+	* Enable or disable tracing.
+	*/
+	strcpy(GVProgramID , "SMTPRSRV");	
+	EnableOrDisableTracing();
+	GVIsTracing = IS_TRACING; // For later usage
+
+
+	/*
+	* Display arguments.
+	*/
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName,"WinMain");		
+		Trace(LVFunctionName,"Begin");
+
+		LVResult = _stat(_pgmptr, &LVFileStat);
+		if (LVResult == 0)
+		{	
+			LVStrBuf = strtok(ctime( &LVFileStat.st_mtime ),"\n");	
+			sprintf(GVTraceMsg,"File Name=[%Fs]  TimeStamp=[%s]  Size=[%ld Bytes]", _pgmptr, LVStrBuf , LVFileStat.st_size );
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+
+		sprintf(GVTraceMsg,"BVUidPwd=[%s] BVDateTime=[%s] BVSessionID=[%s] BVFacilityID=[%s] BVPriorityID=[%s] BVServicedRequestID=[%s]",
+		BVUidPwd.arr, BVDateTime.arr, BVSessionID.arr, BVFacilityID.arr, BVPriorityID.arr, BVServicedRequestID.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Get workstation id.
+	*/
+	BVWorkstationID.arr[0] = '\0';	
+	BVWorkstationID.len = 0;
+	EXEC SQL EXECUTE 
+	BEGIN 
+		WORKSTATION.get_workstation_id
+		(
+			:BVFacilityID,
+			:BVWorkstationID
+		);
+	END ;
+	END-EXEC ; 		
+
+	if ORACLE_ERROR 
+	{
+		sprintf(GVTraceMsg,"Error at WORKSTATION.get_workstation_id: [%s]",sqlca.sqlerrm.sqlerrmc);
+		RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return 0;
+	}
+
+	BVWorkstationID.arr[BVWorkstationID.len] = '\0';
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"BVWorkstationID=[%s]",BVWorkstationID.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Restarting is not required as this program is fetching records
+	* from a single cursor and a separate program is being called
+	* for printing purpose. 
+	*
+	* Hence the following code is commented.
+	*
+	* Comment - Begin
+	*
+	*
+	BVRestartInterval.arr[0]	= '\0';	
+	BVRestartInterval.len		= 0;
+	
+	BVErrorText.arr[0]			= '\0';	
+	BVErrorText.len				= 0;
+
+	BVParameterID.arr[0]		= '\0';	
+	BVParameterID.len			= 0;
+	strcpy(BVParameterID.arr,"RESTARTINTERVAL");
+
+	EXEC SQL EXECUTE 
+	BEGIN 
+		workstation.get_ws_param
+		(
+			:BVWorkstationID,
+			:BVParameterID,
+			:BVRestartInterval,
+			:BVErrorText
+		);
+	END;
+	END-EXEC; 	
+
+	BVRestartInterval.arr[BVRestartInterval.len]    = '\0'; 
+	BVErrorText.arr[BVErrorText.len]				= '\0'; 
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"RestartInterval=[%s] ErrorText=[%s]",BVRestartInterval.arr, BVErrorText.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	RestartInterval = 30;
+	if (BVRestartInterval.arr != NULL)
+		RestartInterval = atoi(BVRestartInterval.arr);
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"Restart Interval=[%s]", RestartInterval );
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+	*
+	* Comment - End
+	*/
+
+	/*
+	*  Get computer name.
+	*/
+	GetComputerName(LVMachineName, &LVMachineNo);
+	strcpy(BVComputerName.arr, LVMachineName);
+	BVComputerName.len = strlen(BVComputerName.arr);
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"BVComputerName=[%s]", BVComputerName.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	*  Get sleep time.
+	*/
+	EXEC SQL 
+	SELECT 	processing_interval
+	INTO	:BVSleepTime
+	FROM	sy_prog_id
+	WHERE	pgm_id = 'SMTPRSRV'; 
+
+	if ORACLE_ERROR 
+	{
+		sprintf(GVTraceMsg,"Error at SELECT from sy_prog_id : [%s]",sqlca.sqlerrm.sqlerrmc);
+		RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+		BVSleepTime = 0;
+	}
+	else if ORACLE_NODATAFOUND
+	{
+		BVSleepTime = 0;
+	}
+	
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"BVSleepTime=[%d]", BVSleepTime);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Start processing (loop)
+	*/
+	LVContinue = 1;
+	while(LVContinue == 1)
+	{
+		
+		if (IS_TRACING) Trace (LVFunctionName,"Calling ProcessPendingRequests() ...");
+		ProcessPendingRequests();
+
+		if (IS_TRACING) Trace (LVFunctionName,"Calling PurgeOldRequests() ...");
+		PurgeOldRequests();
+
+		if (IS_TRACING) 
+		{
+			sprintf(GVTraceMsg,"Sleeping for %d msecs...", BVSleepTime);
+			Trace (LVFunctionName, GVTraceMsg);
+		}
+		Sleep(BVSleepTime);
+
+		if (IS_TRACING) Trace (LVFunctionName,"Checking whether process is to be continued ...");
+		EXEC SQL 
+		SELECT	machine_name, started_by_id
+		INTO	:BVMachineName, :BVStartedByID
+		FROM	SY_BG_PROCESS_CONTROL
+		WHERE	operating_facility_id = :BVFacilityID
+		AND		pgm_id  = 'SMTPRSRV' 
+		AND		priority = :BVPriorityID
+		AND		serviced_requests = :BVServicedRequestID
+		AND		STARTED_DATE IS NOT NULL 
+		AND		TO_CHAR(STARTED_DATE,'DDMMYYHH24MISS') = :BVDateTime;
+
+		if(ORACLE_NODATAFOUND || ORACLE_ERROR)
+		{
+			LVContinue = 0;
+		}
+
+		/*
+		* Restarting is not required as this program is processing 
+		* records from a single cursor and also a separate program 
+		* is being  called for printing purpose. Hence, call to 
+		* RestartProgram is commented.
+		*
+		if (LVContinue == 1)
+		{						
+			LVContinue = RestartProgram();
+		}
+		*
+		*/
+
+	} /* while(LVContinue == 1) */
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"Background process is not running. Program aborting.");
+		Trace(LVFunctionName,GVTraceMsg);
+		Trace(LVFunctionName,"End");
+	}
+
+	exit(0);
+
+} /* End of WinMain */
+
+/*
+*
+*	Function	RestartProgram
+*
+*	Author		K S Sundar
+*
+*	Date		Sep 17, 2002
+*
+*	Purpose		This is to restart the new instance of the program. 
+*				At each specified restart interval,
+*				1. Deletes record from SY_BG_PROCESS_CONTROL for the current run.
+*				2. Inserts a news record into SY_BG_PROCESS_CONTROL for the next run.
+*				3. Starts the new instance.
+*				4. Aborts the current instance.
+*
+*/
+int RestartProgram(void)
+{
+
+	char LVFunctionName[30];
+
+	if (IS_TRACING) 
+	{
+		strcpy(LVFunctionName,"RestartProgram()");
+		Trace(LVFunctionName,"Begin");
+	}
+	
+	/* 
+	* Get the elapsed time since the last start 
+	*/
+	EXEC SQL 
+	SELECT floor(abs(sysdate - TO_DATE(:BVDateTime,'DDMMYYHH24MISS')) * 1440)
+	INTO BVElapsedTime
+	FROM dual;
+
+	if ORACLE_ERROR 
+	{
+		sprintf(GVTraceMsg,"Error at SELECT from dual : [%s]",sqlca.sqlerrm.sqlerrmc);
+		RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return 0;
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"Elapsed time since last start = %d minutes", BVElapsedTime);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	if (BVElapsedTime > RestartInterval)
+	{
+		
+		if (IS_TRACING)
+		{
+			sprintf(GVTraceMsg,"Elapsed time is greater than restart interval!!! Restarting ...");
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+		EXEC SQL DELETE sy_bg_process_control
+		WHERE pgm_id = 'SMTPRSRV'
+		AND   started_date is not null
+		AND   started_date = TO_DATE(:BVDateTime,'DDMMYYHH24MISS');
+
+		if (ORACLE_ERROR)
+		{
+			sprintf(GVTraceMsg,"Error at DELETE from sy_bg_process_control : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+		if (IS_TRACING)
+		{
+			sprintf(GVTraceMsg,"Record removed from sy_bg_process_control");
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+		EXEC SQL
+		SELECT to_char(sysdate,'ddmmyyhh24miss')
+		INTO   bv_next_start_time
+		FROM   dual;
+
+		if (ORACLE_ERROR)
+		{
+			sprintf(GVTraceMsg,"Error at SELECT from dual : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+		EXEC SQL
+		INSERT INTO SY_BG_PROCESS_CONTROL
+		(
+			operating_facility_id,
+			pgm_id,                 
+			machine_name,           
+			started_by_id,          
+			started_date,           
+			priority,               
+			serviced_requests      
+		)
+		VALUES
+		(	
+			:BVFacilityID,
+			'SMTPRSRV',
+			:BVMachineName,
+			:BVStartedByID,
+			to_date(:bv_next_start_time, 'ddmmyyhh24miss'),
+			:BVPriorityID,
+			:BVServicedRequestID
+		);
+
+		if (ORACLE_ERROR)
+		{
+			sprintf(GVTraceMsg,"Error at INSERT into SY_BG_PROCESS_CONTROL : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+		
+		EXEC SQL COMMIT WORK RELEASE;
+
+		/* Frame the command to be executed */
+		bv_cmd_line.arr[0] = '\0';
+	    strcat(bv_cmd_line.arr,"SMTPRSRV");
+		strcat(bv_cmd_line.arr," ");
+		strcat(bv_cmd_line.arr,BVUidPwd.arr);
+		strcat(bv_cmd_line.arr," ");
+		strcat(bv_cmd_line.arr,bv_next_start_time.arr);
+		strcat(bv_cmd_line.arr," ");
+		strcat(bv_cmd_line.arr,BVSessionID .arr);
+		strcat(bv_cmd_line.arr," ");
+		strcat(bv_cmd_line.arr,BVFacilityID .arr);
+
+		bv_cmd_line.arr[strlen(bv_cmd_line.arr)] = '\0';		
+
+
+		/* Invoke the next instance of SMTPRSRV */
+
+		if (IS_TRACING)
+	    {
+			sprintf(GVTraceMsg,bv_cmd_line.arr);
+			Trace(LVFunctionName,GVTraceMsg);
+	    }
+
+		WinExec(bv_cmd_line.arr, SW_SHOWNORMAL);
+
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+
+		/* Exit the current session */
+		exit (0);
+	}
+	
+	return 1;
+
+}	/* End of RestartProgram */
+
+
+/*
+*
+*	Function	PurgeOldRequests
+*
+*	Author		K S Sundar
+*
+*	Date		May 11, 2003
+*
+*	Purpose		Purges the following for processed requests, 
+*					which are older than 2 days:
+*				1. Physical files
+*				2. Error Log from SY_ONLINE_PRINT_ERROR_LOG
+*				3. Print requsts from SY_REPORT_PRINT_REQUSTS
+*
+*/
+void PurgeOldRequests(void)
+{
+
+	char LVFunctionName[30];
+	int LVContinue = 1;
+	BVNoOfPendingRequests  = 0;
+
+	if (IS_TRACING) 
+	{
+		strcpy(LVFunctionName,"PurgeOldRequests()");
+		Trace(LVFunctionName,"Begin");
+	}
+
+	/*
+	* Find out if there is any processed requests older
+	* than 2 days.
+	*/
+	EXEC SQL  
+	SELECT	COUNT(*) 
+	INTO	:BVNoOfPendingRequests 
+	FROM	SY_REPORT_PRINT_REQUEST
+	WHERE	PRINT_SUCCESS_YN IS NOT NULL 
+	AND		SYSDATE - PRINT_DATE >= 2;
+
+	if (BVNoOfPendingRequests == 0)
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"Nothing to purge !!");
+	}
+	else
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"Purging old files.");
+
+		EXEC SQL  
+		DECLARE DEL_CUR CURSOR  FOR
+		SELECT  ONLINE_PRINT_FILE_NAME
+		FROM    SY_REPORT_PRINT_REQUEST
+		WHERE   PRINT_SUCCESS_YN IS NOT NULL 
+		AND		SYSDATE - PRINT_DATE >= 2;
+		if ORACLE_ERROR 
+		{
+			sprintf(GVTraceMsg,"Error at DECLARE cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+
+		EXEC SQL OPEN DEL_CUR; 
+		if ORACLE_ERROR 
+		{
+			sprintf(GVTraceMsg,"Error at OPEN cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+		/*
+		* Purge the physical files which are older than 2 days.
+		*/
+		while(LVContinue!=0)
+		{
+			BVOnlinePrintFileName.arr[0] = '\0';
+			BVOnlinePrintFileName.len    = 0;
+
+			EXEC SQL FETCH DEL_CUR INTO :BVOnlinePrintFileName;
+
+			if (ORACLE_ERROR || ORACLE_NODATAFOUND)
+			{
+				/*
+				* Register error
+				*/
+				if ORACLE_ERROR 
+				{
+					sprintf(GVTraceMsg,"Error at FETCH cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+					RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+				}
+				LVContinue = 0;
+				EXEC SQL CLOSE DEL_CUR;
+			}
+			else
+			{
+				BVOnlinePrintFileName.arr[BVOnlinePrintFileName.len] = '\0';
+				DeleteFile(BVOnlinePrintFileName.arr);
+			}
+		}
+
+		/*
+		* Purge error logs older than 2 days.
+		*/
+		EXEC SQL 
+		DELETE 
+		FROM	SY_ONLINE_PRINT_ERROR_LOG
+		WHERE	( ONLINE_PRINT_NAME, user_id, ONLINE_PRINT_FILE_NAME )
+					IN ( SELECT ONLINE_PRINT_NAME, user_id, ONLINE_PRINT_FILE_NAME 
+						 FROM   SY_REPORT_PRINT_REQUEST 
+						 WHERE  PRINT_SUCCESS_YN IS NOT NULL 
+						 AND	SYSDATE - PRINT_DATE >= 2 
+						);
+
+		if (ORACLE_ERROR)
+		{
+			sprintf(GVTraceMsg,"Error at DELETE from SY_ONLINE_PRINT_ERROR_LOG : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+		/*
+		* Purge print requests older than 2 days.
+		*/
+		EXEC SQL 
+		DELETE 
+		FROM	SY_REPORT_PRINT_REQUEST
+		WHERE	PRINT_SUCCESS_YN IS NOT NULL 
+		AND 	SYSDATE - PRINT_DATE >= 2;
+
+		if (ORACLE_ERROR)
+		{
+			sprintf(GVTraceMsg,"Error at DELETE from SY_REPORT_PRINT_REQUEST : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","Calculate Elapsed Time", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			return 0;
+		}
+
+		EXEC SQL COMMIT;
+	}
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+} /* End of PurgeOldRequests */
+
+/*
+*
+*	Function	ProcessPendingRequests
+*
+*	Author		K S Sundar
+*
+*	Date		May 11, 2003
+*
+*	Purpose		Processes the pending requests as follows:
+*
+*				For each pending print request,
+*				1. Prints the document
+*				2. Updates SY_REPORT_PRINT_REQUEST.PRINT_SUCCESS_YN with printing status 
+*
+*/
+void ProcessPendingRequests(void)
+{
+
+	FILE *fp;
+	int		LVContinue,i;
+	int		LVRequestCtr;
+	char	LVFunctionName[30];
+	char	*wordir;
+	int	 LVProcessReturnCode;
+
+	if (IS_TRACING) 
+	{
+		strcpy(LVFunctionName,"ProcessPendingRequests");
+		Trace(LVFunctionName,"Begin");
+	} 
+	
+	BVNewVersionYN.arr[0] = '\0';
+	BVNewVersionYN.len = 0;
+	strcpy(BVNewVersionYN.arr,"N");
+	if (IS_TRACING) Trace(LVFunctionName,"Checking Medicom Version ...");
+		EXEC SQL EXECUTE 
+   		BEGIN 
+			IF sm_installation_tab_check THEN
+				:BVNewVersionYN := 'Y';
+			ELSE
+				:BVNewVersionYN := 'N';
+			END IF;
+		END ;
+   		END-EXEC ;
+		BVNewVersionYN.len = strlen(BVNewVersionYN.arr);
+	
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg,"Medicom Version=[%s]",BVNewVersionYN.arr);
+		Trace(LVFunctionName, GVTraceMsg);
+	}
+
+	/*
+	* Declare cursor for pending print requests.
+	*/
+
+	/* added by aparna
+		Decode function for operating facility ID and priority value 
+		for all priority changed from '*A' to 0 
+	*/
+
+	EXEC SQL  
+	DECLARE REQUEST_CUR CURSOR  FOR
+	SELECT  operating_facility_id,
+			module_id,
+			online_print_name,
+			online_print_file_name,
+			dest_locn_type,
+			dest_locn_code, 
+			to_char(print_date, 'DDMMYYYYHH24MI'),
+			rowid,
+			ws_no,
+			print_server_id,							-- Added by S. Sundar on Dec 12, 2005
+			printer_name,								-- for checking explicit printing.
+			dest_queue_name
+	FROM    SY_REPORT_PRINT_REQUEST
+	WHERE   operating_facility_id = decode(:BVFacilityID,'*A',operating_facility_id ,:BVFacilityID)
+	AND		print_priority = decode(:BVPriorityID, 0,print_priority,:BVPriorityID)
+//	AND		online_print_name = decode(:BVServicedRequestID,'*A',online_print_name ,:BVServicedRequestID)  //commented to support multiple billing services
+	 AND     (:BVServicedRequestID = '*A'
+	          OR (:BVServicedRequestID = 'RLRRSENQ' AND online_print_name LIKE 'RLR%')
+			  OR (:BVServicedRequestID = 'BLRRSENQ' AND online_print_name LIKE 'BL%'))
+		//Ravi Shankar, 07/10/2016, IN-62208
+		OR (:BVServicedRequestID = 'O' 
+		AND WS_NO IN (SELECT WS_NO FROM RL_RESULT_PRINT_OP_WSNO WHERE OPERATING_FACILITY_ID = DECODE(:BVFacilityID,'*A',OPERATING_FACILITY_ID,:BVFacilityID)) )
+		OR (:BVServicedRequestID = 'N' 
+		AND WS_NO NOT IN (SELECT WS_NO FROM RL_RESULT_PRINT_OP_WSNO WHERE OPERATING_FACILITY_ID = DECODE(:BVFacilityID,'*A',OPERATING_FACILITY_ID,:BVFacilityID)) )
+		//////////////
+	AND		PRINT_IMMEDIATE_YN = 'Y' 
+	// Following code is changed by K S Sundar on Sep 01, 2003
+	//AND		(PRINT_SUCCESS_YN IS NULL OR PRINT_SUCCESS_YN  = 'N')
+	AND		PRINT_SUCCESS_YN IS NULL; 
+	//ORDER	BY PRINT_PRIORITY;
+	
+	if ORACLE_ERROR 
+	{
+		sprintf(GVTraceMsg,"Error at DECLARE cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+		RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return 0;
+	}
+
+	/*
+	* Open cursor.
+	*/
+	EXEC SQL OPEN REQUEST_CUR; 
+	if ORACLE_ERROR 
+	{
+		sprintf(GVTraceMsg,"Error at OPEN cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+		RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return 0;
+	}
+
+	LVRequestCtr = 0;
+	LVContinue = 1;
+
+	while(LVContinue == 1)
+	{
+		
+		/*
+		* Initialize the bind variables.
+				*/
+
+		BVRequestFacilityID.arr[0]	= '\0';
+		BVRequestFacilityID.len		= 0;
+
+		BVModuleID.arr[0]			= '\0';
+		BVModuleID.len				= 0;
+
+		BVOnlinePrintName.arr[0]	= '\0';
+		BVOnlinePrintName.len		= 0;
+
+		BVOnlinePrintFileName.arr[0]= '\0';
+		BVOnlinePrintFileName.len   = 0;
+				
+		BVLocationType.arr[0]       = '\0';
+		BVLocationType.len          = 0;
+
+		BVLocationCode.arr[0]       = '\0';
+		BVLocationCode.len          = 0;
+
+		BVPrintDate.arr[0]			= '\0';
+		BVPrintDate.len				= 0;
+
+		BVRowID.arr[0]				= '\0';
+		BVRowID.len					= 0;
+
+		BVWs_No.arr[0]				= '\0';
+		BVWs_No.len					= 0;
+
+		BVPrinter_ID.arr[0]			= '\0';
+		BVPrinter_ID.len			= 0;
+
+		BVPrinter_Name.arr[0]		= '\0';
+		BVPrinter_Name.len			= 0;
+
+		BVDest_Queue_Name.arr[0]	= '\0';
+		BVDest_Queue_Name.len		= 0;
+
+		/*
+		* Fetch the record.
+		*/
+		/* Added by aparna
+		   fetching operating facility id into new variable BVRequestFacilityID
+		   which is passed as a parameter to printDocument.
+		*/
+
+		EXEC SQL 
+		FETCH REQUEST_CUR INTO 
+			:BVRequestFacilityID,
+			:BVModuleID,
+			:BVOnlinePrintName,
+			:BVOnlinePrintFileName,
+			:BVLocationType,
+			:BVLocationCode,
+			:BVPrintDate,
+			:BVRowID,
+			:BVWs_No,
+			:BVPrinter_ID,
+			:BVPrinter_Name,
+			:BVDest_Queue_Name;
+
+		if (ORACLE_ERROR || ORACLE_NODATAFOUND)
+		{
+			/*
+			* Register if error.
+			*/
+			if ORACLE_ERROR 
+			{
+				sprintf(GVTraceMsg,"Error at FETCH cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+				RegisterError(BVFacilityID.arr, BVModuleID1.arr, BVWorkstationID.arr, BVDocumentID.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "","WORKSTATION.get_workstation_id", GVTraceMsg);
+			}
+
+			/*
+			* No more records. Exit.
+			*/
+			LVContinue = 0;
+			EXEC SQL CLOSE REQUEST_CUR;
+		}
+		else
+		{
+			/*
+			* Process the record.
+			*/
+			LVRequestCtr = LVRequestCtr + 1;
+
+			BVRequestFacilityID.arr[BVRequestFacilityID.len]		= '\0'; 
+			BVModuleID.arr[BVModuleID.len]							= '\0'; 
+			BVOnlinePrintName.arr[BVOnlinePrintName.len]			= '\0'; 
+			BVOnlinePrintFileName.arr[BVOnlinePrintFileName.len]	= '\0'; 
+			BVLocationType.arr[BVLocationType.len]					= '\0'; 
+			BVLocationCode.arr[BVLocationCode.len]					= '\0'; 
+			BVPrintDate.arr[BVPrintDate.len]						= '\0'; 
+			BVRowID.arr[BVRowID.len]								= '\0'; 
+			BVWs_No.arr[BVWs_No.len]								= '\0';
+			BVPrinter_ID.arr[BVPrinter_ID.len]						= '\0';
+			BVPrinter_Name.arr[BVPrinter_Name.len]					= '\0';
+			BVDest_Queue_Name.arr[BVDest_Queue_Name.len]			= '\0';
+
+			if (IS_TRACING) 
+			{	
+				sprintf(GVTraceMsg,"BVRequestFacilityID=[%s] BVModuleID=[%s] BVOnlinePrintName=[%s] BVOnlinePrintFileName=[%s] BVLocationType=[%s] BVLocationCode=[%s] BVPrintDate=[%s] BVRowID=[%s] BVWs_No=[%s] BVPrinter_ID=[%s] BVPrinter_Name=[%s] BVDest_Queue_Name=[%s]",
+				BVRequestFacilityID.arr ,BVModuleID.arr, BVOnlinePrintName.arr, BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrintDate.arr, BVRowID.arr, BVWs_No.arr, BVPrinter_ID.arr, BVPrinter_Name.arr, BVDest_Queue_Name.arr);
+				Trace(LVFunctionName,GVTraceMsg);
+			}
+
+
+			GVIsPrintSuccess = 0;
+
+			/********************************************************************/
+			/*			Reading Pro*C Output Directory 			  */
+			/*	Copy some temporary value to BVerror_text.arr to avoid 	  */
+			/*	Fetched Column Value is Null Error                 		  */
+			/********************************************************************/
+
+			strcpy (BVerror_text.arr, "$test$");
+			BVerror_text.len = strlen (BVerror_text.arr);
+			BVerror_text.arr[BVerror_text.len] = '\0';
+
+			strcpy (BVReport_Output_Dir.arr, "$test$");
+			BVReport_Output_Dir.len = strlen (BVReport_Output_Dir.arr);
+			BVReport_Output_Dir.arr[BVReport_Output_Dir.len] = '\0';
+
+
+			strcpy (BVUserId.arr, BVUidPwd.arr); 
+			strcpy (BVUserId.arr, strtok (BVUserId.arr, "/")); 
+			BVUserId.len = strlen (BVUserId.arr);
+			BVUserId.arr[BVUserId.len] = '\0';
+
+			if (IS_TRACING)
+			{
+				sprintf(GVTraceMsg,"Calling get_report_output_directory ... BVUserId=[%s] BVWorkstationID=[%s] BVNewVersionYN=[%s]...", BVUserId.arr, BVWorkstationID.arr,BVNewVersionYN.arr );
+				Trace(LVFunctionName, GVTraceMsg);
+			}
+			if (strcmp(BVNewVersionYN.arr,"N") == 0)
+			{	
+				wordir=(char*) malloc(200* sizeof(char));
+				i=GetPrivateProfileString("Reports","dir","",wordir,200,"medicom.ini");
+				wordir[i]='\0';
+				strcpy(BVReport_Output_Dir.arr,wordir);
+				BVReport_Output_Dir.len = strlen(BVReport_Output_Dir.arr);
+				if (IS_TRACING)
+				{
+					sprintf(GVTraceMsg,"BVReport_Output_Dir=[%s]",BVReport_Output_Dir.arr);
+					Trace(LVFunctionName,GVTraceMsg);
+				}
+
+			}
+			else
+			{
+				EXEC SQL EXECUTE
+				BEGIN
+					appprint.get_report_output_directory (
+						:BVUserId,
+						:BVWorkstationID,
+						:BVReport_Output_Dir,
+						:BVerror_text);
+				END;
+				END-EXEC;			
+
+			}
+			if (IS_TRACING)
+			{
+				sprintf(GVTraceMsg,"BVUserId = [%s] BVWorkstationID=[%s]  BVReport_Output_Dir=[%s]  BVerror_text=[%s]  ",BVUserId.arr,BVWorkstationID.arr,BVReport_Output_Dir.arr,BVerror_text.arr);
+				Trace(LVFunctionName,GVTraceMsg);
+			}
+			/********************************************************************/
+			/*	Check the return value of BVerror_text.arr and if it is	  */
+			/*	not equal to the Passed temporary value, raise an error       */
+			/********************************************************************/
+
+			BVerror_text.arr[BVerror_text.len] = '\0';
+			if ( (BVerror_text.len > 0) && (strcmp (BVerror_text.arr, "$test$")) )
+			{
+			   sprintf (GVTraceMsg, "Error in Open_log_file (): %s", BVerror_text.arr);
+			   RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVOnlinePrintName.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "",LVFunctionName, GVTraceMsg);
+			   break;
+			}
+
+			BVReport_Output_Dir.arr[BVReport_Output_Dir.len] = '\0';
+			if ( (BVReport_Output_Dir.len > 0) && (!strcmp (BVReport_Output_Dir.arr, "$test$")) )
+			{
+				sprintf (GVTraceMsg, "Report Directory Name not defined for %s Application User and/or %s Workstation",
+					BVUserId.arr, BVReport_Output_Dir.arr);
+				RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVOnlinePrintName.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "",LVFunctionName, GVTraceMsg);
+				break;
+			}
+
+			if (sqlca.sqlcode == 1405 )
+			{
+				sprintf (GVTraceMsg, "Report Output Directory not defined");
+				if (IS_TRACING)
+				{
+					sprintf(GVTraceMsg,"Report Output Directory not defined");
+					RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVOnlinePrintName.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "",LVFunctionName, GVTraceMsg);
+					break;
+				}
+			}
+
+			/*
+			* Check if the file exists.
+			* Call PrintDocument if file exists.
+			*/
+			if ((fp = fopen (BVOnlinePrintFileName.arr, "r")) == NULL)
+			{
+				GetMEDICOMMessage("SY2435",GVErrorMessage);
+				sprintf (GVTraceMsg, "APP-SY2435 %s", GVErrorMessage);
+				RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVOnlinePrintName.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "",LVFunctionName, GVTraceMsg);
+			}
+			else
+			{ 
+				fclose(fp);
+
+				/*
+				* Following code is added by S. Sundar on Dec 12, 2005
+				* to enable explicit printing
+				*/
+
+				if (BVPrinter_ID.len > 0)
+				{
+					/* Explicit Printing */
+					if (IS_TRACING) 
+					{
+						sprintf(GVTraceMsg,"Calling SMTPRINT ...");
+						Trace(LVFunctionName,GVTraceMsg);
+					} 
+
+					/*
+					* Assign " " to BVLocationCode if NULL
+					* This is a requirement of SMTPRINT.
+					*/
+					if (strlen(BVLocationCode.arr) == 0)
+					{
+						strcpy(BVLocationCode.arr," ");
+						BVLocationCode.len = strlen(BVLocationCode.arr);
+					}
+
+					strcpy(GVPgmName, "SMTPRINT");
+					sprintf
+					(
+						GVArguments, " %s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%d", 
+						BVUidPwd.arr, BVWorkstationID.arr, BVFacilityID.arr, 
+						BVModuleID.arr, BVDocumentID.arr, BVOnlinePrintFileName.arr,
+						BVLocationType.arr, BVLocationCode.arr, 
+						BVPrinter_ID.arr,
+						BVPrinter_Name.arr,
+						BVDest_Queue_Name.arr,
+						1, 
+						1, 
+						9999
+					);
+
+					if (IS_TRACING)
+					{
+						sprintf(GVCmd,"Calling %s%s",GVPgmName, GVArguments);
+						Trace(LVFunctionName, GVCmd);
+					}
+
+					LVProcessReturnCode = InvokeProcess(GVPgmName, GVArguments);
+					if (LVProcessReturnCode)	// 1=Success   0=Failure
+						GVIsPrintSuccess = 1;	// 1=Success   0=Failure
+					else
+						GVIsPrintSuccess = 0;
+
+				}
+				else
+				{
+					if (IS_TRACING) 
+					{
+						sprintf(GVTraceMsg,"Calling Print Document ...");
+						Trace(LVFunctionName,GVTraceMsg);
+					} 
+
+					/*
+					* Call WSPrintDocument function to print the document.
+					* BVWs_No passes WORKSTATION NO of user who submit the
+					* print job.
+
+					* BVReport_Output_Dir pass the, Report Out Put Directory
+					* for the current Worksation.Ie,, where the SMTPRSRV
+					* process is running.
+					*/
+					GVSpawnReturnCode =  WSPrintDocument 
+					(
+							BVUidPwd.arr,
+							BVSessionID.arr,
+							BVRequestFacilityID.arr,
+							BVModuleID.arr,
+							BVOnlinePrintName.arr,
+							BVOnlinePrintFileName.arr,
+							BVLocationType.arr,
+							BVLocationCode.arr,
+							1,
+							1,
+							99,
+							BVWs_No.arr,
+							BVReport_Output_Dir.arr
+					);
+				
+					if (!GVSpawnReturnCode)
+						GVIsPrintSuccess = 1;
+					else
+						GVIsPrintSuccess = 0;
+
+				}
+
+
+				if (IS_TRACING)
+				{
+					sprintf(GVTraceMsg,"Printing Success?=[%d]",GVIsPrintSuccess);
+					Trace(LVFunctionName,GVTraceMsg);
+				}
+			}
+
+			/*
+			* Reset GVProramID, since it is a global
+			* variable.
+			*/
+			strcpy(GVProgramID , "SMTPRSRV");						
+			IS_TRACING = GVIsTracing;
+
+			/*
+			* Update SY_REPORT_PRINT_REQUEST with printing status.
+			* PRINT_SUCCESS_YN = 'Y' if success
+			* PRINT_SUCCESS_YN = 'N' if failed
+			*/
+			if (GVIsPrintSuccess)
+			{
+				if (BVPrintDate.len != 0)
+				{
+					if (IS_TRACING) Trace(LVFunctionName,"Updating SY_REPORT_PRINT_REQUEST.PRINT_SUCCESS_YN to Y");
+					EXEC SQL 
+					UPDATE	SY_REPORT_PRINT_REQUEST
+					SET		PRINT_SUCCESS_YN = 'Y',
+							REPRINT_DATE = SYSDATE
+					WHERE	Rowid = :BVRowID;
+				}
+				else
+				{
+					/* 
+					* Printed through REPRINT option of Administer function 
+					*/
+					if (IS_TRACING) Trace(LVFunctionName,"Updating SY_REPORT_PRINT_REQUEST.PRINT_SUCCESS_YN to Y, REPRINT_DATE to SYSDATE");
+					EXEC SQL 
+					UPDATE	SY_REPORT_PRINT_REQUEST
+					SET		PRINT_SUCCESS_YN = 'Y',
+							PRINT_DATE = SYSDATE
+					WHERE	Rowid = :BVRowID;
+				}
+			}
+			else
+			{
+				if (IS_TRACING) Trace(LVFunctionName,"Updating SY_REPORT_PRINT_REQUEST.PRINT_SUCCESS_YN to N");
+				EXEC SQL 
+				UPDATE	SY_REPORT_PRINT_REQUEST
+				SET		PRINT_SUCCESS_YN = 'N'
+				WHERE	Rowid = :BVRowID;
+			}
+			if (OERROR || NODATAFOUND ||  RESOURCE_BUSY ) 
+			{
+				sprintf(GVTraceMsg,"Error UPDATE sy_report_print_request : [%s]",sqlca.sqlerrm.sqlerrmc);
+				RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVOnlinePrintName.arr,  BVOnlinePrintFileName.arr, BVLocationType.arr, BVLocationCode.arr, "", "", "",LVFunctionName, GVTraceMsg);
+			}
+		}
+
+		/*
+		* Save the changes.
+		*/
+		EXEC SQL COMMIT;
+
+	} /* while(LVContinue == 1) */
+
+	if (LVRequestCtr == 0)
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"No pending requests !!");
+	}
+
+	if (IS_TRACING)  Trace(LVFunctionName,"End");
+
+} /* End of ProcessPendingRequests */
+
+

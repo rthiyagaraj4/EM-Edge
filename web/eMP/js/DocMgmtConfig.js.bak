@@ -1,0 +1,366 @@
+//Created by Sethuraman for document Management Config Requirement
+var rowIDArray = new Array();
+
+/*
+ * Functions called from DocumentManagementConfig.jsp
+ */
+
+/*
+Function Name : create()
+Description :  Used for Loading the Function
+*/
+function create()
+{
+	f_query_add_mod.location.href='../../eMP/jsp/DocMgmtConfigMain.jsp?mode=insert';
+}
+
+
+function query()
+{
+	f_query_add_mod.location.href='../../eMP/jsp/DocMgmtConfigMain.jsp?mode=update';
+}
+
+function changeFacility()
+{
+	document.DocMgmtConfigHeaderForm.facilityId.value = document.DocMgmtConfigHeaderForm.facility_id.value;
+}
+
+/*
+	Function Name : loadFrames()
+	Description : Will load the document management configuration for the selected facility
+*/
+
+function loadFrames()
+{
+	var mode = document.DocMgmtConfigHeaderForm.mode.value;
+	var facilityId = document.DocMgmtConfigHeaderForm.facilityId.value;
+
+	if (facilityId == "")
+	{
+		var erroMsg=getMessage("CAN_NOT_BE_BLANK",'COMMON');
+		erroMsg=erroMsg.replace('$',getLabel("Common.facility.label","Common"));
+		if(erroMsg!="")
+		{
+			parent.parent.messageFrame.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+erroMsg+"&err_value=0";
+			return false;
+		}
+	}
+	
+	if (facilityId !="")
+	{
+		parent.DetailsFrame.location.href = '../../eMP/jsp/DocMgmtConfig.jsp?mode='+mode+'&facilityId='+facilityId;
+		parent.parent.messageFrame.location.href = '../../eCommon/jsp/MstCodeError.jsp';
+	}	
+	
+}
+
+
+function setScanEnabled(obj){
+
+	var doc_save_as = eval("document.DocMgmtConfigForm.doc_save_as");
+			
+	var docSaveAsRadios = doc_save_as;
+	for(var i = 0; i < docSaveAsRadios.length; i++){
+		docSaveAsRadios[i].disabled = true;
+	}
+
+	if (obj.checked == true)
+	{
+		for(var i = 0; i < docSaveAsRadios.length; i++){
+			docSaveAsRadios[i].disabled = false;
+		}
+	}
+}
+
+function setDocPathEnabled(obj){
+
+   var doc_sharedPath = eval("DocMgmtConfigForm.doc_shared_path"); // Added by prithvi on 26/08/2015
+
+   var doc_sharedPathArray=doc_sharedPath;
+ 
+   if (doc_sharedPathArray.length != undefined) 
+	   {
+	   for(var i = 0; i < doc_sharedPathArray.length; i++){
+
+			doc_sharedPathArray[i].disabled = true;
+		}
+	}
+	else{
+           document.DocMgmtConfigForm.doc_shared_path.disabled = true;
+	}
+	//document.DocMgmtConfigForm.doc_shared_path.disabled = true;
+	//document.DocMgmtConfigForm.web_service_url.disabled = true;
+	if (obj.checked == true)
+	{
+		if (obj.value == 1)
+		{
+			  if (doc_sharedPathArray.length != undefined) 
+				{
+				   for(var i = 0; i < doc_sharedPathArray.length; i++){
+
+						doc_sharedPathArray[i].disabled = false;
+					}
+				}
+				else{
+					   document.DocMgmtConfigForm.doc_shared_path.disabled = false;
+				}
+		}
+		if (obj.value == 0)
+		{
+			  if (doc_sharedPathArray.length != undefined)  
+				{
+			   for(var i = 0; i < doc_sharedPathArray.length; i++){
+
+				  
+					doc_sharedPathArray[i].disabled = true;
+				}
+	}
+	else{
+           document.DocMgmtConfigForm.doc_shared_path.disabled = true;
+	}
+			//document.DocMgmtConfigForm.web_service_url.disabled = false;
+		}
+	}
+}
+
+
+/*
+Function Name : apply()
+	Description : HTML Object  Values of the file EncSummConfigGroupAddedList.jsp values are Posted to EncSummConfigServlet.java file
+*/
+
+
+function apply()
+{
+	//var scanEnabledValue = 0;
+	//var docSaveAsValue = 0;
+	var docPathOptionValue = 0;
+	//var docCheckStatusValue = 0;	
+	
+	var mode = f_query_add_mod.HeaderFrame.document.forms(0).mode.value;
+
+	if(f_query_add_mod.DetailsFrame!=null)
+	{
+		if (mode = "insert")
+		{	
+			if(mode != null)
+			{	
+				f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.facilityId.value = f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.facilityId.value;
+				//var scanEnabledfield = eval("f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_scan_enabled");	 //  Commented by prithvi on 27/08/2015		
+				/*if (scanEnabledfield.checked == true)
+				{
+					scanEnabledValue = 1;
+				} */
+				
+				//f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.ScanningEnabled.value = scanEnabledValue;
+
+				/*var doc_save_as = eval("f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_save_as");
+		
+				var docSaveAsRadios = doc_save_as;
+				for(var i = 0; i < docSaveAsRadios.length; i++){
+					if(docSaveAsRadios[i].checked){
+						docSaveAsValue = docSaveAsRadios[i].value;
+					}
+				}	
+
+				f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.DocSaveAs.value = docSaveAsValue;  */
+
+				var doc_path_option = eval("f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_folder_option");
+		
+				var docPathAsRadios = doc_path_option;
+				for(var i = 0; i < docPathAsRadios.length; i++){
+					if(docPathAsRadios[i].checked){
+						docPathOptionValue = docPathAsRadios[i].value;
+					}
+				}	
+				f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.DocFolderOption.value = docPathOptionValue;
+
+				//var docSharedPath = f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value; //prithvi
+				
+                var docSharedPath = eval("f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path"); //prithvi
+				
+				var docSharedPathArray = docSharedPath; //prithvi
+
+				var errors = "";
+				
+				if (docPathOptionValue == 1)
+				{
+					//if (docSharedPath == "")  //prithvi
+					if(docSharedPathArray.length != undefined && docSharedPathArray.length != 0)
+					{
+                        for(var a=0; a<docSharedPathArray.length;a++)
+						{
+                            if(docSharedPathArray[a].value=="" || docSharedPathArray[a].value==null || docSharedPathArray[a].value == undefined )
+							{
+						        errors = "Shared Path cannot be empty";
+						        messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+						        return false ;
+							}
+							else{
+
+								//var xmlDoc = new ActiveXObject( "Microsoft.XMLDom" ) ;
+								//var xmlHttp = new ActiveXObject( "Microsoft.XMLHTTP" ) ;
+								var xmlHttp = new XMLHttpRequest();
+								var xmlStr ="<root><SEARCH ";	
+								xmlStr += " filePath=\""+docSharedPathArray[a].value+"\"";	
+								xmlStr +=" /></root>";
+								//xmlDoc.loadXML(xmlStr);
+								new DOMParser().parseFromString(getXMLString(xmlStr), "text/xml");
+								xmlHttp.open("POST","XHAjaxUtil.jsp",false);	
+								xmlHttp.send(xmlDoc);
+								
+								var xhcheck=xmlHttp.responseText;
+								
+								if( xhcheck.indexOf("Y") > -1)
+									{
+									
+									}
+								else{
+									errors = xhcheck+"  in this path!!!!"+docSharedPathArray[a].value;
+						            messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+									return false;
+								}
+							}
+						}
+					}
+					else if(docSharedPathArray.length == undefined)
+					{
+						if(f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value=="" || f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value==null || f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value == undefined )
+							{
+						        errors = "Shared Path cannot be empty";
+						        messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+						        return false ;
+							}
+							else{
+
+								//var xmlDoc = new ActiveXObject( "Microsoft.XMLDom" ) ;
+								//var xmlHttp = new ActiveXObject( "Microsoft.XMLHTTP" ) ;
+								var xmlHttp = new XMLHttpRequest();
+								var xmlStr ="<root><SEARCH ";	
+								xmlStr += " filePath=\""+f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value+"\"";	
+								xmlStr +=" /></root>";
+								//xmlDoc.loadXML(xmlStr);
+								new DOMParser().parseFromString(getXMLString(xmlStr), "text/xml");
+								xmlHttp.open("POST","XHAjaxUtil.jsp",false);	
+								xmlHttp.send(xmlDoc);
+								
+								var xhcheck=xmlHttp.responseText;
+								
+								if( xhcheck.indexOf("Y") > -1)
+									{
+									
+									}
+								else{
+									errors = xhcheck+"  in this path!!!!"+f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value;
+						            messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+									return false;
+								}
+							}
+
+					}
+					else{
+						errors = "Shared Path cannot be empty";
+						messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+						return false ;
+					}
+				}
+	//prithvi		//f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.DocSharedPath.value = f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_shared_path.value;
+
+				/*
+				var webServicePath = f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.web_service_url.value;
+				
+				if (docPathOptionValue == 3)
+				{
+					if (webServicePath == "")
+					{
+						errors = "Web Service URL cannot be empty";
+						messageFrame.document.location.href="../../eCommon/jsp/MstCodeError.jsp?err_num="+errors ;
+						return false ;						
+					}
+				}				
+				f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.WebServiceUrl.value = f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.web_service_url.value;					
+				*/
+
+			/*	var docCheckStatusfield = eval("f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.doc_check_status");			
+				if (docCheckStatusfield.checked == true)
+				{
+					docCheckStatusValue = 1;
+				}
+				
+				f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.DocCheckStatus.value = docCheckStatusValue;  */
+			}	
+			f_query_add_mod.DetailsFrame.document.DocMgmtConfigForm.submit();	
+		}
+	}
+	
+}
+
+function resetFrames()
+{
+	parent.DetailsFrame.location.href = '../../eCommon/html/blank.html';
+	parent.parent.messageFrame.location.href = '../../eCommon/jsp/MstCodeError.jsp';
+}
+
+/*
+Function name :   reset()
+Description : The Function is Used For Refreshing the Function
+*/
+function reset()
+{
+	if(f_query_add_mod.document.forms(0))
+		f_query_add_mod.document.forms(0).reset();
+
+	f_query_add_mod.location.reload();
+
+}
+
+/*
+Function name :   onSuccess
+Description : Function  is Invoked automatically when Records are Submitted to the DataBase 
+*/
+function onSuccess() 
+{
+	
+	if(f_query_add_mod.DetailsFrame.document.forms(0).mode.value=="insert")
+	{
+		f_query_add_mod.location.href='../../eMP/jsp/DocMgmtConfigMain.jsp?mode=insert&facilityId='+f_query_add_mod.DetailsFrame.document.forms(0).facilityId.value;
+	}
+	else if(f_query_add_mod.DetailsFrame.document.forms(0).mode.value=="update")
+	{			
+		f_query_add_mod.location.href='../../eMP/jsp/DocMgmtConfigMain.jsp?mode=update&facilityId='+f_query_add_mod.DetailsFrame.document.forms(0).facilityId.value;
+	}
+	else     
+	      f_query_add_mod.location.href='../../eCommon/html/blank.html';
+}
+
+
+
+function CheckForSpecialCharacter(ObjText)
+{
+	//var key = window.event.keyCode;
+	 var whichCode = (window.Event) ? event.which : event.keyCode;
+     var key = String.fromCharCode(whichCode);  // Get key value from key code
+		if(((key >=33)&&(key <=47))||((key >=58)&&(key <=64))||(key == 32)||((key >=91)&&(key <=96))||((key >=123)&&(key <=126))||((key >=145)&&(key <=146)))
+	{
+			return false;
+	}
+		return true;
+}
+
+function CheckForSpecCharsWithSpaceBlur(ObjText)
+{
+    var strCheck = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\\ ';  // Edited by prithvi on 25/08/2015 (\\ symbol)  Edited by prithvi on 20/10/2015 -removed all special characters
+    var whichCode = (window.Event) ? event.which : event.keyCode;
+    key = String.fromCharCode(whichCode);  // Get key value from key code
+    if (strCheck.indexOf(key) == -1) return false;  // Not a valid key
+	return true ;
+}
+
+
+
+
+
+
+
+
+

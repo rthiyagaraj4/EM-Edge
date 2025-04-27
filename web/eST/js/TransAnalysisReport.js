@@ -1,0 +1,382 @@
+
+var bean_id = "";
+var bean_name = "";
+var xmlDom;
+var xmlHttp;
+var formObj = "";
+async function searchCodeItemClass(obj) {
+	var result = false;
+	var message = "";
+	var flag = "";
+	var function_id = "";
+	var argumentArray = new Array();
+	var dataNameArray = new Array();
+	var dataValueArray = new Array();
+	var dataTypeArray = new Array();
+	argumentArray[0] = document.getElementById("SQL_ST_ITEM_CLASS_LOOKUP_LANG").value + "'" + document.forms[0].p_language_id.value + "'";
+	argumentArray[1] = dataNameArray;
+	argumentArray[2] = dataValueArray;
+	argumentArray[3] = dataTypeArray;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = obj.value;
+	argumentArray[6] = CODE_LINK;
+	argumentArray[7] = CODE_DESC;
+	returnedValues = await CommonLookup(getLabel("Common.ItemClass.label", "Common"), argumentArray);
+	
+			var ret1=unescape(returnedValues);
+		 	var arr=ret1.split(",");
+		 	if(arr[1]==undefined) 
+	 		{
+		 		arr[0]="";	
+		 		arr[1]="";	
+	 		}
+	
+	if ((returnedValues != null) && (returnedValues != "")) {
+		obj.value = arr[0];
+	}
+}
+async function searchCodeItemCode(obj) {
+	var result = false;
+	var message = "";
+	var flag = "";
+	var function_id = "";
+	var argumentArray = new Array();
+	var dataNameArray = new Array();
+	var dataValueArray = new Array();
+	var dataTypeArray = new Array();
+	dataNameArray[0] = "language_id";
+	dataValueArray[0] = document.forms[0].p_language_id.value;
+	dataTypeArray[0] = STRING;
+	argumentArray[0] = document.getElementById("SQL_ST_ITEM_LOOKUP").value;
+	argumentArray[1] = dataNameArray;
+	argumentArray[2] = dataValueArray;
+	argumentArray[3] = dataTypeArray;
+	argumentArray[4] = "2,3";
+	argumentArray[5] = obj.value;
+	argumentArray[6] = CODE_LINK;
+	argumentArray[7] = CODE_DESC;
+	returnedValues = await CommonLookup(getLabel("Common.ItemName.label", "Common"), argumentArray);
+	
+			var ret1=unescape(returnedValues);
+		 	var arr=ret1.split(",");
+		 	if(arr[1]==undefined) 
+	 		{
+		 		arr[0]="";	
+		 		arr[1]="";	
+	 		}
+	
+	if ((returnedValues != null) && (returnedValues != "")) {
+		obj.value = arr[0];
+	}
+}
+function loadPage() {
+	if (document.getElementById("summary_code").value == "A") {
+		parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/RequestStastisticsReport.jsp";
+	} else {
+		if (document.getElementById("summary_code").value == "B") {
+			parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/GRNStastisticsReport.jsp";
+		} else {
+			if (document.getElementById("summary_code").value == "C") {
+				parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/UnfinalizedTransactions.jsp";
+			} else {
+				if (document.getElementById("summary_code").value == "D") {
+					parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/ReportStockStatusTransactedItems.jsp";
+				} else {
+					if (document.getElementById("summary_code").value == "E") {
+						parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/FacilityWiseYearSummaryReportCriteria.jsp";
+					} else {
+						if (document.getElementById("summary_code").value == "F") {
+							parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/QueryStockTurnoverRateReportCriteria.jsp";
+						} else {
+							if (document.getElementById("summary_code").value == "G") {
+								parent.f_query_add_mod_sub.document.location.href = "../../eST/jsp/ReportWorkLoadStatisticsCriteria.jsp";
+							} else {
+								parent.f_query_add_mod_sub.document.location.href = "../../eCommon/html/blank.html";
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+function numbervalidation() {
+	if ((event.keyCode >= 48) && (event.keyCode <= 57)) {
+		return true;
+	} else {
+		event.keyCode = 0;
+	}
+}
+function CheckForSpecialChars(event) {
+	var strCheck = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-.";
+	var whichCode = (window.Event) ? event.which : event.keyCode;
+	key = String.fromCharCode(whichCode);  // Get key value from key code
+	if (strCheck.indexOf(key) == -1) {
+		return false;
+	}  // Not a valid key
+	//if( (event.keyCode >= 97) && (event.keyCode <= 122) )
+	//	return (event.keyCode -= 32);
+	return true;
+}
+async function searchCodeStore(obj) {
+	var result = false;
+	var message = "";
+	var flag = "";
+	var function_id = "";
+	var argumentArray = new Array();
+	var dataNameArray = new Array();
+	var dataValueArray = new Array();
+	var dataTypeArray = new Array();
+	dataNameArray[0] = "language_id";
+	dataValueArray[0] = document.forms[0].p_language_id.value;
+	dataTypeArray[0] = STRING;
+	dataNameArray[1] = "facility_id";
+	dataValueArray[1] = document.forms[0].p_facility_id.value;
+	dataTypeArray[1] = STRING;
+	argumentArray[0] = document.getElementById("SQL_ST_STORE_LOOKUP").value;
+	argumentArray[1] = dataNameArray;
+	argumentArray[2] = dataValueArray;
+	argumentArray[3] = dataTypeArray;
+	argumentArray[4] = "3,4";
+	argumentArray[5] = obj.value;
+	argumentArray[6] = CODE_LINK;
+	argumentArray[7] = CODE_DESC;
+	returnedValues = await CommonLookup(getLabel("Common.Store.label", "Common"), argumentArray);
+	
+			var ret1=unescape(returnedValues);
+		 	var arr=ret1.split(",");
+		 	if(arr[1]==undefined) 
+	 		{
+		 		arr[0]="";	
+		 		arr[1]="";	
+	 		}
+	
+	if ((returnedValues != null) && (returnedValues != "")) {
+		obj.value = arr[0];
+	}
+}
+function reset() {
+	f_query_add_mod_sub.location.reload();
+}
+function run() {
+	if (f_query_add_mod_sub.document.formRequestStastisticsReport) {
+		formObj = f_query_add_mod_sub.document.formRequestStastisticsReport;
+		if (isValidFromToField(formObj.p_fm_item_class_code, formObj.p_to_item_class_code, STRING, getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+			if (isValidFromToField(formObj.p_fm_req_on_str_code, formObj.p_to_req_on_str_code, STRING, getLabel("Common.ReqOnStore.label", "Common"), messageFrame)) { 
+           //   if (isValidFromToField(formObj.p_fm_Alpha_code, formObj.p_to_Alpha_code, STRING, "Alpha Code", messageFrame)) 
+			}
+		}
+		if (doDateCheck(formObj.dt_from, formObj.dt_to, messageFrame)) {
+			formObj.dt_from.value = convertDate(formObj.dt_from_1.value, "DMY", formObj.p_language_id.value, "en");
+		}
+		formObj.dt_to.value = convertDate(formObj.dt_to_1.value, "DMY", formObj.p_language_id.value, "en");
+		//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+    	//f_query_add_mod.document.forms[0].target="messageFrame"
+		formObj.action="../../eCommon/jsp/report_options.jsp";
+		formObj.target="messageFrame";
+		formObj.submit();
+	} else {
+		if (f_query_add_mod_sub.document.formGRNStastisticsReport) {
+			formObj = f_query_add_mod_sub.document.formGRNStastisticsReport;
+			if (isValidFromToField(formObj.p_fm_item_class_code, formObj.p_to_item_class_code, STRING, getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+				if (isValidFromToField(formObj.p_fm_req_on_str_code, formObj.p_to_req_on_str_code, STRING, getLabel("Common.Store.label", "Common"), messageFrame)) {
+					if (doDateCheck(formObj.dt_from, formObj.dt_to, messageFrame)) {
+						formObj.dt_from.value = convertDate(formObj.dt_from_1.value, "DMY", formObj.p_language_id.value, "en");
+					}
+				}
+			}
+			formObj.dt_to.value = convertDate(formObj.dt_to_1.value, "DMY", formObj.p_language_id.value, "en");
+			//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+    		//f_query_add_mod.document.forms[0].target="messageFrame"
+			formObj.action="../../eCommon/jsp/report_options.jsp";
+			formObj.target="messageFrame";
+			formObj.submit();
+		} else {
+			if (f_query_add_mod_sub.document.formUnfinalizedTransactions) {
+				formObj = f_query_add_mod_sub.document.formUnfinalizedTransactions;
+				if (isValidFromToField(formObj.p_fm_str_code, formObj.p_to_str_code, STRING, getLabel("Common.StoreCode.label", "Common"), messageFrame)) {
+					if (isValidFromToField(formObj.p_fr_doc_type, formObj.p_to_doc_type, STRING,getLabel("Common.DocTypeCode.label", "Common"), messageFrame)) {
+						if (isValidFromToField(formObj.p_fm_doc_no, formObj.p_to_doc_no, STRING,getLabel("Common.DocNo.label", "Common"), messageFrame)) {
+							if (doDateCheck(formObj.dt_from, formObj.dt_to, messageFrame)) {
+								formObj.dt_from.value = convertDate(formObj.dt_from_1.value, "DMY", formObj.p_language_id.value, "en");
+							}
+						}
+					}
+				}
+				formObj.dt_to.value = convertDate(formObj.dt_to_1.value, "DMY", formObj.p_language_id.value, "en");
+				//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+    		    //f_query_add_mod.document.forms[0].target="messageFrame"
+				formObj.action="../../eCommon/jsp/report_options.jsp";
+				formObj.target="messageFrame";
+				formObj.submit();
+			} else {
+				if (f_query_add_mod_sub.document.formReportStockStatusTransactedItems) {
+					formObj = f_query_add_mod_sub.document.formReportStockStatusTransactedItems;
+					if (isValidFromToField(formObj.p_fm_item_code, formObj.p_to_item_code, STRING, getLabel("Common.ItemCode.label", "Common"), messageFrame)) {
+						if (isValidFromToField(formObj.p_fm_item_class_code, formObj.p_to_item_class_code, STRING, getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+							if (isValidFromToField(formObj.p_fm_str_code, formObj.p_to_str_code, STRING, getLabel("Common.StoreCode.label", "Common"), messageFrame)) {
+								if (isValidFromToField(formObj.p_fm_alpha_code, formObj.p_to_alpha_code, STRING, getLabel("Common.AlphaCode.label", "Common"), messageFrame)) {
+									if (doDateCheck(formObj.dt_from, formObj.dt_to, messageFrame)) {
+										formObj.dt_from.value = convertDate(formObj.dt_from_1.value, "DMY", formObj.p_language_id.value, "en");
+									}
+								}
+							}
+						}
+					}
+					formObj.dt_to.value = convertDate(formObj.dt_to_1.value, "DMY", formObj.p_language_id.value, "en");
+					//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+					//f_query_add_mod.document.forms[0].target="messageFrame"
+					formObj.action="../../eCommon/jsp/report_options.jsp";
+					formObj.target="messageFrame";
+					formObj.submit();
+				} else {
+					if (f_query_add_mod_sub.document.formFacilityWiseYearSummaryReport) {
+						formObj = f_query_add_mod_sub.document.formFacilityWiseYearSummaryReport;
+						if (formObj.p_fm_year.value != "") {
+							if (formObj.p_fm_year.value.length != 4) {
+								messageFrame.location.href = "../../eCommon/jsp/error.jsp?err_num=" + getMessage("INVALID_YR_FORMAT", "SM");//Invalid Year Format";
+								return false;
+							}
+						}
+						if (formObj.p_to_year.value != "") {
+							if (formObj.p_to_year.value.length != 4) {
+								messageFrame.location.href = "../../eCommon/jsp/error.jsp?err_num=" + getMessage("INVALID_YR_FORMAT", "SM");//Invalid Year Format";
+								return false;
+							}
+						}
+						if (isValidFromToField(formObj.p_fm_item_code, formObj.p_to_item_code, STRING, getLabel("Common.ItemCode.label", "Common"), messageFrame)) {
+							if (isValidFromToField(formObj.p_fm_item_class, formObj.p_to_item_class, STRING, getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+								if (isValidFromToField(formObj.p_fr_alp_code, formObj.p_to_alp_code, STRING, getLabel("Common.AlphaCode.label", "Common"), messageFrame)) {
+									if (isValidFromToField(formObj.p_fm_year, formObj.p_to_year, STRING, getLabel("Common.year.label", "Common"), messageFrame)) {
+										//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+										//f_query_add_mod.document.forms[0].target="messageFrame"
+										formObj.action="../../eCommon/jsp/report_options.jsp";
+										formObj.target="messageFrame";
+										formObj.submit();
+									}
+								}
+							}
+						}
+					} else {
+						if (f_query_add_mod_sub.document.formQueryStockTurnoverRate) {
+							formObj = f_query_add_mod_sub.document.formQueryStockTurnoverRate;
+							if (formObj.p_fm_year.value != "") {
+								if (formObj.p_fm_year.value.length != 4) {
+									messageFrame.location.href = "../../eCommon/jsp/error.jsp?err_num=" + getMessage("INVALID_YR_FORMAT", "SM");//Invalid Year Format";
+									return false;
+								}
+							}
+							if (formObj.p_to_year.value != "") {
+								if (formObj.p_to_year.value.length != 4) {
+									messageFrame.location.href = "../../eCommon/jsp/error.jsp?err_num=" + getMessage("INVALID_YR_FORMAT", "SM");//Invalid Year Format";
+									return false;
+								}
+							}
+							if (isValidFromToField(formObj.p_fm_item_code, formObj.p_to_item_code, STRING, getLabel("Common.ItemCode.label", "Common"), messageFrame)) {
+								if (isValidFromToField(formObj.p_fm_item_class, formObj.p_to_item_class, STRING,getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+									if (isValidFromToField(formObj.p_fr_alp_code, formObj.p_to_alp_code, STRING,getLabel("Common.AlphaCode.label", "Common"), messageFrame)) {
+										if (isValidFromToField(formObj.p_fm_year, formObj.p_to_year, STRING, getLabel("Common.year.label", "Common"), messageFrame)) {
+											//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+											//f_query_add_mod.document.forms[0].target="messageFrame"
+											formObj.action="../../eCommon/jsp/report_options.jsp";
+											formObj.target="messageFrame";
+											formObj.submit();
+										}
+									}
+								}
+							}
+						} else {
+							if (f_query_add_mod_sub.document.formReportWorkLoadStatistics) {
+								formObj = f_query_add_mod_sub.document.formReportWorkLoadStatistics;
+								if (isValidFromToField(formObj.P_FM_STORE_CODE, formObj.P_TO_STORE_CODE, STRING, getLabel("Common.StoreCode.label", "Common"), messageFrame)) {
+									if (isValidFromToField(formObj.p_fm_item_code, formObj.p_to_item_code, STRING, getLabel("Common.ItemCode.label", "Common"), messageFrame)) {
+										if (isValidFromToField(formObj.p_fm_item_class, formObj.p_to_item_class, STRING,getLabel("Common.ItemClass.label", "Common"), messageFrame)) {
+											if (isValidFromToField(formObj.p_fr_alp_code, formObj.p_to_alp_code, STRING, getLabel("Common.AlphaCode.label", "Common"), messageFrame)) {
+												if (doDateCheck(formObj.dt_from, formObj.dt_to, messageFrame)) {
+													formObj.dt_from.value = convertDate(formObj.dt_from_1.value, "DMY", formObj.p_language_id.value, "en");
+												}
+											}
+										}
+									}
+								}
+								formObj.dt_to.value = convertDate(formObj.dt_to_1.value, "DMY", formObj.p_language_id.value, "en");
+								//f_query_add_mod.document.forms[0].action="../../eCommon/jsp/report_options.jsp";
+								//f_query_add_mod.document.forms[0].target="messageFrame"
+								formObj.action="../../eCommon/jsp/report_options.jsp";
+								formObj.target="messageFrame";
+								formObj.submit();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+async function searchDocType(obj) {
+	var result = false;
+	var message = "";
+	var flag = "";
+	var function_id = "";
+	var argumentArray = new Array();
+	var dataNameArray = new Array();
+	var dataValueArray = new Array();
+	var dataTypeArray = new Array();
+	dataNameArray[0] = "language_id";
+	dataValueArray[0] = document.forms[0].p_language_id.value;
+	dataTypeArray[0] = STRING;
+	dataNameArray[1] = "facility_id";
+	dataValueArray[1] = document.forms[0].p_facility_id.value;
+	dataTypeArray[1] = STRING;
+	argumentArray[0] = document.getElementById("SQL_ST_TRN_DOC_TYPE_LOOKUP").value;
+	argumentArray[1] = dataNameArray;
+	argumentArray[2] = dataValueArray;
+	argumentArray[3] = dataTypeArray;
+	argumentArray[4] = "3,4";
+	argumentArray[5] = obj.value;
+	argumentArray[6] = CODE_LINK;
+	argumentArray[7] = CODE_DESC;
+	returnedValues = await CommonLookup(getLabel("Common.DocType.label", "Common"), argumentArray);
+	
+			var ret1=unescape(returnedValues);
+		 	var arr=ret1.split(",");
+		 	if(arr[1]==undefined) 
+	 		{
+		 		arr[0]="";	
+		 		arr[1]="";	
+	 		}
+	
+	if ((returnedValues != null) && (returnedValues != "")) {
+		obj.value = arr[0];
+	}
+}
+async function searchAlphaCode(obj) {
+	var result = false;
+	var message = "";
+	var flag = "";
+	var function_id = "";
+	var argumentArray = new Array();
+	var dataNameArray = new Array();
+	var dataValueArray = new Array();
+	var dataTypeArray = new Array();
+	argumentArray[0] = document.getElementById("SQL_ST_ALPHA_LOOKUP").value;
+	argumentArray[1] = dataNameArray;
+	argumentArray[2] = dataValueArray;
+	argumentArray[3] = dataTypeArray;
+	argumentArray[4] = "1,2";
+	argumentArray[5] = obj.value;
+	argumentArray[6] = CODE_LINK;
+	argumentArray[7] = CODE_DESC;
+	returnedValues = await CommonLookup(getLabel("Common.AlphaCode.label", "Common"), argumentArray);
+				var ret1=unescape(returnedValues);
+		 	var arr=ret1.split(",");
+		 	if(arr[1]==undefined) 
+	 		{
+		 		arr[0]="";	
+		 		arr[1]="";	
+	 		}
+	if ((returnedValues != null) && (returnedValues != "")) {
+		obj.value = arr[0];
+	}
+}
+

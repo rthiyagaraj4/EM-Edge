@@ -1,0 +1,484 @@
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                        */
+/******************************************************************************/
+/* PROGRAM NAME     : SYBPGMST                                                */
+/* AUTHOR           : K.SARAVANAN                                             */
+/* DATE WRITTEN     : 27-OCT-2002                                             */
+/*                                                                            */
+/*                                                                            */
+/* CALLED FROM      : SYBPGMST.INP                                            */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                    SESSION_ID                                              */
+/*                    PGM_DATE IN 'DDMMYYHH24MISS' FORMAT                     */
+/*                                                                            */
+/******************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include <gl.h>
+
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+
+#define VIEW_LOG_FILE        2
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+varchar uid_pwd[40],
+	d_session_id[16],
+	d_table_id[32],
+	d_doc_type_code[8],
+	d_dept_code[8],
+	d_master_code[42],
+    d_group_code[4],
+    d_oper_dept_group_code[4],
+	d_msg_num[8],
+	d_pgm_date[14],
+	d_msg_desc[72],
+    d_oper_dept_code[5],
+	d_table_name  [60],
+	d_msg_text[71],
+	d_facility_id [3],
+	d_entity_code [5];
+
+char	entity_facility_flag, d_dummy;
+
+EXEC SQL END DECLARE SECTION;
+
+//EXEC ORACLE OPTION(HOLD_CURSOR = YES);
+//EXEC ORACLE OPTION(REBIND = NO);
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int can_delete;
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+
+{
+
+	if(argc !=5) {
+	    disp_message (ERR_MESG, "SYBPGMST : Usage SYBPGMST userid/password session_id pgm_date facility_id");
+	    proc_exit();
+	}
+
+	strcpy(uid_pwd.arr,argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr);
+
+	strcpy(d_session_id.arr,argv[2]);
+	d_session_id.len = strlen(d_session_id.arr);
+	strcpy(g_session_id,argv[2]);
+
+	strcpy(d_pgm_date.arr,argv[3]);
+	d_pgm_date.len = strlen(d_pgm_date.arr);
+	strcpy(g_pgm_date,argv[3]);
+
+	d_facility_id.arr[0] = '\0';
+	d_facility_id.len = 0;
+	d_entity_code.arr[0] = '\0';
+	d_entity_code.len = 0;
+
+	EXEC SQL CONNECT :uid_pwd;	
+	if(OERROR) {
+		disp_message (ORA_MESG, "Unable to connect to oracle.");
+		proc_exit();
+	}
+		
+    set_meduser_role();
+	strcpy(g_pgm_id,"SYBPGMST");
+
+	/***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+	//chk_active();
+
+	EXEC SQL SELECT PARAM1, PARAM2, PARAM3 
+		 INTO   :d_table_id, :d_facility_id, :d_entity_code 
+		 FROM   SY_PROG_PARAM
+		 WHERE  PGM_ID = 'SYBPGMST'
+		 AND    PGM_DATE = :d_pgm_date
+		 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+	if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+	d_table_id.arr[d_table_id.len] = '\0';
+	d_facility_id.arr[d_facility_id.len] = '\0';
+	d_entity_code.arr[d_entity_code.len] = '\0';
+
+	start_prog_control();
+	start_prog_msg();
+
+	d_table_id.arr[d_table_id.len] = '\0';
+
+	if(!strcmp(d_table_id.arr,"SY_DOC_TYPE_MASTER"))
+		purge_sydocmst();
+	else if(!strcmp(d_table_id.arr,"SY_ACC_ENTITY_DOC_TYPE"))
+		purge_sydoctp();
+	   
+	end_prog_msg();
+	end_prog_control();
+	del_param();
+
+	EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+} /* end of main */
+
+
+purge_sydocmst()
+{
+   EXEC SQL LOCK TABLE SY_DOC_TYPE_MASTER
+              IN EXCLUSIVE MODE NOWAIT;
+   if (RESOURCE_BUSY)
+         err_mesg("",1,"SY2440");
+   else if (OERROR)
+         err_mesg("LOCK failed on table SY_DOC_TYPE_MASTER",0,"");
+
+   EXEC SQL LOCK TABLE SY_ACC_ENTITY_DOC_TYPE
+              IN EXCLUSIVE MODE NOWAIT;
+   if (RESOURCE_BUSY)
+         err_mesg("",1,"SY2440");
+   else if (OERROR)
+         err_mesg("LOCK failed on table SY_ACC_ENTITY_DOC_TYPE",0,"");
+
+    EXEC SQL DECLARE SY_DOC_TYPE_MASTER_CUR CURSOR FOR
+	     SELECT  DOC_TYPE_CODE, ENTITY_OR_FACILITY_BASED
+	     FROM    SY_DOC_TYPE_MASTER
+	     WHERE   STATUS = 'S'
+	     FOR UPDATE OF STATUS;
+
+    EXEC SQL DECLARE SY_ACC_ENTITY_DOC_TYPE_CUR CURSOR FOR
+	     SELECT  'X'
+	     FROM    SY_ACC_ENTITY_DOC_TYPE
+	     WHERE   DOC_TYPE_CODE = :d_doc_type_code;
+
+    EXEC SQL OPEN SY_DOC_TYPE_MASTER_CUR;
+    if(OERROR)
+	err_mesg("OPEN failed on cursor SY_DOC_TYPE_MASTER_CUR",0,"");
+
+    while(fetch_sydocmst()) 
+	{
+
+	can_delete = FALSE;
+
+	EXEC SQL OPEN SY_ACC_ENTITY_DOC_TYPE_CUR;
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR",0,"");
+
+	EXEC SQL FETCH SY_ACC_ENTITY_DOC_TYPE_CUR INTO :d_dummy;
+	if(OERROR)
+	    err_mesg("FETCH failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR",0,"");
+
+	if(sqlca.sqlcode EQ 0) 
+	    log_messg("SY2427","SY_ACC_ENTITY_DOC_TYPE");
+
+	if(NO_DATA_FOUND) 
+		can_delete = TRUE;
+
+	  if (can_delete) 
+		{
+
+		EXEC SQL DELETE SY_DOC_TYPE_MASTER
+		WHERE DOC_TYPE_CODE = :d_doc_type_code; 
+
+	    if(OERROR)
+	        err_mesg("DELETE failed on table SY_DOC_TYPE_MASTER",0,"");
+
+		if(sqlca.sqlcode EQ 0)
+			log_messg("SY2428"," ");
+		}
+	
+    } /* end of while */
+}
+
+purge_sydoctp()
+{
+
+   EXEC SQL LOCK TABLE SY_ACC_ENTITY_DOC_TYPE
+              IN EXCLUSIVE MODE NOWAIT;
+   if (RESOURCE_BUSY)
+         err_mesg("",1,"SY2440");
+   else if (OERROR)
+         err_mesg("LOCK failed on table SY_ACC_ENTITY_DOC_TYPE",0,"");
+
+    EXEC SQL DECLARE SY_ACC_ENTITY_DOC_TYPE_CUR1 CURSOR FOR
+	     SELECT  DOC_TYPE_CODE
+	     FROM    SY_ACC_ENTITY_DOC_TYPE
+	     WHERE   STATUS = 'S'
+		 AND	 ACC_ENTITY_CODE = :d_entity_code;
+
+    EXEC SQL OPEN SY_ACC_ENTITY_DOC_TYPE_CUR1;
+    if(OERROR)
+	err_mesg("OPEN failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR1",0,"");
+
+    while(fetch_sydoctp()) 
+	{
+		candelete();
+		if (can_delete) 
+		{
+			EXEC SQL DELETE SY_ACC_ENTITY_DOC_TYPE
+			WHERE DOC_TYPE_CODE = :d_doc_type_code
+			AND ACC_ENTITY_CODE = :d_entity_code
+			AND STATUS = 'S';
+
+		if(OERROR)
+	        err_mesg("DELETE failed on table SY_ACC_ENTITY_DOC_TYPE",0,"");
+		}
+  
+    } /* end of while */
+
+}
+
+fetch_sydocmst()
+{
+	EXEC SQL FETCH SY_DOC_TYPE_MASTER_CUR
+	         INTO	:d_doc_type_code,
+					:entity_facility_flag;
+        if(OERROR) 
+	    err_mesg("FETCH failed on cursor SY_DOC_TYPE_MASTER_CUR",0,"");
+
+        if(NO_DATA_FOUND) 
+		return 0;
+
+	d_doc_type_code.arr[d_doc_type_code.len] = '\0';
+
+	strcpy(d_master_code.arr,d_doc_type_code.arr);
+        d_master_code.len = strlen(d_master_code.arr);
+
+	return 1;
+}
+
+fetch_sydoctp()
+{
+	EXEC SQL FETCH SY_ACC_ENTITY_DOC_TYPE_CUR1
+	         INTO	:d_doc_type_code;
+
+        if(OERROR) 
+	    err_mesg("FETCH failed on cursor SY_ACC_ENTITY_DOC_TYPE_CUR1",0,"");
+
+        if(NO_DATA_FOUND) 
+		return 0;
+
+	d_doc_type_code.arr[d_doc_type_code.len] = '\0';
+
+	strcpy(d_master_code.arr,d_doc_type_code.arr);
+        d_master_code.len = strlen(d_master_code.arr);
+
+	return 1;
+}
+
+candelete()
+{
+	EXEC SQL DECLARE AR_TRN_DOC_TYPE_CUR CURSOR FOR
+		SELECT 'X'
+		FROM AR_TRN_DOC_TYPE
+		WHERE DOC_TYPE_CODE = :d_doc_type_code;
+
+	EXEC SQL OPEN AR_TRN_DOC_TYPE_CUR;
+
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor AR_TRN_DOC_TYPE_CUR",0,"");
+	
+	EXEC SQL FETCH AR_TRN_DOC_TYPE_CUR INTO :d_dummy;
+
+	if(OERROR) 
+	    err_mesg("FETCH failed on cursor AR_TRN_DOC_TYPE_CUR",0,"");
+
+    if(NO_DATA_FOUND) 
+	{ 
+		can_delete = TRUE;
+		d_dummy = 'Y';
+	}
+
+	if (d_dummy == 'X') 
+	{	can_delete = FALSE;
+		return 0;
+	}
+
+
+	EXEC SQL DECLARE AP_TRN_DOC_TYPE_CUR CURSOR FOR
+		SELECT 'X'
+		FROM AP_TRN_DOC_TYPE
+		WHERE DOC_TYPE_CODE = :d_doc_type_code;
+
+	EXEC SQL OPEN AP_TRN_DOC_TYPE_CUR;
+
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor AP_TRN_DOC_TYPE_CUR",0,"");
+	
+	EXEC SQL FETCH AP_TRN_DOC_TYPE_CUR INTO :d_dummy;
+
+	if(OERROR) 
+	    err_mesg("FETCH failed on cursor AP_TRN_DOC_TYPE_CUR",0,"");
+
+    if(NO_DATA_FOUND) 
+	{ 
+		can_delete = TRUE;
+		d_dummy = 'Y';
+	}
+
+
+	if (d_dummy == 'X') 
+	{	can_delete = FALSE;
+		return 0;
+	}
+
+
+	EXEC SQL DECLARE BL_TRN_DOC_TYPE_CUR CURSOR FOR
+		SELECT 'X'
+		FROM BL_TRN_DOC_TYPE
+		WHERE DOC_TYPE_CODE = :d_doc_type_code;
+
+	EXEC SQL OPEN BL_TRN_DOC_TYPE_CUR;
+
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor BL_TRN_DOC_TYPE_CUR",0,"");
+	
+	EXEC SQL FETCH BL_TRN_DOC_TYPE_CUR INTO :d_dummy;
+
+	if(OERROR) 
+	    err_mesg("FETCH failed on cursor BL_TRN_DOC_TYPE_CUR",0,"");
+
+    if(NO_DATA_FOUND) 
+	{ 
+		can_delete = TRUE;
+		d_dummy = 'Y';
+	}
+
+
+	if (d_dummy == 'X') 
+	{	can_delete = FALSE;
+		return 0;
+	}
+
+
+	EXEC SQL DECLARE GL_TXN_DOC_HDR_CUR CURSOR FOR
+		SELECT 'X'
+		FROM GL_TXN_DOC_HDR
+		WHERE DOC_TYPE_CODE = :d_doc_type_code;
+
+	EXEC SQL OPEN GL_TXN_DOC_HDR_CUR;
+
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor GL_TXN_DOC_HDR_CUR",0,"");
+	
+	EXEC SQL FETCH GL_TXN_DOC_HDR_CUR INTO :d_dummy;
+
+	if(OERROR) 
+	    err_mesg("FETCH failed on cursor GL_TXN_DOC_HDR_CUR",0,"");
+
+    if(NO_DATA_FOUND) 
+	{ 
+		can_delete = TRUE;
+		d_dummy = 'Y';
+	}
+
+
+	if (d_dummy == 'X') 
+	{	can_delete = FALSE;
+		return 0;
+	}
+
+
+
+	EXEC SQL DECLARE SY_DOC_CONTROL_CUR CURSOR FOR
+		SELECT 'X'
+		FROM SY_DOC_CONTROL
+		WHERE DOC_TYPE_CODE = :d_doc_type_code;
+
+	EXEC SQL OPEN SY_DOC_CONTROL_CUR;
+
+	if(OERROR)
+	    err_mesg("OPEN failed on cursor SY_DOC_CONTROL_CUR",0,"");
+	
+	EXEC SQL FETCH SY_DOC_CONTROL_CUR INTO :d_dummy;
+
+	if(OERROR) 
+	    err_mesg("FETCH failed on cursor SY_DOC_CONTROL_CUR",0,"");
+
+    if(NO_DATA_FOUND) 
+	{ 
+		can_delete = TRUE;
+		d_dummy = 'Y';
+	}
+
+
+	if (d_dummy == 'X') 
+	{	can_delete = FALSE;
+		return 0;
+	}
+}
+
+
+log_messg(l_errid,I_table_name)
+char *l_errid;
+char *I_table_name;
+
+{
+    char msg_text[71];
+	int j = 0;
+	int k = 0;
+	int i = 0;
+
+    can_delete = FALSE;
+    
+	
+	strcpy(d_msg_num.arr,l_errid);
+    strcpy(d_table_name.arr, I_table_name);
+    
+	get_message(d_msg_num.arr,d_msg_desc.arr);
+
+    
+	for (i=0;i < 45 ;i++)
+	{
+		msg_text[i] = d_msg_desc.arr[i];
+	}
+	msg_text[i] = ' ';
+	i++;
+	for (i,k=0;i < 70;i++,k++)
+	{
+      msg_text[i] = d_table_name.arr[k];
+	}
+	msg_text[i] = '\0';
+
+	strcpy(d_msg_text.arr,msg_text);
+
+	d_msg_desc.len = strlen(d_msg_desc.arr);
+
+    d_table_name.len = strlen(d_table_name.arr);
+	
+	d_msg_num.len = strlen(d_msg_num.arr);
+    d_msg_text.len=strlen(d_msg_text.arr);
+	
+		
+
+    EXEC SQL INSERT INTO SY_PURGE_MSG
+	     VALUES (:d_facility_id,
+				 :d_table_id,
+				 :d_master_code,
+				 :d_msg_num,
+				 :d_msg_text
+		    );
+
+    if(OERROR) 
+	err_mesg("INSERT failed on table SY_PURGE_MSG",0,"");
+
+   return 1;
+}
+
+
+del_param()
+{
+	EXEC SQL DELETE SY_PROG_PARAM
+	         WHERE  PGM_ID     = 'SYBPGMST' 
+		 AND    PGM_DATE = :d_pgm_date
+		 AND    SESSION_ID = :d_session_id;
+    if(OERROR) 
+	err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+
+}
+
+

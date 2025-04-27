@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>IP_Trans_BlockBed</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to Block a Bed:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Unit</span> – Enter the Nursing Unit in the alphanumeric format of 15 characters maximum length or select the Nursing Unit using <span class="BoldNumberRFD">[?]</span> function. This field is mandatory. All the Nursing Units associated to the operator station attached to the logged in user are listed in <span class="BoldNumberRFD">[?]</span> function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed No</span> – Enter the Bed Number in the alphanumeric format of eight characters maximum length or select the Bed number using <span class="BoldNumberRFD">[?]</span> function which invokes the ‘Bed Availability Chart’ screen and the beds associated to the selected Nursing Unit are displayed. On selecting the Bed, the Bed Class and Room, number associated to the selected bed is displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Class</span> – The Bed Class is displayed on selection of the bed number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Room/Cubicle No</span> - The Room/Cubicle Number is displayed on selection of the bed number.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Blocking Detail</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Blocking</span> - Select a valid Reason for Blocking the bed from the list. The ‘Blocking Types’ defined in the ‘IP Code Setup’ are displayed in the list. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – This field is disabled and cleared, by default. The field value changes to ‘selected’ based on the blocking type selected. If the selected blocking type has its override check box selected (while creating the ‘Blocking Type’ in IP Code Setup), the same is reflected in this field. The override indicator has the following significance: if the override indicator is selected, the blocked bed can be overridden by another booking/blocking/admission transaction. If it is cleared, the blocked bed cannot be overridden by any other transaction (including admission and transfer).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter the Remarks for blocking the bed in alphanumeric format of 60 characters maximum length. This field is optional if the bed blocking period does not exceed the default blocking period as specified either for the blocking type chosen or based on the values set against the parameter ‘Default period for normal’ in the IP Parameter. If the blocking period exceeds the default blocking period, this field becomes mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From Date</span> - Indicates the start date and time for blocking the bed. Enter the date and time in date format of dd/mm/yyyy hh:mm. The ‘From’ date must be greater than or equal to the current system date and time, or select the date and time using the Calendar function. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Until</span> – Indicates the date and time until when the bed is to be blocked. The system calculates the ‘Until’ date and time based on the default period specified for the blocking type chosen. If the default blocking time is not specified for the chosen blocking type, the system calculates the ‘until’ date based on the ‘Default period for normal’ maintained in the IP Parameter. The ‘Until’ date and time is displayed in the date format of dd/mm/yyyy hh:mm. But the displayed ‘Until’ date and time can be changed provided they do not exceed the ‘maximum allowable period for normal’ set in the IP Parameter setup (system calculates the ‘Until’ date by adding the Bed blocking rules defined for normal/max allowable period for normal with the ‘From’ date), or select the date from the Calendar function. This field is mandatory.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />On viewing the bed availability chart, the blocked bed appears with the relevant color.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

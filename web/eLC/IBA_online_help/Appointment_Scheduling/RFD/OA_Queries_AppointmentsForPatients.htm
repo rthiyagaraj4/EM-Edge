@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OA_Queries_AppointmentsForPatients</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to query the appointments for patients:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Search With</span> - Select a value from the list. The values are system defined. Select All to display the appointment details for all the patients. Select Patient ID to search for a relevant patient record for whom the appointment is booked.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Enter the Patient ID in alphanumeric format of maximum length as specified in MP Parameter. In case the Patient ID is not known, the patient ID can be searched using a standard lookup screen by clicking <span class="BoldNumberRFD">[?]</span> function and by specifying the required query criteria. This field becomes mandatory if ‘Patient ID’ is selected as the ‘Search With’ criteria. The future appointments of the selected Patient ID is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Name</span> - Enter a valid Patient Name in alphanumeric format. If valid Patient ID is entered or selected, system displays the Patient Name corresponding to the entered or selected Patient ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt No</span> - Enter the Appointment Reference Number in alphanumeric format of eight characters maximum length, or else the appointment referral number gets &#160;displayed on entering or selecting a Patient ID. This field is mandatory only if ‘Search With’ is selected as ‘All’. The current system date is displayed as the Appointment ‘From’ Date. The second consecutive date of the current system date is displayed as the Appointment ‘To’ Date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt Date [From-To]</span> - Enter the date range for which the appointments for Patient are scheduled in dd/mm/yyyy format or click Calendar function to search for the required date. The date selected has to be equal to or greater than the current system date. This field becomes mandatory if ‘All’ is selected as the ‘Search With’ criteria.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> – Select the specialty from the list of valid values.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location Type</span> – Select the location type from the list. The listed values are Clinic, Daycare Unit and Procedure Unit. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Type</span> - This field gets enabled only if ‘Patient ID’ is selected in ‘Search With’ field. Select the Resource Type from the list. The listed values are Practitioner, Equipment, Room and Other.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Past Appointments</span> - This field gets enabled only if ‘Patient ID’ is selected in ‘Search With’ field. Select the check box to display all the appointments including the past appointments. Clear the check box to display only the present appointments of the selected patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – This field gets enabled only if ‘Patient ID’ is selected in ‘Search With’ field. Select the location, where the patient is scheduled for an appointment from the list. On selecting the required Location Type, the corresponding Locations are listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource</span> - This field gets enabled only if ‘Patient ID’ is selected in ‘Search With’ field. Select the required resource against whom the Patient is scheduled for an appointment from the list using <span class="BoldNumberRFD">[?]</span> function. On selecting the required Resource Type, the corresponding resources are listed. The lookup function gets enabled on selecting a resource type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Mobile No</span> – Enter the mobile number of the patient for searching the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Facility</u></span> – Select the facility name from this drop-down list. All the facilities are listed in the drop-down list. By default, The logged in facility is displayed..You can modify the facility name.If you select the value ’Select’ (blank value) in the drop-down list, on click of Search the Appointments pertaining to all the facilities are displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click &#160;on the respective Column Heading Toolbar to sort the details under the clicked Heading in the ascending order. <span style="font-weight: normal;">For example, click on the Appointment Number column heading. All the appointment numbers will be sorted out in the ascending order.</span></p>
+<p class="BoldRFD" style="font-weight: normal;">The results display the appointment details such as Specialty, Order Catalog, Referral ID, Patient Instructions, Translator Override Reason, Appt Given by, and status.</p>
+<p class="BoldRFD">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Trans_IPCashier_SettleBillOutstanding</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to settle the outstanding details:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> – Enter a valid Patient Number. The outstanding bill amount for the relevant patient is displayed. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility Id</span> – Select a Facility ID from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Option</span> – The user can either select “Receipt” or “Refund” or “Both”. &#160;The relevant option can be selected only if the logged Cash Counter has access to both the options.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Remarks</span> – The remarks for the relevant Patient ID is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Nature</span> – The user can select either “Patient Bill” or “Payer Bill” or “Both” from the list. Select one of the options from the list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – The gender of the relevant patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – The Age of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Downtime Entry</span> – Select this check box to enter the details of the documents when the server is down</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> – Click [List of Values] to select a Downtime Receipt Document Number. The Document Numbers selected as Receipts in the Document Types function gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Select the date of bill to be generated using calendar function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – Enter the comments for bill generation. The Reason lookup values will be populated from Reasons for Billing Actions in Other Masters.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outstanding details</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The Receipt Nature, Document Type, Document Number, Customer and Episode Number gets displayed.</span> <span style="font-weight: normal;">The description of the Document Type and total outstanding amount are displayed</span>.</p>
+<ol start="12">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Bill</span> – Select the check box, if the Settlement details are to be printed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Service Item List</span> – Select the check box, if the Service Item List is to be printed along with the Settlement Details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Print Specific Service Item List</span> - Select the check box to print a service item list while settling the bill amount. Clear the check box, if printed bill is not required. The check box is accessible only if the 'Print Specific Service Item List' check box is selected under the 'Bill-Cum-Receipt' tab in 'BL Parameters' function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> – Select the check box, if the Settled Amount has to be specified. If the check box is cleared, you cannot specify the Settled Amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settled Amount</span> – Enter the amount in numeric format to indicate the amount settled by the patient or the customer.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rec Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a receipt type. Respective Receipt Type is generated with the receipt number when the bill is settled.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Settle By Services</p>
+<p class="BoldRFD" style="font-weight: normal;">Press the <span class="BoldNumberRFD">[Tab]</span> key to switch to the next tab, Settle by Services. The Outstanding amount for the individual services are displayed. You &#160;can only select the option and specify the Settled Amount for the individual services. Service Date, document reference number recorded for the service, Billing Service associated and the description, token number if any and the net amount are displayed.</p>
+<ol start="18" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to settle the bill amount for respective service. Clear the check box, if you do not want to settle the bill amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settled Amount</span> - Enter the amount to be settled against the respective service.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Settlement Details</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Press the</span> <span class="BoldNumberRFD">[Tab]</span> <span style="font-weight: normal;">key to switch to the next tab, Settlement Details. The Total Outstanding Amount and the Total Settlement Amount is displayed.</span></p>
+<p class="BoldRFD">&#160;</p>
+<ol start="20">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total Outstanding Amount</span> - The Total Outstanding Amount of the patient for the services utilized from the facility is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total Settlement Amount</span> - The total amount settled by the patient or customer against the bills generated is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Received Thru Mail</span> - The check box is selected if the payment is received through mail. The check box is selected or cleared based on the details recorded during transaction.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">SrNo</span> - Enter the serial number in numeric format of three digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Amount</span> – The amount paid by the patient. The amount should be greater than or equal to the total settlement amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Settlement Type. The description for the selected Settlement Type is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Given</span> – Enter the Cash amount given by the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Returned</span> – Specify the amount refunded after deducting the service amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cheque/Credit Card No</span> – Enter the Cheque or the Credit Card number if the Settlement Type is set to one of these.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Click the Calendar icon to set the date when the settlement is made.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bank/Credit Card Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Bank or the Credit Card Company Code.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineBlack">Branch Name</span> – The name of the relevant Bank or the Credit Card Company branch is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Online Approval</span> – Select the check box, if an Online Approval is suitable for the clearance of the payment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Batch No.</span> – Enter the Batch Number in alphanumeric format of eight characters maximum length. The Batch Number identifies the set in which the patient settlement was approved.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Approval Code</span> – Enter the Approval Code in alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sale Draft No</span> - Enter the Sale Draft Number in alphanumeric format of 20 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer’s Name</span> – The Payer’s Name recorded during the patient registration gets displayed. Enter the Payer’s name in alphanumeric format of 40 characters maximum length to update the existing Payer’s Name or record a new Payer Name. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Ref Id/Deposit Ref No</span> – The Payer Reference ID or the deposit reference ID recorded gets displayed. You can update the existing Payer Reference ID in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">TID No.</span> - Enter the transaction reference ID in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">CC Issued Bank</span> - Enter the name of the Bank that has issued the credit card.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> – The total amount entered to be settled under the ‘Outstanding Details’ tab gets displayed. You cannot update the total amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Narration</span> – The remarks entered while recording the financial details get displayed. You cannot update the narration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type/No</span> – The Document Type and the number generated for the selected transaction gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Date</span> – The date when the document type and number was generated for the respective transaction gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Counter</span> – The Cash Counter ID and the shift to which the user has logged in gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Post Mth/Yr</span> – The month and the year when the bill details are posted gets displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Outstanding Deposit Details</p>
+<p class="BoldRFD" style="font-weight: normal;">The document type and number gets displayed along with the deposit amount collected from the patient during registration. The document type and number generated while accepting the deposit from the patient, settlement type and date, adjusted amount and the pending amount are listed.</p>
+<ol start="46">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Number</span> – The document type and number generated during deposit collection gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – The date when the document was generated against the deposit collection gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Type</span> – The Settlement Type using which the deposit was collected gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pending Amt</span> – The amount pending in the deposit gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjusted Amt</span> – The amount from the deposit which are adjusted towards the services gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjust Deposit</span> - Select the check box to adjust the bill amount against the deposit amount. Clear the check box, if the bill amount for the services should not be adjusted with the deposit amount. On selecting the check box, the outstanding deposit details of the patient are displayed against which the service amount can be adjusted.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to settle the bill amount with the outstanding deposit amount. The outstanding deposit amount details are highlighted in green. On selecting the check box, the amount for the selected service gets displayed under 'Adjusted Amt'. Click <span class="BoldNumberRFD">[Commit]</span> on entering the details. A message 'Please Confirm the Printer is ready' gets displayed. The receipt type and the receipt number gets displayed on clicking <span class="BoldNumberRFD">[Confirm]</span>. Click <span class="BoldNumberRFD">[OK]</span> to save the adjustment details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - The deposit remarks captured in the ‘Package Deposit’ and ‘Enter OP Receipts/Refund’ screens is displayed on selecting ‘Receipt’ in the ‘Option’ drop-down list. You can modify the data.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">The Batch Number, Approval Code, Sale Draft Number, Payer’s Name, Payer’s Reference ID, Document Type/Number, Document Date, Cash Counter, and the Posting Month/Year is displayed automatically. The deposit adjustments done gets reflected in the 'Acknowledge Cashier Transactions' function.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Only when you select the ‘Downtime Entry’ check box, the Document No, Date and Reason fields are enabled.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

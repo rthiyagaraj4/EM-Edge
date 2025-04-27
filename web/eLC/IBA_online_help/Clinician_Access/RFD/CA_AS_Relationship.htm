@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>CA_AS_Relationship</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to create a Relationship record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Relationship ID</span> - Enter the Relationship ID in alphanumeric format of 20 characters maximum length. The Relationship ID must be unique and cannot be changed after creating. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Relationship Name</span> - Enter the Relationship Name in alphanumeric format of 60 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sequence No</span> - Enter the Sequence Number in numeric format of four digits maximum length. This value should be unique.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nature</span> - Select the Nature of the Relationship as Lifetime or Encounter Specific. By default, Encounter Specific is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> – Select the check box to enable the Relationship record.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Direct/Indirect Settings</p>
+<p class="BoldRFD" style="font-weight: normal;">The Direct/Indirect setting is applicable based on the Relationship. The condition that is applied is as follows:</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the nature selected is 'Lifetime', 'Allow direct' field is internally set to be enabled, whereas fields under the legend ‘Relationship’ are internally disabled. The Expiry Rule is optional in this case. Select the check box to enable the 'Expiry Rule Applicable', if it is enabled the Expiry Rule is selected from the list box which contains the values 'Day after effect' or 'Hour after effect', which is mandatory and enter the expiry period in numeric format of six digits maximum length. If the 'Expiry Rule Applicable' is disabled no rule is applicable. This indicates that all relationships set up as ‘Lifetime’ is user assigned.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the nature selected is 'Encounter Specific', select the 'Allow direct' check box to enable or clear to disable the flags under the ‘Relationship’ legend.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If 'Allow Direct' field is enabled, all flags under the ‘Relationship’ legend are internally set to be disabled. The 'Expiry Rule Applicable' is set enabled internally. Select the appropriate expiry rule applicable from the list of values with an expiry period.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the 'Allow Direct' is disabled, the flags under the ‘Relationship’ legend are enabled. Select the check box to enable or clear the check box to disable the flags. The 'Expiry Rule Applicable' is selected and set enabled internally to select the appropriate ‘Expiry Rule’ applicable from the list of values with an expiry period.</p>
+</li>
+</ul>
+<p class="BoldRFD" style="font-weight: normal;">All Direct Relationships are available to assign relationships to other practitioners using the task ‘Assign Relationship’ provided in the Clinician Access module. All Indirect Relationships are assigned by the system to the various practitioners that are identified in various transactions of Enterprise Management. The details of when the system assigns an indirect relationship to a practitioner are detailed below.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Relationship</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Enc</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Attending Practitioner’ identified in the ‘Admit Patient’ function or the ‘Assign Bed/Mark Patient Arrival’ functions in the Inpatient and Day Care Management module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Admit</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Admitting Practitioner’ identified in the ‘Admit Patient’ function in the Inpatient and Day Care Management module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP Visit</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Attending Practitioner’ identified in the ‘Register Visit’ function in the Outpatient Management module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accident &amp; Emergency</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Attending Practitioner’ identified in the ‘Register Attendance’ function in the Accident &amp; Emergency module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Day Care</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Admitting Practitioner’ identified in the ‘Admit Patient’ function in the Inpatient and Day Care Management module for day care patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral Reln</span> - Select the check box if applicable. The relationship defined with this flag is assigned to the ‘Practitioner’ identified in the ‘Refer Patient’ function in the Clinician Access module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nurse Relation</span> - Select the check box if applicable. The relationship defined with this flag is assigned to any nurse picking up a patient from the Patient List in the Clinician Access module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> - This flag can be selected against each of the relations mentioned above. This indicates that the relation set is defaulted by the system if there are multiple relationships defined for each of the flags.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Expiry Rule</p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Expiry Based</span> - Select the check box if the Relationship is expiry based. This field is selected and disabled if the Nature chosen is Encounter specific. If the Nature chosen is Lifetime, the check box is optional.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rule</span> - Select a valid rule from the list. The value for this field is selected only if the Expiry Based check box is selected. This field is mandatory, if the ‘Expiry Based’ check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Expiry Period</span> - Enter the period in numeric format of six digits maximum length. This field is mandatory if the ‘Expiry Based’ check box is selected.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

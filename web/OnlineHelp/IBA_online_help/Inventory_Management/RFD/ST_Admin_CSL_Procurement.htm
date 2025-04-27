@@ -1,0 +1,171 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+ <head>
+<title>ST_Admin_CSL Procurement</title>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+<meta name="generator" content="RoboHelp by eHelp Corporation www.ehelp.com">
+<link rel="stylesheet" href="../../default_ns.css"><script type="text/javascript" language="JavaScript" title="WebHelpSplitCss">
+<!--
+if (navigator.appName !="Netscape")
+{   document.write("<link rel='stylesheet' href='../../default.css'>");}
+//-->
+</script>
+<style type="text/css">
+<!--
+ol.whs1 { list-style:decimal; }
+div.whs2 { width:100%; }
+p.whs3 { font-style:italic; font-family:Arial, sans-serif; font-size:8pt; }
+-->
+</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+<!--
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//-->
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute; left:0px; top:0px; z-index:4; visibility:hidden; }
+-->
+</style><script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+</head>
+<body><script type="text/javascript" language="javascript1.2">
+<!--
+if (window.gbWhTopic)
+{
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+//-->
+</script>
+<p class=BoldRFD>Enter the following criteria to Compute Stock Level for 
+ Procurement:</p>
+
+<ol>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Item 
+ Code [From-To]</span> - Enter the Item Codes range for which the report 
+ is to be generated in alphanumeric format of 20 characters maximum length 
+ or select the Item Code using <span class=BoldNumberRFD>[?]</span> function. 
+ The values are optional. If ‘From’ value is not entered, the system assumes 
+ a low value for the ‘From’ selected Item Code and if ‘To’ value is not 
+ entered, the system assumes a high value for the ‘To’ Item Code. When 
+ both values are entered, ‘To’ value has to be greater than or equal to 
+ the ‘From’ value. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Item 
+ Class [From-To]</span> - Enter the Item Class range for which the report 
+ is to be generated in alphanumeric format of four characters maximum length 
+ or select the Item Class using <span class=BoldNumberRFD>[?]</span> function. 
+ The values are optional. If ‘From’ value is not entered, the system assumes 
+ a low value for the ‘From’ selected Item Class code and if ‘To’ value 
+ is not entered, the system assumes a high value for the ‘To’ Item Class 
+ code. When both the values are entered, ‘To’ value has to be greater than 
+ or equal to the ‘From’ value. </p></li>
+</ol>
+
+<p class=BoldRFD>&nbsp;</p>
+
+<p class=BoldRFD>Consumption Criteria</p>
+
+<ol start="3" type="1" class="whs1">
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Consumption 
+ Period</span> – Enter the Consumption Period in numeric format of two 
+ digits maximum length. This period is used to arrive at the ‘Average Consumption 
+ Per Day’. The average consumption per day is computed by the system using 
+ the following formula. This is a mandatory field.</p></li>
+</ol>
+
+<p class=BoldRFD
+	style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consumption 
+ for the last &lt;n&gt; months</p>
+
+<p class=BoldRFD
+	style="font-weight: normal;">Average Consumption Per Day = &nbsp;&nbsp;&nbsp;--------------------------------------------</p>
+
+<p class=BoldRFD
+	style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No. 
+ of Consumed months * 30</p>
+
+<ol start="4" type="1" class="whs1">
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Lead 
+ Days</span> - Enter the Lead Days in numeric format of four digits maximum 
+ length. The entered Lead Days are automatically updated in the Item function 
+ on saving the record. The Reorder Level for an Item is computed based 
+ on the Lead Days entered.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Exclude 
+ External Stores</span> – Select the check box to exclude the External 
+ Stores. The check box is cleared, by default.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Min 
+ Stock Days</span> - Enter minimum stock days in numeric format of four 
+ digits maximum length. The Minimum Stock Level for an Item is computed 
+ based on the Minimum Stock Days and Average Consumption per Day.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Buffer 
+ % of Min Stock</span> - Enter the percentage of minimum stock in numeric 
+ format of four digits maximum length. The Reorder Quantity for an Item 
+ is computed based on the Reorder Level, percentage of Minimum Stock and 
+ Minimum Stock Level as depicted.</p></li>
+</ol>
+
+<p class=BoldRFD
+	style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Consumption 
+ for the last &lt;n&gt; months</p>
+
+<p class=BoldRFD
+	style="font-weight: normal;">Average Consumption Per Day = &nbsp;&nbsp;&nbsp;-------------------------------------------</p>
+
+<p class=BoldRFD
+	style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No. 
+ of Consumed months * 30</p>
+
+<p>&nbsp;</p>
+
+<div placeholder id="footer" class="whs2">
+ <p class="whs3">&nbsp;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+//-->
+</script>
+</body>
+</html>

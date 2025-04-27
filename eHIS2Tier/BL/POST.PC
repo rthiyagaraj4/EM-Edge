@@ -1,0 +1,407 @@
+/*
+#define DEBUG
+*/
+      
+#include <string.h>
+#include <stdio.h>   
+
+/*---------------------------------*/  
+#define PC_START		1
+#define PC_END			2
+#define	INFO_MESG		3
+#define ERR_MESG		4
+#define ORA_MESG		5   
+ 
+void proc_main (int, char **);
+void disp_message ( int, char *);
+void open_log_file();   
+void proc_exit();
+/*-----------------------------------*/ 
+
+EXEC SQL BEGIN DECLARE SECTION;  
+
+	VARCHAR	sub_main_acc1_code[8],
+			sub_main_acc2_code[6],
+			sub_dept_code[12],
+			sub_product_group_code[6],
+			sub_product_line_code[6],
+			sub_subledger_group_code[6],
+			sub_subledger_line_code[10],
+			sub_summary_acc_flag[2],
+			sub_bank_recon_flag[2],
+			sub_status[2],
+			sub_dummy[2],
+			module_valid_id[3],
+			ar_valid_flag[2],
+			ap_valid_flag[2],
+			gl_valid_flag[2],
+			fa_valid_flag[2],
+			bl_valid_flag[2],
+			py_valid_flag[2],
+			st_valid_flag[2],
+			ss_valid_flag[2],
+			foreign_currency_flag[2],
+			foreign_currency_code[5];
+			
+            
+	int     sub_curr_year,sub_post_year,sub_post_month;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA;
+ 
+/* #include "winproc.h" */
+
+char string_var[100]; /* for disp_message() */
+
+/***********************************************************************/
+/*               FUNCTION : validate_posting_acc                       */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function is used to validate the posting account as per       */
+/*  the common logic. The inputs to the function are :                 */
+/*                                                                     */ 
+/*     - main account code 1                                           */ 
+/*     - main account code 2                                           */ 
+/*     - department code                                               */ 
+/*     - product group code                                            */ 
+/*     - product line code                                             */ 
+/*     - subledger group code                                          */ 
+/*     - subledger line code                                           */ 
+/*     - check for bank reconciliation                                 */ 
+/*     - error type  (used to return error type to the calling funct.) */ 
+/*     - error id    (used to return error id to the calling function) */ 
+/*     - error message (used to return error message to calling funct) */ 
+/*                                                                     */ 
+/***********************************************************************/
+
+validate_posting_acct( l_main_acc1_code,
+		       l_main_acc2_code,
+		       l_dept_code,
+		       l_product_group_code,
+		       l_product_line_code,
+		       l_subledger_group_code,
+		       l_subledger_line_code,
+		       l_bank_reconcile,
+		       l_module_valid_id,
+			   l_post_year,
+			   l_post_month,
+		       r_err_typ,
+		       r_err_id,
+		       r_err_msg
+			   )
+
+char l_main_acc1_code[],
+     l_main_acc2_code[],
+     l_dept_code[],
+     l_product_group_code[],
+     l_product_line_code[],
+     l_subledger_group_code[],
+     l_subledger_line_code[],
+     l_bank_reconcile,
+     l_module_valid_id[];
+
+int *r_err_typ,
+     l_post_year, 
+	 l_post_month;
+
+char *r_err_id,
+     *r_err_msg;
+ 
+
+{
+
+    static int first = 1;
+
+    *r_err_typ = 0;
+
+    
+
+    strcpy(sub_main_acc1_code.arr,        l_main_acc1_code);
+    strcpy(sub_main_acc2_code.arr,        l_main_acc2_code);
+    strcpy(sub_dept_code.arr,             l_dept_code);
+    strcpy(sub_product_group_code.arr,    l_product_group_code);
+    strcpy(sub_product_line_code.arr,     l_product_line_code);
+    strcpy(sub_subledger_group_code.arr,  l_subledger_group_code);
+    strcpy(sub_subledger_line_code.arr,   l_subledger_line_code);
+    strcpy(module_valid_id.arr,   l_module_valid_id);
+	sub_post_year = l_post_year;
+	sub_post_month = l_post_month;
+
+    sub_main_acc1_code.len       = strlen(sub_main_acc1_code.arr);
+    sub_main_acc2_code.len       = strlen(sub_main_acc2_code.arr);
+    sub_dept_code.len            = strlen(sub_dept_code.arr);
+    sub_product_group_code.len   = strlen(sub_product_group_code.arr);
+    sub_product_line_code.len    = strlen(sub_product_line_code.arr);
+    sub_subledger_group_code.len = strlen(sub_subledger_group_code.arr);
+    sub_subledger_line_code.len  = strlen(sub_subledger_line_code.arr);
+    module_valid_id.len  = strlen(module_valid_id.arr);
+  
+
+#ifdef DEBUG
+    sprintf(string_var,"Main_acc1_code        = %s\n",sub_main_acc1_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Main_acc2_code        = %s\n",sub_main_acc2_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Dept_code             = %s\n",sub_dept_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_group_code    = %s\n",sub_product_group_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_line_code     = %s\n",sub_product_line_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger group code  = %s\n",sub_subledger_group_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger line code   = %s\n",sub_subledger_line_code.arr);
+    disp_message(INFO_MESG,string_var);
+
+    sprintf(string_var,"Main_acc1_code        = %d\n",sub_main_acc1_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Main_acc2_code        = %d\n",sub_main_acc2_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Dept_code             = %d\n",sub_dept_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_group_code    = %d\n",sub_product_group_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Product_line_code     = %d\n",sub_product_line_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger group code  = %d\n",sub_subledger_group_code.len);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"Subledger line code   = %d\n",sub_subledger_line_code.len);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+    EXEC SQL SELECT NVL(SUMMARY_ACC_FLAG,'N'),
+                    NVL(BANK_RECONCILE_FLAG,'N'),
+                    NVL(STATUS,'N')
+	     INTO   :sub_summary_acc_flag,
+		        :sub_bank_recon_flag,
+		        :sub_status
+	     FROM   GL_POSTING_ACC
+	     WHERE  MAIN_ACC1_CODE       = :sub_main_acc1_code 
+	     AND    MAIN_ACC2_CODE       = :sub_main_acc2_code 
+	     AND    DEPT_CODE            = :sub_dept_code 
+	     AND    PRODUCT_GROUP_CODE   = :sub_product_group_code 
+	     AND    PRODUCT_LINE_CODE    = :sub_product_line_code 
+	     AND    SUBLEDGER_GROUP_CODE = :sub_subledger_group_code
+	     AND    SUBLEDGER_LINE_CODE  = :sub_subledger_line_code;
+
+    if(sqlca.sqlcode < 0) {
+	strcpy(r_err_msg,"SELECT failed on table  GL_POSTING_ACC");
+	*r_err_typ = 0;
+	return (-1);
+    }
+
+    if(sqlca.sqlcode == 1403) {
+       strcpy(r_err_id,"GL1430");
+       *r_err_typ = 1;
+       return (-1);
+    }
+
+    if(sub_status.arr[0] == 'S') {
+        strcpy(r_err_id,"GL1370");
+        *r_err_typ = 1;
+        return (-1);
+    }
+
+    /* Checking if this is a summary account */
+
+    if(sub_summary_acc_flag.arr[0] == 'Y') {
+	strcpy(r_err_id,"GL1540");
+	*r_err_typ = 1;
+	return (-1);
+    }
+
+
+	EXEC SQL SELECT NVL(AR_VALID_FLAG,'N'),
+                      NVL(AP_VALID_FLAG,'N'),
+                      NVL(GL_VALID_FLAG,'N'),
+                      NVL(FA_VALID_FLAG,'N'),
+                      NVL(BL_VALID_FLAG,'N'),
+                      NVL(PY_VALID_FLAG,'N'),
+                      NVL(ST_VALID_FLAG,'N'),
+                      NVL(SS_VALID_FLAG,'N'),
+                      NVL(FOREIGN_CURRENCY_ACCT_YN, 'N'),
+                      NVL(CURRENCY_CODE , '#$@%'),
+                      NVL(STATUS, 'N')                  
+	     INTO         :ar_valid_flag,
+                      :ap_valid_flag,
+                      :gl_valid_flag,
+                      :fa_valid_flag,
+                      :bl_valid_flag,
+                      :py_valid_flag,
+                      :st_valid_flag,
+                      :ss_valid_flag,
+                      :foreign_currency_flag,
+                      :foreign_currency_code,
+                      :sub_status
+	     FROM   GL_ACC_CHART
+	     WHERE  MAIN_ACC1_CODE       = :sub_main_acc1_code 
+	     AND    MAIN_ACC2_CODE       = :sub_main_acc2_code ;
+
+    if(sqlca.sqlcode < 0) {
+	strcpy(r_err_msg,"SELECT failed on table  GL_ACC_CHART");
+	*r_err_typ = 0;
+	return (-1);
+    }
+
+    if(sqlca.sqlcode == 1403) {
+       strcpy(r_err_id,"GL1430");
+       *r_err_typ = 1;
+       return (-1);
+    }
+
+    if(sub_status.arr[0] == 'S') {
+        strcpy(r_err_id,"GL1370");
+        *r_err_typ = 1;
+        return (-1);
+    }
+
+ 
+
+    if   ((strcmp(module_valid_id.arr, "AR") == 0) && 
+          (strcmp(ar_valid_flag.arr, "N") == 0)) 
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if   ((strcmp(module_valid_id.arr, "AP") == 0) && 
+          (strcmp(ap_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if  ((strcmp(module_valid_id.arr, "BL") == 0) && 
+         (strcmp(bl_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if ((strcmp(module_valid_id.arr, "FA") == 0) && 
+        (strcmp(fa_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if ((strcmp(module_valid_id.arr, "ST") == 0) && 
+        (strcmp(st_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if ((strcmp(module_valid_id.arr, "PY") == 0) && 
+        (strcmp(py_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }
+
+    if ((strcmp(module_valid_id.arr, "SS") == 0) && 
+         (strcmp(ss_valid_flag.arr , "N") == 0))
+     {
+        strcpy(r_err_id,"GL6053");
+        *r_err_typ = 1;
+        return (-1);
+     }  
+
+/* 20/02/2003-------------------------------*/
+  
+   if (module_valid_id.arr[0] == '\0') 
+   {
+        strcpy(r_err_id,"SM1033");
+        *r_err_typ = 1;
+        return (-1);
+   }
+  
+/* End 20/02/2003-------------------------------*/
+
+
+    if( (l_bank_reconcile == 'Y') && (sub_bank_recon_flag.arr[0] == 'Y') ) 
+
+	{
+
+      #ifdef DEBUG
+         disp_message(INFO_MESG,"Checking for bank reconcile...\n");
+      #endif
+
+	EXEC SQL SELECT 'X'
+		 INTO   :sub_dummy
+		 FROM   GL_BB_TXN_HDR
+	         WHERE  MAIN_ACC1_CODE       = :sub_main_acc1_code 
+	         AND    MAIN_ACC2_CODE       = :sub_main_acc2_code 
+	         AND    DEPT_CODE            = :sub_dept_code 
+	         AND    PRODUCT_GROUP_CODE   = :sub_product_group_code 
+	         AND    PRODUCT_LINE_CODE    = :sub_product_line_code 
+	         AND    SUBLEDGER_GROUP_CODE = :sub_subledger_group_code
+	         AND    SUBLEDGER_LINE_CODE  = :sub_subledger_line_code;
+
+        if(sqlca.sqlcode < 0) {
+            strcpy(r_err_msg,"SELECT failed on table  GL_BB_TXN_HDR");
+            *r_err_typ = 0;
+            return (-1);
+	}
+
+	if(sqlca.sqlcode == 1403) {
+	    strcpy(r_err_id,"GL2310");
+	    *r_err_typ = 1;
+	    return (-1);
+        }
+
+
+    }
+
+    if(first) {
+
+	EXEC SQL SELECT CURRENT_ACC_YEAR
+		 INTO   :sub_curr_year
+		 FROM   GL_PARAMETER;
+
+	if(sqlca.sqlcode < 0)
+	    err_mesg("SELECT failed on table GL_PARAMETER",0,"");
+
+	first = 0;
+
+    }   
+
+
+    EXEC ORACLE OPTION (SELECT_ERROR=NO);
+
+    EXEC SQL SELECT 'X'
+	 INTO   :sub_dummy
+	 FROM   GL_PERIOD_ACC_BAL_LOCAL
+                WHERE  MAIN_ACC1_CODE       = :sub_main_acc1_code 
+                AND    MAIN_ACC2_CODE       = :sub_main_acc2_code 
+                AND    DEPT_CODE            = :sub_dept_code 
+                AND    PRODUCT_GROUP_CODE   = :sub_product_group_code 
+                AND    PRODUCT_LINE_CODE    = :sub_product_line_code 
+                AND    SUBLEDGER_GROUP_CODE = :sub_subledger_group_code
+                AND    SUBLEDGER_LINE_CODE  = :sub_subledger_line_code
+                AND    POST_YEAR            = :sub_post_year
+				AND    POST_MONTH           = :sub_post_month;
+
+    if(sqlca.sqlcode < 0) {
+        strcpy(r_err_msg,"SELECT failed on table GL_PERIOD_ACC_BAL_LOCAL");
+        *r_err_typ = 0;
+        return (-1);
+    }
+   /*  Commented on 16/02/2004. This part is automated
+    if(sqlca.sqlcode == 1403) {
+        strcpy(r_err_id,"GL2530");
+        *r_err_typ = 1;
+        return (-1);
+    } 
+  */
+
+    EXEC ORACLE OPTION (SELECT_ERROR=YES);
+
+}

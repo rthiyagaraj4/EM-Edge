@@ -1,0 +1,816 @@
+#include <ctype.h> 
+#include <stdio.h>
+//#include "sqlproto.h"
+#include <string.h>
+  
+  
+ /*---------------------------------*/  
+#define PC_START		1
+#define PC_END			2
+#define	INFO_MESG		3
+#define ERR_MESG		4
+#define ORA_MESG		5  
+
+void proc_main (int, char **);
+void disp_message ( int, char *);
+void open_log_file();
+void proc_exit();
+/*-----------------------------------*/ 
+
+char string_var[100];
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR  sub_message_id[8],
+		 sub_message_text[80],
+		 sub_debug_msg[80],
+        	 sub_pgm_id[10],
+		 sub_session_id[16],
+		 sub_active_flag[2],
+		 sub_pgm_date[14];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+ 
+ 
+/********************************************/
+/*  The following extern variables  are     */
+/*  declared in the header file gl.h        */
+/********************************************/
+
+	extern char g_pgm_id[];
+	extern int  end_pgm_control;
+	extern char g_session_id[];
+	extern char g_pgm_date[];
+
+ /*******************************************/
+
+
+
+/***********************************************************************/
+/*               FUNCTION : chk_active                                 */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function checks if the  ACTIVE_FLAG in SY_PROG_CONTROL        */
+/*  is not set to 'Y'  for the program_id available in extern variable */
+/*  g_pgm_id.                                                          */ 
+/*                                                                     */ 
+/*  It calls function err_mesg if any oracle error occurs.             */
+/*                                                                     */
+/*  This function should be  called at the begining of the pro*c       */ 
+/*                                                                     */
+/***********************************************************************/
+
+chk_active()
+{
+
+     
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+	/*EXEC SQL SELECT 'X' 
+		 FROM   SY_PROG_CONTROL
+		 WHERE  PGM_ID               =  :sub_pgm_id
+		 AND    NVL(ACTIVE_FLAG,'N') <> 'Y';*/
+
+
+   EXEC SQL SELECT NVL(ACTIVE_FLAG,'N') 
+          into  :sub_active_flag
+		 FROM   SY_PROG_CONTROL
+		 WHERE  PGM_ID               =  :sub_pgm_id;
+
+		  
+		 
+    if (strcmp(sub_active_flag.arr , "Y") == 0)
+        err_mesg("Program being run by another user. Cannot Proceed .......",0,"");
+
+
+	if(sqlca.sqlcode < 0) 
+	    err_mesg("SELECT failed on table SY_PROG_CONTROL",0,"");
+
+	if(sqlca.sqlcode == 1403) 
+	    err_mesg("SELECT failed on table SY_PROG_CONTROL",1,"SY2260");
+
+}
+ /**************** END FUNCTION CHK_ACTIVE ****************************/
+
+
+/***********************************************************************/
+/*               FUNCTION : start_prog_control                         */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function sets the field ACTIVE_FLAG in SY_PROG_CONTROL to 'Y' */
+/*  for the program_id available in extern variable g_pgm_id.          */ 
+/*                                                                     */ 
+/*  It calls function err_mesg if any oracle error occurs.             */
+/*                                                                     */
+/*  This function should be  called at the begining of the pro*c       */ 
+/*  program as it commits the change to the table immediately.         */ 
+/*                                                                     */
+/*  On successful execution of the function it sets the extern         */
+/*  variable end_pgm_control  to 1. This is to ensure that the         */
+/*  err_mesg function does not perform end_prog_control unless         */
+/*  the start_prog_control is sucessful.                               */
+/*                                                                     */
+/***********************************************************************/
+
+start_prog_control()
+{
+	end_pgm_control = 0;
+
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+    
+
+	EXEC SQL UPDATE SY_PROG_CONTROL
+		 SET    ACTIVE_FLAG     = 'Y',
+			START_DATE_TIME = SYSDATE
+		 WHERE  PGM_ID          = :sub_pgm_id;
+
+
+ 
+	if(sqlca.sqlcode < 0) 
+	    err_mesg("Performing START_PROG_CONTROL",0,"");
+
+	EXEC SQL COMMIT WORK;
+
+	if(sqlca.sqlcode < 0) 
+	    err_mesg("Commiting for start_prog_control",0,"");
+
+	end_pgm_control = 1;
+}
+ /**************** END FUNCTION START_PROG_CONTROL ********************/
+
+
+
+/***********************************************************************/
+/*               FUNCTION : end_prog_control                           */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function sets the field ACTIVE_FLAG in SY_PROG_CONTROL to 'N' */
+/*  for the program_id available in extern variable g_pgm_id.          */ 
+/*                                                                     */ 
+/*  It calls function err_mesg if any oracle error occurs.             */
+/*                                                                     */
+/*  In case of an error it resets the extern variable end_pgm_control  */
+/*  so that the err_mesg function does not perform the end_prog_control*/
+/*  function again.                                                    */
+/*                                                                     */
+/***********************************************************************/
+
+end_prog_control()
+{
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+	EXEC SQL UPDATE SY_PROG_CONTROL
+		 SET    ACTIVE_FLAG     = 'N',
+			START_DATE_TIME = SYSDATE
+		 WHERE  PGM_ID          = :sub_pgm_id;
+
+   	if (sqlca.sqlcode < 0) {
+	   end_pgm_control = 0; 
+	   err_mesg("END_PROG_CONTROL: Updating SY_PROG_CONTROL",0,"");
+         }
+
+}
+
+/******************* END FUNCTION END_PROG_CONTROL ********************/
+
+
+
+
+/***********************************************************************/
+/*               FUNCTION : start_prog_msg                             */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function inserts a row into the table SY_PROG_MSG             */
+/*  for the program_id available in extern variable g_pgm_id to        */ 
+/*  indicate the start of the program.                                 */ 
+/*                                                                     */ 
+/*  This function should be  called at the begining of the pro*c       */ 
+/*  program immediately after the start_prog_control as it commits     */ 
+/*  the message to the database after inserting.                       */ 
+/*                                                                     */ 
+/*  It calls function err_mesg if any oracle error occurs.             */
+/*                                                                     */
+/***********************************************************************/
+
+
+
+start_prog_msg() 
+{ 
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+        strcpy(sub_session_id.arr,g_session_id);
+	sub_session_id.len = strlen(sub_session_id.arr);
+
+	strcpy(sub_pgm_date.arr,g_pgm_date);
+	sub_pgm_date.len = strlen(sub_pgm_date.arr);
+
+	EXEC SQL INSERT INTO   SY_PROG_MSG 
+		      ( PGM_ID,
+			PGM_DATE,
+			SESSION_ID,
+			MSG_TYPE,
+			MSG_DESC,
+			MSG_DATE_TIME
+                      )
+	       VALUES ( :sub_pgm_id,
+			:sub_pgm_date,
+			:sub_session_id,
+			'I',
+			'PROGRAM STARTED',
+			SYSDATE
+		      );
+
+	if(sqlca.sqlcode < 0) 
+	    err_mesg("START_PROG_MSG: Inserting into SY_PROG_MSG",0,"");
+
+	EXEC SQL COMMIT;
+
+	if(sqlca.sqlcode < 0) 
+	    err_mesg("START_PROG_MSG: Commiting record in SY_PROG_MSG",0,"");
+
+}
+
+/******************* END FUNCTION START_PROG_MSG **********************/
+
+
+/***********************************************************************/
+/*               FUNCTION : end_prog_msg                               */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function inserts a row into the table SY_PROG_MSG             */
+/*  for the program_id available in extern variable g_pgm_id to        */ 
+/*  indicate the end of the program.                                   */ 
+/*                                                                     */ 
+/*  It calls function err_mesg if any oracle error occurs.             */
+/*                                                                     */
+/***********************************************************************/
+
+end_prog_msg()
+{
+
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+        strcpy(sub_session_id.arr,g_session_id);
+	sub_session_id.len = strlen(sub_session_id.arr);
+
+	strcpy(sub_pgm_date.arr,g_pgm_date);
+	sub_pgm_date.len = strlen(sub_pgm_date.arr);
+
+	EXEC SQL INSERT INTO   SY_PROG_MSG 
+		      ( PGM_ID,
+			PGM_DATE,
+			SESSION_ID,
+			MSG_TYPE,
+			MSG_DESC,
+			MSG_DATE_TIME
+                      )
+	       VALUES ( :sub_pgm_id,
+			:sub_pgm_date,
+			:sub_session_id,
+			'I',
+			'PROGRAM COMPLETED SUCCESSFULLY', 
+			SYSDATE
+		      );
+
+   	if (sqlca.sqlcode < 0) 
+      	    err_mesg("END_PROG_MSG: Inserting into SY_PROG_MSG",0,"");
+}
+
+/******************* END FUNCTION END_PROG_MSG ************************/
+
+
+
+/***********************************************************************/
+/*               FUNCTION : err_mesg                                   */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function processes all oracle and application error           */
+/*  messages. It is called with the following parameters               */ 
+/*                                                                     */ 
+/*  - a character string containing a message about the processing     */ 
+/*    taking place when the error occured.                             */ 
+/*  - an integer specifying the error type :                           */ 
+/*                  1 - application error                              */ 
+/*                  0 - oracle error                                   */ 
+/*  - a character string containing the message id in case of an       */ 
+/*    application error, or a null string for oracle errors.           */ 
+/*                                                                     */ 
+/*  Function get_message is called to retrive the message for          */ 
+/*  application errors.                                                */
+/*                                                                     */
+/*  After processing error message it inserts a record into            */
+/*  SY_PROG_MSG.                                                       */
+/*                                                                     */
+/*  If start_prog_control has been done then it updates                */
+/*  SY_PROG_CONTROL to reset the active_flag to 'N'.                   */
+/*                                                                     */
+/***********************************************************************/
+
+
+err_mesg(l_errmsg,l_errtype,l_errid) 
+int l_errtype;
+char l_errmsg[],
+     l_errid[];
+
+/*  l_errtype = 1 for application errors  */
+/*            = 0 for oracle errors       */
+
+{
+        char l_msg_desc[70];
+
+	long l_sqlcode;
+	char app_err_msg[79];
+
+	l_sqlcode = sqlca.sqlcode;
+	app_err_msg[0]='\0';
+
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+        strcpy(sub_session_id.arr,g_session_id);
+	sub_session_id.len = strlen(sub_session_id.arr);
+
+	strcpy(sub_pgm_date.arr,g_pgm_date);
+	sub_pgm_date.len = strlen(sub_pgm_date.arr);
+
+	EXEC SQL ROLLBACK WORK;
+
+	sprintf(string_var,"%s\n",l_errmsg);
+	disp_message(INFO_MESG,string_var);
+
+	if(l_errtype)  {
+	     
+		if(get_message(l_errid,l_msg_desc) == -1) 
+		   { sprintf(string_var,"%s\n",l_msg_desc);
+		    disp_message(INFO_MESG,string_var);
+		    }
+		else {
+		    strcpy(app_err_msg,"APP-");
+		    strncat(app_err_msg,l_errid,6);
+		    strncat(app_err_msg,"-",1);
+		    strncat(app_err_msg,l_msg_desc,68);
+		    sprintf(string_var,"%s\n",app_err_msg);
+		    disp_message(INFO_MESG,string_var);
+		}
+
+		strcpy(sub_message_id.arr,l_errid);
+		sub_message_id.len = strlen(sub_message_id.arr);
+		strcpy(sub_message_text.arr,l_msg_desc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+
+
+	}
+	else  {
+		strcpy(sub_message_text.arr,sqlca.sqlerrm.sqlerrmc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+		sprintf(sub_message_id.arr,"%d",l_sqlcode);
+		sub_message_id.len = strlen(sub_message_id.arr);
+		sprintf(string_var,"%s\n",sub_message_text.arr);
+		disp_message(INFO_MESG,string_var);
+	 }
+
+	EXEC SQL DELETE SY_PROG_PARAM
+		 WHERE  PGM_ID     = :sub_pgm_id
+		 AND    PGM_DATE   = :sub_pgm_date 
+		 AND    SESSION_ID = :sub_session_id;
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Delete from SY_PROG_PARAM");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(ORA_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	 }
+
+	strncpy(sub_debug_msg.arr,l_errmsg,70);
+	sub_debug_msg.len = strlen(sub_debug_msg.arr);
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 PGM_DATE,
+			 SESSION_ID,
+                         MSG_TYPE,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+                VALUES ( :sub_pgm_id,
+			 :sub_pgm_date,
+			 :sub_session_id,
+                         'I',
+	                 SUBSTR(:sub_debug_msg,1,70),
+                         SYSDATE
+                       );
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 PGM_DATE,
+			 SESSION_ID,
+                         MSG_TYPE,
+			 MSG_NUM,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+                VALUES ( :sub_pgm_id,
+			 :sub_pgm_date,
+			 :sub_session_id,
+                         'E',
+			 :sub_message_id,
+	                 SUBSTR(:sub_message_text,1,70),
+                         SYSDATE
+                       );
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Insert into SY_PROG_MSG");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(ORA_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	 }
+
+	 EXEC SQL COMMIT WORK;
+
+	 if(end_pgm_control) {
+
+      	    EXEC SQL UPDATE SY_PROG_CONTROL
+                      SET   ACTIVE_FLAG     = 'N',
+                            START_DATE_TIME = SYSDATE
+                     WHERE  PGM_ID          = :sub_pgm_id;
+
+   	    if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Updating SY_PROG_CONTROL");
+      	        disp_message(ORA_MESG,string_var);
+                sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+                disp_message(ORA_MESG,string_var);
+                EXEC SQL ROLLBACK WORK;
+             }
+
+            EXEC SQL COMMIT WORK;
+
+	 }
+
+         proc_exit() ;
+
+}
+
+/*********************** END FUNCTION ERR_MESG ************************/
+
+
+/***********************************************************************/
+/*               FUNCTION : get_message                                */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function retrives the appropriate error message from the      */
+/*  MESSAGE table. The inputs to the function are                      */
+/*                                                                     */ 
+/*     - a character pointer to the message_id                         */ 
+/*     - a character pointer to store the retrived message             */ 
+/*                                                                     */ 
+/*  If an oracle error occurs when retriving the message, The          */
+/*  message_id will contain the oracle error number and the            */
+/*  message description the oracle error message.                      */ 
+/*                                                                     */
+/***********************************************************************/
+
+get_message(l_errid,l_msg_desc)
+char *l_errid, *l_msg_desc;
+{
+
+	strcpy(sub_message_id.arr,l_errid);
+	sub_message_id.len = strlen(sub_message_id.arr);
+
+	EXEC SQL SELECT MESSAGE_TEXT
+	         INTO   :sub_message_text
+	         FROM   MESSAGE
+	 WHERE  MESSAGE_ID = :sub_message_id;
+
+        if(sqlca.sqlcode < 0 || sqlca.sqlcode == 1403) {
+	    strcpy(l_msg_desc,sqlca.sqlerrm.sqlerrmc);
+	    sprintf(l_errid,"%d",sqlca.sqlcode);
+	    return -1;
+	}
+        else {
+	    sub_message_text.arr[sub_message_text.len] = '\0';
+	    strcpy(l_msg_desc,sub_message_text.arr);
+	    return 0;
+	}
+}
+
+/*********************** END FUNCTION GET_MESSAGE *********************/
+
+
+int equal(d1,d2) 
+double d1,d2;
+{
+    char s1[20],s2[20];
+    double zero;
+
+    zero = (double) 0.00;
+
+    sprintf(s1,"%15.2f",d1);
+    l_ltrim(s1);
+    if(!strcmp(s1,"-0.00"))
+	strcpy(s1,"0.00");
+
+    sprintf(s2,"%15.2f",d2);
+    l_ltrim(s2);
+    if(!strcmp(s2,"-0.00"))
+	strcpy(s2,"0.00");
+
+/*
+    sprintf(string_var,"S1 = <%s>\n",s1);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"S2 = <%s>\n",s2);        
+    disp_message(INFO_MESG,string_var);
+*/
+
+    return !(strcmp(s1,s2));
+}
+
+put_val(str,num)
+char *str;
+double num;
+{
+    sprintf(str,"%15.2f",num);
+}
+
+
+l_ltrim(s)
+char *s;
+{
+
+    char s1[20];
+    int i;
+
+    strcpy(s1,s);
+
+    for(i=0;s1[i] == ' '; i++);
+
+    while(s1[i]) 
+	*s++ = s1[i++];
+
+    *s = '\0';
+}
+
+/***********************************************************************/
+/*               FUNCTION : disp_mesg                                  */ 
+/***********************************************************************/
+/*                                                                     */ 
+/*  This function processes all oracle and application error           */
+/*  messages. It is called with the following parameters               */ 
+/*                                                                     */ 
+/*  - a character string containing a message about the processing     */ 
+/*    taking place when the error occured.                             */ 
+/*  - an integer specifying the error type :                           */ 
+/*                  1 - application error                              */ 
+/*                  0 - oracle error                                   */ 
+/*  - a character string containing the message id in case of an       */ 
+/*    application error, or a null string for oracle errors.           */ 
+/*                                                                     */ 
+/*  Function get_message is called to retrive the message for          */ 
+/*  application errors.                                                */
+/*                                                                     */
+/*  After processing error message it inserts a record into            */
+/*  SY_PROG_MSG.                                                       */
+/*                                                                     */
+/***********************************************************************/
+
+
+disp_mesg(l_errmsg,l_errtype,l_errid)
+int l_errtype;
+char l_errmsg[],
+     l_errid[];
+
+/*  l_errtype = 1 for application errors  */
+/*            = 0 for oracle errors       */
+
+{
+        char l_msg_desc[70];
+
+	long l_sqlcode;
+	char app_err_msg[79];
+
+	l_sqlcode = sqlca.sqlcode;
+	app_err_msg[0]='\0';
+
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+        strcpy(sub_session_id.arr,g_session_id);
+	sub_session_id.len = strlen(sub_session_id.arr);
+
+	strcpy(sub_pgm_date.arr,g_pgm_date);
+	sub_pgm_date.len = strlen(sub_pgm_date.arr);
+
+	EXEC SQL ROLLBACK WORK;
+
+	sprintf(string_var,"%s\n",l_errmsg);
+	disp_message(INFO_MESG,string_var);
+
+	if(l_errtype)  {
+	     
+		if(get_message(l_errid,l_msg_desc) == -1) 
+		    {
+		    sprintf(string_var,"%s\n",l_msg_desc);
+		    disp_message(INFO_MESG,string_var);
+		    }
+		else {
+		    strcpy(app_err_msg,"APP-");
+		    strncat(app_err_msg,l_errid,6);
+		    strncat(app_err_msg,"-",1);
+		    strncat(app_err_msg,l_msg_desc,68);
+		    sprintf(string_var,"%s\n",app_err_msg);
+		    disp_message(INFO_MESG,string_var);
+		}
+
+		strcpy(sub_message_id.arr,l_errid);
+		sub_message_id.len = strlen(sub_message_id.arr);
+		strcpy(sub_message_text.arr,l_msg_desc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+
+
+	}
+	else  {
+		strcpy(sub_message_text.arr,sqlca.sqlerrm.sqlerrmc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+		sprintf(sub_message_id.arr,"%d",l_sqlcode);
+		sub_message_id.len = strlen(sub_message_id.arr);
+		sprintf(string_var,"%s\n",sub_message_text.arr);
+		disp_message(INFO_MESG,string_var);
+	 }
+
+	strncpy(sub_debug_msg.arr,l_errmsg,70);
+	sub_debug_msg.len = strlen(sub_debug_msg.arr);
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 PGM_DATE,
+			 SESSION_ID,
+                         MSG_TYPE,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+                VALUES ( :sub_pgm_id,
+			 :sub_pgm_date,
+			 :sub_session_id,
+                         'I',
+	                 SUBSTR(:sub_debug_msg,1,70),
+                         SYSDATE
+                       );
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Insert into SY_PROG_MSG");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(ORA_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	 }
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 PGM_DATE,
+			 SESSION_ID,
+                         MSG_TYPE,
+			 MSG_NUM,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+                VALUES ( :sub_pgm_id,
+			 :sub_pgm_date,
+			 :sub_session_id,
+                         'E',
+			 :sub_message_id,
+	                 SUBSTR(:sub_message_text,1,70),
+                         SYSDATE
+                       );
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Insert into SY_PROG_MSG");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(ORA_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	 }
+
+      EXEC SQL COMMIT WORK;
+      return(0);
+}
+
+/*********************** END FUNCTION DISP_MESG ************************/
+
+log_err_mesg(l_errmsg,l_errtype,l_errid)
+int l_errtype;
+char l_errmsg[],
+     l_errid[];
+/*  l_errtype = 1 for application errors  */
+/*            = 0 for oracle errors       */
+{
+        char l_msg_desc[70];
+
+	long l_sqlcode;
+	char app_err_msg[79];
+
+	l_sqlcode = sqlca.sqlcode;
+	app_err_msg[0]='\0';
+
+        strcpy(sub_pgm_id.arr,g_pgm_id);
+	sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+        strcpy(sub_session_id.arr,g_session_id);
+	sub_session_id.len = strlen(sub_session_id.arr);
+
+	strcpy(sub_pgm_date.arr,g_pgm_date);
+	sub_pgm_date.len = strlen(sub_pgm_date.arr);
+
+	if(l_errtype)  {
+	     
+		if(get_message(l_errid,l_msg_desc) == -1) 
+		   { sprintf(string_var,"%s\n",l_msg_desc);
+		    disp_message(ERR_MESG,string_var);
+		    }
+		else {
+		    strcpy(app_err_msg,"APP-");
+		    strncat(app_err_msg,l_errid,6);
+		    strncat(app_err_msg,"-",1);
+		    strncat(app_err_msg,l_msg_desc,68);
+/*		    sprintf(string_var,"%s\n",app_err_msg);
+			disp_message(ERR_MESG,string_var);*/
+		}
+
+		strcpy(sub_message_id.arr,l_errid);
+		sub_message_id.len = strlen(sub_message_id.arr);
+		strcpy(sub_message_text.arr,l_msg_desc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+
+
+	}
+	else  {
+		strcpy(sub_message_text.arr,sqlca.sqlerrm.sqlerrmc);
+		sub_message_text.len = strlen(sub_message_text.arr);
+		sprintf(sub_message_id.arr,"%d",l_sqlcode);
+		sub_message_id.len = strlen(sub_message_id.arr);
+/*		sprintf(string_var,"%s\n",sub_message_text.arr);
+	    disp_message(INFO_MESG,string_var); */
+	}
+
+	strncpy(sub_debug_msg.arr,l_errmsg,70);
+	sub_debug_msg.len = strlen(sub_debug_msg.arr);
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 PGM_DATE,
+			 SESSION_ID,
+                         MSG_TYPE,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+                VALUES ( :sub_pgm_id,
+			 :sub_pgm_date,
+			 :sub_session_id,
+                         'I',
+	                 SUBSTR(:sub_debug_msg,1,70),
+                         SYSDATE
+                       );
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Insert into SY_PROG_MSG");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(ORA_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	    }
+
+   	EXEC SQL INSERT INTO   SY_PROG_MSG 
+                       ( PGM_ID,
+			 	PGM_DATE,
+				 SESSION_ID,
+                         MSG_TYPE,
+				 MSG_NUM,
+                         MSG_DESC,
+                         MSG_DATE_TIME
+                       )
+	                VALUES ( :sub_pgm_id,
+				 :sub_pgm_date,
+				 :sub_session_id,
+                         'E',
+				 :sub_message_id,
+	                 	 SUBSTR(:sub_message_text,1,70),
+                         SYSDATE
+                       );
+
+   	 if (sqlca.sqlcode < 0) {
+      	        sprintf(string_var,"\n%s\n","ERR_MESG: Insert into SY_PROG_MSG");
+      	        disp_message(ORA_MESG,string_var);
+      	        sprintf(string_var,"\n<%s>\n",sqlca.sqlerrm.sqlerrmc);
+      	        disp_message(INFO_MESG,string_var);
+      	        EXEC SQL ROLLBACK WORK;
+   	 }
+      return(0);
+}

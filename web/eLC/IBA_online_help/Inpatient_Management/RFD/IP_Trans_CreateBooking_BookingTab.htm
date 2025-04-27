@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>IP_Trans_CreateBooking_BookingTab</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Booking</h1>
+<p class="Text">The Booking tab is displayed, by default.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the Date of Procedure/Surgery or select the Date by clicking the Calendar function. On entering the Procedure/Surgery Date, the Preferred Admission Date/Time displays the date entered for Procedure/Surgery.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the number of days for preparation before Operation. If the Procedure/Surgery Date is entered and the Pre-Op Preparations Days specified, the Preferred Admission Date/Time is displayed automatically. If Pre-Op Preparations Days is specified after entering the Preferred Admission Date/Time, the system automatically calculates and displays the Procedure/Surgery Date.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the Preferred Date and Time for Admission in the dd/mm/yyyy hh:mm format or use the Calendar function to select the required date and time. Advance booking can be performed within the period specified in IP Parameter ('Max allowable period for advance bed booking [] days') from the current system date and time. This field is mandatory.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select a Medical Service Group from the list. Only those Medical Service Groups that are attached to Nursing Unit Types, which are in turn, attached to single/multiple Nursing Units are displayed. The selected Medical Service Group indicates the group under which the patient is being booked. This field is mandatory. For the selected Medical Service Group, if the maximum daily bookings or the maximum monthly bookings are specified, the system checks for the rules set during every booking. Once the values set are exceeded, subsequent bookings are not allowed.</p>
+</li>
+</ol>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Generating Booking Reference Number Manually</a></p>
+<div class="droptext" id="POPUP240475234" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The Booking Reference Number is auto-generated or manually entered &#160;based on the selected Medical Service Group.</p>
+<p class="BoldRFD" style="font-weight: normal;">If ‘Generate Booking Number’ check box is not selected for the desired Medical Service Group in the Medical Service Group function of IP Code Setup, the Booking Reference Number needs to be entered manually.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">Enter the Booking Reference Number in alphanumeric format of 12 characters maximum length.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The system prompts you to enter the booking reference number by making the field entry as mandatory.</p>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Auto Generating Booking Reference Number</a></p>
+<div class="droptext" id="POPUP348877035" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The Booking Reference Number is auto-generated or manually entered &#160;based on the selected Medical Service Group.</p>
+<p class="BoldRFD" style="font-weight: normal;">If ‘Generate Booking Number’ check box is selected for the desired Medical Service Group in the Medical Service Group function of IP Code Setup, the Booking Reference Number is generated automatically.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If the system generates booking reference number for the selected Medical Service Group, you are not allowed to enter the number.</p>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Creating Booking for Registered/Unregistered Patients with Referral ID</a></p>
+<div class="droptext" id="POPUP350694222" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enter the Referral ID of the patient in alphanumeric format of 14 characters or select the Referral ID by clicking <span class="BoldNumberRFD">[?]</span> function to get the ‘Referral Search’ screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enter the 
+<a href="javascript:void(0);" id="a5" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('IP_Trans_CreateBooking_ReferralSearch.htm',400,300);return false;">referral details</a> and click <span class="BoldNumberRFD">[Search]</span> to search for a particular referral patient or click <span class="BoldNumberRFD">[Search]</span> without entering the referral details in the fields provided to display all referral patients registered in the facility. The Referral Details of the referral patients are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click the Referral ID hyperlink and the patient details are displayed on the Create Booking screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Clear]</span> to clear the entered data or <span class="BoldNumberRFD">[Close]</span> to exit from the screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">On selecting the required Referral ID, the ‘Referral Search’ screen closes and control shifts back to the ‘Create Booking’ screen. The system displays patient details available for the selected Referral ID in the booking screen along with the preferred date/time of admission as mentioned while registering referral. Enter the other details in the ‘Create Booking’ screen.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />On checking out an outpatient, if a referral has been registered for an inpatient location with the ‘Referred for’ value selected as ‘Booking’ the same is displayed in the result screen of ‘Referral Search’.</p>
+<p class="Note">Booking for Unregistered patients is allowed If ‘Allow Booking for Unregistered Patients’ field is selected in the IP Parameter function.</p>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Creating Booking for Registered/Unregistered Patients without Referral ID</a></p>
+<div class="droptext" id="POPUP352277247" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click the <span class="BoldNumberRFD">[?]</span> function to get the ‘Referral Search’ screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Register Patient Referral]</span> in the Referral Search screen to <a href="../../Outpatient_Management/Transaction/Register_Patient_Referral.htm">register the referral patient</a>. On successfully registering the referral, the patient details are displayed on the Create Booking screen. The Referral ID generated is based on the value set in the Referral ID Numbering function of the Application Masters module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Clear]</span> to clear the entered data or <span class="BoldNumberRFD">[Close]</span> to exit from the screen.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Booking for Unregistered patients is allowed if ‘Allow Booking for Unregistered Patients’ field is selected in the IP Parameter function.</p>
+</div>
+<ol start="5" type="1">
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. 
+<a href="javascript:void(0);" id="a6" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('IP_Trans_CreateBooking_BookingTab_RFD.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If ‘Allow Booking for Unregistered Patients’ field is selected in the IP Parameter function, booking for Unregistered patients is allowed.</p>
+<p class="Note">If ‘Allowed Booking’ is set as ‘Referral’ in the ‘IP Parameter’ function, the ‘Create Booking’ screen allows booking only for referral patients.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP240475234');
+	TextPopupInit('a2','POPUP348877035');
+	TextPopupInit('a3','POPUP350694222');
+	TextPopupInit('a4','POPUP352277247');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

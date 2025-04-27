@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%> 
+<%
+String sStyle	=
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+<%@ page contentType="text/html;charset=UTF-8" import="java.sql.*,webbeans.eCommon.*" %>
+
+<%
+request.setCharacterEncoding("UTF-8");	
+	String url = "../../eCommon/jsp/commonToolbar.jsp?" ;
+	String params = request.getQueryString() ;
+%>
+
+<html>
+	<head>
+		<link rel='stylesheet' type='text/css' href='../../eCommon/html/<%=sStyle%>'></link>
+	</head>
+	<script src='../js/repSMDisInaUserMenuForm.js' language='JavaScript'></script>
+	<script src='../../eCommon/js/common.js' language='javascript'></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+	<iframe name='commontoolbarFrame' id='commontoolbarFrame' src=<%=url + params%> frameborder='0' scrolling='no' noresize style='height:8vh;width:100vw'></iframe>
+		<iframe name='f_query_add_mod' id='f_query_add_mod' src='../../eSM/jsp/repSMDisInaUserMenuForm.jsp' frameborder=0 noresize scrolling='no' style='height:85vh;width:100vw'></iframe><iframe name='messageFrame' id='messageFrame'	src='../../eCommon/jsp/MstCodeError.jsp' frameborder=0 noresize scrolling='auto' style='height:7vh;width:100vw'></iframe>
+</html>
+

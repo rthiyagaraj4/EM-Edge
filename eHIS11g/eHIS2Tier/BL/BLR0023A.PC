@@ -1,0 +1,1052 @@
+/************************************************************************/
+/* PROGRAM NAME          : BLR0023A.PC                                  */
+/* AUTHOR                : D Ganesh Murthi                              */
+/* DATE WRITTEN          : 15/02/2005                                	*/
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+#include <stdio.h>
+#include <string.h>
+#include <bl.h>
+  
+#define OERROR				 (sqlca.sqlcode		< 0)
+#define LAST_ROW			 (sqlca.sqlcode    == 1403)
+#define NOT_FOUND			 (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode	   == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode	   == -1)
+#define	MAX_LINES			 60
+#define ESC					 0x1B
+
+#define INIT_MESG "Report Generation is in progress"
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+
+	VARCHAR		uid_pwd				[132],
+			hosp_name			[120],
+			date_time			[20],
+			user_id				[20],
+			nd_pgm_date			[35],
+			nd_facility_name		[31],
+			nd_session_id			[16],
+			nd_facility_id			[3];
+
+	VARCHAR d_acc_entity_name			[41],
+			d_user				[21],
+			d_sysdate			[17],
+			date				[20],
+			d_currency[10];
+            
+	VARCHAR	nd_lang_id			[4];
+
+	VARCHAR l_pk_value			[200],
+			l_translated_value	[201],
+			l_from_and_to_date  [61];    
+
+	VARCHAR l_episode_type		[2],
+			l_refund_type		[4],
+			l_fr_date			[11],
+			l_to_date			[11],
+			d_episode_id		[10],
+			d_visit_id		[10],
+			d_patient_id		[21],
+			d_payer_name		[61],
+			d_remark            [51],
+			d_ref_doc_type_code     [11],
+			d_refund_doc		[11],
+			d_ref_doc_date   	[21],
+			l_address_line1		[33],
+			l_address_line2		[33],
+			l_address_line3		[33],
+			l_tel_number		[33],
+			d_bill_doc_type_code[11],			
+			d_bill_doc_number	[19],
+			d_bill_doc_date			[11],
+			d_ref_doc_num           [11],
+			d_oth_doc_type_code	[9],
+			d_oth_doc_number	[11],
+			d_oth_doc_date		[11],
+			d_ln1_res_add		[41],
+			d_ln2_res_add		[41],
+			d_ln3_res_add		[41],
+			d_ln4_res_add		[41],
+			d_res_postal_code	[11],
+			d_res_country_code	[11],
+			d_res_country_name	[50],
+			d_dep_doc_num		[18],
+			d_recpt_nature		[3],
+			l_sysdate			[20],
+			l_hospital_name		[50],
+			p_language_id       [3] ;
+ 
+char		loc_legend[40][201];
+char        d_dep_doc_num_arr[7][20],l_mesg[1000];
+
+int			l_line_no =0;
+int			l_page_no =0;
+int			i, j;
+int         d_rownum;
+int         srlno = 1;
+
+double   d_refund_amt;
+double   d_bill_tot_amt;
+double   d_oth_doc_amt;
+double   d_dep_amount;
+double   d_dep_amount_arr[10];
+
+char filename[200];
+char string_var[200];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int lctr = 0,pctr = 0;
+
+FILE *fp;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 4)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+
+	strcpy(uid_pwd.arr,argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr);
+
+	nd_session_id.len = 0;
+	nd_session_id.arr[nd_session_id.len] = '\0';
+
+	strcpy(nd_session_id.arr,argv[2]);
+	nd_session_id.len = strlen(nd_session_id.arr);
+	nd_session_id.arr[nd_session_id.len] = '\0'; 
+
+	nd_pgm_date.len = 0;
+	nd_pgm_date.arr[nd_pgm_date.len] = '\0';
+   
+	strcpy(nd_pgm_date.arr,argv[3]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+	nd_pgm_date.arr[nd_pgm_date.len] = '\0';
+
+	strcpy(nd_facility_id.arr,argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+	nd_facility_id.arr[nd_facility_id.len] = '\0';
+
+	strcpy(p_language_id.arr,l_language_id.arr);
+    p_language_id.len = l_language_id.len; 
+
+	if(sql_connect() == -1)
+	{
+		disp_message(ERR_MESG,"Error in connecting to Oracle\n");
+		if (uid_pwd.len == 0)
+			disp_message(ERR_MESG,"Null oracle uid/pwd\n\n\n");
+		proc_exit();
+	}
+
+    set_meduser_role();
+
+    declare_cursors();
+
+    fetch_prog_param();
+
+    fetch_hosp_name();
+
+    open_file();
+
+    open_cursors();
+
+    fetch_legend_value();
+    print_param_header();
+    print_report();
+
+    end_of_rep();
+
+	EXEC SQL DELETE SY_PROG_PARAM
+            WHERE PGM_ID   = 'BLR0023A'
+            AND SESSION_ID = :nd_session_id
+            AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+
+    
+    EXEC SQL COMMIT WORK RELEASE;
+    if (OERROR)
+         err_mesg("COMMIT WORK RELEASE failed",0,"");
+
+}
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+  
+declare_cursors()
+{
+EXEC SQL DECLARE DEP_REFUND_MAIN CURSOR FOR 
+SELECT	 a.patient_id, 
+	 decode(a.episode_type,'R',null,a.episode_id),
+	 decode(a.episode_type,'E',a.visit_id,'O',a.visit_id,null),
+	 a.payer_name, 
+	 a.doc_type_code,
+	 a.doc_number,
+	 TO_CHAR(a.doc_date,'DD/MM/YYYY') refund_date,
+	 a.bill_doc_type_code ref_against_doc_type, 
+	 a.bill_doc_number ref_against_doc_num, 
+	 TO_CHAR(b.doc_date,'DD/MM/YYYY') bill_date, 
+	 b.bill_amt bill_amount,
+         abs(a.doc_amt) refund_amt, 
+	 a.recpt_nature_code recpt_nature_code
+FROM	 BL_RECEIPT_REFUND_HDRDTL_VW a, bl_bill_hdr b
+WHERE	 a.operating_facility_id	= :nd_facility_id
+AND      a.operating_facility_id	= b.operating_facility_id(+)
+AND      a.bill_doc_type_code		= b.doc_type_code(+)
+AND      a.bill_doc_number		= b.doc_num(+)
+AND	 nvl(a.cancelled_ind,'N')	= 'N'
+AND	 a.episode_type	= decode(:l_episode_type,'A',a.episode_type, :l_episode_type)
+AND	( 
+	(
+	   :l_refund_type in ('D','B') and ((a.recpt_nature_code in ('BI','DC')
+	                            and (nvl(b.prepay_adj_amt,0) + 
+				        nvl(b.deposit_adj_amt,0)) > 0
+					and nvl(b.bill_status,'X') != 'C')
+				     or a.recpt_nature_code in ('AD','RD')
+				    )
+	  )
+	  or
+	 (
+	   :l_refund_type in ('O','B') and a.recpt_nature_code in ('MI')
+
+	  )
+        )
+
+AND	 a.doc_date BETWEEN TO_DATE(:l_fr_date||' 00:00:00','DD/MM/YYYY HH24:MI:SS')
+			AND TO_DATE(:l_to_date||' 23:59:59','DD/MM/YYYY HH24:MI:SS')
+AND	 a.recpt_refund_ind = 'F'
+Order By a.patient_id;
+
+EXEC SQL  DECLARE  DEP_DETAILS CURSOR FOR
+SELECT    org_doc_type_code ||'/'|| to_char(org_doc_num), abs(doc_amt)
+FROM      bl_patient_ledger
+WHERE    (
+	   (
+	   ad_pr_adj_bill_doc_type     =  :d_bill_doc_type_code AND
+	   ad_pr_adj_bill_doc_num      =  :d_bill_doc_number
+	   )
+	 OR
+	   (
+	    org_doc_type_code = :d_bill_doc_type_code AND 
+	    org_doc_num = :d_bill_doc_number 
+	   )	 
+	 )
+AND	  nvl(trx_status,'X')   !=  'C'
+AND recpt_nature_code in ( 'AD','PR');
+
+}
+
+
+fetch_cur()
+{
+    d_episode_id.arr[0]			 = '\0';
+    d_visit_id.arr[0]			 = '\0';
+    d_patient_id.arr[0]			 = '\0';
+    d_payer_name.arr[0]			 = '\0';
+    d_remark.arr[0]				 = '\0';
+    d_ref_doc_type_code.arr[0]		 = '\0';
+    d_ref_doc_num.arr[0]			 = '\0';
+    d_ref_doc_date.arr[0]		 = '\0';
+    d_bill_doc_type_code.arr[0]  = '\0';
+    d_bill_doc_number.arr[0]     = '\0';
+    d_bill_doc_date.arr[0]			 = '\0';
+    d_recpt_nature.arr[0]		 = '\0';
+
+    d_episode_id.len			 = 0;
+    d_visit_id.len				 = 0;
+    d_patient_id.len			 = 0;
+    d_payer_name.len			 = 0;
+    d_remark.len				 = 0;
+    d_ref_doc_type_code.len			 = 0;
+    d_ref_doc_num.len				 = 0;
+    d_ref_doc_date.len			 = 0;
+    d_bill_doc_type_code.len     = 0;
+    d_bill_doc_number.len        = 0;
+    d_bill_doc_date.len				 = 0;
+    d_recpt_nature.len			 = 0;
+
+    d_refund_amt				 = 0;
+    d_bill_tot_amt				 = 0;
+
+    EXEC SQL FETCH DEP_REFUND_MAIN 
+	     INTO  
+		   :d_patient_id,
+		   :d_episode_id,
+		   :d_visit_id,
+		   :d_payer_name,
+		   :d_ref_doc_type_code,
+		   :d_ref_doc_num,
+		   :d_ref_doc_date,
+		   :d_bill_doc_type_code,
+		   :d_bill_doc_number,
+		   :d_bill_doc_date,
+		   :d_bill_tot_amt,
+		   :d_refund_amt,
+		   :d_recpt_nature;
+
+
+
+     if(OERROR)
+	err_mesg("FETCH failed on cursor DEP_REFUND_MAIN",0,"");
+
+    if(NO_DATA_FOUND)
+		return 0;
+
+    d_episode_id.arr[d_episode_id.len]					= '\0';
+    d_visit_id.arr[d_visit_id.len]					= '\0';
+    d_patient_id.arr[d_patient_id.len]					= '\0';
+    d_payer_name.arr[d_payer_name.len]					= '\0';
+    d_ref_doc_date.arr[d_ref_doc_date.len]				= '\0';
+    d_remark.arr[d_remark.len]						= '\0';
+    d_ref_doc_type_code.arr[d_ref_doc_type_code.len]			= '\0';
+	d_refund_doc.arr[d_refund_doc.len]				= '\0';
+	d_ref_doc_date.arr[d_ref_doc_date.len]				= '\0';
+    d_bill_doc_type_code.arr[d_bill_doc_type_code.len]			= '\0';
+    d_bill_doc_number.arr[d_bill_doc_number.len]			= '\0';
+    d_bill_doc_date.arr[d_bill_doc_date.len]				= '\0';
+	d_recpt_nature.arr[d_recpt_nature.len]				= '\0';
+
+	
+    if (d_patient_id.arr[0] != '\0' && d_payer_name.arr[0] == '\0')
+    {
+	EXEC SQL select short_name into :d_payer_name 
+	     FROM mp_patient_mast
+	     WHERE patient_id = :d_patient_id;
+
+	d_payer_name.arr[d_payer_name.len] = '\0';
+    }
+    
+    return 1;
+}
+
+
+fetch_pat_address()
+{
+    d_ln1_res_add.arr[0]		 = '\0';
+    d_ln2_res_add.arr[0]         = '\0';
+    d_ln3_res_add.arr[0]		 = '\0';
+    d_ln4_res_add.arr[0]		 = '\0';
+    d_res_postal_code.arr[0]     = '\0';
+    d_res_country_code.arr[0]    = '\0';
+
+    d_ln1_res_add.len			 = 0;
+	d_ln2_res_add.len            = 0;
+    d_ln3_res_add.len			 = 0;
+    d_ln4_res_add.len			 = 0;
+    d_res_postal_code.len        = 0;
+    d_res_country_code.len       = 0;
+
+
+EXEC SQL  
+SELECT	   ln1_mail_add, 
+	   ln2_mail_add, 
+	   ln3_mail_add, 
+	   ln4_mail_add, 
+	   mail_postal_code, 
+	   mail_country_code
+INTO       :d_ln1_res_add,
+	   :d_ln2_res_add,
+	   :d_ln3_res_add,
+	   :d_ln4_res_add,
+           :d_res_postal_code,
+	   :d_res_country_code
+FROM mp_pat_other_dtls
+WHERE patient_id = :d_patient_id;	
+
+
+          
+    if(OERROR)
+	err_mesg("FETCH failed on cursor PAT_ADDRESS",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+
+    d_ln1_res_add.arr[d_ln1_res_add.len]               = '\0';
+    d_ln2_res_add.arr[d_ln2_res_add.len]               = '\0';
+    d_ln3_res_add.arr[d_ln3_res_add.len]               = '\0';
+    d_ln4_res_add.arr[d_ln4_res_add.len]	       = '\0';
+    d_res_postal_code.arr[d_res_postal_code.len]       = '\0';
+    d_res_country_code.arr[d_res_country_code.len]     = '\0';
+
+
+    if ( d_res_country_code.arr[0] != '\0')
+    {
+	d_res_country_name.arr[0] = '\0';
+	d_res_country_name.len = 0;
+
+	EXEC SQL select country_name into :d_res_country_name
+		 from mp_country_his_vw
+		 where country_code = :d_res_country_code;
+
+	if(OERROR)
+	err_mesg("FETCH failed on MP_COUNTRY_HIS_VW",0,"");
+
+	d_res_country_name.arr[d_res_country_name.len] = '\0';
+     }  
+
+
+
+    return 1;
+
+}
+
+fetch_dep_dtls()
+{
+    d_dep_doc_num.arr[0]	= '\0';
+    d_dep_doc_num.len		= 0;
+    d_dep_amount		= 0;
+
+    
+	EXEC SQL FETCH DEP_DETAILS 
+	INTO  :d_dep_doc_num, 
+	      :d_dep_amount;
+
+         
+		if(OERROR)
+		err_mesg("FETCH failed on cursor fetch_dep_dtls",0,"");
+
+		if(NO_DATA_FOUND)
+		return 0;
+	
+    d_dep_doc_num.arr[d_dep_doc_num.len] = '\0';
+   
+    return 1;
+
+}
+
+
+fetch_prog_param()
+{
+    l_episode_type.arr[0]	 ='\0'; 
+    l_refund_type.arr[0]	 ='\0';
+    l_fr_date.arr[0]		 ='\0';
+    l_to_date.arr[0]		 ='\0';
+
+    l_episode_type.len           = 0;
+    l_refund_type.len            = 0;
+    l_fr_date.len		 = 0;
+    l_to_date.len		 = 0;
+ 
+   EXEC SQL SELECT PARAM1,PARAM2,PARAM3,PARAM4
+            INTO :l_episode_type, :l_refund_type, :l_fr_date, :l_to_date
+            FROM  SY_PROG_PARAM
+            WHERE PGM_ID   = 'BLR0023A'
+            AND SESSION_ID = :nd_session_id
+            AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+	l_episode_type.arr[l_episode_type.len]	= '\0';
+	l_refund_type.arr[l_refund_type.len]	= '\0';
+	l_fr_date.arr[l_fr_date.len]			= '\0';
+    l_to_date.arr[l_to_date.len]			= '\0';
+}
+  
+
+end_of_rep()
+{
+	fprintf(fp,"\n%55s***  END OF REPORT ***\n\f"," ");
+	fflush(fp);
+}
+
+open_file()
+{
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"BLR0023A.lis");
+
+    if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file BLR0023A.lis");
+       proc_exit();
+    }
+}
+
+open_cursors()
+{
+/*  EXEC SQL OPEN REFUND_OTHER;
+
+	if(OERROR)
+	err_mesg("OPEN failed on cursor REFUND_OTHER",0,"");
+
+	EXEC SQL OPEN REFUND_BI;
+
+	if(OERROR)
+	err_mesg("OPEN failed on cursor REFUND_BI",0,"");
+*/
+
+	EXEC SQL OPEN DEP_REFUND_MAIN;
+
+	if(OERROR)	   
+	err_mesg("OPEN failed on cursor DEP_REFUND_MAIN",0,"");
+
+
+	
+	/*EXEC SQL OPEN PAT_ADDRESS;
+
+	if(OERROR)	   
+	err_mesg("OPEN failed on cursor PAT_ADDRESS",0,"");*/
+}
+
+print_rep()
+{
+   
+	for (i=1;i<=10; i++)
+	{
+	for (j=0;j<=10;j++)
+	{
+	d_dep_doc_num_arr[i][j] = '\0';
+	}
+	d_dep_amount_arr[i] = 0;
+	}        
+
+     fprintf(fp,"%5d %-20.20s ",srlno, d_patient_id.arr);
+	 fprintf(fp,"%-10.10s %-8.8s",d_episode_id.arr,d_visit_id.arr);
+				 
+     if (strcmp(d_recpt_nature.arr, "BI") == 0 || strcmp(d_recpt_nature.arr, "DC") == 0)
+     {
+	if (d_bill_doc_number.arr[0] == '\0')
+	{
+		fprintf(fp,"%-18.18s "," ");
+	}
+	else
+	{
+		sprintf(l_mesg,"%s/%s",d_bill_doc_type_code.arr,d_bill_doc_number.arr);
+		fprintf(fp,"%-18.18s ",l_mesg);
+	}  
+     }  
+     else
+	fprintf(fp,"%-18.18s "," ");
+
+     EXEC SQL OPEN DEP_DETAILS;
+
+     if(OERROR)	   
+     err_mesg("OPEN failed on cursor DEP_DETAILS",0,"");
+
+     i=1;
+     while(fetch_dep_dtls())
+     {
+	strcpy(d_dep_doc_num_arr[i],d_dep_doc_num.arr);
+	d_dep_amount_arr[i] = d_dep_amount;
+	i++;
+     }     	
+ 
+     if (d_dep_doc_num_arr[1][0] == '\0')  
+     {
+        fprintf(fp,"%-15.15s"," ");
+	fprintf(fp,"%-18.18s "," ");     
+     }
+     else
+     {
+	print_formated(d_dep_amount_arr[1]);
+	fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[1]);
+     }
+
+    	
+    fprintf(fp,"   ");
+    print_formated(d_refund_amt);
+    
+    sprintf(l_mesg,"%s/%s",d_ref_doc_type_code.arr,d_ref_doc_num.arr);
+
+    fprintf(fp,"%-18.18s\n",l_mesg);
+
+    l_line_no = l_line_no+1;      
+
+    //2
+
+    fprintf(fp,"%5s %-40.40s "," ",d_payer_name.arr);  
+    
+    if (d_bill_doc_date.arr[0] == '\0')
+		fprintf(fp,"%-18.18s "," ");
+    else
+	   fprintf(fp,"%-18.18s ",d_bill_doc_date.arr);
+
+    if ( d_dep_amount_arr[2] == 0 ) 
+		fprintf(fp,"%-15.15s", " ");
+	else  
+		print_formated(d_dep_amount_arr[2]);	
+ 
+    if (d_dep_doc_num_arr[2][0] == '\0')
+	fprintf(fp,"%-18.18s "," ");
+    else
+	fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[2]);
+
+    fprintf(fp,"%-18.18s","");
+    fprintf(fp,"%-10s",d_ref_doc_date.arr);
+	
+    fprintf(fp,"\n");
+    l_line_no = l_line_no+1;  
+	
+    fetch_pat_address();
+
+    //3
+
+    if ( d_ln1_res_add.arr[0] != '\0' || d_dep_amount_arr[3] != 0 ||
+         d_dep_doc_num_arr[3][0] != '\0' || d_bill_tot_amt != 0 )
+    {						
+	    fprintf(fp,"      %-40.40s ",d_ln1_res_add.arr);
+
+	    if (d_bill_tot_amt != 0)
+		print_formated_lr(d_bill_tot_amt);
+	    else
+		fprintf(fp,"%-15.15s"," ");
+
+	    fprintf(fp,"    ");      	
+
+	    if (d_dep_amount_arr[3] == 0 )
+		fprintf(fp,"%-15.15s"," ");
+	    else
+	    { 	
+		print_formated(d_dep_amount_arr[3]);	
+	    }
+
+	    if (d_dep_doc_num_arr[3][0] == '\0')
+		{
+		  fprintf(fp,"%-18.18s "," ");
+		}
+		else
+		{
+		 fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[3]);
+		}
+			
+	    fprintf(fp,"\n");
+	    l_line_no = l_line_no+1;  
+    }
+    // 4
+
+    if ( d_ln2_res_add.arr[0] != '\0' || d_dep_amount_arr[4] != 0 ||
+         d_dep_doc_num_arr[4][0] != '\0' )
+    {
+	fprintf(fp,"      %-40.40s ",d_ln2_res_add.arr);
+	fprintf(fp,"%-18.18s "," ");
+
+	if ( d_dep_amount_arr[4] == 0 )
+		fprintf(fp,"%-15.15s"," " );
+	else
+	{	
+		print_formated(d_dep_amount_arr[4]);	
+	}
+ 
+    if (d_dep_doc_num_arr[4][0] == '\0')
+	{
+	  fprintf(fp,"%-18.18s "," ");
+	}
+	else
+        {
+	 fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[4]);
+	}
+	
+	fprintf(fp,"\n");
+	l_line_no = l_line_no+1;  
+    }
+
+    //5
+    
+     if ( d_ln3_res_add.arr[0] != '\0' || d_dep_amount_arr[5]!= 0 ||
+         d_dep_doc_num_arr[5][0] != '\0' )
+      {
+	fprintf(fp,"      %-40.40s ",d_ln3_res_add.arr);
+	fprintf(fp,"%-18.18s "," ");
+
+	if ( d_dep_amount_arr[5] == 0 ) 
+		fprintf(fp,"%-15.15s"," ");
+	else
+	{
+	  print_formated(d_dep_amount_arr[5]);	
+	}
+ 
+	if (d_dep_doc_num_arr[5][0] == '\0')
+	{
+	  fprintf(fp,"%-18.18s "," ");
+	} 
+	else
+	{
+	 fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[5]);
+	}
+	
+	fprintf(fp,"\n");
+	l_line_no = l_line_no+1;  
+      }
+
+      //6
+	
+      if ( d_ln4_res_add.arr[0] != '\0' || d_dep_amount_arr[6] != 0 ||
+         d_dep_doc_num_arr[6][0] != '\0'
+	 )
+      {       
+
+	fprintf(fp,"      %-40.40s ",d_ln4_res_add.arr);
+	fprintf(fp,"%-18.18s "," ");
+
+	if ( d_dep_amount_arr[6]== 0 ) 
+		fprintf(fp,"%-15.15s"," ");
+	else
+	{
+		print_formated(d_dep_amount_arr[6]);	
+	}
+ 
+        if (d_dep_doc_num_arr[6][0] == '\0')
+	{
+	  fprintf(fp,"%-18.18s "," ");
+	}
+	else
+        {
+	 fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[6]);
+	}
+	
+	fprintf(fp,"\n");
+	l_line_no = l_line_no+1;  	
+      }
+
+      //7
+
+      if ( d_res_country_name.arr[0] != '\0' || d_res_postal_code.arr[0] != '\0' || 
+          d_dep_amount_arr[7] != 0  || d_dep_doc_num_arr[7][0] != '\0')
+        {
+	sprintf(l_mesg, "%-s  %-s ", d_res_postal_code.arr, d_res_country_name.arr);
+	fprintf(fp,"      %-40.40s ",l_mesg);
+	fprintf(fp,"%-18.18s "," ");
+
+	if ( d_dep_amount_arr[7]== 0 ) 
+		fprintf(fp,"%-15.15s"," ");
+	else
+	{
+		print_formated(d_dep_amount_arr[7]);	
+	}
+ 
+        if (d_dep_doc_num_arr[7][0] == '\0')
+	{
+	  fprintf(fp,"%-18.18s "," ");
+	}
+	else
+        {
+	 fprintf(fp,"%-18.18s ",d_dep_doc_num_arr[7]);
+	}
+	
+	fprintf(fp,"\n");
+	l_line_no = l_line_no+1;  	
+       }    
+
+	fprintf(fp,"\n");
+		
+	l_line_no = l_line_no+1;  
+	check_page_break();
+
+}
+
+print_report()
+{
+		print_page_header();
+
+	while(fetch_cur())
+	{
+		print_rep();
+		srlno++;
+	}
+
+}
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+    user_id.arr[0]   = '\0';
+    d_currency.arr[0] = '\0';
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+    user_id.len      = 0;
+    d_currency.len   = 0;
+
+    EXEC SQL SELECT ACC_ENTITY_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+		    USER, '('||BASE_CURRENCY||')'
+    INTO :hosp_name, :date_time, :user_id, :d_currency
+    FROM SY_ACC_ENTITY    
+    WHERE acc_entity_id = :nd_facility_id;
+
+    if (OERROR) err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+	hosp_name.arr[hosp_name.len]           = '\0';
+	date_time.arr[date_time.len]           = '\0';
+	user_id.arr[user_id.len]               = '\0';
+	d_currency.arr[d_currency.len]         = '\0';
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+    char s_amt[30], str_amt[30];	
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+//	    strcat(s_amt,"-");
+        sprintf(str_amt,"%14s",s_amt);
+		l_ltrim(s_amt);
+        fprintf(fp,"%14s-",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%14s",s_amt);
+		l_ltrim(s_amt);
+        fprintf(fp,"%14s ",str_amt);
+    }
+}  
+
+
+print_formated_lr(loc_amount)
+double loc_amount;
+{
+    char s_amt[30], str_amt[30];	
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+        sprintf(str_amt,"%-s-",s_amt);
+	l_ltrim(s_amt);
+        fprintf(fp,"%-15s",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%-s",s_amt);
+	l_ltrim(s_amt);
+        fprintf(fp,"%-14s ",str_amt);
+    }
+}  
+
+check_page_break()
+{
+	if (l_line_no >= 61)	
+	{  
+		l_line_no = 0;
+		fprintf(fp,"\f\n");    
+		print_page_header();
+	}
+}
+
+print_spaces(l_length)
+double l_length;
+{
+	for(i=0;i<l_length;i++)
+	{
+		fprintf(fp," ");
+	}
+}
+
+print_page_title()
+{
+	double l_report_width;
+	double l_acc_entity_length;
+	double l_start_point;
+	double l_comp_name_end_point;
+	int	   l_page_width;
+	
+	l_report_width=132;
+
+    get_header_dtls();    
+
+	l_acc_entity_length = strlen(d_acc_entity_name.arr);
+
+	//Code for Line 1
+	l_start_point=(l_report_width/2)-(l_acc_entity_length/2);
+	fprintf(fp,"MDL           : BL");
+	l_start_point=l_start_point-18;
+	print_spaces(l_start_point);
+	fprintf(fp,"%s",d_acc_entity_name.arr);
+	l_comp_name_end_point=l_start_point+18+l_acc_entity_length;
+	l_start_point=(l_report_width-(15+strlen(date.arr))-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp,"%-15.15s : %s\n",loc_legend[11],date.arr);
+
+	//Code for Line 2  
+	l_start_point=0;
+	l_start_point=(l_report_width/2)-((strlen(loc_legend[1]))/2);
+	fprintf(fp,"OPR           : %s",d_user.arr);
+	l_start_point=l_start_point-(strlen(d_user.arr)+16);
+	print_spaces(l_start_point);
+	fprintf(fp,"%s",loc_legend[1]);
+	l_comp_name_end_point=l_start_point+(strlen(d_user.arr)+16)+strlen(loc_legend[1]);
+	l_start_point=(l_report_width-(17+strlen(date_time.arr))-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp," %-15.15s : %s\n",loc_legend[12],date_time.arr);
+
+	//Code for Line 3
+	l_from_and_to_date.arr[0] = '\0';
+	EXEC SQL SELECT :loc_legend[15]||' '|| :l_fr_date || ' '||:loc_legend[18] ||' ' || :l_to_date
+	           INTO :l_from_and_to_date
+	           FROM dual;
+	l_from_and_to_date.arr[l_from_and_to_date.len] = '\0';
+
+	l_start_point=0;
+	l_start_point=(l_report_width/2)-((strlen(l_from_and_to_date.arr))/2);
+	fprintf(fp,"%-14.14s: BLR0023A",loc_legend[14]);
+	l_start_point=l_start_point-24;
+	print_spaces(l_start_point);
+	fprintf(fp,"%s",l_from_and_to_date.arr);
+	l_comp_name_end_point=l_start_point+24+strlen(l_from_and_to_date.arr);
+	l_start_point=(l_report_width-(17+7)-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp,"%-15.15s : %d\n",loc_legend[13],++l_page_no);
+
+	//Code for Line 4
+	/*
+	l_start_point=0;
+	l_start_point=(l_report_width/2)-((strlen(loc_legend[1]))/2);
+	print_spaces(l_start_point);
+	fprintf(fp,"%s \n",loc_legend[17]);
+	l_comp_name_end_point=l_start_point+strlen(loc_legend[17]);
+	*/
+
+	//l_line_no= l_line_no + 4;
+
+	l_line_no= l_line_no + 3;
+   //	print_page_header();	
+	
+}
+//-----------
+print_param_header()
+{
+int l1,rep_width=132;
+
+  print_page_title();
+  print_line(136);
+  fprintf(fp,"\n\n\n\n\n");
+  //fprintf(fp,"%12sVER: 4.1 \n"," ");
+  fprintf(fp,"%12sINPUT PARAMETER \n"," ");
+  fprintf(fp,"%12s--------------- \n"," ");
+  
+
+    if(strcmp(l_episode_type.arr,"A")==0)
+      fprintf(fp,"%12s %-20s: %-5s \n"," ",loc_legend[23],loc_legend[24]);
+     else     
+      fprintf(fp,"%12s %-20s: %-5s \n"," ",loc_legend[23],l_episode_type.arr);  
+  
+      if(strcmp(l_refund_type.arr,"D") ==0)  	                                
+      fprintf(fp,"%12s %-20s: %-15s\n "," ",loc_legend[25],loc_legend[26]);
+      
+	  if(strcmp(l_refund_type.arr,"O") ==0)  	                                
+      fprintf(fp,"%12s %-20s: %-15s\n "," ",loc_legend[25],loc_legend[27]);
+       
+	  if(strcmp(l_refund_type.arr,"B") ==0)  	                                
+      fprintf(fp,"%12s %-20s: %-11s\n "," ",loc_legend[25],loc_legend[28]);
+
+      fprintf(fp,"%12s%-20s %-11s%-2s %-14s"," ",loc_legend[16],l_fr_date.arr,loc_legend[18],l_to_date.arr);
+
+
+     fprintf(fp,"\f");
+
+}
+
+//----------------
+
+print_page_header()
+{
+   print_page_title();
+	print_line(136);
+	fprintf(fp,"\n");
+	fprintf(fp,"%5.5s %-40.40s %-16.16s %16.16s %-18.18s %17.17s %-18.18s\n", loc_legend[19],loc_legend[2],loc_legend[3],loc_legend[7],loc_legend[8],loc_legend[9],loc_legend[20]);	
+	fprintf(fp,"%5.5s %-40.40s %-16.16s %16.16s %-18.18s %17.17s %-18.18s\n"," ",loc_legend[4], loc_legend[11],d_currency.arr,"","",loc_legend[10]);	
+	fprintf(fp,"%5.5s %-40.40s %-s%s \n"," ",loc_legend[5], loc_legend[6], d_currency.arr);		
+	print_line(136);
+	fprintf(fp,"\n");
+	l_line_no = l_line_no+5;
+}
+
+print_line(l_length)
+int l_length;
+{
+	for(i=0;i<l_length;i++)
+	{
+		fprintf(fp,"-");
+	}
+}
+get_header_dtls()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+				    USER,
+				    TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI'),
+					TO_CHAR(SYSDATE,'DD/MM/YYYY'),
+					TO_CHAR(SYSDATE,'HH24:MI:SS')
+		      INTO :d_acc_entity_name,
+			  	   :d_user,
+				   :d_sysdate,
+				   :date,
+				   :date_time
+              FROM SY_ACC_ENTITY
+			 WHERE acc_entity_id = :nd_facility_id;
+
+	d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+	d_user.arr[d_user.len]                       = '\0';
+	d_sysdate.arr[d_sysdate.len]                 = '\0';
+    date.arr[date.len]							 = '\0';
+    date_time.arr[date_time.len]				 = '\0';	
+
+	return;
+
+	err_exit:
+	   EXEC SQL WHENEVER SQLERROR CONTINUE;
+	   EXEC SQL ROLLBACK WORK RELEASE;
+	   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....");
+	   disp_message(ERR_MESG, sqlca.sqlerrm.sqlerrmc);
+	   proc_exit();
+}
+
+fetch_legend_value()
+{
+    for(i=1;i<50;i++)
+	{	l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLR0023A.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		         INTO :l_pk_value
+				 FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN			
+			blcommon.get_local_lang_desc(	
+							:nd_facility_id,
+							'SM',
+							'SM_LANG_LEGEND',
+							'DFLT_LEGEND_VALUE',
+							:l_pk_value,
+							:l_translated_value,
+							:p_language_id);  
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}  
+
+
+

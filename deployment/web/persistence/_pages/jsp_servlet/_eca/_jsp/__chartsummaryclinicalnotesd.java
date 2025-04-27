@@ -1,0 +1,1805 @@
+package jsp_servlet._eca._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.sql.*;
+import java.net.*;
+import webbeans.eCommon.*;
+import eCommon.XSSRequestWrapper;
+import java.util.*;
+import eCA.*;
+import eOR.*;
+import eOR.Common.*;
+import eCommon.Common.*;
+import java.sql.*;
+import webbeans.eCommon.*;
+import eCA.Common.*;
+import com.ehis.persist.*;
+import eCommon.Common.*;
+import java.lang.*;
+import java.util.*;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __chartsummaryclinicalnotesd extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eca/jsp/ChartSummaryClinicalNotesD.jsp", 1742379082145L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/GetPersistenceBean.jsp", 1717476031037L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 =" \n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\n<!--IN037701 Starts-->\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<!-- IN037701 Ends -->\n<html>\n<head>\n\t\n\t";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\n\t\t\t";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="\n\t\t\t<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\' type=\'text/css\'></link>\n\t\t\t";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\n\t<title>";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="</title>\n\t<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\' type=\'text/css\' />\n\t\t\t<!-- ****  Modified by kishor kumar n on 05/12/2008 for crf0387 applied new css grid. **** -->\n\t\t\n\t\t\n\n\t<script language=\'javascript\' src=\'../../eCommon/js/common.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCommon/js/ValidateControl.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCommon/js/dchk.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCA/js/RecClinicalNotesFileUpload.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCA/js/RecClinicalNotesPart1.js\'></script>\n\t<script language=\'javascript\' src=\'../../eCA/js/RecClinicalNotesPart2.js\'></script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n\t\n\t<script>\n\t//function showNoteData(accession_num,from,no_modalval,encounter_id,contr_mod_accession_num,notestatus,note_group_desc)//[IN032721]\n\tasync function showNoteData(accession_num,from,no_modalval,encounter_id,contr_mod_accession_num,notestatus,note_group_desc,RepDb,clob_data,patient_id)//IN065341\n\t{\n\t\tvar dialogHeight\t= \"80vh\" ;\n\t\tvar dialogWidth\t\t= \"80vw\" ;\n\t\tvar status\t\t\t= \"no\";\n\t\tvar scroll\t\t\t= \"yes\";\n\t\tvar dialogTop\t\t= \"\";\n\t\tvar features\t\t= \"dialogHeight:\" + dialogHeight + \"; dialogWidth:\" + dialogWidth + \"; dialogTop:\"+ dialogTop + \"; status:\"+ status + \"; scroll:\"+ scroll;\n\t\tvar no_modal=no_modalval;\n\t\tvar function_id = \"\";\n\t\tvar called_function_id=\"\";\n\t\tif(from != \'DISCHARGE_SUMMARY\')\n\t\t{\n\t\tvar note_group=note_group_desc;\n\t    var status=notestatus;\n\n\t    var statustxt=\'\';\n\t\t\n\t\tif(status ==  \'3\')\n\t    statustxt =  \'Unauthorized\'\n\t\telse if(status ==  \'4\')\n\t    statustxt =  \'Authorized\'\n\t\telse if(status ==  \'5\')\n\t    statustxt =  \'Modified\'\n\t\telse if(status ==  \'5\')\n\t    statustxt =  \'In Error\' \n\t\taccession_num=accession_num;\t\n\t\t}\n\t\t//var retval = window.showModalDialog(\'../../eCA/jsp/ViewClinicalNoteNoteContentDeatail.jsp?accession_num=\'+accession_num+\'&no_modal=\'+no_modal+\'&note_group=\'+note_group+\'&statustxt=\'+statustxt+\'&fun=VCN&called_function_id=\'+called_function_id+\'&encounter_id=\'+encounter_id+\'&function_id=\'+function_id+\'&contr_mod_accession_num=\'+contr_mod_accession_num,arguments,features);\n\t\tvar retval = await top.window.showModalDialog(\'../../eCA/jsp/ViewClinicalNoteNoteContentDeatail.jsp?accession_num=\'+accession_num+\'&no_modal=\'+no_modal+\'&note_group=\'+note_group+\'&statustxt=\'+statustxt+\'&fun=VCN&called_function_id=\'+called_function_id+\'&encounter_id=\'+encounter_id+\'&function_id=\'+function_id+\'&contr_mod_accession_num=\'+contr_mod_accession_num+\'&RepDb=\'+RepDb+\'&clob_data=\'+clob_data+\'&patient_id=\'+patient_id,arguments,features);//added RepDb,clob_data for IN065341\n\t}\n\t</script>\n</head>\n<!--<body onMouseDown=\"CodeArrest()\" onKeyDown=\"lockKey()\" class=\'CONTENT\'>Niji-->\n<body onMouseDown=\"CodeArrest()\" onKeyDown=\"lockKey()\" style=\'overflow-x:hidden;overflow-y:scroll\'>\n<center>\n<form name=\'\' id=\'\' action=\"\" method=\"\" target=\"\">\n";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="\n\n\t\t\t";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="\n\t\n\t";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="\n\t\t<table class=\'grid\' width=\'100%\' id=\'tb1\' align=\'center\'>\n\n\t\t\n\t";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="\'></td>\n\t\t\t\t<td class=\'columnheadercenter";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="\'>";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="</td>\n\t\t\t\t<td class=\'columnheadercenter";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    private final static java.lang.String  _wl_block19 ="\'>Event Class Description</td>\n\t\t\t\t<td class=\'columnheadercenter";
+    private final static byte[]  _wl_block19Bytes = _getBytes( _wl_block19 );
+
+    private final static java.lang.String  _wl_block20 ="\'></td>\n\t\t</tr> */ %>\n\t";
+    private final static byte[]  _wl_block20Bytes = _getBytes( _wl_block20 );
+
+    private final static java.lang.String  _wl_block21 ="\n\t\t\t<!--IN037701 Starts-->\n\t\t\t";
+    private final static byte[]  _wl_block21Bytes = _getBytes( _wl_block21 );
+
+    private final static java.lang.String  _wl_block22 ="\n\t\t\t<TR>\n\t\t\t\t<td class=\'columnheadercenter\'>";
+    private final static byte[]  _wl_block22Bytes = _getBytes( _wl_block22 );
+
+    private final static java.lang.String  _wl_block23 ="</td>\n\t\t\t\t<td class=\'columnheadercenter\'>";
+    private final static byte[]  _wl_block23Bytes = _getBytes( _wl_block23 );
+
+    private final static java.lang.String  _wl_block24 ="</td>\n\t\t\t\t<td class=\'columnheadercenter\'>&nbsp;</td>\n\t\t\t\t<td class=\'columnheadercenter\'>";
+    private final static byte[]  _wl_block24Bytes = _getBytes( _wl_block24 );
+
+    private final static java.lang.String  _wl_block25 ="</td>\n\t\t\t\t</TR>\n\t\t\t";
+    private final static byte[]  _wl_block25Bytes = _getBytes( _wl_block25 );
+
+    private final static java.lang.String  _wl_block26 ="\n                   \t\t\t";
+    private final static byte[]  _wl_block26Bytes = _getBytes( _wl_block26 );
+
+    private final static java.lang.String  _wl_block27 ="<!-- IN067236starts -->\t\t\t\t\t\t\n\t\t\t\t\t\t\t<tr><td class=\'COLUMNHEADERCENTER\' colspan=\"2\">Therapist Notes</td><td class=\'COLUMNHEADERCENTER\'></td><td class=\'COLUMNHEADERCENTER\'></td><td class=\'COLUMNHEADERCENTER\'></td></tr><!-- 24094 -->\n\t\t\t\t\t\t\n\t\t\t\t\t\t\t";
+    private final static byte[]  _wl_block27Bytes = _getBytes( _wl_block27 );
+
+    private final static java.lang.String  _wl_block28 ="\n\t\t\t\t\t\t\t\t<tr><td class=\'COLUMNHEADERCENTER\' colspan=\"2\">";
+    private final static byte[]  _wl_block28Bytes = _getBytes( _wl_block28 );
+
+    private final static java.lang.String  _wl_block29 ="</td><td class=\'COLUMNHEADERCENTER\'></td><td class=\'COLUMNHEADERCENTER\'></td><td class=\'COLUMNHEADERCENTER\'></td></tr><!-- 24094 -->\n\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t";
+    private final static byte[]  _wl_block29Bytes = _getBytes( _wl_block29 );
+
+    private final static java.lang.String  _wl_block30 ="<!-- IN067236ends -->\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block30Bytes = _getBytes( _wl_block30 );
+
+    private final static java.lang.String  _wl_block31 ="\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block31Bytes = _getBytes( _wl_block31 );
+
+    private final static java.lang.String  _wl_block32 ="<!-- IN071273starts -->\t\n\t\t\t\t\t\t\t<tr><td class=\'COLUMNHEADERCENTER";
+    private final static byte[]  _wl_block32Bytes = _getBytes( _wl_block32 );
+
+    private final static java.lang.String  _wl_block33 ="\' colspan=\"2\">Therapist Notes</td><td class=\'COLUMNHEADERCENTER";
+    private final static byte[]  _wl_block33Bytes = _getBytes( _wl_block33 );
+
+    private final static java.lang.String  _wl_block34 ="\'></td><td class=\'COLUMNHEADERCENTER";
+    private final static byte[]  _wl_block34Bytes = _getBytes( _wl_block34 );
+
+    private final static java.lang.String  _wl_block35 ="\'></td></tr>\t<!-- 24094 -->\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t";
+    private final static byte[]  _wl_block35Bytes = _getBytes( _wl_block35 );
+
+    private final static java.lang.String  _wl_block36 ="\n\t\t\t\t\t\t\t<tr><td class=\'COLUMNHEADERCENTER";
+    private final static byte[]  _wl_block36Bytes = _getBytes( _wl_block36 );
+
+    private final static java.lang.String  _wl_block37 ="\' colspan=\"2\">";
+    private final static byte[]  _wl_block37Bytes = _getBytes( _wl_block37 );
+
+    private final static java.lang.String  _wl_block38 ="</td><td class=\'COLUMNHEADERCENTER";
+    private final static byte[]  _wl_block38Bytes = _getBytes( _wl_block38 );
+
+    private final static java.lang.String  _wl_block39 ="\'></td></tr>\t<!-- 24094 -->\n\t\t\t\t\t\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block39Bytes = _getBytes( _wl_block39 );
+
+    private final static java.lang.String  _wl_block40 ="<!-- IN071273ends -->\t\t\t\t\t\t\t\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block40Bytes = _getBytes( _wl_block40 );
+
+    private final static java.lang.String  _wl_block41 ="\t\t\t\n\t\t\t\t\t<tr>\n\t\t\t\t\t<td class=\'gridData\' width=\'50%\'>";
+    private final static byte[]  _wl_block41Bytes = _getBytes( _wl_block41 );
+
+    private final static java.lang.String  _wl_block42 ="</td>\n\t\t\t\t\t<!-- IN065341 starst -->\n\t\t\t\t\t<!-- <TD><img class=\'gridData\' src=\'../../eCA/images/flow_text.gif\' onClick=\"showNoteData(\'";
+    private final static byte[]  _wl_block42Bytes = _getBytes( _wl_block42 );
+
+    private final static java.lang.String  _wl_block43 ="\',\'";
+    private final static byte[]  _wl_block43Bytes = _getBytes( _wl_block43 );
+
+    private final static java.lang.String  _wl_block44 ="\',\'\',\'";
+    private final static byte[]  _wl_block44Bytes = _getBytes( _wl_block44 );
+
+    private final static java.lang.String  _wl_block45 ="\',\'\');\"/></TD>-->\n\t\t\t\t\t<!--24094 starts-->\n\t\t\t\t\t";
+    private final static byte[]  _wl_block45Bytes = _getBytes( _wl_block45 );
+
+    private final static java.lang.String  _wl_block46 ="\n\t\t\t\t\t <TD><img style=\'cursor:pointer;\' src=\'../../eCA/images/modifiedresult.png\' alt=\'";
+    private final static byte[]  _wl_block46Bytes = _getBytes( _wl_block46 );
+
+    private final static java.lang.String  _wl_block47 ="\'/></TD>\n\t\t\t\t\t";
+    private final static byte[]  _wl_block47Bytes = _getBytes( _wl_block47 );
+
+    private final static java.lang.String  _wl_block48 ="\n\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block48Bytes = _getBytes( _wl_block48 );
+
+    private final static java.lang.String  _wl_block49 ="</td>\n\t\t\t\t\t";
+    private final static byte[]  _wl_block49Bytes = _getBytes( _wl_block49 );
+
+    private final static java.lang.String  _wl_block50 ="\n\t\t\t\t\t<!--24094 ends-->\n\t\t\t\t\t <TD><img class=\'gridData\' src=\'../../eCA/images/flow_text.gif\' onClick=\"showNoteData(\'";
+    private final static byte[]  _wl_block50Bytes = _getBytes( _wl_block50 );
+
+    private final static java.lang.String  _wl_block51 ="\');\"/></TD>\n\t\t\t\t\t<!-- IN065341 ends -->\n\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block51Bytes = _getBytes( _wl_block51 );
+
+    private final static java.lang.String  _wl_block52 ="</td>\n\t\t\t\t\t<td class=\'gridData\' nowrap><b>";
+    private final static byte[]  _wl_block52Bytes = _getBytes( _wl_block52 );
+
+    private final static java.lang.String  _wl_block53 ="</td>\n\t\t\t\t\t</tr>\n\t\t\t\t";
+    private final static byte[]  _wl_block53Bytes = _getBytes( _wl_block53 );
+
+    private final static java.lang.String  _wl_block54 ="\n\t\t\t\t";
+    private final static byte[]  _wl_block54Bytes = _getBytes( _wl_block54 );
+
+    private final static java.lang.String  _wl_block55 ="\n\t\t\t\t\t\t<tr id=\"idddd\"><td class=\'CAGROUP\' colspan=\'9\'>";
+    private final static byte[]  _wl_block55Bytes = _getBytes( _wl_block55 );
+
+    private final static java.lang.String  _wl_block56 ="</td></tr>\n\t\t\t\t\t\t\n\t\t\t\t\t";
+    private final static byte[]  _wl_block56Bytes = _getBytes( _wl_block56 );
+
+    private final static java.lang.String  _wl_block57 ="\n\t\t\t\t\t<tr id=\'";
+    private final static byte[]  _wl_block57Bytes = _getBytes( _wl_block57 );
+
+    private final static java.lang.String  _wl_block58 ="\'>\n\t\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block58Bytes = _getBytes( _wl_block58 );
+
+    private final static java.lang.String  _wl_block59 ="\n\t\t\t\t\t</td>\n\t\t\t\t";
+    private final static byte[]  _wl_block59Bytes = _getBytes( _wl_block59 );
+
+    private final static java.lang.String  _wl_block60 ="\n\t\t\t\t\t\t<td id=\'tooltipCol";
+    private final static byte[]  _wl_block60Bytes = _getBytes( _wl_block60 );
+
+    private final static java.lang.String  _wl_block61 ="\' class=\'gridDataBlue\' onMouseOver=\"hideToolTip(this,\'imgArrow";
+    private final static byte[]  _wl_block61Bytes = _getBytes( _wl_block61 );
+
+    private final static java.lang.String  _wl_block62 ="\')\"  onClick=\"displayToolTip(\'";
+    private final static byte[]  _wl_block62Bytes = _getBytes( _wl_block62 );
+
+    private final static java.lang.String  _wl_block63 ="\',this,\'imgArrow";
+    private final static byte[]  _wl_block63Bytes = _getBytes( _wl_block63 );
+
+    private final static java.lang.String  _wl_block64 ="\')\"  style=\'cursor:pointer\'>";
+    private final static byte[]  _wl_block64Bytes = _getBytes( _wl_block64 );
+
+    private final static java.lang.String  _wl_block65 ="<img align=\'right\' src=\"../../eCommon/images/inactiveArrow.gif\" name=\"imgArrow";
+    private final static byte[]  _wl_block65Bytes = _getBytes( _wl_block65 );
+
+    private final static java.lang.String  _wl_block66 ="\"></td>\n\t\t\t\t\t";
+    private final static byte[]  _wl_block66Bytes = _getBytes( _wl_block66 );
+
+    private final static java.lang.String  _wl_block67 ="\n\t\t\t\t\t\t\t<td class=\'gridData\'> ";
+    private final static byte[]  _wl_block67Bytes = _getBytes( _wl_block67 );
+
+    private final static java.lang.String  _wl_block68 ="</td>\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block68Bytes = _getBytes( _wl_block68 );
+
+    private final static java.lang.String  _wl_block69 ="\n\t\t\t\t\t\t<td class=\'gridData\'><a class=\'gridLink\' href=\"javascript:callMeOnClickSearchResultDis(\'";
+    private final static byte[]  _wl_block69Bytes = _getBytes( _wl_block69 );
+
+    private final static java.lang.String  _wl_block70 ="\',";
+    private final static byte[]  _wl_block70Bytes = _getBytes( _wl_block70 );
+
+    private final static java.lang.String  _wl_block71 =",\'";
+    private final static byte[]  _wl_block71Bytes = _getBytes( _wl_block71 );
+
+    private final static java.lang.String  _wl_block72 ="\')\">";
+    private final static byte[]  _wl_block72Bytes = _getBytes( _wl_block72 );
+
+    private final static java.lang.String  _wl_block73 ="</a>&nbsp;</td>\n\t\t\t\t\t";
+    private final static byte[]  _wl_block73Bytes = _getBytes( _wl_block73 );
+
+    private final static java.lang.String  _wl_block74 ="\n\t\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block74Bytes = _getBytes( _wl_block74 );
+
+    private final static java.lang.String  _wl_block75 ="</td>\n\t\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block75Bytes = _getBytes( _wl_block75 );
+
+    private final static java.lang.String  _wl_block76 ="</td>\n\t\t\t\t\t\t</tr>\n\t\t\t\t";
+    private final static byte[]  _wl_block76Bytes = _getBytes( _wl_block76 );
+
+    private final static java.lang.String  _wl_block77 ="\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<TD>";
+    private final static byte[]  _wl_block77Bytes = _getBytes( _wl_block77 );
+
+    private final static java.lang.String  _wl_block78 ="</TD>\n\t\t\t\t\t</tr>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td class=\'gridData\'>";
+    private final static byte[]  _wl_block78Bytes = _getBytes( _wl_block78 );
+
+    private final static java.lang.String  _wl_block79 ="</td>\n\t\t\t\t\t</tr>\t\n\t\t";
+    private final static byte[]  _wl_block79Bytes = _getBytes( _wl_block79 );
+
+    private final static java.lang.String  _wl_block80 ="\n</table>\n\t<input type=hidden name=query_string id=query_string value=\'";
+    private final static byte[]  _wl_block80Bytes = _getBytes( _wl_block80 );
+
+    private final static java.lang.String  _wl_block81 ="\'>\n\t<input type=hidden name=new_query_string id=new_query_string value=\'";
+    private final static byte[]  _wl_block81Bytes = _getBytes( _wl_block81 );
+
+    private final static java.lang.String  _wl_block82 ="\'>\n\n\t<!-------------hidden fields for fileupload-------------------->\n\t<input type=hidden name=accession_num id=accession_num value=\'\'>\n\t<input type=hidden name=function_id id=function_id value=\'\'>\n\t<input type=hidden name=privilege_type id=privilege_type value=\'\'>\n\t<input type=hidden name=forwarded_clinician_id id=forwarded_clinician_id value=\'\'>\n\t<input type=hidden name=action_comment id=action_comment value=\'\'>\n\t<input type=hidden name=performed_by_id id=performed_by_id value=\'\'>\n\t<input type=hidden name=operation_mode id=operation_mode value=\'\'>\n\t<input type=hidden name=doc_linked_note_yn id=doc_linked_note_yn value=\'\'>\n\t<input type=hidden name=appl_task_id id=appl_task_id value=\'\'>\n\t<input type=\"hidden\" name=\"called_from\" id=\"called_from\" value=\'\'>\n\t<!--Added by Ambiga.M for 18712 on 2/24/2010   --> \n\t<input type=hidden name=forward_mode id=forward_mode value=\'\'>\n\t<input type=hidden name=p_called_from id=p_called_from value=\'";
+    private final static byte[]  _wl_block82Bytes = _getBytes( _wl_block82 );
+
+    private final static java.lang.String  _wl_block83 ="\'><!--IN037701-->\n\t<input type=hidden name=p_notes_view id=p_notes_view value=\'";
+    private final static byte[]  _wl_block83Bytes = _getBytes( _wl_block83 );
+
+    private final static java.lang.String  _wl_block84 ="\'><!--IN037701-->\n\n\n<!------------------------------------------------------------>\n\n<br><br>\n\t<div name=\'tooltiplayer\' id=\'tooltiplayer\' style=\'position:absolute; width:12%; visibility:hidden;\'>\n\t<table id=\'tooltiptable\' cellpadding=0 cellspacing=0 border=\'0\'  width=\'100%\' height=\'100%\' align=\'center\' >\n\t<tr><td width=\'100%\' id=\'t\'></td></tr>\n\t</table>\n\t</div>\t\n\n</form>\n</center>\n</body>\n</html>\n\n\n\n\n\n\n";
+    private final static byte[]  _wl_block84Bytes = _getBytes( _wl_block84 );
+	
+	/** START FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	public Object getBean(String sessionid,String userid,String ws_no,java.sql.Timestamp session_creation_date,Properties jdbc_props){
+		return PersistenceHelper.getBean(sessionid,userid,ws_no,session_creation_date,jdbc_props);
+	}
+	
+	public Object getObjectFromBean(String id,String ClassName,javax.servlet.http.HttpSession session){
+		return PersistenceHelper.getObjectFromBean( id,ClassName,session);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpSession session){
+		PersistenceHelper.putObjectInBean(id,obj,session);
+	}
+
+	/** END FOR GENERIC OBJECTS CORE, CA, OLD ARCHITECTURE **/
+
+	/** START FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+	public Object getBeanObject(String id,String ClassName,javax.servlet.http.HttpServletRequest request){
+		return PersistenceHelper.getBeanObject(id,ClassName,request);
+	}
+
+	public void putObjectInBean(String id,Object obj,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.putObjectInBean(id,obj,request);
+	}
+
+	public void cleanBeanObject(String id,String className,javax.servlet.http.HttpServletRequest request){
+		PersistenceHelper.	cleanBeanObject(id,className,request);
+	} 
+	/** END FOR GENERIC OBJECTS OR , PH, ST AND NEW ARCHITECTURE **/
+
+	/** START TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+	public void cleanAll(javax.servlet.http.HttpSession session){
+		PersistenceHelper.cleanAll(session);
+	}
+	/** END TO CLEAN UP THE PERSISTENCE BEAN FOR A USER**/
+
+
+int rowCnt = 0;
+
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+
+/* 
+--------------------------------------------------------------------------------------------------------------
+Date       Edit History      Name        	Description
+--------------------------------------------------------------------------------------------------------------
+?             100            ?           	created
+09/07/2012    IN035928		Nijitha			CHL-CRF-0044 - 35928
+30/01/2013    EMR1512		Dinesh T		CHL-CRF-0044 - 35928
+18/12/2013		IN042552		Ramesh G	Bru-HIMS-CRF-391 --- Notes Confidentiality	
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Date		Edit History	Name			Rev.Date		Rev.Name			Description
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+02/06/2014	  IN037701		Nijitha												SKR-CRF-0036
+18/06/2014	IN049722		Ramesh G		Akbar S			18/06/2014			OPD/AE Medical Record->Clinical Note for Physician & Nurse->
+																				Upload a Document while recording Notes->A broken image is displayed next to attachment icon
+04/09/2014  PER0409																Performance changes suggested by sunil
+
+12/03/2014  	PER1203		Nijitha												Performance changes suggested by sunil
+10/11/2017      IN061896	Kamalakannan G  	Ramesh G		10/11/2017		System should sort notegroups based on practitioner type
+28/06/2018	IN065341	Prakash C		29/06/2018		Ramesh G 		MMS-DM-CRF-0115
+05/06/2018	IN67872			Dinesh T		05/06/2018	Ramesh G		GHL-CRF-0497.1	
+18/12/2018   IN067236      	 Sivabagyam M	18/12/2018	Ramesh G	   ML-MMOH-CRF-1148
+20/11/2019	 IN071273		sivabagyam	 20/11/2019        Ramesh G       ML-MMOH-SCF-1353
+03/02/2020	 IN071561	SIVABAGYAM M		03/02/2020		RAMESH G		GHL-CRF-0558.1
+18/02/2021    14773	    Nijitha S		18/02/2021      Ramesh G   		    PMG2021-COMN-CRF-0003/PMG2021-COMN-CRF-0003.2
+03/03/2021    14906		Nijitha S		03/03/2021      Ramesh G   		    CA-PMG2021-COMN-CRF-0003/02-Clinical Note Widget
+20/07/2023	  24094	   Ranjith P R		21/07/2023		RAMESH G		ML-MMOH-CRF-1804
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+ 
+*/ 
+
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            _bw.write(_wl_block6Bytes, _wl_block6);
+
+		request.setCharacterEncoding("UTF-8");
+request= new XSSRequestWrapper(request); //MMS-ME-SCF-0097
+response.addHeader("X-XSS-Protection", "1; mode=block"); //MMS-ME-SCF-0079
+response.addHeader("X-Content-Type-Options", "nosniff"); //MMS-ME-SCF-0085
+		//String sStyle = (session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+		//[IN035950] Starts
+		//IN037701 Starts
+		String p_called_from = (request.getParameter("p_called_from") == null) ? "" : request.getParameter("p_called_from");
+		String called_from  = (request.getParameter("called_from") == null) ? "" : request.getParameter("called_from"); //37701
+		String p_notes_view = (request.getParameter("p_notes_view") == null) ? "" : request.getParameter("p_notes_view");
+		//IN037701 Ends
+			String sStyle =
+			(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+			
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+			//IN037701 Starts
+			if(!"CA_SPC".equals(p_called_from)){
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+
+			}
+			//IN037701 Ends
+			
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+			String prefStyleSheet = request.getParameter("prefStyle");//Nijitha
+			String content_ID = request.getParameter("content_ID");
+			String title = request.getParameter("title");
+			String sessionStyle = "";
+			if(!"".equals(prefStyleSheet)){
+			 sessionStyle=prefStyleSheet;
+			}
+			/*else{
+				sStyle=prefStyleSheet;
+			}*/
+			//[IN035950] Ends
+		java.util.Properties p = (java.util.Properties) session
+				.getValue("jdbc");
+		String locale = (String) p.getProperty("LOCALE");
+	
+            _bw.write(_wl_block10Bytes, _wl_block10);
+            out.print( String.valueOf(title));
+            _bw.write(_wl_block11Bytes, _wl_block11);
+            out.print( String.valueOf(sessionStyle));
+            _bw.write(_wl_block12Bytes, _wl_block12);
+
+	Connection con = null;
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
+
+	PreparedStatement pstmtcnt = null;
+	ResultSet rscnt = null;
+
+	PreparedStatement pstmtimglist = null;//IN037701
+	ResultSet rsimglist = null;//IN037701
+	String query_notes_detail = "";
+	StringBuffer query_string = new StringBuffer();
+	//StringBuffer whereClause = new StringBuffer();	//Checkstyle 4.0 Beta 6
+
+	String function_id = "";
+	String classValue = "";
+	String facility_id = "";
+	String accession_num = "";
+	String note_type = "";
+	String note_type_desc = "";
+	String note_group = "";
+	String appl_task_id = "";
+	String service_code = "";
+	String service_name = "";
+	String event_title_desc = "";
+	String event_date_time = "";
+	String modified_date = "";//24094
+	String performed_by_id = "";
+	String performed_by_name = "";
+	String authorized_by_name = "";
+	String status = "";
+	String status1 = "";
+	String tblrow_id = "";
+	String login_user_id = "";
+	String clinician_id = "";
+	String resp_id = "";
+	String operations_allowed = "";
+	String amendment_type = "";
+	String privilege_type = "";
+	String patient_id = "";
+	String encounter_id = "";
+	String episode_type = "";
+	String lower_limit = "";
+	String upper_limit = "";
+	String from_date_time = "";
+	String to_date_time = "";
+	String event_status = "";
+	String status_display_text = "";
+	String filter = "";
+	String strModifiedId = "";
+	String patient_class = "";
+	String other_unsigned_yn = "";
+	String doc_linked = "";
+	String doc_linked_note_yn = "";
+	String med_anc = "";
+	String contr_mod_accession_num = "";
+	String performed_by = "";
+	String ref_no = "";
+	String doc_ref_id = "";
+	String Encline = "";
+	String oldEncline = "";//IN037701
+	String speciality_code = "";
+	String res_encounter_id = "";
+	String eventClass="";
+	String event_class_desc ="";
+	String current_event_class_desc="";	
+	String practitioner_type =""; //IN061896
+	boolean isClinician=false;//IN067236
+	//int rowCnt = 0, maxRecordsDisp = 10;//IN037701
+	int maxRecordsDisp = 10;//IN037701
+	int startIndex = 0, endIndex = 0;
+	int totalRecordCount = 0, colIndex = 0;
+	int sec_count = 0;
+
+	patient_id = (request.getParameter("patient_id") == null) ? ""
+			: request.getParameter("patient_id");
+	//IN065341 starts
+	String bean_id = "ca_CentralizedBean" ;
+		String bean_name = "eCA.CentralizedBean";
+		CentralizedBean bean = (CentralizedBean)getBeanObject( bean_id, bean_name, request ) ;
+		bean.setLanguageId(localeName);
+		bean.clear() ;
+		bean.setFunctionId(bean.checkForNull(request.getParameter("function_id")));
+	String called_from_new=request.getParameter("called_from")==null?"":request.getParameter("called_from");
+	String RepDb=request.getParameter("RepDb")==null?"":request.getParameter("RepDb");
+	String clob_data=request.getParameter("clob_data")==null?"":request.getParameter("clob_data");
+	if(called_from_new.equals("CDR")){
+		encounter_id = request.getParameter("enc_id1")==null?"":request.getParameter("enc_id1");
+		patient_class = (request.getParameter("pat_class") == null) ? ""
+			: request.getParameter("pat_class");
+		facility_id = (request.getParameter("facility_id1") == null) ? ""
+			: request.getParameter("facility_id1");	
+	}else{//IN065341 ends
+	 	 encounter_id = request.getParameter("encounter_id") == null? ""
+			: request.getParameter("encounter_id");
+	 	 patient_class = (request.getParameter("patient_class") == null) ? ""
+			: request.getParameter("patient_class");
+		facility_id= (String) session.getValue("facility_id");	
+	}//IN065341
+	episode_type = (request.getParameter("episode_type") == null) ? ""
+			: request.getParameter("episode_type");
+	event_status = (request.getParameter("status") == null) ? "0"
+			: request.getParameter("status");
+	other_unsigned_yn = (request.getParameter("other_unsigned_yn") == null) ? "N"
+			: request.getParameter("other_unsigned_yn");
+	filter = (request.getParameter("filter") == null) ? "A" : request
+			.getParameter("filter");
+	function_id = (request.getParameter("function_id") == null) ? ""
+			: request.getParameter("function_id");
+	from_date_time = (request.getParameter("from_date_time") == null) ? ""
+			: request.getParameter("from_date_time");
+	to_date_time = (request.getParameter("to_date_time") == null) ? ""
+			: request.getParameter("to_date_time");
+	lower_limit = (request.getParameter("lower_limit") == null) ? "1"
+			: request.getParameter("lower_limit");
+	upper_limit = (request.getParameter("upper_limit") == null) ? ("" + maxRecordsDisp)
+			: request.getParameter("upper_limit");
+	note_type = (request.getParameter("note_type") == null) ? ""
+			: request.getParameter("note_type");
+	note_group = (request.getParameter("note_group") == null) ? ""
+			: request.getParameter("note_group");
+	appl_task_id = (request.getParameter("p_appl_task_id") == null) ? ""
+			: request.getParameter("p_appl_task_id");
+	performed_by = (request.getParameter("performed_by") == null) ? ""
+			: request.getParameter("performed_by");
+	med_anc = (request.getParameter("med_anc") == null) ? "" : request
+			.getParameter("med_anc");
+	contr_mod_accession_num = (request
+			.getParameter("contr_mod_accession_num") == null) ? ""
+			: request.getParameter("contr_mod_accession_num");
+	ref_no = (request.getParameter("ref_no") == null) ? "" : request
+			.getParameter("ref_no");
+	speciality_code = (request.getParameter("speciality_code") == null) ? ""
+			: request.getParameter("speciality_code");
+	//String option_id = (request.getParameter("option_id") == null) ? "" : request.getParameter("option_id");	//Checkstyle 4.0 Beta 6
+	//IN037701 Starts
+	String p_event_class_widget = (request.getParameter("p_event_class_widget") == null) ? "" : request.getParameter("p_event_class_widget");
+	String chart_encounter_id = (request.getParameter("chart_encounter_id") == null) ? "" : request.getParameter("chart_encounter_id");
+	//IN037701 Ends
+	query_string.append("patient_id=");
+	query_string.append(patient_id);
+	query_string.append("&encounter_id=");
+	query_string.append(encounter_id);
+	query_string.append("&episode_type=");
+	query_string.append(episode_type);
+	query_string.append("&function_id=");
+	query_string.append(function_id);
+	query_string.append("&from_date_time=");
+	query_string.append(from_date_time);
+	query_string.append("&to_date_time=");
+	query_string.append(to_date_time);
+	query_string.append("&appl_task_id=");
+	query_string.append(appl_task_id);
+	query_string.append("&patient_class=");
+	query_string.append(patient_class);
+	query_string.append("&filter=");
+	query_string.append(filter);
+	query_string.append("&status=");
+	query_string.append(event_status);
+	query_string.append("&other_unsigned_yn=");
+	query_string.append(other_unsigned_yn);
+	query_string.append("&med_anc=");
+	query_string.append(med_anc);
+	query_string.append("&performed_by=");
+	query_string.append(performed_by);
+	query_string.append("&ref_no=");
+	query_string.append(ref_no);
+	query_string.append("&speciality_code=");
+	query_string.append(speciality_code);
+
+	from_date_time = com.ehis.util.DateUtils.convertDate(
+			from_date_time, "DMYHM", locale, "en");
+	to_date_time = com.ehis.util.DateUtils.convertDate(to_date_time,
+			"DMYHM", locale, "en");
+
+	startIndex = Integer.parseInt(lower_limit);
+	endIndex = Integer.parseInt(upper_limit);
+    String noofencQry = "select no_enc_display from ca_chart_summ_content##REPDB## where content_id = ?";//PMG2021-COMN-CRF-0003
+	noofencQry=noofencQry.replaceAll("##REPDB##",RepDb);
+    String no_enc_display ="";//PMG2021-COMN-CRF-0003
+	try {
+		con = ConnectionManager.getConnection(request);
+		//PMG2021-COMN-CRF-0003 Starts
+		pstmt = con.prepareStatement(noofencQry);
+		pstmt.setString(1, content_ID);
+		rs = pstmt.executeQuery();
+		while (rs.next()) {
+			no_enc_display = rs.getString("no_enc_display")==null?"":rs.getString("no_enc_display");
+		}
+		if(null!=pstmt){
+		pstmt.close();
+		}
+		if(null!=rs){
+		rs.close();
+		}
+		//PMG2021-COMN-CRF-0003 Ends
+		isClinician = eCommon.Common.CommonBean.isSiteSpecific(con, "CA","CLINICIAN_TO_THERAPIST");//IN067236
+		boolean restrict_rd	=false;	//IN071561
+		restrict_rd =eCommon.Common.CommonBean.isSiteSpecific(con, "CA","RD_PEER_REVIEW_RESTRICT");//IN071561
+		login_user_id = (String) session.getValue("login_user");
+		//facility_id = (String) session.getValue("facility_id");commented for IN065341
+		resp_id = (String) session.getValue("responsibility_id");
+		clinician_id = (String) session.getValue("ca_practitioner_id");
+		practitioner_type = (String) session.getValue("practitioner_type"); //IN061896
+		//IN037701 Starts	
+		//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, b.note_type_desc,b.note_group_id, nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id , null Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note a, ca_note_type_lang_vw b where CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and 	a.patient_id = ? and 	a.facility_id =? ";
+		if(appl_task_id.equals("MEDICAL_CERTFICATE")){
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, b.note_type_desc, nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id,Decode(patient_class,'XT', 'Non-Encounter Specific', replace(CA_GET_VISIT_DTL_NEW(a.FACILITY_ID,a.patient_class,a.ENCOUNTER_ID,A.PATIENT_ID),'\''','  ')) Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note a, ca_note_type_lang_vw b  where CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and a.patient_id = ? and a.facility_id =?";
+			//PER0409 - start
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw where language_id=? and note_type = a.note_type), nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id,Decode(patient_class,'XT', 'Non-Encounter Specific', replace(CA_GET_VISIT_DTL_NEW(a.FACILITY_ID,a.patient_class,a.ENCOUNTER_ID,A.PATIENT_ID),'\''','  ')) Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note a, ca_note_type b  where CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and a.patient_id = ? and a.facility_id =?";//PER1203
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw ##REPDB## where language_id=? and note_type = a.note_type), nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE ##REPDB##(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp ##REPDB## where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id,Decode(patient_class,'XT', 'Non-Encounter Specific', replace(CA_GET_VISIT_DTL_NEW(a.FACILITY_ID,a.patient_class,a.ENCOUNTER_ID,A.PATIENT_ID),'\''','  ')) Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note##CLOB## a, ca_note_type ##REPDB## b,pr_encounter ##REPDB## c  where CA_GET_APPL_NOTE_OPERN ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and a.encounter_id = c.encounter_id  and a.facility_id = c.facility_id and a.patient_id = ? and a.facility_id =?";//IN065341
+			query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw ##REPDB## where language_id=? and note_type = a.note_type), nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE ##REPDB##(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp ##REPDB## where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id,Decode(patient_class,'XT', 'Non-Encounter Specific', replace(CA_GET_VISIT_DTL_NEW(a.FACILITY_ID,a.patient_class,a.ENCOUNTER_ID,A.PATIENT_ID),'\''','  ')) Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc, to_char(a.modified_date,'dd/mm/yyyy hh24:mi') modified_date1 from 	ca_encntr_note##CLOB## a, ca_note_type ##REPDB## b,pr_encounter ##REPDB## c  where CA_GET_APPL_NOTE_OPERN ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and a.encounter_id = c.encounter_id  and a.facility_id = c.facility_id and a.patient_id = ? and a.facility_id =?";//IN065341 //24094
+
+    
+		}
+		else{
+			//PER0409 - start
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, b.note_type_desc,b.note_group_id, nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, /*replace(e.practitioner_name,'''',' ')*/ replace(AM_GET_DESC.AM_PRACTITIONER(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id , null Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note a, ca_note_type_lang_vw b where CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and 	a.patient_id = ? and 	a.facility_id =? ";
+			
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw  where language_id=? and note_type = a.note_type) note_type_desc ,b.note_group_id, nvl2(a.EXT_IMAGE_APPL_ID,'Y','N') doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, replace(AM_GET_DESC.AM_PRACTITIONER(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id , null Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from 	ca_encntr_note a, ca_note_type b where CA_GET_APPL_NOTE_OPERN( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type and 	a.patient_id = ? and 	a.facility_id =? ";	
+			//query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw ##REPDB## where language_id=? and note_type = a.note_type) note_type_desc ,b.note_group_id, to_char(nvl2(a.EXT_IMAGE_APPL_ID,'Y','N')) doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE ##REPDB##(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN##REPDB## ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp ##REPDB## where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id , null Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc from ca_encntr_note##CLOB## a, ca_note_type ##REPDB## b, pr_encounter ##REPDB## c where CA_GET_APPL_NOTE_OPERN##REPDB##( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type  and a.encounter_id = c.encounter_id  and a.facility_id = c.facility_id and 	a.patient_id = ? and 	a.facility_id =? ";	//IN065341 
+			query_notes_detail = "select A.EVENT_CLASS,a.facility_id, a.accession_num, a.note_type, (select note_type_desc from ca_note_type_lang_vw ##REPDB## where language_id=? and note_type = a.note_type) note_type_desc ,b.note_group_id, to_char(nvl2(a.EXT_IMAGE_APPL_ID,'Y','N')) doc_linked, b.doc_linked_note_yn , a.service_code, AM_GET_DESC.AM_SERVICE ##REPDB##(a.service_code,?,'2')  service_name, event_title_desc, to_char(a.event_date_time,'dd/mm/yyyy hh24:mi') event_date_time1, a.performed_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.performed_by_id,?,'1') ,'''',' ') performed_by_name, a.authorized_by_id, replace(AM_GET_DESC.AM_PRACTITIONER ##REPDB##(a.authorized_by_id,?,'1') ,'''',' ')   authorized_by_name, a.note_content, a.event_status status, CA_GET_APPL_NOTE_OPERN##REPDB## ( a.facility_id, a.accession_num, ?, ?, a.note_type, ? ,?)  operations_allowed, b.ammendment_type, ( select PRIVILEGE_TYPE from ca_note_type_for_resp ##REPDB## where RESP_ID = ? and note_type=a.note_type) privilege_type,A.MODIFIED_BY_ID modifiedid, a.DOC_REF_ID doc_ref_id , null Encline,a.encounter_id,decode(a.event_class,'PHY$','Physician Notes','CLI$','Clinician Notes','NUR$','Nursing Notes') event_class_desc, to_char(a.modified_date,'dd/mm/yyyy hh24:mi') modified_date1 from ca_encntr_note##CLOB## a, ca_note_type ##REPDB## b, pr_encounter ##REPDB## c where CA_GET_APPL_NOTE_OPERN##REPDB##( a.facility_id, a.accession_num, ?, ?, a.note_type, ? , ?)  is not null and  a.note_type = b.note_type  and a.encounter_id = c.encounter_id  and a.facility_id = c.facility_id and 	a.patient_id = ? and 	a.facility_id =? ";	//IN065341 //24094
+			//PER0409 - end
+		}
+		//IN037701 Ends
+		
+		
+		//PER0409 - commented below query
+		//IN042552 Start.
+		//query_notes_detail = query_notes_detail + " and nvl(ca_view_confidnt_event (a.facility_id,a.ENCOUNTER_ID,a.PATIENT_ID,a.accession_num,'CA',a.NOTE_TYPE,'CLNT','"+clinician_id+"','"+resp_id+"',a.PERFORMED_BY_ID,a.AUTHORIZED_BY_ID,null),'N')='Y'";
+		//IN042552 End.
+		
+		//EMR1512, starts
+		if(!encounter_id.equals(""))
+		{
+			//query_notes_detail = query_notes_detail + " and a.encounter_id = NVL(?,0) ";		//PER0409
+			query_notes_detail = query_notes_detail + " and a.encounter_id = ? ";				//PER0409
+		}
+		//EMR1512, ends
+		
+		//PER0409 - moved from above
+		//query_notes_detail = query_notes_detail + " and nvl(ca_view_confidnt_event (a.facility_id,a.ENCOUNTER_ID,a.PATIENT_ID,a.accession_num,'CA',a.NOTE_TYPE,'CLNT',?,?,a.PERFORMED_BY_ID,a.AUTHORIZED_BY_ID,null),'N')='Y'";commented for IN065341
+		query_notes_detail = query_notes_detail + " and nvl(ca_view_confidnt_event##REPDB## (a.facility_id,a.ENCOUNTER_ID,a.PATIENT_ID,a.accession_num,'CA',a.NOTE_TYPE,'CLNT',?,?,a.PERFORMED_BY_ID,a.AUTHORIZED_BY_ID,null),'N')='Y'";//IN065341
+		//PER0409 - end
+		//IN071561 starts
+		if(restrict_rd)
+			query_notes_detail = query_notes_detail +" AND RD_PEER_NOTE_RESULT_HIDE_YN(a.facility_id,a.CONTR_MOD_ACCESSION_NUM,'"+login_user_id+"')='N' ";
+		   //IN071561 ends
+		//[IN035916]	Start.
+				
+			//query_notes_detail = query_notes_detail +"and 	b.NOTE_GROUP_ID IN (SELECT 	NOTE_GROUP FROM CA_NOTE_GROUP WHERE APPL_TASK_ID=?)  ";
+			query_notes_detail = query_notes_detail +"and 	b.NOTE_GROUP_ID IN (SELECT 	NOTE_GROUP FROM CA_NOTE_GROUP ##REPDB## WHERE APPL_TASK_ID=?)  ";//IN065341
+		
+		//PER0409 - start
+		//[IN035916]	End.
+		//PER0409 - start
+		//query_notes_detail = query_notes_detail + " and b.language_id = ?  &&APPL_TASK_FILTER and a.event_status NOT IN('9') order by event_class_desc,event_date_time DESC";
+		if(!"".equals(p_event_class_widget) && null!=p_event_class_widget)//IN037701 Starts
+		{
+			query_notes_detail = query_notes_detail + " and a.event_class=? " ;
+		}
+		//IN061896 start
+		//query_notes_detail = query_notes_detail + " and a.event_status NOT IN('9') order by event_class_desc,event_date_time DESC";
+		if("MD".equals(practitioner_type))
+		{
+			//query_notes_detail	=	query_notes_detail	+	"and a.event_status NOT IN('9') ORDER BY (case when event_class = 'PHY$' then 1 when event_class = 'CLI$' then 2 when event_class = 'NUR$' then 3 else 4 end), event_date_time DESC";//IN67872
+			query_notes_detail	=	query_notes_detail	+	"and a.event_status NOT IN('9','8') &&EVENTDATEFILTER ORDER BY (case when event_class = 'PHY$' then 1 when event_class = 'CLI$' then 2 when event_class = 'NUR$' then 3 else 4 end), event_date_time DESC";//IN67872//PMG2021-COMN-CRF-0003
+		}
+		else if("NS".equals(practitioner_type))
+		{
+			//query_notes_detail	=	query_notes_detail	+	"and a.event_status NOT IN('9') ORDER BY (case when event_class = 'NUR$' then 1 when event_class = 'CLI$' then 2 when event_class = 'PHY$' then 3 else 4 end), event_date_time DESC";//IN67872
+			query_notes_detail	=	query_notes_detail	+	"and a.event_status NOT IN('9','8') &&EVENTDATEFILTER  ORDER BY (case when event_class = 'NUR$' then 1 when event_class = 'CLI$' then 2 when event_class = 'PHY$' then 3 else 4 end), event_date_time DESC";//IN67872//PMG2021-COMN-CRF-0003
+		}
+		else
+		{
+			//query_notes_detail = query_notes_detail + " and a.event_status NOT IN('9') order by event_class_desc,event_date_time DESC";//IN67872
+			query_notes_detail = query_notes_detail + " and a.event_status NOT IN('9','8')  &&EVENTDATEFILTER order by event_class_desc,event_date_time DESC";//IN67872//PMG2021-COMN-CRF-0003
+		}
+		
+		//IN061896 end
+		
+		//if(!"".equals(p_event_class_widget) && null!=p_event_class_widget)//IN037701 Starts
+		//{
+		//	query_notes_detail = query_notes_detail.replace("&&APPL_TASK_FILTER","and a.event_class=?");
+		//}
+		//else
+		//{
+		//query_notes_detail = query_notes_detail.replace("&&APPL_TASK_FILTER","");
+		//}
+		//PER0409 - end
+		//PMG2021-COMN-CRF-0003 Starts
+				if(!"".equals(no_enc_display) && !"0".equals(no_enc_display)){
+					query_notes_detail = query_notes_detail.replace("&&EVENTDATEFILTER"," AND TO_DATE (a.modified_date, 'dd/mm/yyyy') BETWEEN TO_DATE (nvl(C.DISCHARGE_DATE_TIME,SYSDATE)-?, 'dd/mm/yyyy')  and  TO_DATE (nvl(C.DISCHARGE_DATE_TIME,SYSDATE), 'dd/mm/yyyy')  ");//14906
+					//query_notes_detail = query_notes_detail.replace("&&EVENTDATEFILTER","  AND TO_DATE (a.event_date_time, 'dd/mm/yyyy') between to_date(nvl((SYSDATE-?),'01/01/1000'),'dd/mm/yyyy') and  to_date(nvl((SYSDATE),'31/12/9999'),'dd/mm/yyyy')+.999    ");//14906
+				}else{
+					query_notes_detail = query_notes_detail.replace("&&EVENTDATEFILTER","  ");
+				}
+				//PMG2021-COMN-CRF-0003 Ends
+		//IN065341 starts
+		if(called_from_new.equals("CDR")){
+			bean.executeCDR(con,patient_id,encounter_id,RepDb,"CA_ENCNTR_NOTE");
+		}
+		//pstmt = con.prepareStatement(query_notes_detail.toString(),ResultSet.TYPE_SCROLL_INSENSITIVE,	ResultSet.CONCUR_READ_ONLY);
+				
+		String result = query_notes_detail.toString();
+
+		result=result.replaceAll("##CLOB##",clob_data);
+		result=result.replaceAll("##REPDB##",RepDb);
+		pstmt = con.prepareStatement(result,ResultSet.TYPE_SCROLL_INSENSITIVE,	ResultSet.CONCUR_READ_ONLY);
+		//IN065341 ends
+				
+		pstmt.setString(++colIndex, locale);		//PER0409
+		pstmt.setString(++colIndex, locale);
+		pstmt.setString(++colIndex, locale);
+		pstmt.setString(++colIndex, locale);
+		pstmt.setString(++colIndex, resp_id);
+		pstmt.setString(++colIndex, clinician_id);
+		pstmt.setString(++colIndex, login_user_id);
+		pstmt.setString(++colIndex, other_unsigned_yn);
+
+		pstmt.setString(++colIndex, resp_id);
+		pstmt.setString(++colIndex, resp_id);
+		pstmt.setString(++colIndex, clinician_id);
+		pstmt.setString(++colIndex, login_user_id);
+		pstmt.setString(++colIndex, other_unsigned_yn);
+		//	pstmt.setString( ++colIndex,	locale			);
+		pstmt.setString(++colIndex, patient_id);
+		//IN037701 Starts
+		/*if (!(appl_task_id.equals("MEDICAL_CERTFICATE"))
+				&& !(appl_task_id.equals("MC_CONSULT"))) {IN037701*/
+		if (!(appl_task_id.equals("MC_CONSULT"))) {
+			pstmt.setString(++colIndex, facility_id);
+			//EMR1512, starts
+			if(!encounter_id.equals(""))
+			{
+				pstmt.setString(++colIndex, encounter_id);
+			}
+			//EMR1512, ends
+		}
+		//PER0409-start
+		pstmt.setString(++colIndex, clinician_id);
+		pstmt.setString(++colIndex, resp_id);		
+		//PER0409-end
+		//pstmt.setString(++colIndex, "CLINICAL_NOTES");
+		if("CA_SPC".equals(p_called_from) && "MEDICAL_CERTFICATE".equals(appl_task_id))
+		{
+			pstmt.setString(++colIndex, "MEDICAL_CERTFICATE");
+		}
+		else
+		{
+			pstmt.setString(++colIndex, "CLINICAL_NOTES");
+		}
+		//IN037701 Ends
+		//pstmt.setString(++colIndex, locale);//PER0409
+		
+		if (!(from_date_time.equals("")))
+			pstmt.setString(++colIndex, from_date_time);
+
+		if (!(to_date_time.equals(""))) {
+			pstmt.setString(++colIndex, to_date_time);
+		}
+		if (!(event_status.equals("0"))) {
+
+			pstmt.setString(++colIndex, event_status);
+		}
+		if (!(contr_mod_accession_num.equals(""))) {
+
+			pstmt.setString(++colIndex, contr_mod_accession_num);
+		}
+		if ((filter.equals("R"))) {
+
+			pstmt.setString(++colIndex, clinician_id);
+
+		} else if ((filter.equals("S"))) {
+			pstmt.setString(++colIndex, clinician_id);
+
+		}
+
+		if (!note_type.equals("")) {
+
+			pstmt.setString(++colIndex, note_type);
+
+		}
+	
+		if (!performed_by.equals("")) {
+
+			pstmt.setString(++colIndex, performed_by);
+		}
+
+		if (!med_anc.equals("")) {
+
+			pstmt.setString(++colIndex, med_anc);
+		}
+		//IN037701 Starts
+		if(!"".equals(p_event_class_widget) && null!=p_event_class_widget)
+		{
+			pstmt.setString(++colIndex, p_event_class_widget);
+		}
+		//IN037701 Ends
+		//PMG2021-COMN-CRF-0003 Starts
+		if(!"".equals(no_enc_display) && !"0".equals(no_enc_display)){
+			pstmt.setInt(++colIndex, Integer.parseInt(no_enc_display));
+		}
+		//PMG2021-COMN-CRF-0003 Ends
+		rs = pstmt.executeQuery();
+		
+		if (!(rs.next())) {
+			out.println("<table class='grid' width='100%' cellspacing='0' cellpadding='0'><tr><td class='gridData'>"+com.ehis.util.BundleMessage.getBundleMessage(pageContext,"eCA.NODATAFOUND.label","ca_labels")+"</td></tr>");
+
+            _bw.write(_wl_block13Bytes, _wl_block13);
+
+			} else {
+					rs.last();
+					totalRecordCount = rs.getRow();
+					rs.beforeFirst();
+					
+					if (totalRecordCount > maxRecordsDisp) {
+		
+            _bw.write(_wl_block14Bytes, _wl_block14);
+
+		}
+	
+            _bw.write(_wl_block15Bytes, _wl_block15);
+ /* 	<tr>
+				<td class='columnheadercenter<%=content_ID
+            _bw.write(_wl_block16Bytes, _wl_block16);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block17Bytes, _wl_block17);
+
+            if (_jsp__tag0(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block18Bytes, _wl_block18);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block19Bytes, _wl_block19);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block20Bytes, _wl_block20);
+
+		/* if (startIndex > 1)
+					rs.absolute((startIndex - 1)); */
+
+				//String countQuerySec = "select count(*) count  from ca_note_section_view where note_type = ? ";
+				String countQuerySec = "select count(*) count  from ca_note_section_view##REPDB## where note_type = ? ";//IN065341
+				countQuerySec=countQuerySec.replaceAll("##REPDB##",RepDb);//IN065341
+				pstmtcnt = con.prepareStatement(countQuerySec);
+			
+			
+            _bw.write(_wl_block21Bytes, _wl_block21);
+if("CA_SPC".equals(p_called_from) && "S".equals(p_notes_view)){
+            _bw.write(_wl_block22Bytes, _wl_block22);
+
+            if (_jsp__tag1(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag2(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag3(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block24Bytes, _wl_block24);
+
+            if (_jsp__tag4(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag5(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag6(request, response, pageContext, _activeTag, null))
+             return;
+
+            if (_jsp__tag7(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag8(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block23Bytes, _wl_block23);
+
+            if (_jsp__tag9(request, response, pageContext, _activeTag, null))
+             return;
+            _bw.write(_wl_block25Bytes, _wl_block25);
+}
+			//IN037701 Ends
+				while (rs.next()) {
+					tblrow_id = "tblrow_id" + (rowCnt);
+
+					rowCnt++;
+
+					if ((rowCnt % 2) == 0)
+						classValue = "QRYEVEN";
+					else
+						classValue = "QRYODD";
+
+					facility_id = rs.getString("facility_id") == null ? ""
+							: rs.getString("facility_id");
+					accession_num = rs.getString("accession_num") == null ? ""
+							: rs.getString("accession_num");
+					note_type = rs.getString("note_type") == null ? "" : rs
+							.getString("note_type");
+					note_type_desc = rs.getString("note_type_desc") == null ? ""
+							: rs.getString("note_type_desc");
+					service_code = rs.getString("service_code") == null ? ""
+							: rs.getString("service_code");
+					service_name = rs.getString("service_name") == null ? ""
+							: rs.getString("service_name");
+					service_name = service_name.replace('\'', ' ');
+					event_title_desc = rs.getString("event_title_desc") == null ? "&nbsp;"
+							: rs.getString("event_title_desc");
+					event_date_time = rs.getString("event_date_time1") == null ? ""
+							: rs.getString("event_date_time1");
+					modified_date = rs.getString("modified_date1") == null ? ""//24094
+							: rs.getString("modified_date1");////24094
+					performed_by_id = rs.getString("performed_by_id") == null ? ""
+							: rs.getString("performed_by_id");
+					performed_by_name = rs.getString("performed_by_name") == null ? ""
+							: rs.getString("performed_by_name");
+					authorized_by_name = rs.getString("authorized_by_name") == null ? ""
+							: rs.getString("authorized_by_name");
+					doc_ref_id = rs.getString("doc_ref_id") == null ? ""
+							: rs.getString("doc_ref_id");
+					if (appl_task_id.equals("MEDICAL_CERTFICATE")) {//IN037701
+						Encline = rs.getString("Encline") == null ? "" : rs
+								.getString("Encline");
+					}
+					//status						=			rs.getString("status")==null?"&nbsp;":rs.getString("status");
+					status1 = rs.getString("status") == null ? "&nbsp;"
+							: rs.getString("status");
+					operations_allowed = rs.getString("operations_allowed") == null ? ""
+							: rs.getString("operations_allowed");
+					amendment_type = rs.getString("ammendment_type") == null ? ""
+							: rs.getString("ammendment_type");
+					privilege_type = rs.getString("privilege_type") == null ? ""
+							: rs.getString("privilege_type");
+					strModifiedId = rs.getString("modifiedid") == null ? ""
+							: rs.getString("modifiedid");
+					doc_linked_note_yn = rs.getString("doc_linked_note_yn") == null ? "N"
+							: rs.getString("doc_linked_note_yn");
+					doc_linked = rs.getString("doc_linked") == null ? "N"
+							: rs.getString("doc_linked");
+					res_encounter_id = rs.getString("encounter_id") == null ? "0"
+							: rs.getString("encounter_id");
+					event_date_time = com.ehis.util.DateUtils.convertDate(
+							event_date_time, "DMYHM", "en", locale);
+					modified_date = com.ehis.util.DateUtils.convertDate(
+							modified_date, "DMYHM", "en", locale);//24094
+					
+					
+					eventClass = rs.getString("EVENT_CLASS") == null ? "0"
+							: rs.getString("EVENT_CLASS");
+					
+					
+					event_class_desc = rs.getString("event_class_desc") == null ? "0"
+							:rs.getString("event_class_desc");
+					//IN037701 Starts
+					java.sql.Clob note_content = (java.sql.Clob) rs.getObject("note_content");
+					
+					java.io.Reader			content_reader		= null;
+					java.io.BufferedReader	bf_content_reader	= null;
+					String	notes_content		=	"";
+					if(note_content != null)
+					{
+						try
+						{
+							content_reader	= note_content.getCharacterStream();
+							bf_content_reader = new java.io.BufferedReader(content_reader);
+							char[] arr_notes_content = new char[(int)note_content.length()];
+							bf_content_reader.read(arr_notes_content,0,(int)note_content.length());
+							notes_content = new String(arr_notes_content);
+							bf_content_reader.close();
+						}
+						catch(Exception e)
+						{
+							out.println("Exception@2-readCLOB : "+e);
+						}
+						if(!"CA_SPC".equals(p_called_from))//IN037701
+						{
+							if(!notes_content.equals(""))
+							{
+								int nIndex	= notes_content.indexOf("<BODY>");
+								int nIndex1 = notes_content.lastIndexOf("</BODY>");
+								
+								if(nIndex != -1 && nIndex1 != -1){
+									notes_content = notes_content.substring(nIndex+6,nIndex1);
+									int nIndex2 = notes_content.indexOf("<br>");
+									notes_content = notes_content.substring(nIndex2+4);
+								}
+							}
+						}
+					}	
+					//IN037701 Ends				
+					if (doc_linked_note_yn.equals("Y")) {
+						pstmtcnt.clearParameters();
+						pstmtcnt.setString(1, note_type);
+						rscnt = pstmtcnt.executeQuery();
+
+						while (rscnt.next()) {
+							sec_count = rscnt.getInt("count");
+						}
+
+						if (rscnt != null)
+							rscnt.close();
+					}
+
+					if (status1.equals("1"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.InProgress.label",
+										"common_labels");
+					else if (status1.equals("2"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.Transcribed.label",
+										"common_labels");
+					else if (status1.equals("3"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.Unauthorized.label",
+										"common_labels");
+					else if (status1.equals("4"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.Authorized.label",
+										"common_labels");
+					else if (status1.equals("5"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.Modified.label",
+										"common_labels");
+					else if (status1.equals("9"))
+						status = com.ehis.util.BundleMessage
+								.getBundleMessage(pageContext,
+										"Common.InError.label",
+										"common_labels");
+
+					String img = "";
+
+					if (doc_linked.equals("Y")) {
+						img = "<img src='../../eCA/images/DOCUL.gif' onClick='openDocWindow(\""
+								+ accession_num
+								+ "\",\""
+								+ note_type
+								+ "\")' height='20' title='View Linked File' >";						
+						//IN037701 Starts
+						if("CA_SPC".equals(p_called_from)){		
+						//IN065341 starts
+							//pstmtimglist = con.prepareStatement("SELECT FILE_SEQ_NO,OBJTYPE FROM CR_ENCOUNTER_DETAIL_OBJ where ACCESSION_NUM = ? and CONTR_SYS_EVENT_CODE = ?");
+							String sql="SELECT FILE_SEQ_NO,OBJTYPE FROM CR_ENCOUNTER_DETAIL_OBJ##REPDB## where ACCESSION_NUM = ? and CONTR_SYS_EVENT_CODE = ?";
+							sql=sql.replaceAll("##REPDB##",RepDb);
+							pstmtimglist=con.prepareStatement(sql);
+						//IN065341 ends
+							pstmtimglist.setString(1,accession_num);
+							pstmtimglist.setString(2,note_type);
+							rsimglist = pstmtimglist.executeQuery();
+							
+							while (rsimglist.next()) {
+								String[] objArray =((String)rsimglist.getString("OBJTYPE")).split("\\/"); //IN049722
+								if("image".equals(objArray[0])){ //IN049722
+									img=img+("<img src='../../servlet/eCA.DisplayImagesDetailsServlet?accessionnum="+accession_num+"&contr_sys_event_code="+note_type+"&file_seq_no="+(String)rsimglist.getString("FILE_SEQ_NO")+"' width='500' height='300'><br>");												
+								}//IN049722
+							}
+						}
+						//IN037701 Ends						
+					}else
+						img = "&nbsp;";
+
+					if (status1.equals("9")) {
+						status_display_text = "<a class='gridLink' href=\"javascript:showNoteStatus('"
+								+ accession_num
+								+ "',"
+								+ tblrow_id
+								+ ")\">"
+								+ status
+								+ "</a>&nbsp;&nbsp;<a class='gridLink' href=\"javascript:showErrorRemarks('"
+								+ accession_num
+								+ "','"
+								+ facility_id
+								+ "')\" style='color:red'><b>?</b></a>";
+					} else 
+					{
+						status_display_text = "<a class='gridLink' href=\"javascript:showNoteStatus('"
+								+ accession_num
+								+ "',"
+								+ tblrow_id
+								+ ")\">"
+								+ status + "</a>";
+					}
+				//IN037701 Starts					
+		  		if(!"CA_SPC".equals(p_called_from))
+				{
+					if(!current_event_class_desc.trim().equalsIgnoreCase(event_class_desc.trim()))
+					{
+						if(sStyle.equals(prefStyleSheet) ){
+            _bw.write(_wl_block26Bytes, _wl_block26);
+if(isClinician && eventClass.equals("CLI$")){
+            _bw.write(_wl_block27Bytes, _wl_block27);
+}else{ 
+            _bw.write(_wl_block28Bytes, _wl_block28);
+            out.print( String.valueOf(event_class_desc));
+            _bw.write(_wl_block29Bytes, _wl_block29);
+} 
+            _bw.write(_wl_block30Bytes, _wl_block30);
+
+						}
+						else
+						{
+						
+            _bw.write(_wl_block31Bytes, _wl_block31);
+if(isClinician && eventClass.equals("CLI$")){
+            _bw.write(_wl_block32Bytes, _wl_block32);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block33Bytes, _wl_block33);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block34Bytes, _wl_block34);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block34Bytes, _wl_block34);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block35Bytes, _wl_block35);
+}else{ 
+            _bw.write(_wl_block36Bytes, _wl_block36);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block37Bytes, _wl_block37);
+            out.print( String.valueOf(event_class_desc));
+            _bw.write(_wl_block38Bytes, _wl_block38);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block34Bytes, _wl_block34);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block34Bytes, _wl_block34);
+            out.print( String.valueOf(content_ID));
+            _bw.write(_wl_block39Bytes, _wl_block39);
+} 
+            _bw.write(_wl_block40Bytes, _wl_block40);
+
+						}
+					current_event_class_desc =event_class_desc;
+					}
+					 
+            _bw.write(_wl_block41Bytes, _wl_block41);
+            out.print( String.valueOf(note_type_desc));
+            _bw.write(_wl_block42Bytes, _wl_block42);
+            out.print( String.valueOf(accession_num ));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(appl_task_id));
+            _bw.write(_wl_block44Bytes, _wl_block44);
+            out.print( String.valueOf(res_encounter_id));
+            _bw.write(_wl_block44Bytes, _wl_block44);
+            out.print( String.valueOf(status));
+            _bw.write(_wl_block45Bytes, _wl_block45);
+ if(status1.equals("5")){  
+            _bw.write(_wl_block46Bytes, _wl_block46);
+            out.print( String.valueOf(modified_date ));
+            _bw.write(_wl_block47Bytes, _wl_block47);
+} else {
+            _bw.write(_wl_block48Bytes, _wl_block48);
+            out.print( String.valueOf(""));
+            _bw.write(_wl_block49Bytes, _wl_block49);
+ } 
+            _bw.write(_wl_block50Bytes, _wl_block50);
+            out.print( String.valueOf(accession_num ));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(appl_task_id));
+            _bw.write(_wl_block44Bytes, _wl_block44);
+            out.print( String.valueOf(res_encounter_id));
+            _bw.write(_wl_block44Bytes, _wl_block44);
+            out.print( String.valueOf(status));
+            _bw.write(_wl_block44Bytes, _wl_block44);
+            out.print( String.valueOf(RepDb));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(clob_data));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(patient_id));
+            _bw.write(_wl_block51Bytes, _wl_block51);
+            out.print( String.valueOf(img));
+            _bw.write(_wl_block52Bytes, _wl_block52);
+            out.print( String.valueOf(event_date_time));
+            _bw.write(_wl_block53Bytes, _wl_block53);
+
+				}
+				else if("CA_SPC".equals(p_called_from) && "S".equals(p_notes_view))
+				{
+				
+            _bw.write(_wl_block54Bytes, _wl_block54);
+
+				if(appl_task_id.equals("MEDICAL_CERTFICATE")){
+					if(!Encline.equals(oldEncline)){
+            _bw.write(_wl_block55Bytes, _wl_block55);
+            out.print( String.valueOf(Encline));
+            _bw.write(_wl_block56Bytes, _wl_block56);
+ }
+				}
+            _bw.write(_wl_block57Bytes, _wl_block57);
+            out.print( String.valueOf(tblrow_id));
+            _bw.write(_wl_block58Bytes, _wl_block58);
+            out.print( String.valueOf(event_date_time));
+            _bw.write(_wl_block59Bytes, _wl_block59);
+
+					if(doc_linked_note_yn.equals("Y") && sec_count == 0)
+					{
+					
+            _bw.write(_wl_block60Bytes, _wl_block60);
+            out.print( String.valueOf(rowCnt));
+            _bw.write(_wl_block61Bytes, _wl_block61);
+            out.print( String.valueOf(rowCnt));
+            _bw.write(_wl_block62Bytes, _wl_block62);
+            out.print( String.valueOf(facility_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(note_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(accession_num));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(performed_by_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(operations_allowed));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(amendment_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(privilege_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(service_code));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(authorized_by_name));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(strModifiedId));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(doc_linked_note_yn));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(patient_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(encounter_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(episode_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(function_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(from_date_time));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(to_date_time));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(appl_task_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(note_group));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(patient_class));
+            _bw.write(_wl_block63Bytes, _wl_block63);
+            out.print( String.valueOf(rowCnt));
+            _bw.write(_wl_block64Bytes, _wl_block64);
+            out.print( String.valueOf((status1.equals("5")?"<i>":"") + note_type_desc + (status1.equals("5")?"</i>":"")));
+            _bw.write(_wl_block65Bytes, _wl_block65);
+            out.print( String.valueOf(rowCnt));
+            _bw.write(_wl_block66Bytes, _wl_block66);
+
+					}else{
+						//IN037701 Starts
+						if("PRINTPREVIEW".equals(called_from))
+						{
+            _bw.write(_wl_block67Bytes, _wl_block67);
+            out.print( String.valueOf(note_type_desc));
+            _bw.write(_wl_block68Bytes, _wl_block68);
+}
+						else if(!chart_encounter_id.equals(encounter_id)){
+						
+            _bw.write(_wl_block67Bytes, _wl_block67);
+            out.print( String.valueOf(note_type_desc));
+            _bw.write(_wl_block68Bytes, _wl_block68);
+	
+						}
+						else{
+					
+            _bw.write(_wl_block69Bytes, _wl_block69);
+            out.print( String.valueOf(facility_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(note_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(accession_num));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(performed_by_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(operations_allowed));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(amendment_type));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(privilege_type));
+            _bw.write(_wl_block70Bytes, _wl_block70);
+            out.print( String.valueOf(tblrow_id));
+            _bw.write(_wl_block71Bytes, _wl_block71);
+            out.print( String.valueOf(service_code));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(authorized_by_name));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(strModifiedId));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(doc_linked_note_yn));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(sec_count));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(speciality_code));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(res_encounter_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(status));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(status1));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(appl_task_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(function_id));
+            _bw.write(_wl_block43Bytes, _wl_block43);
+            out.print( String.valueOf(p_called_from));
+            _bw.write(_wl_block72Bytes, _wl_block72);
+            out.print( String.valueOf((status1.equals("5")?"<i>":"") + note_type_desc + (status1.equals("5")?"</i>":"")));
+            _bw.write(_wl_block73Bytes, _wl_block73);
+}//IN037701 Ends
+					
+					}
+					
+            _bw.write(_wl_block74Bytes, _wl_block74);
+            out.print( String.valueOf(doc_ref_id));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(img));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(service_name));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(event_title_desc));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(performed_by_name));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf((authorized_by_name == null || authorized_by_name.equals("") )?"&nbsp;":authorized_by_name));
+            _bw.write(_wl_block75Bytes, _wl_block75);
+            out.print( String.valueOf(status_display_text));
+            _bw.write(_wl_block76Bytes, _wl_block76);
+}
+				else
+				{
+					
+            _bw.write(_wl_block77Bytes, _wl_block77);
+            out.print( String.valueOf(notes_content));
+            _bw.write(_wl_block78Bytes, _wl_block78);
+            out.print( String.valueOf(img));
+            _bw.write(_wl_block79Bytes, _wl_block79);
+		}
+			}
+		}
+				//IN037701 Ends
+				if (rscnt != null)
+					rscnt.close();
+				if (pstmtcnt != null)
+					pstmtcnt.close();
+				if (rs != null)
+					rs.close();
+				if (pstmt != null)
+					pstmt.close();
+
+			} catch (Exception e) {
+				out.println("Exception@1 : " + e);
+				e.printStackTrace();
+			} finally {
+				if (con != null)
+					ConnectionManager.returnConnection(con, request);
+			}
+		
+            _bw.write(_wl_block80Bytes, _wl_block80);
+            out.print( String.valueOf(query_string.toString()));
+            _bw.write(_wl_block81Bytes, _wl_block81);
+            out.print( String.valueOf(request.getQueryString()));
+            _bw.write(_wl_block82Bytes, _wl_block82);
+            out.print( String.valueOf(p_called_from));
+            _bw.write(_wl_block83Bytes, _wl_block83);
+            out.print( String.valueOf(p_notes_view));
+            _bw.write(_wl_block84Bytes, _wl_block84);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+
+    private boolean _jsp__tag0(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag0 = null ;
+        int __result__tag0 = 0 ;
+
+        if (__tag0 == null ){
+            __tag0 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag0);
+        }
+        __tag0.setPageContext(pageContext);
+        __tag0.setParent(null);
+        __tag0.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.NoteType.label", java.lang.String .class,"key"));
+        __tag0.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag0;
+        __result__tag0 = __tag0.doStartTag();
+
+        if (__result__tag0!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag0== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag0.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag0);
+            return true;
+        }
+        _activeTag=__tag0.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag0);
+        __tag0.release();
+        return false;
+    }
+
+    private boolean _jsp__tag1(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag1 = null ;
+        int __result__tag1 = 0 ;
+
+        if (__tag1 == null ){
+            __tag1 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag1);
+        }
+        __tag1.setPageContext(pageContext);
+        __tag1.setParent(null);
+        __tag1.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.datetime.label", java.lang.String .class,"key"));
+        __tag1.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag1;
+        __result__tag1 = __tag1.doStartTag();
+
+        if (__result__tag1!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag1== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag1.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag1);
+            return true;
+        }
+        _activeTag=__tag1.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag1);
+        __tag1.release();
+        return false;
+    }
+
+    private boolean _jsp__tag2(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag2 = null ;
+        int __result__tag2 = 0 ;
+
+        if (__tag2 == null ){
+            __tag2 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag2);
+        }
+        __tag2.setPageContext(pageContext);
+        __tag2.setParent(null);
+        __tag2.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.NoteType.label", java.lang.String .class,"key"));
+        __tag2.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag2;
+        __result__tag2 = __tag2.doStartTag();
+
+        if (__result__tag2!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag2== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag2.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag2);
+            return true;
+        }
+        _activeTag=__tag2.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag2);
+        __tag2.release();
+        return false;
+    }
+
+    private boolean _jsp__tag3(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag3 = null ;
+        int __result__tag3 = 0 ;
+
+        if (__tag3 == null ){
+            __tag3 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag3);
+        }
+        __tag3.setPageContext(pageContext);
+        __tag3.setParent(null);
+        __tag3.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("eCA.RefNo.label", java.lang.String .class,"key"));
+        __tag3.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${ca_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag3;
+        __result__tag3 = __tag3.doStartTag();
+
+        if (__result__tag3!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag3== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag3.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag3);
+            return true;
+        }
+        _activeTag=__tag3.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag3);
+        __tag3.release();
+        return false;
+    }
+
+    private boolean _jsp__tag4(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag4 = null ;
+        int __result__tag4 = 0 ;
+
+        if (__tag4 == null ){
+            __tag4 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag4);
+        }
+        __tag4.setPageContext(pageContext);
+        __tag4.setParent(null);
+        __tag4.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.Med/AncService.label", java.lang.String .class,"key"));
+        __tag4.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag4;
+        __result__tag4 = __tag4.doStartTag();
+
+        if (__result__tag4!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag4== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag4.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag4);
+            return true;
+        }
+        _activeTag=__tag4.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag4);
+        __tag4.release();
+        return false;
+    }
+
+    private boolean _jsp__tag5(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag5 = null ;
+        int __result__tag5 = 0 ;
+
+        if (__tag5 == null ){
+            __tag5 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag5);
+        }
+        __tag5.setPageContext(pageContext);
+        __tag5.setParent(null);
+        __tag5.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.TITLE.label", java.lang.String .class,"key"));
+        __tag5.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag5;
+        __result__tag5 = __tag5.doStartTag();
+
+        if (__result__tag5!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag5== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag5.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag5);
+            return true;
+        }
+        _activeTag=__tag5.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag5);
+        __tag5.release();
+        return false;
+    }
+
+    private boolean _jsp__tag6(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag6 = null ;
+        int __result__tag6 = 0 ;
+
+        if (__tag6 == null ){
+            __tag6 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag6);
+        }
+        __tag6.setPageContext(pageContext);
+        __tag6.setParent(null);
+        __tag6.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.Performed.label", java.lang.String .class,"key"));
+        __tag6.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag6;
+        __result__tag6 = __tag6.doStartTag();
+
+        if (__result__tag6!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag6== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag6.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag6);
+            return true;
+        }
+        _activeTag=__tag6.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag6);
+        __tag6.release();
+        return false;
+    }
+
+    private boolean _jsp__tag7(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag7 = null ;
+        int __result__tag7 = 0 ;
+
+        if (__tag7 == null ){
+            __tag7 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag7);
+        }
+        __tag7.setPageContext(pageContext);
+        __tag7.setParent(null);
+        __tag7.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.by.label", java.lang.String .class,"key"));
+        __tag7.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag7;
+        __result__tag7 = __tag7.doStartTag();
+
+        if (__result__tag7!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag7== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag7.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag7);
+            return true;
+        }
+        _activeTag=__tag7.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag7);
+        __tag7.release();
+        return false;
+    }
+
+    private boolean _jsp__tag8(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag8 = null ;
+        int __result__tag8 = 0 ;
+
+        if (__tag8 == null ){
+            __tag8 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag8);
+        }
+        __tag8.setPageContext(pageContext);
+        __tag8.setParent(null);
+        __tag8.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.authorizedby.label", java.lang.String .class,"key"));
+        __tag8.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag8;
+        __result__tag8 = __tag8.doStartTag();
+
+        if (__result__tag8!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag8== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag8.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag8);
+            return true;
+        }
+        _activeTag=__tag8.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag8);
+        __tag8.release();
+        return false;
+    }
+
+    private boolean _jsp__tag9(javax.servlet.ServletRequest request, javax.servlet.ServletResponse response, javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag activeTag, javax.servlet.jsp.tagext.JspTag parent) throws java.lang.Throwable
+    {
+        javax.servlet.jsp.tagext.JspTag _activeTag = activeTag;
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter) out;
+         org.apache.taglibs.standard.tag.rt.fmt.MessageTag __tag9 = null ;
+        int __result__tag9 = 0 ;
+
+        if (__tag9 == null ){
+            __tag9 = new  org.apache.taglibs.standard.tag.rt.fmt.MessageTag ();
+            weblogic.servlet.jsp.DependencyInjectionHelper.inject(pageContext, __tag9);
+        }
+        __tag9.setPageContext(pageContext);
+        __tag9.setParent(null);
+        __tag9.setKey(( java.lang.String ) weblogic.jsp.internal.jsp.utils.JspRuntimeUtils.convertType("Common.status.label", java.lang.String .class,"key"));
+        __tag9.setBundle(( javax.servlet.jsp.jstl.fmt.LocalizationContext ) weblogic.servlet.jsp.ELHelper.evaluate("${common_labels}",javax.servlet.jsp.jstl.fmt.LocalizationContext.class,pageContext,_jspx_fnmap));
+        _activeTag=__tag9;
+        __result__tag9 = __tag9.doStartTag();
+
+        if (__result__tag9!= javax.servlet.jsp.tagext.Tag.SKIP_BODY){
+            if (__result__tag9== javax.servlet.jsp.tagext.BodyTag.EVAL_BODY_BUFFERED) {
+            }
+        }
+        if (__tag9.doEndTag()== javax.servlet.jsp.tagext.Tag.SKIP_PAGE){
+            _activeTag = null;
+            _releaseTags(pageContext, __tag9);
+            return true;
+        }
+        _activeTag=__tag9.getParent();
+        weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, __tag9);
+        __tag9.release();
+        return false;
+    }
+}

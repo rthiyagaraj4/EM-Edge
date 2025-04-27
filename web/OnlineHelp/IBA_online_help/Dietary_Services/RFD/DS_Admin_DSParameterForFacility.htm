@@ -1,0 +1,261 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>DS_Admin_DSParameterForFacility</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define the parameters:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">General 
+	 Default Diet for Patients Without Orders</span> – Select the check 
+	 box, if default diet orders are applicable for patients for whom the 
+	 diet orders are not placed. Clear the check box, if the default diet 
+	 order is not applicable and order has to be placed for each patient 
+	 using the Place Diet Order function. &#160;&#160;&#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Label 
+	 Message</span> – Enter the Label message to be displayed for default 
+	 diet orders while printing Meal Tickets. Clear the check box, if the 
+	 label message is not to be printed on the meal tickets.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Multi 
+	 Kitchen</span> - Select the check box to indicate that the facility 
+	 has multiple kitchens. Clear the check box to indicate that the facility 
+	 has only one kitchen. If the check box is selected, the Kitchen Code 
+	 field in this parameter setup is enabled and you can select a Kitchen 
+	 from the list. This indicates that the selected kitchen has multiple 
+	 kitchen areas associated to it. If the check box is cleared, the Kitchen 
+	 Code field gets disabled. This indicates that the facility has only 
+	 kitchen and no kitchen areas associated to the facility.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Kitchen 
+	 Code</span> - Select the Kitchen Code from the list. The selected 
+	 kitchen code is displayed during Report generation, by default. The 
+	 values are defined using the &#160;‘Kitchen/Kitchen Area’ function. 
+	 This field gets enabled, if the check box ‘Multi Kitchen’ is selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Meal Plan Allowed Days</span> – Enter the maximum number of days for 
+	 which the Meal Plan is allowed in numeric format of two digits maximum 
+	 length. This controls the number of days allowed for meal plan generation. 
+	 You can generate Meal Plans using ‘Generate Meal Plan’ function for 
+	 the number of days specified beginning from the current system date. 
+	 You can generate a meal plan using the 'Generate Meal Plan' function 
+	 for the number of days specified from the current date. An error message 
+	 'Date is outside the limit specified in Parameter' is displayed, if 
+	 the number of days specified in 'Generate Meal Plan' function exceeds 
+	 the days entered.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Next 
+	 Meal Plan No.</span> – Enter the next meal plan number in numeric 
+	 format of three digits maximum length. The values in this field are 
+	 setup only once. The entered value is validated during Report generation.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Accept 
+	 diet type for each meal type</span> - Select the check box to assign 
+	 different diet types for each meal type for a patient while placing 
+	 the diet orders in ‘Place Diet Order’ function in Transactions. Clear 
+	 the check box to disable the selection of diet types for each meal 
+	 type.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Interfaced 
+	 to Patient Billing</span> – Select the check box to interface Dietary 
+	 Services module to Patient Billing Manager module. Clear the check 
+	 box, if the interface to Patient Billing Manager module is not required. 
+	 &#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Maximum 
+	 Days Allowed (Including Current Day)</u></span> - Enter a single numeric 
+	 character ranging from 1 to 9. By default, the value 9 is displayed 
+	 in the text field.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Attendant 
+	 Orders Applicable</span> – Select the check box to place diet orders 
+	 for attendants accompanying the patients. You can place the diet order 
+	 for attendants using the ‘Place Diet Order’ function, if the check 
+	 box is selected. Clear the check box, if the attendants are not served 
+	 in the facility.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Applicability 
+	 For Grace Period</span> –Select the check box to display the Grace 
+	 Period text field in the DS Parameter For Facility screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Grace 
+	 Period</span> – Enter the grace period to place a diet order even 
+	 if the patient is discharged or consultation for the patient is closed 
+	 and the patient is deceased.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />If you enters 
+ the grace period greater than 24 hrs, the system invokes an error message 
+ ‘Time should not exceed 24 Hours’.</p>
+<p class="note">&#160;</p>
+<ol start="13">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Cut-off 
+	 Time to Acknowledge Frequency Based Items</span> – Enter the cut-off 
+	 time to acknowledge Frequency Based Special Food Items in numeric 
+	 format of two digits maximum length. The cut-off time indicates the 
+	 maximum time limit from the scheduled time to acknowledge the frequency 
+	 based special food items. The scheduled time is recorded while placing 
+	 an order for the patient in ‘Place Diet Order’ function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Patient 
+	 Care Taker Label</u></span> – Enter the label name in alphanumeric format 
+	 upto 30 characters. Based on label name the care taker terminology 
+	 is used across the Inpatient functions in the system. &#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict 
+	 Diet Order Date Range for Inpatients</u></span> – Select the checkbox 
+	 to allow configuring the date range within which Inpatient diet orders 
+	 will be allowed in the system in Place Diet Order screen. By default 
+	 this checkbox is not selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Generate 
+	 Meal Plan for patients with Nil By Mouth</u></span> – Select the checkbox 
+	 to configure whether or not patients with Nil By Mouth (NBM) will 
+	 be considered while generating the meal plan, Diet Order Sheet and 
+	 Special Food Meal Ticket reports. It is a one-time setup.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Notification 
+	 Message for Place Diet Order</u></span> - Enter message to be displayed 
+	 while placing irregular diet order in the system. The text box allows 
+	 maximum 150 characters. By default, this text box will be blank. If 
+	 no message is configured in this field, the system will allow you 
+	 to continue placing diet order without displaying any notification 
+	 message.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD" style="text-decoration: none; "><span 
+	 style="text-decoration: underline; "><u>Instruction in Label (Formula)</u></span> 
+	 – Enter the instruction in alphanumeric format up to 50 characters 
+	 in length. The dietary orders ordered from Order Entry screen will 
+	 be authorized by the dietitian or any privileged users. The dietary 
+	 orders for which authorization is complete, a label will be printed 
+	 by the kitchen staff. This is applicable only for users in ML MMOH 
+	 sites.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD" style="text-decoration: none; "><span 
+	 style="text-decoration: underline; "><u>Maximum Diet Order Date Range 
+	 Allowed for Inpatients (Including Current Day)</u></span> – Enter the 
+	 maximum number of days within which Inpatient diet orders will be 
+	 allowed in the system. The text box will be enabled and mandatory 
+	 only if the checkbox Restrict Diet Order Date Range for Inpatients 
+	 is selected, otherwise this text box will be disabled and greyed. 
+	 By default this textbox is blank. However, the previously entered 
+	 value will be retained in the text box.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Enable 
+	 Multi Facility Meal Order for Outpatients / Emergency Patients</span> 
+	 – Select the check box to place a meal order for outpatients and Emergency 
+	 Patients across facilities. If the check box is selected, you can 
+	 place the meal order for outpatients across the facilities from the 
+	 Place Meal Order for Outpatients screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Enable 
+	 Drug Food Interaction Message For IP Patient</u></span> - Select the check 
+	 box to prompt drug-food interaction alert in the ‘Place Diet Order’ 
+	 and ‘Modify Meal Plan for a Patient’ screens for inpatients across 
+	 facilities. &#160;This is applicable only for normal Rx with Inpatient 
+	 and Daycare patient class.</p></li>
+</ol>
+<p class="NumberRFD" style="font-weight: bold;">Serving Time and Late/Irregular 
+ Diet Orders Applicable for</p>
+<ol start="22" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Inpatient</u></span> 
+	 – Select the checkbox to enable the functionality of placing Irregular 
+	 diet orders for Inpatients in the system. This checkbox is enabled 
+	 only if the checkbox ‘Accept diet type for each meal type’ is selected; 
+	 otherwise it will be disabled and greyed out.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Outpatients</u></span> 
+	 – Select the checkbox to enable the functionality of placing Irregular 
+	 diet orders for Outpatients in the system. This checkbox is enabled 
+	 only if the checkbox ‘Accept diet type for each meal type’ is selected; 
+	 otherwise it will be disabled and greyed out.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Emergency 
+	 Patients</u></span> – Select the checkbox to enable the functionality 
+	 of placing Irregular diet orders for Emergency Patients in the system. 
+	 This checkbox is enabled only if the checkbox ‘Accept diet type for 
+	 each meal type’ is selected; otherwise it will be disabled and greyed 
+	 out.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Staff 
+	 Orders</u></span> – Select the checkbox to enable the functionality of 
+	 placing Irregular diet orders for Staff in the system. This checkbox 
+	 is enabled only if the checkbox ‘Accept diet type for each meal type’ 
+	 is selected; otherwise it will be disabled and greyed out.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Supplementary 
+	 Order</u></span> - Select the checkbox to enable the functionality of 
+	 placing Irregular Supplementary diet orders in the system. This checkbox 
+	 is enabled only if the checkbox ‘Accept diet type for each meal type’ 
+	 is selected; otherwise it will be disabled and greyed out.</p></li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

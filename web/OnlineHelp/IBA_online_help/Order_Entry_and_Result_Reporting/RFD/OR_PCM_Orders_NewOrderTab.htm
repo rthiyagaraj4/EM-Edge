@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OR_PCM_Orders_NewOrderTab</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>New Orders</h1>
+<p class="Text">Click New Orders tab to place new orders for the selected patient. Orders are placed using any of the following tabs:</p>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Additional Search</a></p>
+<div class="droptext" id="POPUP226416711" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Using the Additional Search tab, you can select Order Catalogs across Categories based on the Parameter Setup. Specify Order Category/Order Type/Order Catalog/Service as criteria and execute the query. You can select the required Catalogs from the query result. On selecting the required Order Catalogs, option to preview and execute Orderables is provided.</p>
+<p class="BoldRFD" style="font-weight: normal;">‘Addl. Search’ is displayed on selecting ‘New Orders’, by default. If the logged in user and attending practitioner are same, orders can be placed directly using the tab. If practitioner type of the logged in user is ‘Nurse’, the ordering has to be performed on behalf of the ordering practitioner. This concept is explained later.</p>
+<p class="BoldRFD" style="font-weight: normal;">The system validates these conditions while searching for order catalogs.</p>
+<p class="BoldRFD" style="font-weight: normal;">In ‘OR Parameter’, if ‘Pre-select Order Category’ is selected, the selection of order category is mandatory.</p>
+<p class="BoldRFD" style="font-weight: normal;">It then checks, if ‘Order Type by Class’ is selected. If order type by class is applicable, the rules defined in the function ‘Ordering Rules by Patient Class’ are verified.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If Order Category is mandatory, the selected Order Category and type are made default across the other tabs (tick sheet and order set). The selected Order Category is made default under ‘Image’ tab, only if ‘Radiology’ or ‘Department diagnostics’ and ‘Trmt Procedure’ are selected.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enter the details in mandatory fields.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Search]</span> to display Orders grouped under Order Set, Panel and Individual.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Expiry rules defined for the patient class in the function ‘Ordering Rules by Class’.</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Based on the practitioner type, description of the Order Catalogs is displayed. For Physician, Surgeon, Dentist and Psychiatrist direct care synonym is displayed and ancillary department synonym is displayed for radiologist and pathologist. When the Nurse logs in, the short description of the order catalog is displayed. Order catalogs defined as ‘Department only’ under charting tab in order catalog master function appears only for radiologists and pathologists. Order Catalogs applicable to the patient class are listed. Only enabled Order Catalog is displayed.</span></p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Select the required Order Set/Panel/Individual Order Catalog. On selecting the check box, prompt message appears if prompt text is entered for the catalog (‘Prompt Alert’ is applicable and prompt text entered in the Order Catalog function).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Preview]</span> to preview the selected orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Clear]</span> to clear the displayed Orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Place Order.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The order catalogs are displayed vertically if the ‘Order Search Results Display in Vertical’ check box is selected in the OR Parameter screen.</p>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Tick Sheet</a></p>
+<div class="droptext" id="POPUP226411278" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">You can select Order Catalogs through tick sheets. Order Category/Order Type/Tick Sheet is/are specified as search criteria and executed. Order Catalogs associated with the tick sheet are selected for placing order. Non-specific tick sheets can also be selected. Based on practitioner/location/service, tick sheets are available for selection. Tick Sheets not associated to practitioner/location/service (Index check box cleared in the function ‘Tick Sheet’) are available to all the practitioners of the logged in facility. On selecting the required Order Catalogs, option to preview and execute the orderables is provided.</p>
+<p class="BoldRFD"><span style="font-weight: normal;">On selecting ‘Tick Sheet’ tab. You can select the required catalogs from the tick sheets. Tick sheets can be specific to order categories. On selecting the order category, the tick sheets associated with it are listed. You can select the required tick sheet. On selecting the required tick sheet, order catalogs under them are displayed for selection. You can select the required catalogs. Based on the setup, non-specific tick sheets (tick sheets not belonging to any category) are available for selection.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enter the details in mandatory fields.</p>
+</li>
+</ol>
+<p class="BoldRFD">The tick sheets are displayed based on the following conditions:</p>
+<p class="BoldRFD" style="font-weight: normal;">By default, all the tick sheets belonging to the selected order category are displayed. If the tick sheets are indexed and associated to practitioner, primary service of the location and ordering Location in the index tick sheet function, the associated practitioner, Primary service of the Location and Ordering Location can access the tick sheet.</p>
+<p class="BoldRFD" style="font-weight: normal;">If order category is not mandatory, on clicking the ‘Tick Sheet’ tab, tick sheets associated to the ordering practitioner, services of the ordering location (Index tick sheet function) and nonspecific tick sheets are displayed, by default. You can select the required tick sheet.</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Select the required Order Catalog. On selecting the check box, prompt message appears if prompt text is entered for the catalog (‘Prompt Alert’ is applicable and prompt text entered in the Order Catalog function).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Preview]</span> to preview the selected orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Clear]</span> to clear the displayed Orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Place Order.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The order catalogs are displayed vertically if the ‘Order Search Results Display in Vertical’ check box is selected in the OR Parameter screen.</p>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Order Sets</a></p>
+<div class="droptext" id="POPUP226416189" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Select the required order set for ordering under Order set tab. You can select Order Sets belonging to all/particular diagnosis. Order sets associated to practitioner/location/service are available for selection. On selecting an order set, the order catalogs can be viewed based on the order execution time.</p>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Image</a></p>
+<div class="droptext" id="POPUP226400901" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">To place imaging orders, select Image tab. Only Radiology, Dep Diagnostics and Order Category can be selected. On specifying order category/order type, image hotspots appear. Select the required hotspot. Orderables linked to the hotspot are displayed. Choose the required orderables and click ‘Place Order’ to execute the Order.</p>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Place Order</a> - To Place <a href="OR_PCM_Orders_MedicationOrdering.htm" target="_blank">Medication Orders</a>. Click Place Order Tab directly.</p>
+<div class="droptext" id="POPUP226403860" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">On selecting the required Order Catalogs, you can place Orders thorough this tab. Required details are entered while ordering. To place Medication Orders, you can select this function directly.</p>
+<p class="BoldRFD" style="font-weight: normal;">The sequence in which these two tabs are displayed is based on the setup done in the ‘Orders Tab’ master function of OR code setup in the ‘Order Entry and Result Reporting’ module for the logged in practitioner and the function from where these tabs are invoked. If there is no setup specific to the logged in practitioner or from the function from where it is invoked, the display of the tabs is based on the default setup.</p>
+<p class="BoldRFD" style="font-weight: normal;">The total charge for respective service, patient charge, approval required and value recorded during Billing Service definition are listed. Click <a href="javascript:void(0);" id="a6" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../Patient_Billing_Manager(J)/Edit_Enter_Charge_Details.htm',600,400);return false;"><span class="RFDhyperlinkBackground">View/Edit</span></a> hyperlink to edit the charges or override the service definition.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">If the patient is insured and holds ARAMCO policy, the hyperlink <a href="javascript:void(0);" id="a7" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../Patient_Billing_Manager(J)/Screening_Services.htm');return false;">Screening Services</a> will be displayed on this screen.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">The screen also displays the following functions.</p>
+<ul>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Drug Profile</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Allergies</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Active Problems</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Demographics</p>
+</li>
+</ul>
+<p class="BulletRFD">Click <img src="../../image257.gif" style="border: none;" alt="image257.gif" width="14" height="14" border="0" /> to record Order Format details. The Order Format screen displays fields based on the Order Format Setup done in Request and Results module. For Laboratory orders, an Other check box is displayed. Select the 'Others' check box to enter the clinical comments in alphanumeric format of 40 characters maximum length. On selecting the 'Others' check box, the Clinical Comments field is disabled. Clear the 'Others' check box to select the clinical comments using the <span class="BoldNumberRFD">[?]</span> function.</p>
+</div>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />A visual and auditory warning is displayed when a duplicate order is created. You can override the warning message by entering a justification.</p>
+<p class="Text">&#160;</p>
+<p class="Text">On placing the Order, the message “Do you want to Record Consent” appears if the ‘Record Consent Form With Order’ check box is selected in OR Parameter screen. Click <span style="font-weight: bold;"><b>[OK]</b></span>, the Consent Order dialog with all the consent requests generated for that patient gets displayed. Select the required order and record the consent.</p>
+<p class="Text">&#160;</p>
+<p class="Text">On placing the order, the <a href="../../Patient_Billing_Manager(J)/Discount_For_Encounter_Charge_Dtls.htm">discount screen</a> or the <a href="../../Patient_Billing_Manager(J)/Bill_Settlement_Details.htm">bill settlement</a> screen is displayed to settle the amount, if the 'Invoke Settlement Screen For Patient Class' option is selected for the respective patient class in the 'OR Parameter For Facility' function.</p>
+<p class="Note">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You can continue or cancel an order from the Place Order screen, if the order is duplicate depending on the 'Duplicate Override Reason Required’ check box and &#160;setup made for ‘Type’ under ‘Duplicate Check’ tab in ‘Order Catalog’ function in 'Order Entry and Result Reporting' module. If a duplicate order is placed, ‘Duplicate Check’ screen is displayed listing the Order Catalog. Enter the remarks in the ‘Dup Override Reason’ text box and click [Continue] to place the duplicate order. &#160;Or, you can capture the override reason for each order entry at line level by clicking the ‘Dup Override Reason’ hyperlink against each ‘Duplicate order’. Select the check box ‘Discard’ and click [Continue] to cancel the order.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a4','POPUP226416711');
+	TextPopupInit('a5','POPUP226411278');
+	TextPopupInit('a1','POPUP226416189');
+	TextPopupInit('a2','POPUP226400901');
+	TextPopupInit('a3','POPUP226403860');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

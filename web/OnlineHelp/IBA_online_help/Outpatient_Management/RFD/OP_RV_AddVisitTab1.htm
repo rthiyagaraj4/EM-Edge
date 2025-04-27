@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_RV_AddVisitTab1</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Citizen ID</span> - Enter the Citizen ID in numeric format as entered while registration. The 'Prompt' specified for the citizen ID in MP Parameter is displayed as the field legend. The length and format as specified in MP Parameter has to be adhered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alternate ID Type(s)</span> - Enter Alternate ID number(s) in the format and length as specified in MP Parameter. Based on the MP Parameter setup, system displays the Alternate ID Type description(s).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Other Alt ID</span> - Select the required alternate ID from the list. The listed values are defined in the function 'Alternate ID Type' of MP module. On selecting the required alternate ID type, enter the ID in alphanumeric format of 20 characters maximum length. The field 'Other Alt ID' is displayed if 'Accept Other Alt ID' is set in MP Parameter (Alt ID checks tab) of Master Patient Index module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alternate ID1</span> - Enter the Alternate ID of the patient. The Alternate ID of the patient is recorded during patient registration. If multiple patients are linked to the same Alternate ID, a screen is displayed with the list of patients registered with the same Alternate ID. The Alternate ID is defined in MP Parameter of Master Patient Index module. The details displayed are Patient ID, Patient Name, Patient Name In Local Language, Medical Record Number, Gender and Date of Birth. Click the Patient ID hyperlink to select a single patient from the list of patients for registering visit. If only one patient is associated to the Alternate ID1 and a patient search is performed based on the Alternate ID1 entered, the system displays the details of the patient in the 'Register Visit' function. If 'Check Unique' check box is selected for the Alternate ID in Alternate ID Checks Tab of MP Parameter function, you cannot associate multiple Patient IDs to a single Alternate ID. The Patient Details for Alternate ID is not displayed while searching for patients based on Alternate ID in 'Register Visit' function.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The field names are displayed based on the legends for Alternate ID defined in the MP Parameter.</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - Enter the Patient ID in alphanumeric format of maximum length as specified in the MP Parameter. You can query for the patient details by invoking the <span class="BoldNumberRFD">[?]</span> function. On entering the relevant details in the lookup screen, the result screen is populated with patient details that satisfy the entered query details. You can select the patient by clicking on the hyperlink of the patient. The control now shifts back to the 'Register Patient Visit' screen with the patient details populated. If the required patient record is not found in 'Patient Search' function', the patient has to be registered. In this case, on clicking <span class="BoldNumberRFD">[Register Patient]</span> from the 'Patient Search' screen, the 'Register Patient' function is invoked, the Patient is registered and on completion of registration, the registered patient details are displayed in 'Add Visit' screen and additional details of the visit can be entered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral ID</span> - Enter the Referral ID in alphanumeric format of 14 characters maximum length. You can query for the patient referral details by invoking the <span class="BoldNumberRFD">[?]</span> function. On entering the relevant details in the lookup screen, the result screen is populated with patient referral details that satisfy the entered query details. You can select the patient by clicking on the hyperlink of the patient. The control now shifts back to the 'Register Patient Visit' screen with the patient details populated. If the required patient record is not found in 'Referral Search' function', the patient has to be registered. In this case, on clicking <span class="BoldNumberRFD">[Register Referral]</span> from the 'Referral Search' screen, the 'Register Patient Referral' function is invoked, the Patient is registered and on completion of registration, the registered patient details are displayed in 'Add Visit' screen and additional details of the visit can be entered.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

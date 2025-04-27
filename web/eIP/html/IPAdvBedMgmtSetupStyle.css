@@ -1,0 +1,268 @@
+/*
+	style sheet for IP Advanced Bed Management Setup functions
+	Created By Sudhakar.
+*/
+body {
+	overflow:no;
+	margin:0px;
+	padding:0px;
+	/*overflow:auto;
+	border:1px solid red;*/
+}
+/*
+	floor set up styles starts here
+*/
+.floorsetupMain{
+	overflow:auto;
+	position:fixed;				
+}
+.floorWrappersetup{
+	left:10px;
+	width:1160px; 
+	height:600px;
+	background-image: url(../../eCommon/images/background_square.png);
+	overflow:auto;
+	position:fixed;
+}
+/*
+	
+*/
+.floorsetup { 
+	width:500px; /* floor will be defaulted when there is not setup data*/
+	height:500px;/* floor will be defaulted when there is not setup data*/
+	border:0px solid silver; 
+	background-color:#9cd7e6;/*display background color of floor whic can be resized  by user*/				
+}
+/*
+	floor set up styles Ends here
+*/
+
+/*
+	Nuring Unit Room set up at floor level style starts
+*/
+
+.floorroomContainer{
+	height:100%;	
+	width:100%;	
+}
+/*unassignedroomsbox is division for romms which are not set up in floor room layout. We are setting the height of the div dynamically by getting the height of the window, so that div will occupy total height.*/
+.unassignedroomsbox{
+	height:600px;
+	width: 150px; 				 
+	float: left; 
+	margin-right:5px;
+	border:0px solid silver;		
+	overflow-y:auto;
+}
+/*
+	floor wrapper which contains floor set u[p done by user.
+	We are setting the height of the div dynamically by getting the height of the window.
+	width of the div is dynamic widow width minus unassignedroomsbox width.
+*/
+.floorWrapper_floorroom{
+	border:0px solid silver; 
+	padding-right:0px;
+	padding-bottom:0px;
+	overflow:auto;
+	position:fixed;	
+	/*background-color:green;*/
+}
+/*
+	floor style in floor room function. Height and width of the floor is dynamically come from Database based on user set up.
+*/
+.floor_floorroom{ 
+	position:absolute;	
+	/*background-color:red;*/
+	background-image: url(../../eCommon/images/background_square.png);
+}
+/*
+	unassigned rooms which are displaying in unassignedroomsbox will be positioned in floor.
+*/
+.unassignedroom_floorroom{
+	float:left;
+	height:120px;
+	width:160px;				
+	border:0px solid black;
+	text-align: center;
+	font-size:10pt;
+	margin-left:1px;
+	margin-right:1px;
+	margin-top:1px;
+	margin-bottom:1px;
+	background-color:#9cd7e6;
+}
+/*
+	header part of the room
+*/
+.roomheader_floorroom{
+	height:20px;
+	background-color:#aadeeb;
+}
+/*
+	displays room no
+*/
+.roomDtls_floorroom{
+	float:left;
+	width:80%;	
+	font-size:10pt;
+}
+/*
+	this div contains close button wich will display when room is placed in the floor lay out
+*/
+.roomClose_floorroom{	
+	float:right;
+	font-size:10pt;
+	border: 0px solid black;
+	cursor:pointer;
+}
+.roomDivBody_floorroom{
+}
+/*
+	width,height,left position and top position are come from database for assignedRoom_floorroom
+*/
+.assignedRoom_floorroom{
+	text-align: center;
+	background-color:#9cd7e6;
+	border:0px solid black;
+	/*below added after deleiver to alpha*/
+	margin:1px;
+	position:absolute;
+}
+/*
+	floor room set up styles Ends here
+*/
+/*
+	Nuring Unit Room Beds set up at Room level style starts
+*/
+.unassignedbedssbox{
+	height:580px;
+	width: 150px; 
+	float: left; 
+	margin-right:5px;
+	border:0px solid silver;		
+	overflow-y:auto;
+}
+
+.floorWrapper_roombed{ 
+	width:1040px; 
+	height:580px;									
+	border:0px solid silver;
+	overflow:auto;
+	position:fixed;				
+}
+
+.floor_roombed{ 
+	width:1100px; 
+	height:600px;
+	padding:1px;				
+	border:1px solid silver; 			
+}
+/*
+	width,heigth,top postion and left positionare dynamic data
+*/
+.roomContainer_roombed{ 
+	border:1px solid black;
+	position:absolute;	
+	background-image: url(../../eCommon/images/background_square.png);
+}
+.roomheader_roombed{
+	height:20px;
+	background-color:#aadeeb;
+}
+.roomDtls_roombed{
+	float:left;
+	width:100%;	
+	font-size:8pt;				
+}
+.unassignedbed_roombed{
+	float:left;
+	height:90px;
+	width:150px;				
+	border:0px solid black;
+	text-align: center;
+	font-size:10pt;
+	margin-left:1px;
+	margin-right:1px;
+	margin-top:1px;
+	margin-bottom:1px;
+	background-color:#8bd69f;
+}
+.bedheader_roombed{
+	height:15px;
+	background-color:#adf0bf;
+}
+.bedDtls_roombed{
+	float:left;
+	width:80%;	
+	font-size:10pt;
+}
+.bedreset_roombed{	
+	float:right;
+	font-size:10pt;
+	border: 0px solid black;
+	cursor:pointer;
+}
+.bedbody_roombed{
+}
+.assignedBed_roombed{
+	border:0px solid black;
+	position:absolute;
+	text-align: center;
+	margin:1px;
+	background-color:#8bd69f;
+}
+.assignedBedMask_roombed{
+	border:0px solid black;
+	position:absolute;
+	text-align: center;
+	background-color:#8bd69f;
+}
+
+/*
+	color picker setup styles start here...
+*/
+.dfltdtls_container{
+	height:50px;
+	border:0px solid black;
+	margin-bottom:0px;
+	margin-bottom:10px;
+}
+
+.dfltdtls{
+	width:50%; 
+	height:100%;
+	border:0px solid black;
+}
+.clrpick_container{
+	height:400px;
+	border:0px solid black;				
+}
+.clrpick_clr_disp{
+	float:left;
+	width:60%; 
+	height:100%;
+	border:1px solid black;
+}
+.clr_pick_beds{
+	float:left;
+	width:100%; 
+	height:100%;
+	text-align: center;
+	margin-left:1%;
+	margin-right:1%;
+	margin-top:1%;
+	margin-bottom:1%;
+	border:0px solid black;
+}
+.color_pick_bed{
+	float:left;
+	height:15%;
+	width:22%;				
+	border:1px solid black;
+	margin:1%;
+	FONT-SIZE: 8pt;
+	TEXT-ALIGN: LEFT;
+	/*TEXT-ALIGN: RIGHT;*/
+	PADDING-LEFT:5px;
+	PADDING-RIGHT:5px
+}

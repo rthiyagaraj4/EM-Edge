@@ -1,0 +1,761 @@
+<%@ page import="java.sql.*,java.util.*,webbeans.eCommon.*" contentType="text/html;charset=UTF-8" %>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%>
+<%@include file="../../eCommon/jsp/GetPersistenceBean.jsp" %>
+
+<%
+	request.setCharacterEncoding("UTF-8");
+	webbeans.eCA.RecClinicalNotesSectionBean sectionBean = (webbeans.eCA.RecClinicalNotesSectionBean)getObjectFromBean("sectionBean","webbeans.eCA.RecClinicalNotesSectionBean",session);
+
+
+
+	
+%>
+<html>
+<head>
+	<title><fmt:message key="eCA.RichTextEditor.label" bundle="${ca_labels}"/></title>
+	<%
+		
+		String sStyle = (session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+	%> 
+	
+	<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css' />
+	<script language='javascript' src='../../eCommon/js/common.js'></script>
+	<script language='javascript' src='../../eCommon/js/ValidateControl.js'></script>
+	<script language='javascript' src='../../eCA/js/RecClinicalNotesPart2.js'></script>
+	<script language='javascript' src='../../eCA/js/RecClinicalNotesPart1.js'></script>
+	<script language='javascript' src='../../eCA/js/prototype.js'></script>
+	<script>
+
+	function showSectionTemplate_new(curr_sec_hdg_code,curr_section_type,curr_child_sec_hdg_code, template_title,patient_id,episode_id,sex,dob)
+	{	
+		var arguments		=	"" ;		
+		var action_url		=	'../../eCA/jsp/RecClinicalNotesTemplateMain.jsp';
+		action_url			+=	"?curr_sec_hdg_code="+curr_sec_hdg_code+"&curr_section_type="+curr_section_type+"&curr_child_sec_hdg_code="+curr_child_sec_hdg_code+"&template_title="+template_title+"&operation_mode=&patient_id="+patient_id+"&episode_id="+episode_id+"&Sex="+sex+"&Dob="+dob;
+		parent.RecClinicalNotesSecDetailsFrame.location.href	= action_url;
+		parent.EditorTitleFrame.location.href = "../../eCA/jsp/RecClinicalNotesEditorTitle.jsp?editor_title="+encodeURIComponent(template_title,"UTF-8");			
+		setTimeout("fnEnableLinks()",1500);		
+	}
+
+	function fnEnableLinks(){	
+		parent.frameSetIdMessage.rows='*%,0%'
+		compressSectionFrames();
+	}
+
+	function callMeToGetEditor()
+	{
+		document.GetEditorForm.target = parent.RecClinicalNotesSecDetailsFrame.name;
+		document.GetEditorForm.submit();
+	}
+	
+	function changeEditorTitle_new(editor_title,image_linked_yn)
+	{	
+		parent.EditorTitleFrame.location.href = "../../eCA/jsp/RecClinicalNotesEditorTitle.jsp?editor_title="+encodeURIComponent(editor_title,"UTF-8")+"&image_linked_yn="+image_linked_yn;
+	}
+
+	function recordSectionDetails()
+	{
+		var noteType = parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.note_type.value;
+		var FieldRef = parent.RecClinicalNotesSecControlFrame.document.RecClinicalNotesSecControlForm.Field_Ref.value
+		
+		var ContrAcc = parent.RecClinicalNotesSecControlFrame.document.RecClinicalNotesSecControlForm.contr_mod_accession_num.value
+		var module_id = parent.RecClinicalNotesSecControlFrame.document.RecClinicalNotesSecControlForm.module_id.value
+//		var Performed = parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.performed_by_id.value
+//		var evtdttime = parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.event_date_time.value
+
+		parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.target	=	parent.messageFrameReference.name;
+		parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.action	=	'../../servlet/eCA.RecClinicalNotesServlet?note_type='+noteType+"&Field_Ref="+FieldRef +"&contr_mod_accession_num="+ContrAcc+'&module_id='+module_id;
+		parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.method	=	'post';
+		parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.submit();
+	}
+
+	async function showLinkDocuments(sec_hdg_code, sec_content_type, child_sec_hdg_code, child_sec_content_type, result_linked_rec_type,image_linked_yn)
+	{
+		var episode_type	= parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.episode_type.value;
+		var encounter_id	= parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.encounter_id.value;
+		var patient_id		= parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.patient_id.value;
+
+		var retVal				=	"";
+		var dialogTop			=	"80" ;
+		var dialogHeight		=	"30" ;
+		var dialogWidth			=	"80" ;
+		var status				=	"no";
+		var arguments			=	"" ;
+		var sql					=	"";
+		var search_code			=	"";
+		var search_desc			=	"";
+		var title				=	"";
+		var param				=	"";
+		var action_url			=   "";
+		
+
+		action_url			=	'../../eCA/jsp/RecClinicalNotesLinkHistMain.jsp';
+		var features		=	"dialogHeight:" + dialogHeight + "; dialogWidth:" + dialogWidth + "; dialogTop:" + dialogTop +" ; scroll=no; status:" + status;
+		action_url			+=	"?result_linked_rec_type="+result_linked_rec_type+"&episode_type="+episode_type+"&encounter_id="+encounter_id+"&patient_id="+patient_id;
+
+		if(image_linked_yn=='Y')
+			var url = parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesRTEditorFrame.location.href;
+		else
+			var	url	=	parent.RecClinicalNotesSecDetailsFrame.location.href;
+
+		if( (url.indexOf('/eCA/jsp/RTEditor.jsp')!=-1) )
+		{
+			if(image_linked_yn=='Y')
+				parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesRTEditorFrame.RTEditor0.focus();
+			else
+				parent.RecClinicalNotesSecDetailsFrame.RTEditor0.focus();
+		}
+			
+		retVal				=await	window.showModalDialog(action_url,arguments,features);
+		
+		if (retVal != null)
+		{
+			if( (url.indexOf('/eCA/jsp/RTEditor.jsp')==-1) )
+			{
+				swapHeaderValues();
+				assignSectionDetails(sec_hdg_code,sec_content_type,child_sec_hdg_code, child_sec_content_type, result_linked_rec_type,'sectionEdit',doc_exists);
+			}
+			else
+			{
+				if(image_linked_yn=='Y')							
+					var txtRange			=	parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesRTEditorFrame.RTEditor0.document.body.createTextRange();
+				else
+					var txtRange			=	parent.RecClinicalNotesSecDetailsFrame.RTEditor0.document.body.createTextRange();
+				
+				var section_content	=	txtRange.text;
+
+				if(section_content.length>0)
+				{
+					if(result_linked_rec_type=='CLNT'||result_linked_rec_type=='MEDN'||result_linked_rec_type=='ALGY'||result_linked_rec_type=='DIAG' || result_linked_rec_type == 'PTCR' || result_linked_rec_type == 'LBIN' || result_linked_rec_type == 'LBRP'|| result_linked_rec_type == 'RDIN' || result_linked_rec_type == 'RDRP' || result_linked_rec_type == 'SUNT' || result_linked_rec_type == 'TRET' )
+						retVal	= "<br>"+retVal;
+					
+				}
+			
+				if(result_linked_rec_type!="" && result_linked_rec_type!=null)
+				{
+					if(image_linked_yn=='Y')							
+						parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesRTEditorFrame.RTEditor0.document.body.insertAdjacentHTML("BeforeEnd",(retVal));
+					else
+						parent.RecClinicalNotesSecDetailsFrame.RTEditor0.document.body.insertAdjacentHTML("BeforeEnd",(retVal));
+				}
+				else
+				{
+					if(image_linked_yn=='Y')
+						parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesRTEditorFrame.RTEditor0.document.execCommand("paste","",retVal );
+					else
+						parent.RecClinicalNotesSecDetailsFrame.RTEditor0.document.execCommand("paste","",retVal );
+				}			
+			}
+		}
+
+		parent.RecClinicalNotesToolbarFrame.document.forms(0).link_doc.disabled = false;
+}
+	</script>
+</head>
+<%
+	
+	
+	String		prev_sec_content_type					= "";
+	String 		prev_sec_hdg_code						= "";
+	String 		prev_child_sec_hdg_code					= "";
+	String 		prev_result_link_type					= "";
+	String 		ageDependentCompIds						= "";
+	String 		compDependentAgeGrps					= "";
+	String 		patient_id								= "";
+	String 		ageDependentResults						= "";
+	String 		no_of_rows								= "";
+	String 		section_content							= "";
+	String 		prev_image_linked_yn					= "";
+	String 		prev_populated_section_tblrowID			= "";
+	String 		strContentEditableYn					= "";
+	String 		curr_section_type						= "";
+	String 		url_for_details_frame					= "";
+	String 		image_view_counter						= "";
+	String 		encounter_id							= "";
+	String 		template_title							= "";
+	String 		curr_sec_hdg_code						= "";
+	String 		curr_child_sec_hdg_code					= "";
+	String 		grid_component_ids						= "";
+	String 		section_image_content					= "";
+	String 		curr_image_linked_yn					= "";
+	String 		sec_content_type						= "";
+	String 		editor_title							= "";
+	String 		operation_mode							= "";
+	String 		note_type								= "";
+	String 		image_edited_yn							= "";
+	String 		curr_result_link_type					= "";
+	String 		curr_result_link_yn						= "";
+	String		patient_class							= "";
+	String		accession_num							= "";
+	String		episode_type							= "";
+	String		strRecFlag								= "";
+	String		strKey									=	"";
+	String		field_ref								=	"";
+	String		contr_mod_accession_num					=	"";
+	String		Sex										=	"";
+	String		Dob										=	"";
+	String		module_id								=	"";
+	String		xslURL1  								=	"";
+	String		xslURL									=	"";
+	String		appl_task_id							=	"";
+	String		selection_type							=	"";
+	String		clear_values							=	"";
+	Properties tempProp = null;
+	String chk_Empty = "";
+	Connection con = null;
+//	int			exc										=	0;
+//	int			exc1									=	0;
+
+	java.util.Properties p = (java.util.Properties) session.getValue( "jdbc" ) ;
+	String locale = (String) p.getProperty("LOCALE");
+
+	strRecFlag							=		checkForNull(request.getParameter("rec_flag"));
+	prev_sec_hdg_code					=		checkForNull(request.getParameter("prev_sec_hdg_code"));
+	prev_child_sec_hdg_code				=		checkForNull(request.getParameter("prev_child_sec_hdg_code"));
+	patient_id							=		checkForNull(request.getParameter("patient_id"));
+	section_content						=		checkForNull(request.getParameter("section_content"));
+	prev_populated_section_tblrowID		=		checkForNull(request.getParameter("prev_populated_section_tblrowID"));
+	image_view_counter					=		checkForNull(request.getParameter("image_view_counter"));
+	encounter_id						=		checkForNull(request.getParameter("encounter_id"));
+	template_title						=		checkForNull(request.getParameter("template_title"));
+	curr_sec_hdg_code					=		checkForNull(request.getParameter("curr_sec_hdg_code"));
+	curr_child_sec_hdg_code				=		checkForNull(request.getParameter("curr_child_sec_hdg_code"));
+	grid_component_ids					=		checkForNull(request.getParameter("grid_component_ids"));
+	section_image_content				=		checkForNull(request.getParameter("section_image_content"));
+	editor_title						=		checkForNull(request.getParameter("editor_title"));
+	operation_mode						=		checkForNull(request.getParameter("operation_mode"));
+	note_type							=		checkForNull(request.getParameter("note_type"));
+	image_edited_yn						=		checkForNull(request.getParameter("image_edited_yn"));
+	no_of_rows							=		checkForNull(request.getParameter("no_of_rows"));
+	patient_class						=		checkForNull(request.getParameter("patient_class"));
+	accession_num						=		checkForNull(request.getParameter("accession_num"));
+	episode_type						=		checkForNull(request.getParameter("episode_type"));
+	field_ref							=		checkForNull( request.getParameter("Field_Ref")	);
+	
+	contr_mod_accession_num				=		checkForNull( request.getParameter("contr_mod_accession_num")	);
+	Sex				=		checkForNull( request.getParameter("Sex")	);
+	Dob				=		checkForNull( request.getParameter("Dob")	);
+	module_id		=		checkForNull( request.getParameter("module_id")	);
+	appl_task_id		=		checkForNull( request.getParameter("appl_task_id"));
+	selection_type		=		checkForNull( request.getParameter("selection_type"));
+	chk_Empty		=		request.getParameter("chk_Empty")==null?"false":request.getParameter("chk_Empty");
+	clear_values		=		request.getParameter("clear_values")==null?"":request.getParameter("clear_values");
+
+			
+	if (encounter_id.equals(""))
+		encounter_id = "0";
+	
+	xslURL   = HttpUtils.getRequestURL(request).toString();
+	xslURL = xslURL.substring(0,xslURL.indexOf("jsp/"));
+	xslURL1 = xslURL + "html/RecClinicalNotesTemplateDispayView.xsl";
+	
+
+
+	try
+	{
+		//excepThrow();
+
+		//exc1 = exc/0;
+	
+		con	= ConnectionManager.getConnection(request);
+
+		strKey	= patient_id + "~"+encounter_id;
+		strKey = strKey.trim();
+
+		tempProp = sectionBean.getPatientSection(strKey);
+			
+		StringBuffer sectionContentXML	=	new StringBuffer();
+		StringBuffer sbSecFormat		=	new StringBuffer();
+		StringBuffer sbOutFormat		=	new StringBuffer();
+		
+		String contentXML="";
+		StringBuffer contentOutXML = new StringBuffer();
+
+		Hashtable htParameter=new Hashtable();
+		Hashtable htPatdet=new Hashtable();
+		Hashtable htOutParameter ;
+
+		
+		if(!(prev_sec_hdg_code.equals("")) || !(prev_child_sec_hdg_code.equals("")))
+		{
+			prev_sec_content_type		= sectionBean.getSectionType(prev_sec_hdg_code,prev_child_sec_hdg_code);
+			
+			prev_result_link_type		= sectionBean.getResultLinked(prev_sec_hdg_code,prev_child_sec_hdg_code);
+			prev_image_linked_yn		= sectionBean.getImageLinked(prev_sec_hdg_code,prev_child_sec_hdg_code);
+			
+		}
+		
+		if(!(curr_sec_hdg_code.equals("")) || !(curr_child_sec_hdg_code.equals("")))
+		{
+			curr_section_type		= sectionBean.getSectionType(curr_sec_hdg_code,curr_child_sec_hdg_code);			
+			curr_image_linked_yn	= sectionBean.getImageLinked(curr_sec_hdg_code,curr_child_sec_hdg_code);
+			curr_result_link_yn		= sectionBean.getResultLinked(curr_sec_hdg_code,curr_child_sec_hdg_code);
+			curr_result_link_type	= sectionBean.getHistoryType(curr_sec_hdg_code,curr_child_sec_hdg_code);
+			
+		}
+		
+		if(prev_sec_content_type.equals("T"))
+		{
+			try
+			{
+				
+			Enumeration enumParameter=request.getParameterNames();
+			
+			String parameterName="";
+			String parameterValue="";
+					
+			while(enumParameter.hasMoreElements())
+			{
+				parameterName=(String)enumParameter.nextElement();
+				
+				parameterValue = request.getParameter(parameterName)==null?"":request.getParameter(parameterName);
+			
+				htParameter.put(parameterName, parameterValue);
+				
+			}
+			
+				
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				
+				
+			}
+			
+			htOutParameter = new Hashtable(htParameter);
+
+			eCA.DomParser parser = new eCA.DomParser();
+		
+			contentXML=(String)sectionBean.getSectionContent(prev_sec_hdg_code,prev_child_sec_hdg_code);
+						
+		//	eCA.DomParser outparser = new eCA.DomParser();
+
+			try
+			{
+				//con	= ConnectionManager.getConnection(request);
+
+				if (contentXML == null || contentXML.equals("") )
+				{
+					contentXML = "";
+					PreparedStatement psSec = null;
+					ResultSet rsSec = null;
+			
+					String strSecGetQuery = "Select AGE_GRP_DEP_COMP_INFO,DEP_AGE_GRP_INFO,TEMPLATE_FORMAT from CA_SECTION_HDG where sec_hdg_code = ? ";
+			
+					psSec =	con.prepareStatement(strSecGetQuery);
+					psSec.setString(1,prev_child_sec_hdg_code);			
+					
+					rsSec	= psSec.executeQuery();		
+						
+					if(rsSec.next())
+					{
+						ageDependentCompIds		= rsSec.getString(1)==null?"":rsSec.getString(1); 
+						compDependentAgeGrps	= rsSec.getString(2)==null?"":rsSec.getString(2);
+						Clob clb = rsSec.getClob(3);				
+					
+						if(clb!=null)
+						{
+							java.io.BufferedReader r = new java.io.BufferedReader(clb.getCharacterStream());
+							String line = null;
+							
+							while((line=r.readLine()) != null) 
+							{
+								sbSecFormat.append(line);
+							}
+						}
+					}
+
+					//check for the age group dependency and call a function to delete the component from the XML by parsing it
+					if(rsSec!=null) rsSec.close();
+					if(psSec!=null) psSec.close();
+
+					PreparedStatement psage = null;
+					ResultSet rsage = null;
+	
+					if(!ageDependentCompIds.equals(""))
+					{
+						String functionSQL = "Select ca_comp_visibility(?,?) from dual";
+						psage =con.prepareStatement(functionSQL);
+
+						psage.setString(1,compDependentAgeGrps);
+						psage.setString(2,patient_id);
+						rsage = psage.executeQuery();
+
+						if(rsage.next())
+						{
+							ageDependentResults = rsage.getString(1);
+							eCA.AgeGroupCodeDependencyParser ageGroupBeanObj=new eCA.AgeGroupCodeDependencyParser();
+							sbSecFormat = ageGroupBeanObj.removeAgeDependentComponents(sbSecFormat,ageDependentCompIds,ageDependentResults);
+						}
+					}
+
+					if(rsage!=null) rsage.close();
+					if(psage!=null) psage.close();
+				
+					contentXML = sbSecFormat.toString();
+				}
+
+				if(!grid_component_ids.equals(""))
+				{			
+					eCA.GridComponent gridComp = new eCA.GridComponent();			
+					contentXML = gridComp.updateXML(no_of_rows, contentXML).toString();			
+					gridComp = null;
+				}				
+				if (contentXML!= null && !contentXML.equals("") &&  clear_values.equals("clearTemplateValues"))
+				{	
+					htParameter = parser.clearComponentValues(new StringBuffer(contentXML),htParameter);
+					htOutParameter = htParameter;
+					
+					//htParameter.clear();
+					sectionBean.removeSectionContent ( prev_sec_hdg_code,prev_child_sec_hdg_code);
+				}
+
+				sectionContentXML.append(contentXML);	
+				
+				StringBuffer sectionContentUpdatedXML=new StringBuffer();
+				if(!sectionContentXML.toString().equals("") && sectionContentXML != null && !clear_values.equals("clearTemplateValues"))
+				{ 						
+					chk_Empty = parser.isTemplateEmpty(sectionContentXML,htParameter);							
+					if(operation_mode.equals("") && chk_Empty.equals("false"))
+					{						
+						sectionBean.removeSectionContent( prev_sec_hdg_code,prev_child_sec_hdg_code);
+					}
+					
+					
+				//Added By Sridhar Reddy V on 13/05/2010 to restrict recording empty section.
+					if(chk_Empty.equals("true"))
+					{									sectionContentUpdatedXML=parser.updateXMLContentValues(sectionContentXML,htParameter,locale);
+					}
+					
+				}
+				parser=null;				
+				
+				
+
+
+				// new changes
+					PreparedStatement pstmt = null;
+					ResultSet rs = null;
+				String output_yn =  "";
+
+					output_yn = sectionBean.getOutputExistYN(prev_sec_hdg_code,prev_sec_hdg_code);
+				
+				if(output_yn.equals("Y") && !clear_values.equals("clearTemplateValues") && !sectionContentUpdatedXML.equals(""))
+				{
+					String output_format_qry ="select OUTPUT_XML_FORMAT from  CA_SEC_OUTPUT_FORM b where b.SEC_HDG_CODE =?" ;
+					pstmt=	con.prepareStatement(output_format_qry);
+					pstmt.setString(1,prev_sec_hdg_code);	
+					rs	= pstmt.executeQuery();	
+
+					if(rs.next())
+					{
+						
+						Clob clb1 = rs.getClob("OUTPUT_XML_FORMAT");				
+					
+						if(clb1!=null)
+						{
+							java.io.BufferedReader r = new java.io.BufferedReader(clb1.getCharacterStream());
+							String line = null;
+							
+							while((line=r.readLine()) != null) 
+							{
+								sbOutFormat.append(line);
+							}
+						}
+					}
+					
+					if(rs!=null) rs.close();
+					if(pstmt!=null) pstmt.close();
+
+					contentOutXML = sbOutFormat;
+
+				}
+				
+				StringBuffer contentOutUpdatedXML = new StringBuffer();
+				
+				
+				
+			
+			//	htParameter.put("C_MRFROM2","abcd");
+			//	htParameter.put("C_MRTO3","efgh");
+			
+				
+				htPatdet = sectionBean.getPatOutDetails(patient_id);
+				
+				if(htPatdet!=null)
+				{
+					htOutParameter.put("PATIENT_ID",htPatdet.get("PATIENT_ID"));
+					htOutParameter.put("PATIENT_NAME",htPatdet.get("PATIENT_NAME"));
+					htOutParameter.put("REGN_DATE",htPatdet.get("REGN_DATE"));
+					htOutParameter.put("GENDER",htPatdet.get("GENDER"));
+					htOutParameter.put("RESIDENTAIL_ADDRESS",htPatdet.get("RESIDENTAIL_ADDRESS"));
+					htOutParameter.put("AGE",htPatdet.get("AGE"));
+					htOutParameter.put("FACILITY_NAME",htPatdet.get("FACILITY_NAME"));
+					htOutParameter.put("DATE_OF_BIRTH",htPatdet.get("DATE_OF_BIRTH"));
+					htOutParameter.put("MAR_STATUS_CODE",htPatdet.get("MAR_STATUS_CODE"));
+					htOutParameter.put("NATIONALITY_CODE",htPatdet.get("NATIONALITY_CODE"));
+					htOutParameter.put("RH_FACTOR",htPatdet.get("RH_FACTOR"));
+					htOutParameter.put("BLOOD_GRP",htPatdet.get("BLOOD_GRP"));
+					htOutParameter.put("RES_AREA_CODE",htPatdet.get("RES_AREA_CODE"));
+					htOutParameter.put("RES_TOWN_CODE",htPatdet.get("RES_TOWN_CODE"));
+					htOutParameter.put("RELGN_CODE",htPatdet.get("RELGN_CODE"));
+					htOutParameter.put("NAME_PREFIX",htPatdet.get("NAME_PREFIX"));
+					htOutParameter.put("REGION_CODE",htPatdet.get("REGION_CODE"));
+					htOutParameter.put("ENCOUNTER_ID",htPatdet.get("ENCOUNTER_ID"));
+					htOutParameter.put("CURRENT_LOCATION",htPatdet.get("CURRENT_LOCATION"));
+					htOutParameter.put("ATTENDING_PRACTITIONER",htPatdet.get("ATTENDING_PRACTITIONER"));
+					htOutParameter.put("ADMISSION_DATE",htPatdet.get("ADMISSION_DATE"));
+					htOutParameter.put("SPECIALITY",htPatdet.get("SPECIALITY"));
+					htOutParameter.put("PATIENT_CLASS",htPatdet.get("PATIENT_CLASS"));
+					htOutParameter.put("ROOM_NUM",htPatdet.get("ROOM_NUM"));
+					htOutParameter.put("BED_NUM",htPatdet.get("BED_NUM"));
+					htOutParameter.put("SERVICE_CODE",htPatdet.get("SERVICE_CODE"));
+					htOutParameter.put("ATT_PRACT_WITH_CREDENTIAL",htPatdet.get("ATT_PRACT_WITH_CREDENTIAL"));
+
+				}
+				
+				if(!contentOutXML.toString().equals("") && contentOutXML != null)
+				{ 
+					if(parser==null)
+					{
+						parser = new eCA.DomParser();	
+					}								
+					contentOutUpdatedXML=parser.updateXMLOutContentValues(sectionContentUpdatedXML,contentOutXML,htOutParameter,locale,xslURL1);								
+				}
+
+			
+
+				String prev_sec_hdg_code_out ="";
+				String prev_child_sec_hdg_code_out ="";
+
+				prev_sec_hdg_code_out = prev_sec_hdg_code+"_out";
+				prev_child_sec_hdg_code_out = prev_child_sec_hdg_code+"_out";
+
+				
+				
+
+
+				// new changes ends..
+				
+				
+				parser=null;
+				sectionBean.setSectionContent(prev_sec_hdg_code,prev_child_sec_hdg_code,sectionContentUpdatedXML.toString());
+				sectionBean.setSectionValues(prev_sec_hdg_code_out,prev_child_sec_hdg_code_out,"T","N","N","N","N","","N","N", contentOutUpdatedXML.toString(),"",output_yn);
+				
+
+			putObjectInBean("sectionBean",sectionBean,session);		
+			}
+			catch(Exception ex)
+			{
+				out.println("Exception @ RecClinicalemplateCtrl"+ex.toString());
+				ex.printStackTrace();
+			}
+			
+		}//end of Template Based Sections
+		else if(prev_sec_content_type.equals("F") || prev_sec_content_type.equals("R"))
+		{			
+			if(!(section_content.equals("")) )
+			{				
+				sectionBean.setSectionContent ( prev_sec_hdg_code,prev_child_sec_hdg_code, section_content);
+			}
+			else if (section_content.equals("")&&( !(appl_task_id.equals("PAT_MEDICAL_REPORT")&&selection_type.equals("M"))) )
+			{				
+				sectionBean.removeSectionContent ( prev_sec_hdg_code,prev_child_sec_hdg_code);
+			}
+			
+			if(prev_image_linked_yn.equals("Y") && image_edited_yn.equals("Y"))
+				sectionBean.setSectionImageContent(prev_sec_hdg_code,prev_child_sec_hdg_code,section_image_content);
+
+			putObjectInBean("sectionBean",sectionBean,session);
+		}
+
+		if(!section_content.equals("") && !prev_populated_section_tblrowID.equals(""))
+		{
+			out.println("<script>");
+			out.println("var tblrow_id = eval(\"parent.RecClinicalNotesSectionFrame.document.all." + prev_populated_section_tblrowID + "\");");
+			out.println("if(tblrow_id != null)");
+			out.println("{");
+			out.println("tblrow_id.cells(0).className = \"POPULATED_SECTION\";");
+			out.println("}");
+			out.println("</script>");
+		}
+	}
+	
+	catch(Exception e)
+	{
+		
+		e.printStackTrace();
+	}finally
+	{
+		if(con!=null)
+			ConnectionManager.returnConnection(con,request);
+	}
+	
+	// this code takes care of the display part of the current section.......
+	try
+	{
+		section_content = "";		
+		if(!curr_sec_hdg_code.equals("") && !curr_child_sec_hdg_code.equals(""))
+		{
+			section_content = (java.lang.String) sectionBean.getSectionContent ( curr_sec_hdg_code,curr_child_sec_hdg_code );
+
+			if(section_content == null || section_content.equals("") )
+				section_content = "";
+			
+			section_content			=	java.net.URLEncoder.encode(section_content,"UTF-8");
+		}
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+		
+	}
+%>
+ <BODY onMouseDown="CodeArrest()" onKeyDown="lockKey()"> 
+<form name='RecClinicalNotesSecControlForm' method='post' >
+	<input type='hidden' name='image_linked_yn' value='<%=curr_image_linked_yn%>'>
+	<input type='hidden' name='operation_mode' value='<%=operation_mode%>'>
+	<input type='hidden' name='curr_section_type' value='<%=curr_section_type%>'>
+	<input type='hidden' name='curr_result_link_type' value='<%=curr_result_link_type%>'>
+	<input type='hidden' name="section_image_content" >
+	<input type='hidden' name="section_content" >
+	<input type = 'hidden' name = 'Field_Ref' value="<%=field_ref%>">
+	<input type = 'hidden' name = 'contr_mod_accession_num' value="<%=contr_mod_accession_num%>">
+	<input type='hidden' name='Sex' value='<%=Sex%>'>
+	<input type='hidden' name='Dob' value='<%=Dob%>'>
+	<input type='hidden' name='module_id' value='<%=module_id%>'>
+	<input type='hidden' name='accession_num' value='<%=accession_num%>'>
+</form>
+<%
+	if(curr_section_type.equals("T"))
+	{		
+		%>
+			<script language='javascript'>				
+			
+		var template_mode = 	showSectionTemplate_new("<%=curr_sec_hdg_code%>","<%=curr_section_type%>","<%=curr_child_sec_hdg_code%>","<%=editor_title%>","<%=patient_id%>","<%=encounter_id%>","<%=Sex%>","<%=Dob%>");
+
+			</script>
+		<%
+	}
+	else if(curr_section_type.equals("F") || curr_section_type.equals("R"))
+	{		
+		
+		if(curr_image_linked_yn.equals("Y"))
+		{
+			url_for_details_frame = "../../eCA/jsp/RecClinicalNotesEditorsFrame.jsp?content_editable_yn="+strContentEditableYn+"&patient_id="+patient_id+"&encounter_id="+encounter_id+"&editor_param=I";
+		}else if(appl_task_id.equals("PAT_MEDICAL_REPORT")&&selection_type.equals("M"))
+		{
+			
+			url_for_details_frame = "../../eCA/jsp/RecClinicalNotesSectionView.jsp?note_type="+note_type+"&patient_id="+patient_id+"&encounter_id="+encounter_id+"&appl_task_id="+appl_task_id+"&selection_type="+selection_type;
+				//+"&multi_sec_hdg_code="+multi_sec_hdg_code+"&multi_child_sec_hdg_code="+multi_child_sec_hdg_code;
+		}
+		else {
+			
+			url_for_details_frame = "../../eCA/jsp/RTEditor.jsp?content_editable_yn="+strContentEditableYn+"&editor_param=R";
+		}
+
+		%>
+
+		<form name='GetEditorForm' method='post' action='<%=url_for_details_frame%>'>	
+			<input type='hidden' name='RTEText' value='<%=section_content%>'>
+			<input type='hidden' name='image_linked_yn' value='<%=curr_image_linked_yn%>'>
+			<input type='hidden' name='curr_sec_hdg_code' value='<%=curr_sec_hdg_code%>'>
+			<input type='hidden' name='curr_child_sec_hdg_code' value='<%=curr_child_sec_hdg_code%>'>
+			<input type='hidden' name='curr_section_type' value='<%=curr_section_type%>'>
+			<input type='hidden' name='curr_result_link_type' value='<%=curr_result_link_type%>'>
+			<input type='hidden' name='curr_result_link_yn' value='<%=curr_result_link_yn%>'>
+			<input type='hidden' name='sec_hdg_code' value='<%=sec_content_type.equals("S")?curr_child_sec_hdg_code:curr_sec_hdg_code%>'>
+			<input type='hidden' name='ModuleID' value='CA'>
+			
+
+		</form>
+		</body>
+</html>
+		<script language='javascript'>			
+			changeEditorTitle_new("<%=editor_title%>","<%=curr_image_linked_yn%>");
+			callMeToGetEditor();
+		</script>
+
+		<%
+	}
+	else if(operation_mode.equals("sectionView"))
+	{ 			
+		if(chk_Empty.equals("false") && prev_sec_content_type.equals("T") && !clear_values.equals("clearTemplateValues")){
+		
+		%>
+					<script>		
+					alert(getMessage("FILL_COMPONENT",'CA'));		
+					
+					var curr_sec_hdg_code = parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesTemplateFrame.document.getElementById("sec_hdg_code").value;
+					
+					var curr_section_type = parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesTemplateFrame.document.getElementById("sec_content_type").value;
+					
+					var curr_child_sec_hdg_code = parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesTemplateFrame.document.getElementById("child_sec_hdg_code").value;
+					
+					var editor_title = parent.RecClinicalNotesSecDetailsFrame.RecClinicalNotesTemplateFrame.document.getElementById("template_title").value;					
+					
+					assignSectionDetails(curr_sec_hdg_code,curr_child_sec_hdg_code,editor_title,'','sectionView');
+					
+					//Newly added  by Name :Selvin M  Date :16 june 2011 INCIDENT NO: 27228 Changes:newly added Starts
+					parent.RecClinicalNotesToolbarFrame.document.all.display_view.innerHTML ='<b>Click on "Notes View" for "Record" & "SIGN" buttons</b>';
+					//Ends
+					setToolBarButtons(parent.RecClinicalNotesToolbarFrame.document.forms(0).sign,false);	
+					setToolBarButtons(parent.RecClinicalNotesToolbarFrame.document.forms(0).record,false);
+					setToolBarButtons(parent.RecClinicalNotesToolbarFrame.document.forms(0).notesView,true);
+					parent.frameSetIdMessage.rows='*%,0%';
+
+				</script>
+		<% }else{ %>
+						
+					<script>									
+					var multi_sec_hdg_code = parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.multi_sec_hdg_code.value;
+						var multi_child_sec_hdg_code = parent.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm.multi_child_sec_hdg_code.value
+						parent.RecClinicalNotesSecDetailsFrame.location.href = '../../eCA/jsp/RecClinicalNotesSectionView.jsp?note_type=<%=note_type%>&patient_id=<%=patient_id%>&encounter_id=<%=encounter_id%>&appl_task_id=<%=appl_task_id%>&selection_type=<%=selection_type%>&multi_sec_hdg_code='+multi_sec_hdg_code+'&multi_child_sec_hdg_code='+multi_child_sec_hdg_code;
+						</script>				
+	<%			//}
+			}
+	}
+	else if(operation_mode.equals("Preview"))
+	{		
+		%>
+			<script>			
+			var Obj = top.content.workAreaFrame.RecClinicalNotesFrame.RecClinicalNotesHeaderFrame.document.RecClinicalNotesHeaderForm;	
+			
+			var note_title			= "";
+			var med_service			= "";
+			var event_date_time		= "";
+			var performed_by_name	= "";
+
+			event_date_time		= Obj.event_date_time.value;
+			performed_by_name	= Obj.performing_phy_name.value;
+			note_title			= Obj.event_title_desc.value;
+
+			if(Obj.serv_disp != null)
+				med_service			= Obj.serv_disp.value;
+
+			var url ='../../eCA/jsp/RecClinicalNotesPrintPreview.jsp?note_type=<%=note_type%>&encounter_id=<%=encounter_id%>&episode_type=<%=episode_type%>&accession_num=<%=accession_num%>&patient_class=<%=patient_class%>&patient_id=<%=patient_id%>&note_title='+encodeURIComponent(note_title)+'&med_service='+encodeURIComponent(med_service)+'&event_date_time='+event_date_time+'&performed_by_name='+encodeURIComponent(performed_by_name);
+			window.open(url,'Document','height=570,width=790,top=0,left=0,resizable=yes,scrollbars=yes' );  
+			
+			</script>
+		<%
+	}
+	else if(strRecFlag.equals("") && (operation_mode.equals("Record") || operation_mode.equals("Sign") || operation_mode.equals("ModifySection")) )
+	{
+		%>
+		<script>
+			recordSectionDetails();
+		</script>
+		<%
+	}else if(operation_mode.equals("Update")) {  %>
+		
+		<script>			
+			setTimeout("parent.RecClinicalNotesSecDetailsFrame.location.href = '../../eCA/jsp/RecClinicalNotesSectionView.jsp?note_type=<%=note_type%>&patient_id=<%=patient_id%>&encounter_id=<%=encounter_id%>'",1500);
+		//setButtonsforOperations("<%=operation_mode%>",true);
+		</script>
+<%}%>
+<%!
+	private String checkForNull(String inputString)
+	{
+		return (inputString==null)	?	""	:	inputString;
+	}	
+%>

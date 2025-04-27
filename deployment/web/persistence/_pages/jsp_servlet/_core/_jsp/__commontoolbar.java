@@ -1,0 +1,185 @@
+package jsp_servlet._core._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import com.iba.framework.core.util.Constants;
+
+public final class __commontoolbar extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/core/jsp/CommonToolbar.jsp", 1725013815876L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/framework/html/Tag.text", 1669269889579L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "ISO-8859-1".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="<!DOCTYPE html>\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\r\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\r\n\r\n";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\r\n\r\n<script>\r\n\tvar loadMethod=\"";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\"\r\n\tvar applyMethod=\"";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\"\r\n\tvar queryMethod=\"";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\"\r\n\tvar updateMethod=\"";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    private final static java.lang.String  _wl_block8 ="\"\r\n\tvar deleteMethod=\"";
+    private final static byte[]  _wl_block8Bytes = _getBytes( _wl_block8 );
+
+    private final static java.lang.String  _wl_block9 ="\"\r\n\tvar contextPath=\"";
+    private final static byte[]  _wl_block9Bytes = _getBytes( _wl_block9 );
+
+    private final static java.lang.String  _wl_block10 ="\"\r\n\tvar dwrMessage=\"\";\r\n\t\r\n</script>";
+    private final static byte[]  _wl_block10Bytes = _getBytes( _wl_block10 );
+
+    private final static java.lang.String  _wl_block11 ="\n<html>\n\t<head>\n";
+    private final static byte[]  _wl_block11Bytes = _getBytes( _wl_block11 );
+
+    private final static java.lang.String  _wl_block12 ="\n\t<link rel=\'stylesheet\' type=\'text/css\' href=\'/eHIS-DS/core/css/";
+    private final static byte[]  _wl_block12Bytes = _getBytes( _wl_block12 );
+
+    private final static java.lang.String  _wl_block13 ="\'></link>\n\n<Script>\n\t   function activate( newimg ) {\n\t\t\treturn true;\n\t\t}\n\t\tfunction reset()\n\t\t{\n\t\t\tparent.reset();\n\t\t}\n\t\tfunction onDelete(){\n\t\t  parent.deleterec();\n\t\t  parent.commontoolbarFrame.location.href=\'../eDS/MealType/html/process.html\';\n\t\t}\n\n\t\tfunction onApply() {\n\t\t\tparent.apply() ;\n\t\t}\n\t</Script>\n\t<script type=\'text/javascript\' src=\'";
+    private final static byte[]  _wl_block13Bytes = _getBytes( _wl_block13 );
+
+    private final static java.lang.String  _wl_block14 ="/dwr/interface/MessageReader.js\'></script>\n\t\t<script type=\'text/javascript\' src=\'";
+    private final static byte[]  _wl_block14Bytes = _getBytes( _wl_block14 );
+
+    private final static java.lang.String  _wl_block15 ="/dwr/engine.js\'></script>\n\t\t<script type=\'text/javascript\' src=\'";
+    private final static byte[]  _wl_block15Bytes = _getBytes( _wl_block15 );
+
+    private final static java.lang.String  _wl_block16 ="/dwr/util.js\'></script>\n\t\t<script type=\'text/javascript\' src=\'";
+    private final static byte[]  _wl_block16Bytes = _getBytes( _wl_block16 );
+
+    private final static java.lang.String  _wl_block17 ="/framework/js/Ajax_DWR.js\'></script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n\t</head>\n\t<body class=\"COMMON_TOOLBAR\" leftmargin=0 topmargin=0 bgcolor=#ffffff>\n\n\t\t<form name=\"CommonToolbar_form\" id=\"CommonToolbar_form\" action=\"/ToolbarAction\">\n\t\t\t<table width=\"100%\" cellspacing=\'0\' cellpading=\'0\'>\n\t\t\t\t<tr class=\"COMMONTOOLBARFUNCTION\">\n\t\t\t\t\t<td align=\"left\" class=\"COMMONTOOLBARFUNCTION\">\n\t\t\t\t\t\t";
+    private final static byte[]  _wl_block17Bytes = _getBytes( _wl_block17 );
+
+    private final static java.lang.String  _wl_block18 ="\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t<table width=\"100%\" cellspacing=\'0\' cellpading=\'0\'>\n\t\t\t\t\t\t\t<tr class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\" align=\"left\" width=\"50%\">\n\t\t\t\t\t\t\t\t\t<table cellspacing=\'0\' cellpading=\'0\'>\n\t\t\t\t\t\t\t\t\t\t<tr class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\'\n\t\t\t\t\t\t\t\t\t\t\t\t\tonclick=\"parent.create();parent.messageFrame.location.href=\'MessageFrame.jsp\'\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tvalue=\'Create\' name=\'create\' id=\'create\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\n\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\'\n\t\t\t\t\t\t\t\t\t\t\t\t\tonclick=\"parent.query();parent.messageFrame.location.href=\'MessageFrame.jsp\'\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tvalue=\'Query\' name=\'query\' id=\'query\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\n\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\' onclick=\"parent.deleterec();parent.messageFrame.location.href=\'MessageFrame.jsp\'\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tvalue=\'Delete\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\n\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\' onclick=\"onApply();\" value=\'Apply\' onclick=\"parent.reset();parent.messageFrame.location.href=\'MessageFrame.jsp\'\" name=\'apply\' id=\'apply\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\' onclick=\"parent.run();\" value=\'Run\'\n\t\t\t\t\t\t\t\t\t\t\t\t\tonclick=\"parent.run();parent.messageFrame.location.href=\'MessageFrame.jsp\'\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tname=\'run\' id=\'run\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\n\t\t\t\t\t\t\t\t\t\t\t<td class=\"COMMON_TOOLBAR\">\n\t\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\' onclick=\"parent.reset();\" value=\'Reset\'\n\t\t\t\t\t\t\t\t\t\t\t\t\tonclick=\"parent.reset();parent.messageFrame.location.href=\'MessageFrame.jsp\'\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t name=\'reset\' id=\'reset\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t\t\t\t<input type=\'button\' onClick=\'parent.parent.parent.frames[1].expand(this)\' onclick=\"\'\" value=\'Menu\' name=\'home\' id=\'home\' class=\'BUTTON\'></input>\n\t\t\t\t\t\t\t\t\t\t\t</td>\n\n\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t</table>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\n\t\t</form>\n\n\t</body>\n</html>\n\n";
+    private final static byte[]  _wl_block18Bytes = _getBytes( _wl_block18 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            out.print( String.valueOf(Constants.LOAD));
+            _bw.write(_wl_block5Bytes, _wl_block5);
+            out.print( String.valueOf(Constants.CREATE));
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(Constants.QUERY));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+            out.print( String.valueOf(Constants.UPDATE));
+            _bw.write(_wl_block8Bytes, _wl_block8);
+            out.print( String.valueOf(Constants.DELETE));
+            _bw.write(_wl_block9Bytes, _wl_block9);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block10Bytes, _wl_block10);
+            _bw.write(_wl_block11Bytes, _wl_block11);
+
+			String sStyle = ((session.getAttribute("PREFERRED_STYLE") != null) || (session
+			.getAttribute("PREFERRED_STYLE") != "")) ? (String) session.getAttribute("PREFERRED_STYLE")
+			:"IeStyle.css" ;
+			if(sStyle==null)sStyle="IeStyle.css";
+
+            _bw.write(_wl_block12Bytes, _wl_block12);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block13Bytes, _wl_block13);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block14Bytes, _wl_block14);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block15Bytes, _wl_block15);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block16Bytes, _wl_block16);
+            out.print( String.valueOf(request.getContextPath()));
+            _bw.write(_wl_block17Bytes, _wl_block17);
+
+						//= functionname
+						
+            _bw.write(_wl_block18Bytes, _wl_block18);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

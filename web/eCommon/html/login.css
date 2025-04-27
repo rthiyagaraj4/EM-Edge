@@ -1,0 +1,541 @@
+/**
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+**/
+*{
+	margin:0;
+	padding:0;
+}
+.main
+{
+	
+	/*background:url(../images/bgStrip.jpg) repeat-x;*/
+	
+	margin-left:0;
+	margin-right:0;
+	margin-top:0;
+	margin-bottom:0;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.mainSwitchResponsibility
+{
+	
+	background:url(../images/bgStrip.jpg) repeat-x;
+	background-position:center;
+	background-color:#C5D5DC;
+	margin-left:0;
+	margin-right:0;
+	margin-top:0;
+	margin-bottom:0;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.topSpaceSwitchResponsibility
+{
+	height:230px;
+}
+.topSpace
+{
+	height:155px;
+}
+.mainTable
+{
+	background-color:#b3e3ef;
+	min-height:100%;
+	min-width:100%;
+	height:100%;
+	width:100%;
+	position:absolute;
+	display:table;
+	
+}
+.subTable
+{
+	width:500px;
+	border-collapse:collapse;
+}
+.loginTopLeft
+{
+	background:url(../images/loginTopLeft.jpg) no-repeat;
+	width:10px;
+	height:45px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.loginTopCenter
+{
+	background:url(../images/loginTopStrip.jpg) repeat-x;
+	width:464px;
+	height:45px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.loginTopRight
+{
+	background:url(../images/loginTopRight.jpg) no-repeat;
+	width:26px;
+	height:45px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.boldText
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	color: #000000;
+	font-weight: bold;
+}
+.loginText
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+.normalText
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 7pt;
+	color: #000000;
+}
+
+.loginCenterLeft
+{
+	background:url(../images/loginCenterLeft.gif) no-repeat;
+	width:10px;
+	height:175px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.loginCenterCenter
+{
+	border-collapse:collapse;
+}
+.loginCenterRight
+{
+	background:url(../images/loginCenterRight.jpg) no-repeat;
+	width:26px;
+	height:175px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:5px;
+	padding-bottom:0;
+	vertical-align:top;
+}
+.isoftLogo
+{
+	background:url(../images/isoftLogo.gif) no-repeat;
+	width:207px;
+	height:175px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.space
+{
+	height:5px;
+}
+.controls
+{
+	background:url(../images/loginCenterStrip.jpg) repeat-x;
+	height:175px;
+	width:257px;
+	text-align:center;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;	
+}
+.loginError
+{
+	padding-left:2px;
+	padding-right:2px;
+	padding-top:2px;
+	padding-bottom:2px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	
+	color:red;/*Changed by Vel*/
+	text-align:left;
+}
+.loginBottomLeft
+{
+	background:url(../images/loginBottomLeft.jpg) no-repeat;
+	width:10px;
+	height:60px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.loginBottomCenter
+{
+	display:table-cell;
+	height: 70px;
+    width: 100%;
+	background: #21a1bc;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIxYTFiYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNjY2NzciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #21a1bc 0%, #166677 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#21a1bc), color-stop(100%,#166677)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #21a1bc 0%,#166677 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #21a1bc 0%,#166677 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#21a1bc', endColorstr='#166677',GradientType=0 ); /* IE6-8 */
+	border-top:#1b1f2d 1px solid;
+	box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+	-webkit-box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+	-moz-box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+		text-align:left;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:normal;
+	font-size:12px;
+	color:#FFF;
+ 	padding-top:10px;
+}
+.loginBottomRight
+{
+	background:url(../images/loginBottomRight.jpg) no-repeat;
+	width:26px;
+	height:60px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.clientLogo
+{
+	padding-left:5px;
+	padding-top:5px;
+}
+
+.textbox {
+	background-color: #FFFFFF;
+	border: 1px solid #FFFFFF;
+	width:250px;
+	padding-top: 3px;
+	padding-bottom: 2px;
+}
+.loginButtonAlign
+{
+	text-align:right;
+}
+/*.button
+{
+	width:90px;
+	height:36px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	border:0px;
+	font-weight: bold;
+	text-align:center;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+	border-radius:3px
+-ms-border-radius:3px; 
+	-moz-border-radius:3x;
+	-webkit-border-radius: 3px;
+	/*background-image: url(images/ButtonBg.PNG);*/
+	/*background-color:#000
+
+}*/
+
+.button
+{
+	width: 90px;
+	height: 36px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	/*border: 0px;*/
+	border: 1px solid #008c95;/*Changed by Vel*/
+	/*font-weight: bold;*//*commented by Vel*/
+	text-align: center;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	/*border-radius:3px
+-ms-border-radius:3px; 
+	-moz-border-radius:3x;
+	-webkit-border-radius: 3px;*/				/* Comment by VEL*/
+	/*background-image: url(images/ButtonBg.PNG);*/
+	/*background-color: #000;
+	color: #FFF;*/
+	background-color: #ffffff;/*Changed by Vel*/
+	color: #000;
+	/*border-color: #FFF;*//*Commented by Vel*/	
+}
+.version {
+	font-family: arial;
+	font-size: 12px;
+	color: #000;/*Changed by Vel*/
+	text-align: center;
+	padding-right: 40px;/*Changed by Vel*/
+}
+
+.separator
+{
+	background:url(images/separator.jpg) repeat-x;
+	height:2px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+}
+.copyrights
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 7pt;
+	color: #666666;
+	background-color:#C5D5DC;
+}
+.roleProfile
+{
+	background:url(../images/loginCenterStrip.jpg) repeat-x;
+	width:464px;
+	height:175px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+	text-align:center;
+}
+.merge
+{
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+	padding-bottom:0;
+	text-align:center;
+}
+.userName
+{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 7pt;	
+	color: #ffffff;
+}
+.roleProfileText
+{
+	width:120px;
+	padding-left:0;
+	padding-right:0;
+	padding-top:10px;
+	padding-bottom:0;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #FFFFFF;
+	font-weight:bold;
+	text-align:right;
+}
+.select
+{
+	width:250px;
+	font-size:9pt;
+	text-align:center;
+}
+
+.selectBoxCell
+{
+	/*width:100%;*/
+	/*text-align:center;*/
+}
+.option1{
+	background-color: #E2E3F0;
+}
+
+.option2{
+	background-color: #F0F0F2;
+}
+
+#Headercontainer
+{
+	display:table-row;
+	width: 100%;
+    height:10px;
+}
+#Contentcontainer
+{
+	display:table-row;
+	width: 100%;
+	height:100%;
+	position:relative;
+	overflow:visible;
+	background-image:url(images/LoginBg.jpg);
+	background-position:center;
+	background-repeat: no-repeat;
+	background-color:#ffffff;
+	
+
+}
+#footercontainer
+{
+	
+	display:table-row;
+	width: 100%;
+    height:50px;
+	position:absolute;
+	bottom:0;
+}
+
+
+
+.clearfix:after {
+ content: "."; 
+ display: block; 
+ height: 0; 
+ clear: both; 
+ visibility: hidden;
+ }
+.clearfix{display: inline-block;}
+* html .clearfix{height: 1%;}
+.clearfix{display: block;}
+#Maincontainer
+{
+	
+	min-height:100%;
+	min-width:100%;
+	height:100%;
+	width:100%;
+	position:absolute;
+	display:table;
+	border:0px;
+}
+#Header
+{
+	display:table-cell;
+	width: 100%;
+    height:25px;
+	position:relative;
+
+	background: #21a1bc;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIxYTFiYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNjY2NzciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #21a1bc 0%, #166677 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#21a1bc), color-stop(100%,#166677)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #21a1bc 0%,#166677 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #21a1bc 0%,#166677 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#21a1bc', endColorstr='#166677',GradientType=0 ); /* IE6-8 */
+	border-bottom:#1b1f2d 1px solid;
+	box-shadow:  0px 2px 3px rgba(0,0,0,0.75);
+	-webkit-box-shadow:  0px 2px 3px rgba(0,0,0,0.75);
+	-moz-box-shadow:  0px 2px 3px rgba(0,0,0,0.75);
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:bold;
+	font-size:12px;
+	color:#FFF;
+ 	padding-top:5px;
+}
+#footer
+{
+	display:table-cell;
+	height: 55px;
+    width: 100%;
+	background: #21a1bc;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIxYTFiYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNjY2NzciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, #21a1bc 0%, #166677 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#21a1bc), color-stop(100%,#166677)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #21a1bc 0%,#166677 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #21a1bc 0%,#166677 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #21a1bc 0%,#166677 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#21a1bc', endColorstr='#166677',GradientType=0 ); /* IE6-8 */
+	border-top:#1b1f2d 1px solid;
+	box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+	-webkit-box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+	-moz-box-shadow:  0px 0px 3px rgba(0,0,0,0.75);
+		text-align:left;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:normal;
+	font-size:12px;
+	color:#FFF;
+ 	padding-top:0px;
+	bottom:0;
+}
+#Contentcontainerbg
+{
+	width: 637;
+	height: 425;
+	position: absolute;
+	left: 42%;
+	top: 40%;
+	margin: -150px 0 0 -226px;/*
+background: #feffff; 
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZlZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNjNWU0ZjciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, #feffff 0%, #c5e4f7 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#feffff), color-stop(100%,#c5e4f7)); 
+background: -webkit-linear-gradient(top, #feffff 0%,#c5e4f7 100%); 
+background: -o-linear-gradient(top, #feffff 0%,#c5e4f7 100%);
+background: -ms-linear-gradient(top, #feffff 0%,#c5e4f7 100%);
+background: linear-gradient(to bottom, #feffff 0%,#c5e4f7 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#c5e4f7',GradientType=0 );*/
+	background-image: url(../../eCommon/images/LoginWidget.png);
+	border-radius: 0px;
+	-moz-border-radius: 0x;
+	-webkit-border-radius: 0px;
+}
+
+.CopyRight
+{
+	color:#85cbda;
+	font: Arial;
+	font-size: 12;
+}
+.logo
+{
+	padding-right:15px;
+	padding-left:15px;
+	padding-top:3px;
+	width:20px;	
+}
+.CusLogo
+{
+	padding-left:0px;
+	padding-top:5px;
+}
+
+.heading{
+	font-family:Segoe UI,Montserrat;
+	font-size:12px;
+	color:#000000;/*Changed by Vel*/
+}
+
+.siteheading{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:bold;
+	color:#000000;
+}
+.inputH {
+	height: 28px;
+	border: 1px solid #d0d0d0;/*Changed by Vel*/
+	
+}
+.selectLogin
+{
+	width:250px;
+	font-size:9pt;
+	text-align:center;
+	height: 28px;
+}

@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Patient Disposal Approval</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Medical Records\nTransaction\nPatient Disposal Approval");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Patient Disposal Approval</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Approve</span> the patient IDs for disposal.</p>
+<p class="Text">This function allows you to generate the patient IDs or lists out the patient ID’s based on the defined criteria, who are not having any active encounter or inactive or no visit, since parameter defined years (like 1, 2 or 5 YRS) against a specialty. Thereby, allows to mark the Patient ID’s as Disposal.</p>
+<p class="Text">&#160;</p>
+<p class="Text">The system considers the following hierarchy to mark patient as disposal:</p>
+<ul type="disc">
+<li class="p-Text">
+<p class="Text">The system will not list the patient in the transaction list, if below criteria is met:</p>
+</li>
+<li style="list-style: none; display: inline">
+<ul type="circle">
+<li class="p-Text">
+<p class="Text">If patient is having a case of MLC, Post Mortem, OSCC.</p>
+</li>
+<li class="p-Text">
+<p class="Text">If the patient has undergone Blood Transfusion and Blood Donor.</p>
+</li>
+<li class="p-Text">
+<p class="Text">If the patient is Psychiatric and Alive.</p>
+</li>
+</ul>
+</li>
+<li class="p-Text">
+<p class="Text">The system will list the patients only if medical report status is in ‘Cancelled’ and ‘Report Delivered’.</p>
+</li>
+<li class="p-Text">
+<p class="Text">The patient marked for Blood Donor will not be listed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">The system will exclude the patient to appear in the transaction list, if it is initiated for merge process.</p>
+</li>
+</ul>
+<p class="Text">&#160;</p>
+<p class="Text">The system considers following criteria before marking the Patient ID’s as Disposal.</p>
+<ul type="disc">
+<li class="p-Text">
+<p class="Text">If encounter is open, the system will not allow to mark EMR status as disposed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">The date Patient is checked out/discharged, will be considered to mark EMR status as disposed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">The encounter Discharge /Checked out date will be considered to mark EMR status as disposed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">The Past and Future Appointment/Referral/ Booking will not be checked while listing these patients in the transaction screen and marking as disposal.</p>
+</li>
+</ul>
+<h2>Approving Patient ID for Disposal</h2>
+<p class="From">From MR Transactions, select the Patient Disposal Approval function.</p>
+<p class="Text">The Patient Disposal Criteria screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Select the Patient ID from the lookup.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the required Date From by clicking the calendar icon. This field is mandatory.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span style="font-weight: bold;"><b>[Search]</b></span> to view the list of patient IDs to be considered for disposal.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Once the patient records get displayed, the Disposal Approval button gets enabled.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the check box against the patient IDs to be disposed and click <span style="font-weight: bold;"><b>[Disposal Approval]</b></span> button to send for approval. The message 'Operation completed successfully' gets displayed with OK button. &#160;</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />A batch ID gets generated and stored internally. The batch ID consists of 'User ID- System Name-Date &amp; Time'. The disposal is yet not done. It means one group of patients pending for disposal approval.</p>
+<ol start="6">
+<li class="p-Number">
+<p class="Number">Click <span style="font-weight: bold;"><b>[OK]</b></span>, the ‘Internal Report’ dialog gets displayed to print patients selected for disposal.</p>
+</li>
+<li class="p-Number">
+<p class="Number">If you search again, the list will exclude the selected (for disposal approval) patient in the newly generated list. The system will not list those patient records who have been sent for disposal approval.</p>
+</li>
+</ol>
+<hr style="float: aligncenter;" />
+<p class="Number">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

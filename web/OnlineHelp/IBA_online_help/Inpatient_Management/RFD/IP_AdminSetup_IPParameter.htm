@@ -1,0 +1,744 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>IP_AdminSetup_IPParameter</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details under the ADT tab:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Booking</p>
+<ol>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Booking For Unregistered Patients</span> - Select the check box to 
+	 allow booking for admission with/without bed for unregistered patients, 
+	 that is, create a booking without specifying a Patient ID. If the 
+	 check box is cleared, the booking can be made only for registered 
+	 patients. The check box is cleared, by default.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Grace 
+	 Period For Revision Of Booking () Days</span> – Enter the number of 
+	 days allowed to revise the booking in numeric format of three digits 
+	 maximum length. The facility can revise the booking for admission 
+	 within the number of days specified after the preferred admission 
+	 date has elapsed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Period For Advance Bed Booking () Days</span> - Enter the 
+	 number of days allowed to perform advance booking in numeric format 
+	 of three digits maximum length. It specifies the number of days the 
+	 booking can be performed in advance. While &#160;booking a admission, 
+	 if you specify a preferred admission date greater than the date calculated 
+	 based on this parameter setting, the system alerts you with an appropriate 
+	 message. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Check 
+	 Booking Limit Based on</span> – Select one of the values from the 
+	 list. The listed values are ‘Nursing Unit – Bed Class’ and ‘Age Group 
+	 – Bed Class’. This field is used to indicate the basis for validating 
+	 booking limits for bed bookings.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allowed 
+	 Booking</span> – Select an option from the list, as either ‘Direct’ 
+	 or ‘Referral’. Selecting ‘Direct’, indicates that booking is allowed 
+	 for patients without Referral and selecting ‘Referral’ indicates that 
+	 booking is allowed only for Referral patients.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Block 
+	 Bed based on</span> – Select one of the values from the list. This 
+	 field is used to indicate the basis for validating time period for 
+	 bed blockings. The listed values are ‘Preferred Admission Date/Time’ 
+	 and ‘Expected Discharge Date Time’.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Multiple 
+	 Booking for Patients</span> - Select the check box if multiple bookings 
+	 are to be performed with the same Patient ID in ‘Create booking’ function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Capture 
+	 Financial Details</span> - Select the check box to capture the Financial 
+	 Details in ‘Create Booking’ function. The check box is visible only 
+	 if Patient Billing Manager module is installed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Display 
+	 No Show Status in Confirm booking after</u></span> – Enter the numeric 
+	 value of maximum three characters length, it can be blank or greater 
+	 than zero. If the patient has not turned after the minutes entered 
+	 here, the booking status of the patient is displayed as ‘No Show’ 
+	 in Confirm/Cancel/Revise Booking screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Released 
+	 Booked Bed if Admitted into Different Bed</u></span> – Select the check 
+	 box to release the booked bed if the confirmed booking patient gets 
+	 admitted in a different Bed number. The released bed gets displayed 
+	 in the Bed availability chart.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Admission/Discharge/Transfer</p>
+<ol start="11" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Backdated Admission</span> – Enter the Hours/Days in numeric 
+	 format of three digits maximum length to indicate the time that is 
+	 allowed for backdating an admission. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allowed 
+	 Admission</span> – Select an option from the list to indicate the 
+	 types of admission allowed. The listed values are ‘Referral’, ‘Booking’, 
+	 ‘Direct’ and ‘Booking or Referral’. Selecting ‘Referral’ indicates 
+	 admission is allowed only for referral patients. On selecting ‘Booking’, 
+	 admission is allowed for patients who have made prior booking for 
+	 admission. The selection of ‘Direct’ indicates that the admission 
+	 is allowed for patients without booking or those who are not referral 
+	 patients and selecting ‘Booking or Referral’ indicates admission is 
+	 allowed only for patients with prior booking or those who are referral 
+	 patients.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Invoke 
+	 Admission from New Born Registration</span> - Select the check box, 
+	 if admission is allowed for the patient from New Born Registration 
+	 function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Discharge Period for Day Care () Hours</span> – It is used to indicate 
+	 the maximum period of day care stay allowed (in hours only), before 
+	 the patient is discharged from day care unit. This field is applicable 
+	 for Day Care patient management. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Backdated Discharge</span> – Enter the required value in 
+	 Hours/Days in the numeric format of three digits maximum length. This 
+	 is used to indicate the time limit set for backdating a discharge. 
+	 This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Invoke 
+	 Admission from New Born Registration</span> - Select the check box 
+	 if admission can be performed for the patient from ‘Newborn Registration’ 
+	 function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Grace 
+	 period for Assign Bed/Mark arrival</span> - Enter the ‘Grace period 
+	 for Assign Bed/Mark arrival’ in numeric format of maximum one digit. 
+	 This field allows you to enter the number of hours after admission 
+	 which is identified as the grace period and the details of the &#160;patient 
+	 who has arrived after the mentioned period is highlighted using different 
+	 color in the function 'Assign Bed/Mark patient arrival'. This is a 
+	 mandatory field.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Priority 
+	 Applicable</span> – Select the check box to indicate the applicability 
+	 of transfer priorities for the facility. This field is used to indicate 
+	 that the transfers are to be performed based on priorities assigned. 
+	 The check box is cleared, by default.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Priority</span> 
+	 – This is used to select a default priority that can be assigned by 
+	 the system for routine transfers. This field is enabled , if the ‘Priority 
+	 Applicable’ field is selected.</p></li>
+</ol>
+<ol start="20" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Patient Check in</span> – Select the check box if the Mark Patient 
+	 Arrival function has to be a mandatory step for the confirmation of 
+	 a patient admission, even if the bed and attending practitioner are 
+	 specified at the ‘Admit Patient’ function. If the check box is selected, 
+	 the bed is confirmed for a patient only after Patient arrival is marked. 
+	 If the check box is cleared, the Mark Patient Arrival becomes an optional 
+	 function to assign bed and/or attending practitioner. The check box 
+	 is cleared, by default.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Deactivate 
+	 Pseudo Bed</span> – Select the check box to indicate that all pseudo 
+	 beds set up for the facility are available for use only once. After 
+	 they have been associated to a user, they are deactivated and not 
+	 available for use in future. The check box is cleared, by default.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Request 
+	 for Bed Class Change</span> – Select the check box to indicate that 
+	 a request for bed class change is applicable as a part of the transfer 
+	 process. This enables transferring a patient from one bed class/type 
+	 to other bed class/type. If this is not selected, ‘Request for bed 
+	 class change’ check box does not get displayed in any of the transfer 
+	 functions.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Vital 
+	 Signs Battery</span> - Select the appropriate value from the list. 
+	 This field is used to indicate that the default vital sign battery 
+	 is applicable to all Nursing Units. These values are defined in the 
+	 Application Masters module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Discharge 
+	 Check List Applicable</span> – Select the check box, if ‘Discharge 
+	 Check List’ has to be a mandatory option before discharging a patient. 
+	 The check box is cleared, by default.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Discharge 
+	 Checklist Expiry Period</span> - Enter the required value in Hours/Days 
+	 in numeric format of three digits maximum length to indicate the expiry 
+	 period of a discharge checklist.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Display 
+	 Discharge Patient List</span> – Select one of the values from the 
+	 list. The listed values are ‘All Patients’ and ‘Only Patient with 
+	 Discharge Advice’. Selecting ‘All Patients’ indicates the Discharge 
+	 Patient function will list inpatients, with and without discharge 
+	 advice. On selecting ‘Only Patient with Discharge Advice’ indicates 
+	 that the Discharge Patient function will list inpatients with discharge 
+	 advice.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Alert 
+	 Re-admission of the Patient Within ( ) Hours</u></span> &#160;– Enter 
+	 the time in numeric format of three digits maximum length. You can 
+	 also leave the box blank or enter zero. Only for values greater than 
+	 zero validation takes place. If the patient is re-admitted within 
+	 the defined time, an alert gets displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">C</span><span 
+	 style="text-decoration: underline; "><u>heck for Pending Orders before 
+	 Discharge Advice</u></span> - Select this check box to search for any 
+	 pending orders at the time of preparing discharge advice. &#160;By 
+	 default this check box is cleared.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>If 
+	 Orders are Pending</u></span> - This option appears only when the '<span 
+	 class="UnderlineRFD" style="text-decoration: none; ">C</span>heck 
+	 for Pending Orders before Discharge Advice' check box is selected.</p></li>
+</ol>
+<p class="BulletRFD" style="margin-left: 40px;">• <span style="text-decoration: underline; "><u>Do 
+ not Allow Discharge Advice</u></span> - Select this option to reject the preparation 
+ of discharge advice if there are pending orders. The system prompts an 
+ error message about the pending orders. Click <span style="font-weight: bold;"><b>[OK]</b></span> 
+ to view the pending orders.</p>
+<p class="BulletRFD" style="margin-left: 40px;">• <span style="text-decoration: underline; "><u>Allow 
+ Discharge Advice</u></span> - Select this option to allow the discharge advice 
+ preparation even if there are pending orders. On clicking the Encounter 
+ ID, the View Pending Orders dialog is displayed. Closing the View Pending 
+ Order dialog prompts a warning message.</p>
+<ol start="30" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD" style="text-align: left;"><span 
+	 style="text-decoration: underline; "><u>Restrict Discharge Advice if 
+	 Return Mediation is pending</u></span> – Select the check box to restrict 
+	 discharge advice preparation if return medication is pending for a 
+	 patient. By default, this check box is cleared.</p></li>
+</ol>
+<p class="BulletRFD" style="text-align: left; margin-left: 40px;">• If 
+ you select this check box, the system checks whether any Return Medication 
+ is pending for the current encounter ID of a patient in Prepare Discharge 
+ Advice screen. If ‘Return Medication’ is not performed against any of 
+ the ‘Ward Returns’, the system restricts the preparation of discharge 
+ advice.</p>
+<ol start="31" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">C</span><span 
+	 style="text-decoration: underline; "><u>heck for Pending Orders before 
+	 Discharge</u></span> - Select this check box to search for any pending 
+	 orders before discharging a patient. By default, this check box is 
+	 cleared.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict 
+	 Discharge Patient if BT orders are pending</u></span> - Select the check 
+	 box to restrict the discharge of patient if BT orders are pending 
+	 for that patient. By default, the check box is cleared. This field 
+	 is applicable only for users in MOHML sites.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>If 
+	 Orders are Pending</u></span> - This option appears only when the 'Check 
+	 for Pending Orders before Discharge' check box is selected.</p></li>
+</ol>
+<p class="BulletRFD" style="margin-left: 40px;">• <span style="text-decoration: underline; "><u>Do 
+ not Allow Discharge</u></span> - Select this option to reject the discharge 
+ of patient if there are pending orders. The system prompts an error message 
+ about the pending orders. Click <span style="font-weight: bold;"><b>[OK]</b></span> 
+ to view the pending orders.</p>
+<p class="BulletRFD" style="margin-left: 40px;">• <span style="text-decoration: underline; "><u>Allow 
+ Discharge</u></span> - Select this option to allow discharge even if there 
+ are pending orders. On clicking Encounter ID, the View Pending Orders 
+ dialog is displayed. Closing the View Pending Orders dialog prompts a 
+ warning message. &#160;</p>
+<ol start="34" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Reserve 
+	 Bed while Transfer</span> - If the check box is selected, you can 
+	 reserve bed transaction in ‘Intra-Ward Patient Transfer’ and ‘Transfer 
+	 Patient In’ functions. It is mandatory for reservation of beds.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Multiple Beds For Reserving</span> - Select the check box to allow 
+	 multiple beds for reserving.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict 
+	 Reserving for Intra-Ward Transfer</u></span> - Select the check box if 
+	 you want to restrict the reservation of bed while doing intra-ward 
+	 transfer. When you select this check box, the 'Reserve Bed' and 'Reason 
+	 for Reserve Bed' fields under the Reserve Bed Details section in Intra-ward 
+	 Patient Transfer function get disabled. &#160;This check box is enabled 
+	 or disabled based on the ‘Reserve Bed While Transfer’ check box.</p></li>
+</ol>
+<p class="BulletRFD" style="margin-left: 40px;">• When the ‘Reserve Bed 
+ While Transfer’ check box is unselected, the ‘Restrict Reserving for Intra-Ward 
+ Transfer’ check box remains disabled and unselected.</p>
+<p class="BulletRFD" style="margin-left: 40px;">• When the ‘Reserve Bed 
+ while Transfer’ check box is selected, the ‘Restrict Reserving for Intra-ward 
+ Transfer’ check box gets enabled automatically. But, you need to select 
+ the ‘Restrict Reserving for Intra-ward Transfer’ check box manually if 
+ you want to restrict the reservation of bed while doing intra-ward transfer.</p>
+<ol start="37" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Allow 
+	 User to modify Discharge Type/Discharge Status</u></span> - Select the 
+	 check box to modify the Discharge Type and Discharge Status in Discharge 
+	 Patient screen after recording the Discharge Type and Discharge Status 
+	 in Prepare Discharge Advice screen without cancelling or reverting 
+	 the prepare discharge advice. You cannot change the Discharge Type 
+	 for a selected patient from Alive to Dead accordingly and vise-versa 
+	 in Discharge Patient screen. By default, the check box is cleared. 
+	 This field is applicable only to users in MOHML.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict 
+	 Discharge Advice if Sale/Issue or Sale Return pending to be finalized</u></span> 
+	 – Select the check box to restrict discharge advice if Sale/Issue 
+	 or Sale Return is pending for finalization. By default, the check 
+	 box is selected. On selecting, the system displays an alert message 
+	 ‘Sale/Issue or Sale Return pending to be finalized, cannot proceed 
+	 further” in Prepare Discharge Advice screen if Sale/Issue or Sale 
+	 Return is pending to be finalized. This is applicable for users in 
+	 AMRI.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict, 
+	 if OT Record Surgical Note/Operation are pending</u></span> – Select the 
+	 check box to restrict discharge advice preparation and patient discharge 
+	 if OT Record Surgical Note/Operation/procedure are pending. By default, 
+	 the check box is cleared.</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">If you select the Prepare 
+	 Discharge Advice check box, the system will not allow to prepare discharge 
+	 advice if OT Record Surgical Note/Operation/Procedure are pending.</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">If you select the Discharge 
+	 check box, the system will not allow to discharge the patient if OT 
+	 Record Surgical Note/Operation/Procedure are pending.</p></li>
+	<li class="p-BulletRFD"><p class="BulletRFD">If you select both the 
+	 Discharge and Prepare Discharge Advice check boxes, the system will 
+	 not allow to prepare discharge advice as well as discharge the patient 
+	 if OT Record Surgical Note/Operation/Procedure are pending.</p></li>
+</ol>
+<ol start="40" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Change 
+	 Admission Details</span> - Enter the number of hours in numeric format 
+	 of two digits maximum length. This is used to indicate the hours within 
+	 which you can change the admission details of a patient after admitting 
+	 the patient. This is a mandatory field.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Allow 
+	 Gate Pass Entry in Prepare Discharge Advice</u></span> – Select the check 
+	 box to allow gate pass generation in Prepare Discharge Advice screen. 
+	 &#160;By default, the check box is selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 invoking Maintain Death Register in Prepare Discharge Advice</span> 
+	 – Select the check box to invoke Maintain Death Register function 
+	 in Prepare Discharge Advice function, if the discharge type is deceased.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">• Mandatory – If you select 
+ this option with the check box selected, the system automatically launches 
+ the ‘Maintain Death Register’ screen after the Prepare Discharge Advice 
+ transaction.</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Non Mandatory - If you 
+ select this option with the check box selected, the system prompts the 
+ message ‘Do you want to invoke Maintain Death Register’ after the ‘Prepare 
+ Discharge Advice’ transaction. By default, this option is selected.</p>
+<ol start="43" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Admission 
+	 Consent Text</u></span> – Select the check box to invoke a text box to 
+	 add the comments. You can enter up to 3000 characters.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Enable 
+	 Reason For Late Discharge</u></span> &#160;– Select the check box to enable 
+	 ‘Reason For Late Discharge’ field to record the reasons for late discharge 
+	 in the ‘Patient Discharge’ screen. By default, this check box is not 
+	 selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Allow 
+	 transfer without baby delink</u></span> – You can use this check box to 
+	 define the automatic transfer of a baby bed with the mother’s bed, 
+	 during an intra-ward or inter-ward transfer. The functionality of 
+	 this parameter is described as follows:</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px; font-weight: bold; text-decoration: none; ">&#160;</p>
+<p class="NumberRFD" style="margin-left: 40px; font-weight: bold; text-decoration: none; ">Allow 
+ transfer without baby delink (selected):</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ The child bed (s) is also automatically transferred, provided there is 
+ enough child bed (s) in the destination ward.</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ Once the mother and baby are transferred to the destination successfully 
+ then a popup message is displayed “Operation completed successfully” with 
+ OK command.</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ If there is no sufficient baby bed(s) in the destination ward, the following 
+ message is displayed:</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">“Sufficient 
+ Baby beds are not available at destination ward. The child patient will 
+ be de-linked from mother. Do you want to continue?”</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">&#160;- 
+ Click <span style="font-weight: bold;"><b>OK</b></span> to de-link the baby and 
+ transfer the mother patient alone. Transfer the baby manually and then 
+ re-link through the Link baby to mother transaction.</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">&#160;- 
+ Click <span style="font-weight: bold;"><b>Cancel</b></span> if you want to cancel 
+ the transfer action.</p>
+<p class="NumberRFD" style="margin-left: 40px; font-weight: bold; text-decoration: none; ">&#160;</p>
+<p class="NumberRFD" style="margin-left: 40px; font-weight: bold; text-decoration: none; ">Allow 
+ transfer without baby delink (cleared):</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ The message &quot;Do you want to de link baby bed from mother bed” is 
+ always displayed.</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ Click OK; the child bed is de-linked from the mother patient and the mother 
+ is transferred to the destination bed.</p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">• 
+ Re-link the baby to the mother patient through the Link baby to mother 
+ transaction.</p>
+<p class="NumberRFD" style="margin-left: 40px; color: #800080; text-decoration: none; "><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" /><span style="margin-left: 40px; text-decoration: none; ">By 
+ default, the check box remains cleared.</span></p>
+<p class="NumberRFD" style="margin-left: 40px; text-decoration: none; ">&#160;</p>
+<ol start="46" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Enable 
+	 Initiate Pre-Discharge</u></span> – Select this check box if you want 
+	 practitioners to perform the Initiate Pre-discharge activity before 
+	 nurses can perform the Prepare Discharge Advice activity. By default, 
+	 this check box is unchecked.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px; color: #800080;"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />If 
+ this check box is cleared, and you select IP Transactions &gt; Initiate 
+ Pre-discharge, an error message “This function is not applicable since 
+ Enable Pre-Discharge is unchecked in IP Parameter” will be displayed.</p>
+<p class="NumberRFD" style="margin-left: 40px; color: #800080;">&#160;</p>
+<ol start="47" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Reason 
+	 for Admission Mandatory</span> – Select this check box if you want 
+	 to capture the admission reason as mandatory. By default, this check 
+	 box is cleared. When you select this check box, the ‘Reason for Admission’ 
+	 field becomes mandatory in Admit Patient screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Weight 
+	 on Admission Mandatory</u></span> – Select one of the values from the 
+	 list. The listed values are ‘Assign Bed / Mark Patient Arrival’, ‘Prepare 
+	 Discharge Advice’ and ‘Discharge Patient’. By default, the value ‘Select’ 
+	 will be displayed. This is not a mandatory field. Based on the selected 
+	 value, the 'Weight on Admission' field becomes mandatory in the respective 
+	 function. &#160;</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Auto 
+	 Confirmation request for transfer</u></span> – Select the check box to 
+	 confirm the encounter automatically during Request for Transfer and 
+	 this encounter will not be available in ‘Confirm Request for Transfer’ 
+	 screen. By default, this check box is not selected. Once you place 
+	 the request for transfer, you could proceed with ‘Transfer Patient 
+	 Out’ without the ‘Confirm Request for Transfer’ step. In addition, 
+	 the Bed No field gets enabled and becomes mandatory in Transfer Patient 
+	 Out screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Display 
+	 Bed Class change Authorization details in Current Encounter Details 
+	 and Admission History</u></span> – &#160;Select the check box to view 
+	 the confirmed bed class change records in Current Encounter Details 
+	 and Admission History windows invoked in Request for Transfer, Intraward 
+	 Transfer, Emergency Transfer, Confirm Bed Class Change transactions. 
+	 &#160;By default, the check box is cleared.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Restrict 
+	 Transfer for Unfinalized New Born Records</u></span> - Select the check 
+	 box to restrict the bed transfers done in IP for the mother patient 
+	 if any of the child record is in unfinalized state. By default, the 
+	 check box is not selected. This field is applicable only for users 
+	 in Selayang.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">The following are the bed 
+ transfers where the restriction is done:</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Intra-ward Patient Transfer</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Request For Transfer</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Transfer Patient Out</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Transfer Patient In</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Confirm Bed Class Change</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Swap Patient Beds</p>
+<p class="NumberRFD" style="margin-left: 40px;">• Emergency Transfer</p>
+<ol start="52" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Default 
+	 Disposition Type for Revoke Death</u></span> &#160;– By default, the value 
+	 ‘Select’ is displayed. Select the required Disposition value from 
+	 the drop-down list. The selected value appears as default value in 
+	 the Disposition Type field in the IP check out. Then go to ‘Record/Revoke 
+	 Patient Death’ function to revoke the patient. This change is applicable 
+	 only to users in MMOH sites.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Validate 
+	 existence of National ID during IP Admission</u></span> - Select the check 
+	 box to validate the existence of national ID/Civil ID of a patient 
+	 during IP admission. By default, the check box is selected. This is 
+	 applicable for users in MOD.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">If the check box is selected, 
+ then in Admit Patient screen, after entering the patient ID in the Patient 
+ ID field and on tab out the system validates if whether CIVL ID/National 
+ ID has been recorded for the patient or not. If not recorded, an alert 
+ message is displayed.</p>
+<ol start="54" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD" style="text-align: left;"><span 
+	 class="UnderlineRFD">Enabled Discharge Diagnosis in Prepare Discharge 
+	 Advice</span> - &#160;Select the check box to <span style="margin-left: 40px;">display 
+	 the Discharge Diagnosis button in Prepare Discharge Diagnosis function. 
+	 When the check box is cleared, the Discharge Diagnosis button will 
+	 not be displayed in the Prepare Discharge Diagnosis function in IP 
+	 and CA.</span></p></li>
+</ol>
+<p class="Text">&#160;</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Bed Blocking</p>
+<ol start="55" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Default 
+	 Period for Normal () Hrs</span> - Enter the default bed blocking period 
+	 in hours for normal blockings in the numeric format of three digits 
+	 maximum length. This is used in the ‘Block Bed’ function and ‘Book 
+	 Bed for Patient Transfer’ while blocking the bed (to default the ‘Blocked 
+	 until Date/Time’). The default ‘Blocked From Date/Time’ specified 
+	 in the transaction is calculated based on the value specified in this 
+	 field. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Period for Normal</span> – Enter the maximum allowable period 
+	 for bed blocking period in numeric format of three digits maximum 
+	 length. This is specified in terms of hours or days and is used to 
+	 indicate the maximum period a bed can be blocked manually for any 
+	 reason. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Period for Discharge () Hrs</span> – Enter the maximum allowable 
+	 time for bed blocking period in numeric format of three digits maximum 
+	 length. This is specified in terms of hours and is used to indicate 
+	 the maximum period a bed can be blocked immediately after discharging 
+	 a patient. This is validated in the Discharge Patient function. This 
+	 field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Period for Transfer Out () Hrs</span> – Enter the maximum 
+	 allowable period for bed blocking period in numeric format of three 
+	 digits maximum length. This is specified in terms of hours and is 
+	 used to indicate the maximum period a bed can be blocked immediately 
+	 after transferring a patient out.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Default 
+	 Bed Blocking Period on Transfer/Discharge of Infectious Disease Patients 
+	 () Hrs</span> - Enter the maximum allowable period for bed blocking 
+	 period in numeric format of three digits maximum length. This is specified 
+	 in terms of hours and is used to indicate the maximum period a bed 
+	 can be blocked immediately after transferring or discharging a patient 
+	 with a infectious disease.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details under the Additional tab:</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Lodger/Accompanying Person Reference</p>
+<ol start="60" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Next 
+	 Serial No</span> - Enter the Next Serial Number in numeric format 
+	 of eight digits maximum length. The system generates the Next Serial 
+	 Number for each Lodger or person accompanying an inpatient (who is 
+	 selected by using ‘Check in Lodger’ function). This is used to indicate 
+	 the reference number that is generated for lodgers. This number is 
+	 incremented by one against every subsequent transaction. The value 
+	 entered must be greater than zero. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Serial No</span> – Enter the Maximum Serial Number in numeric format 
+	 of eight digits maximum length. The number specified is the Maximum 
+	 Serial number that can be generated by the system for the reference 
+	 Serial Number. The entered value cannot be less than the Next Number. 
+	 When the Maximum Serial Number is reached maximum, no further numbers 
+	 are generated and the System Administrator has to reset the Max Serial 
+	 Number. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowed Period of Stay for Lodger/Accompanying Person () Hrs</span> 
+	 – Enter the time limit of maximum stay for lodger/accompanying person 
+	 in the facility. This is specified in terms of hours and is used to 
+	 indicate the maximum period for which a lodger/accompanying person 
+	 is allowed to stay within the facility.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allowable 
+	 Period for Issue/Renewal of Gate Pass</span> – Enter the Maximum allowable 
+	 period for issue or renewal of a gate pass in numeric format of three 
+	 digits maximum length. This is specified in terms of hours or days 
+	 and is used to indicate the maximum period for which a gate pass can 
+	 be issued or renewed for a person accompanying the patient, who has 
+	 been selected in.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowed Accompanying Persons</span> – Enter the maximum number of 
+	 people that can be selected in as accompanying person for an inpatient. 
+	 This restricts the number of people that can accompany a patient during 
+	 the patient’s stay as an inpatient.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Maximum 
+	 Period after Discharge for Check in Lodger () Hrs</span> - Enter the 
+	 time limit of maximum period of stay for Check in lodgers after the 
+	 facility has discharged the patient. This is specified in terms of 
+	 hours and is used to indicate the maximum period for which a discharged 
+	 patient can be allowed to stay as a lodger within the facility.</p></li>
+</ol>
+<p class="BoldRFD">Leave</p>
+<ol start="66" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Release 
+	 Bed On Leave</span> – Select the check box to release the bed when 
+	 the patient is sent on leave. If the check box is cleared, the bed 
+	 is retained for the patient even when patient is sent on leave.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Max 
+	 Allowable Leave Period () Hrs</span> – Specify in hours the maximum 
+	 allowable leave period in numeric format of three digits maximum length. 
+	 This is used to indicate the maximum period for which a patient can 
+	 avail leave during an inpatient stay.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Leave Cancellation Within () Mins</span> – Specify in minutes the 
+	 maximum allowable period within which the leave can be cancelled, 
+	 from the time of granting the leave, in numeric format of three digits 
+	 maximum length. This is used to indicate the maximum period within 
+	 which a leave that is granted can be cancelled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Grace 
+	 Period for Abscond Patient () Hrs</span> – Enter a value to specify 
+	 the period that is considered, after the leave period has expired, 
+	 for the patient status to be set as ‘Absconding’. This period is taken 
+	 into consideration after the grace period set for ‘No Show’ has elapsed. 
+	 The value is specified in terms of hours.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Grace 
+	 Period for No Show () Hrs</span> - Enter a value to specify the period 
+	 that is considered, after the leave period has expired, for the patient 
+	 status to be set as ‘No Show’. The value is specified in terms of 
+	 hours.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Action 
+	 On Exceeding Max Leave</span> – Select either ‘Warning’ or ‘Error’ 
+	 as action on exceeding the maximum leave period. If ‘Warning’ is selected, 
+	 a warning message gets displayed in the ‘Record Inpatient Leave’ function, 
+	 when the maximum leave is exceeded. If ‘Error’ is selected, in the 
+	 ‘Record Inpatient Leave’ function an error message gets displayed 
+	 on exceeding the specified value. The system prevents you from proceeding 
+	 with the transaction.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p><span class="BoldNumberRFD">Billing</span></p>
+<ol start="72" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Interface 
+	 to Billing Module</span> – Select the check box, if this module has 
+	 to be interfaced to the Patient Billing Manager module for billing 
+	 purposes.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Bed Availability Chart Setup</p>
+<ol start="73" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Booking for Current occupied beds without EDD</span> - Select the 
+	 check box to allow booking the current occupied beds for which the 
+	 EDD is not recorded.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 booking on the current occupied bed considering EDD</span> - Select 
+	 the check box to allow booking the current occupied bed for which 
+	 the EDD is recorded.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Type 
+	 of Booking</span> - The Booking Types 'Booked Overrideable Confirmed', 
+	 'Booked Overrideable Unconfirmed', 'Booked Non-Overrideable Confirmed' 
+	 and 'Booked Non-Overrideable Unconfirmed' are displayed with unique 
+	 color code.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Indicate 
+	 future booking</span> - Select the check box if future booking is 
+	 applicable for the booking type.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Number 
+	 of days before</span> - Enter the number of days before in numeric 
+	 format of three digits maximum length if future booking is applicable.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Consider 
+	 EDD Before Stop</span> – Select the check box if the EDD entered during 
+	 admission should be considered before it is stopped. If the check 
+	 box is selected, the system checks if the EDD entered during admission 
+	 is less than the Booked Date and alerts or stops the admission.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Action 
+	 on Booking/admission</span> - Select the Action from the list. The 
+	 listed values are 'Stop' and 'Warn'.</p></li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="NumberRFD" style="font-weight: bold;">General Details</p>
+<ol start="80" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Default 
+	 Referring Practitioner in Bedside Referral</u></span> – Select from the 
+	 drop- down list, the default referring practitioner to be displayed 
+	 in Inpatient Bedside Referral screen. You can select one of the two 
+	 values:</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>a. 
+ Attending Practitioner</b></span> – If you select this value, the attending 
+ practitioner for that particular patient will be displayed as the default 
+ referring practitioner in the Register Inpatient Referral screen.</p>
+<p class="NumberRFD" style="margin-left: 40px;"><span style="font-weight: bold;"><b>b. 
+ Login Practitioner</b></span> – If you select this value, the logged-in user’s 
+ name will be displayed as the referring practitioner in the Bedside Referral 
+ screen, provided the logged-in user is a practitioner. If a non-practitioner 
+ logs in, the referring practitioner field in the Register Inpatient Referral 
+ screen will display a blank value and you can select a practitioner’s 
+ name.</p>
+<ol start="81" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Allow 
+	 Multiple Bedside Referral Review</u></span> - Select this check box if 
+	 you want to review the bedside referral requests multiple times in 
+	 the Confirm Bedside Referral screen. By default this check is not 
+	 selected. If you select this check, you will be able to view a ‘Status’ 
+	 drop-down list and ‘Audit Trail’ hyperlink in the Confirm Bedside 
+	 Referral screen.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Enable 
+	 Recording of Referral Letter Note with Referral Request</u></span> – Select 
+	 this check box if you want to enable recording of referral letter 
+	 note along with the referral request. On selecting this check box, 
+	 the system displays the ‘Record Referral Letter Note’ button in the 
+	 Register Outgoing Referral, Register Inpatient Referral and Bed Side 
+	 Referral screens. By default this check box is selected.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Allow 
+	 Registration of New Referrals in Inpatient Admission Function</u></span> 
+	 – Select the check box to allow registration of new referrals in Admit 
+	 Patient function. When the check box is selected, the ‘Register Patient 
+	 Referral’ button is displayed in Referral Search window invoked from 
+	 ‘Admit Patient’ screen. By default, the check box is selected. This 
+	 is applicable only for IP and not for OP and ER. Clear the check box 
+	 to not allow registration of new referrals from Admit Patient function. 
+	 When the check box is cleared, the ‘Register Patient Referral’ button 
+	 is not displayed in the Referral Search window invoked from ‘Admit 
+	 Patient’ screen.</p></li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

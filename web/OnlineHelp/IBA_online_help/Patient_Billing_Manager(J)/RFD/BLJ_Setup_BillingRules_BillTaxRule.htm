@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BLJ_Setup_BillingRules_BillTaxRule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following Details</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Patient Class – Select the Patient class from the drop down. The Patient classes defined in the billing class are listed in the drop down list. This is mandatory fields.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Billing Group – Select the Billing Group using lookup function. The Billing Groups defined in the billing masters are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Customer Group – Select the Billing Group using lookup function. The Customer Groups defined in the billing masters are listed. If a particular customer group is selected, the customers mapped to that customer group alone will be listed in customer lov.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Customer – Select the customer using lookup function. The customers defined in the billing masters are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Rule Code – Select the Rule Code using lookup function. The Rule codes defined in the Rule for Additional Charge are listed. The Rule code is associated to patient class / billing group /customer group / customer code / policy combination.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Policy Type – Select the Policy Type using lookup function. The Policy Type defined in the billing masters are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Effective [From-To] – Select the Date using calendar function. The Bill Tax Rule will be applicable based on the selected date.</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="BoldRFD">Criteria for Tax</p>
+<p class="NumberRFD">In this section, you can define the service tax rule that will be applied to the cosmetic services. If any of the codes defined in this block are present in the bill, the bill becomes eligible for cosmetic service tax calculation.</p>
+<p class="NumberRFD">&#160;</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Type – Select the Rule Type using lookup function. The Rule Type defined in the Rule for Additional Charge are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Service Code – Enter Service code in the alpha numeric character format. If billing service is selected in type, all the billing services will be listed in the lookup function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Add – Click this button to add a new row.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Remove – Select this checkbox to remove the selected record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enabled – Select this checkbox to enable the rule which has been created. Only if the rule is enabled it will be applied in the corresponding bill. If the rule is not needed to be applied in the bill, the user can clear the check box</p>
+</li>
+</ol>
+<p class="NumberRFD">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If there are two rows in header block, one for OP patient class and another for ** patient class, and if OP visit is registered, priority will be given to OP patient class row setup. If the rule code created in Rule for additional charge is end dated, automatically the entry in Cosmetic Service Tax Applicability screen (new screen) will become obsolete. More than one combination of Billing Group, Customer Group, Customer, Rule code and Policy are not allowed in this screen. This section can be empty for the header block. If it is empty, the rule will not be applied in the bill.</p>
+<p class="Note">&#160;</p>
+<p class="BoldRFD">Criteria For Tax</p>
+<p class="BoldRFD" style="font-weight: normal;">This section is used to to define the tax rule. If any of the codes defined in this section are present in the bill, the bill becomes eligible for cosmetic service tax calculation.</p>
+<p>&#160;</p>
+<ol start="13" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Type – Select the Rule Type using lookup function. The Rule Type defined in the Rule for Additional Charge are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Service Code – Enter Service code in the alpha numeric character format. If billing service is selected in type, all the billing services will be listed in the lookup function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Inclusion/Exclusion – Select a value ‘Include’ or ‘Exclude’ from drop down list. Based on selection, the services are included or excluded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Add – Click this button to add a new row.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Remove – Select this checkbox to remove the selected record.</p>
+</li>
+</ol>
+<p class="Note">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The current excluded services will be applied only on services which are outside the packageBased on the bill tax rule master, the tax will be calculated on the bill amount. 0Payer coverage check box will not be considered for calculating the tax created in Bill Tax Rule master screen.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

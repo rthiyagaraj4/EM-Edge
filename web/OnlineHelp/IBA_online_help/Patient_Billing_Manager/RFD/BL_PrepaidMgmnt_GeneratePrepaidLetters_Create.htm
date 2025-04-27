@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_PrepaidMgmnt_GeneratePrepaidLetters_Create</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Create</h1>
+<p class="BoldRFD"><span style="font-weight: normal;">The patient records that match the search criteria specified are displayed. The details that are recorded through the 'Patient Registration for Prepaid Program' and 'Maintain Prepaid Patient Records' function are displayed.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select All</span> - Select the check box to generate prepaid letters for all patient records that are listed. Color indicators adjacent to the patient record indicate if the amount is overdue, undue or due currently.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> - Select the check box to generate prepaid letter for the respective patient record. Clear the check box if prepaid letter generation is not required for the respective patient record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment No.</span> - The Payment Number is displayed automatically based on the protocols associated to the patient through the 'Maintain Prepaid Patient Records' function. You cannot update the value that is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Due Date</span> - The due date is displayed based on the patient registration date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payment Amt</span> - The payment amount recorded for the respective Protocol is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Id</span> - The ID of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Name</span> - The name of the patient as recorded during registration is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register No.</span> - The registration number recorded through the 'Patient Registration for Prepaid Program' function is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register Date</span> - The registration date is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Protocol Code</span> - The Protocol code that is associated to the patient during registration through 'Patient Registration for Prepaid Program' function is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy Type</span> - The Policy Type that is associated to the patient during registration through 'Patient Registration for Prepaid Program' function is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Additional Infor.</span> - Click <span class="BoldNumberRFD">[C]</span> to record <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">additional information</a> about the patient.</p>
+<div class="droptext" id="POPUP1004710063" style="display: none;">
+<p><span class="BoldButton">Additional Information</span></p>
+<ol>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Letter Number</span> - Enter the Letter Number in alphanumeric format of 100 characters maximum length.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Policy Number</span> - Enter the Policy Number alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Letter For</span> - Enter the value in alphanumeric format of 49 characters maximum length.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Donor Id</span> - Click [List of Values] to select a Donor ID. Select the donor ID if the letter is being generated for the donor.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Visit/Admsn Date and Time [From - To]</span> - Click the Calendar function to select visit or admission date range.</p>
+</li>
+</ol>
+<p><span class="BoldButton">Diagnosis and Procedure</span></p>
+<ol start="6">
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Diagnosis [1-4]</span> - Click [List of Values] to select and associate a diagnosis code, if the patient has undergone a diagnosis in the facility.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Procedure [1-4]</span> - Click [List of Values] to select and associate a procedure, if the patient has undergone procedures in the facility.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Discharge Status</span> - Enter the discharge status of the patient.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Discharge Type</span> - Enter the discharge type of the patient.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="UnderlineBlack">Remarks</span> - Enter the remarks, if any.</p>
+</li>
+<li class="p-Number">
+<p class="Number"><span class="BoldButton">[&lt;&lt;Back]</span> - Click <span class="BoldButton">[&lt;&lt;Back]</span> to switch to 'Generate Prepaid Letter' screen.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Protocol Desc</span> - The description of the respective protocol is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Policy</span> - The description of the respective policy is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">A document number is generated with the Document Type associated to the protocol in 'Prepaid Payment Setup Rule' function.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004710063');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_IncomeAccounts</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define Income Accounts:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accounting Entity</span> - The Accounting Entity code defined using the ‘Accounting Parameters’ function in the ‘Financial Setup’ menu in the System Manager module gets displayed. The Accounting Entity is set by default and the field is disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bill Type Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Bill Type. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Income Account Details</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Selection Criteria</span> – Select a value from the list. The values are system defined – ‘Service Group’, ‘Service Classification’ and ‘Billing Service’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service Group – Select Service Group to associate an Income account to the Service Groups.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Service – Select Billing Service to associate an Income account to the Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service Classification – Select Service Classification to associate an Income account to a Billing Service.</p>
+</li>
+</ol>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> - Select a valid Billing Service from the list. The values differ based on the Selection Criteria.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the respective Billing Service gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">GL Interface</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a GL Interface code. The account codes set as income accounts in the General Ledger module gets listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">GL Interface Description</span> – The Description for the selected GL interface code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. Date From</span> – Click Calendar function to select a date. The selected Income Account is valid for the Bill Type from the date selected. The date selected has to be greater than the system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. Date To</span> - Click Calendar function to select a date. The selected Income Account is valid for the Bill Type until the date selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Additional Charge Interface</p>
+<p class="BoldRFD" style="font-weight: normal;">You can associate a Billing Service and Income Account code to a Rule Code. The selected Rule Code is considered towards income generation for the respective facility.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define additional charge interface:</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Rule Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Rule Code. The Rule Codes defined using the function ‘Rule for Additional Service Charge’ get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Selection Criteria</span> – Select a value from the list. The system defined values are ‘Service Group’, ‘Service Classification’ and ‘Billing Service’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service Group – Select Service Group to associate an Income account to the Service Groups for additional charge interface.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Service – Select Billing Service to associate an Income account to the Billing Service for additional charge interface.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Service Classification – Select Service Classification to associate an Income account to a Billing Service for additional charge interface.</p>
+</li>
+</ol>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> - Select a valid Billing Service from the list. The values differ based on the Selection Criteria.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> - The description for the respective Billing Service gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Income Acc Int Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select an Income Account code. The account codes set as income accounts in the General Ledger module get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Income Account Code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. Date From</span> – Click Calendar function to select a date. The selected Income Account is associated to the Rule Code from the date selected. The date selected has to be greater than the system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Eff. Date To</span> - Click Calendar function to select a date. The selected Income Account is associated to the Rule Code until the date selected.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

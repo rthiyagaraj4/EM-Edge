@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>BL_Code_AmendPrices</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to amend prices:</p>
+<p>&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the Facility from the list. The facilities associated to the logged in User get displayed. The prices defined are valid for the facility selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Billing Service. The description for the selected Billing Service gets displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply To</span> – Select a value from the list. The values are system defined– All, Standard, Price Class and Billing Group. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All – Select All to update either the Price Class, Billing Group or Customer level charges defined for a patient class and associated to a Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Price Class – Select Price Class to update the price and discount details defined for a patient class, which is associated to a selected Price Class and a Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Group – Select Billing Group to update the price and discount details defined for a patient class, which is associated to a selected Billing Group and a Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Standard – Select Standard to update the standard prices defined for a patient class, which is associated to a selected Billing Service and a Facility.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Click [Execute Query] or press [F8] to view all the entries associated to the relevant Billing Service. To create a new record, click [Create Record] and enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> – Select a value from the list. The values are system defined– Standard, Customer, Billing Group and Price Class. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Standard – Select Standard to update the standard prices defined for a patient class and associated to a facility. The Standard prices already defined get listed. To insert a new record, click <span class="BoldNumberRFD">[Create Record]</span>. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Customer – Select Customer to update Customer Specific Prices defined for a patient class and associated to a facility. The prices already defined get listed. To insert a new record, click <span class="BoldNumberRFD">[Create Record]</span>. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Billing Group – Select Billing Group to update the Billing Group Specific Prices defined for a patient class and associated to a facility. The prices already defined get listed. To insert a new record, click <span class="BoldNumberRFD">[Create Record]</span>. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Price Class – Select Price Class to update the Price Class Specific Prices defined for a patient class and associated to a facility. The prices already defined get listed. To insert a new record, click [Create Record]. This is a mandatory field.</p>
+</li>
+</ol>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a code. The values in the list differ based on the Indicator selected. This is a mandatory field.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The price and discount percentage defined for a patient class and associated to the selected Billing Service and Billing Group get displayed on selecting Billing Group. To define the price for a new Billing Group, select a value from the list. The values defined using the Billing Group function get listed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The price and discount percentage defined for a patient class and associated to the selected Billing Service and Facility get displayed on selecting Standard as the indicator. To define a new standard price, select a facility from the list. The Facilities associated to the logged in User get listed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The price and discount percentage defined for a patient class and associated to the selected Billing Service and Customer get displayed on selecting Customer as the indicator. To define the price for a new Customer, select a value from the list. The values defined using the Customer function get listed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The price and discount percentage defined for a class and associated to the selected Billing Service and Price Class get displayed on selecting Price Class as the indicator. To define a price for a new Price Class, select a value from the list. The Price Class defined using the Price Class tab in the Price Class Specific Price function gets listed.</p>
+</li>
+</ol>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> – Click Calendar function to select a date for new records. The price defined is valid for the selected patient class, Indicator and the Billing Service from the date selected. The date gets displayed automatically when the price is defined for the patient class indicator selected and associated Billing Service using the Price Class Specific Prices or Billing Group/Customer Specific Price function. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> - Click Calendar function to select a date for new records. The price defined is valid for the selected patient class, Indicator and the Billing Service until the date selected. The date gets displayed automatically when the price is defined for the patient class indicator selected and associated Billing Service using the Price Class Specific Prices or Billing Group/Customer Specific Price function.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Pricing by Billing Class for Billing Service</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Class</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Billing Class. The Description for the selected Billing Class gets displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">R/F</span> – Select a value from the list. The values are system defined – Rate and Factor.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Rate – Select Rate, if the service price has to be charged for the patient class associated to the selected indicator and the Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Factor – Select Factor and the service price is multiplied with the factor entered for a patient class associated to the selected indicator and the Billing Service.</p>
+</li>
+</ol>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Rate</span> – The price defined for the Inpatients get displayed. You can update the price defined by entering the new price valid for the selected patient class. The text box is enabled, if the selected Billing Class is an Inpatient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DC Rate</span> - The price defined for the Daycare patients gets displayed. You can update the price defined by entering the new price valid for the selected patient class. The text box is enabled, if the selected Billing Class is a Daycare patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP Rate</span> - The price defined for the Outpatients gets displayed. You can update the price defined by entering the new price valid for the selected patient class. The text box is enabled, if the selected Billing Class is an Outpatient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Emg. Rate</span> – The price defined for the Emergency patients gets displayed. You can update the price defined by entering the new price valid for the selected patient class. The text box is enabled, if the selected Billing Class is valid for Emergency patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext. Rate</span> – The price defined for the External/Referral patients gets displayed. You can update the price defined by entering the new price valid for the selected patient class. The text box is enabled, if the selected Billing Class is valid for External/Referral patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min Charge</span> – Enter the minimum charge for the service in numeric format. The price defined for a patient class has to be equal to or higher than the minimum charge. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Base Qty</span> – Enter the Base Quantity towards the service in numeric format. The price for the patient class associated to the Billing Service is calculated as the product of service price and the base quantity.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> – Select a value from the list to identify the reimbursable type. The system-defined values are – ‘Full’, ‘Partial’ and ‘NA’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Full – Select Full to refund the entire amount paid by the patient towards the service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Partial – Select Partial to refund only a fraction of the amount paid towards the service. A part of the amount is deducted for the service availed and the remaining amount is refunded to the patient/payer. You have to specify the amount to be reimbursed in the field ‘Reimbursable Amount’ under the ‘General’ tab. The Charge is specified only if the ‘Charge Type’ is set to ‘Charge’.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable – Select NA, if the service is not reimbursable.</p>
+</li>
+</ol>
+<ol start="18">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allowed</span> – Select the check box, if the Billing Service is reimbursable for the selected patient class. Clear the check box, if the respective Billing Class is non-reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reimbursable Amt</span> – Enter the amount, which can be reimbursed to the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – Select the check box, if the respective Billing Service is reimbursable for the selected patient class. The override option for the patient class takes precedence over the override check box in the header field. If the service is not reimbursable and if the check box is selected for the patient class, it indicates that the Billing Service is reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross/Net Applicability</span> – Select a value from the list. The values are system defined – Gross and Net.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Gross - Select Gross to charge the Gross amount for the service. The charge towards the service is calculated based on the discount and the price defined for the patient class associated to an indicator and a Billing Service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Net – Select Net to charge the Net amount for the service. The service charge is calculated based on the price defined for the patient class, associated to an indicator and a Billing Service. The discount amount for the service is not considered during bill generation.</p>
+</li>
+</ol>
+<ol start="22">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Cost availability</span> – Select the check box, if the Cost Amount is applicable for the selected patient class, associated to an indicator and a Billing Service. Clear the check box, if the Cost Amount is not considered towards the charge calculation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply Discnt</span> – Select the check box, if Discount is applicable for the selected Billing Class. You can define or update the discount percentage, if the check box is selected. Clear the check box, if the discount is not applicable for the patient class associated to the Billing Service.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Applicable Discounts for Service and Billing Class</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The text boxes are enabled, if the ‘Apply Disc’ check box is selected.</span></p>
+<ol start="24">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Indicator</span> – Select a value from the list to issue discount for the Billing Service. The system-defined values are ‘Amount’ and ‘%’. Select Amount to specify the amount that has to be issued as a discount amount on the Billing Service. Select Percentage to specify the percentage of amount that has to be issued as a discount amount on the Billing Service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP - (%/Amt)</span> - Enter the value to issue discount towards the service for Inpatients. The price is calculated based on the percentage of amount and the service price defined. If the discount percentage is already defined, the values get displayed. Enter the new discount percentage to update the existing values in numeric format. The value is computed as amount or discount based on the value selected for 'Discount Indicator'. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DC - (%/Amt)</span> - Enter the value to issue discount towards the service for Daycare patients. The price is calculated based on the percentage of amount and the service price defined. If the discount percentage is already defined, the values get displayed. Enter the new discount percentage to update the existing values in numeric format. The value is computed as amount or discount based on the value selected for 'Discount Indicator'. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP - (%/Amt)</span> - Enter the value to issue discount towards the service for Outpatients. The price is calculated based on the percentage of amount and the service price defined. If the discount percentage is already defined, the values get displayed. Enter the new discount percentage to update the existing values in numeric format. The value is computed as amount or discount based on the value selected for 'Discount Indicator'. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Emg - (%/Amt)</span> - Enter the value to issue discount towards the service for Emergency patients. The price is calculated based on the percentage of amount and the service price defined. If the discount percentage is already defined, the values get displayed. Enter the new discount percentage to update the existing values in numeric format. The value is computed as amount or discount based on the value selected for 'Discount Indicator'.This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext - (%/Amt)</span> - Enter the value to issue discount towards the service for External/Referral patients. The price is calculated based on the percentage of amount and the service price defined. If the discount percentage is already defined, the values get displayed. Enter the new discount percentage to update the existing values in numeric format. The value is computed as amount or discount based on the value selected for 'Discount Indicator'. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> – Click Calendar function to select a date. The discount percentage defined for the patient class is valid from the date selected. The discount period has to be within the Billing Service period and has to be greater than the system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> - Click Calendar function to select a date. The discount percentage defined for the patient class is valid until the date selected. The discount period has to be within the Billing Service period. The date selected has to be greater than the Valid From date. This is a mandatory field.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

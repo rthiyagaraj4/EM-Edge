@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BillingGroups_RFD</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define a Billing Group:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Group</span> - Enter the Billing Group in alphanumeric format of two characters maximum length. A Billing Group Code has to be unique and cannot be changed after creation. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the Long Description in alphanumeric format of 60 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Desc</span> - Enter the Short Description in alphanumeric format of 15 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Explanatory Note</span> - Enter an explanatory note for the Billing Group in alphanumeric format with a maximum of 2000 characters. The explanatory note is displayed on the screen. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Settlement Indicator</span> - Select a Settlement Indicator from the list. The values are system defined - 'Cash Patient', 'Credit Patient' and 'Sponsored Patient'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Cash Settlement - Select Cash Settlement, if the Billing Group is applicable for Cash settlements.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Credit Patient – Select Credit Patient, if the Billing Group is applicable for Credit settlements.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Sponsored Patient – Select Sponsored Patient, if the Billing Group is applicable for Insurance policy holders or patients availing sponsorship from the Employer.</p>
+</li>
+</ol>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Settlement Type</span> – The Payer Settlement Type indicates the mode of payment chosen by the payer to settle the service amount. You have an option to associate a Settlement Type to the Service. The values are system defined - 'Cash', 'Payment by Approved Company' and 'Payment by Insurance Company'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Cash – Select Cash, if the payer has to settle the amount by making a Cash payment.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Payment by Approved Company – Select Payment by Approved Company, if the Employer or an Approved Company settles the amount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Payment by Insurance Company - Select Payment by Insurance Company, if the payment towards the service is settled by the Insurance Company.</p>
+</li>
+</ol>
+<ol start="7">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Capture Pat Bed Category</u></span> – Select the check box if you want to consider the patient bed category for the required billing group for inpatients. By default, the check box is not selected.</p>
+</li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">When the ‘Capture Pat Bed Category’ check box is selected for the billing group, its mandatory to select the patient bed category during patient’s admission (3 tier) / during Modify Financial function (2 tier). This change is applicable for users in GHL only.</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Doc Ref required</span> - Select the check box, if the Credit Document Reference is mandatory during patient registration. This is applicable only if the Settlement Indicator is set to Sponsor or Credit and not applicable if the Settlement Indicator is Cash.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Basic Classification</span> – Select the check box, if the Billing Group has to be listed during patient registration in the Financial Details tab. Clear the check box and the Billing Group is not listed for selection during patient registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign during Admission</span> – Select the check box, if the respective Billing Group has to be listed during inpatient admission to the Facility.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign during Visit</span> – Select the check box, if the Billing Group has to be during Outpatient Visit registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Discounts at Billing</span> – Select the check box, if discounts are allowed for the respective Billing Group. Clear the check box and the bill cannot be modified for any discounts.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Employer ID Mandatory</span> – Select the check box, if the Employer Name has to be recorded during patient registration, patient admission and visit registration in the Master Patient Index, Inpatient and Day Care Management and the Outpatient Management modules for an Insured patient. The Employer Name is made mandatory under the ‘Financial Details’ tab in the Register Patient, Admit Patient and Register Visit functions in the Master Patient Index, Inpatient and Day Care Management and the Outpatient Management modules. Clear the check box, if the Employer Name is not mandatory for an Insured Patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Capture Referral Source</span> – Select the check box, if the Referral Source details have to be captured for the Billing Group. If the check box is selected, the fields ‘Primary Referral Source’ and the ‘Secondary Referral Source’ Details have to be entered while registering the Visit in Outpatient Management module, patient registration in the Master Patient Index module or admitting patient in the Inpatient and Day Care Management module. Clear the check box to disable the fields during the transaction in the respective modules.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ref Source Main Mandatory</span> – Select the check box, if primary referral source details are mandatory during patient registration. If the check box is cleared, primary referral source is not mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ref Source Sub Mandatory</span> - Select the check box, if the secondary referral source details has to be captured during patient registration. If the check box is cleared, secondary referral source is not mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Settlement Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to associate a default Settlement Type to the Billing Group. On selecting the Billing Group during transaction in the external modules like during visit registration in Outpatient Management module, patient admission in the Inpatient and Day Care Management module, or patient registration in the Master Patient Index module, the Settlement Type is set automatically to the one selected. You have an option to select any other default Settlement Type during transaction.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign during Patient Regn</span> - Select the check box to assign the Billing Group to a patient during registration. Clear the check box and the respective Billing Group is not listed during patient registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign during Day Care Admission</span> – Select the check box to enable the respective Billing Group during Daycare Admission. The respective Billing Group gets listed during modification of financial details for a Daycare Admission. Clear the check box and the relevant Billing Group does not get listed during Daycare admission.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Assign during Accident &amp; Emergency Visit</span> – Select the check box, if the relevant Billing Group has to get listed only for Accident and Emergency visits. Clear the check box to disable the Billing Group from the list for Accident and Emergency visits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check for Cost Availability</span> – Select the check box to enable the Cost indicator option. Clear the check box and you cannot specify the Cost Amount and the Reimbursable Amount towards the relevant Billing Group.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Applicable if Used as Non-Ins</span> - Select the check box to define the Billing Group as 'Non-Insurance Billing Group'. You can also define the discount amount applicable for the specific Billing Group. The discount amount defined for the Billing Group is deducted from the standard price, when the Billing Group is used as a 'Non-Insurance Billing Group' in patient transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accident Classification</span> - Select a value from the list. The values are system defined – 'Not Applicable', 'Injury on Duty' and 'Motor Vehicle Accident'.This value is used to generate the reports having different classifications in circumstances of injury as indicated by the doctor in Ambulatory Care Management and Inpatient and Day Care Management modules.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Not Applicable – Select Not Applicable, if the Billing Group is not applicable for Accident Classification.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Injury on Duty – Select Injury on Duty to categorize the Billing Group as applicable for accident case, where the patient is injured on duty.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Motor Vehicle Accident – Select Motor Vehicle Accident, if the Billing Group is used to classify the accident cases as Motor Vehicle Accident.</p>
+</li>
+</ol>
+<ol start="24">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Applicable Item Type</u></span> – Select the Applicable Item Type from drop down. The listed values are Low Cost Item, High Cost Item and Not Applicable. By default, the value for applicable item type is ‘Not Applicable’. You can select the value Low Cost Item or High Margin Item as per the requirement from the drop-down list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Category</span> – Select a Category from the list. The values are system defined. The Billing Group is categorized based on the entries set for Category.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Unrestricted – Select Unrestricted, if the Billing Group is applicable to all the patients visiting the facility. The patient can be a valid citizen of the country or a non-national.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Nationals – Select Nationals to enable the Billing Group to the valid citizens of the nation. The Billing Group is not applicable to other patients visiting the facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Others – Select Others, if the relevant Billing Group is applicable to non-national patients.</p>
+</li>
+</ol>
+<ol start="26">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Level of Service Elig for Inpatient Only</span> – Enter the level of service in numeric format with a maximum of two digits. The level of service indicates the priority of the selected Billing Group for Inpatients. The Bed Class gets listed in the ‘Hospital’s Request’ field while transferring or admitting the patient in the Inpatient and Day Care Management module, based on the level of service defined here and in the Billing Class function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service Price in Currency</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to associate a Foreign Currency to the Billing Group. The Currency associated to the respective Billing Group gets displayed in the ‘Price Class – Billing Group Definition’ tab in the ‘Price Class Specific Prices’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Package Patient</span> – Select the check box, if the Billing Group is valid for package subscription. You can associate the Billing Group to a Price Class using the ‘Price Class Specific Prices’ function, if the check box is selected. Clear the check box, if the Billing Group is not package related.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

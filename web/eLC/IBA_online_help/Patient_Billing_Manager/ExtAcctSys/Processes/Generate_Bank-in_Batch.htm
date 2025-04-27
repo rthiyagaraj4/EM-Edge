@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Generate Bank-in Batch</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nExtAcctSys\nProcesses\nGenerate Bank-in Batch");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Generate Bank-in Batch</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Generate</span> the Bank-in batch details.</p>
+<p class="Text">Generate Bank-in Batch function is used to create a batch for a number of transactions. The Cash Control Documents are populated automatically. It is also used to process Bank-in Batch documents to generate Bank-in slips. The batch process can be completed only on generating Cash Control Receipts. You cannot create a batch, if Cash Control Receipts are not generated for all receipt transactions.</p>
+<h2>Generate Bank-in Batch</h2>
+<p class="From">From the Transactions &gt; Bank in Slip, double-click Generate Bank-in Batch Function.</p>
+<p class="Text">The Generate Bank-in Batch screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click the Calendar function to set the transaction date. Latter date transactions are not allowed for bank-in batch generation, if the previous date transactions are pending. System populates receipt transaction details associated to the date. 
+<a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../RFD/BL_ExtAcctSys_Processes_GenerateBank-inBatch.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the maximum number of cheques per Bank-in slip. This indicates the maximum number of cheques that can be sent during Bank-in batch generation process.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Preview Batches]</span> to view the Batches created for a selected transaction date. The Bank-in batch details are populated automatically. System displays the details before the batch is generated.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to search for the Cash Control Receipts.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Generate Batch]</span> to create a batch of Cash Control Receipts.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A document reference number is generated on successful generation of batch.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A print confirmation message 'Do you want to Print?' is displayed. Click <span class="BoldButton">[Yes]</span> to print or <span class="BoldButton">[No]</span> to cancel the printing process.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Cash Control Receipt','../../Transactions/Cash_Control/Cash_Control_Receipt.htm');return false;" title="Related Topics"><img src="../../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Update Bank-in Slip','Update_Bank-in_Slip.htm');return false;" title="See Also"><img src="../../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a2');
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Adobe RoboHelp 8" />
+<title>AE Checkout</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Accident and Emergency\nTransaction\nAE Checkout");
+addTocInfo("Accident and Emergency\nTransaction\nAE Checkout\nProcess_Flow_Diagram___AE_Checkout");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>AE Checkout</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Close</span> an active encounter of an emergency patient and <span class="RedItalic">Record</span> the outcome details of the encounter.</p>
+<p class="Text">Check out is a process of concluding an encounter against a clinic at the end of consultation. This function is used when the patient’s stay is complete and patient is either being sent home after treatment or is being referred to another facility for further treatment. AE Checkout function is used to close an active encounter and also allows concluding an active episode, issuing a medical certificate, putting the patient in wait list or referring the patient to another provider for further treatment.</p>
+<p class="Text">&#160;</p>
+<p class="Text">Hospital and Professional Charges are displayed on recording the financial details of a patient. The patient payable amount towards Hospital charge as well as Doctor’s charge is displayed. Professional Charge is displayed along with the Hospital Charge, only if the billing details and visit registration rules are defined for the Clinic. The doctor’s charge has to be a part of the panel, if the Professional charge has to be set as zero. If the Professional Charge is set as a Service, you cannot set the doctor’s fee as zero. You can instead associate the Hospital Charges to make up the Professional fees, when the doctor does not charge the patient for the services.</p>
+<p class="Text">&#160;</p>
+<p class="ProcessFlowDiagram"><a href="#Process_Flow_Diagram___AE_Checkout">Process Flow Diagram</a></p>
+<h2>Checking Out Emergency Patients</h2>
+<p class="From">From the AE Transactions, select the AE Checkout Function.</p>
+<p class="Text">AE Checkout screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">By default, the patients who have their attendance registered are displayed in the screen. Enter the query criteria to select any required patient. The displayed 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">patient records</a> are segregated based on the Location/Practitioner/Room combination. The patient listing is sorted based on the priority zone under the following sub tabs, namely, Critical, Semi-Critical, Non-Critical, Unassigned and All. 
+<a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/AE_Trans_AECheckout_RFD1.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+<div class="droptext" id="POPUP347328426" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> - The name of the Practitioner associated to the patient gets displayed. Practitioner name field is left blank, if the Practitioner is not associated to the selected patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> – The Priority Zone assigned to the patient gets displayed. The colors used to represent the zones are:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Red – Critical Zone</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Yellow– Semi Critical Zone</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Green – Non Critical Zone</p>
+</li>
+</ol>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date/Time In</span> – The Date and Time the patient checked in to the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed/Bay No</span> – The Bed/Bay number assigned to the patient gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Name</span> – The Patient Name gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – The Patient ID gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Wait Time</span> – The Wait Time for the patient in the facility gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Status</span> – The Status of the patient gets displayed. The various statuses applicable to a patient queue are ‘Checked In’, ‘Assigned Treatment Area’, ‘Undergoing Treatment’, ‘Checked Out’ and ‘Consultation in Progress’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Current Location</span> – The Location Type/Location against which the patient visit is registered gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Disaster</span> – If the patient is a victim of Disaster, ‘yes’ is displayed or ‘no’ is displayed in the field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Case of Trauma</span> - If case patient is registered under case of Trauma, ‘yes’ is displayed or ‘no’ is displayed in the field.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Refresh]</span> to refresh the Patient records or re-query the screen manually. By default, this screen is refreshed automatically based on the Refresh value parameter setup.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click Patient Details hyperlink of the required patient to Checkout the patient.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the Checkout screen to perform the Checkout. 
+<a href="javascript:void(0);" id="a7" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/AE_Trans_AECheckout_RFD2.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Certificate]</span> in the Check Out screen to issue a 
+<a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/AE_Trans_AECheckOut_Certificate.htm',600,400);return false;">medical certificate</a>. Click <span class="BoldButton">[OK]</span> to save the certificate, <span class="BoldButton">[Clear]</span> to clear the details entered or <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Create Waitlist]</span> to <a href="../../Appointment_Scheduling/Transaction/Create_Waitlist.htm" target="_blank">create a wait list</a> for the patient if schedule is not available. This button is enabled if the ‘Type’ in the Check Out screen is selected as a value with the ‘Use at Visit Conclusion’ check box selected in the Disposition Type function of the Application Masters module.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Conclude Episode]</span> to 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">conclude episode</a>.</p>
+<div class="droptext" id="POPUP241272754" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">If the Episode of the selected visit has to be concluded, click <span class="BoldNumberRFD">[Conclude Episode]</span>. Episode cannot be concluded for patients who are asked to come back on a future date, in such cases the button is disabled. Conclude Episode screen displays the Service Start and End date of the current episode. You can enter the Notes pertaining to the Episode.</p>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Record]</span> to record the Checkout details or click <span class="BoldButton">[Cancel]</span> to return to patient queue screen. &#160;</p>
+</li>
+<li class="p-Number">
+<p class="Number">You cannot checkout the patient, if outstanding patient bills exist for the encounter. An error message 'Outstanding Patient Bill(s) exists for this encounter. Cannot Proceed' is displayed. Click <span class="BoldButton">[OK]</span>. A hyperlink '
+<a href="javascript:void(0);" id="a8" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../Patient_Billing_Manager(J)/Bill_Settlement_Details.htm');return false;">Outstanding Bills Settlement</a>' is displayed. Click the hyperlink to settle bill details. The Bill Number and outstanding amount are displayed with the Bill Number displayed as a hyperlink. Click the hyperlink to view and settle bill details. A Receipt Number is generated on clicking <span class="BoldButton">[OK]</span>.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The 
+<a href="javascript:void(0);" id="a9" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../Patient_Billing_Manager(J)/Visit_Charge_Details.htm');return false;">Visit Charge Details</a> screen is displayed with the charge details. Click <span class="BoldButton">[Continue]</span> to proceed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">You cannot checkout the patient without settling the bill details, if the check box 'Allow AE checkout with bill settlement' is selected in 'AE Parameter' function. An authorized user can <a href="../../Patient_Billing_Manager(J)/Discount_For_Encounter_Charge_Dtls.htm">issue discounts and settle the bill</a> amount of a patient. A visit bill number is generated and the <a href="../../Patient_Billing_Manager(J)/Bill_Settlement_Details.htm">bill settlement details</a> screen pops-up on visit bill generation. Enter the payment details to generate bill-cum-receipt for the respective patient encounter. A receipt document type and number is generated.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The system prompts a pop-up message if patient requires a referral registration. Click <span class="BoldButton">[OK]</span> in the message dialog to register a referral and the Register Referral Details screen appears. Click <span class="BoldButton">[Cancel]</span> to return to patient queue screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory fields in 
+<a href="javascript:void(0);" id="a5" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/AE_Trans_AECheckout_RFD3.htm',600,400);return false;">Register Referral Details</a> screen. Click <span class="BoldButton">[Clear]</span> to clear the entered details if required.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On entering the details, click <span class="BoldButton">[Record]</span> to add the patient as referral and 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a6">Referral Details</a> are displayed. Click <span class="BoldButton">[Clear]</span> to clear the displayed details. Click <span class="BoldButton">[Refresh]</span> to refresh the screen and on completion of registration of referrals, click <span class="BoldButton">[Close]</span> to return to the patient queue screen.</p>
+<div class="droptext" id="POPUP347857977" style="display: none;">
+<p class="BoldRFD">The following details are displayed:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral ID</span> - The Referral Identification Number generated for referral is displayed and hyperlinked. You can view the referral details on clicking hyperlink.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Preferred On</span> – The preferred date of referral is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referred To</span> – The destination facility of referral is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> – The Specialty name to which referral has been recorded is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> - The location to which referral has been recorded is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Practitioner</span> - The name of the practitioner against whom referral has been recorded is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Appt. No</span> – If appointment has been confirmed using the referral identification number, the Appointment Number is displayed. You can proceed with booking an appointment using the <span class="BoldNumberRFD">[Book Appt]</span> hyperlink.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /></p>
+<ol type="1">
+<li class="p-Note">
+<p class="Note">‘Recall Details’ is disabled for emergency patient check out.</p>
+</li>
+<li class="p-Note">
+<p class="Note">This function can also be invoked from ‘Current Emergency Patients’, or ‘Current Emergency Patients using Bed/Bay chart’. This direct option is basically provided for users who do not have access to ‘Current Emergency Patients’ and ‘Current Emergency Patients using Bed/Bay chart’ function to record the Checkout details.</p>
+</li>
+<li class="p-Note">
+<p class="Note">When you click the [Record] button, the system will check for the minimum data sets (MDS) for the encounter based on the configuration. If the MDS criteria are not met, the system will display the message “Criteria not met” with Check hyperlink. The [Record] Button will be disabled. You can click the Check hyperlink and see the MDS values which have not been met in the Minimum data set compliance dialog. Once you complete the required MDS, the [Record] Button will be enabled.</p>
+</li>
+</ol>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','AE Parameter','../AdminSetup/AE_Parameter.htm','Clinic','../../Outpatient_Management/CodeSetup/Clinic.htm','Reason','../../Application_Masters/CodeSetup/Reason.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics1.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Cancel AE Checkout','Cancel_AE_Checkout.htm','Current Emergency Patients','Current_Emergency_Patients.htm','Current Emergency Patients Using Bed-Bay Chart','..\\..\\Accounts_Receivable\\a\\ Ó','OP Check Out','../../Outpatient_Management/Transaction/OP_Check_Out.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<hr style="float: aligncenter;" />
+<h3><a name="Process_Flow_Diagram___AE_Checkout" id="Process_Flow_Diagram___AE_Checkout">Process Flow Diagram - AE Checkout</a></h3>
+<p align="center"><img src="../../image578.gif" style="border: none;" alt="image578.gif" width="225" height="673" border="0" /></p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP347328426');
+	TextPopupInit('a4','POPUP241272754');
+	TextPopupInit('a6','POPUP347857977');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

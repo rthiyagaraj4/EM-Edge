@@ -1,0 +1,6898 @@
+/************************************************************************************
+*
+*	Name			SMTLBLCV.PC
+*
+*	Author			MEDICOM R&D Team, Muscat.
+*
+*	Purpose			Converts LIS file to ZPL file (Labels)
+*
+*	Input Arguments
+*   ==========================================================================
+*	No. Argument									Remarks
+*   ==========================================================================
+*	1.  DB Connect String (User/Password@DBName)	Mandatory
+*	2.  Report Output Directory						Mandatory
+*	3.  LIS File Name								Mandatory
+*	4.  Printer  ID									Mandatory
+*	5.  Number of Copies							Mandatory
+*	6.  Facility ID (For RegisterError)				Mandatory
+*	7.  Module ID (For RegisterError)				Mandatory  
+*	8.  Workstation ID (For RegisterError)			Mandatory
+*	9.  Document ID (For RegisterError)				Mandatory
+*   ==========================================================================
+*
+*	Modification History   
+*   ==========================================================================
+*	Date		Person		Version	Remarks
+*   ==========================================================================
+*	Aug 13,2003	S. Sundar	 1.0	Created
+*
+*	Oct 7, 2003	S. Sundar	 1.1	Printer driver is not required anymore.
+*									Hence, all the references to Printer driver name 
+*									is replaced by Printer id.
+*
+*									PrinterID (In Argument) should be
+*									starting with 'ZEB' or 'ELT'.
+*									Examples:
+*									ZEB_LAB_PRINTER
+*									ZEB_ADMIN_PRINTER
+*									ELT_ADMIN_PRINTER 
+*									ELT_ICU_PRINTER
+*   Jul 9, 2004	A Sathish	 1.2	Created new function ConvRLSpecimenLabelEPL	
+*									to convert the LIS to EPL2 format.(for Malaysia)
+*
+*   Jul 11,2004	N K Nanjayan 1.2    1.Changed function 
+*									ZebraConvert to ZPLConvert
+*									and EltronConvert to 	EPLConvert	
+*									
+*									2.Eltron printer use EPL Programing language
+*									Where as Zebra printers are using
+*									EPL Programing language
+*									and ZPL Programing language
+*									So .ZPL generation contains 
+*									'ZPL' or 'EPL' has been changed.
+*									PinterID should be starting with
+*									'ZPL' to generate Zebra Programing 
+*									Language file
+*									'EPL' to generate EPL Programing 
+*									Language file
+*									instead of checking 'ZEB' for 'ZPL'
+*									and 'ELT' for 'EPL'
+*									Examples:
+*									ZPL_LAB_PRINTER
+*									ZPL_ADMIN_PRINTER
+*									EPL_ADMIN_PRINTER 
+*									EPL_ICU_PRINTER
+*
+*									3.Instead of Printer Type, Printer Language is used
+*									Commented following variable
+*									int BVPrinterTypeIsZEBRA
+*									int BVPrinterTypeIsELTRON
+*									and instead of above variable, 
+*									new two variables used.
+*									int BVLanguageIsZPL
+*									int BVLanguageIsEPL respectively
+*
+*									4.Changed Printer ID 'ZEB' to 'ZPL'
+*									'ELT' to 'EPL'
+*
+*									5.All the function which are ended
+*									with 'ETL' changed to end with 'EPL'
+*									'std_label_etl'     to 'std_label_epl'
+*									'mp_file_label_etl' to 'mp_file_label_epl'
+*									'mp_id_label_etl'   to 'mp_id_label_epl'
+*									'spl_label_etl'     to 'spl_label_epl'
+*									6.Call to RLRALILB has been included.
+*									
+*									7.Call of ORRCOLBL has been changed 
+*									to RLRCOLBL
+*									8. Else condition for tempbuf variable is
+*									   added.
+* May 16, 2005	Sai Dutt	                        1 Created the following new functions 
+*									  ConvertRLAliquotSlideLabel, 
+*									  ConvRLAnatomyPathLabelZPL, 
+*									  ConvRLSampleSlideZPL, 
+*									  ConvBDUnitLabelEPL, 
+*									  ConvBDUnscreenedLabelEPL, 
+*									  ConvBDScreenedLabelEPL, 
+*									  ConvRLAliquotSlideEPL, 
+*									  ConvRLSampleSlideEPL and 
+*									  ConvRLAnatomyPathLabelEPL
+*									  to convert the LIS to EPL2 format.(for Malaysia)
+* July 17, 2005	Sai Dutt	                        1 Created the following new functions 
+*									  ConvBTTagLabelEPL and 
+*									  ConvBTTagLabelZPL 
+* August 06, 2005	Sai Dutt	      1) Changed the barcode font face from 1,1,4 to 1,2,4 for 
+*									  the labels BTRALCBU, BDRUNTLB, BDRSCRLB, BDRUSRLB.
+*									  2) Increased the font of Product Description for BDRALCBU
+*									  Label.
+*
+* Feb 04,2006	S. Sundar		Label Format Designer Changes.
+* August 06, 2006	Sai Dutt	Modified the all the ZPL, EPL file creation procedures to make the noofcopies to 1
+*								because if in print routing noofcopies defined is greater than 1 then 
+*								it will try to print the ZPL file that many times defined, so it is hardcoded to 1.
+* Sep 08, 2006	Sai Dutt		Added ConvRLHistoControlSlideZPL, ConvRLHistoControlSlideEPL
+* Aug 06, 2008  K. Pramodini	Added IPLConvert for supporting Intermec Printer for Sriraj
+* Nov 18, 2014  P. Gopikannan   Added one more condition to reduce the Barcode length for Specimen Barcode Label for HSA-SCF-0163.
+* Dec 01, 2014	P. Gopikannan   Changed the Variable to avoid the Blur Label Printing for EPL Printer for HSA-SCF-0170.
+************************************************************************************/
+
+/*
+* Header Files.
+*/
+#include <windows.h>
+#include <process.h>
+#include <winspool.h>
+#include <malloc.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <debug.h>
+
+HWND	hwnd;
+MSG	msg;
+WNDCLASS wndclass;
+HANDLE hPrinter;
+
+/*
+* Define Constants
+*/
+#define	SUCCESS 1
+#define FAILURE 0
+
+/*
+* Declare variables.
+*/
+char	*GVLISFileName,GVZPLFileName[80],err[150];
+char	err_text[500];
+int		GVNumberOfCopies; 
+char	GVErrorMessage[200];
+
+FILE	*fp;
+
+char	GVMsgText[150];
+char	GVTmpStr[128];
+
+int	GenerateZPL(void);
+
+/*
+* ZPL file generation Routines.
+*/
+int ZPLConvert(char *document_name,int no_copy);
+int ZPXConvert(char *document_name,int no_copy);
+int std_label(int no_cpy,int bldline);
+int std_wrs_label(int no_cpy,int bldline);
+int ConvertRLSpecimenLabel(int no_cpy,int bldline);
+int ConvertRLSpecimenLabel90X(int no_cpy,int bldline);
+int ConvertRLAliquotSlideLabel(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Aliquot and Normal Slide Label 
+int ConvRLAnatomyPathLabelZPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Anatomy Pathalogy label
+int ConvRLSampleSlideZPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Histo Sample Slide Label 
+int ConvRLHistoControlSlideZPL(int no_cpy,int bldline); // Added by Sai Dutt on 08/09/2006 for Histo Control Slide Label 
+int std_mfg_label(int no_cpy,int bldline);
+int mp_file_label(int no_cpy,int bldline);
+int mp_id_label(int no_cpy,int bldline);
+int spl_label(int no_cpy,int bldline);
+int ConvertRLSpecimenLabelZPL(int no_cpy,int bldline);//Added by pramodini on 19/12/2008 for Aliquot and Screened label width change
+
+/*
+* EPL file generation Routines.
+*/
+int EPLConvert(char *document_name,int no_copy);
+int std_label_epl(int no_cpy,int bldline);
+int mp_file_label_epl(int no_cpy,int bldline);
+int mp_id_label_epl(int no_cpy,int bldline);
+int spl_label_epl(int no_cpy,int bldline);
+int ConvRLSpecimenLabelEPL(int no_cpy,int bldline);
+int ConvBDUnitLabelEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for BD Unit Label
+int ConvBDUnscreenedLabelEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for BD Unscreened Label
+int ConvBDScreenedLabelEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for BD Screened Label
+int ConvRLAliquotSlideEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Aliquot and Normal Slide Label 
+int ConvRLSampleSlideEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Histo Sample Slide Label 
+int ConvRLHistoControlSlideEPL(int no_cpy,int bldline); // Added by Sai Dutt on 08/09/2006 for Histo Control Sample Slide Label 
+int ConvRLAnatomyPathLabelEPL(int no_cpy,int bldline); // Added by Sai Dutt on 16/05/2005 for Anatomy Pathalogy Label 
+
+/*
+* IPL file generation Routines.
+*/
+int IPLConvert(char *document_name,int no_copy);
+int ConvBDUnitLabelIPL(int no_cpy,int bldline);
+int ConvBDUnscreenedLabelIPL(int no_cpy,int bldline);
+int ConvBDScreenedLabelIPL(int no_cpy,int bldline);
+int ConvBDUnitLabelISBTIPL(int no_cpy,int bldline);
+int ConvBDUnitLabelISBT912IPL(int no_cpy,int bldline);
+int ConvRLSpecimenLabelIPL(int no_cpy,int bldline);
+int ConvRLAliquotSlideIPL(int no_cpy,int bldline);
+int ConvBTTagLabelIPL(int no_cpy,int bldline);
+int ConvBDNonISBTScreenedLabelIPL(int no_cpy,int bldline);
+
+
+
+/*
+* Declare Bind variables
+*/
+EXEC SQL BEGIN DECLARE SECTION;
+	VARCHAR BVUidPwd[132];				// Database Connect
+
+	VARCHAR BVReportOutputDir[256];		// Report Output Directory					Mandatory
+	VARCHAR BVLISFileName[128];			// LIS File Name							Mandatory
+	VARCHAR BVPrinterID[128];			// Printer ID						Mandatory
+	VARCHAR	BVNumberOfCopies[2];		// Number of Copies
+	
+ 	VARCHAR BVFacilityID[64];			// For RegisterError
+ 	VARCHAR BVModuleID[64];				// For RegisterError
+	VARCHAR BVWorkstationID[64];		// For RegisterError
+ 	VARCHAR BVDocumentID[64];			// For RegisterError
+
+/*	
+	int BVPrinterTypeIsZEBRA;			// Printer type is ZEBRA
+	int BVPrinterTypeIsELTRON;			// printer type is ELTRON*/
+	int BVLanguageIsZPL;				// Language is ZPL
+	int BVLanguageIsZPX;				// Language is ZPX
+	int BVLanguageIsEPL;				// Language is EPL
+	int BVLanguageIsIPL;				// Language is IPL
+	int BVLanguageIsAPL;				// Language is EPL (For argox printer)
+	int BVValidPrinter;					// Is printer valid?
+
+	/* Label Format Designer Variables - Start */
+	int		 BVFormatDefinedYN;
+	varchar	 BVHdrStringDelim[3];
+	varchar	 BVHdrInitString[64];
+	varchar	 BVNoOfCopiesString[64];
+	varchar	 BVHdrTermString[32];
+	int		 BVLineNo;
+	varchar	 BVDtlInitString[128];
+	varchar	 BVDtlTermString[32];
+	varchar	 BVProgramLanguage[16];
+	/* Label Format Designer Variables - End */
+
+	// Added for BDRUNIBP check
+	varchar checkFileName[80];
+
+	VARCHAR l_customer_id [50];	////added on 26.03.2014 against Bru-HIMS-CRF-389 and 420.
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+/* Win main */
+int WINAPI WinMain(HINSTANCE  hInstance,HINSTANCE  hPrevInstance,
+    LPSTR  lpCmdLine,int  nShowCmd)
+{ 
+	char LVFunctionName[30];
+	char sep[3]= ";" ;
+
+	char	*LVUidPwd;
+	char	*LVReportOutputDir;
+	char	*LVLISFileName;
+	char	*LVPrinterID;
+	char	*LVNumberOfCopies;
+ 	char	*LVFacilityID;
+ 	char	*LVModuleID;
+	char	*LVWorkstationID;
+ 	char	*LVDocumentID;
+ 	char	*LVStrBuf;
+	int		LVReturnFlag;
+	struct _stat LVFileStat;
+	int LVResult;
+
+	/*
+	* Assign input arguments to local variables.
+	*/
+	LVUidPwd			=strtok(lpCmdLine,sep);		// Token 1
+	LVReportOutputDir	=strtok(NULL,sep);			// Token 2
+	LVLISFileName		=strtok(NULL,sep);			// Token 3
+	LVPrinterID	=strtok(NULL,sep);			// Token 4
+	LVNumberOfCopies	=strtok(NULL,sep);			// Token 5
+	LVFacilityID		=strtok(NULL,sep);			// Token 6
+	LVModuleID			=strtok(NULL,sep);			// Token 7
+	LVWorkstationID		=strtok(NULL,sep);			// Token 8
+	LVDocumentID		=strtok(NULL,sep);			// Token 9
+
+	/*
+	* Exit if any mandatory parameter is missing.
+	*/
+	if (LVUidPwd==NULL				|| LVReportOutputDir==NULL		||
+		LVLISFileName==NULL			|| LVPrinterID==NULL	||
+		LVNumberOfCopies==NULL		|| LVWorkstationID==NULL		||
+		LVFacilityID==NULL			|| LVModuleID==NULL				||
+		LVDocumentID==NULL)
+	{
+		strcpy (GVTraceMsg, "SMTLBLCV;ConnectString;ReportOutputDir;LISFileName;");
+		strcat (GVTraceMsg, "PrinterID;NumberOfCopies;");
+		strcat (GVTraceMsg, "FacilityID;ModuleID;WorkstationID;DocumentID");
+		MessageBox(hwnd, GVTraceMsg, "SMTLBLCV: Command line usage", MB_OK);
+		return 0;
+	} 
+
+	/*
+	* Assign input arguments to bind variables.
+	*/
+	BVUidPwd.arr[0]         = '\0';
+	BVUidPwd.len= 0;
+	strcpy(BVUidPwd.arr,LVUidPwd);
+	BVUidPwd.len = strlen(BVUidPwd.arr);
+
+	BVReportOutputDir.arr[0]   = '\0';
+	BVReportOutputDir.len= 0;
+	strcpy(BVReportOutputDir.arr,LVReportOutputDir);
+	BVReportOutputDir.len = strlen(BVReportOutputDir.arr);
+
+	BVLISFileName.arr[0]    = '\0';
+	BVLISFileName.len= 0;
+	strcpy(BVLISFileName.arr,LVLISFileName);
+	BVLISFileName.len = strlen(BVLISFileName.arr);
+
+	//Added for BDRUNIBP check 
+	checkFileName.arr[0]   = '\0';
+	checkFileName.len= 0;
+	strcpy(checkFileName.arr,LVLISFileName);
+	checkFileName.len = strlen(checkFileName.arr);
+	//Upto Here
+
+	BVPrinterID.arr[0]   = '\0';
+	BVPrinterID.len= 0;
+	strcpy(BVPrinterID.arr,LVPrinterID);
+	BVPrinterID.len = strlen(BVPrinterID.arr);
+
+	BVNumberOfCopies.arr[0]   = '\0';
+	BVNumberOfCopies.len= 0;	
+	strcpy(BVNumberOfCopies.arr,LVNumberOfCopies);
+	BVNumberOfCopies.len = strlen(BVNumberOfCopies.arr);
+	GVNumberOfCopies = atoi(BVNumberOfCopies.arr);
+	if (GVNumberOfCopies == 0)
+		GVNumberOfCopies = 1;
+
+	BVFacilityID.arr[0]           = '\0';
+	BVFacilityID.len= 0;
+	strcpy(BVFacilityID.arr,LVFacilityID);
+	BVFacilityID.len = strlen(BVFacilityID.arr);
+
+	BVModuleID.arr[0]    = '\0';
+	BVModuleID.len= 0;
+	strcpy(BVModuleID.arr,LVModuleID);
+	BVModuleID.len = strlen(BVModuleID.arr);
+
+	BVWorkstationID.arr[0]  = '\0';
+	BVWorkstationID.len= 0;
+	strcpy(BVWorkstationID.arr,LVWorkstationID);
+	BVWorkstationID.len = strlen(BVWorkstationID.arr);
+
+	BVDocumentID.arr[0]  = '\0';
+	BVDocumentID.len= 0;
+	strcpy(BVDocumentID.arr,LVDocumentID);
+	BVDocumentID.len = strlen(BVDocumentID.arr);
+
+
+	/* Create Window*/
+	
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc    = NULL;
+	wndclass.cbClsExtra		= 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.hInstance		= hInstance;
+	wndclass.hIcon			= NULL;  //LoadIcon ( NULL, IDI_APPLICATION );
+	wndclass.hCursor		= NULL;  //LoadCursor ( NULL, IDC_ARROW);
+	wndclass.hbrBackground	= GetStockObject (WHITE_BRUSH);
+	wndclass.lpszMenuName	= NULL;
+	wndclass.lpszClassName	= "Printing Pc";
+	RegisterClass ( &wndclass );
+
+	hwnd = CreateWindow("Label Conversion",(LPSTR)NULL,
+                         WS_POPUP | WS_DLGFRAME,170,190,300,100,
+                         (HWND)NULL,(HMENU)NULL,(HANDLE)hInstance,
+						 (LPSTR) lpCmdLine);
+
+	/* End of Create Window */
+
+	/*
+	* Connect Database.
+	*/
+	EXEC SQL CONNECT :BVUidPwd;	
+	if(sqlca.sqlcode < 0)
+	{
+		sprintf(err_text,"Database connect failed! [%s] %s", BVUidPwd.arr, sqlca.sqlerrm.sqlerrmc);
+		MessageBox(hwnd,err_text,"SMTLBLCV: Database Donnect",MB_OK|MB_ICONSTOP);
+		exit(0);
+	}
+	set_meduser_role();
+
+	/*
+	* Enable or disable tracing.
+	*/
+	strcpy(GVProgramID,"SMTLBLCV");
+	EnableOrDisableTracing();
+
+	/*
+	* Write parameter values in tracing log.
+	*/
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName,"WinMain");
+		Trace(LVFunctionName,"Begin");
+
+		LVResult = _stat(_pgmptr, &LVFileStat);
+		if (LVResult == 0)
+		{	
+			LVStrBuf = strtok(ctime( &LVFileStat.st_mtime ),"\n");	
+			sprintf(GVTraceMsg,"File Name=[%Fs]  TimeStamp=[%s]  Size=[%ld Bytes]", _pgmptr, LVStrBuf , LVFileStat.st_size );
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+		sprintf(GVTraceMsg,"BVReportOutputDir=[%s] BVLISFileName=[%s]",
+				BVReportOutputDir.arr,BVLISFileName.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+
+		sprintf(GVTraceMsg,"BVPrinterID=[%s]  BVNumberOfCopies=[%s] BVWorkstationID=[%s] ",
+				BVPrinterID.arr,BVNumberOfCopies.arr,BVWorkstationID.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+
+		sprintf(GVTraceMsg,"BVFacilityID=[%s]  BVModuleID=[%s] BVDocumentID=[%s]",
+				BVFacilityID.arr,BVModuleID.arr,BVDocumentID.arr);
+		Trace(LVFunctionName,GVTraceMsg);	
+		
+	}
+
+	/*
+	* Get LIS File Name with PATH.
+	*/
+	GVLISFileName=(char *)malloc(80*sizeof(char));
+	strcpy(GVLISFileName, BVReportOutputDir.arr);
+	strcat(GVLISFileName, BVLISFileName.arr);
+
+	/*
+	* Validate PrinterID.
+	* Exit if PrinterID is not equal to 'ZPL%' and 'EPL%'
+	*/
+	BVValidPrinter = 0;
+
+
+	/*EXEC SQL 
+	SELECT	1
+	INTO	:BVValidPrinter
+	FROM	dual
+	WHERE	( UPPER(:BVPrinterID) like 'ZPL%' OR UPPER(:BVPrinterID) like 'EPL%' OR UPPER(:BVPrinterID) like 'ZPX%');*/
+
+	EXEC SQL 
+	SELECT	1
+	INTO	:BVValidPrinter
+	FROM	dual
+	WHERE	( UPPER(:BVPrinterID) like 'ZPL%' OR UPPER(:BVPrinterID) like 'EPL%' OR UPPER(:BVPrinterID) like 'ZPX%' OR UPPER(:BVPrinterID) like 'IPL%' OR UPPER(:BVPrinterID) like 'APL%');
+
+	if (!BVValidPrinter)
+	{
+		GetMEDICOMMessage("SY2476",GVErrorMessage);
+		sprintf (GVTraceMsg, "APP-SY2476 %s", GVErrorMessage);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, GVLISFileName, "","","","", BVPrinterID.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return(0);
+	}
+
+	get_site_customer_id();
+	sprintf(GVTraceMsg,"l_customer_id=[%s]  ",l_customer_id.arr); 
+	Trace(LVFunctionName,GVTraceMsg);
+
+	/*
+	* Process.
+	*/
+	LVReturnFlag = Process();  
+
+	if (IS_TRACING)
+	{
+		if (LVReturnFlag == SUCCESS)
+		{
+			sprintf(GVTraceMsg,"Conversion Successful. [%s] Created.", GVZPLFileName);
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+		else
+			Trace(LVFunctionName,"Conversion Failed!!");
+	}
+	
+	/*
+	* This program is invoked from SMTPRDOC using _spawnlp system call.
+	*
+	* Exit (0) = Success
+	* Exit (-1) = Not Success
+	*/
+	if (LVReturnFlag)
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"End. exit(0)");
+		exit (0);
+	}
+	else
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"End. exit(-1)");
+		exit (-1);
+	}
+}
+
+int Process(void)
+{
+	char	LVFunctionName[30];
+	int		LVReturnFlag = 0;
+	int		LVLen;
+
+	if (IS_TRACING) 
+	{
+		strcpy(LVFunctionName,"Process");
+		Trace(LVFunctionName,"Begin");
+	}
+
+	/*
+	* Check if LIS file exists.
+	*/
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg,"Check if [%s] exists",GVLISFileName);
+		Trace(LVFunctionName, GVTraceMsg);
+	}
+
+	if ((fp = fopen (GVLISFileName, "r")) == NULL)
+	{
+		GetMEDICOMMessage("SY2435",GVErrorMessage);
+		sprintf (GVTraceMsg, "APP-SY2435 %s", GVErrorMessage);
+		if (IS_TRACING) Trace(LVFunctionName, "Before registererr");
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, GVLISFileName, "","","","", BVPrinterID.arr, LVFunctionName, GVTraceMsg);
+		free(GVLISFileName);
+		if (IS_TRACING) Trace(LVFunctionName, "End");
+		return(0);
+	}
+
+	/*
+	* Code added by S. Sundar on 04-Feb-06 - Start
+	*
+	* New tables are introduced for formatting labels.
+	* If entry for report id is found in SM_LABEL_FORMAT_HDR, then
+	*  Generate ZPL based on formatting defined in tables
+	* Else
+	*  Proceed as it was.
+	*/
+
+	/*
+	* Read program language from printer id
+	*/
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Fetching program language from printer id ..");
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+	BVProgramLanguage.arr[0] = '\0';
+	EXEC SQL 
+	SELECT substr(UPPER(:BVPrinterID),1,instr(UPPER(:BVPrinterID),'_')-1) 
+	INTO :BVProgramLanguage
+	FROM dual;
+	BVProgramLanguage.arr[BVProgramLanguage.len] = '\0';
+
+	/*
+	* Read program language from printer id
+	*/
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Fetching format for [%s] and [%s]",BVDocumentID.arr,BVProgramLanguage.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+	BVFormatDefinedYN = 0;
+	EXEC SQL 
+	SELECT COUNT(1)
+	INTO   :BVFormatDefinedYN
+	FROM   sm_label_format_hdr
+	WHERE  report_id = :BVDocumentID
+	AND    program_language = :BVProgramLanguage;
+
+	if(sqlca.sqlcode < 0)
+	{
+		if (IS_TRACING)
+		{
+			sprintf(GVMsgText, "Error: %s",sqlca.sqlerrm.sqlerrmc);
+			if (IS_TRACING) Trace(LVFunctionName,GVMsgText);
+		}
+		BVFormatDefinedYN = 0;
+	}
+
+	if (BVFormatDefinedYN) 
+	{
+		strcpy(GVZPLFileName,GVLISFileName);
+		LVLen=strlen(GVLISFileName);
+		strncpy(GVZPLFileName+(LVLen-3),"ZPL",3);
+
+		if (IS_TRACING)
+		{
+			sprintf(GVTraceMsg, "Format defined for %s",BVDocumentID.arr);
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+		return(GenerateZPL());
+	}
+	else
+	{
+		if (IS_TRACING)
+		{
+			sprintf(GVTraceMsg, "Format NOT defined for %s",BVDocumentID.arr);
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+				/* 
+		* Depending on the printer id (IPL%)
+		* Call appropriate function to do the conversion.
+		*/
+		BVLanguageIsIPL = 0;
+
+		/*
+		* Code added by S. Sundar on 04-Feb-06 - End
+		*/
+
+		/* 
+		* Depending on the printer id (ZPL% or EPL%)
+		* Call appropriate function to do the conversion.
+		*/
+		BVLanguageIsZPL = 0;
+
+		/* 
+		* Depending on the printer id (ZPL% or EPL% or ZPX%)
+		* Call appropriate function to do the conversion.
+		*/
+		BVLanguageIsZPL = 0;
+		BVLanguageIsZPX = 0;
+
+		EXEC SQL 
+		SELECT	1
+		INTO	:BVLanguageIsZPL 
+		FROM	dual
+		WHERE	UPPER(:BVPrinterID) like 'ZPL%' ;
+
+		if (BVLanguageIsZPL == 1)
+		{
+			if (IS_TRACING)
+			{
+				sprintf(GVTraceMsg, "Printer=[%s] Calling ZPLConvert ..", BVPrinterID.arr);
+				Trace(LVFunctionName,GVTraceMsg);
+			}
+			LVReturnFlag = ZPLConvert(BVDocumentID.arr, GVNumberOfCopies);
+		}
+		else
+		{
+			/* BVLanguageIsEPL = 0; -- Changed the Variable to avoid the Blur Label Printing for EPL Printer for HSA-SCF-0170 */
+			BVLanguageIsAPL = 0;
+
+			EXEC SQL 
+			SELECT	1
+			INTO	:BVLanguageIsAPL /* BVLanguageIsEPL -- Changed the Variable to avoid the Blur Label Printing for EPL Printer for HSA-SCF-0170 */
+			FROM	dual
+			WHERE	UPPER(:BVPrinterID) like 'EPL%';
+
+
+			/*	if (BVLanguageIsEPL == 1) -- Changed the Variable to avoid the Blur Label Printing for EPL Printer for HSA-SCF-0170 */
+			if (BVLanguageIsAPL == 1)
+			{
+				if (IS_TRACING)
+				{
+					sprintf(GVTraceMsg, "Printer=[%s] Calling EPLConvert ..", BVPrinterID.arr);
+					Trace(LVFunctionName,GVTraceMsg);
+				}
+
+				LVReturnFlag = EPLConvert(BVDocumentID.arr, GVNumberOfCopies);
+			}
+			else
+			{
+				BVLanguageIsZPX = 0;
+
+				EXEC SQL 
+				SELECT	1
+				INTO	:BVLanguageIsZPX 
+				FROM	dual
+				WHERE	UPPER(:BVPrinterID) like 'ZPX%';
+
+				if (BVLanguageIsZPX == 1)
+				{
+					if (IS_TRACING)
+					{
+						sprintf(GVTraceMsg, "Printer=[%s] Calling ZPXConvert ..", BVPrinterID.arr);
+						Trace(LVFunctionName,GVTraceMsg);
+					}
+					LVReturnFlag = ZPXConvert(BVDocumentID.arr, GVNumberOfCopies);
+				}  /*added by pramodini*/
+				else
+				{
+					BVLanguageIsIPL = 0;
+
+					EXEC SQL 
+					SELECT	1
+					INTO	:BVLanguageIsIPL 
+					FROM	dual
+					WHERE	UPPER(:BVPrinterID) like 'IPL%';
+
+					if (BVLanguageIsIPL == 1)
+					{
+						if (IS_TRACING)
+						{
+							sprintf(GVTraceMsg, "Printer=[%s] Calling IPLConvert ..", BVPrinterID.arr);
+							Trace(LVFunctionName,GVTraceMsg);
+						}
+						LVReturnFlag = IPLConvert(BVDocumentID.arr, GVNumberOfCopies);
+					}
+					else
+					{
+						BVLanguageIsAPL = 0;
+
+						EXEC SQL 
+						SELECT	1
+						INTO	:BVLanguageIsAPL 
+						FROM	dual
+						WHERE	UPPER(:BVPrinterID) like 'APL%';
+
+						if (BVLanguageIsAPL == 1)
+						{
+							if (IS_TRACING)
+							{
+								sprintf(GVTraceMsg, "Printer=[%s] Calling EPLConvert for Argox Printer..", BVPrinterID.arr);
+								Trace(LVFunctionName,GVTraceMsg);
+							}
+							LVReturnFlag = EPLConvert(BVDocumentID.arr, GVNumberOfCopies);
+						}
+					}
+
+				}
+			}
+		}
+	}
+	if (IS_TRACING) Trace(LVFunctionName, "End");
+	return (LVReturnFlag);
+}
+
+int ZPLConvert(char *document_name,int no_copy)
+{
+	char    LVFunctionName[100];
+	int len;
+	
+	len=strlen(GVLISFileName);
+	
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ZPLConvert");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_copy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	strcpy(GVZPLFileName,GVLISFileName);
+	strncpy(GVZPLFileName+(len-3),"ZPL",3);
+
+	if(_stricmp(document_name,"MPRIDLBL")==0)
+	{
+		return(mp_id_label(no_copy,4));
+	}
+	else if(_stricmp(document_name,"MPRFILBL")==0) 
+	{
+		return(mp_file_label(no_copy,5));
+	}
+	else if( (_stricmp(document_name,"OPRSPLBL")==0) ||
+			 (_stricmp(document_name,"IPRSPLBL")==0)  )
+	{
+		return(spl_label(no_copy,2));
+	}
+	else if( (_stricmp(document_name,"OPREXLBL")==0) ||
+			 (_stricmp(document_name,"IPREXLBL")==0))
+	{
+		return(std_label(no_copy,2));
+	}
+	else if( (_stricmp(document_name,"OPVSLBL")  ==0) ||
+			 (_stricmp(document_name,"ADMLBL")   ==0) ||
+			 (_stricmp(document_name,"TFRLBL")   ==0) ||
+			 (_stricmp(document_name,"CSRVSLBL") ==0) )
+	{
+		return(std_label(no_copy,3));
+	}
+	else if(_stricmp(document_name,"RDRXRLBL") ==0)
+		return(std_rxr_label(no_copy,1));	
+	else if(_stricmp(document_name,"WRSLBL")==0) 
+	{ 
+		return(std_wrs_label(no_copy,1));	     
+//	    return(std_label(no_copy,1));
+	}
+	else if(_stricmp(document_name,"PSRMFGLB")==0) 
+	{ 
+		return(std_mfg_label(no_copy,1));	     
+	}
+	else if(_stricmp(document_name,"PSRREPLB")==0) 
+	{ 
+		return(std_rpck_label(no_copy,1));	     
+	}
+	else if((_stricmp(document_name,"OTRLABLE")==0) ||
+			(_stricmp(document_name,"OTROPLBL")==0)) 
+	{
+		return(std_otr_label(no_copy,1));	     
+	}
+	else if( (_stricmp(document_name,"RLRSPCLB")==0) ||
+		  (_stricmp(document_name,"RLRCOLBL")==0))
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSPCHS")==0) )
+	{
+		return(ConvRLAnatomypathLabelZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSLILB")==0) ||
+		  (_stricmp(document_name,"RLRALILB")==0)) // Aliquot and Slide label
+	{
+		return(ConvertRLAliquotSlideLabel(no_copy,0));
+	}
+// Added By Sai dutt on 16/05/2005 for BD Unit Label
+	else if( (_stricmp(document_name,"BDRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRSCRLB")==0) ||
+			 (_stricmp(document_name,"BDRALILB")==0) ||
+			 (_stricmp(document_name,"BDRCONVL")==0) ||
+			 (_stricmp(document_name,"BDRSPRLB")==0) ) // Screend label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRSCRLB")==0) || 
+			 (_stricmp(document_name,"BTRALILB")==0) || 
+			 (_stricmp(document_name,"BTRCONVL")==0) || 
+			 (_stricmp(document_name,"BTRSPRLB")==0) ) //  BT Screend label added on 19/12/08
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRUSRLB")==0) ) // Unscreend label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+
+	else if( (_stricmp(document_name,"SSRPRTLB")==0) )
+	{
+		return(ss_pack_label(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"SSRAUCLB")==0) )
+	{
+		return(ss_sterile_label(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRHLABL")==0) ) // Sample slide label converted from RDF to PROC
+	{
+		return(ConvRLSampleSlideZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRCNLBL")==0) ) // Histo Control slide label
+	{
+		return(ConvRLHistoControlSlideZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRALCBU")==0) ) // BT Tag label converted from RDF to PROC
+	{
+		return(ConvBTTagLabelZPL(no_copy,0));
+	}
+	else
+	{
+		return(std_label(no_copy,0));
+	}
+}
+// Start - Added by Sai Dutt on 17/01/2005 for Zebra90x Printer 
+int ZPXConvert(char *document_name,int no_copy)
+{
+	char    LVFunctionName[100];
+	int len;
+	
+	len=strlen(GVLISFileName);
+	
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ZPXConvert");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_copy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	strcpy(GVZPLFileName,GVLISFileName);
+	strncpy(GVZPLFileName+(len-3),"ZPL",3);
+
+	if( (_stricmp(document_name,"RLRSPCLB")==0) ||
+		  (_stricmp(document_name,"RLRCOLBL")==0))
+	{
+		return(ConvertRLSpecimenLabel90X(no_copy,0));
+			
+	}
+	else if( (_stricmp(document_name,"RLRSPCHS")==0) ) 
+	{
+		return(ConvRLAnatomypathLabelZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSLILB")==0) ||
+               (_stricmp(document_name,"RLRALILB")==0)) // Aliquot and Slide label
+	{
+		return(ConvertRLAliquotSlideLabel(no_copy,0));
+	}
+
+// Added By Sai dutt on 16/05/2005 for BD Unit Label
+	else if( (_stricmp(document_name,"BDRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRSCRLB")==0) ||
+			 (_stricmp(document_name,"BDRALILB")==0) ||
+			 (_stricmp(document_name,"BDRCONVL")==0) ||
+			 (_stricmp(document_name,"BDRSPRLB")==0) ) // Screend label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRSCRLB")==0) ||
+		     (_stricmp(document_name,"BTRALILB")==0) ||
+		     (_stricmp(document_name,"BTRCONVL")==0) ||
+			 (_stricmp(document_name,"BTRSPRLB")==0) ) // Screend label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRUSRLB")==0) ) // Unscreend label
+	{
+		return(ConvertRLSpecimenLabel(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRHLABL")==0) ) // Sample slide label converted from RDF to PROC
+	{
+		return(ConvRLSampleSlideZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRCNLBL")==0) ) // Histo Control slide label 
+	{
+		return(ConvRLHistoControlSlideZPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRALCBU")==0) ) // BT Tag label converted from RDF to PROC
+	{
+		return(ConvBTTagLabelZPL(no_copy,0));
+	}
+
+}
+
+// End - Added by Sai Dutt on 17/01/2005 for Zebra90x Printer
+
+
+//Added by pramodini on 06/08/2008 for Intermec Printer 
+int IPLConvert(char *document_name,int no_copy)
+{
+	char    LVFunctionName[100];
+	int len;
+	
+	
+	len=strlen(GVLISFileName);
+	
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "IPLConvert");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_copy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	//To get FileName without extension for BDRUNIBP check
+	
+	checkFileName.arr[checkFileName.len-4] = '\0';
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "checkFileName for BDRUNIBP=[%s]",checkFileName.arr);
+		Trace(LVFunctionName,GVTraceMsg);  
+	}
+
+	strcpy(GVZPLFileName,GVLISFileName);
+	strncpy(GVZPLFileName+(len-3),"ZPL",3);
+
+	if( (_stricmp(document_name,"BDRUNTLB")==0) ) // Normal Unit Label
+	{
+		return(ConvBDUnitLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRUNTLB")==0) ) // Normal Unit Label
+	{
+		return(ConvBDUnitLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRSCIBT")==0) ) // Screened label
+	{
+		return(ConvBDScreenedLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRUSRLB")==0) ) // Unscreened label
+	{
+		return(ConvBDUnscreenedLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRUNIBT")==0) ) // 9*12 Unit ISBT label
+	{
+		if ( (_stricmp(checkFileName.arr,"BDRUNIBP")==0) )
+		{
+			return(ConvBDUnitLabelISBT912IPL(no_copy,0));	// Unit ISBT 9*12 Format
+		}
+		else
+		{
+			return(ConvBDUnitLabelISBTIPL(no_copy,0));		// Single Unit ISBT label
+		}
+	}
+	else if( (_stricmp(document_name,"BTRUNIBT")==0) ) 
+	{
+		return(ConvBDUnitLabelISBTIPL(no_copy,0));		// Single Unit ISBT label
+	}
+	else if( (_stricmp(document_name,"BTRSCIBT")==0) ) // Added against SCR#7021
+	{
+		return(ConvBDScreenedLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSPCLB")==0) ||  //Specimen or Collection Label
+		  (_stricmp(document_name,"RLRCOLBL")==0) ) 
+	{
+		return(ConvRLSpecimenLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSLILB")==0) ||  //Aliquot and Slide Label
+		  (_stricmp(document_name,"RLRALILB")==0))
+	{
+		return(ConvRLAliquotSlideIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRALCBU")==0) ) // Transfusion tag
+	{
+		return(ConvBTTagLabelIPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRSCRLB")==0) ) // Transfusion tag
+	{
+		return(ConvBDNonISBTScreenedLabelIPL(no_copy,0));
+	}
+	/*else
+	{
+		return(std_label_epl(no_copy,0));
+	}*/
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+}
+
+int std_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+	col = 50;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+		
+      if (buffer[0] == '') 
+	   
+	   {                                                                            /* begin of barcode */
+	 row = row + 30;     
+	     col = 200; 
+	 tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf);       
+	     fprintf(ofp, "^FO%d,%d^BY2^B3N,N,60,N,N^FD%s^FS\n",col ,row ,buffer); 
+	     col = col - 150;
+	     row = row + 40; 
+	   }
+      else   
+	   {                                  
+	     row = row + 30;                                            /* Next line */
+	     tmp_buf = strtok(buffer,"\n");
+	 if (tmp_buf)
+	    {
+	     strcpy(buffer,tmp_buf);       
+	     if (line_no == bldline)                                      /* Make Bold */
+				fprintf(ofp, "^FO%d,%d^ABN10D,20,15^FD%s^FS\n", col, row, buffer);
+	     else 
+				fprintf(ofp, "^FO%d,%d^AEN20D^FD%s^FS\n", col, row, buffer);
+	    }
+	  else
+	      fprintf(ofp, "^FO%d,%d^AEN20D^FD%s^FS\n", col, row, buffer);
+	     }
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);		/* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int mp_file_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,st_pos;       
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "mp_file_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+	fprintf(ofp,"^MD30\n");
+
+
+	col = 25;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{       
+/*	 if (buffer[0] == '') 
+	   {                                                                            //begin of barcode 
+	     row = 100;     
+		 col = 25; 
+	     tmp_buf = strtok(buffer+1,"\n");
+		     strcpy(buffer,tmp_buf);       
+		     fprintf(ofp, "^FO %d,%d ^BY2^B3N,N,60,N,N^FD%s^FS\n",col ,row ,buffer); 
+		 }
+	  else   
+		 {                                  
+		      row = row + 30;                                           // Next line 
+		      tmp_buf = strtok(buffer,"\n");
+	      if (tmp_buf)
+		 {
+		  strcpy(buffer,tmp_buf);       
+		  if (line_no ==1) {
+					l_ltrim(strrev(buffer));
+			st_pos = (860 - (strlen(strrev(buffer)) * 20))/2;
+				fprintf(ofp, "^FO %d,%d^AD^FD%s^FS\n",st_pos, row, buffer);                          
+			row = row + 30;
+						}
+		  else if (line_no == 2) {
+				fprintf(ofp, "^FO%d,%d^AEN10D^FD%s^FS\n", col, row, buffer);
+			row = row + 70;
+						}
+		  else if (line_no == 3) {
+					fprintf(ofp, "^FO%d,%d^AEN10D,350,55^FD%s^FS\n", col, row, buffer);
+			row = row + 230;
+						}
+		  else if (line_no == bldline) {                                     // Make Bold 
+					fprintf(ofp, "^FO%d,%d^ABN10D,20,15^FD%s^FS\n", col, row, buffer);
+							}
+		  else                                     
+				fprintf(ofp, "^FO%d,%d^AEN10D^FD%s^FS\n", col, row, buffer);
+		  }
+	       } */
+		if(line_no == 1)
+			fprintf(ofp,"^FO25,40,^AE^FD%s^FS",buffer);
+		else if(line_no==2)
+			fprintf(ofp,"^FO100,100^BY2^B3N,N,60,N,N^FD%s^FS\n",buffer);
+		else if(line_no==3)
+			fprintf(ofp,"^FO25,200^ADN15D,350,55^FD%s^FS\n",buffer);
+		else if(line_no==4)
+			fprintf(ofp,"^FO25,385^ABN10D,20,15^FD%s^FS\n",buffer);
+	    else if(line_no==5)
+			fprintf(ofp,"^FO25,440^ABN10D,20,15^FD%s^FS\n",buffer);
+	    else if(line_no==6)
+			fprintf(ofp,"^FO25,490^AEN10D^FD%s^FS\n",buffer);
+	    line_no = line_no+1;
+       }
+	 fprintf(ofp,"^PQ%d\n",no_cpy);			/* Number of labels format  */
+	 fprintf(ofp,"^XZ\n\n");				/* End of label format      */
+	 fclose(ofp);
+	 fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	 return 1;
+
+}
+
+int mp_id_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,st_pos;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "mp_id_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+	fprintf(ofp,"^MD30\n");
+
+
+	col = 25;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	     {                                                                               // begin of barcode
+	      row = 70;     
+	      col = 25; 
+	     tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf);       
+	     fprintf(ofp, "^FO%d,%d^BY2^B3N,N,60,N,N^FD%s^FS\n",col ,row ,buffer); 
+	     col = col - 150;
+	     row = row + 40; 
+	    }
+      else   
+	   {                                  
+	    row = row + 30;                                             // Next line 
+	    tmp_buf = strtok(buffer,"\n");
+	    if (tmp_buf)
+	       {
+	        strcpy(buffer,tmp_buf);       
+	        if (line_no ==1) {
+	           st_pos = (860 - (strlen(buffer) * 20))/2;
+	           fprintf(ofp, "^FO %d,%d^AC^FD%s^FS\n",30, 40, buffer); 
+			   }
+			else if (line_no ==2) {                          
+//				fprintf(ofp, "^FO%d,%d^AEN10D^FD%s^FS\n", col, row, buffer);
+	        	row = row + 40;
+		       }
+			else if (line_no ==3) {                          
+				fprintf(ofp, "^FO%d,%d^AEN10D^FD%s^FS\n", 25, 140, buffer);
+	        	row = row + 40;
+		       }
+			else if (line_no ==4) {                          
+				fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n", 25, 180, buffer);
+	        	row = row + 40;
+		       }
+			else if (line_no ==5) {                          
+				fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n", 25, 210, buffer);
+	        	row = row + 40;
+		       }
+			else if (line_no == bldline) {                           
+		        fprintf(ofp, "^FO%d,%d^ABN10D,20,15^FD%s^FS\n", col, row, buffer);
+	      }
+	    else                                     
+			fprintf(ofp, "^FO%d,%d^AEN10D^FD%s^FS\n", 25, 70, buffer);
+	    }
+	  }
+	line_no = line_no+1;
+	}
+	fprintf(ofp,"^PQ%d\n",no_cpy);  // Number of labels format  
+	fprintf(ofp,"^XZ\n\n");             // End of label format      
+	fclose(ofp);
+	fclose(ifp);
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int spl_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,col1;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "spl_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+	 sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+	 MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+	 return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+	 sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+	 MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+	 return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.	
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+	fprintf(ofp,"^MD30\n");
+
+
+	col  = 50;
+	row  = 0 ;
+	col1 = 440;
+
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{               
+     if (buffer[0] == '') 
+    
+	   {                                                                            // begin of barcode 
+    	 row = row + 30;     
+	     col  = 60; 
+		 col1 = 460; 
+	     
+	     tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf);       
+	     fprintf(ofp, "^FO%d,%d^BY2^B3N,N,60,N,N^FD%s^FS\n",col ,row ,buffer); 
+	     fprintf(ofp, "^FO%d,%d^BY2^B3N,N,60,N,N^FD%s^FS\n",col1 ,row ,buffer); 
+	     col  = col  - 10;
+	     col1 = col1 - 20;
+	     row = row + 40; 
+	   }
+     else   
+	   {                                  
+	    row = row + 30;                                            // Next line 
+	    tmp_buf = strtok(buffer,"\n");
+	    if (tmp_buf)
+	      {
+	      strcpy(buffer,tmp_buf);       
+	      if (line_no == bldline){                    // Make Bold 
+		      fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col,  row, buffer);
+	          fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col1, row, buffer);
+		     }  
+	      else 
+		     {
+		      fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col,  row, buffer);
+		      fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col1, row, buffer);
+		    }
+	      }
+	    else
+	      {
+		    fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col,  row, buffer);
+			fprintf(ofp, "^FO%d,%d^ADN20D^FD%s^FS\n", col1, row, buffer);
+	       }
+	   }
+    line_no = line_no+1;
+   }
+   fprintf(ofp, "^FO 415,5  ^ADN20D^FD|^FS\n");
+   fprintf(ofp, "^FO 415,50 ^ADN20D^FD|^FS\n");
+   fprintf(ofp, "^FO 415,105^ADN20D^FD|^FS\n");
+   fprintf(ofp, "^FO 415,155^ADN20D^FD|^FS\n");
+   fprintf(ofp, "^FO 415,205^ADN20D^FD|^FS\n");
+
+   fprintf(ofp,"^PQ%d\n",no_cpy);       // Number of labels format  
+   fprintf(ofp,"^XZ\n\n");          // End of label format     
+   fclose(ofp);
+   fclose(ifp);
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+   
+   return 1;
+
+
+
+}
+
+l_ltrim(s)
+char *s;
+{
+	char    LVFunctionName[100];
+
+    char s1[200];
+    int i;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ltrim");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+    strcpy(s1,s);
+
+    for(i=0;s1[i] == ' '; i++);
+
+    while(s1[i]) 
+	*s++ = s1[i++];
+
+    *s = '\0';
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+}
+
+
+
+int EPLConvert(char *document_name, int no_copy)
+{
+	char    LVFunctionName[100];
+	int len;
+	len=strlen(GVLISFileName);
+	
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "EPLConvert");
+		Trace(LVFunctionName,"Begin");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_copy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	strcpy(GVZPLFileName,GVLISFileName);
+	strncpy(GVZPLFileName+(len-3),"zpl",3);
+
+	if(_stricmp(document_name,"MPRIDLBL")==0)
+	{
+		return(mp_id_label_epl(no_copy,4));
+	}
+	else if(_stricmp(document_name,"MPRFILBL")==0) 
+	{
+		return(mp_file_label_epl(no_copy,5));
+	}
+	else if( (_stricmp(document_name,"OPRSPLBL")==0) ||
+			 (_stricmp(document_name,"IPRSPLBL")==0)  )
+	{
+		return(spl_label_epl(no_copy,2));
+	}
+	else if( (_stricmp(document_name,"OPREXLBL")==0) ||
+			 (_stricmp(document_name,"IPREXLBL")==0))
+	{
+		return(std_label_epl(no_copy,2));
+	}
+	else if( (_stricmp(document_name,"OPVSLBL")  ==0) ||
+			 (_stricmp(document_name,"ADMLBL")   ==0) ||
+			 (_stricmp(document_name,"TFRLBL")   ==0) ||
+			 (_stricmp(document_name,"CSRVSLBL") ==0) ||
+			 (_stricmp(document_name,"RDRXRLBL") ==0) )
+	{
+		return(std_label_epl(no_copy,3));
+	}
+	else if(_stricmp(document_name,"WRSLBL")==0)
+    { 
+	     
+		return(std_label_epl(no_copy,1));
+	}
+	//RLRSPCLB included on 09-07-2004 for EPL language
+	else if( (_stricmp(document_name,"RLRSPCLB")==0) ||
+		  (_stricmp(document_name,"RLRCOLBL")==0) ) 
+	{
+		return(ConvRLSpecimenLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSPCHS")==0) ) 
+	{
+		return(ConvRLAnatomyPathLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRSLILB")==0) ||
+		  (_stricmp(document_name,"RLRALILB")==0))
+	{
+		return(ConvRLAliquotSlideEPL(no_copy,0));
+	}
+// Added By Sai dutt on 16/05/2005 for BD Unit Label
+	else if( (_stricmp(document_name,"BDRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvBDUnitLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRUNTLB")==0) ) // Unit Label
+	{
+		return(ConvBDUnitLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRSCRLB")==0) ||
+			 (_stricmp(document_name,"BDRALILB")==0) ||
+			 (_stricmp(document_name,"BDRCONVL")==0) ||
+			 (_stricmp(document_name,"BDRSPRLB")==0) ) // Screend label
+	{
+		return(ConvBDScreenedLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRSCRLB")==0) ||
+			 (_stricmp(document_name,"BTRALILB")==0) ||
+			 (_stricmp(document_name,"BTRCONVL")==0) ||
+			 (_stricmp(document_name,"BTRSPRLB")==0) ) // Screened label added on 19/12/08
+	{
+		return(ConvBDScreenedLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BDRUSRLB")==0) ) // Unscreend label
+	{
+		return(ConvBDUnscreenedLabelEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRHLABL")==0) ) // Sample slide label converted from RDF to PROC
+	{
+		return(ConvRLSampleSlideEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"RLRCNLBL")==0) ) // Histo Control slide label 
+	{
+		return(ConvRLHistoControlSlideEPL(no_copy,0));
+	}
+	else if( (_stricmp(document_name,"BTRALCBU")==0) ) // BT tag label converted from RDF to PROC
+	{
+		return(ConvBTTagLabelEPL(no_copy,0));
+	}
+	else
+	{
+		return(std_label_epl(no_copy,0));
+	}
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+}
+
+/*  -------  */ 
+
+int mp_id_label_epl(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,st_pos;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "mp_id_label_epl");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"\n");
+	fprintf(ofp,"N\n");
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");  //For Argox printer
+	else
+		fprintf(ofp,"D2\n");
+	
+	col = 25;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	     {                                                                               // begin of barcode
+	      row = 70;     
+	      col = 25; 
+	      tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf);  
+		 fprintf(ofp,"B%d,%d,0,3,2,3,60,N,\"%s\"\n",col ,row ,buffer);      
+	     col = col - 150;
+	     row = row + 40; 
+	    }
+      else   
+	   {                                  
+	    row = row + 30;                                             // Next line 
+	    tmp_buf = strtok(buffer,"\n");
+	    if (tmp_buf)
+	       {
+	        strcpy(buffer,tmp_buf);       
+	        if (line_no ==1) {
+	            st_pos = (860 - (strlen(buffer) * 20))/2;
+				fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",st_pos, row, buffer); 
+			   }
+			else if (line_no ==2) { 
+			    fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col, row, buffer);                          
+				row = row + 40;
+		       }
+			else if (line_no == bldline) { 
+			    fprintf(ofp,"D2\n");
+				fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col, row, buffer); 
+				fprintf(ofp,"D2\n");                                               
+		         
+	      }
+	    else 
+		    fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col, row, buffer);                                                              
+	    }
+	  }
+	line_no = line_no+1;
+	}
+	fprintf(ofp,"P%d\n",no_cpy);  // Number of labels format  
+    fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+
+}
+
+ /* ----------- */
+
+int mp_file_label_epl(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];	
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,st_pos;       
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "mp_file_label_epl");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+ 
+    fprintf(ofp,"\n");
+	fprintf(ofp,"N\n");
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");  //For Argox printer
+	else
+		fprintf(ofp,"D2\n");
+	
+	col = 25;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{       
+	 if (buffer[0] == '') 
+	   {                                                                            /* begin of barcode */
+	     row = 100;     
+		 col = 25; 
+	     tmp_buf = strtok(buffer+1,"\n");
+		 strcpy(buffer,tmp_buf);
+		  fprintf(ofp,"B%d,%d,0,3,2,3,60,N,\"%s\"\n",col ,row ,buffer);         
+	     }
+	  else   
+		 {                                  
+		      row = row + 30;                                           /* Next line */
+		      tmp_buf = strtok(buffer,"\n");
+	      if (tmp_buf)
+		 {
+		  strcpy(buffer,tmp_buf);       
+		  if (line_no ==1) {
+					l_ltrim(strrev(buffer));
+			st_pos = (860 - (strlen(strrev(buffer)) * 20))/2;
+                fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",st_pos, row, buffer); 
+	         row = row + 30;
+						}
+		  else if (line_no == 2) {
+                  fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col,row,buffer); 
+				  row = row + 70;
+						}
+		  else if (line_no == 3) {
+		            fprintf(ofp,"A%d,%d,0,5,2,4,N,\"%s\"\n",col, row, buffer); 
+					row = row + 180;
+						}
+		  else if (line_no == bldline) {  /* Make Bold */  
+		            fprintf(ofp,"D2\n");                      
+					fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col, row, buffer); 
+					fprintf(ofp,"D2\n"); 
+							}
+		  else  
+		        fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col,row,buffer);                                    
+				 
+		  }
+	       }
+	    line_no = line_no+1;
+       }
+	 fprintf(ofp,"P%d\n",no_cpy); /* Number of labels format  */
+	 fclose(ofp);
+	 fclose(ifp);
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	 return 1;
+
+}
+
+ 
+int spl_label_epl(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];	
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,col1;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "spl_label_epl");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+	 sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+	 MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+	 return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+	 sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+	 MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+	 return 0;
+	}
+
+    
+    fprintf(ofp,"\n");
+	fprintf(ofp,"N\n");
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");  //For Argox printer
+	else
+		fprintf(ofp,"D2\n");
+
+	col  = 50;
+	row  = 0 ;
+	col1 = 440;
+
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{               
+     if (buffer[0] == '') 
+	   {                                                                            // begin of barcode 
+    	 row = row + 30;     
+	     col  = 60; 
+		 col1 = 460; 
+	     
+	     tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf); 
+	     fprintf(ofp,"B%d,%d,0,3,2,3,60,N,\"%s\"\n",col ,row ,buffer);
+		 fprintf(ofp,"B%d,%d,0,3,2,3,60,N,\"%s\"\n",col1 ,row ,buffer);            	       
+	     col  = col  - 10;
+	     col1 = col1 - 20;
+	     row = row + 40; 
+	   }
+     else   
+	   {                                  
+	    row = row + 30;                                            // Next line 
+	    tmp_buf = strtok(buffer,"\n");
+	    if (tmp_buf)
+	      {
+	      strcpy(buffer,tmp_buf);       
+	      if (line_no == bldline){   // Make Bold 
+		      fprintf(ofp,"D2\n");
+		      fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col,row,buffer); 
+			  fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col1,row,buffer); 
+		      fprintf(ofp,"D2\n");
+		     }  
+	      else 
+		     {
+			  fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col,row,buffer); 
+			  fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col1,row,buffer); 
+		     
+		    }
+	      }
+	    else
+	      {
+		    fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col,row,buffer); 
+			fprintf(ofp,"A%d,%d,0,2,1,1,N,\"%s\"\n",col,row,buffer); 
+		     
+	       }
+	   }
+    line_no = line_no+1;
+   }
+
+  
+   fprintf(ofp,"A415,50,0,4,1,1,N,\"!\"\n");
+   fprintf(ofp,"A415,105,0,4,1,1,N,\"!\"\n");
+   fprintf(ofp,"A415,160,0,4,1,1,N,\"!\"\n");
+   fprintf(ofp,"A415,215,0,4,1,1,N,\"!\"\n");
+    
+   
+   fprintf(ofp,"P%d\n",no_cpy);       // Number of labels format  
+   fclose(ofp);
+   fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+   return 1;
+
+}
+
+
+/* --------------------- */
+
+int std_label_epl(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_label_epl");
+		Trace(LVFunctionName,"Begin ");
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+     
+	fprintf(ofp,"\n");
+	fprintf(ofp,"N\n");
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");  //For Argox printer
+	else
+		fprintf(ofp,"D2\n");
+
+
+	col = 50;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+		
+      if (buffer[0] == '') 
+	   {                                                                            /* begin of barcode */
+		 row = row + 30;     
+	     col = 200; 
+	     tmp_buf = strtok(buffer+1,"\n");
+	     strcpy(buffer,tmp_buf);       
+		 fprintf(ofp,"B%d,%d,0,3,2,3,60,N,\"%s\"\n",col ,row ,buffer);
+	     col = col - 120;
+	     row = row + 40; 
+	   }
+      else   
+	   {                                  
+	     row = row + 30;                                            /* Next line */
+	     if (line_no == bldline)  /* Make Bold */
+		   fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col,row,buffer);
+		 else 
+			fprintf(ofp,"A%d,%d,0,4,1,1,N,\"%s\"\n",col,row,buffer);  
+	   }
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */
+	fclose(ofp);
+	fclose(ifp);
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+
+int std_otr_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_otr_label");
+		Trace(LVFunctionName,"Begin ");
+	}
+		
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 125;
+	row = 30;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{		
+     tmp_buf = strtok(buffer,"\n");
+	 if (tmp_buf)
+	    {
+			strcpy(buffer,tmp_buf);       
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,10^FD%s^FS\n",col,row,buffer);
+		}
+	  else
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,10^FD%s^FS\n",col,row,buffer);
+	   row = row + 35;                                            /* Next line */    
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvertRLSpecimenLabel(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+	int font_width;
+	int font_height;
+	int barcode_yn;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvertRLSpecimenLabel");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD7\n");
+
+	row = 30;
+	line_no = 1;
+	font_width = 20;
+	font_height = 20;
+	barcode_yn = 0;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	  {              
+		barcode_yn = 1;
+		/* Barcode */
+	  	col = 35;
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY2,^BCN,50,N^FD%s^FS\n",col ,row ,buffer);  //changed 50 to row on 30/06/2004
+		row = row + 60; 
+	  }
+      else   
+	  { 
+	
+		/* Other lines */                              
+		col = 25;
+	    tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+
+			/* Set font height based on line number */
+			if (barcode_yn)
+			{
+				barcode_yn = 0;
+				font_height = 25;
+			}
+			else
+				font_height = 20;
+
+			/* Set font width based on number of characters to be printed */
+			if (strlen(buffer) > 40)
+				font_width = 15;
+			else
+				font_width = 20;
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); //AD changed as AB on 4/07/04
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+
+		row = row + 25;                                            // Next line 		
+	  } 
+
+	  line_no = line_no + 1;
+	 } 
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */ 
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+/*
+* Start - Added by Sai Dutt on 17/01/2005 for 16/05/2005 for Aliquot and Normal Slide Label
+*/
+
+
+int ConvRLAnatomypathLabelZPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+	int font_width;
+	int font_height;
+	int barcode_yn;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLAnatomypathLabelZPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD7\n");
+
+	row = 35;
+	line_no = 1;
+	//font_width = 17;
+	font_height = 47;
+	font_width = 33;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	  {              
+		barcode_yn = 1;
+		/* Barcode */
+	  	col = 35;
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY2,^BCN,50,N^FD%s^FS\n",col ,row ,buffer);  
+		row = row + 55; 
+	  }
+      else   
+	  { 
+	
+		/* Other lines */                              
+		col = 25;
+	    tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+
+			/*if (line_no == 7)
+			{
+				font_width = 20;
+				font_height = 40;
+			}
+			else
+			{
+				font_width = 33;
+				font_height = 47;
+			}
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);  */
+			
+			
+			if (line_no == 1)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +50;				
+			}
+			else if(line_no == 2)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +55;				
+			}
+			else if(line_no == 3)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +50;				
+			}
+			else if(line_no == 4)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +55;				
+			}
+			else if(line_no == 5)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +55;				
+			}
+			else if(line_no == 6)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +45;				
+			}
+			else
+			{
+				font_height = 40;
+				font_width = 20;				
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row +55;				
+			}			
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+		//fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+		//row = row + 55;                                            // Next line 		
+	  } 
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+
+int ConvertRLAliquotSlideLabel(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE	*ifp,*ofp;
+	int		i,col,row,line_no;
+	char	buffer[200];
+	char	*tmp_buf;
+	int		font_width, font_height;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvertRLSlideLabel");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD7\n");
+
+	row = 40;
+	line_no = 1;
+	col = 25;
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+		/* Barcode */
+	  	col = 25;
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY1.4,^BCN,55,N^FD%s^FS\n",col ,row ,buffer);  
+		row = row + 40; 
+	  }
+        else
+        {
+		if (line_no == 1)
+		{
+			font_width = 11;
+			font_height = 14;
+		}
+		else
+		{
+			font_width = 11;
+			font_height = 14;
+		}
+	    
+		tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+		else
+		{
+			/* If data is null    */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+
+         }
+         row = row + 20;                                            // Next line 		
+	   line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+/* Start -- Added by Sai Dutt on 08.09.2006 for Histo Control Slide Label --*/
+int ConvRLHistoControlSlideZPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE	*ifp,*ofp;
+	int		i,col,row,line_no;
+	char	buffer[200];
+	char	*tmp_buf;
+	int		font_width, font_height;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLHistoControlSlideZPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBX interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD0\n");
+
+	row = 20;
+	line_no = 1;
+	col = 25;
+	//font_width = 12; Commented for SCR#7376 
+	//font_height = 12;
+
+	font_width = 22;
+	font_height = 22;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+		tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf); 
+			/*Added against SCR#7376 */
+			if (line_no == 1)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD^FS\n", col, row, font_height, font_width);
+				row = row + 20;
+			}
+			//Upto Here
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+
+		row = row + 20;                                            // Next line 		
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+/* End -- Added by Sai Dutt on 08.09.2006 for Histo Control Slide Label --*/
+
+int ConvRLSampleSlideZPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE	*ifp,*ofp;
+	int		i,col,row,line_no;
+	char	buffer[200];
+	char	*tmp_buf;
+	int		font_width, font_height;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLSampleSlideZPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBX interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD0\n");
+
+	row = 20;
+	line_no = 1;
+	col = 35;
+	//font_width = 12; commented for SCR#7376
+	//font_height = 12;
+	
+
+	font_height = 24;
+	font_width = 22;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+		tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);  
+			
+			/*Added against SCR#7376 */
+			if (line_no == 1)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD^FS\n", col, row, font_height, font_width);
+				row = row + 20;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD^FS\n", col, row, font_height, font_width);
+				row = row + 10;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+				row = row + 25;
+			}//Upto Here 
+			else if (line_no == 2 )
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 25;
+			}
+			else if (line_no == 3)
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 20;
+			}
+			else
+			{
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row +20;
+			}
+
+			/*if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);*/
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+
+		//row = row + 20;                                            // Next line 		
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+/*
+* End - Added by Sai Dutt on 16/05/2005 for Aliquot and Normal Slide Label
+*/
+
+// Start - Added by Sai Dutt on 02/07/2005 for ZPL Printer
+int ConvBTTagLabelZPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+	int font_width;
+	int font_height;
+	int barcode_yn;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvBTTagLabelZPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD7\n");
+
+	row = 20;
+  	col = 25;
+	line_no = 1;
+	font_height = 26;
+	//font_width = 17;
+	font_width = 22;
+	for(;fgets(buffer,200,ifp);)
+	{
+		col = 25;
+
+      /*  if (line_no > 4)
+	  {
+	    //if (line_no == 6 || line_no >= 12) //Commented and code added by pramodini on 17.12.08 against spr-7226
+		if (line_no == 5 )
+		{
+              font_height = 22;
+              font_width = 17;
+		}
+		else if (line_no == 6 )
+		{
+              font_height = 20;
+              font_width = 12;
+		}
+		else if ( line_no >= 12 ) 
+		{
+			font_height = 20;
+            font_width = 20;
+		}
+		else
+		{
+              font_height = 22;
+              font_width = 21;
+		} 
+		//upto here  
+	  }*/
+       if (buffer[0] == '') 
+	   {              
+		barcode_yn = 1;
+		/* Barcode */
+
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY2,^BCN,60,N^FD%s^FS\n",col ,row ,buffer);  
+		row = row + 70; 
+	   }
+      else   
+	  { 
+	
+	    tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+			
+			if ((line_no == 1) || (line_no == 2))
+			{
+				font_height = 26;
+				font_width = 22;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if ((line_no == 4) || (line_no == 8)|| (line_no == 9)|| (line_no == 10)|| (line_no == 12))
+			{
+				font_height = 24;
+				font_width = 21;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if (line_no == 5)
+			{
+				font_height = 24;
+				font_width = 18;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if (line_no == 6)
+			{
+				font_height = 24;
+				font_width = 15;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 30;
+			}
+			else if ((line_no == 7) || (line_no == 19) || (line_no == 20))
+			{
+				font_height = 24;
+				font_width = 15;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if ((line_no == 13) || (line_no == 14) || (line_no == 15) || (line_no == 16) )
+			{
+				font_height = 24;
+				font_width = 19;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if (line_no == 17)
+			{
+				font_height = 24;
+				font_width = 16;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+			else if (line_no == 18)
+			{
+				font_height = 24;
+				font_width = 16;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 30;
+			}
+			else
+			{
+				font_height = 24;
+				font_width = 16;
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+				row = row + 40;
+			}
+
+			//fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+
+			/*if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);*/
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+
+		//row = row + 40;                                            // Next line 		
+	  } 
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+// End   - Added by Sai Dutt on 02/07/2005 for ZPL Printer
+
+// Start - Added by Sai Dutt on 17/01/2005 for Zebra90x printer
+
+int ConvertRLSpecimenLabel90X(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+	int font_width;
+	int font_height;
+	int barcode_yn;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvertRLSpecimenLabel90X");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD0\n");
+
+	row = 30;
+	line_no = 1;
+	font_width = 25;
+	font_height = 30;
+	barcode_yn = 0;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	  {              
+		barcode_yn = 1;
+		/* Barcode */
+	  	col = 60;
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY3,^BCN,70,N^FD%s^FS\n",col ,row ,buffer);  //changed 50 to row on 30/06/2004
+		row = row + 82; 
+	  }
+      else   
+	  { 
+	
+		/* Other lines */                              
+		col = 50;
+	    tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+
+			/* Set font height based on line number */
+			if (barcode_yn)
+			{
+				barcode_yn = 0;
+				font_height = 30;
+			}
+			else
+				font_height = 25;
+
+			/* Set font width based on number of characters to be printed */
+			if (strlen(buffer) > 40)
+				font_width = 25;
+			else
+				font_width = 30;
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); //AD changed as AB on 4/07/04
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+
+		row = row + 32;                                            // Next line 		
+	  } 
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvertRLSlideLabel90X(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE	*ifp,*ofp;
+	int		i,col,row,line_no;
+	char	buffer[200];
+	char	*tmp_buf;
+	int		font_width, font_height;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvertRLSlideLabel90X");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBX interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD0\n");
+
+	row = 40;
+	line_no = 1;
+	col = 25;
+	for(;fgets(buffer,200,ifp);)
+	{
+
+		if (line_no == 1)
+		{
+			font_width = 18;
+			font_height = 18;
+		}
+		else
+		{
+			font_width = 23;
+			font_height = 28;
+		}
+	    
+		tmp_buf = strtok(buffer,"\n");
+
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);       
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); //AD changed as AB on 4/07/04
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+		else
+		{
+			/* If data is null */
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer);
+		}
+
+		row = row + 30;                                            // Next line 		
+
+	  line_no = line_no + 1;
+	 } 
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+
+// end - Added by Sai Dutt on 17/01/2005 for Zebra90x printer
+
+// Start - Added by Sai Dutt on 16/05/2005 for EPL printer (BD Labels)
+
+int ConvBDScreenedLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvBDScreenedLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  2;
+	horm=  1;
+	verm=  2;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+          	col = 25;  
+	        row = 300; 
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+
+	  }
+      else     
+	  {  
+          if (line_no == 1)
+          {
+          	col = 25;  
+	        row = 20; 
+            font=  2;
+            horm=  1;
+            verm=  1;
+            imag= 'R';
+          }
+          else if (line_no == 2) 
+          {
+          	col = 25;  
+            row = 40; 
+            font=  3;
+            horm=  1;
+            verm=  2;
+            imag= 'N';
+          }
+          else if (line_no == 3)
+          {
+          	col = 25;  
+            row = 75; 
+            font=  1;
+            horm=  1;
+            verm=  2;
+            imag= 'N';
+          }
+          else if (line_no == 4)
+          {
+          	col = 25;  
+            row = 100; 
+            font=  1;
+            horm=  1;
+            verm=  2;
+            imag= 'N';
+          }
+          else if (line_no == 5)
+          {
+          	col = 25;  
+            row = 125; 
+            font=  1;
+            horm=  1;
+            verm=  2;
+            imag= 'N';
+          }
+          else if (line_no == 6)
+          {
+          	col = 90;  
+            row = 150; 
+            font=  5;
+            horm=  4;
+            verm=  3;
+            imag= 'R';
+          }
+          else if (line_no == 7)
+          {
+          	col = 380;  
+            row = 175; 
+            font=  1;
+            horm=  1;
+            verm=  1;
+            imag= 'N';
+          }
+          else if (line_no == 8)
+          {
+          	col = 380;  
+            row = 195; 
+            font=  1;
+            horm=  3;
+            verm=  8;
+            imag= 'R';
+          }
+          else if (line_no == 9) //barcode no need of this else if but for knowing fonts sizes
+          {
+          	col = 25;  
+            row = 300; 
+            font=  3;
+            horm=  2;
+            verm=  4;
+          }
+          else if (line_no == 10)
+          {
+          	col = 25;  
+            row = 365; 
+            font=  2;
+            horm=  1;
+            verm=  2;
+            imag= 'N';
+          }
+          else if (line_no == 11)
+          {
+          	col = 25;  
+            row = 400; 
+            font=  3;
+            horm=  2;
+            verm=  2;
+            imag= 'N';
+          }
+
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvBDUnscreenedLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvBDUnscreenedLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 10; 
+    rot =  0;
+	font=  2;
+	horm=  1;
+	verm=  2;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+          	col = 25;  
+	        row = 30; 
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 50,imag, buffer);  
+
+	  }
+      else     
+	  {  
+          if (line_no == 1)
+          {
+          	col = 25;  
+	        row = 10; 
+            font=  2;
+            horm=  1;
+            verm=  1;
+          }
+          else if (line_no == 2) //barcode no need of this else if but for knowing fonts sizes
+          {
+
+          	col = 25;  
+	        row = 30; 
+            font=  3;
+            horm=  2;
+            verm=  4;
+          }
+          else if (line_no == 3)
+          {
+          	col = 480;  
+	        row = 10; 
+            font=  1;
+            horm=  2;
+            verm=  4;
+          }
+          else if (line_no == 4)
+          {
+          	col = 480;  
+	        row = 55; 
+            font=  1;
+            horm=  1;
+            verm=  3;
+          }
+          else if (line_no == 5)
+          {
+          	col = 480;  
+	        row = 90; 
+            font=  1;
+            horm=  1;
+            verm=  1;
+          }
+          else if (line_no == 6)
+          {
+         	col = 20;  
+	        row = 85; 
+            font=  1;
+            horm=  1;
+            verm=  2;
+          }
+
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvBDUnitLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvBDUnitLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  2;
+	horm=  1;
+	verm=  2;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+		row = row + 10;
+	    
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+			row = row + 70; //Changed on 30/06/2004
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+     			 //else condition is added by Rayilla  on 10/03/2005
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvRLAliquotSlideEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLAliquotSlideEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D8\n");        //stating line  modified on 01.12.2015 against ML-MMOH-CRF-0324
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  2;
+	horm=  1;
+	verm=  1;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+		// row = row + 5;
+	    
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 1, 4, 55,imag, buffer);  
+			row = row + 60; //Changed on 30/06/2004
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+/* Start -- Added by Sai Dutt on 08.09.2006 for Histo Control Slide Label --*/
+int ConvRLHistoControlSlideEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLHistoControlSlideEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  1;
+	horm=  1;
+	verm=  1;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '.') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,".\n");
+		tmp_buf = strtok(buffer+1,".\n");
+     		strcpy(buffer,tmp_buf);       
+		row = row + 10;
+	    
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 1, 4, 60,imag, buffer);  
+			row = row + 60; //Changed on 30/06/2004
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+/* End -- Added by Sai Dutt on 08.09.2006 for Histo Control Slide Label --*/
+
+int ConvRLSampleSlideEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLSampleSlideEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");            //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  1;
+	horm=  1;
+	verm=  1;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+		row = row + 10;
+	    
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 1, 4, 60,imag, buffer);  
+			row = row + 60; //Changed on 30/06/2004
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvRLAnatomyPathLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLAnatomyPathLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  1;
+	horm=  2;
+	verm=  4;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+			
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 3, 2, 4, 50,imag, buffer);  
+			row = row + 55; 
+			spec_flag = 1;  
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+			}
+			else
+			{
+			  fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 55;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+// End - Added by Sai Dutt on 16/05/2005 for EPL printer
+
+// Start - Added by Sai Dutt on 02/07/2005 for EPL printer
+int ConvBTTagLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvBTTagLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize EPL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+		fprintf(ofp,"D2\n");        //stating line
+
+ 	col = 25;  
+	row = 20; 
+    rot =  0;
+	font=  4;
+	horm=  1;
+	verm=  1;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+        if (line_no > 4)
+	  {
+	    if (line_no == 6 || line_no == 7 )
+		{
+          font=  1;
+          horm=  1;
+          verm=  2;
+		}
+		else
+		{
+          font=  2;
+          horm=  1;
+          verm=  2;
+		}
+	  }
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+			
+		fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+		row = row + 70; 
+
+        font=  2;
+        horm=  1;
+        verm=  2;
+
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+                   }
+			 else
+			 {
+			   fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 40;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+// End - Added by Sai Dutt on 02/07/2005 for EPL printer
+
+int ConvRLSpecimenLabelEPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no,rot,font,horm,verm,spec_flag=0;
+	char buffer[200],imag;
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvRLSpecimenLabelEPL");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)   
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");  
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\nN\n");           //To initialize ZBL interprter in the printer.
+	if (BVLanguageIsAPL == 1)
+		fprintf(ofp,"D8\n");		//For Argox printer
+	else
+	{
+	/**** COMMENTED BY BALARAMAN ON 27/07/2011 for Medicity to make the barcode bold
+		fprintf(ofp,"D2\n");        //stating line         ***********/
+		fprintf(ofp,"D8\n");        //stating line         
+	}
+
+ 	col = 25;   
+	row = 20; 
+    rot =  0;
+	font=  2;
+	horm=  1;
+	verm=  1;
+	imag= 'N';
+	line_no = 1;  
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		// begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+		row = row + 10;
+	    
+		if (strcmp(l_customer_id.arr,"MOHBR") == 0)	
+		{
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 3, 2, 4, 50,imag, buffer);  
+		}
+		else if (strcmp(l_customer_id.arr,"SHALM") == 0) /* Added By Gopikannan for HSA-SCF-0163, Barcode length for Specimen Barcode Label is too long */	
+		{
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 3, 2, 4, 65,imag, buffer);  
+		} /* End HSA-SCF-0163, Barcode length for Specimen Barcode Label is too long */	
+		else
+		{
+			fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 3, 2, 5, 65,imag, buffer);  
+		}
+
+		//	row = row + 60; //Changed on 30/06/2004
+			row = row + 75;
+			spec_flag = 1;  
+	  }
+      else     
+	  {  
+	     tmp_buf = strtok(buffer,"\n");
+		 
+		 if (spec_flag == 1) // to print the specimen no in big.
+		   {font = 3; spec_flag=0;}           
+		 else
+			font = 2;
+
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if (line_no == bldline)                                      // Make Bold 
+					 fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+					// fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s", col, row, rot, font, horm, verm, imag, buffer); 
+                                   //Commented by Rayilla on 10/03/2005
+				 else 
+					fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, buffer);
+					// fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s", col, row, rot, font, horm, verm, imag, buffer);
+                                    //Commented by Rayilla on 10/03/2005
+			}
+			else
+            			//else condition is added by Rayilla  on 10/03/2005
+			{
+			  fprintf(ofp, "A%d,%d,%d,%d,%d,%d,%c,\"%s\"\n", col, row, rot, font, horm, verm, imag, "");
+		       }
+			
+			row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	fprintf(ofp,"P%d\n",no_cpy);  /* Number of labels format  */	
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+
+
+int ss_sterile_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ss_sterile_label");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.	
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 50;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+		
+		if(line_no==1)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,50,buffer);
+		else if(line_no==2)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,100,buffer);
+	    else if(line_no==3)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,250,buffer);
+		else if(line_no==4)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,300,buffer);
+		else if(line_no==5)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,350,buffer);
+		else if(line_no==6)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,400,buffer);
+		else if(line_no==7)
+			fprintf(ofp,"^FO%d,%d^BY2,2.1^B3N,N,75,N,N^FD%s^FS\n",180,150,buffer);
+		line_no = line_no+1;
+	 } 
+
+
+
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ss_pack_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ss_pack_label");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.	
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 50;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+		
+		if(line_no==1)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,50,buffer);
+		else if(line_no==2)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,100,buffer);
+	    else if(line_no==3)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,150,buffer);
+		else if(line_no==4)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,300,buffer);
+		else if(line_no==5)
+			fprintf(ofp,"^FO%d,%d^AD^FD%s^FS\n",150,350,buffer);
+		else if(line_no==6)
+			fprintf(ofp,"^FO%d,%d^BY2,2.1^B3N,N,75,N,N^FD%s^FS\n",180,200,buffer);
+		line_no = line_no+1;
+	 } 
+
+
+
+
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+
+}
+
+int std_rpck_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_rpck_label");
+		Trace(LVFunctionName,"Begin ");
+	}
+	
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 75;
+	row = 20;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{		
+     tmp_buf = strtok(buffer,"\n");
+	 if (tmp_buf)
+	    {
+		strcpy(buffer,tmp_buf);       
+	     if(line_no==1)
+		 {
+			fprintf(ofp, "^FO%d,%d^ACN10D,30,10^FD%s^FS\n",col,row,buffer);
+			row = row + 20;
+		 }
+		 else 
+		 {
+			fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+		 }
+
+		}
+	  else
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+	   row = row + 21;                                            /* Next line */    
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+	
+}
+
+int std_mfg_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_mfg_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 50;
+	row = 30;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{		
+     tmp_buf = strtok(buffer,"\n");
+	 if (tmp_buf)
+	    {
+		strcpy(buffer,tmp_buf);       
+	     if(line_no==1)
+		 {
+			fprintf(ofp, "^FO%d,%d^ACN10D,30,10^FD%s^FS\n",col,row,buffer);
+		 }
+		 else if(line_no==2)
+		 {
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+		 }
+		 else if(line_no==3)
+		 {
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+		 }
+		 else if(line_no==4)
+		 {
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+		 }
+		 else if(line_no==5)
+		 {
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+		 }
+		 else if(line_no==6)
+		 {
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+		  }
+		 else if(line_no==7)
+		 {
+			fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+		  }
+		}
+	  else
+			fprintf(ofp, "^FO%d,%d^ABN10D,20,5^FD%s^FS\n",col,row,buffer);
+	   row = row + 40;                                            /* Next line */    
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+
+}
+
+int std_wrs_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_wrs_label");
+		Trace(LVFunctionName,"Begin ");
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.	
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD50\n");
+
+	col = 25;
+	row = 10;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{
+	    tmp_buf = strtok(buffer,"\n");
+		if(line_no == 1)
+			fprintf(ofp, "^FO%d,%d^AF^FD%s^FS\n",25,10,buffer);		
+		else if(line_no == 2)
+			fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",25,50,buffer);		
+		else if(line_no==3)
+			fprintf(ofp, "^FO%d,%d^AF^FD%s^FS\n",25,80,buffer);		
+/*	 if (tmp_buf)
+	    {
+	     strcpy(buffer,tmp_buf);       
+		 fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+	    }
+	  else
+		  fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+	   row = row + 25;                                            // Next line 
+*/	     
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+
+}
+
+int std_rxr_label(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "std_rxr_label");
+		Trace(LVFunctionName,"Begin ");
+	}
+	
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.	
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD30\n");
+
+
+	col = 125;
+	row = 40;
+	line_no = 1;
+	for(;fgets(buffer,200,ifp);)
+	{		
+     tmp_buf = strtok(buffer,"\n");
+	 if (tmp_buf)
+	    {
+			strcpy(buffer,tmp_buf);       
+			fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+		}
+	  else
+			fprintf(ofp, "^FO%d,%d^AC^FD%s^FS\n",col,row,buffer);
+	   row = row + 35;                                            /* Next line */    
+	   line_no = line_no+1;
+	 }
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+	
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+
+int GenerateZPL(void)
+{
+	FILE	*ifp,*ofp;
+	char	*LVToken;
+	char	*LVTmpBuffer;
+	char	LVSep[3];
+	char	LVRecordBuffer[200];
+	char    LVFunctionName[100];
+	int i;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "GenerateZPL()");
+		Trace(LVFunctionName,"Begin");
+		sprintf(GVMsgText,"GVLISFileName=[%s] GVZPLFileName=[%s] Copies=[%d]",GVLISFileName, GVZPLFileName,GVNumberOfCopies);
+		Trace(LVFunctionName,GVMsgText);
+	}
+
+	/*
+	* Open LIS File
+	*/
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(GVMsgText," %s -- File Opening Error",GVLISFileName);
+		if (IS_TRACING) Trace(LVFunctionName,GVMsgText);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		MessageBox(hwnd,GVMsgText,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	/*
+	* Open ZPL File
+	*/
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(GVMsgText," %s -- File Opening Error",GVZPLFileName);
+		if (IS_TRACING) Trace(LVFunctionName,GVMsgText);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		MessageBox(hwnd,GVMsgText,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	/*
+	* Read label format header properties.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"Reading label format header properties ..");
+
+	BVHdrStringDelim.arr[0] = '\0';
+	BVHdrInitString.arr[0] = '\0';
+	BVNoOfCopiesString.arr[0] = '\0';
+	BVHdrTermString.arr[0] = '\0';
+
+	EXEC SQL 
+	SELECT string_delim, init_string, no_of_copies_string, term_string
+	INTO   :BVHdrStringDelim, :BVHdrInitString, :BVNoOfCopiesString, :BVHdrTermString
+	FROM   sm_label_format_hdr
+	WHERE  report_id = :BVDocumentID
+	AND    program_language = :BVProgramLanguage;
+
+	BVHdrStringDelim.arr[BVHdrStringDelim.len] = '\0';
+	BVHdrInitString.arr[BVHdrInitString.len] = '\0';
+	BVNoOfCopiesString.arr[BVNoOfCopiesString.len] = '\0';
+	BVHdrTermString.arr[BVHdrTermString.len] = '\0';
+
+	if (IS_TRACING)
+	{
+		sprintf(GVMsgText,"BVHdrStringDelim=[%s] BVHdrInitString=[%s] Copies=[%s] BVHdrTermString=[%s]",
+				BVHdrStringDelim.arr, BVHdrInitString.arr, BVNoOfCopiesString.arr, BVHdrTermString.arr);
+		Trace(LVFunctionName,GVMsgText);
+	}
+
+	if(sqlca.sqlcode < 0)
+	{
+		sprintf(GVMsgText, "Error: %s",sqlca.sqlerrm.sqlerrmc);
+		if (IS_TRACING) Trace(LVFunctionName,GVMsgText);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+	}
+
+	/*
+	* Write header into ZPL file
+	*/
+	strcpy(GVTmpStr,BVHdrInitString.arr);
+	strcpy(LVSep, BVHdrStringDelim.arr);
+	LVToken = strtok(GVTmpStr,LVSep);
+	while( LVToken != NULL )
+	{
+		fprintf(ofp,"%s\n", LVToken);
+		LVToken = strtok(NULL,LVSep);             
+	}
+		
+	/*
+	* Write data into ZPL file
+	*/
+	BVLineNo = 1;
+	
+	for(;fgets(LVRecordBuffer,200,ifp);)
+	{       
+		if (LVRecordBuffer[0] == '') 	
+		{
+			/*
+			* This line contains barcode number. Remove barcode indicator and 
+			* new line character from buffer.
+			*/
+			LVTmpBuffer = strtok(LVRecordBuffer+1,"\n");
+			strcpy(LVRecordBuffer,LVTmpBuffer);       
+			if (IS_TRACING)
+			{
+				sprintf(GVTmpStr,"Barcode Record=[%s]", LVRecordBuffer);
+				Trace(LVFunctionName, GVTmpStr);
+			}
+		}
+		else
+		{
+			/*
+			* Other lines. Remove new line character from buffer.
+			*/
+			if (strlen(LVRecordBuffer) > 0)
+			{
+				if (strstr( LVRecordBuffer, "\n" ) != NULL)
+				{
+					LVTmpBuffer= strtok(LVRecordBuffer,"\n");
+					if (LVTmpBuffer != NULL)
+						strcpy (LVRecordBuffer, LVTmpBuffer);
+					else
+						strcpy (LVRecordBuffer, " ");
+				}
+			}
+
+			if (IS_TRACING)
+			{
+				sprintf(GVTmpStr,"Text Record=[%s]", LVRecordBuffer);
+				Trace(LVFunctionName, GVTmpStr);
+			}
+		}
+
+		/*
+		* Read formatting properties for the current line.
+		*/
+
+		BVDtlInitString.arr[0] = '\0';
+		BVDtlTermString.arr[0] = '\0';
+
+		EXEC SQL	
+		SELECT init_string, term_string
+		INTO   :BVDtlInitString, :BVDtlTermString
+		FROM   sm_label_format_dtl
+		WHERE  report_id = :BVDocumentID
+		AND    program_language = :BVProgramLanguage
+		AND    line_no = :BVLineNo;
+
+		BVDtlInitString.arr[BVDtlInitString.len] = '\0';
+		BVDtlTermString.arr[BVDtlTermString.len] = '\0';
+
+		if(sqlca.sqlcode < 0)
+		{
+			sprintf(GVMsgText, "Error: %s",sqlca.sqlerrm.sqlerrmc);
+			if (IS_TRACING) Trace(LVFunctionName,GVMsgText);
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+		}
+		
+		if (IS_TRACING) 
+		{
+			sprintf(GVTmpStr,"Line=[%d] InitStr=[%s] TermStr=[%s]", 
+				BVLineNo, BVDtlInitString.arr,BVDtlTermString.arr);
+			Trace(LVFunctionName,GVTmpStr);
+		}
+
+		/*
+		* Frame string and write into ZPL
+		*/
+		sprintf(GVTmpStr,"%s%s%s",BVDtlInitString.arr, LVRecordBuffer, BVDtlTermString.arr);
+		fprintf(ofp,"%s\n",GVTmpStr); 
+				
+		/*
+		* Increment line counter.
+		*/
+		BVLineNo = BVLineNo + 1;
+	}	
+
+	/*
+	* Write footer portion into ZPL file
+	*/
+
+	fprintf(ofp,"%s%d\n",BVNoOfCopiesString.arr, GVNumberOfCopies);  
+	fprintf(ofp,"%s\n", BVHdrTermString.arr);             
+
+	/*
+	* Close files.
+	*/
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+	return 1;
+} /* End of GenerateZPL */
+
+
+//Added by pramodini
+int ConvBDUnscreenedLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,spec_flag=0,line_no,point;
+	char buffer[200];
+	char *tmp_buf;
+	
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+	
+	line_no	= 0;
+	col		= 380; 
+	row		= 25;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  7;
+
+
+	for(;fgets(buffer,200,ifp);)
+	{
+	   
+      if (buffer[0] == '') 
+	  {              
+	  	// begin of barcode //
+     	//tmp_buf = strtok(buffer+1,"\n");
+			tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf); 
+
+          	col = 360;  
+	        row = 25;
+			horm	=  80;
+			verm	=  1;
+			//line = 2;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 0, 0, horm, verm, 0, 3, buffer);  
+
+	  }
+      else     
+	  {  
+          if (line_no == 0)
+          {
+			line_no	= 0;
+			col		= 380; 
+			row		= 25;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  7;
+		  }
+          else if (line_no == 1) //barcode no need of this else if but for knowing fonts sizes
+          {
+
+         /* 	line_no	= 0;
+			col		= 270; 
+			row		= 50;  
+			rot		=  3;
+			font	=  25;
+			horm	=  1;
+			verm	=  2;
+		//	imag	= 'N';
+			line_no = 1;*/
+          }
+          else if (line_no == 2)
+          {
+          	line_no	= 2;
+			col		= 390; 
+			row		= 450;  
+			rot		=  3;
+			font	=  34;
+			horm	=  2;
+			verm	=  1;
+			point   =  0;
+          }
+          else if (line_no == 3)
+          {
+          	line_no	= 3;
+			col		= 330; 
+			row		= 450;  
+			rot		=  3;
+			font	=  34;
+			horm	=  2;
+			verm	=  1;
+			point   =  0;
+          }
+          else if (line_no == 4)
+          {
+          	line_no	= 4;
+			col		= 300; 
+			row		= 450;  
+			rot		=  3;
+			font	=  25;
+			horm	=  8;
+			verm	=  10;
+			point   =  0;
+          }
+          else if (line_no == 5)
+          {
+         	line_no	= 5;
+			col		= 285; 
+			row		= 25;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  8;
+          }
+
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);
+
+				if ( (line_no == 0) || (line_no == 5) )			         
+					fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, 3, buffer,point);
+				else if (line_no == 3)
+					fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer, point);
+				else   
+					fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+             }
+			 else
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+
+			
+		//	row = row + 20;                                            // Next line 		
+	  } 
+
+		//line_no = line_no+1;
+		line_no = line_no + 1; 
+	 } 
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+}
+
+int ConvBDUnitLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,line_no,rot,font,horm,verm,spec_flag=0,point;
+	char buffer[200];
+	char *tmp_buf;
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+	
+
+	line_no	= 1;
+	col		= 50; 
+	row		= 50;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  8;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '') 
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+			
+		   	col = 120;  
+	        row = 50;
+			horm	=  80;
+			verm	=  1;
+			//line_no = 2;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 0, 0, horm, verm, 0, 3, buffer);  
+
+	  }
+      else     
+	  {  
+
+		  	//line_no	= 1;
+			col		= 40; 
+			row		= 50;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point	=  8;
+
+			tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+				 	
+             }
+			 else
+			 {
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+		     }
+			
+			//row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+	
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+}
+
+int ConvBDScreenedLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,line_no,rot,font,horm,verm,spec_flag=0,point,UnitCodeLen=0,bufLen=0;
+	char buffer[200];
+	char *tmp_buf;
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+	
+
+	line_no	= 1;
+	col		= 820; 
+	row		= 30;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  10;
+	//no_cpy = 0;	Corrected against IN23811 (Removed hardcoded no_cpy for this function which is not reqd)
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+		if ( (line_no == 1) && (buffer[0] == '') )
+		{              
+	  	    // begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+			tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+          	col = 740;  
+	        row = 30; 
+			horm	=  80;
+			verm	=  2;
+			line_no = 1;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+		}
+		else if ( (line_no ==2) && (buffer[0] == '') )
+		{              
+	  	    // begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+			tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+          	col = 740;  
+	        row = 420; 
+			horm	=  80;
+			verm	=  2;
+			line_no = 2;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+		}
+		else if ( (line_no ==23) && (buffer[0] == '') )
+		{              
+	  	    // begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+			tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+          	col = 350;  
+	        row = 30; 
+			horm	=  80;
+			verm	=  2;
+			line_no = 23;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+		}
+		else if ( (line_no ==24) && (buffer[0] == '') )
+		{              
+	  	    // begin of barcode //
+     		//tmp_buf = strtok(buffer+1,"\n");
+			tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);       
+
+			col = 350;  
+	        row = 420; 
+			horm	=  80;
+			verm	=  2;
+			line_no = 24;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+		}
+
+		else
+		{
+			if (line_no == 3)
+        {
+			UnitCodeLen = strlen(buffer);
+			//UnitCodeLen = UnitCodeLen - 1;
+          	line_no	= 3;
+			col		= 660; 
+			row		= 30;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+		  else if (line_no == 4)
+		  {
+			  bufLen = strlen(buffer);
+			  line_no = 4;
+			  col   = 660;
+			  //row   = 160; commented to calculate the row position depending on the unit length
+			  row	= 20 + ((UnitCodeLen) * 17); 
+			  rot	=  3;
+			  font	=  26;
+			  horm	=  0;
+			  verm	=  0;
+			  point =  11;
+		  }
+		  else if (line_no == 5) 
+          {
+			
+          	line_no	= 5;
+			col		=  655;
+			//row		=  340; commented to calculate the row position depending on the unit length
+			row = row + ((bufLen+1)* 18); 
+			rot		=  2;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+		  else if (line_no == 6) 
+          {
+          	line_no	= 6;
+			col		=  660;
+			//row		=  350; commented to calculate the row position depending on the unit length
+			bufLen	=  row + 5; // row value stored to print the box
+			row     =  row +12;
+			rot		=  3;
+			font	=  26;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+          else if (line_no == 7) 
+          {
+			
+          	line_no	= 7;
+			col		= 660; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+          else if (line_no == 8)
+          {
+          	line_no	= 8;
+			col		= 650; 
+			row		= 05;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+          else if (line_no == 9)
+          {
+          	line_no	= 9;
+			col		= 615; 
+			row		= 10;  
+			rot		=  3;
+			font	=  25;
+			horm	=  14;
+			verm	=  9;
+			point   =  0;
+          }
+          else if (line_no == 10)
+          {
+          	line_no	= 10;
+			col		= 590; 
+			row		= 10;  
+			rot		=  3;
+			font	=  25;
+			horm	=  14;
+			verm	=  9;
+			point   =  0;
+          }
+          else if (line_no == 11)
+          {
+          	line_no	= 11;
+			col		= 565; 
+			row		= 10;  
+			rot		=  3;
+			font	=  25;
+			horm	=  14;
+			verm	=  9;
+			point   =  0;
+          }
+          else if (line_no == 12)
+          {
+          	line_no	= 12;
+			col		= 570; 
+			row		= 170;  
+			rot		=  3;
+			font	=  26;
+			horm	=  18;
+			verm	=  12;
+			point   =  0;
+          }
+          else if (line_no == 13)
+          {
+	        line_no	= 13;
+			col		= 560; 
+			row		= 05;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+          else if (line_no == 14) //barcode no need of this else if but for knowing fonts sizes
+          {
+			line_no	= 14;
+			col		= 660; 
+			row		= 470;  
+			rot		=  3;
+			font	=  25;
+			horm	=  100;
+			verm	=  100;
+			point   =  0;
+          }
+          else if (line_no == 15)
+          {
+          	line_no	= 15;
+			col		= 520; 
+			row		= 05;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+          else if (line_no == 16)
+          {
+          	line_no	= 16;
+			col		= 500; 
+			row		= 05;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 17)
+          {
+          	line_no	= 17;
+			col		= 480; 
+			row		= 05;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 18)
+          {
+          	line_no	= 18;
+			col		= 460; 
+			row		= 05;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 19)
+          {
+          	line_no	= 19;
+			col		= 440; 
+			row		= 05;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 20)
+          {
+          	line_no	= 20;
+			col		= 470; 
+			row		= 430;  
+			rot		=  3;
+			font	=  25;
+			horm	=  15;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 21)
+          {
+          	line_no	= 21;
+			col		= 440; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  25;
+			verm	=  20;
+			point   =  0;
+          }
+		  else if (line_no == 22)
+          {
+          	line_no	= 22;
+			col		= 400; 
+			row		= 25;  
+			rot		=  3;
+			font	=  25;
+			horm	=  16;
+			verm	=  18;
+			point   =  0;
+          }
+		  else if (line_no == 25)
+          {
+          	line_no	= 25;
+			col		= 270; 
+			row		= 30;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+		  else if (line_no == 26)
+          {
+          	line_no	= 26;
+			col		= 270; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point   =  10;
+          }
+		  else if (line_no == 27)
+          {
+          	line_no	= 27;
+			col		= 350; 
+			row		= 665;  
+			rot		=  3;
+			font	=  25;
+			horm	=  14;
+			verm	=  9;
+			point   =  0;
+          }
+		  else if (line_no == 28)
+          {
+          	line_no	= 28;
+			col		= 320; 
+			row		= 665;  
+			rot		=  3;
+			font	=  25;
+			horm	=  14;
+			verm	=  9;
+			point   =  0;
+          }
+		  else if (line_no == 29)
+          {
+          	line_no	= 29;
+			col		= 240; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  17;
+			verm	=  14;
+			point   =  0;
+          }
+		  else if (line_no == 30)
+          {
+          	line_no	= 30;
+			col		= 240; 
+			row		= 05;  
+			rot		=  3;
+			font	=  25;
+			horm	=  17;
+			verm	=  14;
+			point   =  0;
+          }
+		  else if (line_no == 31)
+          {
+          	line_no	= 31;
+			col		= 210; 
+			row		= 05;  
+			rot		=  3;
+			font	=  25;
+			horm	=  17;
+			verm	=  14;
+			point   =  0;
+          }
+		  else if (line_no == 32)
+          {
+          	line_no	= 32;
+			col		= 205; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 33)
+          {
+          	line_no	= 33;
+			col		= 205; 
+			row		= 605;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 34)
+          {
+          	line_no	= 34;
+			col		= 185; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 35)
+          {
+          	line_no	= 35;
+			col		= 185; 
+			row		= 605;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 36)
+          {
+          	line_no	= 36;
+			col		= 165; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 37)
+          {
+          	line_no	= 37;
+			col		= 165; 
+			row		= 605;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 38)
+          {
+          	line_no	= 38;
+			col		= 145; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 39)
+          {
+          	line_no	= 39;
+			col		= 145; 
+			row		= 605;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 40)
+          {
+          	line_no	= 40;
+			col		= 125; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  12;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 41)
+          {
+          	line_no	= 41;
+			col		= 125; 
+			row		= 730;  
+			rot		=  3;
+			font	=  26;
+			horm	=  20;
+			verm	=  20;
+			point   =  0;
+          }
+		  else if (line_no == 42)
+          {
+          	line_no	= 42;
+			col		= 135; 
+			row		= 5;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 43)
+          {
+          	line_no	= 43;
+			col		= 115; 
+			row		= 5;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 44)
+          {
+          	line_no	= 44;
+			col		= 95; 
+			row		= 5;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 45)
+          {
+          	line_no	= 45;
+			col		= 75; 
+			row		= 5;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 46)
+          {
+          	line_no	= 46;
+			col		= 55; 
+			row		= 5;  
+			rot		=  3;
+			font	=  26;
+			horm	=  12;
+			verm	=  8;
+			point   =  0;
+          }
+		  else if (line_no == 47)
+          {
+          	line_no	= 47;
+			col		= 35; 
+			row		= 5;  
+			rot		=  3;
+			font	=  25;
+			horm	=  15;
+			verm	=  10;
+			point   =  0;
+          }
+		  else if (line_no == 48)
+          {
+          	line_no	= 48;
+			col		= 95; 
+			row		= 420;  
+			rot		=  3;
+			font	=  25;
+			horm	=  17;
+			verm	=  14;
+			point   =  0;
+          }
+		 		
+
+	     tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf);         
+				 if ( (line_no == 3) || (line_no == 4) || (line_no == 5) || (line_no == 6) || (line_no == 7) || (line_no == 8) || (line_no == 13) || (line_no == 25) || (line_no == 26) )
+					 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+				 else
+					 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+
+
+             }
+			 else
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+			
+			//row = row + 20;                                            // Next line 		
+	 } 
+
+		line_no = line_no+1;
+	}
+
+/* To print the box which will not come in the lis file*/
+			line_no	= 49;
+			col		=  660;
+			//row		=  340; 
+			row		= bufLen;
+			rot		=  3;
+			//font	=  25;
+			horm	=  40;
+			verm	=  40;
+			point   =  2;
+	fprintf(ofp, "<STX>W%d;o%d,%d;f%d;l%d;h%d;w%d<ETX>\n",line_no, col, row, rot, horm, verm,point);
+
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+	
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+}
+
+int ConvBDUnitLabelISBTIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,line_no,rot,font,horm,verm,spec_flag=0,point,UnitCodeLen=0,bufLen=0;
+	char buffer[200];
+	char *tmp_buf;  
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+	
+	line_no	= 1;
+	col		= 50; 
+	row		= 50;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  8;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);  
+			
+			UnitCodeLen = strlen(buffer);
+			
+		//	fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+          	col = 120;  
+	        row = 50;
+			horm	=  80;
+			verm	=  2;
+			line_no = 1;
+			rot = 3;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+
+	  }
+      else     
+	  {  
+		 	if (line_no == 2)					
+			{
+
+				UnitCodeLen = strlen(buffer);
+				
+				//UnitCodeLen = UnitCodeLen - 1;
+
+				line_no	= 2;
+				col		= 40; 
+				row		= 50;  
+				rot		=  3;
+				font	=  25;
+				horm	=  0;
+				verm	=  0;
+				point	=  10;
+			}
+			if (line_no == 3)					
+			{
+				bufLen = strlen(buffer);
+				//UnitCodeLen = strlen(buffer);
+				//UnitCodeLen = UnitCodeLen - 1;
+
+				line_no	= 3;
+				col		= 40; 
+				//row		= 50;  
+				row		= 50 + ((UnitCodeLen) * 17);
+				rot		=  3;
+				font	=  26;
+				horm	=  0;
+				verm	=  0;
+				point	=  10;
+			}
+			else if (line_no == 4)			
+			{
+				
+				line_no	= 4;
+				col		= 35;
+				row		= row + ((bufLen+1)*17);
+				/*if (UnitCodeLen < 17)
+				{
+					col		= 35; 
+					row		= 285;   
+				}
+				else 
+				{
+					col = 35;
+					row = 335;  
+				}*/
+				//col		= 40; 
+				//row		= 265;  
+				rot		=  2;
+				font	=  25;
+				horm	=  0;
+				verm	=  0;
+				point	=  8;
+			}
+			else if (line_no == 5)				
+			{
+				line_no	= 5;
+				col		= 36;
+				bufLen	=  row + 5; // row value stored to print the box
+				row     =  row + 8;
+				/*
+				if (UnitCodeLen < 17)
+				{
+					col		= 40; 
+					row		= 290;
+				}
+				else 
+				{
+					col = 40;  
+					row = 340;
+				}*/
+				//col		= 40; 
+				//row		= 270;  
+				rot		=  3;
+				font	=  26;
+				horm	=  0;
+				verm	=  0;
+				point	=  8;
+			}
+			
+
+			tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+				 strcpy(buffer,tmp_buf); 
+				 if  ( (line_no == 2)  || (line_no == 3) || (line_no == 4) || (line_no == 5) )
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+				 	
+             }
+			 else
+			 {
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+		     }
+			
+			//row = row + 20;                                            // Next line 		
+	  } 
+
+		line_no = line_no+1;
+	 } 
+
+
+	/* To print the box which will not come in the lis file*/
+				line_no	= 6;				
+				col		= 35;
+				row		= bufLen - 5;
+				/*if (UnitCodeLen < 17)
+				{
+					col		= 40; 
+					row		= 285;
+				}
+				else 
+				{
+					col = 40;
+					row = 335;   
+				}*/
+				
+				rot		=  3;
+	//			font	=  26;
+				horm	=  25;
+				verm	=  27;
+				point	=  2;
+
+			
+				 fprintf(ofp, "<STX>W%d;o%d,%d;f%d;l%d;h%d;w%d<ETX>\n",line_no, col, row, rot, horm, verm,point);
+
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+	
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+}
+
+int ConvBDUnitLabelISBT912IPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,brow,rot,font,horm,verm,point,len=0,line_no,line=1,strLen=0,drow=0;
+	char buffer[200];
+	char *tmp_buf;  
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+	
+line_no	= 1;
+	col		= 880; 
+	row		= 45;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  7;
+
+for(;fgets(buffer,200,ifp);)
+	{
+	   
+      if (buffer[0] == '') 
+	  {              
+	  	// begin of barcode //
+     	//tmp_buf = strtok(buffer+1,".\n");
+			tmp_buf = strtok(buffer+1,"");
+     		strcpy(buffer,tmp_buf); 
+
+          	//col = 360;
+			//If it is last label, position it little up so that data will not miss
+			if (line == 26)
+				col = 105;
+			row = 45;
+			horm	=  80;
+			verm	=  2;
+			//line = 2;
+			
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			line_no++;
+
+			/* To read the 2nd label in the same line*/
+			row = row + 360;
+			tmp_buf = strtok(NULL,"");
+     		strcpy(buffer,tmp_buf); 
+
+			strcpy(buffer,buffer+1);
+			strcpy(buffer,buffer+1);
+
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			col = col-80;
+			
+	  }
+	  else
+	  {
+		if ( (line == 2) || (line == 7) || (line == 12) || (line == 17) || (line == 22) || (line == 27) || (line == 32) || (line == 37) ||(line == 42) || (line == 47) || (line == 52) || (line == 57))
+		{
+			//If it is last label, position it little up so that data will not miss
+			if (line == 27)
+				col = 28;
+			row		= 45;
+			rot		=  3;
+			font	=  25;
+			horm	=  0;
+			verm	=  0;
+			point	=  10;
+
+			tmp_buf = strtok(buffer,"~");
+     		strcpy(buffer,tmp_buf);
+			strLen = strlen(buffer);
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+			line_no++;
+
+			row = row + 360;
+
+			tmp_buf = strtok(NULL,"~");
+			strcpy(buffer,tmp_buf);
+			
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+
+			//col = col-20;
+		}
+		else if ( (line == 3) || (line == 8) || (line == 13) || (line == 18) || (line == 23) || (line == 28) || (line == 33) || (line == 38) ||(line == 43) || (line == 48) || (line == 53) || (line == 58))
+		{
+			//If it is last label, position it little up so that data will not miss
+			if (line == 28)
+				col = 28;
+//			row		= 165; commented to calculate the row position depending on the length of the unit number 
+			row		= 45 + ((strLen+1) * 17);
+			rot		=  3;
+			font	=  26;
+			horm	=  0;
+			verm	=  0;
+			point	=  10;
+
+			tmp_buf = strtok(buffer,"~");
+     		strcpy(buffer,tmp_buf);
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+			line_no++;
+			
+			row = row + 360;
+			
+			tmp_buf = strtok(NULL,"~");
+			strcpy(buffer,tmp_buf);
+			
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+
+			//col = col-20;
+		}
+		else if ( (line == 4) || (line == 9) || (line == 14) || (line == 19) || (line == 24) || (line == 29) || (line == 34) || (line ==39) || (line == 44) || (line == 49) || (line == 54) || (line == 59)) 
+		{
+			row		= 320;
+			rot		= 2;
+			font	= 25;
+			point   = 8;
+			//If it is last label, position it little up so that data will not miss
+			if (line == 29)
+				col = col-5;
+			else
+				col		= col-7;
+
+			tmp_buf = strtok(buffer,"~");
+     		strcpy(buffer,tmp_buf);
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+			line_no++;
+
+			row = row + 360;
+
+			tmp_buf = strtok(NULL,"~");
+			strcpy(buffer,tmp_buf);
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+		}
+		else if ( (line == 5) || (line == 10) || (line == 15) || (line == 20) || (line == 25) || (line == 30) || (line == 35) || (line == 40) || (line == 45) || (line == 50) || (line == 55) || (line == 60) ) 
+		{
+			row		= 325;
+			rot		= 3;
+			font	= 26;
+			col		= col+3;
+					
+			tmp_buf = strtok(buffer,"~");
+     		strcpy(buffer,tmp_buf);
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+			line_no++;
+
+			// To print the checksum digit box which will not be there in the lis file 
+			brow	= 320;
+			horm	= 25;
+			verm	= 27;
+			point	= 2;
+
+			fprintf(ofp, "<STX>W%d;o%d,%d;f%d;l%d;h%d;w%d<ETX>\n",line_no, col, brow, rot, horm, verm,point);
+			// upto here
+			line_no++;
+
+			row = row + 360;
+			point	= 8;
+
+			tmp_buf = strtok(NULL,"~");
+			strcpy(buffer,tmp_buf);
+			/* To avoid the checkbox when there is no 2nd label.
+			If data for the 2nd label is present, then only print the checkbox */
+			if ( buffer[0] != '\n')
+			{
+
+			fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+
+			line_no++;
+
+			horm	= 25;
+			verm	= 27;
+			point	= 2;
+			brow = brow + 360;
+
+			fprintf(ofp, "<STX>W%d;o%d,%d;f%d;l%d;h%d;w%d<ETX>\n",line_no, col, brow, rot, horm, verm,point);
+			}
+
+			point = 7;
+			col = col-75;
+		}
+
+	  }
+	  line_no = line_no + 1;
+	  line = line +1;
+	  
+
+	}
+
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+}
+
+
+//Added by pramodini on 19.12.08 against spr-7194
+int ConvertRLSpecimenLabelZPL(int no_cpy,int bldline)
+{
+	char    LVFunctionName[100];
+	FILE *ifp,*ofp;
+	int i,col,row,line_no;
+	char buffer[200];
+	char *tmp_buf;
+	int font_width;
+	int font_height;
+	int barcode_yn;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "ConvertRLSpecimenLabel");
+		Trace(LVFunctionName,"Begin ");
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "Number of Copies=[%d]", no_cpy);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"~J1\n");           //To initialize ZBL interprter in the printer.
+	fprintf(ofp,"^XA\n");           //stating line
+	fprintf(ofp,"^LH0,0\n");
+    fprintf(ofp,"^MD7\n");
+
+	row = 30;
+	line_no = 1;
+	font_width = 25;
+	font_height = 24;
+	barcode_yn = 0;
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '') 
+	  {              
+		barcode_yn = 1;
+		/* Barcode */
+	  	col = 35;
+		row = 270;
+	  	if (IS_TRACING) Trace(LVFunctionName, buffer);
+		tmp_buf = strtok(buffer+1,"\n");
+		strcpy(buffer,tmp_buf);       
+    
+		fprintf(ofp, "^FO%d,%d^BY2,^BCN,60,N^FD%s^FS\n",col ,row ,buffer);  //changed 60 to row on 26/02/2009
+		//row = row + 60; 
+	  }
+      else   
+	  { 
+	
+		/* Other lines */                              
+		col = 30;
+	    tmp_buf = strtok(buffer,"\n");
+
+/*		if (tmp_buf)
+		{
+			/* If data is NOT null */
+/*			strcpy(buffer,tmp_buf);       
+
+			/* Set font height based on line number */
+/*			if (barcode_yn)
+			{
+				barcode_yn = 0;
+				font_height = 25;
+			}
+			else
+			{
+				if (line_no == 6)
+				{
+					font_height = 30;
+					font_width  = 25;
+				}
+				else
+				{
+					font_height = 20;
+
+					if (strlen(buffer) > 40)
+						font_width = 15;
+					else
+						font_width = 20;
+				}
+			}
+			/* Set font width based on number of characters to be printed */
+			/*if (strlen(buffer) > 40)
+				font_width = 15;
+			else
+				font_width = 20;
+				*/
+
+/*			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); //AD changed as AB on 4/07/04
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+		else
+		{
+			/* If data is null */
+/*			font_height = 20;
+			font_width  = 20;
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+*/      //code commented and added for IN008078
+		if (tmp_buf)
+		{
+			/* If data is NOT null */
+			strcpy(buffer,tmp_buf);
+			
+			if (line_no == 1)
+			{
+				row = 30;
+				font_height = 30;
+				font_width  = 25;
+			}
+			else if (line_no == 2)
+			{
+				row = 65;
+				font_height = 24;
+				font_width  = 25;
+			}
+			else if (line_no == 3)
+			{
+				row = 95;
+				font_height = 24;
+				font_width  = 25;
+			}
+			else if (line_no == 4)
+			{
+				row = 125;
+				font_height = 24;
+				font_width  = 25;
+			}
+			else if (line_no == 5)
+			{
+				row = 155;
+				font_height = 24;
+				font_width  = 25;
+			}
+			else if (line_no == 6)
+			{
+				row = 185;
+				font_height = 34;
+				font_width  = 30;
+			}
+			else if (line_no == 7)
+			{
+				row = 210;
+				font_height = 24;
+				font_width  = 25;
+			}
+			else if (line_no == 8)
+			{
+				row = 230;
+				font_height = 34;
+				font_width  = 25;
+			}
+			else if (line_no == 10)
+			{
+				row = 345;
+				font_height = 30;
+				font_width  = 25;
+			}
+			else if (line_no == 11)
+			{
+				row = 375;
+				font_height = 30;
+				font_width  = 25;
+			}
+
+			if (line_no == bldline)                                      // Make Bold 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height, font_width, buffer); 
+			else 
+				fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+		else
+		{
+			row = row + 25;
+			/* If data is null */
+			font_height = 24;
+			font_width  = 25;
+			fprintf(ofp, "^FO%d,%d^A0N,%d,%d^FD%s^FS\n", col, row, font_height,font_width, buffer);
+		}
+
+		//row = row + 25;                                            // Next line 		
+	  } 
+
+	  line_no = line_no + 1;
+	 } 
+
+	fprintf(ofp,"^PQ%d\n",no_cpy);  /* Number of labels format  */ 
+	fprintf(ofp,"^XZ\n\n");             /* End of label format      */
+	fclose(ofp);
+	fclose(ifp);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+	return 1;
+}
+
+int ConvRLSpecimenLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,point,len=0,line_no,line=1;
+	char buffer[200];
+	char *tmp_buf; 
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+
+	line_no	= 1;
+	col		= 400;
+	row		= 20; 
+    rot		=  3;
+	font	=  25;
+	horm	=  12;
+	verm	=  10; 
+	point	=  0;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+			
+		//	fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+			line_no = 2;
+          	//col = 360;  
+	        //row = 20;
+			rot = 3;
+			horm	=  100; // 80; 
+			verm	=  2;
+						
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			col = col - 103; // 83;  
+
+	  }
+      else     
+	  {  
+		  tmp_buf = strtok(buffer,"\n");
+			horm	=  12;
+			verm	=  10;
+		 
+			 if (tmp_buf) 
+			 {
+			   strcpy(buffer,tmp_buf); 
+
+		   	   if (line_no == 3)
+				   font = 26;
+			   else font = 25;
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer); 	
+             }
+			 else
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+		 	
+			if (line_no == 1)
+				col = col - 40;
+			else
+				col = col - 25;
+	  }
+	  line_no = line_no + 1;
+	}
+	
+	
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+
+}
+
+/************ before converting into the change as required by Siriraj
+need to remove one line test desc from the .lis file, hence the relevant change is done
+since the lable size is also changed. The .zpl is designed at site and the corresponding change is 
+made in the above program unit 
+
+int ConvRLSpecimenLabelIPL_old(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,point,len=0,line_no,line=1;
+	char buffer[200];
+	char *tmp_buf; 
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+
+	line_no	= 1;
+	col		= 400; 
+	row		= 20;  
+    rot		=  3;
+	font	=  25;
+	horm	=  12;
+	verm	=  10;
+	point	=  0;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+			
+		//	fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+			line_no = 2;
+          	//col = 360;  
+	        //row = 20;
+			rot = 3;
+			horm	=  55;
+			verm	=  2;
+						
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			col = col - 58;
+
+	  }
+      else     
+	  {  
+		  tmp_buf = strtok(buffer,"\n");
+			horm	=  12;
+			verm	=  10;
+		 
+			 if (tmp_buf) 
+			 {
+			   strcpy(buffer,tmp_buf); 
+
+		   	   if (line_no == 3)
+				   font = 26;
+			   else font = 25;
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer); 	
+             }
+			 else
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+		 	
+			if (line_no == 1)
+				col = col - 40;
+			else
+				col = col - 25;
+	  }
+	  line_no = line_no + 1;
+	}
+	
+	
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+
+}
+
+***************** commented upto here ****************/
+
+
+int ConvBTTagLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,point,len=0,line_no,line=1;
+	char buffer[200];
+	char *tmp_buf;  
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+
+	line_no	= 1;
+	col		= 880; 
+	row		= 20;  
+    rot		=  3;
+	font	=  25;
+	horm	=  12;
+	verm	=  10;
+	point	=  0;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+			
+		//	fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+			//line_no = 3;
+          	//col = 360;  
+	        //row = 20;
+			rot = 3;
+			horm	=  70;
+			verm	=  2;
+						
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			col = col - 70;
+
+	  }
+      else     
+	  {  
+		  tmp_buf = strtok(buffer,"\n");
+		 
+			 if (tmp_buf) 
+			 {
+			   strcpy(buffer,tmp_buf); 
+
+		   	   if ( (line_no == 1) || (line_no == 2) )
+			   {
+				   font = 26;
+				   horm	= 14;
+				   verm	= 12;
+			   }
+			   else if ( (line_no == 6) || (line_no == 7) )
+			   {
+				   font = 25;
+				   horm = 12;
+				   verm = 9;
+			   }
+			   else
+			   {
+				   font = 25;
+				   horm	= 16;
+				   verm	= 12;
+			   }
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer); 	
+             }
+			 else
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+		 	
+			if ( (line_no == 2) || (line_no == 10) )
+				col = col - 40;
+			else
+				col = col - 30;
+	  }
+	  line_no = line_no + 1;
+	}
+	
+	
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+	
+	return 1;
+
+}
+
+
+int ConvRLAliquotSlideIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,point,len=0,line_no,line=1;
+	char buffer[200];
+	char *tmp_buf;  
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+
+	line_no	= 1;
+	col		= 400; 
+	row		= 1;  
+    rot		=  3;
+	font	=  25;
+	horm	=  12;
+	verm	=  10;
+	point	=  0;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+			
+		//	fprintf(ofp, "B%d,%d,%d,%d,%d,%d,%d,%c,\"%s\"\n",col ,row, rot, 1, 2, 4, 60,imag, buffer);  
+			line_no = 2;
+          	col = 370;  
+	        //row = 20;
+			rot = 3;
+			horm	=  55;
+			verm	=  2;
+						
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+			col = col - 55;
+
+	  }
+      else     
+	  {  
+		  tmp_buf = strtok(buffer,"\n");
+		  font = 25;
+			horm	=  12;
+			verm	=  10;
+		 
+			 if (tmp_buf) 
+			 {
+			   strcpy(buffer,tmp_buf); 
+
+		   	   /*if (line_no == 3)
+				   font = 26;
+			   else font = 25;*/
+			   fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer); 	
+             }
+			 else
+				 fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer);
+		 	
+			/*if (line_no == 1)
+				col = col - 40;
+			else*/
+				col = col - 25;
+	  }
+	  line_no = line_no + 1;
+	}
+
+	
+	
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+
+	return 1;
+
+}
+
+int ConvBDNonISBTScreenedLabelIPL(int no_cpy,int bldline)
+{
+	FILE *ifp,*ofp;
+	int col,row,rot,font,horm,verm,point,len=0,line_no,line=1;
+	char buffer[200];
+	char *tmp_buf;  
+
+	ifp = fopen(GVLISFileName,"r");
+	if (ifp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVLISFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+
+	ofp = fopen(GVZPLFileName,"w");
+	if (ofp==NULL)
+	{
+		sprintf(err_text," %s -- File Opening Error",GVZPLFileName);
+		MessageBox(hwnd,err_text,"Error",MB_OK|MB_ICONSTOP);
+		return 0;
+	}
+	
+	fprintf(ofp,"\n<STX><ESC>C<ETX>\n");   //To initialize IPL interprter in the printer.
+	fprintf(ofp,"<STX><ESC>P<ETX>\n");
+	fprintf(ofp,"<STX>E1;F1<ETX>\n");
+
+	line_no	= 1;
+	col		= 430; 
+	row		= 50;  
+    rot		=  3;
+	font	=  25;
+	horm	=  0;
+	verm	=  0;
+	point	=  8;
+
+	for(;fgets(buffer,200,ifp);)
+	{
+      if (buffer[0] == '')
+	  {              
+	  		tmp_buf = strtok(buffer+1,"\n");
+     		strcpy(buffer,tmp_buf);   	    
+
+			rot = 3;
+			horm	=  75;
+			verm	=  2;
+			row		= 50;
+			col = col - 80;
+						
+			fprintf(ofp, "<STX>B%d;o%d,%d;f%d;c%d,%d;h%d;w%d;i%d;d%d,%s<ETX>\n",line_no, col ,row, rot, 6, 0, horm, verm, 0, 3, buffer);  
+	  }
+      else     
+	  {  
+		  tmp_buf = strtok(buffer,"\n");
+		  sprintf(err_text,"%d",line_no);
+	 
+			 if (tmp_buf) 
+			 {
+			   strcpy(buffer,tmp_buf); 
+
+
+		   	   if ( (line_no == 3) || (line_no == 1) ) 
+			   {
+					row		= 50;
+					col		= col - 35;
+					font	= 25;
+					horm	= 0;
+				    verm	= 0;
+					point	= 8;
+			   }
+			   else if (line_no == 2)
+			   {
+				   row		= 50;
+				   col		= col - 25;
+				   font		= 34;
+				   horm		= 0;
+				   verm		= 0;
+				   point	= 8;
+			   }
+			   else if ( (line_no == 4) || (line_no == 5) )
+			   {
+					row		= 50;				   
+					col		= col - 25;
+					font	= 25;
+					horm	= 0;
+				    verm	= 0;
+					point	= 8;
+			   }
+			   else if (line_no == 6)
+			   {
+				   row		= 50;
+				   col		= col - 30;
+				   font		= 25;
+				   horm		= 38;
+				   verm		= 100;
+				   point	= 8;
+			   }
+			   else if (line_no == 7)
+			   {
+					row		= 300;
+					col		= col + 5;
+					font	= 25;
+					horm	= 0;
+					verm	= 0;
+					point	= 8;
+			   }
+			   else if (line_no == 8)
+			   {
+					row		= 300;
+					col		= col - 25;
+					font	= 25;
+					horm	= 0;
+					verm	= 0;
+					point	= 20;
+			   }
+			   else if (line_no == 10)
+			   {
+					row		= 50;
+					col		= col - 75;
+					font	= 25;
+					horm	= 0;
+					verm	= 0;
+					point	= 10;
+			   }
+			   else if (line_no == 11)
+			   {
+					row		= 50;
+					col		= col - 25;
+					font	= 34;
+					horm	= 0;
+					verm	= 0;
+					point	= 12;
+			   }
+		    }	
+			if  ( (line_no == 1)  || (line_no == 8) )
+				fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;b%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, 1, horm, verm, 3, buffer,point);
+			else if (line_no == 6)
+				fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;b%d;h%d;w%d;d%d,%s<ETX>\n",line_no, col, row, rot, font, 1, horm, verm, 3, buffer);
+			else if (line_no != 9)
+				fprintf(ofp, "<STX>H%d;o%d,%d;f%d;c%d;h%d;w%d;d%d,%s;k%d<ETX>\n",line_no, col, row, rot, font, horm, verm, 3, buffer,point);
+
+	}
+	line_no = line_no + 1;
+
+	}
+
+	fprintf(ofp,"<STX>R<ETX>\n");
+	fprintf(ofp,"<STX><ESC>E1<ETX>\n");
+	fprintf(ofp,"<STX><CAN><ETX>\n");
+
+	fprintf(ofp,"<STX><RS>%d<ETX>\n",no_cpy);  /* Number of labels format  */	
+	fprintf(ofp,"<STX><ETB><ETX>\n");
+
+	fclose(ofp);
+	fclose(ifp);
+	return 1;
+}
+
+
+get_site_customer_id()
+{
+	l_customer_id.arr[0]		= '\0';
+	l_customer_id.len		= 0;
+
+	EXEC SQL SELECT NVL(customer_id, '!!')
+		INTO l_customer_id
+		FROM SM_SITE_PARAM;
+
+	l_customer_id.arr[l_customer_id.len]	= '\0';
+
+	if (NO_DATA_FOUND);
+
+	if (OERROR);
+
+}
+

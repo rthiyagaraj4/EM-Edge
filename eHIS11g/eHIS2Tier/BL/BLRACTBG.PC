@@ -1,0 +1,739 @@
+/************************************************************************/
+/* OCS MEDICOM VER 2.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRACTBG.PC                                  */
+/* AUTHOR                : RAJANISH NAMBIAR                             */
+/* DATE WRITTEN          : 22/4/2003                                    */
+/* CALLED FROM           : BLRACTBG.fmb                                 */
+/************************************************************************/
+
+#include <stdio.h>   
+#include <string.h>
+#include <bl.h>  
+
+#define OERROR			(sqlca.sqlcode < 0)
+#define NODATA_FOUND	(sqlca.sqlcode == 1403)
+#define NOT_FOUND		(sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY   (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY   (sqlca.sqlcode == -1)
+#define ROW_COUNT       (sqlca.sqlerrd[2])
+#define MAX_LINES		42
+#define ESC				0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR hosp_name                   [120],
+            date_time                   [20],
+            user_id                     [91],
+            nd_pwd                      [91],
+            nd_session_id               [16],
+            nd_pgm_date                 [25],
+            d_curr_pgm_name             [15],
+			nd_temp_date				[21],
+			p_language_id				[3],
+			date_convert				[21],
+			nd_loc_date					[21],
+			nd_facility_id              [3],
+            
+/* pp ---> values obtained from sy_prog_pram */
+			pp_fm_date					[12], 
+			pp_to_date					[12],
+			pp_fm_facility              [3],
+			pp_to_facility              [3],
+            pp_fm_cashcounter           [8],
+            pp_to_cashcounter           [8],
+			pp_fm_blng_srv				[11],
+			pp_to_blng_srv				[11],
+			pp_1_blng_grp				[8],
+			pp_2_blng_grp				[8],
+			pp_3_blng_grp				[8],
+			pp_4_blng_grp				[8],
+			pp_5_blng_grp				[8],
+			pp_6_blng_grp				[8],
+
+ /* cv ---> values obtained from cursor  */
+            cv_facility					[3],
+			cv_cash_counter_code        [5],	
+			cv_blng_grp                [11],
+			cv_blng_serv_code		   [11],
+			cv_service_desc			   [41], 
+			cv_chk_val				    [3],
+						
+			cv_cash_cntr_name			[41],
+			cv_facility_name			[41], //CHANGED FROM 31 TO 41
+			l_pk_value					[100],
+		    l_translated_value	        [201],
+			prv_facility		         [3],
+			prv_cash_counter_code	     [5];
+			
+     double cv_sum1	= 0, cv_sum2 = 0, cv_sum3 = 0, cv_sum4 = 0, 
+			cv_sum5	= 0, cv_sum6 = 0, cv_sum7 = 0, cv_sum8 = 0,
+			cc_sum1	= 0, cc_sum2 = 0, cc_sum3 = 0, cc_sum4 = 0, 
+			cc_sum5	= 0, cc_sum6 = 0, cc_blsr_tot=0,
+			fc_sum1	= 0, fc_sum2 = 0, fc_sum3 = 0, fc_sum4 = 0, 
+			fc_sum5	= 0, fc_sum6 = 0, fc_blsr_tot=0,
+			gr_sum1	= 0, gr_sum2 = 0, gr_sum3 = 0, gr_sum4 = 0, 
+			gr_sum5	= 0, gr_sum6 = 0, gr_blsr_tot=0,
+			blsr_total = 0;			
+
+char filename[150];
+char loc_legend[999][201];
+char string_var[200];
+char g_facility_id[3];
+	int i;	
+
+EXEC SQL END DECLARE SECTION;  
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+int i = 0, lctr = 0, pctr = 0, first = 1;
+
+FILE *fp;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 4)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+	
+    strcpy(g_pgm_id,"BLRACTBG");
+    strcpy(nd_pwd.arr,argv[1]);
+	nd_pwd.len = strlen(nd_pwd.arr);
+	
+	conn_sql();
+	 
+	set_meduser_role(); 
+	strcpy(p_language_id.arr,l_language_id.arr);
+    p_language_id.len = l_language_id.len;
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    strcpy(g_session_id,nd_session_id.arr);
+
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+    strcpy(g_pgm_date,nd_pgm_date.arr);
+
+	strcpy(g_facility_id,argv[4]);
+	strcpy(nd_facility_id.arr,argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+
+	fetch_legend_value();
+	fetch_hosp_name();
+
+	fetch_prog_param();
+   
+    open_file();
+	fprintf(fp,"%c&l1O",ESC); fprintf(fp,"%c&k2S",ESC);
+
+	print_title();
+	
+	print_head();
+
+	get_val(); 
+
+	horz_skip(79); fprintf(fp,"*****   %-15s   *****",loc_legend[210]);
+	fprintf(fp,"%c&l0O",ESC); fprintf(fp,"%cE",ESC); fflush(fp); fclose(fp);
+	EXEC SQL DELETE FROM SY_PROG_PARAM
+              WHERE PGM_ID     = 'BLRACTBG'
+                AND SESSION_ID = :nd_session_id
+                AND PGM_DATE   = :nd_pgm_date;
+	if (OERROR)   
+		err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+
+	end_prog_msg();
+	EXEC SQL COMMIT WORK RELEASE;
+	return;
+}
+
+/*	****************************	Sub Programs	****************************	*/
+
+conn_sql()
+{
+	EXEC sql connect :nd_pwd;
+	  if (sqlca.sqlcode < 0 )
+	   {
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+       }
+}
+
+open_file()
+{
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"BLRACTBG.lis");
+	if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file BLRACTBG.lis"); proc_exit();
+    }
+}
+
+fetch_prog_param()
+{
+
+
+	EXEC SQL SELECT PARAM1, 
+	                         PARAM2, 
+				 PARAM3, 
+				 PARAM4,
+                                 NVL(PARAM5,'LOWEST'),
+				 NVL(PARAM6,'HIGHEST'),
+				 NVL(PARAM7,'LOWEST'),
+				 NVL(PARAM8,'HIGHEST'),
+				 PARAM9, 
+				 PARAM10, 
+				 PARAM11, 
+				 PARAM12, 
+				 PARAM13, 
+				 PARAM14
+               INTO	         :pp_fm_date,
+	                         :pp_to_date,
+				 :pp_fm_facility,
+				 :pp_to_facility,
+				 :pp_fm_cashcounter,
+				 :pp_to_cashcounter,
+				 :pp_fm_blng_srv,
+				 :pp_to_blng_srv,
+				 :pp_1_blng_grp,
+				 :pp_2_blng_grp, 
+				 :pp_3_blng_grp,
+				 :pp_4_blng_grp, 
+				 :pp_5_blng_grp, 
+				 :pp_6_blng_grp
+			   FROM SY_PROG_PARAM
+              WHERE PGM_ID     = 'BLRACTBG' 
+			    AND SESSION_ID = :nd_session_id 
+                AND PGM_DATE   = :nd_pgm_date;
+
+    if (OERROR)
+		err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+	if (NODATA_FOUND)
+	    err_mesg("No Record found in SY_PROG_PARAM",0,"");
+}
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+    user_id.arr[0]   = '\0';
+    
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+    user_id.len      = 0;
+
+    EXEC SQL SELECT UPPER(ACC_ENTITY_NAME), TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),USER
+               INTO :hosp_name, :date_time, :user_id
+               FROM SY_ACC_ENTITY_lang_vw
+			  WHERE ACC_ENTITY_ID = :nd_facility_id
+			  AND		language_id=:p_language_id;
+
+       if (OERROR) err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+	hosp_name.arr[hosp_name.len]           = '\0';
+	date_time.arr[date_time.len]           = '\0';
+	user_id.arr[user_id.len]               = '\0';
+}
+
+get_cash_cntr_name()
+{
+   cv_cash_cntr_name.arr[0]	= '\0';
+    cv_cash_cntr_name.len		= 0;
+
+	EXEC SQL 
+	SELECT SHORT_DESC
+	  INTO :cv_cash_cntr_name
+	  FROM BL_CASH_COUNTER_LANG_VW
+	 WHERE CASH_COUNTER_CODE = :cv_cash_counter_code
+	   AND OPERATING_FACILITY_ID = :cv_facility
+	   and language_id=:p_language_id;
+
+    if(OERROR)
+        err_mesg("SELECTION failed on table BL_CASH_COUNTER",0,"");
+	  
+	cv_cash_cntr_name.arr[cv_cash_cntr_name.len]  = '\0';
+}
+
+get_facility_name()
+{
+	cv_facility_name.arr[0]		= '\0';
+    cv_facility_name.len		= 0;
+
+	EXEC SQL 
+	SELECT a.acc_entity_name name
+        INTO     cv_facility_name
+	FROM   SY_ACC_ENTITY_lang_vw a, SY_USER b
+	WHERE b.facility_id   = a.acc_entity_id
+	AND     b.user_id  = USER
+	AND     a.acc_entity_id = :pp_fm_facility
+	AND		language_id=:p_language_id;
+	
+	if(OERROR)
+        err_mesg("SELECTION failed on table SY_ACC_ENTITY & SY_USER",0,"");
+	  
+	cv_facility_name.arr[cv_facility_name.len]  = '\0';
+}
+
+print_title()
+{
+	common_head();
+	fprintf(fp,"VER : 2.10.01"); next_line();;
+	next_line();; next_line();; next_line();; horz_skip(35); 
+	fprintf(fp,"%-15s :",loc_legend[80]); 
+	next_line();; horz_skip(35); 
+	fprintf(fp,"----------------"); 
+	next_line();; next_line();; horz_skip(50);
+	init_date_temp_var();                              
+    strcpy(date_convert.arr,pp_fm_date.arr);            
+	fun_change_loc_date();
+	fprintf(fp,"%-15.15s   %-5.5s: %-10.10s",loc_legend[90],loc_legend[100],date_convert.arr);
+ 	next_line();; horz_skip(50);
+	init_date_temp_var();                              
+    strcpy(date_convert.arr,pp_to_date.arr);            
+	fun_change_loc_date();
+	fprintf(fp,"                    %-3.3s: %-10.10s",loc_legend[110],date_convert.arr);
+	next_line();; next_line();; horz_skip(50);
+	fprintf(fp,"%-15.15s   %-5.5s: %-8.8s",loc_legend[120],loc_legend[100],pp_fm_facility.arr);
+ 	next_line();; horz_skip(50);
+	fprintf(fp,"                    %-3.3s: %-8.8s",loc_legend[110],pp_to_facility.arr);
+	next_line();; next_line();; horz_skip(50);
+	fprintf(fp,"%-15.15s   %-5.5s: %-8.8s",loc_legend[130],loc_legend[100],pp_fm_cashcounter.arr);
+	next_line();; horz_skip(50);
+	fprintf(fp,"                    %-3.3s: %-8.8s",loc_legend[110],pp_to_cashcounter.arr);
+	next_line();; next_line();; horz_skip(50);
+	fprintf(fp,"%-15.15s   %-5.5s: %-10.10s",loc_legend[140],loc_legend[100],pp_fm_blng_srv.arr);
+ 	next_line();; horz_skip(50);
+	fprintf(fp,"                    %-3.3s: %-10.10s",loc_legend[110],pp_to_blng_srv.arr);
+	next_line();; next_line();; horz_skip(50);
+	fprintf(fp,"%-15.15s        : ",loc_legend[150]);
+ 	fprintf(fp,"%-4.4s",pp_1_blng_grp.arr); horz_skip(2);
+	fprintf(fp,"%-4.4s",pp_2_blng_grp.arr); horz_skip(2);
+	fprintf(fp,"%-4.4s",pp_3_blng_grp.arr); horz_skip(2);
+	fprintf(fp,"%-4.4s",pp_4_blng_grp.arr); horz_skip(2);
+	fprintf(fp,"%-4.4s",pp_5_blng_grp.arr); horz_skip(2);
+	fprintf(fp,"%-4.4s",pp_6_blng_grp.arr);
+	next_line();; fprintf(fp,"\f");
+}
+
+print_head()
+{
+	common_head(); 
+	fprintf(fp,"%-16.16s",loc_legend[140]); horz_skip(7);
+	fprintf(fp,"%16.16s",pp_1_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",pp_2_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",pp_3_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",pp_4_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",pp_5_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",pp_6_blng_grp.arr); horz_skip(9);
+	fprintf(fp,"%16.16s",loc_legend[160]); next_line();;dash_line(); 
+}
+
+common_head()
+{
+	lctr =1; fprintf(fp,"\n");fprintf(fp,"%-3.3s : %-2s",loc_legend[10],loc_legend[20]); horz_skip(73);
+	//fprintf(fp,"%-30.30s",hosp_name.arr); horz_skip(61);
+	fprintf(fp,"%-30s",hosp_name.arr); horz_skip(61);
+	init_date_temp_var();                              
+    strcpy(date_convert.arr,date_time.arr);            
+	fun_change_loc_date();
+	fprintf(fp,"%-16s",date_convert.arr); next_line();;
+	fprintf(fp,"%-3.3s : %-10s",loc_legend[50], user_id.arr); next_line();;
+	fprintf(fp,"%-3.3s : %-8s",loc_legend[60],loc_legend[30]); horz_skip(60); 
+	fprintf(fp,"%-40.40s",loc_legend[40]); horz_skip(58);
+	fprintf(fp,"%-5.5s : %4d",loc_legend[70],++pctr); next_line(); dash_line(); 
+}
+
+dec_SEL_CUR()
+{
+	EXEC SQL DECLARE SEL_CUR CURSOR FOR 
+	SELECT facility_id, cash_cntr_code,blng_serv_desc,
+	   	   sum(sum1), sum(sum2), sum(sum3), sum(sum4), sum(sum5), sum(sum6)	   											  				 			 			 		   							
+	  FROM(SELECT a.operating_facility_id facility_id,
+				  a.cash_counter_code cash_cntr_code,
+				  c.short_desc blng_serv_desc,
+				  a.blng_grp_id blng_grp_id,
+				  decode(a.blng_grp_id ,:pp_1_blng_grp, b.upd_net_charge_amt,0) sum1,
+				  decode(a.blng_grp_id ,:pp_2_blng_grp, b.upd_net_charge_amt,0) sum2,
+			      decode(a.blng_grp_id ,:pp_3_blng_grp, b.upd_net_charge_amt,0) sum3,
+			      decode(a.blng_grp_id ,:pp_4_blng_grp, b.upd_net_charge_amt,0) sum4,
+  				  decode(a.blng_grp_id ,:pp_5_blng_grp, b.upd_net_charge_amt,0) sum5,
+				  decode(a.blng_grp_id ,:pp_6_blng_grp, b.upd_net_charge_amt,0) sum6		  				  				  				  
+			 FROM bl_bill_hdr a,
+	 	          bl_patient_charges_folio b ,
+                  bl_blng_serv c ,
+                  bl_blng_serv_grp d
+			WHERE a.doc_type_code = b.bill_doc_type_code
+			  AND a.doc_num = b.bill_doc_num
+			  AND b.blng_serv_code = c.blng_serv_code
+			  AND c.serv_grp_code = d.serv_grp_code
+			  AND NVL(bill_status,'~') <> 'C'
+			  AND a.operating_facility_id = b.operating_facility_id
+			  
+			  AND trunc(a.doc_date) BETWEEN to_date(:pp_fm_date,'dd/mm/yyyy') AND to_date(:pp_to_date,'dd/mm/yyyy')
+			  AND a.operating_facility_id BETWEEN :pp_fm_facility AND :pp_to_facility	
+			  AND a.cash_counter_code BETWEEN DECODE(:pp_fm_cashcounter,'LOWEST','!!',:pp_fm_cashcounter) 
+			  							                                          AND DECODE(:pp_to_cashcounter,'HIGHEST','~~',:pp_to_cashcounter)
+		      AND b.blng_serv_code BETWEEN DECODE(:pp_fm_blng_srv,'LOWEST','!!',:pp_fm_blng_srv)
+			  	  				  	                                       AND DECODE(:pp_to_blng_srv,'HIGHEST','~~',:pp_to_blng_srv)
+		 ORDER BY 1,2,3)
+	GROUP BY facility_id, cash_cntr_code,blng_serv_desc;
+}
+
+open_SEL_CUR()
+{
+    EXEC SQL OPEN SEL_CUR;
+    if (OERROR)
+      err_mesg("OPEN failed on cursor SEL_CUR",0,"");
+}
+
+fetch_SEL_CUR()
+{
+	cv_facility.arr[0]					= '\0';
+	cv_cash_counter_code.arr[0]	    	= '\0';
+	cv_service_desc.arr[0]	    		= '\0';
+
+	cv_facility.len						= 0;
+	cv_cash_counter_code.len			= 0;
+	cv_service_desc.len					= 0;
+	
+	EXEC SQL FETCH SEL_CUR INTO 
+							:cv_facility,:cv_cash_counter_code,:cv_service_desc,
+							:cv_sum1,:cv_sum2,:cv_sum3,:cv_sum4,:cv_sum5,:cv_sum6;
+							
+	cv_facility.arr[cv_facility.len]							= '\0';
+	cv_cash_counter_code.arr[cv_cash_counter_code.len]			= '\0';
+	cv_service_desc.arr[cv_service_desc.len]					= '\0';
+		
+	if (OERROR)
+		err_mesg("FETCH failed on cursor SEL_CUR",0,"");
+
+    return(NODATA_FOUND?0:1);
+}
+
+close_SEL_CUR()
+{
+    EXEC SQL CLOSE SEL_CUR;
+    if (OERROR)
+         err_mesg("CLOSE failed on cursor SEL_CUR",0,"");
+}
+
+get_val()
+{ 
+    dec_SEL_CUR(); open_SEL_CUR(); 
+	prv_facility.arr[0]					= '\0';
+	prv_cash_counter_code.arr[0]		= '\0';
+	
+    prv_facility.len					= 0;
+	prv_cash_counter_code.len			= 0;
+	
+	while(fetch_SEL_CUR())
+	{
+		get_cash_cntr_name();
+		get_facility_name();
+		if (strcmp(prv_facility.arr,cv_facility.arr)!=0)
+		{	
+			if (first == 1)
+			{					
+				first = 0; print_grp_hd(); print_val();
+			}
+			else
+			{
+				print_cc_tot(); print_fc_tot();
+				print_grp_hd(); print_val();
+			}
+		}
+		else if (strcmp(prv_cash_counter_code.arr,cv_cash_counter_code.arr)!=0)
+		{
+			print_cc_tot(); check_line(2);
+			fprintf(fp,"%-15.15s : %-4.4s",loc_legend[130],cv_cash_counter_code.arr); fprintf(fp," - "); 
+			fprintf(fp,"%-41.41s",cv_cash_cntr_name.arr);
+			next_line();; next_line();; print_val();
+		}
+		else if (strcmp(prv_cash_counter_code.arr,cv_cash_counter_code.arr)==0)
+		{
+			print_val();
+		}
+		strcpy(prv_facility.arr,cv_facility.arr);
+		strcpy(prv_cash_counter_code.arr,cv_cash_counter_code.arr);
+	}
+	print_cc_tot(); print_fc_tot(); print_gr_tot(); 
+	fflush(fp); close_SEL_CUR();
+}
+
+print_grp_hd()
+{
+	fprintf(fp,"%-15.15s     : %-2.2s",loc_legend[170],cv_facility.arr); fprintf(fp,"-"); 
+	//fprintf(fp,"%-30.30s",cv_facility_name.arr); next_line();
+	fprintf(fp,"%-30s",cv_facility_name.arr); next_line();
+	fprintf(fp,"%-15.15s : %-4.4s",loc_legend[130],cv_cash_counter_code.arr); fprintf(fp," - "); 
+	fprintf(fp,"%-41.41s",cv_cash_cntr_name.arr); next_line(); next_line();;
+}
+
+print_val()
+{
+	blsr_total = cv_sum1+cv_sum2+cv_sum3+cv_sum4+cv_sum5+cv_sum6;
+	cum_cc();
+	fprintf(fp,"%-20.20s",cv_service_desc.arr); horz_skip(4);
+	print_formated_amt(cv_sum1); horz_skip(9);
+	print_formated_amt(cv_sum2); horz_skip(9);
+	print_formated_amt(cv_sum3); horz_skip(9);
+	print_formated_amt(cv_sum4); horz_skip(9);
+	print_formated_amt(cv_sum5); horz_skip(9);
+	print_formated_amt(cv_sum6); horz_skip(9);
+	print_formated_amt(blsr_total); next_line();
+}
+
+cum_cc()
+{
+	cc_sum1=cc_sum1+cv_sum1; cc_sum2=cc_sum2+cv_sum2;
+	cc_sum3=cc_sum3+cv_sum3; cc_sum4=cc_sum4+cv_sum4; 
+	cc_sum5=cc_sum5+cv_sum5; cc_sum6=cc_sum6+cv_sum6; 
+	cc_blsr_tot=cc_blsr_tot+blsr_total;
+}
+print_cc_tot()
+{
+	check_line(2); dash_line(); 
+	fprintf(fp,"%17.17s",loc_legend[180]); horz_skip(7);
+	print_formated_amt(cc_sum1); horz_skip(9);
+	print_formated_amt(cc_sum2); horz_skip(9);
+	print_formated_amt(cc_sum3); horz_skip(9);
+	print_formated_amt(cc_sum4); horz_skip(9);
+	print_formated_amt(cc_sum5); horz_skip(9);
+	print_formated_amt(cc_sum6); horz_skip(9);
+	print_formated_amt(cc_blsr_tot); 
+	next_line(); dash_line(); cum_fc(); reset_cc();
+}
+
+cum_fc()
+{
+	fc_sum1=fc_sum1+cc_sum1; fc_sum2=fc_sum2+cc_sum2; fc_sum3=fc_sum3+cc_sum3;
+	fc_sum4=fc_sum4+cc_sum4; fc_sum5=fc_sum5+cc_sum5; fc_sum6=fc_sum6+cc_sum6; 
+	fc_blsr_tot=fc_blsr_tot+cc_blsr_tot;
+}
+
+print_fc_tot()
+{
+	check_line(1);
+	fprintf(fp,"%17.17s",loc_legend[190]); horz_skip(7);
+	print_formated_amt(fc_sum1); horz_skip(9);
+	print_formated_amt(fc_sum2); horz_skip(9);
+	print_formated_amt(fc_sum3); horz_skip(9);
+	print_formated_amt(fc_sum4); horz_skip(9);
+	print_formated_amt(fc_sum5); horz_skip(9);
+	print_formated_amt(fc_sum6); horz_skip(9);
+	print_formated_amt(fc_blsr_tot); 
+	next_line(); dash_line(); cum_gr(); reset_fc();
+}
+
+cum_gr()
+{
+	gr_sum1=gr_sum1+fc_sum1; gr_sum2=gr_sum2+fc_sum2; gr_sum3=gr_sum3+fc_sum3;
+	gr_sum4=gr_sum4+fc_sum4; gr_sum5=gr_sum5+fc_sum5; gr_sum6=gr_sum6+fc_sum6; 
+	gr_blsr_tot=gr_blsr_tot+fc_blsr_tot;
+}
+
+print_gr_tot()
+{
+	check_line(1);
+	fprintf(fp,"%17.17s",loc_legend[200]); horz_skip(7);
+	print_formated_amt(gr_sum1); horz_skip(9);
+	print_formated_amt(gr_sum2); horz_skip(9);
+	print_formated_amt(gr_sum3); horz_skip(9);
+	print_formated_amt(gr_sum4); horz_skip(9);
+	print_formated_amt(gr_sum5); horz_skip(9);
+	print_formated_amt(gr_sum6); horz_skip(9);
+	print_formated_amt(gr_blsr_tot); next_line(); dash_line(); 
+}
+
+reset_cc()
+{
+	cc_sum1	= 0, cc_sum2 = 0, cc_sum3 = 0, cc_sum4 = 0, 
+	cc_sum5	= 0, cc_sum6 = 0, cc_blsr_tot=0;
+}
+
+reset_fc()
+{
+	fc_sum1	= 0, fc_sum2 = 0, fc_sum3 = 0, fc_sum4 = 0, 
+	fc_sum5	= 0, fc_sum6 = 0, fc_blsr_tot=0;
+	reset_cc();
+}
+
+check_line(skip) /* will check for MAX LINE before printing totals */
+int skip;
+{
+ 	if ((lctr + skip) > (MAX_LINES-1))
+	{
+		nxt_page(); 
+	}
+}
+
+next_line() /* will check for MAX LINE before printing totals */		
+{
+	if (lctr > (MAX_LINES-1))
+	{
+		nxt_page(); 
+	}
+	else
+	{
+		fprintf(fp,"\n"); ++lctr; /* fprintf(fp,"%2d",lctr); */
+	}
+}
+
+nxt_page() /* will move the cursor to next page */
+{
+	fprintf(fp,"\f");  print_head(); 	
+}
+
+horz_skip(num) /* will move as many number of blank spaces as passed 
+                  by parameter */
+int num;
+{
+	for(i=0;i<num;i++)fprintf(fp," "); 
+}
+
+dash_line() /* will prodce give number of dash's */
+{
+	for(i=0;i<188;i++)fprintf(fp,"-"); next_line();
+}
+
+/*print_formated_amt(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30], fstr_amt[30];
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);        	       
+        sprintf(str_amt,"%16s",s_amt);				
+		strcpy(fstr_amt,"-");
+		strcat(fstr_amt,str_amt);		
+		sprintf(str_amt,"%16s",fstr_amt);		
+        fprintf(fp,"%16s",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%16s",s_amt);
+        fprintf(fp,"%16s",str_amt);
+     }
+} */
+
+print_formated_amt(l_amt)
+double l_amt;
+{
+	char  s_amt[15];
+
+    if(l_amt < 0)
+	{
+        put_val(s_amt,-l_amt);
+        format_amt(s_amt);
+        strcat(s_amt,"-");  
+		fprintf(fp,"%16s",s_amt);
+    }
+    else 
+	{
+        put_val(s_amt,l_amt);
+        format_amt(s_amt);
+        strcat(s_amt," ");
+		fprintf(fp,"%16s",s_amt);
+    }
+}
+
+fetch_legend_value()
+{
+	for(i=1;i<=900;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLRACTBG.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+get_local_date()
+{
+
+	
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+	
+	BEGIN
+	
+	  
+       //	get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);  
+      
+	  // :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+		   
+	:nd_loc_date :=  	sm_convert_date_2t(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI:SS'),:p_language_id);  
+
+
+	END;
+
+	END-EXEC;
+        
+
+		if (OERROR)
+        err_mesg("SELECTING Date failed",0,"");
+
+}
+
+                     
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}
+
+/*		*************************	End of Program   *************************		*/

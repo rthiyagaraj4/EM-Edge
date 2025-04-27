@@ -1,0 +1,708 @@
+/*  
+#define DEBUG   
+*/  
+  
+#include <stdio.h>
+#include <string.h>
+#include "gl.h"
+#include "bl.h"
+                                        
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd[135],
+	    d_session_id[16],
+	    d_pgm_date[14], 
+            rep_date[20],
+            comp_name[50],
+            oper_id[21],
+            d_curr_pgm_name[15];
+
+    VARCHAR nd_date_time               [17],
+	    nd_blng_class_code         [3],
+	    nd_day_type_code           [3],
+	    nd_time_slab_code          [3],
+	    nd_service_fm              [11],
+	    nd_service_to              [11],
+	    d_rowid                    [25],
+	    d_blng_class_code          [3],
+	    d_blng_class_desc          [31],
+            d_day_type_code            [3],
+            d_time_slab_code           [3],
+            d_blng_serv_code           [11],
+            d_blng_serv_desc           [41],    
+            d_addl_factor              [9],
+            d_old_addl_factor          [9],
+	    nd_facility_id             [3],
+	    nd_ws_no                   [31];
+    
+    double  d_addl_factor_num;
+
+    char    nd_option;  /* 
+			   1 - Print Edit List only
+			   2 - Update price and print revised list
+			   3 - Print Revised List only
+			*/
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+#define REP_WIDTH 80
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1];
+
+char rep_title1[45];
+char rep_title2[35];
+
+char prv_blng_class_code[7];
+
+FILE *f1;
+
+int page_no,
+    line_no,
+    first_line,
+    g_count;
+
+char filename[150];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+    if(argc < 5) {
+        disp_message(ERR_MESG,"Usage BLRRLUPD userid/password session_id pgm_date facility_id");
+        proc_exit();
+    }
+
+    strcpy(g_pgm_id,"BLRRLUPD");
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+        disp_message(ORA_MESG,"Unable to connect to oracle.");
+        proc_exit();
+    }
+
+    set_meduser_role();
+    fetch_prog_param();
+    fetch_sys_info();
+
+   	strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrrlupd.lis");
+
+  //  strcpy(filename,"blrrlupd.lis");
+
+    if( (f1=fopen(filename,"w")) == NULL) {
+        disp_message(ERR_MESG,"Error in opening output file...");
+	proc_exit();
+    }
+
+    page_no=1;
+    line_no=1;
+
+    decl_curs();
+
+    /*put_inp_parm();*/
+
+    if (nd_option == '1')
+        do_report();
+    else if (nd_option == '2')
+	do_update();
+    else 
+	do_report1();
+
+    print_end_of_rep();
+
+    fclose(f1);
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+}
+
+fetch_prog_param()
+{
+    nd_date_time.arr[0]        = '\0';
+    nd_blng_class_code.arr[0]  = '\0';
+    nd_day_type_code.arr[0]    = '\0';
+    nd_time_slab_code.arr[0]   = '\0';
+    nd_service_fm.arr[0]       = '\0';
+    nd_service_to.arr[0]       = '\0';
+    nd_facility_id.arr[0]      = '\0'; 
+    nd_ws_no.arr[0]            = '\0';
+
+    nd_date_time.len           = 0;
+    nd_blng_class_code.len     = 0;
+    nd_day_type_code.len       = 0;
+    nd_time_slab_code.len      = 0;
+    nd_service_fm.len          = 0;
+    nd_service_to.len          = 0;
+    nd_facility_id.len         = 0; 
+    nd_ws_no.len               = 0;
+    
+    nd_option            = '\0';
+
+   EXEC SQL SELECT operating_facility_id,
+		   PARAM1,
+		   PARAM2,
+		   PARAM3,
+		   PARAM4,
+		   PARAM5,
+		   PARAM6,
+		   PARAM7,
+		   PARAM8
+              INTO :nd_facility_id,
+                   :nd_date_time,
+                   :nd_blng_class_code,
+                   :nd_day_type_code,
+                   :nd_time_slab_code,
+                   :nd_service_fm,
+                   :nd_service_to,
+		   :nd_option,
+                   :nd_ws_no
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NO_DATA_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+    nd_date_time.arr[nd_date_time.len]                 = '\0';
+    nd_blng_class_code.arr[nd_blng_class_code.len]     = '\0';
+    nd_day_type_code.arr[nd_day_type_code.len]         = '\0';
+    nd_time_slab_code.arr[nd_time_slab_code.len]       = '\0';
+    nd_service_fm.arr[nd_service_fm.len]               = '\0';
+    nd_service_to.arr[nd_service_to.len]               = '\0';
+    nd_ws_no.arr[nd_ws_no.len]                         = '\0';
+    nd_facility_id.arr[nd_facility_id.len]             = '\0';
+	strcpy(g_facility_id,nd_facility_id.arr);
+    if(nd_option == '1')
+        strcpy(rep_title1,"EDIT LIST FOR BILLING RULE FACTOR UPDATE");
+    else 
+        strcpy(rep_title1, "REVISED LIST FOR BILLING RULE FACTOR UPDATE");
+
+    strcpy(rep_title2,"EFFECTIVE FROM ");
+    strcat(rep_title2,nd_date_time.arr);
+
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+   
+}
+
+
+decl_curs()
+{
+
+    EXEC SQL DECLARE RULE_UPDT_CUR CURSOR FOR
+	      SELECT ROWID,
+		     BLNG_CLASS_CODE,
+                     DAY_TYPE_CODE,
+                     TIME_SLAB_CODE,
+                     BLNG_SERV_CODE,
+                     LTRIM(TO_CHAR(ADDL_FACTOR_NUM,'990.9999')),
+		     ADDL_FACTOR_NUM
+		FROM BL_RULE_FCTR_UPDT
+	       WHERE EFF_DATE_TIME = TO_DATE(:nd_date_time,'DD/MM/YYYY HH24:MI')
+		 AND BLNG_CLASS_CODE = NVL(:nd_blng_class_code,BLNG_CLASS_CODE)
+		 AND DAY_TYPE_CODE   = NVL(:nd_day_type_code,DAY_TYPE_CODE)
+		 AND TIME_SLAB_CODE  = NVL(:nd_time_slab_code,TIME_SLAB_CODE)
+		 AND BLNG_SERV_CODE  BETWEEN 
+		       NVL(:nd_service_fm,'!!!!!!!!!!') AND 
+		       NVL(:nd_service_to,'~~~~~~~~~~')
+            ORDER BY BLNG_CLASS_CODE,
+		     DAY_TYPE_CODE,
+		     TIME_SLAB_CODE,
+		     BLNG_SERV_CODE;
+
+    EXEC SQL DECLARE REVISED_UPDT_CUR CURSOR FOR
+	      SELECT BLNG_CLASS_CODE,
+                     DAY_TYPE_CODE,
+                     TIME_SLAB_CODE,
+                     BLNG_SERV_CODE,
+                     LTRIM(TO_CHAR(ADDL_FACTOR_NUM,'990.9999')),
+                     LTRIM(TO_CHAR(OLD_ADDL_FACTOR_NUM,'990.9999'))
+		FROM BL_BLNG_RULE
+	       WHERE FCTR_REVISED_DATE = 
+				 TO_DATE(:nd_date_time,'DD/MM/YYYY HH24:MI')
+            ORDER BY BLNG_CLASS_CODE,
+		     DAY_TYPE_CODE,
+		     TIME_SLAB_CODE,
+		     BLNG_SERV_CODE;
+}
+
+fetch_data()
+{
+
+    d_rowid.arr[0]              = '\0';
+    d_blng_class_code.arr[0]    = '\0';
+    d_day_type_code.arr[0]      = '\0';
+    d_time_slab_code.arr[0]     = '\0';
+    d_blng_serv_code.arr[0]     = '\0';
+    d_addl_factor.arr[0]        = '\0';
+
+    d_rowid.len                 = 0;
+    d_blng_class_code.len       = 0;
+    d_day_type_code.len         = 0;
+    d_time_slab_code.len        = 0;
+    d_blng_serv_code.len        = 0;
+    d_addl_factor.len           = 0;
+
+    d_addl_factor_num           = 0;
+
+    EXEC SQL FETCH RULE_UPDT_CUR
+	      INTO :d_rowid,
+		   :d_blng_class_code,
+                   :d_day_type_code,
+                   :d_time_slab_code,
+                   :d_blng_serv_code,
+                   :d_addl_factor,
+                   :d_addl_factor_num;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor RULE_UPDT_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+
+    d_rowid.arr[d_rowid.len]                        = '\0';
+    d_blng_class_code.arr[d_blng_class_code.len]    = '\0';
+    d_day_type_code.arr[d_day_type_code.len]        = '\0';
+    d_time_slab_code.arr[d_time_slab_code.len]      = '\0';
+    d_blng_serv_code.arr[d_blng_serv_code.len]      = '\0';
+    d_addl_factor.arr[d_addl_factor.len]            = '\0';
+
+    fetch_blng_serv_desc();
+
+    return 1;
+}
+
+fetch_data1()
+{
+
+    d_blng_class_code.arr[0]    = '\0';
+    d_day_type_code.arr[0]      = '\0';
+    d_time_slab_code.arr[0]     = '\0';
+    d_blng_serv_code.arr[0]     = '\0';
+    d_addl_factor.arr[0]        = '\0';
+    d_old_addl_factor.arr[0]    = '\0';
+
+    d_rowid.len                 = 0;
+    d_blng_class_code.len       = 0;
+    d_day_type_code.len         = 0;
+    d_time_slab_code.len        = 0;
+    d_blng_serv_code.len        = 0;
+    d_addl_factor.len           = 0;
+    d_old_addl_factor.len       = 0;
+
+    EXEC SQL FETCH REVISED_UPDT_CUR
+	      INTO :d_blng_class_code,
+                   :d_day_type_code,
+                   :d_time_slab_code,
+                   :d_blng_serv_code,
+                   :d_addl_factor,
+                   :d_old_addl_factor;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor REVISED_UPDT_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+	return 0;
+
+    d_blng_class_code.arr[d_blng_class_code.len]    = '\0';
+    d_day_type_code.arr[d_day_type_code.len]        = '\0';
+    d_time_slab_code.arr[d_time_slab_code.len]      = '\0';
+    d_blng_serv_code.arr[d_blng_serv_code.len]      = '\0';
+    d_addl_factor.arr[d_addl_factor.len]            = '\0';
+    d_old_addl_factor.arr[d_old_addl_factor.len]    = '\0';
+
+    fetch_blng_serv_desc();
+
+    return 1;
+}
+
+fetch_blng_serv_desc()
+{
+    d_blng_serv_desc.arr[0]     = '\0';
+    d_blng_serv_desc.len        = 0;
+
+    EXEC SQL SELECT LONG_DESC
+	       INTO :d_blng_serv_desc
+	       FROM BL_BLNG_SERV
+	      WHERE BLNG_SERV_CODE = :d_blng_serv_code;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table BL_BLNG_SERV",0,"");
+
+    if(NO_DATA_FOUND) {
+
+	EXEC SQL SELECT LONG_DESC
+		   INTO :d_blng_serv_desc
+		   FROM BL_BLNG_SERV_GRP
+		  WHERE SERV_GRP_CODE = SUBSTR(:d_blng_serv_code,1,2);
+	      
+        if(OERROR)
+	    err_mesg("SELECT failed on table BL_BLNG_SERV",0,"");
+
+	if(NO_DATA_FOUND) {
+
+	    if(!strcmp(d_blng_serv_code.arr,"ALL")) {
+		strcpy(d_blng_serv_desc.arr,"ALL SERVICES");
+		d_blng_serv_desc.len = strlen(d_blng_serv_desc.arr);
+	    }
+
+	}
+	    
+    }
+
+    d_blng_serv_desc.arr[d_blng_serv_desc.len]  = '\0';
+
+}
+
+get_blng_class_desc()
+{
+
+    d_blng_class_desc.arr[0]    = '\0';
+    d_blng_class_desc.len       = 0;
+
+    EXEC SQL SELECT LONG_DESC
+	       INTO :d_blng_class_desc
+	       FROM BL_BLNG_CLASS
+	      WHERE BLNG_CLASS_CODE = :d_blng_class_code;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table BL_BLNG_CLASS",0,"");
+
+    d_blng_class_desc.arr[d_blng_class_desc.len]   = '\0';
+
+}
+
+do_report()
+{
+
+    int first;
+
+    put_hdr();
+
+    EXEC SQL OPEN RULE_UPDT_CUR;
+    if(OERROR)
+	err_mesg("OPEN failed on cursor RULE_UPDT_CUR",0,"");
+
+    prv_blng_class_code[0] = '\0';
+    first = 1;
+
+    while(fetch_data()) {
+
+	if(strcmp(prv_blng_class_code, d_blng_class_code.arr)) {
+
+	    get_blng_class_desc();
+	    if(!first) {
+		fprintf(f1,"\n\n");
+		line_no += 2;
+	    }
+
+	    chk_break(1);
+	    fprintf(f1,"%-2s %-31s\n\n", d_blng_class_code.arr, 
+			                 d_blng_class_desc.arr);
+	    line_no += 2;
+
+	}
+
+	chk_break(1);
+	fprintf(f1,"   %-10s %-40s %-2s   %-2s     %8s\n",
+                  d_blng_serv_code.arr,
+                  d_blng_serv_desc.arr,
+                  d_day_type_code.arr,
+		  d_time_slab_code.arr,
+		  d_addl_factor.arr);
+
+	line_no ++;
+
+	first = 0;
+	strcpy(prv_blng_class_code, d_blng_class_code.arr);
+    }
+
+    EXEC SQL CLOSE RULE_UPDT_CUR;
+    if(OERROR)
+	err_mesg("CLOSE failed on cursor RULE_UPDT_CUR",0,"");
+}
+
+do_update()
+{
+
+    EXEC SQL OPEN RULE_UPDT_CUR;
+    if(OERROR)
+	err_mesg("OPEN failed on cursor RULE_UPDT_CUR",0,"");
+
+    while(fetch_data()) {
+
+	EXEC SQL UPDATE BL_BLNG_RULE
+		    SET OLD_ADDL_FACTOR_NUM = ADDL_FACTOR_NUM,
+			ADDL_FACTOR_NUM     = :d_addl_factor_num,
+	                FCTR_REVISED_DATE   = TO_DATE(:nd_date_time,'DD/MM/YYYY HH24:MI'),
+			MODIFIED_BY_ID      = USER,
+			MODIFIED_DATE       = SYSDATE,
+			MODIFIED_AT_WS_NO   = :nd_ws_no,
+			MODIFIED_FACILITY_ID= :nd_facility_id
+		  WHERE BLNG_CLASS_CODE     = :d_blng_class_code
+		    AND DAY_TYPE_CODE       = :d_day_type_code
+		    AND TIME_SLAB_CODE      = :d_time_slab_code
+		    AND BLNG_SERV_CODE      = :d_blng_serv_code;
+
+	if(OERROR)
+	    err_mesg("UPDATE failed on table BL_BLNG_RULE",0,"");
+
+	/*
+	EXEC SQL UPDATE BL_RULE_FCTR_UPDT
+		    SET POSTED_DATE_TIME = SYSDATE
+		  WHERE ROWID            = :d_rowid;
+
+	if(OERROR)
+	    err_mesg("UPDATE failed on table BL_RULE_FCTR_UPDT",0,"");
+        */
+
+
+    }
+
+    EXEC SQL CLOSE RULE_UPDT_CUR;
+    if(OERROR)
+	err_mesg("CLOSE failed on cursor RULE_UPDT_CUR",0,"");
+
+    EXEC SQL DELETE BL_RULE_FCTR_UPDT
+	      WHERE EFF_DATE_TIME = TO_DATE(:nd_date_time,'DD/MM/YYYY HH24:MI');
+
+    if(OERROR)
+	err_mesg("DELETE failed on table BL_RULE_FCTR_UPDT",0,"");
+
+    /*
+    EXEC SQL COMMIT WORK;
+    if(OERROR)
+        err_mesg("COMMIT failed",0,"");
+    */
+
+    do_report1();
+}
+
+do_report1()
+{
+
+    int first;
+
+    put_hdr();
+
+    EXEC SQL OPEN REVISED_UPDT_CUR;
+    if(OERROR)
+	err_mesg("OPEN failed on cursor REVISED_UPDT_CUR",0,"");
+
+    prv_blng_class_code[0] = '\0';
+    first = 1;
+
+    while(fetch_data1()) {
+
+	if(strcmp(prv_blng_class_code, d_blng_class_code.arr)) {
+
+	    get_blng_class_desc();
+	    if(!first) {
+		fprintf(f1,"\n\n");
+		line_no += 2;
+	    }
+
+	    chk_break(1);
+	    fprintf(f1,"%-2s %-31s\n\n", d_blng_class_code.arr, 
+			                 d_blng_class_desc.arr);
+	    line_no += 2;
+
+	}
+
+	chk_break(1);
+	fprintf(f1,"   %-10s %-40s %-2s   %-2s     %8s %8s\n",
+                  d_blng_serv_code.arr,
+                  d_blng_serv_desc.arr,
+                  d_day_type_code.arr,
+		  d_time_slab_code.arr,
+		  d_old_addl_factor.arr,
+		  d_addl_factor.arr);
+
+	line_no ++;
+
+	first = 0;
+	strcpy(prv_blng_class_code, d_blng_class_code.arr);
+    }
+
+    EXEC SQL CLOSE REVISED_UPDT_CUR;
+    if(OERROR)
+	err_mesg("CLOSE failed on cursor REVISED_UPDT_CUR",0,"");
+}
+
+chk_break(nol)
+int nol;
+{
+
+	if(line_no+nol >= 55) {
+           line_no = 1;
+	   g_count = 1;
+	   put_hdr();
+	}
+
+}
+
+put_inp_parm()
+{
+
+    form_hdr();
+    fprintf(f1,"VER : 1.10.01\n");
+    fprintf(f1,"\n\n\n\n");
+    fprintf(f1,"\tINPUT PARAMETERS\n");
+    fprintf(f1,"\t----------------\n\n");
+    fprintf(f1,"\t\tEFFECTIVE DATE/TIME   : %s\n",nd_date_time.arr);
+
+}
+
+print_end_of_rep()
+{
+    int col;
+    char buff[REP_WIDTH+1];
+
+    memset(buff,' ',REP_WIDTH+1);
+    col = (int)(REP_WIDTH-19)/2;
+
+    strcpy(buff+col,"** END OF REPORT **",19);
+    fprintf(f1,"\n%s\n",buff);
+}
+
+put_hdr()
+{
+
+    form_hdr();
+
+    if(nd_option == '1') {
+        fprintf(f1,"BILLING CLASS                                      DAY  TIME ADDITIONAL\n");
+        fprintf(f1,"   BILLING SERVICE CODE AND DESCRIPTION            TYPE TYPE     FACTOR\n");
+    }
+    else {
+        fprintf(f1,"BILLING CLASS                                      DAY  TIME   <---ADDL FCTR--->\n");
+        fprintf(f1,"   BILLING SERVICE CODE AND DESCRIPTION            TYPE TYPE   PREVIOUS  REVISED\n");
+
+    }
+
+/*
+XX XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+   XXXXXX XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX XX   XX     990.9999 990.9999
+*/
+
+    fprintf(f1,"%s\n",hdr_line5);
+    fprintf(f1,"\n");
+    line_no=9;
+
+}
+
+form_hdr()
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+
+    if(first) {
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+        memset(hdr_line4,' ',REP_WIDTH+1);
+	memset(hdr_line5,'-',REP_WIDTH);
+	hdr_line5[REP_WIDTH] = '\0';
+
+        strncpy(hdr_line1,"MDL : BL",8);
+        col = (int)(REP_WIDTH-strlen(comp_name.arr))/2;
+        strncpy(hdr_line1+col,comp_name.arr,strlen(comp_name.arr));
+        col = (REP_WIDTH-strlen(rep_date.arr));
+        strcpy(hdr_line1+col,rep_date.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,oper_id.arr);
+
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP : BLRRLUPD",14);
+    col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+    sprintf(buf,"PAGE : %4d",page_no++);
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+
+    col = (int)(REP_WIDTH-strlen(rep_title2))/2;
+    strcpy(hdr_line4+col,rep_title2);
+
+    if(first)
+        fprintf(f1,"%s\n",hdr_line1);
+    else
+        fprintf(f1,"\f%s\n",hdr_line1);
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3);
+    fprintf(f1,"%s\n",hdr_line4);
+    fprintf(f1,"%s\n",hdr_line5);
+
+    first = 0;
+}
+
+fetch_sys_info()
+{
+
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+		    TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+	     INTO   :comp_name,
+		    :rep_date,
+		    :oper_id
+	     FROM   SY_ACC_ENTITY
+         WHERE acc_entity_id = :nd_facility_id; 
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len] = '\0';
+    oper_id.arr[oper_id.len] = '\0';
+}
+
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+
+    if(l_amt < 0){
+        put_val(s_amt,-l_amt);
+        format_amt(s_amt);
+        strcat(s_amt,"-");
+    }
+    else {
+        put_val(s_amt,l_amt);
+        format_amt(s_amt);
+        strcat(s_amt," ");
+    }
+}

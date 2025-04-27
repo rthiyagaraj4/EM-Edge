@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+      <title>PaySky UHA Test</title>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+      <Script src="../../eCommon/js/jquery-3.6.3.js" language="JavaScript"></Script>	
+	  <script language="javascript" src="../../eXH/js/ps-uha-1.1.js"></script>
+      <style>
+         .cnt-custinfoackcallback p,
+         .cnt-healthidcallback p,
+         .cnt-notifypmtcallback p,
+         .cnt-errorcallback p {
+         font-size: 12px;
+         }
+         .call-back {
+         font-size: 15px;
+         font-weight: bold;
+         padding-bottom: 10px;
+         }
+      </style>
+   </head>
+   <body>
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+         <div class="container">
+            <div class="navbar-header">
+               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               </button>
+               <a class="navbar-brand" href="#">PaySky UHA</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse"></div>
+            <!--/.navbar-collapse -->
+         </div>
+      </nav>
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+         <div class="container">
+            <h1>Welcome!</h1>
+            <p>PaySky - UHA integration.</p>
+            <p><button class="btn btn-primary btn-lg" id="send" onclick="sendPaymentRequest();">Send Payment Request &raquo;</button></p>
+         </div>
+      </div>
+      <div class="container">
+         <!-- Example row of columns -->
+         <div class="row">
+            <div class="col-md-3">
+               <p class="call-back">Receive HealthID Callback</p>
+               <p class='cnt-healthidcallback text-success'></p>
+            </div>
+            <div class="col-md-3">
+               <p class="call-back">Request Payment Ack Callback</p>
+               <p class='cnt-custinfoackcallback text-success'></p>
+            </div>
+            <div class="col-md-3">
+               <p class="call-back">Payment Result Callback</p>
+               <p class='cnt-notifypmtcallback text-success'></p>
+            </div>
+            <div class="col-md-3">
+               <p class="call-back">Error Callback</p>
+               <p class='cnt-errorcallback text-danger'></p>
+            </div>
+         </div>
+         <hr>
+         <footer>
+            <small>© 2021, All Rights Reserved. Powered by <b> <a href="http://paysky.io/" target="_blank">PaySky.io</a></b> </small>
+         </footer>
+      </div>
+      <!-- /container -->
+      <script type="text/javascript">
+         PsUhaClient.ReceiveHealthIdCallback = function (hids) {
+			 $(hids).each(function (idx, obj) {
+				$('.cnt-healthidcallback').append('<p>ID: ' + obj + '</p>');
+			 });
+         };
+
+         PsUhaClient.PaymentResultCallback = function (pmtObj) {
+			 $('.cnt-notifypmtcallback').append('<p>PatientId: ' + pmtObj.PatientId + '</p>');
+			 $('.cnt-notifypmtcallback').append('<p>ProcessingReference: ' + pmtObj.ProcessingReference + '</p>');
+			 $('.cnt-notifypmtcallback').append('<p>TransactionId: ' + pmtObj.TransactionId + '</p>');
+			 $('.cnt-notifypmtcallback').append('<p>Result Code: ' + pmtObj.Result + '</p>');
+         };
+
+         PsUhaClient.ErrorCallback = function (error) {
+			 $('.cnt-errorcallback').append('<p>' + error + '</p>');
+         };
+
+         PsUhaClient.RequestPaymentAckCallback = function (obj) {
+			 $('.cnt-custinfoackcallback').append('<p>Payment Request Received By the Server</p>');
+			 $('.cnt-custinfoackcallback').append('<p>Response Code: ' + obj.Response + '</p>');
+			 $('.cnt-custinfoackcallback').append('<p>PatientId: ' + obj.PatientId + '</p>');
+			 $('.cnt-custinfoackcallback').append('<p>TransactionId: ' + obj.TransactionId + '</p>');
+         };
+         
+		 function sendPaymentRequest() {
+			 PsUhaClient.RequestPayment(
+			 {
+				 PatientId: 123456,
+				 TransactionId: 101,
+				 Amount: 500
+			});
+         }
+      </script>
+   </body>
+</html>
+

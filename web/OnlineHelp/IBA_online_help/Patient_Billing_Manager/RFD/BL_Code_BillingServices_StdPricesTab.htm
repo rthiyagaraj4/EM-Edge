@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BillingServices_StdPricesTab</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Standard Prices Tab</h1>
+<p class="BoldRFD"><span style="font-weight: normal;">Standard Prices tab enables you to set up standard price for the service. The Standard price is valid for the selected facility.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to define a Standard Price:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select the Facility from the list to define the Standard Price for a relevant Billing Class. The facilities defined in the System Manager module and associated to the relevant user get listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid From</span> – Click Calendar function to select the date. The Standard Prices are applicable for the Billing Classes in the Facility from the date selected. The date set has to be greater than the system date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid To</span> – Click Calendar function to select the date. The Standard Prices are applicable for the Billing Classes in the Facility until the date selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Class</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a valid Billing Class and set up a Standard Price for the relevant patient category. The Billing Classes defined under the ‘Billing Rule’ menu in the Masters gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The Description for the selected Billing Class is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cost Ind.</span> – Select a valid Cost Indicator from list. The values are system defined – '%age', 'Amount' and 'N/A'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cost Amt</span> – Enter the actual price towards the service. When the selected Cost Indicator is:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">%age – A percentage of the Cost Amount is calculated for the standard price. The cost amount is charged towards the service for the relevant Billing Class.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Amt – The amount defined for a patient category associated to the Billing Class in the Billing Service function is charged towards the service.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">N/A – Select N/A, if the Cost Amount is not applicable for the selected Billing Class.</p>
+</li>
+</ol>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Rate</span> – Enter the base price to be charged for the inpatients. The inpatients availing the service are charged based on the quantity of the service used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">DC Rate</span> – Enter the base price to be charged for the Daycare patients. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP Rate</span> - Enter the base price to be charged for the Outpatients. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Emg. Rate</span> - Enter the base price to be charged for the Emergency cases. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext. Rate</span> - Enter the base price to be charged for the External or the Referral patients. The charge towards the service is calculated accordingly based on the quantity used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min. Charge</span> - Enter the minimum charge towards the service. The charge towards the service will be calculated accordingly based on the quantity used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Charge</span> – Enter the maximum charge towards the service. This is applicable only when the Cost Indicator is set. This identifies the maximum amount, which is charged towards the service when the Cost Indicator is set. You cannot charge an amount beyond the limit specified for the service.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allowed</span> – Select the check box, if the Billing Service is reimbursable for the selected patient class. Clear the check box, if the respective Billing Class is non-reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – Select the check box, if the respective Billing Service is reimbursable for the selected patient class. The override option for the patient class takes precedence over the override check box in the header field. If the service is not reimbursable and the check box is selected for the patient class, it indicates that the Billing Service is reimbursable for the selected patient class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reimbursable Amt</span> – Enter the amount, which can be reimbursed to the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Base Qty</span> – Enter the Base Quantity towards the service. The charge is calculated based on the quantity used. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gross/Net Applicability</span> – Select a value from the list. The values are system defined – 'Gross' and 'Net'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Gross – Select Gross to charge the Gross amount for the service. The charge towards the service is calculated based on the discount and the price defined for the Billing Class.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Net – Select Net to charge the Net amount for the service. The service charge is calculated based on the price for the Billing Class. The discount amount for the service is not considered during bill generation.</p>
+</li>
+</ol>
+<ol start="18">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Cost Availability</span> – Select the check box, if the Cost Amount is applicable. Clear the check box, if the Cost Amount is not applicable.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_FinReClass_FinClassRule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define Financial Classification Rule:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Classification Code</span> – Enter the Classification Code in alphanumeric format of six characters maximum length. The Classification Code is unique and cannot be changed after creation. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> – Enter the Long Description in alphanumeric format of 100 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter the Short Description in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Classification Type</span> – Select a value from the list to identify the Classification Type. The system-defined values are - Social Grant, Exempted, Provisional, Income/Asset Based, Visitors, Special Case, Credit, Sponsored and Insurance.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Family Members</span> – Select the check box if the family members of the patient can be grouped under the financial classification rule. This check box is enabled only if the ‘Classification Type’ is selected as ‘Income/Asset Based’.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Valid for registration</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Select the check boxes against the respective encounter, if the financial classification code is valid for the respective patient encounter. The ‘Patient Registration’ check box is disabled, if the ‘Classification Type’ is selected as ‘Special Case’.</span></p>
+<ol>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Patient Registration – Select the check box, if the financial classification code is applicable for patient registration. Clear the check box, if the financial classification code is not valid for patient registration.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Emergency Encounter - Select the check box, if the financial classification code is applicable for emergency encounters. Clear the check box, if the financial classification code is not valid for emergency encounters.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Outpatient Encounter - Select the check box, if the financial classification code is applicable for Outpatient Encounters. Clear the check box, if the financial classification code is not valid for Outpatient Encounters.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Daycare Encounter - Select the check box, if the financial classification code is applicable for Daycare Encounters. Clear the check box, if the financial classification code is not valid for Daycare Encounters.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Inpatient Encounter - Select the check box, if the financial classification code is applicable for Inpatient Encounters. Clear the check box, if the financial classification code is not valid for Inpatient Encounters.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid Settlement Type</span> - The Settlement Types are displayed and disabled based on the Classification Type selected. The listed items for List Items Settlement Type are Cash, Credit and Sponsored.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Valid Settlement Type should be Cash only when the classification type is either Social Grant, Exempted, Income/Asset Based, Provisional, Visitors.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the classification type is either Special Case/Credit, Settlement Type has to be credit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Settlement Type has to be Sponsored, if the classification type is either Sponsored/Insurance.</p>
+</li>
+</ol>
+<ol start="7">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Settlement Type</span> - The Payer Settlement Types are displayed and disabled based on the Classification Type selected.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The values in the list are Cash, Payment by Approved by Company, Payment by Insurance by Payer.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The value has to be cash, if the valid settlement type is Cash. The value has to be either Payment by Approved by Company or Payment by Insurance by Payer only when the valid settlement type is either Special Case or Credit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The value has to be Payment by Payer only when the valid settlement type is either Sponsored or Insurance.</p>
+</li>
+</ol>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable to Patient Sex</span> – Select the gender from the list. The system-defined values are &#160;Male, Female and Both.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable to Child</span> - Select the check box, if the financial reclassification is applicable to a child. On selecting the check box and using the respective financial classification code in the transaction functions while updating the financial details for a child, system compares the child’s age with the age defined in the ‘Financial Reclassification Parameters’ function.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">The following validations are required only when the classification type is other than Income/Asset Based:</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable Billing Group</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select the Billing Group. The values defined in the Billing Groups function get listed. You can associate a Billing Group to only one Financial Classification code. The Billing Group selected should match with the Valid Settlement Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid For [IP, DC, OP, AE]</span> – The check boxes are selected for the respective patient class based on the Billing Group definition. You cannot clear or select the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Payer Group</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Payer Group. The values defined in the Customer Groups function get listed. The list of values is available for selection only if the Classification Type is selected as ‘Credit’ or ‘Sponsored’. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Customer. The values defined in the Customer function get listed. The list of values is available for selection only if the Classification Type is selected as ‘Credit’ or ‘Sponsored’. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validity Check for Basic classification</span> – Select the check box, if the Billing Group is valid for reclassification. Clear the check box, if the Billing Group is not valid for financial reclassification.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable for Basic Billing groups during Encounter Registration</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a cash, credit or sponsored Billing Group.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">The following validations are required only when the classification type is Income/Asset Based:</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Income/Asset Indicator</span> – Select the value as ‘Income’ or ‘Asset’. The values are system-defined. The Billing Group is selected for the income/asset.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Lower Limit</span> – Enter the lower limit in numeric format. This indicates the lower limit valid for income/asset range when the financial reclassification code is used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Higher Limit</span> – Enter the higher limit in numeric format. This indicates the higher limit valid for income/asset range when the financial reclassification code is used.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable Billing Group</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Cash Billing Group. The values defined in the Billing Groups function get listed. You can associate a Billing Group to only one Financial Classification code. The Billing Group selected should match with the Valid Settlement Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Valid For [IP, DC, OP, AE]</span> – The check boxes are selected for the respective patient class based on the Billing Group definition. You cannot clear or select the check box.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

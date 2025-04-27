@@ -1,0 +1,1594 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File : btrtrcrh.pc
+
+*  Ver 1.10.01
+   
+*  Purpose : To generate a report for Crossmatch/Transfusion History
+
+*  Input Parameters : 
+              Command line inputs
+	
+              1. Usr_id/Password
+              2. Session id
+              3. Program Date    
+              4. Patient_id
+              5. From_date
+              6. To_date  
+
+*  Table Accessed : BT_UNIT_REQUEST_HDR
+                    BT_UNIT_REQUEST_DTL
+					BT_REACTION_CODE_MAST
+					BT_BLOOD_UNITS_MAST
+					BT_PRODUCT_MAST
+					BT_UNIT_REQUEST_CATEGORY
+					BT_PATIENT_BLGRP_RH_ANT
+
+*  Output File : btrtrcrh.lis
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+/* INPUT PARAMETERS TO MAIN */
+	
+		
+
+        VARCHAR uid_pwd     [91],
+			nd_user_id          [21],
+			nd_session_id       [16],
+			nd_pgm_date	        [20],
+			
+ 			nd_from_date        [31],
+			nd_to_date			[31],
+			nd_user	            [15],
+			nd_file_no          [15],
+			nd_file_name		[150];
+
+/****************************/
+
+/* Fields from table SY_ACC_ENTITY*/
+	varchar 	d_acc_entity_name        [41],
+			d_user                   [21],
+			d_sysdate                [30],
+            d_title                  [50],
+			entity_name				 [81],
+			sys_date                 [81],
+			l_title                  [81];
+
+	
+
+/* Fields from MP_PATIENT_MAST Table   */
+   varchar     nd_patient_name[81];
+
+
+/*Fields from BT_UNIT_REQUEST_HDR Table */
+	varchar		nd_specimen_date_time[18],
+				nd_patient_id		[32],
+				nd_episode_type		[2],
+				nd_antibody_code[5],
+				nd_anti_code2[5],
+				nd_anti_code3[5],
+				nd_anti_code4[5],
+				nd_operating_facility_id	[3],
+				nd_anti_code5[5],
+				antibodies[25];
+				
+
+
+	int		nd_red_cells_requested,
+			nd_platellets_requested,
+			nd_ffp_requested,
+			nd_others_requested;
+
+/*Fields from BT_PATIENT_BLGRP_RH_ANT Table */
+	varchar		nd_blood_group[5],
+				nd_rhesus_code[6];
+
+
+/* Fields from BT_UNIT_REQUEST_DTL      */
+	varchar     d_unit_no[21],
+		    d_product_code[11],
+		    d_blood_group[5],
+		    d_rhesus_code[6],
+            d_unit_status[2],
+		    d_crossmatched_yn[2],
+            d_react_code[5],
+			d_specimen_no [21];
+
+        int d_trans_count,
+		    d_cross_count;
+
+/* Fields from BT_PRODUCT_MAST     */ 
+       varchar      d_short_desc[17];
+
+/* Fields from BT_BLOOD_UNITS_MAST     */ 
+       int          d_volume;
+       varchar      d_volume_units[11];
+
+/* Fields from BT_REACTION_CODE_MAST     */ 
+       varchar      d_short_description[17];
+
+
+/* Fields from table RL_SECTION_CODE */
+	 varchar      d_printer_name    [16],
+		      nd_fm_section_code[1] ,
+		      nd_section_desc   [40];
+
+/* Fields from table BT_UNIT_REQUEST_CATEGORY */
+	 varchar  d_category_code    [5];
+	 int      d_category_requested;
+			  
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+ 
+char string_var[100] ;
+char temp_string[500];
+int i =  0;
+int c_ount = 0 ;
+int c_ount1 = 0 ;
+int line_no = 0;
+int page_no = 0 ;
+
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+
+
+{
+  	void gen_file_name() ;
+	void get_header_dtls() ;
+	void get_dept_printer() ;
+	void do_report() ;
+	char command_line[200] ;
+
+   if(argc != 9) 
+   {
+     disp_message(ORA_MESG,"Usage btrtrcrh uid/passwd patient_id from_date to_date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+   strcpy(nd_operating_facility_id.arr, argv[4]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr); 
+
+   strcpy(nd_episode_type.arr, argv[5]);
+   nd_episode_type.len = strlen(nd_episode_type.arr); 
+
+   strcpy(nd_patient_id.arr, argv[6]);
+   nd_patient_id.len = strlen(nd_patient_id.arr); 
+
+   strcpy(nd_from_date.arr, argv[7]);
+   nd_from_date.len = strlen(nd_from_date.arr); 
+
+   strcpy(nd_to_date.arr, argv[8]);
+   nd_to_date.len = strlen(nd_to_date.arr); 
+ 	
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+
+	if(OERROR)
+		disp_message(ORA_MESG,"Failed to connect using : \n");
+
+	#ifdef DEBUG
+		printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+	#endif  
+
+		set_meduser_role();
+
+	   	gen_file_name();
+        get_header_dtls() ;
+        do_report() ;
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK RELEASE;
+
+	fclose(f1) ;
+	return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error occurred at main_function_cursor()\n");
+   proc_exit();
+}   
+
+
+/*************** GENERATE FILE NAME ***************/
+void gen_file_name()
+{
+  	 /* For a constant file name (4 lines) */
+  	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+         nd_file_name.len = strlen(nd_file_name.arr); 
+         strcat(nd_file_name.arr,"btrtrcrh.lis");
+	 nd_file_name.len = strlen(nd_file_name.arr);
+
+	 if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+         {
+	   sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);       
+	   disp_message(ERR_MESG,string_var);
+           proc_exit();
+         }
+ 
+}
+
+/************ GET_HEADER_DETAILS****************/
+void get_header_dtls()
+{
+         d_acc_entity_name.arr[0]   = '\0';
+	 d_acc_entity_name.len	    = 0;
+	 d_user.arr[0]		    = '\0';
+	 d_user.len                 = 0;
+	 d_sysdate.arr[0]	    = '\0';
+	 d_sysdate.len              = 0;
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(LPAD(ACC_ENTITY_NAME,
+		   TRUNC(15 + 0.5*LENGTH(ACC_ENTITY_NAME))),1,30),
+		   USER,
+		   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI'),
+		   'Crossmatch/Transfusion History For ' || :nd_patient_id
+	     INTO :d_acc_entity_name,
+		  :d_user,
+		  :d_sysdate,
+		  :d_title
+          FROM SY_ACC_ENTITY
+		  WHERE ACC_ENTITY_ID=:nd_operating_facility_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+  d_title.arr[d_title.len]                     = '\0';
+
+
+
+#ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+
+
+
+/************ LAYOUT/LOGIC FOR THE PROC REPORT ***************/
+void do_report()
+{
+
+        void print_hdr();
+		void get_patient_dtls();
+        void print_patient_dtls();
+        void do_rep(char t_c);
+
+/*************** date  ******************/
+  c_ount = strlen(d_sysdate.arr) ;
+  c_ount1 = (80 - c_ount)/2 ;
+
+  for(i;i<(c_ount1-6);i++)
+		strcat(sys_date.arr," ") ;
+  strcat(sys_date.arr,"Date: ");
+  strcat(sys_date.arr,d_sysdate.arr) ;
+  sys_date.len=strlen(sys_date.arr);
+
+/*************** entity name  ***********/
+  c_ount = strlen(d_acc_entity_name.arr) ;
+  c_ount1 = (80 - c_ount)/2 ;
+  
+  for(i;i<c_ount1;i++)
+		strcat(entity_name.arr," ") ;
+  
+  strcat(entity_name.arr,d_acc_entity_name.arr) ;
+  entity_name.len=strlen(entity_name.arr);
+
+/*************** title  ******************/
+  
+  c_ount = strlen(d_title.arr) ;
+  c_ount1 = (80 - c_ount)/2 ;
+  
+  for(i;i<c_ount1;i++)
+		strcat(l_title.arr," ") ;
+  
+  strcat(l_title.arr,d_title.arr) ;
+  l_title.len=strlen(l_title.arr);
+
+/******************************************************/
+
+  line_no = 0 ;
+  print_hdr();
+
+  get_patient_dtls(); 
+
+
+  print_patient_dtls();
+
+  fprintf(f1,"\nTransfusion History:-\n");
+  fprintf(f1,"----------------------\n");
+  line_no = line_no + 2;
+
+  do_rep('T');
+
+  fprintf(f1,"\nCrossmatch History:-\n");
+  fprintf(f1,"----------------------\n");
+  line_no = line_no + 2;
+
+  do_rep('C');
+  
+  return ;
+ err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at report() occured....\n");
+   proc_exit();
+}   
+
+
+void do_rep(char t_c)
+{
+
+	void print_hdr();
+	
+	void dclr_master_trans_cur();
+	void open_master_trans_cur();
+	int  fetch_master_trans_cur();
+	void close_master_trans_cur();
+
+	void dclr_master_cross_cur();
+	void open_master_cross_cur();
+	int  fetch_master_cross_cur();
+	void close_master_cross_cur();
+
+	void dclr_detail_trans_cur();
+	void open_detail_trans_cur();
+	int  fetch_detail_trans_cur();
+	void close_detail_trans_cur();
+	
+	void dclr_detail_cross_cur();
+	void open_detail_cross_cur();
+	int  fetch_detail_cross_cur();
+	void close_detail_cross_cur();
+
+        void get_prod_desc();
+        void get_volume();
+        void get_react_desc();
+
+	void get_specimen_dtls();
+        void print_specimen_dtls();
+        void print_unit_hdr(char t_c);
+	void print_detail_record(char t_c);
+
+/**********************************/
+
+  int still_master_exist=0;
+  int still_detail_exist=0;
+
+
+if (t_c == 'T')
+{
+
+  dclr_master_trans_cur();
+
+  open_master_trans_cur();
+
+  still_master_exist=fetch_master_trans_cur();
+
+  while (still_master_exist==1)
+  {
+    if (line_no>=MAX_LINES) 
+      {
+        line_no=0;
+	//fprintf(f1,"");
+	fprintf(f1,"\f");
+  	page_no++;
+	print_hdr();
+      }
+
+
+  get_specimen_dtls();
+  print_specimen_dtls();
+
+  dclr_detail_trans_cur();
+  open_detail_trans_cur();
+
+    if (line_no>=MAX_LINES)
+      {
+        line_no=0;
+	//fprintf(f1,"");
+	fprintf(f1,"\f");
+  	page_no++;
+	print_hdr();
+      }
+
+  print_unit_hdr(t_c);
+
+  still_detail_exist=fetch_detail_trans_cur();
+
+  while (still_detail_exist == 1)
+  {
+   get_prod_desc();
+   get_volume();
+   get_react_desc();
+
+        if (line_no >= MAX_LINES) 
+	      {
+        	line_no = 0;
+		//fprintf(f1,"");
+		fprintf(f1,"\f");
+	  	page_no++;
+		print_hdr();
+	      }
+
+  print_detail_record(t_c);
+
+  still_detail_exist=fetch_detail_trans_cur();
+   if (still_detail_exist != 1) 
+   {
+      break;
+   }   
+  } 
+ 	  
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"\n");
+ line_no = line_no + 1;
+
+ close_detail_trans_cur();
+ still_master_exist=fetch_master_trans_cur();
+   if (still_master_exist != 1) 
+   {
+   
+      break;
+   }   
+
+}
+close_master_trans_cur();
+}
+else
+{
+
+  dclr_master_cross_cur();
+
+  open_master_cross_cur();
+
+  still_master_exist=fetch_master_cross_cur();
+
+  while (still_master_exist==1)
+  {
+    if (line_no>=MAX_LINES) 
+      {
+        line_no=0;
+	//fprintf(f1,"");
+	fprintf(f1,"\f");
+  	page_no++;
+	print_hdr();
+      }
+
+  get_specimen_dtls();
+
+  print_specimen_dtls();
+
+  dclr_detail_cross_cur();
+  open_detail_cross_cur();
+
+    if (line_no>=MAX_LINES) 
+      {
+        line_no=0;
+	//fprintf(f1,"");
+	fprintf(f1,"\f");
+  	page_no++;
+	print_hdr();
+      }
+
+  print_unit_hdr(t_c);
+
+  still_detail_exist=fetch_detail_cross_cur();
+
+  while (still_detail_exist == 1)
+  {
+   get_prod_desc();
+   get_volume();
+   get_react_desc();
+
+    if (line_no>=MAX_LINES) 
+      {
+        line_no=0;
+	//fprintf(f1,"");
+	fprintf(f1,"\f");
+  	page_no++;
+	print_hdr();
+      }
+
+  print_detail_record(t_c);
+  still_detail_exist=fetch_detail_cross_cur();
+   if (still_detail_exist != 1) 
+   {
+      break;
+   }   
+  } 
+ 	  
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"\n");
+ line_no = line_no + 1;
+ close_detail_cross_cur();
+ still_master_exist=fetch_master_cross_cur();
+   if (still_master_exist != 1) 
+   {
+   
+      break;
+   }   
+
+}
+close_master_cross_cur();
+}
+}
+
+
+/********* GET PATIENT DETAILS **********/
+void get_patient_dtls()
+  {
+
+    nd_patient_name.arr[0] = '\0';
+    nd_patient_name.len = 0 ;
+    nd_blood_group.arr[0] = '\0';
+    nd_blood_group.len = 0 ;
+    nd_rhesus_code.arr[0] = '\0';
+    nd_rhesus_code.len = 0 ;
+	
+   /* EXEC SQL WHENEVER SQLERROR GOTO err_exit;*/
+
+
+    EXEC SQL SELECT first_name || ' ' || second_name
+                        || ' ' || third_name 
+               INTO :nd_patient_name
+	       FROM MP_PATIENT_MAST
+	      WHERE patient_id = :nd_patient_id ;
+
+	if (NODATAFOUND)
+	{
+		EXEC SQL SELECT first_name || ' ' || second_name
+								|| ' ' || third_name 
+					   INTO :nd_patient_name
+				   FROM RL_PATIENT_MAST
+				  WHERE patient_id = :nd_patient_id ;
+
+		if (NODATAFOUND)
+			nd_patient_name.arr[0] = '\0';
+			nd_patient_name.len = 0 ;
+	}
+
+
+/**************
+    EXEC SQL SELECT DISTINCT  blood_group,rhesus_code
+              INTO :nd_blood_group,:nd_rhesus_code
+	      FROM BT_UNIT_REQUEST_HDR
+	     WHERE PATIENT_ID = :nd_patient_id
+		 AND   OPERATING_FACILITY_ID=:nd_operating_facility_id;
+*********/
+
+    EXEC SQL SELECT blood_group,rhesus_code
+              INTO :nd_blood_group,:nd_rhesus_code
+	      FROM BT_PATIENT_BLGRP_RH_ANT
+	     WHERE PATIENT_ID = :nd_patient_id;
+
+
+    EXEC SQL SELECT COUNT(*) 
+	       INTO :d_trans_count 
+               FROM BT_UNIT_REQUEST_DTL
+              WHERE specimen_no in (SELECT specimen_no 
+				                     FROM BT_UNIT_REQUEST_HDR
+									 WHERE OPERATING_FACILITY_ID=:nd_operating_facility_id
+									 AND   patient_id=:nd_patient_id
+									 AND added_date >= to_date(:nd_from_date,'dd/mm/yyyy') 
+									 AND added_date < (to_date(:nd_to_date,'dd/mm/yyyy') + 1))						 
+				AND OPERATING_FACILITY_ID=:nd_operating_facility_id
+				AND PATIENT_ID=:nd_patient_id
+                AND UPPER(nvl(UNIT_STATUS,'X'))='T';
+				
+    EXEC SQL SELECT COUNT(*) 
+               INTO :d_cross_count 
+               FROM BT_UNIT_REQUEST_DTL
+              WHERE specimen_no in (SELECT specimen_no 
+				                      FROM BT_UNIT_REQUEST_HDR
+									 WHERE OPERATING_FACILITY_ID=:nd_operating_facility_id
+									 AND   patient_id=:nd_patient_id
+									 AND added_date >= to_date(:nd_from_date,'dd/mm/yyyy') 
+									 AND added_date < (to_date(:nd_to_date,'dd/mm/yyyy') + 1))
+				AND OPERATING_FACILITY_ID=:nd_operating_facility_id
+				AND PATIENT_ID=:nd_patient_id
+                AND UPPER(nvl(CROSSMATCHED_YN,'X'))='Y';
+
+  nd_patient_name.arr[nd_patient_name.len]    = '\0';
+  nd_blood_group.arr[nd_blood_group.len]      = '\0';
+  nd_rhesus_code.arr[nd_rhesus_code.len]      = '\0';
+
+#ifdef DEBUG
+    printf("leaving get_patient_name()\n");
+	printf(" nd_patient_name= %s\n", nd_patient_name.arr);
+    printf(" nd_blood_group=%s\n", nd_blood_group.arr) ;
+    printf(" nd_rhesus_code=%s\n", nd_rhesus_code.arr) ;
+#endif
+
+  return;
+
+   err_exit:
+
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+
+   disp_message(ORA_MESG,"Oracle error at get_patient_name() occured....\n");
+   proc_exit();	
+
+
+}
+
+
+void print_patient_dtls()
+{
+ fprintf(f1,"Patient ID %s\n",nd_patient_id.arr);
+ fprintf(f1,"Patient Name %-10s\n",nd_patient_name.arr);
+ fprintf(f1,"Blood Group %-15s\n",nd_blood_group.arr);
+ fprintf(f1,"Rhesus factor %-5s\n",nd_rhesus_code.arr);
+ fprintf(f1,"No. Of Previous Transfusions:%d\n",d_trans_count);
+ fprintf(f1,"No. Of Previous Crossmatches:%d\n",d_cross_count);
+ fprintf(f1,"____________________________________");
+ fprintf(f1,"____________________________________");
+ fprintf(f1,"\n");
+ line_no = line_no + 7;
+}
+
+
+/********* DECLARE MASTER_TRANS_CURSOR **********/
+  void dclr_master_trans_cur()
+  {
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  
+  EXEC SQL DECLARE MASTER_TRANS_CURSOR CURSOR FOR
+          SELECT TO_CHAR(A.specimen_no) 
+		  FROM BT_UNIT_REQUEST_HDR A
+          WHERE A.PATIENT_ID = :nd_patient_id
+				 AND A.OPERATING_FACILITY_ID=:nd_operating_facility_id
+				 AND A.specimen_no IN(SELECT specimen_no FROM BT_UNIT_REQUEST_DTL
+                             WHERE OPERATING_FACILITY_ID=:nd_operating_facility_id
+							 AND    patient_id = :nd_patient_id
+                             AND UPPER(nvl(UNIT_STATUS,'X')) = 'T')
+				 AND A.added_date >= to_date(:nd_from_date,'dd/mm/yyyy') 
+				 AND A.added_date < (to_date(:nd_to_date,'dd/mm/yyyy') + 1)				 
+				 
+	      ORDER BY A.specimen_no;
+
+#ifdef DEBUG
+    printf("leaving dclr_master_cur()\n");
+    fflush(stdout);
+#endif
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_MASTER__trans_cur() occured....\n");
+   proc_exit();	
+
+ }
+
+/********* DECLARE MASTER_CROSS_CURSOR **********/
+void dclr_master_cross_cur()
+  {
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  
+  EXEC SQL DECLARE MASTER_CROSS_CURSOR CURSOR FOR 
+          SELECT A.specimen_no 
+		  FROM	 BT_UNIT_REQUEST_HDR A
+          WHERE	 A.PATIENT_ID = :nd_patient_id
+			 AND A.OPERATING_FACILITY_ID=:nd_operating_facility_id
+             AND A.specimen_no IN 
+						(SELECT specimen_no 
+						 FROM BT_UNIT_REQUEST_DTL
+                         WHERE patient_id = :nd_patient_id
+                             AND UPPER(nvl(CROSSMATCHED_YN,'X')) = 'Y'
+							 AND OPERATING_FACILITY_ID=:nd_operating_facility_id
+						 )
+			 AND A.spec_regd_date_time > to_date(:nd_from_date,'dd/mm/yyyy') 
+			 AND A.spec_regd_date_time < (to_date(:nd_to_date,'dd/mm/yyyy') + 1)			 
+             ORDER BY A.specimen_no;
+
+#ifdef DEBUG
+    printf("leaving dclr_master_cur()\n");
+    fflush(stdout);
+#endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_MASTER__trans_cur() occured....\n");
+   proc_exit();	
+}
+
+/********* OPEN MASTER TRANS CURSOR **********/
+ void open_master_trans_cur()
+  {
+   /*  EXEC SQL WHENEVER SQLERROR GOTO err_exit;*/
+
+     EXEC SQL OPEN MASTER_TRANS_CURSOR;
+
+		if(OERROR)
+			disp_message(ORA_MESG,"Error in opening Master Trans Cursor \n");
+
+     return;
+	 	 
+   err_exit:
+   
+   	 EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+
+
+     disp_message(ORA_MESG,"Oracle error while Opening master trans cursor occured...\n");
+     proc_exit();
+	 
+
+  }
+
+/********* OPEN MASTER CROSS CURSOR **********/
+ void open_master_cross_cur()
+  {
+     EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN MASTER_CROSS_CURSOR;
+
+	 if(OERROR)
+			disp_message(ORA_MESG,"Error in opening Master Cross Cursor \n");
+
+     return;
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Opening master cross cursor occured...\n");
+     proc_exit();
+  }
+
+/********* FETCH MASTER TRANS CURSOR **********/
+int fetch_master_trans_cur()
+{
+
+  d_specimen_no.arr[0]  = '\0';
+  d_specimen_no.len		= 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH MASTER_TRANS_CURSOR	
+            INTO :d_specimen_no;
+
+  d_specimen_no.arr[d_specimen_no.len]	= '\0';
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+
+  if (NODATAFOUND)
+{
+    return 0;
+}
+
+#ifdef DEBUG
+   printf("********* Details from BT_UNIT_REQUEST_HDR**************\n");
+   printf(" d_specimen_no= %d\n", d_specimen_no);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   if (NODATAFOUND)
+   {
+     disp_message(ORA_MESG,"trans MASTER NO DATA FOUND....\n");
+     return 0;
+   }
+
+   
+    disp_message(ORA_MESG,"Oracle error at fetch_Master_trans_cursor() occured....\n");
+    proc_exit();
+
+}
+
+/********* FETCH MASTER CROSS CURSOR **********/
+int fetch_master_cross_cur()
+{
+
+  d_specimen_no.arr[0]  = '\0';
+  d_specimen_no.len		= 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH MASTER_CROSS_CURSOR	
+            INTO :d_specimen_no;
+
+  d_specimen_no.arr[d_specimen_no.len]	= '\0';
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+{
+    return 0;
+}
+
+#ifdef DEBUG
+   printf("********* Details from BT_UNIT_REQUEST_HDR**************\n");
+   printf(" d_specimen_no= %d\n", d_specimen_no);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   if (NODATAFOUND)
+   {
+     disp_message(ORA_MESG,"cross MASTER NO DATA FOUND....\n");
+     return 0;
+   }
+    disp_message(ORA_MESG,"Oracle error at fetch_Master_cross_cursor() occured....\n");
+    proc_exit();
+}
+
+
+
+/********** CLOSE MASTER TRANS CURSOR *********/
+void close_master_trans_cur()
+{
+  
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	 EXEC SQL CLOSE MASTER_TRANS_CURSOR ;
+
+	 return ;
+   
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+	 
+     disp_message(ORA_MESG,"Oracle error while Closing trans master cursor occured...\n");
+     proc_exit();
+
+}
+
+
+/********** CLOSE MASTER CROSS CURSOR *********/
+void close_master_cross_cur()
+{
+  
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	 EXEC SQL CLOSE MASTER_CROSS_CURSOR ;
+
+	 return ;
+   
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Closing trans master cursor occured...\n");
+     proc_exit();
+}
+
+/********* DECLARE DETAIL_CURSOR **********/
+  void dclr_detail_trans_cur()
+  {
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+ 
+ /*  EXEC SQL DECLARE DETAIL_TRANS_CURSOR CURSOR FOR 
+    SELECT unit_no,product_code,blood_group,rhesus_code,react_code FROM RL_ALLOC_UNIT_TRN 
+    WHERE PATIENT_ID = :nd_patient_id 
+    AND SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+    AND UPPER(nvl(UNIT_STATUS,'X')) = 'T';
+	*/
+
+
+	EXEC SQL DECLARE DETAIL_TRANS_CURSOR CURSOR FOR 
+    SELECT B.unit_no,B.product_code,A.blood_group,A.rhesus_code,B.reaction_code 
+	FROM BT_UNIT_REQUEST_HDR A , BT_UNIT_REQUEST_DTL B
+    WHERE A.PATIENT_ID=B.PATIENT_ID
+			AND A.SPECIMEN_NO=B.SPECIMEN_NO
+			AND A.PATIENT_ID = :nd_patient_id 
+			AND A.SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+			AND A.OPERATING_FACILITY_ID=B.OPERATING_FACILITY_ID
+			AND A.OPERATING_FACILITY_ID=:nd_operating_facility_id
+			AND UPPER(nvl(B.UNIT_STATUS,'X')) = 'T';
+
+
+#ifdef DEBUG
+    printf("leaving dclr_detail_cur()\n");
+    fflush(stdout);
+#endif
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_detail_trans_cur() occured....\n");
+   proc_exit();	
+  }
+
+/********* OPEN DETAIL CURSOR **********/
+   void open_detail_trans_cur()
+   {
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN DETAIL_TRANS_CURSOR;
+     return;
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Opening trans detail cursor occured...\n");
+     proc_exit();
+   }
+
+
+/********* FETCH DETAIL CURSOR **********/
+int fetch_detail_trans_cur()
+{
+
+  d_unit_no.arr[0]                                   = '\0';
+  d_unit_no.len                                      = 0;
+  d_product_code.arr[0]                              = '\0';
+  d_product_code.len                                 = 0;
+  d_blood_group.arr[0]				     = '\0';
+  d_blood_group.len            			     = 0;
+  d_rhesus_code.arr[0]                               = '\0';
+  d_rhesus_code.len                                  = 0;
+  d_react_code.arr[0]                                = '\0';
+  d_react_code.len                                   = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH detail_trans_cursor	
+	    INTO :d_unit_no,:d_product_code,
+		 :d_blood_group,:d_rhesus_code,:d_react_code;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_unit_no.arr[d_unit_no.len]				    	= '\0';
+  d_product_code.arr[d_product_code.len]			= '\0';
+  d_blood_group.arr[d_blood_group.len]				= '\0';
+  d_rhesus_code.arr[d_rhesus_code.len]                          = '\0';
+  d_react_code.arr[d_react_code.len]                            = '\0';
+
+  
+#ifdef DEBUG
+   printf("********* Details from BT_UNIT_REQUEST_HDR / DTL **************\n");
+   printf(" d_unit_no= %s\n", d_unit_no.arr);
+   printf(" d_product_code= %s\n", d_product_code.arr);
+   printf(" d_blood_group= %s\n", d_blood_group.arr);
+   printf(" d_rhesus_code= %s\n", d_rhesus_code.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   if (NODATAFOUND)
+     return 0;
+   disp_message(ORA_MESG,"Oracle error at fetch_Detail_trans_cursor() occured....\n");
+   proc_exit();
+}
+
+
+
+/********** CLOSE DETAIL CURSOR *********/
+void close_detail_trans_cur()
+{
+  
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	 EXEC SQL CLOSE DETAIL_TRANS_CURSOR ;
+
+	 return ;
+   
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Closing trans detail cursor occured...\n");
+     proc_exit();
+}
+
+/********* DECLARE DETAIL_CURSOR **********/
+  void dclr_detail_cross_cur()
+  {
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+ 
+ /*
+   EXEC SQL DECLARE DETAIL_CROSS_CURSOR CURSOR FOR 
+    SELECT unit_no,product_code,blood_group,rhesus_code,react_code FROM RL_ALLOC_UNIT_TRN 
+    WHERE PATIENT_ID = :nd_patient_id 
+    AND SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+    AND UPPER(nvl(CROSSMATCHED_YN,'X')) = 'Y';
+*/
+
+   EXEC SQL DECLARE DETAIL_CROSS_CURSOR CURSOR FOR 
+    SELECT B.unit_no,B.product_code,A.blood_group,A.rhesus_code,B.reaction_code 
+	FROM BT_UNIT_REQUEST_HDR A , BT_UNIT_REQUEST_DTL B
+    WHERE A.PATIENT_ID=B.PATIENT_ID
+			AND A.SPECIMEN_NO=B.SPECIMEN_NO
+			AND A.PATIENT_ID = :nd_patient_id 
+			AND A.SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+			AND A.OPERATING_FACILITY_ID=B.OPERATING_FACILITY_ID
+			AND A.OPERATING_FACILITY_ID=:nd_operating_facility_id
+			AND UPPER(nvl(CROSSMATCHED_YN,'X')) = 'Y';
+
+
+
+#ifdef DEBUG
+    printf("leaving dclr_detail_cur()\n");
+    fflush(stdout);
+#endif
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_detail_cross_cur() occured....\n");
+   proc_exit();	
+  }
+
+/********* OPEN DETAIL CROSS CURSOR **********/
+   void open_detail_cross_cur()
+   {
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN DETAIL_CROSS_CURSOR;
+     return;
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Opening trans detail cursor occured...\n");
+     proc_exit();
+   }
+
+
+/********* FETCH DETAIL CROSS CURSOR **********/
+int fetch_detail_cross_cur()
+{
+
+  d_unit_no.arr[0]                                   = '\0';
+  d_unit_no.len                                      = 0;
+  d_product_code.arr[0]                              = '\0';
+  d_product_code.len                                 = 0;
+  d_blood_group.arr[0]				     = '\0';
+  d_blood_group.len            			     = 0;
+  d_rhesus_code.arr[0]                               = '\0';
+  d_rhesus_code.len                                  = 0;
+  d_react_code.arr[0]                                = '\0';
+  d_react_code.len                                   = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH detail_cross_cursor	
+	    INTO :d_unit_no,
+			 :d_product_code,
+			 :d_blood_group,
+			 :d_rhesus_code,
+			 :d_react_code;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_unit_no.arr[d_unit_no.len]				    	= '\0';
+  d_product_code.arr[d_product_code.len]			= '\0';
+  d_blood_group.arr[d_blood_group.len]				= '\0';
+  d_rhesus_code.arr[d_rhesus_code.len]                          = '\0';
+  d_react_code.arr[d_react_code.len]                            = '\0';
+
+  
+#ifdef DEBUG
+   printf("********* Details from BT_UNIT_REQUEST_DTL / HDR**************\n");
+   printf(" d_unit_no= %s\n", d_unit_no.arr);
+   printf(" d_product_code= %s\n", d_product_code.arr);
+   printf(" d_blood_group= %s\n", d_blood_group.arr);
+   printf(" d_rhesus_code= %s\n", d_rhesus_code.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   if (NODATAFOUND)
+     return 0;
+   disp_message(ORA_MESG,"Oracle error at fetch_Detail_cross_cursor() occured....\n");
+   proc_exit();
+}
+
+
+
+/********** CLOSE DETAIL CURSOR *********/
+void close_detail_cross_cur()
+{
+  
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	 EXEC SQL CLOSE DETAIL_CROSS_CURSOR ;
+
+	 return ;
+   
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Closing cross detail cursor occured...\n");
+     proc_exit();
+}
+
+
+
+/********************************************************************/
+void get_prod_desc()
+{
+
+  d_short_desc.arr[0]                                ='\0';
+  d_short_desc.len                                   =0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL SELECT short_desc
+	     INTO :d_short_desc 
+	     FROM bt_product_mast
+	    WHERE product_code=:d_product_code;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+  {
+   strcpy(d_short_desc.arr," ");      
+   d_short_desc.arr[d_short_desc.len]			= '\0';
+   return;
+  }
+
+  d_short_desc.arr[d_short_desc.len]			= '\0';
+  return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+
+   if (NODATAFOUND)
+   {
+    strcpy(d_short_desc.arr," ");      
+    d_short_desc.arr[d_short_desc.len]			= '\0';
+    return;
+   }
+   disp_message(ORA_MESG,"Oracle error at fetch_Detail_cursor() occured....\n");
+   proc_exit();
+}
+
+
+/********************************************************************/
+void get_volume()
+{
+  d_volume_units.arr[0]                              ='\0';
+  d_volume_units.len                                 =0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL SELECT nvl(current_volume,0),nvl(volume_units,'ml') 
+	     INTO :d_volume,
+			  :d_volume_units
+	     FROM bt_blood_units_mast
+	    WHERE product_code=:d_product_code
+	      AND unit_no=:d_unit_no
+		  AND OPERATING_FACILITY_ID=:nd_operating_facility_id;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+  {
+   strcpy(d_volume_units.arr," ");      
+   d_volume_units.arr[d_volume_units.len]			= '\0';
+   return;
+  }
+
+  d_volume_units.arr[d_volume_units.len]			= '\0';
+  return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+
+  if (NODATAFOUND)
+  {
+   strcpy(d_volume_units.arr," ");      
+   d_volume_units.arr[d_volume_units.len]			= '\0';
+   return;
+  }
+
+   disp_message(ORA_MESG,"Oracle error at get_volume() occured....\n");
+   proc_exit();
+}
+
+
+/********************************************************************/
+void get_react_desc()
+{
+  d_short_description.arr[0]                         ='\0';
+  d_short_description.len                            =0;
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL SELECT short_desc 
+	     INTO :d_short_description 
+	     FROM bt_reaction_code_mast
+	    WHERE reaction_code=:d_react_code;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+  {
+   strcpy(d_short_description.arr," ");      
+   d_short_description.arr[d_short_description.len]    	= '\0';
+   return;
+  }
+
+  d_short_description.arr[d_short_description.len]    	= '\0';
+  return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+
+   if (NODATAFOUND)
+   {
+    strcpy(d_short_description.arr," ");      
+    d_short_description.arr[d_short_description.len]    	= '\0';
+    return;
+   }
+   disp_message(ORA_MESG,"Oracle error at fetch_Detail_cursor() occured....\n");
+   proc_exit();
+}
+
+/************ PREPARE NEW PAGE **************/
+void prepare_new_page(f1)
+FILE *f1;
+{
+   fprintf(f1,"");
+   line_no = 0;
+   page_no++ ;
+}
+
+
+void print_hdr()
+{
+ fprintf(f1,"\n");
+ fprintf(f1,"%s\n",sys_date.arr);
+ fprintf(f1,"%-9s\n",entity_name.arr);
+ fprintf(f1,"%-6s\n",l_title.arr);
+ fprintf(f1,"____________________________________");
+ fprintf(f1,"____________________________________");
+ fprintf(f1,"\n\n");
+ line_no = line_no + 6 ;
+}
+
+/********* GET SPECIMEN DETAILS **********/
+void get_specimen_dtls()
+  {
+    	
+        nd_specimen_date_time.arr[0] = '\0';
+        nd_specimen_date_time.len    =0;
+        nd_antibody_code.arr[0]  = '\0';
+        nd_antibody_code.len     = 0;
+	nd_anti_code2.arr[0]     = '\0';
+	nd_anti_code2.len        =  0;
+	nd_anti_code3.arr[0]     = '\0';
+	nd_anti_code3.len        =  0;
+	nd_anti_code4.arr[0]     = '\0';
+	nd_anti_code4.len        =  0;
+	nd_anti_code5.arr[0]     = '\0';
+	nd_anti_code5.len        =  0;
+    antibodies.arr[0]		 = '\0';
+    antibodies.len			 = 0;
+	
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL SELECT TO_CHAR(added_date,'DD/MM/YYYY HH24:MI'),antibody_code1,
+					antibody_code2,antibody_code3,antibody_code4,antibody_code5
+               INTO :nd_specimen_date_time,:nd_antibody_code,
+					:nd_anti_code2,:nd_anti_code3,:nd_anti_code4,:nd_anti_code5
+	       FROM BT_UNIT_REQUEST_HDR
+	      WHERE specimen_no= TO_NUMBER(:d_specimen_no)
+		  AND   OPERATING_FACILITY_ID=:nd_operating_facility_id;
+
+
+if (NODATAFOUND)
+    return ;
+
+
+if (nd_antibody_code.len>1)
+{
+strcpy(antibodies.arr,nd_antibody_code.arr);
+}
+
+if (nd_anti_code2.len>1)
+{
+strcat(antibodies.arr,",");
+strcat(antibodies.arr,nd_anti_code2.arr);
+}
+
+if (nd_anti_code3.len>1)
+{
+strcat(antibodies.arr,",");
+strcat(antibodies.arr,nd_anti_code3.arr);
+}
+
+if (nd_anti_code4.len>1)
+{
+strcat(antibodies.arr,",");
+strcat(antibodies.arr,nd_anti_code4.arr);
+}
+
+if (nd_anti_code5.len>1)
+{
+strcat(antibodies.arr,",");
+strcat(antibodies.arr,nd_anti_code5.arr);
+}
+
+        nd_specimen_date_time.arr[nd_specimen_date_time.len] = '\0';
+        nd_antibody_code.arr[nd_antibody_code.len]           = '\0';
+	    nd_anti_code2.arr[nd_anti_code2.len]                = '\0';
+	    nd_anti_code3.arr[nd_anti_code3.len]                 = '\0';
+	    nd_anti_code4.arr[nd_anti_code4.len]                = '\0';
+	    nd_anti_code5.arr[nd_anti_code5.len]                 = '\0';
+
+#ifdef DEBUG
+    printf("leaving get_specimen_dtls()\n");
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_specimen_dtls() occured....\n");
+   proc_exit();	
+}
+
+
+void print_specimen_dtls()
+{
+
+
+ fprintf(f1,"Specimen No :%s        ",d_specimen_no.arr);
+ fprintf(f1,"Date Time :%s",nd_specimen_date_time.arr);
+
+ fprintf(f1,"\n\tType  Of Antibodies\t:-\t%s\n", antibodies.arr);
+ fprintf(f1,"\tRequested Units\t\t:-\n");
+
+  do_category();
+}
+
+void print_unit_hdr(char t_c)
+{
+ char unit_type[13]; 
+if (t_c=='T')
+     strcpy(unit_type,"Transfused");
+ else
+    strcpy(unit_type,"Crossmatched");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"\nUNIT NO         PRODUCT    VOLUME  BLOOD  RHESUS  %s  REACTION\n",unit_type);
+ fprintf(f1,"                                   GROUP");
+ fprintf(f1,"\n");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"\n");
+line_no=line_no + 4;
+}
+
+void print_detail_record(char t_c) 
+{
+ char unit_type[13]; 
+if (t_c=='T')
+
+     strcpy(unit_type,"TRANSFUSED");
+ else
+    strcpy(unit_type,"CROSSMATCHED");
+
+
+// fprintf(f1,"%-16s%-11s%d%-4s   %-3s  %-8s%s  %-16s",d_unit_no.arr,
+//				d_short_desc.arr,d_volume,d_volume_units.arr,d_blood_group.arr,d_rhesus_code.arr,unit_type,d_short_description.arr);
+
+fprintf(f1,"%-16s",d_unit_no.arr);
+fprintf(f1,"%-11s",d_short_desc.arr);
+fprintf(f1,"%d",d_volume);
+fprintf(f1,"%-4s",d_volume_units.arr);
+fprintf(f1,"%-3s",d_blood_group.arr);
+fprintf(f1,"%-8s",d_rhesus_code.arr);
+fprintf(f1,"%d",unit_type);
+fprintf(f1,"%-16s",d_short_description.arr);
+
+ fprintf(f1,"\n") ;
+ line_no++ ;
+}
+
+/********* DECLARE CATEGORY_CURSOR **********/
+
+  void dclr_category_cur()
+  {
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  
+  /*
+  EXEC SQL DECLARE CATEGORY_CURSOR CURSOR FOR
+          SELECT category_code,category_requested
+		  FROM BT_UNIT_REQUEST_CATEGORY A
+          WHERE A.specimen_no IN(SELECT specimen_no FROM BT_UNIT_REQUEST_HDR
+                             WHERE specimen_no = A.specimen_no
+							 AND   OPERATING_FACILITY_ID=:nd_operating_facility_id)
+		  AND A.OPERATING_FACILITY_ID=:nd_operating_facility_id					 ;
+*/
+
+  EXEC SQL DECLARE CATEGORY_CURSOR CURSOR FOR
+          SELECT category_code,category_requested
+		  FROM BT_UNIT_REQUEST_CATEGORY A
+          WHERE A.specimen_no = TO_NUMBER(:d_specimen_no)
+		  AND A.OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+#ifdef DEBUG
+    printf("leaving category_cur()\n");
+    fflush(stdout);
+#endif
+   
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_category_cur() occured....\n");
+   proc_exit();	
+}
+
+
+/********* OPEN CATEGORY CURSOR **********/
+ void open_category_cur()
+  {
+     EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN CATEGORY_CURSOR;
+
+     return;
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Opening category cursor occured...\n");
+     proc_exit();
+  }
+
+/********* FETCH CATEGORY CURSOR **********/
+int fetch_category_cur()
+{
+
+  d_category_code.arr[0]  = '\0';
+  d_category_code.len		= 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+  EXEC SQL FETCH CATEGORY_CURSOR	
+            INTO :d_category_code,
+				 :d_category_requested;
+
+  d_category_code.arr[d_category_code.len]	= '\0';
+
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+{
+    return 0;
+}
+
+  return 1;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_Detail_cross_cursor() occured....\n");
+   proc_exit();
+
+}
+
+/********** CLOSE CATEGORY CURSOR *********/
+void close_category_cur()
+{
+  
+	 EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	 EXEC SQL CLOSE CATEGORY_CURSOR ;
+
+	 return ;
+   
+   err_exit:
+     EXEC SQL WHENEVER SQLERROR CONTINUE;
+     EXEC SQL ROLLBACK WORK RELEASE;
+     disp_message(ORA_MESG,"Oracle error while Closing category cursor occured...\n");
+     proc_exit();
+}
+/************* DO CATEGORY *******************/
+
+do_category()
+{
+
+  int still_category_exist=0;
+
+  dclr_category_cur();
+  open_category_cur();
+
+  still_category_exist = fetch_category_cur();
+  while (still_category_exist==1)
+  {
+    if (line_no>=MAX_LINES) 
+      {
+	      line_no=0;
+		 //fprintf(f1,"");
+	     fprintf(f1,"\f");
+  		  page_no++;
+		  print_hdr();
+      }
+ 
+       print_category_dtls();
+
+  
+       still_category_exist=fetch_category_cur();
+  } 
+ close_category_cur();
+ 	  
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"------------------------------------");
+ fprintf(f1,"\n");
+ line_no = line_no + 1;
+
+}
+
+
+print_category_dtls()
+{
+ 
+ fprintf(f1,"%-4.4s",d_category_code.arr);
+ fprintf(f1,"  :-  %d\n",d_category_requested);
+ line_no++;
+}
+

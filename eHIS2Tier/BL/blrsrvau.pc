@@ -1,0 +1,831 @@
+     
+/************************************************************************/
+/* CSS MEDICOM VER 2.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRSRVAU.PC                                  */
+/* AUTHOR                : V.SRIKANTH                                   */
+/* DATE WRITTEN          : 21/03/1999                                   */
+/*                                                                      */
+/* FUNCTION              : AUDIT TRAIL FOR BILLING SERVICES             */
+/*                                                                      */
+/* TABLE DETAILS         : BL_BLNG_SERV_AUDIT_DTLS                      */
+/*                         SY_ACC_ENTITY                                */
+/*                         SY_PROG_PARAM                                */
+/*                                                                      */
+/*                                                                      */
+/* FUNCTIONS             : decl_curs()                                  */    
+/*						   do_report()							        */
+/*						   fetch_prt_grp_desc()						    */
+/*						   fetch_bl_blng_audit()						*/
+/*						   put_hdr()						            */
+/*						   put_rec() 								    */
+/*						   chk_break()						            */
+/*						   put_inp_parm()							    */
+/*						   print_end_of_rep()						    */	
+/*						   del_parm()						            */
+/*						   print_formated()						        */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+      
+/*
+#define DEBUG
+*/
+        
+#include <stdio.h>
+#include <string.h>
+#include <bl.h>
+#define  INIT_MESG "Report Generation In Progress"
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd				[41],
+  	        d_session_id		[16],
+	        d_pgm_date			[14],
+	        rep_date			[20],
+	        comp_name			[50],
+			d_facility_id		[10],
+	        oper_id				[21];
+
+    VARCHAR trx_date_fm			[17],
+			trx_date_to			[17],
+			trx_blsrv_fm		[11],
+			trx_blsrv_to		[11],
+			trx_usrid_fm		[21],
+			trx_usrid_to		[21],
+			trx_report_ord		[2],
+			trx_report_opt		[2];
+    
+	VARCHAR d_blng_serv_code				[11],
+            d_long_desc						[41],
+			d_short_desc					[15],
+			d_loc_lang_long_desc			[31],
+	     	d_loc_lang_short_desc			[17],
+			d_serv_grp_code					[3],
+   			d_serv_clasfn_code				[4],
+			d_prt_grp_hdr_code				[3],
+   			d_prt_grp_line_code				[3],
+			d_src_mod_dept_flag				[2],
+   			d_dept_code						[7],
+			d_drfee_flag					[2],
+			d_dir_ent_flag					[2],
+			d_src_mod_rate_flag				[2],
+			d_rate_chg_flag					[2],
+			d_def_bill_type_code			[3],
+			d_serv_locn_code				[5],
+			d_serv_anal_grp1				[7],
+			d_serv_anal_grp2				[7],
+			d_price_rev_date				[11],
+			d_added_by_id					[21],
+			d_modified_by_id				[21],
+			d_added_date					[11],
+			d_modified_date					[11],
+			d_status						[2],
+			d_phys_cat_code					[14],
+			d_misc_serv						[2],
+			d_nurse_serv					[2],
+			d_trx_date_time					[20],
+			d_trx_user_id					[21],
+			d_trx_type						[14],
+			d_trx_remarks					[31],
+			d_prt_grp_desc					[16],
+			d_curs							[3000];
+
+
+    double  d_ip_rate,
+			d_op_rate,
+			d_rf_rate,
+			d_min_chg_amt,
+			d_base_qty,
+			d_serv_old_ip_rate,
+			d_serv_old_op_rate,
+			d_serv_old_rf_rate,
+			d_old_min_chg_amt,
+			d_def_chg;
+
+	char	filename						[150];
+    char	string_var						[150];
+	char	l_mesg							[150];
+
+	int cnt,rec_cnt,brk,g_hdr_cnt;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *f1;
+
+int		page_no,
+		lno,
+		g_hdr_cnt;
+	
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+    if(argc < 5) 
+	{
+		disp_message(ERR_MESG,"Usage BLRSRVAU userid/password session_id pgm_date facility_id \n");
+		proc_exit();
+    }
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    strcpy(g_pgm_id,"BLRSRVAU");
+    strcpy(g_pgm_date,argv[3]);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+	set_meduser_role();
+
+    if(OERROR) 
+	{
+		disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		proc_exit();
+    }
+
+    start_prog_msg();
+
+    trx_date_fm.arr [0]			        = '\0';
+    trx_date_to.arr [0]		            = '\0';
+    trx_blsrv_fm.arr[0]				    = '\0';
+	trx_blsrv_to.arr[0]				    = '\0';
+    trx_usrid_fm.arr[0]				    = '\0';    
+    trx_usrid_to.arr[0]				    = '\0';    
+	trx_report_opt.arr[0]				= '\0';
+	trx_report_ord.arr[0]				= '\0';
+	
+	trx_date_fm.len						= 0;
+    trx_date_to.len						= 0;
+    trx_blsrv_fm.len			        = 0;
+	trx_blsrv_to.len			        = 0;
+    trx_usrid_fm.len			        = 0;
+    trx_usrid_to.len			        = 0;
+	trx_report_opt.len					= 0;
+	trx_report_ord.len					= 0;
+
+	//sprintf(l_mesg,"Session Id %s   Pgm Date  %s  ",d_session_id.arr,d_pgm_date.arr);
+	//disp_message(ERR_MESG,l_mesg);
+
+	EXEC SQL SELECT PARAM1,
+					PARAM2, 
+					PARAM3, 
+					PARAM4, 
+					PARAM5, 
+					PARAM6, 
+					PARAM7,
+					PARAM8,
+					operating_facility_id
+		 INTO	   :trx_date_fm,
+				   :trx_date_to,
+				   :trx_blsrv_fm,
+				   :trx_blsrv_to,
+				   :trx_usrid_fm,
+				   :trx_usrid_to,
+				   :trx_report_ord,
+				   :trx_report_opt,
+				   :d_facility_id
+		 FROM   SY_PROG_PARAM
+		 WHERE  PGM_ID     = 'BLRSRVAU'
+		 AND    PGM_DATE   = :d_pgm_date
+		 AND    SESSION_ID = :d_session_id;
+
+    if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    trx_date_fm.arr[trx_date_fm.len]				= '\0';
+	trx_date_to.arr[trx_date_to.len]				= '\0';
+	trx_blsrv_fm.arr[trx_blsrv_fm.len]				= '\0';
+	trx_blsrv_to.arr[trx_blsrv_to.len]				= '\0';
+	trx_usrid_fm.arr[trx_usrid_fm.len]				= '\0';
+	trx_usrid_to.arr[trx_usrid_to.len]				= '\0';
+	trx_report_ord.arr[trx_report_ord.len]			= '\0';
+	trx_report_opt.arr[trx_report_opt.len]			= '\0';
+	
+	d_facility_id.arr[d_facility_id.len]			= '\0';
+	strcpy(g_facility_id, d_facility_id.arr);
+
+   
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrsrvau.lis");
+
+    if( (f1=fopen(filename,"w")) == NULL) 
+	{
+		disp_message(ERR_MESG,"Error in opening output file...\n");
+		proc_exit();
+    }
+
+
+	//sprintf(l_mesg,"Facility id    %s ",d_facility_id.arr);
+	//disp_message(ERR_MESG,l_mesg);
+
+
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+					TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+					USER 
+	     INTO		:comp_name,
+					:rep_date,
+					:oper_id
+	     FROM		SY_ACC_ENTITY
+		WHERE		acc_entity_id = :d_facility_id;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr [rep_date.len]  = '\0';
+    oper_id.arr  [oper_id.len]	 = '\0';
+
+	//sprintf(l_mesg,"Co Name %s  Rep Date %s  Oper Id %s ",comp_name.arr,rep_date.arr,oper_id.arr);
+	//disp_message(ERR_MESG,l_mesg);
+
+    page_no=1;
+    lno=1;
+
+    decl_curs();
+    put_inp_parm();
+    do_report();
+
+    fclose(f1);
+    del_parm();
+    end_prog_msg();
+    EXEC SQL COMMIT RELEASE;
+
+    return;
+}
+
+del_parm()
+{
+    EXEC SQL DELETE SY_PROG_PARAM
+	 WHERE  PGM_ID     = 'BLRSRVAU' 
+	 AND    PGM_DATE   = :d_pgm_date
+	 AND    SESSION_ID = :d_session_id;
+
+    if(OERROR) 
+	err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+}
+
+
+decl_curs()
+{
+
+strcpy(d_curs.arr,"SELECT  BLNG_SERV_CODE,LONG_DESC,SHORT_DESC, \
+LOC_LANG_LONG_DESC, \
+LOC_LANG_SHORT_DESC, \
+SERV_GRP_CODE, \
+SERV_CLASSIFICATION_CODE, \
+PRT_GRP_HDR_CODE, \
+PRT_GRP_LINE_CODE, \
+SOURCE_MODULE_DEPT_FLAG,\
+DEPT_CODE, \
+DR_FEE_FLAG,DIR_ENTRY_FLAG,	SOURCE_MODULE_RATE_FLAG, \
+RATE_ENTRY_BY_USER_FLAG,DEF_CHARGE,	DEF_REF_BILL_TYPE_CODE,	IP_RATE, \
+OP_RATE,REF_RATE,MIN_CHARGE_AMT,BASE_QTY,SERV_LOCN_CODE, \
+SERV_ANAL_GRP1,	SERV_ANAL_GRP2,	OLD_IP_RATE,OLD_OP_RATE, \
+OLD_REF_RATE,OLD_MIN_CHARGE_AMT,PRICE_REVISED_DATE,	ADDED_BY_ID, \
+MODIFIED_BY_ID,	TO_CHAR(ADDED_DATE,'DD/MM/YYYY'), \
+TO_CHAR(MODIFIED_DATE,'DD/MM/YYYY'),STATUS, \
+DECODE(PHYS_CAT_CODE,'A','ASSOCIATE','R','RESIDENT'), \
+MISC_SERV_YN,NURSING_SERV_YN, \
+TO_CHAR(TRX_DATE_TIME,'DD/MM/YYYY HH24:MI:SS'),	TRX_USER_ID, \
+DECODE(TRX_TYPE,'C','CREATED','M','MODIFIED'),	TRX_REMARKS \
+FROM		BL_BLNG_SERV_AUDIT_DTLS \
+WHERE		BLNG_SERV_CODE BETWEEN :trx_blsrv_fm and :trx_blsrv_to AND \
+TRX_DATE_TIME  BETWEEN TO_DATE(:trx_date_fm,'DD/MM/YYYY HH24:MI') and \
+TO_DATE(:trx_date_to,'DD/MM/YYYY HH24:MI') AND \
+TRX_USER_ID    BETWEEN :trx_usrid_fm and  :trx_usrid_to ");
+
+if ((trx_report_opt.arr[0] == 'C') || (trx_report_opt.arr[0] == 'M'))
+	strcat (d_curs.arr," AND TRX_TYPE  = :trx_report_opt ");
+
+if (trx_report_ord.arr[0] == 'S')
+	strcat(d_curs.arr," ORDER BY BLNG_SERV_CODE ");
+else
+	strcat(d_curs.arr," ORDER BY TRX_DATE_TIME ");
+
+d_curs.len = strlen(d_curs.arr);
+
+EXEC SQL PREPARE TRANS_LIST FROM :d_curs;
+
+if(OERROR)
+	err_mesg("PREPARE failed on TRANS_LIST",0,"");
+
+EXEC SQL DECLARE TRANS_LIST_CUR CURSOR FOR TRANS_LIST;
+
+if(OERROR)
+	err_mesg("DECLARE failed on TRANS_LIST_CUR",0,"");
+
+
+EXEC SQL DECLARE BL_PRT_GRP_DESC_CUR CURSOR FOR
+			   SELECT   SHORT_DESC   
+			   FROM     BL_BLNG_PRT_GRP_LINE
+			   WHERE    PRT_GRP_HDR_CODE = :d_prt_grp_hdr_code AND
+			            PRT_GRP_LINE_CODE = :d_prt_grp_line_code;
+
+if ((trx_report_opt.arr[0] == 'C') || (trx_report_opt.arr[0] == 'M'))
+{
+
+EXEC SQL OPEN TRANS_LIST_CUR USING
+                 :trx_blsrv_fm,
+				 :trx_blsrv_to,
+	             :trx_date_fm,
+                 :trx_date_to,
+                 :trx_usrid_fm,
+                 :trx_usrid_to,
+                 :trx_report_opt;
+}
+else
+{
+EXEC SQL OPEN TRANS_LIST_CUR USING
+                 :trx_blsrv_fm,
+				 :trx_blsrv_to,
+	             :trx_date_fm,
+                 :trx_date_to,
+                 :trx_usrid_fm,
+                 :trx_usrid_to;
+}
+
+if(OERROR)
+	err_mesg("OPEN failed on cursor TRANS_LIST_CUR",0,"");
+
+}
+
+
+do_report()
+{
+    
+    char s_amt[20];
+    lno = 0;
+	g_hdr_cnt = 0;
+	cnt = 0;
+	rec_cnt = 0;
+		
+    while(fetch_bl_blng_audit()) 
+	{
+		if (!g_hdr_cnt)
+		{
+			put_hdr();
+			g_hdr_cnt = 1;
+		}
+		cnt = 1;
+		fetch_prt_grp_desc();		
+		put_rec();
+/*-- Record counter is added to display the No of records picked after
+     report execution VSK 02/05/1999 */
+		rec_cnt++;
+		chk_break(1);
+	}
+	print_end_of_rep();
+}
+
+
+fetch_prt_grp_desc()
+{
+
+    EXEC SQL OPEN BL_PRT_GRP_DESC_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor BL_PRT_GRP_DESC_CUR",0,"");
+
+    d_prt_grp_desc.arr[0]  = '\0';
+    d_prt_grp_desc.len     = 0;
+
+    EXEC SQL FETCH BL_PRT_GRP_DESC_CUR
+	     INTO  :d_prt_grp_desc ;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor BL_PRT_GRP_DESC_CUR",0,"");
+
+    d_prt_grp_desc.arr[d_prt_grp_desc.len]  = '\0';
+
+
+}
+
+
+fetch_bl_blng_audit()
+{
+	d_blng_serv_code.arr[0]				=	'\0';
+    d_long_desc.arr[0]					=	'\0';
+	d_short_desc.arr[0]					=	'\0';
+	d_loc_lang_long_desc.arr[0]			=	'\0';
+	d_loc_lang_short_desc.arr[0]		=	'\0';
+	d_serv_grp_code.arr[0]				=	'\0';
+   	d_serv_clasfn_code.arr[0]			=	'\0';
+	d_prt_grp_hdr_code.arr[0]			=	'\0';
+   	d_prt_grp_line_code.arr[0]			=	'\0';
+	d_src_mod_dept_flag.arr[0]			=	'\0';
+   	d_dept_code.arr[0]					=	'\0';
+	d_drfee_flag.arr[0]					=	'\0';
+	d_dir_ent_flag.arr[0]				=	'\0';
+	d_src_mod_rate_flag.arr[0]			=	'\0';
+	d_rate_chg_flag.arr[0]				=	'\0';
+	d_def_bill_type_code.arr[0]			=	'\0';
+	d_serv_locn_code.arr[0]				=	'\0';
+	d_serv_anal_grp1.arr[0]				=	'\0';
+	d_serv_anal_grp2.arr[0]				=	'\0';
+	d_price_rev_date.arr[0]				=	'\0';
+	d_added_by_id.arr[0]				=	'\0';
+	d_modified_by_id.arr[0]				=	'\0';
+	d_added_date.arr[0]					=	'\0';
+	d_modified_date.arr[0]				=	'\0';
+	d_status.arr[0]						=	'\0';
+	d_phys_cat_code.arr[0]				=	'\0';
+	d_misc_serv.arr[0]					=	'\0';
+	d_nurse_serv.arr[0]					=	'\0';
+	d_trx_date_time.arr[0]				=	'\0';
+	d_trx_user_id.arr[0]				=	'\0';
+	d_trx_type.arr[0]					=	'\0';
+	d_trx_remarks.arr[0]				=	'\0';
+
+	d_blng_serv_code.len				=	0;
+    d_long_desc.len						=	0;
+	d_short_desc.len					=	0;
+	d_loc_lang_long_desc.len			=	0;
+	d_loc_lang_short_desc.len			=	0;
+	d_serv_grp_code.len					=	0;
+   	d_serv_clasfn_code.len				=	0;
+	d_prt_grp_hdr_code.len				=	0;
+   	d_prt_grp_line_code.len				=	0;
+	d_src_mod_dept_flag.len				=	0;
+   	d_dept_code.len						=	0;
+	d_drfee_flag.len					=	0;
+	d_dir_ent_flag.len					=	0;
+	d_src_mod_rate_flag.len				=	0;
+	d_rate_chg_flag.len					=	0;
+	d_def_bill_type_code.len			=	0;
+	d_serv_locn_code.len				=	0;
+	d_serv_anal_grp1.len				=	0;
+	d_serv_anal_grp2.len				=	0;
+	d_price_rev_date.len				=	0;
+	d_added_by_id.len					=	0;
+	d_modified_by_id.len				=	0;
+	d_added_date.len					=	0;
+	d_modified_date.len					=	0;
+	d_status.len						=	0;
+	d_phys_cat_code.len					=	0;
+	d_misc_serv.len						=	0;
+	d_nurse_serv.len					=	0;
+	d_trx_date_time.len					=	0;
+	d_trx_user_id.len					=	0;
+	d_trx_type.len						=	0;
+	d_trx_remarks.len					=	0;
+
+    d_ip_rate							=	0;
+	d_op_rate							=	0;
+	d_rf_rate							=	0;
+	d_min_chg_amt						=	0;
+	d_base_qty							=	0;
+    d_serv_old_ip_rate					=	0;
+	d_serv_old_op_rate					=	0;
+	d_serv_old_rf_rate					=	0;
+	d_old_min_chg_amt					=	0;
+	d_def_chg							=	0;
+
+
+         EXEC SQL FETCH TRANS_LIST_CUR
+	          INTO  :d_blng_serv_code,
+					:d_long_desc,
+					:d_short_desc,
+					:d_loc_lang_long_desc,
+					:d_loc_lang_short_desc,
+					:d_serv_grp_code,
+					:d_serv_clasfn_code,
+					:d_prt_grp_hdr_code,
+					:d_prt_grp_line_code,
+					:d_src_mod_dept_flag,
+					:d_dept_code,
+					:d_drfee_flag,
+					:d_dir_ent_flag,
+					:d_src_mod_rate_flag,
+					:d_rate_chg_flag,
+					:d_def_chg,
+					:d_def_bill_type_code,   
+					:d_ip_rate,
+					:d_op_rate,
+					:d_rf_rate,
+					:d_min_chg_amt,
+					:d_base_qty,
+					:d_serv_locn_code,
+					:d_serv_anal_grp1,
+					:d_serv_anal_grp2,
+					:d_serv_old_ip_rate,
+					:d_serv_old_op_rate,
+					:d_serv_old_rf_rate,
+					:d_old_min_chg_amt,
+					:d_price_rev_date,
+					:d_added_by_id,
+					:d_modified_by_id,
+					:d_added_date,
+					:d_modified_date,
+					:d_status,
+					:d_phys_cat_code,
+					:d_misc_serv,
+					:d_nurse_serv,
+					:d_trx_date_time,
+					:d_trx_user_id,
+					:d_trx_type,
+					:d_trx_remarks;
+
+    if(OERROR)
+		err_mesg("FETCH failed on cursor BL_BLNG_SERV_AUDIT_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+		return 0;
+
+	d_blng_serv_code.arr[d_blng_serv_code.len]				=	'\0';
+    d_long_desc.arr[d_long_desc.len]						=	'\0';
+	d_short_desc.arr[d_short_desc.len]						=	'\0';
+	d_loc_lang_long_desc.arr[d_loc_lang_long_desc.len]		=	'\0';
+	d_loc_lang_short_desc.arr[d_loc_lang_short_desc.len]	=	'\0';
+	d_serv_grp_code.arr[d_serv_grp_code.len]				=	'\0';
+   	d_serv_clasfn_code.arr[d_serv_clasfn_code.len]			=	'\0';
+	d_prt_grp_hdr_code.arr[d_prt_grp_hdr_code.len]			=	'\0';
+   	d_prt_grp_line_code.arr[d_prt_grp_line_code.len]		=	'\0';
+	d_src_mod_dept_flag.arr[d_src_mod_dept_flag.len]		=	'\0';
+   	d_dept_code.arr[d_dept_code.len]						=	'\0';
+	d_drfee_flag.arr[d_drfee_flag.len]						=	'\0';
+	d_dir_ent_flag.arr[d_dir_ent_flag.len]					=	'\0';
+	d_src_mod_rate_flag.arr[d_src_mod_rate_flag.len]		=	'\0';
+	d_rate_chg_flag.arr[d_rate_chg_flag.len]				=	'\0';
+	d_def_bill_type_code.arr[d_def_bill_type_code.len]		=	'\0';
+	d_serv_locn_code.arr[d_serv_locn_code.len]				=	'\0';
+	d_serv_anal_grp1.arr[d_serv_anal_grp1.len]				=	'\0';
+	d_serv_anal_grp2.arr[d_serv_anal_grp2.len]				=	'\0';
+	d_price_rev_date.arr[d_price_rev_date.len]				=	'\0';
+	d_added_by_id.arr[d_added_by_id.len]					=	'\0';
+	d_modified_by_id.arr[d_modified_by_id.len]				=	'\0';
+	d_added_date.arr[d_added_date.len]						=	'\0';
+	d_modified_date.arr[d_modified_date.len]				=	'\0';
+	d_status.arr[d_status.len]								=	'\0';
+	d_phys_cat_code.arr[d_phys_cat_code.len]				=	'\0';
+	d_misc_serv.arr[d_misc_serv.len]						=	'\0';
+	d_nurse_serv.arr[d_nurse_serv.len]						=	'\0';
+	d_trx_date_time.arr[d_trx_date_time.len]				=	'\0';
+	d_trx_user_id.arr[d_trx_user_id.len]					=	'\0';
+	d_trx_type.arr[d_trx_type.len]							=	'\0';
+	d_trx_remarks.arr[d_trx_remarks.len]					=	'\0';
+
+    return 1;
+
+}
+
+
+put_hdr()
+{
+    fprintf(f1,"MDL : BL        %30s%30s%22s                %s\n"," ",comp_name.arr," ",rep_date.arr);
+    fprintf(f1,"OPR : %s\n",oper_id.arr);
+    fprintf(f1,"REP : BLRSRVAU                                   AUDIT TRAIL FOR BILLING SERVICE                                       PAGE : %4d\n",page_no);
+    fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f1,"\n");
+    lno=6;
+
+}
+
+put_rec() 
+{
+    char s_amt[20];
+
+//  First Line Details    
+	fprintf(f1,"Billing Serv.  : ");
+	fprintf(f1,"%-10s  %-15s",d_blng_serv_code.arr,d_short_desc.arr);
+	fprintf(f1,"                        Rates             New           Old    Direct Entry     : ");
+	fprintf(f1,"%s",d_dir_ent_flag.arr);
+	fprintf(f1,"\n");
+
+//  Second Line Details
+	fprintf(f1,"Long Desc      : ");
+	fprintf(f1,"%-40s",d_long_desc.arr);
+	fprintf(f1,"          IP  : ");
+	put_val(s_amt,d_ip_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"  ");
+	put_val(s_amt,d_serv_old_ip_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"    Rate Fm Source   : ");
+	fprintf(f1,"%s",d_src_mod_rate_flag.arr);
+	fprintf(f1,"\n");
+
+//  Third Line Details
+	fprintf(f1,"Long Desc(Loc) : ");
+	fprintf(f1,"%30s",d_loc_lang_long_desc.arr);
+	fprintf(f1,"                    OP  : ");
+	put_val(s_amt,d_op_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"  ");
+	put_val(s_amt,d_serv_old_op_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"    Rate/Charge      : ");
+	fprintf(f1,"%s",d_rate_chg_flag.arr);
+	fprintf(f1,"\n");
+
+//  Forth Line Details
+	fprintf(f1,"Short Desc(Loc): ");
+	fprintf(f1,"%16s",d_loc_lang_short_desc.arr);
+	fprintf(f1,"                                  RF  : ");
+	put_val(s_amt,d_rf_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"  ");
+	put_val(s_amt,d_serv_old_rf_rate);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"    Doctor Fees      : ");
+	fprintf(f1,"%s",d_drfee_flag.arr);
+	fprintf(f1,"\n");
+
+//  Fifth Line Details
+	fprintf(f1,"Base Qty       : ");
+	put_val(s_amt,d_base_qty);
+    format_amt(s_amt);
+	fprintf(f1,"%-12s",s_amt);
+	fprintf(f1,"     Dflt Chg: ");
+	put_val(s_amt,d_def_chg);
+    format_amt(s_amt);
+	fprintf(f1,"%-12s",s_amt);
+	fprintf(f1,"     Min.Chrg  : ");
+	put_val(s_amt,d_min_chg_amt);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"  ");
+	put_val(s_amt,d_old_min_chg_amt);
+    format_amt(s_amt);
+	fprintf(f1,"%12s",s_amt);
+	fprintf(f1,"    Misc. Service    : ");
+	fprintf(f1,"%s",d_misc_serv.arr);
+	fprintf(f1,"\n");
+
+//  Sixth Line Details
+	fprintf(f1,"Serv.Grp/Clasfn: ");
+	fprintf(f1,"%2s/%3s",d_serv_grp_code.arr,d_serv_clasfn_code.arr);
+	fprintf(f1,"   Ref Bill Type Cd: ");
+	fprintf(f1,"%2s",d_def_bill_type_code.arr);
+	fprintf(f1,"    Service Loc.Cd/Anal1/Anal2 : ");
+	fprintf(f1,"%4s/%6s/%6s",d_serv_locn_code.arr,d_serv_anal_grp1.arr,d_serv_anal_grp2.arr);
+	fprintf(f1,"      Nursing Service  : ");
+	fprintf(f1,"%s",d_nurse_serv.arr);
+	fprintf(f1,"\n");
+
+//  Seventh Line Details
+	fprintf(f1,"A/C Dept Fm.Src: ");
+	fprintf(f1,"%s",d_src_mod_dept_flag.arr);
+	fprintf(f1,"           A/C Dept Code: ");
+	fprintf(f1,"%-6s",d_dept_code.arr);
+	fprintf(f1,"           Print Group/Line: ");
+	fprintf(f1,"%2s/%2s/%-15s",d_prt_grp_hdr_code.arr,d_prt_grp_line_code.arr,d_prt_grp_desc.arr);
+	fprintf(f1,"   Status           : ");
+	fprintf(f1,"%s",d_status.arr);
+	fprintf(f1,"\n");
+
+//  Eighth Line Details
+	fprintf(f1,"Price Rev.Date : ");
+	fprintf(f1,"%-10s",d_price_rev_date.arr);
+	fprintf(f1,"  Added Id/Date: ");
+	fprintf(f1,"%-20s / %-10s",d_added_by_id.arr,d_added_date.arr);
+	fprintf(f1,"  Modified Id/Date : ");
+	fprintf(f1,"%-20s / %-10s",d_modified_by_id.arr,d_modified_date.arr);
+	fprintf(f1,"\n");
+
+//  Nineth Line Details
+	fprintf(f1,"Trx.Date.Time  : ");
+	fprintf(f1,"%-20s",d_trx_date_time.arr);
+	fprintf(f1," User: ");
+	fprintf(f1,"%-20s",d_trx_user_id.arr);
+	fprintf(f1,"           Trx. Type : ");
+	fprintf(f1,"%-12s",d_trx_type.arr);
+	fprintf(f1,"\n");
+
+//  Tenth Line Details
+	fprintf(f1,"Remarks        : ");
+	fprintf(f1,"%-30s",d_trx_remarks.arr);
+	fprintf(f1,"                          Phys.Cat.Cd : ");
+	fprintf(f1,"%-12s",d_phys_cat_code.arr);
+	fprintf(f1,"\n\n");
+
+	lno +=11;
+
+}
+
+
+chk_break(nol)
+int nol;
+{
+	if(lno+nol >= 55) 
+	{
+	   fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------\n");
+	   fprintf(f1,"");
+	   lno = 1;
+	   ++page_no;
+	   put_hdr();
+	}
+}
+
+put_inp_parm()
+{
+    fprintf(f1,"MDL : BL        %30s%30s%22s                %s\n"," ",comp_name.arr," ",rep_date.arr);
+    fprintf(f1,"OPR : %s\n",oper_id.arr);
+    fprintf(f1,"REP : BLRSRVAU                                   AUDIT TRAIL FOR BILLING SERVICE                                       PAGE : %4d\n",page_no);
+    fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f1,"\n");
+    fprintf(f1,"VER : 4.1\n");
+    fprintf(f1,"\n\n\n\n");
+    fprintf(f1,"\tINPUT PARAMETERS\n");
+    fprintf(f1,"\t----------------\n\n");
+	
+	if (trx_blsrv_fm.arr[0] == '!') 
+	    fprintf(f1,"\t\tBILLING SERVICES      FROM : LOWEST\n");
+	else
+		fprintf(f1,"\t\tBILLING SERVICES      FROM : %s\n",trx_blsrv_fm.arr);
+
+	if (trx_blsrv_to.arr[0] == '~') 
+		fprintf(f1,"\t\t                        TO : HIGHEST\n\n");
+	else
+		fprintf(f1,"\t\t                        TO : %s\n\n",trx_blsrv_to.arr);
+
+    fprintf(f1,"\t\tTRANSACTION DATE      FROM : %s\n",trx_date_fm.arr);
+    fprintf(f1,"\t\t                        TO : %s\n\n",trx_date_to.arr);
+
+	if (trx_usrid_fm.arr[0] == '!') 
+		fprintf(f1,"\t\tUSER ID               FROM : LOWEST\n");
+	else
+		fprintf(f1,"\t\tUSER ID               FROM : %s\n",trx_usrid_fm.arr);
+    
+	if (trx_usrid_to.arr[0] == '~') 
+		fprintf(f1,"\t\t                        TO : HIGHEST\n\n");
+	else
+		fprintf(f1,"\t\t                        TO : %s\n\n",trx_usrid_to.arr);
+	
+	if (trx_report_ord.arr[0] == 'S')
+        fprintf(f1,"\t\tREPORT ORDER               : Billing Service\n\n");
+	else
+	    fprintf(f1,"\t\tREPORT ORDER               : Transaction Date\n\n");
+	
+	if (trx_report_opt.arr[0] == 'C')
+        fprintf(f1,"\t\tREPORT OPTION              : New Records    \n\n");
+	else if (trx_report_opt.arr[0] == 'M')
+	    fprintf(f1,"\t\tREPORT OPTION              : Modified Records\n\n");
+	else
+	    fprintf(f1,"\t\tREPORT OPTION              : All Records     \n\n");
+    
+	fprintf(f1,"");
+    ++page_no;
+
+}
+
+
+print_end_of_rep()
+{
+
+/*-- No of records printed after the report VSK 02/05/1999*/
+
+	if (cnt == 1)
+	{
+	 fprintf(f1,"----------------------------------------------------------------------------------------------------------------------------------\n");
+	 fprintf(f1,"No of Records     :    %d\n\n",rec_cnt);
+     fprintf(f1,"\n\n                                                    ** END OF REPORT **                                                             \n\f");
+	}
+	else
+	{
+	 put_hdr();
+	 fprintf(f1,"No of Records     :    %d\n\n",rec_cnt);
+     fprintf(f1,"\n\n                                                    ** END OF REPORT **                                                             \n\f");
+	}
+}
+
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[20];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);
+        format_amt(s_amt);
+        strcat(s_amt,"-");
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);
+        format_amt(s_amt);
+        strcat(s_amt," ");
+    }
+
+	fprintf(f1,"%12s \n",s_amt); 
+}                                
+
+/****************************** O  V  E  R *******************************/   

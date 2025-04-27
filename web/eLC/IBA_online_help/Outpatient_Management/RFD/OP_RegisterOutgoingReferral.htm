@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>OP_RegisterOutgoingReferral</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD" style="font-weight: bold;"><span style="font-weight: bold;"><b>Enter the following details:</b></span></p>
+<ol type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="font-weight: normal;">Quick Admission – Select this check box if you want to proceed with quick admission process for the patient in case of emergencies, such as AE checkout. Once this is checked, the screen immediately displays the following additional fields:</span></p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;"><span style="text-decoration: underline;"><u>a. Bed Class</u></span> – The class of bed; general,</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px; text-decoration: underline;">b. Admission Type</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px; text-decoration: underline;">c. Bed Type &#160;</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">Also, the following existing fields become mandatory.</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px; text-decoration: underline;">a. Service</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px; text-decoration: underline;">b. Location</p>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px; text-decoration: underline;">c. Practitioner</p>
+<ol start="2" type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Referral Type</u></span> – Select the Referral Type from the list. The listed types are Login Facility, Enterprise and External. This is a mandatory field.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Healthcare Setting Type</u></span> – Select the Healthcare Setting Type from the list to which the patient has to be referred to. This &#160;is a mandatory field. Healthcare setting types are set up using Application Masters module. The values listed in this field are specific to healthcare setting types for IP Referral.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type selected is ‘Enterprise’, all the healthcare setting types defined in the Healthcare Setting Type master function is displayed here except for the one associated with the logged in facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type selected is ‘External’, all the healthcare setting types to which External Referral Sources associated in the External Referral Source master function are displayed here.</p>
+</li>
+</ol>
+<ol start="3" type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Referred To</u></span> –</p>
+</li>
+</ol>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type is selected as &#160;‘Enterprise’, the entire active facilities of the enterprise except the logged in Facility are listed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referred Type is selected as ‘External’, all the external referral sources are listed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referred Type is selected as ‘Login Facility’, the logged in facility name is made default. This field is mandatory. Place the mouse on the <img src="../../image482.gif" style="border: none;" alt="image482.gif" width="16" height="16" border="0" /> icon to display the long name of the External or Referral Source recorded in ‘External/Referral Source’ function of Application Masters module. The &#160;<img src="../../image482.gif" style="border: none;" alt="image482.gif" width="16" height="16" border="0" /> icon appears on the screen if the long name for the External Referral Source is recorded in ‘External/Referral Source’ function of Application Masters module.</p>
+</li>
+</ul>
+<ol start="4" type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span class="UnderlineRFD">Specialty</span> – Enter the Specialty in alphanumeric format of 30 characters maximum length or click <span style="font-weight: bold;"><b>[?]</b></span> function to select the Specialty. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Note" style="margin-left: 40px;"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /><span style="color: #0000ff;"><font color="blue" >If Referral Type is ‘External’, the Specialty field is not mandatory.</font></span></p>
+<p class="Note" style="margin-left: 40px; font-weight: bold; color: #0000ff;">Note:</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">1. If you have selected the Quick Admission check box in this page, the Patient Admission page is displayed when you click this button. &#160;The referral details will be displayed by default, in the page.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">2. On completing the admission, the billing details will be displayed in a popup window based on whether the patient is citizen or non-citizen. On clicking OK, the page from where the quick admission process started, will be displayed; for example, AE Checkout page or the OP Check out page.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">3. If you are unable to complete the quick admission, the focus will return to the referral page. (See Warnings )The referral page will display the created referral ID. The column Appt No./Encounter ID &#160;will display the hyperlink “Quick Admission”. &#160;</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">4. You can open the screen anytime and click this hyperlink and complete the Quick Admission process. Once the admission is completed the corresponding encounter ID will be displayed in place of the “Quick Admission” hyperlink.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">5. If you try to create a Quick Admission Referral in the Register Outgoing Referral screen for an inpatient, the following error message will be displayed on launch the Admit Patient screen: “This patient is currently an Inpatient”.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff; font-weight: bold;">Warnings:</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">1. You cannot admit inpatients; the following error message will be displayed on launch the Admit Patient screen: “This patient is currently an Inpatient”.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">2. You cannot admit a patient using an existing Quick Admission Referral number; the following error message will be displayed: “Invalid Referral ID”.</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">3. If you create a quick admission referral, but then uncheck the Quick Admission check box for the particular operation station in Operator Station setup function, you will not be able to admit the patient. The following message will be displayed:</p>
+<p class="Note" style="margin-left: 40px; color: #0000ff;">“Operator Station not defined for Quick Admission.”</p>
+<ol start="5" type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Location Type</u></span> – Select the Location Type from the list. The pre-defined values are listed in the list. This is a mandatory field.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Location</u></span> – If the Referral Type is ‘External’, the location list gets disabled and you have to specify the location in alphanumeric format of 30 characters maximum length in the text box provided. If the referral type selected is ‘Enterprise’, the Location Type and the Location can be identified, while the adjoining text box does not allow any data entry. The values for the Location Type field are ‘Clinic’, ‘Procedure Unit’ or ‘Day Care’. Depending on the Healthcare Setting Type, referred source, Specialty and Location type selected, corresponding locations are populated in the list. You can select the required value from the list. The same holds good if the referral type selected is ‘Login Facility’. This is a mandatory field.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Service</u></span> – Select the required Service from the list.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type is selected as ‘Login Facility’, the services are listed based on the Specialty, Location Type and Location chosen.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type chosen is ‘Enterprise’, the services are listed based on the Healthcare Setting Type, Referred Source, Specialty, Location Type and Location chosen.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the Referral Type chosen is ‘External’, all the services set up in the ‘Service’ master function is available in the list.</p>
+</li>
+</ol>
+<ol start="8" type="1">
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Practitioner</u></span> – Enter the Practitioner name or select the practitioner using the <span style="font-weight: bold;"><b>[?]</b></span> function. The list values correspond to the selected ‘Referred Source’. This field is enabled only if the Referral Type is ‘Enterprise’ or ‘Login Facility’ and if the specialty is selected, or it is disabled. For the Referral type ‘External’ the practitioner name can be entered in the text box provided in alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Referred For</u></span> - Select the Referred To from the list. The listed values are ‘Admit’ and ‘Booking’.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Preferred Date</u></span> – Enter Preferred Date in dd/mm/yyyy format or select the date from the Calendar icon. This &#160;is a mandatory field. The user can enter Preferred Date greater than or equal to the system date. If you had checked the Quick Admission check box, the system date will be displayed here by default and you can select a different date, if needed.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Reason for Referral</u></span> – Enter the referral reason for the patient or select the reason from the <span style="font-weight: bold;"><b>[?]</b></span> function.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Priority</u></span> – Select the Referral Priority from the list. The values displayed are ‘Elective’, ‘Semi Emergency’ and ‘Emergency’. This &#160;is a mandatory field.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Referral Notes</u></span> – Click <span style="font-weight: bold;"><b>[Referral Notes]</b></span> to open the Referral Notes dialog. Enter the Referral Notes of the patient in alphanumeric format of 1500 characters maximum length and close the Referral Notes dialog. The control shifts back to the main screen.</p>
+</li>
+<li style="font-weight: normal;" class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span style="text-decoration: underline;"><u>Record Referral Letter Note</u></span> – This button appears only if the ‘Enable Recording of Referral Letter Note with Referral Request’ check box is selected in IP Parameter. Click <span style="font-weight: bold;"><b>[Record Referral Letter Note]</b></span> to invoke the Record Referral Letter dialog where you can record new referral letter or search and modify the existing referral letters available for the patient. This button is disabled when the ‘Referral Type’ is selected as ‘External Facility’ and it is enabled only when the ‘Referral Type’ is selected as Login Facility or Enterprise.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+/*
+-------------------------------------------------------------------------------------------------------
+Date       Edit History      Name        Description
+-------------------------------------------------------------------------------------------------------
+?             100            ?           created
+20/01/2012	IN029143		Menaka V		<JD-CRF-0111 This option is available in HIS 2.x and KAUH needs to be in
+											EM version. In the current workflow the option is being used frequently. When a physician selects the patient, system will ask to enter the PIN Code. Physician needs to authenticate in the Prescription screen using the PIN code. This will prevent from unauthorised access while the physician is on rounds>.	
+31/01/2012	IN030711		Menaka V		When the User is not assigned any Pin No. and he enters any Pin
+											No.,Wrong prompt message is displayed
+09/11/2012	IN036069		Karthi L		New message added to confirm delete rows in dynamically added form	
+04/12/2012	IN035976		ChowminyaG		Include Dept_authorization validation for RD orders br appt schedule		
+08/01/2014		LICN_1			Karthi						MMS Issue.
+10/03/2014	  	IN024984		Chowminya										Duplicate order recording with reason - new mandatory option
+26/08/2014    IN050607		Nijitha S										KDAH-SCF-0255	
+24/07/2015		IN054381	Karthi											MMS-QF-CRF-0211
+06/10/2015	IN055737		Karthi L		IN055737 HSA-CRF-0250.1 - Dispatch Slip
+29/06/2016	IN060516		Karthi L		MMS-MD-SCF-0017 
+-------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------
+Date			Edit History		Name       Rev.Date   Rev.By		Description
+--------------------------------------------------------------------------------------------------------------------------------
+22/08/2016		IN059646			Raja S								ML-BRU-SCF-1676
+10/05/2017		IN064215		Krishna Gowtham J	10/05/2017		Ramesh G		PMG2017-SH-CRF-0001
+09/06/2017		IN063816		Vijayakumar K										GHL-CRF-0445.1 [IN:063816]	
+03/08/2017		IN062992		Dinesh T			07/08/2017		Ramesh G		ML-MMOH-CRF-0345.1		
+26/10/2017		IN061892		Prakash C			31/10/2017		Ramesh G		ML-MMOH-CRF-0544		
+15/12/2017	IN065942	Dinesh T	15/12/2017	Ramesh G	In Nuclear medicine  department we required the barcode 																		functionality at the time of Registration of order,required patient 															Id,patient name,age,sex,register date and name of study.
+17/01/2018  	IN066341		Kamalakannan G  	10/01/2018  	Ramesh G 		OR-ML-MMOH-CRF-0545/02
+06/02/2018		IN065642		Prathyusha P				 		GHL-CRF-0487 [IN:065642]
+08/10/2018	  IN063719		Kamalakannan 	08/10/2018	Ramesh G		GHL-CRF-0419
+28/02/2019  IN068370    Dinesh T      28/02/2019    Ramesh G    PMG2018-GHL-CRF-0014
+28/02/2019  IN068373    Dinesh T      28/02/2019    Ramesh G    PMG2018-GHL-CRF-0015
+27/05/2019	IN069027	Ramesh G								MMS-DM-CRF-0150
+--------------------------------------------------------------------------------------------------------------
+*/
+package eOR.resources;
+import java.util.*;
+public class Messages extends ListResourceBundle implements java.io.Serializable{
+
+	public Object[][] getContents() {
+         return contents;
+     }
+
+	static final Object[][] contents = {		
+			{"NO_SERVICE_AVAILABLE"       ,					"APP-OR0001 No Services Available" },
+			{"NEXT_NUMBER_GREATER_MAX"    ,					"APP-OR0002 Next Order Number cannot be greater than Maximum" },
+			{"OVERLAPPING"                ,					"APP-OR0003 This number is overlapping with existing Service Type" },
+			{"VALIDNUMBER"                ,					"APP-OR0004 Enter valid number, should be greater than zero" },
+			{"CODEISUSED"                 ,					"APP-OR0005 This Section code is used in the Service for Order Format Section" },
+			{"USERACCESS"                 ,					"APP-OR0006 User not authorized to access this function" },
+			{"ALLAUTHORIZE"               ,					"APP-OR0007 You are allowed to authorize this order. Authorize now"},
+			{"UNSUCCESS"                  ,					"APP-OR0008 This order is required to be authorized before release" },
+			{"AUTHORIZE_ATLEAST_ONE"      ,					"APP-OR0009 Atleast one Order to be authorized " },
+			{"RESULT_AUTH_ATLEAST_ONE"    ,					"APP-OR0010 Atleast one Result to be authorized " },
+			{"NO_ORDER_FORMAT_AVAILABLE"  ,					"APP-OR0011 No Order Formats Available " },
+			{"BLANK_RESULT_DATA"          ,					"APP-OR0012 Result Data for the service &SERVICE cannot be blank" },
+			{"ATLEAST_ONE_RESULT"         ,					"APP-OR0013 Atleast one Service Result to be Entered " },
+			{"DUP_CHK"                    ,					"APP-OR0014 Duplicate " },
+			{"SERVICE_DATE_BLANK"         ,					"APP-OR0015 Service Date cannot be Blank" },
+			{"INVALID_STATUS"             ,					"APP-OR0016 Service Status for &SERVICE is Invalid" },
+			{"INVALID_DECIMAL"            ,					"APP-OR0017 Decimal Precision Exceeded" },
+			{"CHECK_CODE_DESC"            ,					"APP-OR0018 Code and Description cannot be empty" },
+			{"CHK_DESC"                   ,					"APP-OR0019 Description Should be mentioned " }, 
+			{"CHK_ID"                     ,					"APP-OR0020 ID Should be mentioned " }, 
+			{"CHK_CODE"                   ,					"APP-OR0021 Code Should be mentioned " }, 
+			{"ATLEAST_ONE_RECORD"         ,					"APP-OR0022 Entry for atleast one record is Mandatory " },
+			{"ORDER_CATEGORY"             ,					"APP-OR0023 Order Category Cannot be Blank" },
+			{"MAX_RECORDS"                ,					"APP-OR0024 Max limit of text is 200 Characters"},
+			{"UNPROCESS_INPROCESSED"      ,					"APP-OR0026 Either Unprocessed or InProcess cannot be blank"},
+			{"VALID_DATA"                 ,					"APP-OR0027 Valid  Number is  not entered for either UnProcessed or InProcess" },
+			{"INVALID_NUMBER"             ,					"APP-OR0028 Both Unprocessed and InProcess cannot be zero" },
+			{"NOT_VALID"                  ,					"APP-OR0029 Apply is not a valid operation here" },
+			{"ONLY_PRACT_OR_RESP"         ,					"APP-OR0030 Either Practitioner or Responsibility need to be selected" },
+			{"BLANK_RECORD"               ,					"APP-OR0031 Blank Records Cannot be Submitted" },
+			{"INVALID_ZERO"				  ,					"APP-OR0032 Unprocessed  cannot be zero" +"<br>" +" APP-OR0032 InProcess cannot be zero"},
+			{"INVALID_DESC"               ,					"APP-OR0033 Desccription Should be mentiond for the entered ID "},
+			{"INVALID_ID"                 ,					"APP-OR0034 Description Should be mentiond for the IDS Entered"},
+			{"CHK_SPEC_GEN"               ,					"APP-OR0035 If Generation Label is Checked  Generation Look Ahead Field cannot be blank"},
+			{"EXPIRY_PERIOD"              ,					"APP-OR0036 Expiry Period cannot be blank"},
+			{"TIME_BASED_RULE"            ,					"APP-OR0037 Time Based Rule cannot be blank"},
+			{"MIN_LESS_THAN_MAX"          ,					"APP-OR0038 Min. value cannot be greater than Max. value"},
+			{"ONLY_POSITIVE_NUM"          ,					"APP-OR0039 Only positive integer is allowed"},
+			{"MAX_VAL_NOT_BLANK"          ,					"APP-OR0040 Maximum Value cannot be blank"},
+			{"MAX_VAL_NOT_ZERO"           ,					"APP-OR0041 Maximum Value cannot be Zero"},
+			{"MIN_VAL_NOT_BLANK"          ,					"APP-OR0042 Minimum Value cannot be blank"},
+			{"DISCRETE_MSR_NOT_NULL"      ,					"APP-OR0043 Discrete Measure cannot be blank"},
+			{"DESC_NOT_BLANK"             ,					"APP-OR0044 Description cannot be blank"},
+			{"SEQ_NO_NOT_BLANK"           ,					"APP-OR0045 Sequence Number cannot be blank"},
+			{"ONLY_NUMBERS"               ,					"APP-OR0046 Only Numbers can be entered"},
+			{"FIELD_CANNOT_BE_EMPTY"      ,					"APP-OR0047 List values cannot be empty.Click on \"Fields\" button"},
+			{"DUP_DESC"                   ,					"APP-OR0048 Duplicate Description"},
+			{"DUP_SEQ_NUM"                ,					"APP-OR0049 Duplicate Sequence Number"},
+			{"SEQ_NO_NOT_ZERO"            ,					"APP-OR0050 Sequence Number cannot be Zero"},
+			{"SELECT_TO_CLEAR"            ,					"APP-OR0051 Please select a record to clear"},
+			{"DESC_NOT_SPACES"            ,					"APP-OR0052 Description cannot contain only Spaces"},
+			{"VAL_NOT_ZERO"               ,					"APP-OR0053 Value cannot be Zero"},
+			{"PRACT_NOT_BLANK"            ,					"APP-OR0054 Practitioner cannot be Blank"},
+			{"RESP_NOT_BLANK"             ,					"APP-OR0055 Responsibility cannot be Blank"},
+			{"SELECT_RESP_OR_PRACT"       ,					"APP-OR0056 Select Either Practitioner Or Responsibility"},
+			{"FREQ_NOT_BLANK"             ,					"APP-OR0057 Frequency cannot be Blank"},
+			{"OTHER_LOC_PRINT"            ,					"APP-OR0058 Print at Other Locations, specific location cannot be blank"}, 
+			{"DISCHARGE_LOC_PRINT"        ,					"APP-OR0059 Print Location for Discharged Patients , specific location cannot be blank"}, 
+			{"INVALID_TIME_ENTRY"         ,					"APP-OR0060 Time should be entered in increasing order"}, 
+			{"INVALID_TIME_DAY_COMB"      ,					"APP-OR0061 Entered Time Field's does not match the number of Repeats" },
+			{"INVALID_TIME_FMT"           ,					"APP-OR0062 Invalid Time Format" },
+			{"FIELD_MNEMONIC_CANNOT_BE_EMPTY",				"APP-OR0063 Field Mnemonic cannot be blank"},
+			{"DESC_FORTEXT_NOT_BLANK"     ,					"APP-OR0064 Any One Description or For Text cannot be Blank" },
+			{"ORDER_TYPE"                 ,					"APP-OR0065 Order Type  cannot be Blank" },
+			{"PATIENT_CLASS"              ,					"APP-OR0066 Patient Class  cannot be Blank" },
+			{"RECORD_EXISTS1"             ,					"APP-OR0067 Record already created. Update from Query mode" }, 
+			{"INVALID_TIME_FMT_HRS"       ,					"APP-OR0068 Valid Entry is between 00:00 and 00:59" },
+			{"MAX_LIMIT"                  ,					"APP-OR0069 Max limit of text allowed is 2000 Characters" }, 
+			{"SYSTEM_USER_DEFINED"        ,					"APP-OR0070 Cannot Modify the System Defined Values" }, 
+			{"PRACT_RESP_NO_ACCESS"       ,					"APP-OR0071 Practitioner/Responsibility does not have the access to Report the order."}, 
+			{"CATALOG_AUTH_CHECK"         ,					"APP-OR0072 Auth Level should be greater than or equal to Security Level."}, 
+			{"ONE_ENTRY_MIN_AGE"          ,					"APP-OR0073 At least one entry is mandatory for  Min Age"}, 
+			{"ONE_ENTRY_MAX_AGE"          ,					"APP-OR0074 At least one entry is mandatory for  Max Age"}, 
+			{"MIN_MAX_AGE_CHECK"          ,					"APP-OR0075 Max Age should be greater than Min Age"}, 
+			{"SEX_MAX_MIN_OVERLAP_CHK"    ,					"APP-OR0076 Same Sex cannot have Overlapping for Min age and Max age"}, 
+			{"ENTER_MONTH_CHK"            ,					"APP-OR0077 Months should be between 0 and 11"}, 
+			{"ENTER_DAY_CHK"              ,					"APP-OR0078 Days should be between 1 and 31"}, 
+			{"INSTRN_BLANK_CHK"           ,					"APP-OR0079 Instrn cannot be blank"}, 
+			{"AUTH_REQD_CONFIRM"          ,					"APP-OR0080 You are Allowed to Authorize this Order. Authorize Now?"}, 
+			{"SINGLE_RECORD_CHK"          ,					"APP-OR0081 Only Single Record Accepted for this Mnemonic"},
+			{"INVALID_DATE_FMT"           ,					"APP-OR0082 Invalid Date Format. Valid entry dd/mm/yyyy" },
+			{"INVALID_DATE_TIME_FMT"      ,					"APP-OR0083 Invalid Date and Time Format. Valid entry dd/mm/yyyy hh:mi" },
+			{"ENTER_RPT_PRACT"            ,					"APP-OR0084 Enter the Reporting Practitioner" },
+			{"ALL_MAND_FIELDS"            ,					"APP-OR0085 Enter all Mandatory Fields" },
+			{"VARIABLE_DEC_DIGIT"         ,					"APP-OR0086 Only @ decimal digit(s) allowed" },
+			{"RSLT_NOT_LESS_DIGIT"        ,					"APP-OR0087 Result entered cannot be less than @ digits" },
+			{"RSLT_NOT_MORE_DIGIT"        ,					"APP-OR0088 Result entered cannot be more than @ digits" },
+			{"AUTH_RESULT"                ,					"APP-OR0089 You are Allowed to Authorize this Result." +"\n" + "Authorize now ?" },
+			{"FUTURE_DATE_TIME"           ,					"APP-OR0090 Ordered Date cannot be greater than Future Order Date" },
+			{"BACK_DATE_TIME"             ,					"APP-OR0091 Ordered Date  cannot be lesser than Past Ordered Date " },
+			{"FILL_ORDER_FORMAT_FLDS"     ,					"APP-OR0092 Additional info cannot be Blank" },
+			{"VALUE_BETWEEN_RANGE"        ,					"APP-OR0093 Entered value should be between " },
+			{"ADMDATE_LESS_DATE"          ,					"APP-OR0094 Ordered Date cannot  be lesser than Visit Adm. Date " },
+			{"CANNOT_BE_BLANK"            ,					"APP-OR0095 @ cannot be blank" },
+			{"SELECT_STATUS"              ,					"APP-OR0096 Status cannot be Blank" },
+			{"ROUT_STATUS"                ,					"APP-OR0097 Routine for Loc1 and Loc2 cannot be blank" },
+			{"URG_STATUS"                 ,					"APP-OR0098 Urg/Stat for Loc1 and Loc2 cannot be blank" },
+			{"SYSTEM_DEFINED_CANNOT_DELETE",				"APP-OR0099 Cannot Delete the System Defined Values" }, 
+			{"ORDER_SET_SELECTED"          ,				"APP-OR0100 Order Set Already selected" }, 
+			{"ORDER_SET_BLANK"             ,				"APP-OR0101 Order Set Cannot be blank" }, 
+			{"DUP_ORDER_SET_ENTRY"         ,				"APP-OR0102 Duplicated Entry for the combination not allowed." }, 
+			{"PRACT_RESP_NOT_AUTHORISED"   ,				"APP-OR0103 Practitioner or Responsibility does not have the Access to Authorize the Order..." }, 
+			{"IMAGE_PRE_SELECT_CATEGORY"   ,				"APP-OR0104 Images cannot be selected for this Category" }, 
+			{"DURATION_CANNOT_BE_BLANK"    ,				"APP-OR0105 Duration Value cannot be blank" }, 
+			{"LABEL_TEXT_CANNOT_BE_BLANK"  ,				"APP-OR0106 Label Text cannot be blank" }, 
+			{"INVALID_INTEGER_RANGE"       ,				"APP-OR0107 Invalid Integer Range" }, 
+			{"INVALID_DECIMAL_RANGE"       ,				"APP-OR0108 Invalid Decimal Range" }, 
+			{"SEQ_ORDER_CAT_SECTION_CHK"   ,				"APP-OR0109 Sequence Number cannot be the same for different Order Catalogs" }, 
+			{"LAB_MODULE_INSTALLED"        ,				"APP-OR0110 Cannot Use this Function. Please access Lab Module" }, 
+			{"PRACT_RESP_CANNOT_REGISTER"  ,				"APP-OR0111 Practitioner/Responsibility does not have the access to Register the order."}, 
+			{"CLICK_ANY_ONE"               ,				"APP-OR0112 Check atleast one Order"}, 
+			{"MAX_DURN_MAND_CHK"           ,				"APP-OR0113 Max Value Should be greater than Durn  value"}, 
+			{"NOT_VALID_DELETE"            ,				"APP-OR0114 Delete is not valid operation here ..."},
+			{"SELECT_HOTSPOT"              ,				"APP-OR0115 Select a Hotspot ..."},
+			{"COSIGN_REQD_CONFIRM"         ,				"APP-OR0116 You are Allowed to Cosign this Order. Cosign Now?"}, 
+			{"SCHEDULE_CANNOT_BE_BLANK"    ,				"APP-OR0117 Schedule Frequency cannot be blank"}, 
+			{"SPECIAL_APPROVAL_REQD_CONFIRM",				"APP-OR0118 You are Allowed to Approve this Order. Approve Now?"}, 
+			{"DECIMAL_NOT_ALLOWED"         ,				"APP-OR0119 Decimals not allowed"},
+			{"SCH_FREQ_BLANK"              ,				"APP-OR0120 Quantity cannot be blank" }, 
+			{"DOSE_LIMIT"                  ,				"APP-OR0121 Exceeds the Dosage Limit" },
+			{"QTY_NOT_EQUAL"               ,				"APP-OR0122 Quantity Values cannot be equal" },
+			{"QTY_VAL_NOT_SAME"            ,				"APP-OR0123 All Qty Values Cannot be same" },
+			{"START_DATE_TIME_VALIDATE"    ,				"APP-OR0124 Start Date time should fall within Scheduled Date times.." },
+			{"PRACT_RESP_CANNOT_SPECIAL_APPRV",				"APP-OR0125 Practitioner or Responsbility does not have the Access to Special Approval" }, 
+			{"INVALID_DECIMAL_NUMBER"      ,				"APP-OR0126 Invalid Decimal Number" }, 
+			{"MAX_NO_DECIMAL"              ,				"APP-OR0127 Max. of 3 precision  value is allowed" }, 
+			{"MAX_255_CHARS"               ,				"APP-OR0128 Max. limit of Text is 255 Characters" }, 
+			{"REASON_CANNOT_BLANK"         ,				"APP-OR0129 Reason Cannot be Blank" }, 
+			{"TO_LOCATION_GR_EQ_FROM_LOCATION",				"APP-OR0130 To Location should be greater than or equal to From Location" }, 
+			{"TO_ORDER_TYPE_GR_EQ_FROM_ORDER_TYPE",			"APP-OR0131 To Order Type should be greater than or equal to From Order Type" }, 
+			{"SHEDULE_FUTURE_DATE_TIME"    ,				"APP-OR0132 Start Date cannot be greater than Future Order Date" },
+			{"SHEDULE_BACK_DATE_TIME"      ,				"APP-OR0133 Start Date cannot be lesser than Past Ordered Date " },
+			{"RADIOLOGY_MODULE_INSTALLED"  ,				"APP-OR0134 Cannot Use this Function. Please access Radiology Module" }, 
+			{"START_ORDER_DATE_TIME"       ,				"APP-OR0135 Start Date cannot be lesser than Ordered Date " },
+			{"CLICK_ONE_ORDERABLE"         ,				"APP-OR0136 Select atleast One Orderable"}, 
+			{"CLICK_ONE_NEW_ORDERABLE"     ,				"APP-OR0137 For Preview, Select atleast one New Orderable"},
+			{"OR_MODULE_INSTALL"           ,				"APP-OR0138 OR Module is not Operational for this Facility"}, 
+			{"SPECIMEN_COLLECTION_DATE_BLANK",				"APP-OR0139 Specimen Collection Date Time cannot be Blank"},
+			{"PERF_LOCN_CANNOT_BLANK"      ,				"APP-OR0140 Performing Location cannot be Blank"},
+			{"CHECK_ATLEAST_ONE_EVENT"     ,				"APP-OR0141 Check Atleast One Event"},
+			{"SPECIMEN_COLLECTION_ORDER_DATE",				"APP-OR0142 Date should be greater than or equal to Ordered Date"},
+			{"SPECIMEN_COLLECTION_PREV_COLLECTION_DATE",	"APP-OR0143 Date can not be less than previous Collection Date"},
+			{"RESULT_REPORTING_LOCN_BLANK" ,				"APP-OR0144 Location cannot be blank"},
+			{"PRACT_RESP_AUTH_NO_ACCESS"  ,				"APP-OR0145 Practitioner/Responsibility does not have the access to Authorize Results."}, 
+			{"NEW_ORDER_CONFIRM"           ,				"APP-OR0146 New Order is to be Generated....Do you want to Continue"},
+			{"QTY_CANNOT_BE_BLANK"         , 				"APP-OR0147 Quantity cannot be blank (or) zero" }, 
+			{"RPT_SUBMIT_TO_PRINTER"       ,				"APP-OR0148 Report has been Submitted to the Printer" },
+				{"SUBMIT_TO_PRINTER"       ,				"APP-OR0148 # has been Submitted to the Printer" },//IN065942, Child of RPT_SUBMIT_TO_PRINTER
+			{"RPT_CANNOT_BE_BLANK"         ,				"APP-OR0149 Report Cannot be blank" },  
+			{"PRINT_AT_LOCN_CANNOT_BE_BLANK",				"APP-OR0150 Print At Location cannot be Blank" }, 
+			{"ORDERS_CANNOT_BE_PLACED"     ,				"APP-OR0151 Orders cannot be placed due to the Ordering Rule set for the Patient Class"}, 
+			{"DIRECT_CARE_ANCILLARY_DEPT_ACTIVATE",			"APP-OR0153 Synonym for Direct Care/Ancillary Dept. is not Checked. Record will not be saved.Do u want to make Active?"},
+			{"CLICK_RENEW_ORDER"           ,				"APP-OR0154 Order has to be Renewed. New Orders cannot be selected"}, 
+			{"REFUSAL_LESS_VISIT_DATE_TIME",				"APP-OR0155 Refusal Date and Time cannot be lesser than Visit Adm. Date and Time  "}, 
+			{"REFUSAL_LESS_REGN_DATE_TIME" ,				"APP-OR0156 Refusal Date and Time cannot be lesser than Registration Date and Time"}, 
+			{"REFUSAL_LESS_SYS_DATE_TIME"  ,				"APP-OR0157 Refusal Date and Time cannot be greater than Current Date and Time"}, 
+			{"AT_LEAST_ONE_PERFORMING_LOCATION",			"APP-OR0158 Atleast one Performing Location to be selected"},
+			{"DUPLICATE_PERFORMING_LOCATION",				"APP-OR0159 Duplicate Performing Location is not allowed"},
+			{"CLICK_ANY_ONE_PATIENT"       ,				"APP-OR0160 Check atleast one Patient"}, 
+			{"CLICK_ANY_ONE_USER_DEFINED_TABS",				"APP-OR0161 Select Atleast one more User Defined Tabs"}, 
+			{"SHD_NOT_BE_BLANK"             ,				"APP-ORO162 Patient Id Should not be blank"},
+			{"INVALID_PATIENT"              ,				"APP-ORO163 Invalid Patient Id"},
+			{"ADDITIONAL_SEARCH_TABNAME_NOT_BLANK",			"APP-ORO164 User Defined Tab Name for Additional Search cannot Be Blank"},
+			{"ADDITIONAL_SEARCH_SEQNO_NOT_BLANK",			"APP-ORO165 Sequence Number for Additional Search cannot Be Blank"},
+			{"TICK_SHEETS_TABNAME_NOT_BLANK",				"APP-ORO166 User Defined Tab Name for Tick Sheets cannot Be Blank"},
+			{"TICK_SHEETS_SEQNO_NOT_BLANK"  ,				"APP-ORO167 Sequence Number for Tick Sheets cannot Be Blank"},
+			{"ORDER_SETS_TABNAME_NOT_BLANK" ,				"APP-ORO168 User Defined Tab Name for Order Sets cannot Be Blank"},
+			{"ORDER_SETS_SEQNO_NOT_BLANK"   ,				"APP-ORO169 Sequence Number for Order Sets cannot Be Blank"},
+			{"IMAGE_TABNAME_NOT_BLANK"      ,				"APP-ORO170 User Defined Tab Name for Image cannot Be Blank"},
+			{"IMAGE_SEQNO_NOT_BLANK"        ,				"APP-ORO171 Sequence Number for Image cannot Be Blank"},
+			{"PLACE_ORDER_TABNAME_NOT_BLANK",				"APP-ORO172 User Defined Tab Name for Place Order cannot Be Blank"},
+			{"PLACE_ORDER_SEQNO_NOT_BLANK"  ,				"APP-ORO173 Sequence Number for Place Order cannot Be Blank"},
+			{"LOCN_TYPE_NOT_BLANK"          ,				"APP-OR0174 Location Type cannot be blank"},
+			{"LOCN_NOT_BLANK"               ,				"APP-OR0175 Location cannot be blank"},
+			{"SPECIMEN_COLLECTION_COLLECTION_DATE"       ,	"APP-OR0176 Date should be greater than or equal to Specimen Collection Date"},
+			{"SPECIMEN_COLLECTION_DISPATCH_DATE_BLANK"   ,	"APP-OR0177 Dispatch Date Time cannot be Blank"},
+			{"SPECIMEN_COLLECTION_DISPATCH_MODE_BLANK"   ,	"APP-OR0178 Dispatch Mode cannot be Blank"},
+			{"SPECIMEN_COLLECTION_DISPATCH_BY_BLANK"     ,	"APP-OR0179 Dispatch By cannot be Blank"},
+			{"SPECIMEN_COLLECTION_DISPATCH_REMARKS_BLANK",	"APP-OR0180 Remarks cannot be Blank"},
+			{"SPECIMEN_COLLECTION_COLLECTION_BY_BLANK"   ,	"APP-OR0181 Collection By cannot be Blank"},
+			{"SPECIMEN_COLLECTION_DISPATCH_LOCN_BLANK"   ,	"APP-OR0182 Dispatch Location cannot be Blank"},
+			{"ATLEAST_ONE_EXCEPTION_IDENTIFIER"          ,	"APP-OR0183 Atleast One Exception Identifier should be selected"},
+			{"PREFERRED_SURGERY_DATE_LESSER_SYSDATE"     ,	"APP-OR0184 Preferred Surgery Date cannot be lesser than Current Date and Time"},
+			{"SEQ_TICK_SHEET_SECTION_CHK"                ,	"APP-OR0185 Sequence Number cannot be the same for different Sections"},
+			{"PERF_SURGEON_BLANK"                        ,	"APP-OR0186 Performing Team/Surgeon cannot be Blank"},
+			{"REVIEW_REMARKS_MAX_LENGTH"                 ,	"APP-OR0187 Remarks Length cannot be more than 2000 characters"},
+			{"REVIEW_RESULTS_PREVIOUS_ORDERS"            ,	"APP-OR0188 Multiple Patients cannot be selected for the previous orders"},
+			{"RENEW_ORDERS_SUCCESSFUL"                   ,	"APP-OR0189 Renewed Successfully..."},
+			{"STAT_DURATION_TYPE_BLANK"                  ,	"APP-OR0190 Stat Duration Type cannot be blank..."},
+			{"URGENT_DURATION_TYPE_BLANK"                ,	"APP-OR0191 Urgent Duration Type cannot be blank..."},
+			{"ROUTINE_DURATION_TYPE_BLANK"               ,	"APP-OR0192 Routine Duration Type cannot be blank..."},
+			{"STAT_DURATION_BLANK"                       ,	"APP-OR0193 Stat Duration cannot be blank..."},
+			{"URGENT_DURATION_BLANK"                     ,	"APP-OR0194 Urgent Duration cannot be blank..."},
+			{"ROUTINE_DURATION_BLANK"                    ,	"APP-OR0195 Routine Duration cannot be blank..."},
+			{"ATLEAST_ONE_PRIVILEGE"                     ,	"APP-OR0196 Atleast One Privilege Should Be Selected"},
+			{"ATLEAST_ONE_RECORD_ACTIVE"                  ,	"APP-OR0197 Mandatory Fields for the Active should be Selected"},
+			{"REFERRAL_RECEIVED_DATE_LESSER_REPORTING_DATE","APP-OR0198 Referral Received Date cannot be less than Reporting Date"},
+			{"REFERRAL_RECEIVED_DATE_BLANK"              ,  "APP-OR0199 Referral Received Date cannot be blank..."},			
+			{"RECEIVE_REPORTING_PRACTITIONER_BLANK"      ,	"APP-OR0200 Receive Reporting Practitioner cannot be blank..."},
+			{"REPORTING_PRACTITIONER_BLANK"              ,  "APP-OR0201 Reporting Practitioner cannot be blank..."},
+			{"REFERRAL_FACILITY_BLANK"                   ,	"APP-OR0202 Referral Facility cannot be blank..."},
+			{"REFERRAL_RECEIVED_DATE_LESSER_SYSDATE"     ,  "APP-OR0203 Referral Received Date cannot be greater than Current Date"},
+			{"PERFORMING_LOCATION_BLANK"                 ,	"APP-OR0204 Performing Location cannot be blank..."},
+			{"PERFORMING_FACILITY_BLANK"                 ,	"APP-OR0205 Performing Facility cannot be blank..."},
+			{"DUPLICATE_ORDERABLES"                      ,	"APP-OR0206 Orderables cannot be Duplicate"},
+			{"REPORTING_DATE_LESSER_ORDER_DATE"          ,	"APP-OR0207 Reporting Date cannot be less than Order Date"},
+			{"COL_SEQ_NO_NOT_BLANK"                      ,	"APP-OR0208 Column Sequence Number cannot be blank"},
+			{"COL_NO_CANNOT_REPEATED_SAME_ROW"           ,	"APP-OR0209 Column No. cannot be repeated in the same Row"},
+			{"CLINICAL_EVENT_BLANK"                      ,	"APP-OR0210 Clinical Event cannot be blank"},
+			{"ATLEAST_ONE_PRIVILEGE_VALUE"               ,  "APP-OR0211 Atleast One Privilege Should Be Selected for the Corresponding Privilege Type"},
+			{"ATLEAST_ONE_PRIVILEGE_TYPE"                ,  "APP-OR0212 Atleast One Privilege Type Should Be Selected for the Corresponding Privilege"},
+			{"ATLEAST_ONE_PRIVILEGE_TYPE_VALUE"          ,	"APP-OR0213 Atleast One Privilege Type/Privilege Value should be Selected"},
+			{"DUPLICATE_ORGANISM"                        ,	"APP-OR0214 @ Values cannot duplicate"},
+			{"DIAGNOSIS_EVENT_BLANK"                     ,	"APP-OR0215 Diagnosis cannot be blank..."},
+			{"MAX_ORDERABLES"                            ,	"APP-OR0216 More than 10 Orderables is not Allowed"},
+			{"RESULT_TYPE_BLANK"                         ,	"APP-OR0217 Result Matrix cannot be blank..."},
+			{"EXT_ORD_CAT_BLANK"                         ,	"APP-OR0218 Order Category cannot be blank..If orderable is selected"},
+			{"PRACT_RESP_NOT_COSIGN"                     ,	"APP-OR0219 Practitioner or Responsibility does not have the Access to Cosign the Order..." }, 
+			{"ATLEAST_ONE_TAB_SELECTED"                  ,	"APP-ORO220 Any One Existing Orders or New Orders Should be Selected"},
+			{"EXISTING_ORDERS_TABNAME_NOT_BLANK"         ,  "APP-ORO221 User Defined Tab Name for Existing Orders cannot Be Blank"},
+			{"NEW_ORDERS_TABNAME_NOT_BLANK"              ,	"APP-ORO222 User Defined Tab Name for New Orders cannot Be Blank"},
+			{"EXISTING_ORDER_SEQNO_NOT_BLANK"            ,	"APP-ORO223 Sequence Number for Existing Orders cannot Be Blank"},
+			{"NEW_ORDER_SEQNO_NOT_BLANK"                 ,	"APP-ORO224 Sequence Number for New Orders cannot Be Blank"},
+			{"SOURCE_TYPE_BLANK"                         ,	"APP-OR0225 Source Type Cannot be blank..."},
+			{"MAX_LMT_PERIOD_MONTH"                      ,	"APP-OR0226 Maximum Limit of the Period is for only 12 Months"},
+			{"SEQ_NO_EXISTS"                             ,	"APP-OR0227 Duplicate Sequence Number not allowed"},
+			{"PH_NOT_ALLOWED"                            ,	"APP-OR0228 Pharmacy cannot be updated here"},
+			{"ATLEAST_ONE_DISCR_MEASURE"                 ,	"APP-OR0229 Atleast One record should have Discrete Measure."},
+			{"EXT_ORD_TYPE_BLANK"                        ,	"APP-OR0230 Order Type cannot be blank..If orderable is selected"},
+			{"BOOK_APPT_CATALOG"                         ,	"APP-OR0231 Do you want to book an appointment for "},
+			{"CLINICAL_COMMENTS_BLANK"                   ,	"APP-OR0232 Clinical Comments cannot be blank"},
+			{"PH_SELECT_NOT"                             ,	"APP-OR0233 Pharmacy cannot be selected here"},
+			{"LB_ORDER_NOT_ALLOWED_SOURCE"               ,  "APP-OR0234 Laboratory Order not allowed for this Referral Facility"},
+			{"RD_ORDER_NOT_ALLOWED_SOURCE"               ,  "APP-OR0235 Radiology Order not allowed for this  Referral Facility"},
+			{"CP_START_DATE_TIME"                        ,	"APP-OR0236 Do You want to change the Start Date Time"},
+			{"BOOK_OT_APPT"                              ,	"APP-OR0237 Do you want to book an appointment ?"},
+			{"FREQUENT_NOT_SELECT"                       ,	"APP-OR0238 Frequent Orders cannot be selected" }, 
+			{"ADMISSION_DATE_LESSER_SYSDATE"             ,  "APP-OR0239 Admission Date cannot be lesser than Current Date and Time"},
+			{"FORMAT_ITEM_CANNOT_BE_EMPTY"               ,  "APP-OR0240 Format Item cannot be blank" },
+			{"CHECK_ATLEAST_ONE_CATEGORY"                ,  "APP-OR0241 Check Atleast One Category" },
+			{"ATLEAST_ONE_SERVICE"                       ,	"APP-OR0242 Atleast One Service Should be Selected  " },
+			{"ATLEAST_ONE_PRACTITIONER"                  ,	"APP-OR0243 Atleast One Practitioner Should be Selected  " },
+			{"ATLEAST_ONE_NUR_UNIT"                      ,	"APP-OR0244 Atleast One Nursing Unit Should be Selected  " },
+			{"ATLEAST_ONE_CLINIC"                        ,	"APP-OR0245 Atleast One Clinic Should be Selected  " },
+			{"GREEN_TIME_IND_LESS"                       ,	"APP-OR0246 Always green time indicators should be lesser than the yellow time Indicators" },
+			{"YELLOW_TIME_IND_GREATER"                   ,	"APP-OR0247 Always Yellow Indicators Should be Greater Than the Green Indicators" },
+			{"YELLOW_TIME_IND_LESS"                      ,	"APP-OR0248 Always Yellow Indicators Should be Less than the Red Indicators" },
+			{"RED_TIME_IND_SHUD_GREATER"                 ,	"APP-OR0249 Always Red Indicators Should be Greater Than the Yellow and Green Indicators" },
+			{"CONSENT_TO_BE_OBTAINED"                    ,	"APP-OR0250 Consent to be obtained, Prior to Order Registration" },
+			{"ATLEAST_ONE_PROC_CODE"                     ,	"APP-OR0251 Atleast one Procedure Code is Mandatory " },
+			{"MORE_CODES_NOT_SELECT"                     ,	"APP-OR0252 More than 10 Codes cannot be Selected " },
+			{"MULTI_PRESENTATION_CANNOT_BE_SELECTED"     ,	"APP-OR0253 Multi Presentation Option cannot be Selected" },
+			{"REFERRAL_RECORD_NOT_FOUND"                 ,	"APP-OR0254 No record found in Referral Setup" },
+			{"REFERRAL_MORE_THAN_ONE_RECORD"             ,  "APP-OR0255 More than One record found in Referral Setup" },
+			{"NEW_ORDER_CATALOG_BLANK"                   ,	"APP-OR0256 New Order Catalog cannot be blank..." },
+			{"NEW_CHARGE_TYPE_BLANK"                     ,	"APP-OR0257 New Charge Type cannot be blank..." },
+			{"CHARGE_TYPE_NOT_SAME"                      ,	"APP-OR0258 Existing Charge Type and New Charge Type cannot be the same..." },
+			{"CHANGE_CHARGE_TYPE_NO_ACCESS"              ,  "APP-OR0259 Access rights do not exits..." },
+			{"COMPLETE_DATE_TIME_CANNOT_BLANK"           ,	"APP-OR0260 Order completion Date Cannot be Blank" }, 
+			{"COMPLETE_DATE_TIME_START_DATE_TIME_CHK"    ,  "APP-OR0261 Order Completion Date should be greater than the Start Date" }, 
+			{"COMPLETE_DATE_TIME_SYSDATE_TIME_CHK"       ,	"APP-OR0262 Order Completion Date should not be greater than The System Date" }, 
+			{"FUTURE_ORDER_ACTIVATED_LINKED"             ,  "APP-OR0263 Future Orders to be Activated and Linked to the Current Encounter ?" }, 
+			{"FUTURE_ORDER_ACTIVATED_CURRENT"            ,	"APP-OR0264 Orders have been Activated to the Current Encounter" }, 
+			{"FUTURE_ORDER_NOTACTIVATED_CURRENT"         ,	"APP-OR0265 Orders cannot be Activated to the Current Encounter" }, 
+			{"CONTINUE_RESULT_REPORT"                    ,	"APP-OR0267 Do you want to continue with Result Reporting ?" }, 
+			{"PROCEDURE_LINK_MAND"                       ,	"APP-OR0268 Procedure Link is Mandatory" }, 
+			{"INVALID_DATE_TIME_FORMAT"                  ,  "APP-OR0269 Invalid Date and Time Format. Valid entry dd/mm/yyyy hh:mi:ss" },
+			{"OT_MODULE_INSTALLED"                       ,	"APP-OR0270 Cannot Use this Function. Please access OT Surgery Module" }, 
+			{"OR_STATUS_CHANGED"					     , 	"APP-OR0271 Cannot Perform this Opeartion. Since Order Status has been Changed by Some Other User"},
+			{"OR_REPORT_PRACT_CHANGE_TO_OTHER"		     ,	"APP-OR0272 Continue with the Same Reporting Practitioner for Other Results"},
+			{"OR_ORDER_TRACKING_MANDATORY"			     ,	"APP-OR0273 Specify Atleast One Search Criteria among Order Type, Patient Id, Location"},
+			{"DUPLICATE_FIELD_MNEMONIC"					 ,	"APP-OR0274 Duplicate Value for the Field Mnemonic "                            }, 												  
+			{"OPTION_SELECTED"					         ,	"APP-OR0276 Option cannot be selected again...."                               }, 				
+			{"PRINT_LOC1_AND_LOC2"					     ,	"APP-OR0277 Print at Destination Routine for Loc1 and Loc2 cannot be blank"     }, 												  
+			{"PRINT_DEST_URG_START"					     ,	"APP-OR0278 Print at Destination Urg/Stat for Loc1 and Loc2 cannot be blank"    }, 												  
+			{"PRINT_DEPT_AT_LOC1_LOC2"					 ,	"APP-OR0279 Print at Department Routine for Loc1 and Loc2 cannot be blank"      }, 												  
+			{"PRINT_DEPT_URG_START"   					 ,	"APP-OR0280 Print at Department Urg/Stat for Loc1 and Loc2 cannot be blank"     }, 												  
+			{"PRINT_AT_OTHER_LOC"					     ,	"APP-OR0281 Print at Other Location Routine for Loc1 and Loc2 cannot be blank"  }, 												  
+			{"PRINT_AT_OTHER_URG_START"					 ,	"APP-OR0282 Print at Other Location Urg/Stat for Loc1 and Loc2 cannot be blank" }, 												  
+			{"START_TIME"					             ,	"APP-OR0283 Start Time cannot be blank"                                         },
+		 	{"START_DATE"				                 ,	"APP-OR0284 Start Date cannot be blank"                                         },
+			{"IMAGE_LINK_ALREADY_EXISTS"				 ,  "APP-OR0285 Image Link already exists"},
+    		{"ORDER_ID_GENERATION_PATIENT"               ,  "APP-OR0286 Order Id Generation For the Patient"},
+		    {"DUPLICATE_SEQ_NO"                          ,  "APP-OR0287 Duplicate Sequence number exists"},
+     		{"VERIFICATION_SUCCESS"                      ,  "APP-OR0288 Verification Successful"},
+			{"DUPLICATE_VALUES"                          ,  "APP-0R0289 Duplicate values are passed"},
+			{"NUM_CANT_BLANK"					         ,      "APP-OR0290 Number can not be started by Zero"},
+			{"ONLY_POSITIVE_INTEGERS"					 ,		"APP-OR0291 Only positive integers are allowed exculding zero"},
+     		{"SEQUENCE_NUMBER_FOR_CHKBOX"                ,      "APP-OR0292 Sequence no's for Check Box Checked should be filled"},
+		    {"DELETE_CONFIRM"                            ,      "APP-OR0293 Are you sure you want to delete this record"},
+	    	{"CONFIRM_ZOOM"                              ,      "APP-OR0294 Would you like to view the editor in Zoom mode ?"},
+    		{"CONFIRM_COPY"                              ,      "APP-OR0295 Cannot copy this Orderable. Do you wish to continue?"},
+		    {"FACILITY_BLANK"                            ,      "APP-OR0296 Facility cannot be blank........."},
+		    {"SERVICE_BLANK"                             ,      "APP-OR0297 Service cannot be blank..."},
+			{"TRY_AFTER"                                 ,      "APP-OR0298 Pl. try after some time"},
+		    {"TIMENOTCORRECT"                            ,      "APP-OR0299 Time Not Correct"},
+			{"VIEW_CONFIRM"                              ,   	"APP-OR0300 Do You Want to View Other Records... Current Selected Data Will be Lost"},
+    		{"CANNOT_SYNC"	                             ,      "APP-OR0301 Cannot Sync......"},
+    		{"NO_OF_CHARACTERS"                          ,	    "APP-OR0302 The number of characters cannot exceed "},
+			{"DO_WANT_VIEW"					             ,	    "APP-OR0303 Do you want to View?"                                                          }, 												  
+	    	{"NEW_ORDERS_SHOULD_BE_SELECTED"             ,    	"APP-OR0304 New Orders should be selected"},
+		    {"PRIVILEGE_LEVEL_BLANK"                     ,      "APP-OR0305 Privilege Level cannot be blank"},
+		    {"CONFIRM_SEND"                            	,       "APP-OR0306 Do you want to Send Out?"},
+		    {"CONFIRM_RESULT"	                         ,      "APP-OR0307 Do you want to Result?"},
+		    {"DATE_MORE_THAN_SYS_DATE"                   ,      "APP-OR0308 Date should be greater than or equal to Current Date"},
+			{"REASON_CANT_BLANK"					     ,	    "APP-OR0309 Reason Can not be Blank..."                                                    }, 												  
+			{"NUM_OF_CHARACTERS"					     ,	    "APP-OR0310 Cannot exceed 255 Characters..."                                               },   
+			{"NAME_BLANK"					             ,	    "APP-OR0311 Name cannot be blank..."                                            }, 												  
+			{"CONSENT_NOTE_CANT_BLANK"					 ,	    "APP-OR0312 Consent Notes cannot be blank..."                                   }, 						  
+			{"DATE_COMPARE"					             ,	    "APP-OR0313 Date should be less than or equal to System Date"                 },  												  
+			{"FIELD_MNEMONIC_START_WITH"				 ,	     "APP-OR0314 Field Mnemonic cannot start with a Numeric or _"                               }, 								  
+			{"WRONG_ACSSESS"					         ,	     "APP-OR0315 Wrong Acssess....."                                                            }, 												  
+			{"FROM_VISIT"	                             ,        "APP-OR0316 from visit admin:"                                                            },
+			{"COMMENT_CANT_EXCEED_255"		             ,		 "APP-OR0317 Comment cannot exceed 255 characters"                             },
+			{"DATE_LESS_SYS_DATE"		                 ,		 "APP-OR0318 Date should be less than or equal to System Date"                 },
+			{"TEXT_CANT_EXCEED_255"			             ,		 "APP-OR0319 Text cannot exceed 255 characters."                               },
+			{"REMARK_CANT_EXCEED_255_CHAR"				 ,	     "APP-OR0320 Remark cannot exceed 255 characters."                             },
+		    {"NO_MORE_MNEMONICS_SELECTED"					,		"APP-OR0321 No More Mnemonics can be selected"},
+			{"REPORTING_DATE_BLANK"                      ,	"APP-OR0322 Reporting Date cannot be blank..."},
+			{"CHECK_ANY_ONE"                             ,      "APP-OR0323 Check any one"},
+			{"TEXT_MAX"                                  ,      "APP-OR0324 Text cannnot exceed {1} characters"},
+			{"PRINT_CONFIRM"                             ,      "APP-OR0325 Would you like to print this report"},
+			{"CONFIRM_ABNORMAL_RESULT"                   ,      "APP-OR0326 Do you want see  Abnormal Result Only ?"},
+			{"CONFIRM_COMPLETE_REVIEW"                   ,      "APP-OR0327	Do you want to complete the review?"},
+			{"REFUSAL_TYPE"                              ,      "APP-OR0328 Refusal type cannot be blank..."},
+			{"MAX_LIMIT_TEXT"					         ,	    "APP-OR0329 Max limit of Text is 255 Characters"                                           },
+			{ "ATLEAST_ONE_DEFAULT"						 ,	"APP-OR0330 ATLEAST_ONE_DEFAULT TO BE SELECTED....."   },
+			{ "NO_RECORDS_TO_RECORD"					 ,	"APP-OR0331 No Records to Record the Results"},
+			{ "ATLEAST_ONE_CONSENT"						,	"APP-OR0332 Atleast One Consent Should be Selected"},
+			{ "OR_ORDER_CATALOG_MULTICONSENT_MANDATORY"						,	"APP-OR0333 Please enter all the required Mandatory Consents"},
+			{ "OR_ORDER_CATALOG_MULTICONSENT_CHECKBOX"						,	"APP-OR0334 Please select atleast one Select Checkbox for the entered Consent"},
+			{ "OR_ORDER_CATALOG_MULTICONSENT"						,	"APP-OR0335 Please select a Valid Consent"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_EXC_SPEC_COUNT"						,	"APP-OR0336 No of Consent to be Recorded Before Order Release Exceeds the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_EXC_SPEC_COUNT"						,	"APP-OR0337 No of Consent to be Recorded Before Order Registration Exceeds the Specified Count"},
+			{ "ASSIGN_CONSENT_FORM_TO_RECORD"						,	"APP-OR0338 Please Assign a Consent Form to Record"},
+			{ "DUPLICATE_CONSENT_FORM_NOT_ALLOWED"						,	"APP-OR0339 Duplicate Consent Form are Not Allowed"},
+			{ "UNCHECK_CONSENT_FORM_CLEAR_ENTERED_CONSENT"						,	"APP-OR0340 Unchecking the Consent Form will Clear the Entered Content"},
+			{ "CHANGING_CONSENT_FORM_CLEAR_ENTERED_CONSENT"						,	"APP-OR0341 Changing the Consent Form will Clear the Entered Content"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_LESS_THAN_SPEC_COUNT"						,	"APP-OR0342 No of Consent to be Recorded Before Order Release is Less Than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_LESS_THAN_SPEC_COUNT"						,	"APP-OR0343 No of Consent to be Recorded Before Order Registration is Less Than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_BEFOR_ORDER_REALEASE_AND_ORDER_REGISTRATION_LESS_THAN_SPEC_COUNT"						,	"APP-OR0344 No of Consent to be Recorded Before Order Release and Before Registration is Less Than the Specified Count"},
+    		{"ATLEAST_ONE_CONSENT_FORM_SHOULD_BE_SELECTED_OR_DEFINED"						,	"APP-OR0345 Atleast One Consent Form Should be Selected or Defined"},
+			{"CONSENT_FORM_SELECTED_IS_ALREADY_RECORDED"						,	"APP-OR0346 Consent Form Selected is Already Recorded"},
+			{"YOU_ARE_NOT_ELIGIBLE_TO_RECORD_THIS_CONSENT"						,	"APP-OR0347 You are Not Eligible to Record this Consent"},
+			{"CHECK_ATLEAST_ONE_CONSENT_FORM_TO_RECORD"						,	"APP-OR0348 Check Atleast One Consent Form to Record"},
+			{"CHECK_DATE_ORDERID_PATIENTID"						,	"APP-OR0349 Check! Either date range should be with in a month or Patient ID or Order ID should be entered."},
+			{"OR_ORDER_CATALOG_CONSENT_REQUIRED"			,	"APP-OR0350 Total number Of Consent Required should be more than one."},
+			{"OR_PRIVILEGE_GROUP_COPY_FROM"			,	"APP-OR0351 No values to copy from  "},
+			{"OR_PRIVILEGE_GROUP_UNDO"			,	"APP-OR0352 Unable to perform undo operation "},
+			{"INVALID_BLOOD_TRANS_EXPECTED_DATE"			,	"APP-OR0353 Invalid Blood Transfusion Expected Date "},
+			{"FUTURE_ORDER_DURATION"			,	"APP-OR0354 Future Order Duration Cannot Be Blank "},
+			{"CONSENT_FOR_BEFORE_REGISTERATION"			,	"APP-OR0355 Consent For Before Registeration is Recorded "},
+			{"CONSENT_FOR_BEFORE_RELEASE"			,	"APP-OR0356 Consent For Before Release is Recorded "},
+			{"BEFORE_ORDER_RELEASE_CANNOT_BE_MORE_THAN","APP-OR0357 Before Order Release cannot be more than..."},
+			{"BEFORE_ORDER_REGISTRATION_CANNOT_BE_MORE_THAN","APP-OR0358 Before Order Registeration cannot be more than..."},
+			{"CONSENTS_RECORD_MORE_THAN_COUNT"			,	"APP-OR0359 No of Consent to be Recorded Exceeds the Specified Count"},
+			{"CONSENTS_RECORD_LESS_THAN_COUNT"			,	"APP-OR0360 No of Consent to be Recorded Less than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_MORE_THAN_SPEC_COUNT"						,	"APP-OR0361 No of Consent to be Recorded Before Order Release is More than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_MORE_THAN_SPEC_COUNT"						,	"APP-OR0362 No of Consent to be Recorded Before Order Registration is More than the Specified Count"},
+			{ "DUPLICATE_CONSENTS_NOT_ALLOWED"	,"APP-OR0363 Duplicate Consent Form are Not Allowed"},
+			{ "SPECAILTY_SHOULD_NOT_BLANK"	,"APP-OR0364 Speciality Should not be blank"},
+			{ "BILLING_SERVICE_NOT_DEFINED"	,"APP-OR0365 Billing Service not defined for {1} and cannot be included for place order"},
+			{ "NO_OF_CONSENTS_TO_BE_RECORD_ARE_MORE_THAN_REQUIRED"	,"APP-OR0366 No.of Consents to be record are more than Required"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_MORE_THAN_SPEC_COUNT"						,	"APP-OR0367 No of Consent to be Recorded Before Order Release is More than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_MORE_THAN_SPEC_COUNT"						,	"APP-OR0368 No of Consent to be Recorded Before Order Registration is More than the Specified Count"},
+			{ "DELETE_NOT_ALLOWED"						,	"APP-OR0369  The list value marked for delete cannot be deleted! - Delink from Order Catalog and try."},
+			{ "ORDERTRACKING_SEARCH_VALIDATE",	"APP-OR0370 Atleast one of the below condition should be true. \n1. Patient ID  entered.\n2. Status is -All-  and the period range is one day.\n3. Status is not -All- and period range is max of one week. "},
+			{ "REGORDER_SEARCH_VALIDATE",	"APP-OR0371 Atleast one of the below condition should be true. \n1. Patient ID  entered.\n2. Order ID  entered.\n3. Period range is max of one week.\n4. Order Category is selected  and the period range is within one month."},
+			{ "ORDER_SET_EXPLN_TEXT",	"APP-OR0372 View Order Set Details"},
+			{ "ORDER_SET_ADMIN_ROUTE",	"APP-OR0373 Enter the Route for the Associated Record"},
+			{"PAT_CLASS_ENC_ID_NOT_PASSED","APP-OR0374 Encounter ID and Patient Class are not passed."},
+			{"ATLEAST_ONE_ALLOWED_TYPE","APP-OR0375 Allowed Type Cannot Be Blank."},
+			{"ATLEAST_ONE_PRACTITIONER","APP-OR0376 Select atleast One Practitioner"},
+			{"ATLEAST_ONE_PRACTITIONER_TYPE","APP-OR0377 Select Atleast one Practitioner Type."},
+			{"ATLEAST_ONE_RESPONSIBILITY","APP-OR0378 Select Atleast one Responsibility."},
+			{"COMPLETE_ON_ORDER","APP-OR0379 Complete On Order is Mandatory."},
+			{"CANNOT_PLACE_ORDER","APP-OR0380 Order Cannot be placed as both the  order set and order items are selected."},
+			{"DUPLICATE_RECORDS_FOUND","APP-OR0381 Duplicate Records Found...Cannot Proceed..."},
+			{"VALUE_NOT_ENTERED","APP-OR0382 Value not entered for"},
+			{"VALUE_ENTERED_LOST","APP-OR0383 All the entered values will be lost, do you want to continue...."},
+			{"MORE_THAN_THREE_RECORDS_NOT_ALLOWED","APP-OR0384 More than three records will not be Accepted for this Mnemonic"},
+			{"BEFORE_ORDER_RELEASE_CONSENT_LINKED","APP-OR0385 For Before Order Release Already {1} Consent linked"},
+			{"BEFORE_ORDER_REGISTRATION_CONSENT_LINKED","APP-OR0386 For Before Order Registration Already {1} Consent linked"},
+			{"REFUSAL_CONTENT_IS_NOT_CONFIRMED_CONFIRM_BEFORE_CONTINUE","APP-OR0387 Refusal Content is not confirmed.Confirm before continue."},
+			{"DUPLICATE_ORDERS_FOUND","APP-OR0388 Duplicate orders Found...Cannot Proceed..."},
+			{"DATE_SHOULD_BE_MORE_THAN_START_DATE_TIME","APP-OR0389 Date Should be More than Start Date Time..."},
+			{"DATE_SHOULD_BE_LESS_THAN_SYSDATE_TIME","APP-OR0390 Date Should be Less than System Date Time..."},
+			{"ORDER_CATEGORY_NOT_SETUP_FOR_MULTI_PATIENT_RESULT_REPORTING","APP-OR0391 Order Category not setup for multi patient result reporting"},
+			{"FOR_ORDER_ID","APP-OR0392 for Order ID"},
+			{"RECORD_CONFIRM"                            ,      "APP-OR0393 Are you sure you want to Record"},
+			{"ALLOW_PRIV_TO_ORDER"         ,      "APP-OR0394 Do you want to control ordering by privilege group set up"},
+			{"ALLOW_PRIV_TO_ORDER_AUTHORISE"         ,      "APP-OR0395 Do you want to control order authorisation by privilege group set up"},
+			{"ASSIGN_PRIVILEGE_TO_PRACT_YN_TO_ORDER"         ,      "APP-OR0396 Atleast One Privilege Group has to be Assigned to the Ordering Practitioner"},
+			{"OPERATION_FAILED"         ,      "APP-OR0397 Exception Occurred - Unable to complete the operation, Please Retry"},
+			{"PRIV_GROUP_CANNOT_BE_BLANK"         ,      "APP-OR0398 Privilege Group Cannot be Blank"},
+			{"GROUP_BY_CANNOT_BE_BLANK"         ,      "APP-OR0399 Group By Cannot be Blank"},
+			{"ORDER_SCHEDULE_TIME"         ,      "APP-OR0400 For $ time must be in ascending order."},
+			{"MAND_PROCEDURE_LINK"         ,      "APP-OR0401 Procedure is not Linked for Mandatory Catalog"},
+			{"TIME_BLANK"         ,      "APP-OR0402 Time at $ cannot be blank"},
+			{"MIN_VAL_GRT_OR_EQL_TO"         ,      "APP-OR0403 MIN_VAL  should be greaterthan or equal to"},
+			{"PRIV_ORDER_AUTH_RIGHTS"         ,      "APP-OR0404 Authorization is not setup and this order {1} will not be placed.Please contact System Administrator"},
+			{"MIN_DIGIT_ALLOW"         ,      "APP-OR0405 Minimum digits should be "},
+			{"ATLEAST_ONE_CATEGORY","APP-OR0406 Select atleast One Order Category"},
+			{"NO_SCHEDULE","APP-OR0407 No Schedule set for selected frequency"},
+			{"CONSECUTIVE_RECORDS_ONLY","APP-OR0408 Please Select Consecutive Records Only For Copy"},
+			{"SELECT_ORDER_TYPE_FOR_SPECIFIC","APP-OR0409 Please Select Atleast One Order Type for Specific Applicable Order Type"},
+			{"ASSOCIATE_ORDER_TYPE_FOR_CATALOG","APP-OR0410 Order Type For The Associated Order Catalog Cannot Be Blank "},
+			{"RECORD_EXISTS_FOR_CATEGORY","APP-OR0411 Record Already Exists for $$ Report Grouping"},
+			{"ORDER_TRACKING_RPT_MANDATORY" ,"APP-OR0412 Patient Id or Location must be entered"},
+			/*Added by Uma on 12/1/2010 for IN017231 PMG20089-CRF-0830*/
+			{"REJECT_ORDERS_EXISTS","APP-OR0413 The Reject Orders Cannot be Placed. Uncheck Reject Orders To Proceed"}	,
+			{"CATALOGS_NOT_AVAIL_TO_PROCEED","APP-OR0414 This Order Catalog Will Be Removed For All Patients"}	,
+			{"PATIENT_NOT_AVAIL_TO_PROCEED","APP-OR0415 This Patient Will Not Be Placed Orders"},	
+			{"ENCOUNTER_ID_CANNOT_BE_BLANK","APP-OR0416 Encounter ID Cannot be Blank"},	
+			/*Ends Here*/
+			/*Added by Uma on 3/12/2010 IN019656*/
+			{"ORDERSET_NOT_ALLOWED_IN_AMEND","APP-OR0417 Order Set Cannot Be Placed in Amend Mode"},
+			{"SCHD_ENTER_VALID_QTY","APP-OR0418 Schedule Quantity should be greater than zero"},
+			{"CATALOG_OPERATIONAL_MODULE","APP-OR0419 Operational Module has to be linked for this {1} Catalog"},
+			/*Ends Here*/
+			/*Added by Uma for package billing*/
+			{"CONSULT_DATE_GRT_THAN_END_DATE","APP-OR0420 Consult Date Cannot Be Greater than Package End Date"},	
+			{"CONSULT_DATE_LESS_THAN_START_DATE","APP-OR0421 Consult Date Cannot Be less than Package Start Date"},
+			/*Ends Here*/
+			/*Added by Sridhar Reddy to fix IN019204 & 20575*/
+			{"CANCEL_DISCONTINUE_ADD_MIXTURE_ORDER","APP-OR0422 Individual items cannot be # for direct and admixture orders , Select All items to $ order"},				
+			/*Ends Here*/
+			{ "SPECIMEN_ORDER_SEARCH_VALIDATE_NEW_LIST",	"APP-OR0423 Atleast one of the below condition should be true. \n1. Patient ID  entered.\n2. Order ID  entered.\n3. Encounter ID Entered. \n4. Period range is max of Parameter Value."},
+			{ "SPECIMEN_ORDER_SEARCH_VALIDATE",	"APP-OR0424 Atleast one of the below condition should be true. \n1. Patient ID  entered.\n2. Order ID  entered.\n3. Encounter ID Entered. \n4. Specimen No is entered. \n5. Period range is max of Parameter Value."},
+			{ "VALIDATE_DATE_ON_SEARCH",	"APP-OR0425 Atleast one of the below condition should be true. \n1. Patient ID  entered \n2. Period range is max of One Week."},
+			{ "VALIDATE_DATE_ON_SEARCH_WITH_ENC",	"APP-OR0426 Atleast one of the below condition should be true. \n1. Patient ID  entered \n2. Encounter ID  entered \n3. Period range is max of One Week."},
+			{ "VALIDATE_DATE_ON_SEARCH_WITH_ENC_ORDER",	"APP-OR0427 Atleast one of the below condition should be true. \n1. Patient ID  entered \n2. Encounter ID  entered \n3. Order ID entered \n4. Period range is max of One Week."},
+			{ "OR_ORDER_CATALOG_MULTI_CONSENT_MANDATORY"						,	"APP-OR0428 Please enter $ # Consents"},
+			{ "OR_NOTES_PENDING_REVIEW"						,	"APP-OR0429 Result Note has been forwarded and review is pending. Do you want to change status to Resulted-Complete?"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_MORE_THAN_SPEC_COUNT_CAT"						,	"APP-OR0430 For $$ , No of Consent to be Recorded Before Order Release is More than the Specified Count"},
+			{ "NO_OF_CONSENTS_TO_BE_RECORD_ARE_MORE_THAN_REQUIRED_CAT"	,"APP-OR0431 For $$ , No.of Consents to be record are more than Required"},
+			{"CONSENTS_RECORD_MORE_THAN_COUNT_CAT"			,	"APP-OR0432 For $$ , No of Consent to be Recorded Exceeds the Specified Count"},
+			{"CONSENTS_RECORD_LESS_THAN_COUNT_CAT"			,	"APP-OR0433 For $$ , No of Consent to be Recorded Less than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_MORE_THAN_SPEC_COUNT_CAT"						,	"APP-OR0362 For $$ , No of Consent to be Recorded Before Order Registration is More than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REALEASE_LESS_THAN_SPEC_COUNT_CAT"						,	"APP-OR0342 For $$ , No of Consent to be Recorded Before Order Release is Less than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_ORDER_REGISTRATION_LESS_THAN_SPEC_COUNT_CAT"						,	"APP-OR0343 For $$ , No of Consent to be Recorded Before Order Registration is Less than the Specified Count"},
+			{ "NO_OF_CONSENT_RECORDED_BEFOR_BEFOR_ORDER_REALEASE_AND_ORDER_REGISTRATION_LESS_THAN_SPEC_COUNT_CAT"						,	"APP-OR0344 For $$ , No of Consent to be Recorded Before Order Release and Before Registration is Less than the Specified Count"},			
+			{ "CANNOT_MODIFY_SPEC_FORMAT",	"APP-OR0438 Selected specimen number format conatins transaction records\nSystem doesn't allow to modify the format."},
+			{ "CANNOT_ADD_MORETHAN_ON_RUNSEQ",	"APP-OR0439 Cannot add more than one Running Sequence no to the format."},
+			{ "RESET_SPEC_FRMT_FOR_ALL",	"APP-OR0440 For selected facility already other specimen format is mapped for some order types / All. \n It will reset new format for all \n Do you want to continue?"},
+			{"RESULTING_LESS_PREV_REC"			,	"APP-OR0441 Resulting date time should be greater than Last Resulted date time"},//IN029143
+			{"ENTER_PIN"			,	"APP-OR0442 Enter the PIN "},//IN029143
+			{"INVALID_PIN"			,	"APP-OR0443 Invalid PIN "},//IN029143
+			{"PIN_NOT"			,	"APP-OR0444 PIN not available.Please contact System Administrator."},//IN030711
+			{"OPERATION_PARTIAL"			,	"APP-OR0445 Operation completed partially..."},//IN030711
+			{"DUPLICATE_RECORDS",	"  Record combination already exists in setup..."}, //CRF 160
+			{"DELETE ROWS", "APP-OR0446 Are you sure you want to remove selected rows"}, //IN036069
+			{"AUTH_RAD_SCH", "APP-OR0447 Pending for Departmental Authorization, Cannot Proceed"}, //IN035976
+			{"LESS_OR_EQUAL_VALIDATE",			 "APP-OR0448	 From @ should be less than or equal to To @"}, //IN036491
+			{"UPDATE_FUTDAT_CURRDAT_SPECIMEN","APP-OR0449 This action will update the Start Date/Time of the selected future order to Current Date/Time. Click on OK to confirm and RECORD to complete the action."}, //CRF 360 //IN041138
+			{"ORDER_ALREADY_VERIFIED"         ,				"APP-OR0450 Order status changed, cannot proceed..." },//IN043143
+			{"MAND_CHECK"         ,				"APP-OR0451 Please select atleast one Privilege Group..." },  // LICN_1
+			{"DUP_REASON_REQD"         ,				"APP-OR0452 Duplicate Override reason is mandatory..." },  // IN024984
+			{"OR_ORDERING_RULE_CHK"         ,		"APP-OR0454 Ordering rule setup exists, cannot proceed... " },  // IN050607
+			{"PERIOD_SHOULD_LESS_THAN_YEAR", "APP-OR0455 The selected period should not be more than a Year" }, //IN054381
+			{"SPECIMENNO_SELECTED", "APP-OR0456 Specimen no is selected..." }, // IN055737 HSA-CRF-0250.1
+			{"SPECIMENNO_IS_NOT_AVAIL", "APP-OR0457 Selected Specimen no is not available in the list..." }, // IN055737 HSA-CRF-0250.1
+			{"SPECIMENNO_ALREADY_SELECTED", "APP-OR0458 Selected Specimen no is already added in the list..." }, // IN055737 HSA-CRF-0250.1
+			{"SPECIMEN_COLLECTION_ORDER_DATE_WARN",	"APP-OR0459 Date should be greater than or equal to Ordered Date for the Order $$. \n Please Uncheck and check the Auto-Update Collection Date and Time again to continue..."}, //MMS-MD-SCF-0017 [IN060516]
+			{"UPDATE_FUTDAT_CURR_SPECIMEN_DATE","APP-OR0460 This action will update the Start Date/Time of the selected future order to Specimen Collection Date/Time. Click on OK to confirm and RECORD to complete the action."}, //IN059646
+			{"NOT_AUTHORIZED_TO_VIEW_CONFIDENTIAL_RESULT","APP-OR0461 You are not authorized to view Confidential Result."}, //IN064215
+			{"BARCODE_RPT_SUBMIT_TO_PRINTER"       ,				"APP-OR0462 Barcode report has been Submitted to the Printer" }, //IN063816
+			{"AGE_WISE_DATA_REQUIRED" ,	"APP-OR0463 At least one age group must be included" },//IN062992
+			{"TIME_FRAME_EMPTY_ALERT","APP-OR0464 Time duration shall not be blank. Please enter the Numeric value" },//IN061892
+			{"REVIEW_ATLEAST_ONE","APP-OR0465 Atleast one order to be selected to be reviewed"},//IN066341
+			{"RECORD_INSERTED","APP-OR0466 Operation Completed Successfully" },//IN065642
+			{"OR_DATE_RANGE","APP-OR0467 Date range exceeds a month period." },//IN065642
+			{"REPORINGFACILITYBLANK","APP-OR0467 Please select the Reporting facility." },//IN065642
+			{"NO_RECORDS_HAVE_BEEN_SELECTED","APP-OR0468 No records have been selected!!!" },//IN065642
+			{"ASSIGNEDPRACTATIONERBLANK","APP-OR0469 Please select the assign radiologist." },//IN065642
+			{"ORDER_RESTRICT_AE_AND_OP_ENCOUNTER","APP-OR0470 Patient has an active admission. Orders for Open AE encounter cannot be placed"},//IN063719
+			{"OCC_NO_CANNOT_BLANK","APP-OR0471 Occurance no cannot be blank" },//IN68241
+			{"DUPLICATE_OCC_NO","APP-OR0472 Contains duplicate Occurrance No" },//IN68241
+			{"DUPLICATE_OCC_NO_SHLD_NOT_SELECT","APP-OR0473 Duplicate Occurrance No cannot be selected" },//IN68241
+			{"MULTI_DOSAGE_TYPE_CONFIG","APP-OR0474 This catalog has multi Dosage Type configuration" },//IN68241
+			{"ORDERSET_INCORRECT_CATALOG_COMB","APP-OR0475 Selected order catalogs not assigned to selected facilitty, so cannot create order set" },//IN068370,IN068373
+			{"ATLEAST_ONE_FAC_SHLD_BE_MAPPED","APP-OR0476 Atleast one facility should be mapped" },//IN068370,IN068373
+			{"ATLEAST_ONE_SPECIALTY_TO_BE_SELECTED","APP-OR0477 At least one Specialty to be selected" },//IN69021
+			{"ATLEAST_ONE_ORDER_CATEGORY_TO_BE_SELECTED","APP-OR0478 At least one Order Category to be selected" },//IN69021
+			{"ATLEAST_ONE_PATIENT_CLASS_TO_BE_SELECTED","APP-OR0479 At least one Patient Class to be selected" },//IN69021
+			{"DIAG_NOT_RECORDED","APP-OR0480 Patient Diagnosis not recorded, please complete to proceed further." },//IN69027
+			{"NO_VIDEO_FILES_TO_LINK","APP-OR0477 No Video Files to Link" },
+			{"RESTRICTED_PHORDER_SELF_FAMILY","Placing of prescriptions or medical items for self or for your family members are strictly restricted. Stop Ordering restricted Order Category or Consult with another Practitioner to Proceed."},
+			{"RESTRICTED_ORDER_SELF_FAMILY","Placing of Orders for self or for your family members are strictly restricted. Stop Ordering restricted Order Category or Consult with another Practitioner to Proceed."},
+			{"CONSENTS_FORM_LOADING","Please wait while the Consent Form is Loading..."}
+		};
+}
+		
+					
+			
+										                                                   

@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Build Library</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Care Plan\nCodeSetup\nBuild Library");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Build Library</h1>
+<p class="Italic">From this function you can <span style="color: #ff0000;"><font color="red" >Create</font></span> the libraries.</p>
+<p class="Text">This function is used to build libraries that can be used in generating a care plan for a patient, which is predefined. Libraries are built with one or more terminology codes, one or more goals associated with each terminology code and one or more group of interventions and outcomes associated to each goal.</p>
+<p class="Text">The library serves as a template while generating a care plan for the patient.</p>
+<h2>Creating Build Library</h2>
+<p class="From">From the CP Codes Setup &gt; CP Code Setup, select the Build Library function.</p>
+<p class="Text">The Build Library screen gets displayed.</p>
+<ol type="1">
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Create]</b></span> to invoke the Create screen.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Select the Library using <span style="font-weight: bold;"><b>[?]</b></span> function. This is a mandatory field. The Library Description, Version No and Status get displayed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>Associate Term Code</b></span> hyperlink, the Terminology Code Search dialog gets displayed.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Enter the respective fields in the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Terminology Code Search</a> dialog.</p>
+<div class="droptext" id="POPUP1004774725" style="display: none;">
+<p class="NumberRFD">Enter the following details in order to associate term codes to the Library:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Terminology Set</u></span> – Select the Terminology Set from the list of values. The values listed are the terminology sets defined in the ‘Terminology Set’ master in the Medical Records Module. This is a mandatory field. Only those terminology sets that are Diagnosis Specific and Procedure Specific are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Type</u></span> – Select the Type from the list. &#160;The listed values depend on the terminology set selected. The values are ‘Procedure’ or ‘Diagnosis’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Classification Level</u></span> - Select the Classification Level from the list of valid values. The listed values depend on the terminology set selected. The number of levels defined for the terminology set is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Terminology Code</u></span> – Enter the Terminology Code in alphanumeric format of 30 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Terminology Code Description</u></span> - Enter the Terminology Code Description in alphanumeric format of 50 characters maximum length.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Search]</b></span>. The Terminology Code, Description, Actual, Potential, Wellness and Sensitive details gets displayed. On clicking any of the alphabets the list of terminology codes belonging to the selected terminology set, selected classification level and which are starting with the alphabet clicked are listed for selection.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Select the checkbox against the Terminology Code to be associated and click <span style="font-weight: bold;"><b>[Close]</b></span>.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>Goal</b></span> hyperlink, the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Goal</a> dialog gets displayed.</p>
+<div class="droptext" id="POPUP1004742200" style="display: none;">
+<p class="NumberRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Terminology Set</u></span> - The Terminology Set from which the terminology code is selected is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Terminology Code</u></span> – The short description of the Terminology Code is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Associated</u></span> – This is a hyperlink. The system displays the goals associated to the terminology code, by default. Click the hyperlink to view the goals, which are associated already to the term code when required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Alphabets</u></span> – The goals are listed in the alphabetical order. To view the goals in the alphabetical order, click on the respective alphabet, which is hyperlinked. For example to view the goals, which start with ‘T’, click on the hyperlink ‘T’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Others</u></span> – This is a hyperlink. The goals that start with a number or symbol other than an alphabet are displayed on clicking the hyperlink.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Goal Description</u></span> – The description as entered for the goal in the Outcome master is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Target Period</u></span> – This consists of two fields. The first field is to enter the duration. The second field is to capture the duration units.</p>
+</li>
+</ol>
+<ul>
+<li style="list-style:none;display: inline">
+<ol>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span style="text-decoration: underline;"><u>Duration Units</u></span> – Select from the list of values. The list values are Day(s), Hour(s), Minute(s), Month(s) and Week(s). By default, the value Day(s) is selected.</p>
+</li>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span style="text-decoration: underline;"><u>Duration</u></span> – Enter the duration in the numeric format of maximum five characters. The duration entered in this field along with the duration units is taken as the period to achieve the goal selected.</p>
+</li>
+</ol>
+</li>
+</ul>
+<ol start="8">
+<li type="1" class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Practitioner Type</u></span> - Select the Practitioner Type from the list values. The list consists of all the practitioner types, which are system defined.</p>
+</li>
+</ol>
+<p>&#160;</p>
+</div>
+</li>
+<li class="p-Text">
+<p class="Text">Select the check box against the Goal Description to be associated with the Library. Once you associate the goal(s) by clicking the check boxes against them, the intervention that needs to be performed to achieve the goal has to be mapped.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>Interventions/Outcomes</b></span> hyperlink, the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Interventions/Outcomes</a> dialog gets displayed.</p>
+<div class="droptext" id="POPUP1004754052" style="display: none;">
+<p class="NumberRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Intervention Description</u></span> – The description recorded for the intervention is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Alt</u></span> – Enter the number, which is considered as an Alt ID. Interventions with the same Alt ID is taken as Alternative Interventions in a library for a goal.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Relative Start</u></span> – Enter the period in numerical format and select the period units from the list value. The combination of the two is taken as the relative start period.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Frequency</u></span> – Select from the list values. The frequency values are defined in the AM Frequency master.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Duration</u></span> – Enter the duration by selecting it from the list, the duration multiplied with the frequency gives the number of tasks in the task list.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Dependency</u></span> – Select from the list of values the dependency levels. The values displayed are from one to nine.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Stage</u></span> – This is from the Stage master meant for mentioning the stage at which the intervention has to be performed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Select</u></span> – Select the check box to select the intervention.</p>
+</li>
+</ol>
+<p class="NumberRFD">When the intervention(s) are selected, the outcome for the intervention(s) is to be associated by selecting an outcome.</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Outcome Description</u></span> – The Outcome Description recorded for the intervention is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Nature</u></span> – The drop-down list has system defined values. The listed values are ‘Actual’, ‘Potential’, ‘Both’ and ‘Wellness’. Select the nature based on the term code associated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Target Period</u></span> – This consists of two fields. The first field is to enter the duration. The second field is to capture the duration units.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Select</u></span> – Select the check box to select the outcomes of the intervention.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Create New Group</u></span> – Click <span style="font-weight: bold;"><b>[Create New Group]</b></span> to form a group of the interventions and the outcomes selected. The system displays the group number as a hyperlink.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Close</u></span> - Click <span style="font-weight: bold;"><b>[Close]</b></span> to close the window.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Text">
+<p class="Text">Close the Goal dialog.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Preview]</b></span> to preview the selected Library. The Term set, Term Code, Goals, Intervention/Outcome groups associated to the library are displayed. If all these are not associated, it is highlighted in red. You need to associate all the above to view the preview.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Save]</b></span> to save the changes made.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Reset]</b></span> to clear the entered data.</p>
+</li>
+<li class="p-Text">
+<p class="Text">Click <span style="font-weight: bold;"><b>[Query]</b></span> to invoke the Query screen and to search for the existing records.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<hr style="float: aligncenter;" />
+<p class="Text"><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Library','Library.htm','Terminology Code','../../Medical_Records/TerminologySet/Terminology_Code.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics3.gif" border="0" height="17" width="81" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004774725');
+	TextPopupInit('a2','POPUP1004742200');
+	TextPopupInit('a3','POPUP1004754052');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

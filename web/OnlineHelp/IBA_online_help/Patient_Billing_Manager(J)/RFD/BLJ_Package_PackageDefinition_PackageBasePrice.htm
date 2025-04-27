@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BLJ_Package_PackageDefinition_PackageBasePrice</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define Package Base Price:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Class</span> - Click <span class="BoldNumberRFD">[?]</span> function to select and associate a Billing Class. The values defined through the 'Billing Class' function are listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Indicator</span> - Select an Indicator from the list. The system-defined values are 'Price' and 'Factor'. The first record should have the indicator as 'Price'. This is mandatory. 'Factor' is valid for selection only for non-order catalog packages.</p>
+</li>
+</ol>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Price</span> - Enter the price in numeric format at which respective package can be offered for the Billing Class.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Common Base Price can only be a 'Price'.</p>
+<p class="Note">=&gt; You cannot specify duplicate Package Base Price for the same Billing Class.</p>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round To</span> - Enter the value in numeric format. You can select 'Round To' only when the 'Indicator' is selected as ' Price'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Round Indicator</span> - Select a value from the round indicator. The system-defined values are 'Up' and 'Down'. Select 'Up' to round off the value to the highest nearing value specified for 'Round To'. Select 'Down' to round off the value to the lowest nearing value specified for 'Round To'. For Example, if the package value is 3,515 and the 'Round To' is set as 10 with the 'Round Indicator' as 'Up', the package price is rounded off to 3520.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deposit</span> - Select the check box if deposit amount has to be accepted for the package. Clear the check box if deposit is not mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Partial Deposit</span> - Select the check box to accept partial deposit for the package. Clear the check box if partial deposit is not mandatory. You can select the check box only if the check box 'Deposit' is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Percent/Amount</span> - Select a value from the list. This field is enabled for selection only if the check box 'Partial Deposit' field is selected. You can choose to accept a specific amount as the deposit amount or a percentage of the base price as the deposit amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Minimum Deposit Amount</span> - Enter the minimum deposit amount that has to be accepted from the patient in numeric format. The partial deposit amount to be accepted from the patient for the package is calculated based on the value selected for 'Percent/Amount' and 'Minimum Deposit Amount'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Factor Applicable for Service Limit</span> - Select the check box to define the factor available for service limit. This field is enabled for selection only if the 'indicator' value is selected as 'factor'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Add]</span> - Click <span class="BoldNumberRFD">[Add]</span> to associate the details to the package.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

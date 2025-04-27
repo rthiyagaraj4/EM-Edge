@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>RD_Admin_RD Parameter for Facility</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to define RD Parameters for facility:</p>
+<p class="BoldRFD">Operational Settings</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Operating Units/Wings</span> – Select the required operational setting. Select the option ‘One’, if the facility has only one Operating Wing or select the option ‘Many’. You cannot change the operational setting from ‘Many’ to ‘One’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operating Unit/Wing</span> – Enter the Operating Unit/Wing code in alphanumeric format of two characters maximum length or click <span class="BoldNumberRFD">[List of Values]</span> to select an Operating Unit/Wing code. It is mandatory to select the Operating Unit/Wing code, if number of wings defined is ‘One’.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Registration Settings</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Register Referral Patient</span> – Select the check box, if referral patient registration is allowed in the Facility.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral Source Mandatory</span> – Select the check box, if recording the referral source is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Registration Backdate Limit</span> – Enter the number of days in numeric format of two digits maximum length to indicate the time that is allowed for backdating the radiology registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Period Ahead to register Exams against original visit:</span></p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">OP – Enter the hours allowed to register the radiology exams for Outpatients in numeric format of five digits maximum length. This specifies the number of hours the radiology exams can be registered in advance.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">AE – Enter the hours allowed to register the radiology exams for Emergency patients in numeric format of five digits maximum length. This specifies the number of hours the radiology exams can be registered in advance.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">IP – Enter the hours allowed to register the radiology exams for Inpatients in numeric format of five digits maximum length. This specifies the number of hours the radiology exams can be registered in advance.</p>
+</li>
+</ol>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Future Booking Days Limit</span> – Enter the number of days in numeric format of two digits maximum length to indicate the time that is allowed for booking the radiology examinations in advance.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Split Partially Unbilled Orders</u></span> - Select the checkbox to split partially unbilled orders in Register Examinations screen while registering an order. The orders are split such that:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Original order ID is applicable only for all the ‘billed’ exams and exams that do not require billing/payment. The one or more unbilled orders within this order ID are automatically cancelled with the reason “This order is cancelled as it is linked to a new order’”. This cancelled order is displayed within the CA module.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Another new order ID is created for all the ‘unbilled’ exams.</p>
+</li>
+</ol>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interface with External Queue Series</span> - Select the check box, if the queue number is mandatory for examination. Selecting this check box indicates that an external Queue Management System (QMS) is interfaced with the EM application and it is mandatory to allocate the queue number from external QMS.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Manual Radiologist Assignment</u></span> – Select the check box to assign radiologist manually in the Register Examinations screen. When the check box is selected, the Radiologist ID field gets enabled and appears as a lookup in Register Examinations screen so that you can select the required Radiologist from look up and complete the registration. By default, the check box is not selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Reporting Settings</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Preliminary Reporting</span> – Select the check box to allow preliminary reporting.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Authorization Settings</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dept. Authorization Required</span> - Select the check box to indicate that Departmental Authorization is required before performing an examination. If the check box is selected, all the examinations to be performed in this facility must be authorized before performing an examination. The status of the examination, which requires departmental authorization, is displayed as ‘PAUTH’ referring to Pending Authorization.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept PIN while Authorizing</span> - Select the check box to indicate that the authorizing user must enter the Personal Identification Number to authenticate while authorizing.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Others</p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Track Patient Location</span> – Select the check box to enable tracking of the patient location. The ‘Change Perform Location’ function is accessible if the check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Items Used Selection</span> – Select the option from the list. Select ‘Manual’ to manually enter the items, which are used for the examinations. Select ‘Auto populate’ for the system to display the items, which are used for the examinations.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validate Batch ID for Contrast</span> – Select the check box to indicate that the Batch ID must be validated, if contrasts are used for the examination.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Control Section Access</span> – Select the check box to restrict the control of the section.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validate MPPS</span> – Select the check box to enable the Enterprise Management applicable to recognize the images captured using MPPS. MPPS is an acronym for Modality Performed Procedure Steps and is an external application, which is interfaced to the Enterprise Management application.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Routine</span> - Enter the Routine in alphanumeric format of 50 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">mAS Auto Calculate</span> – Select this check box to display the milliamps Seconds (mAS) value in the Exposure Factors tab in the Record Exam Completion screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Technologist Comment In History?</span> - Select this check box to include the technologist comments into the Clinical Event History screen in Clinician Access module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Manual Allocation For Queue Number</span> - &#160;Select the check box, if the queue number is to be entered manually when the Queue Management System (QMS) is operationally down.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cosign Required For The Exam Placed ‘From’ Radiology</span> – Select the check box to indicate that the exam placed from Radiology Information Systems as ‘Additional Exam’ or ‘New Exam’ is to be co-signed in Clinician Access module.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If ‘Additional Exam’ order is placed, it has to be co-signed by the Ordering Practitioner.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If ‘New Exam’ order is placed, it has to be co-signed by the Attending Practitioner.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal; margin-left: 40px;">The exams are listed in the ‘Order Co-signing’ function as ‘Ordered from Radiology’ with reasons recorded (if any). You cannot modify the reasons. The exams are displayed with an icon &#160;. Clear the check box to indicate that the radiology exams do not require co-signing and is listed in the ‘Orders’ and ‘Register Order’ function.</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Co-signing is a method of intimating the attending practitioner of any orders placed by practitioners who are not directly related to the patient. Co-signing does not delay the processing of the order and is used to purely intimate the attending practitioner of any orders placed against patients who are directly under the care of that practitioner. The check box is selected, by default.</p>
+<p class="Note">The co-signing is applicable for orders placed for Daycare, Outpatients, Inpatients and Emergency patients. The co-signing is not applicable for orders placed for referral or external patients.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Interface to Other Modules</p>
+<ol start="24" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">M</span><span style="text-decoration: underline;"><u>andate Result Status when Authorising by Radiologist</u></span> - Select this checkbox to make the ‘Result Status’ dropdown mandatory. By default this checkbox is not selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interfaced to Patient Billing</span> - Select the check box to interface the Revenue Management module with the Radiology Information Systems module. If the check box is selected, the bill amount of the examination is displayed when the Radiology order is placed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Recalled Patient</span> – Select the check box to charge the patient, who is recalled for repeating an examination. Patients are recalled for re-examination purposes. Select this check box if the patient must be charged to undergo the same examination.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Consumables</span> -Select this check box to charge the item consumables used in the Record Exam Completion and Record Consumables screen. The item consumables are charged only if the ‘Interfaced to Patient Billing’ check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interfaced to Inventory Management</span> – Select this check box to interface the Inventory Management module with the Radiology module. If this check box is selected, the available stock quantity is displayed when a radiology order is placed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Type</span> – Enter the document type in alphanumeric format of six characters maximum length or click <span class="BoldNumberRFD">[List of Values]</span> to select the document type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Interfaced to PACS</span> - Select the check box to interface the Picture Archiving and Communication System (PACS).</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_CodeSetup_ResourceForLocation</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to create a Resource for Location record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – This field has two components where you have has to select a value from list and <span class="BoldNumberRFD">[?]</span> function to identify the care location. The list is the Location Type and <span class="BoldNumberRFD">[?]</span> function is used to select all the Locations that come under the selected Location Type. The Location Type values listed are 'Clinic', 'Procedure Unit' and 'Daycare Unit'. &#160;On selecting the required Location Type, the Locations listed are based on the following condition:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All Locations that are created for the logged in facility under the selected Location Type and have effective status as enabled</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All the defined Locations must be associated to the Operator Station assigned to the logged in user</p>
+</li>
+</ol>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Class/Type</span> - Select the Resource Class and Resource Type from the list. The values populated for Resource Class are ‘Practitioner’, ‘Room’, ‘Equipment’ and ‘Others’ for locations, which is based on Ambulatory Level of Care, and values are ‘Room’, ‘Equipment’ and ‘Others’ for locations, which is based on Emergency Level of Care. Based on the value selected in Resource Class, the values in Resource Type are filtered and populated from Application Masters module.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />When you select the ‘Location Type’ as ‘Procedure Unit’; and the ‘Location’ as Procedure unit specific to Radiology:</p>
+<ul type="disc">
+<li class="p-Note">
+<p class="Note">Resource Class field is defaulted as ‘Equipment’ and disabled.</p>
+</li>
+<li class="p-Note">
+<p class="Note">Resource Name loads the Equipment values specific to Radiology.</p>
+</li>
+</ul>
+<ol start="3">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Resource Name</span> - This field is enabled on selecting the Location, Resource Class and Resource Type. Enter the resource name in alphanumeric format of 30 characters maximum length or click <span class="BoldNumberRFD">[?]</span>, to invoke a search screen to look for the required resource. The displayed list is based on the following conditions:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Resources that fall under the selected Resource Class and Resource Type</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">In case of Resource Class ‘Practitioner’, the listing is based on Specialty associated to the Location</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">In case of Resource Class ‘Room’, the listing is based on Accounting Department associated to the Location</p>
+</li>
+</ol>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> - Select the check box if the record is to be activated and clear the check box if the record is to be deactivated.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Working days</span> - Click on the appropriate check boxes to indicate the days when the resources are applicable to the Location. Based on this definition, the Appointment Scheduling/Visit Registration transactions allow selection of resources only on applicable days of the week. The day check boxes are selected based on the working days of the Location selected and clear the check box to reallocate the working days for the resource.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Applicable Visit Type Indicators</p>
+<ol start="6" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable Visit Type Indicators</span> – Identify the Applicable Visit Type Indicators applicable for the Resource by selecting the appropriate check boxes. The check boxes are enabled based on the Applicable Visit Type Indicators of the Location. Based on this definition, the Resources are listed for an Outpatient encounter during Visit Registration.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,750 @@
+#include <stdio.h>   
+#include <string.h>
+#include "rl.h"
+#include "gl.h"
+   
+#define NODATAFOUND (sqlca.sqlcode == 1403)
+#define OERROR (sqlca.sqlcode < 0) 
+#define ESC 0x1B
+#define MAX_LINES 55
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1 
+EXEC SQL BEGIN DECLARE SECTION;    
+
+    VARCHAR		nd_operating_facility_id   [3],
+	            uid_pwd			           [91],
+				nd_session_id			   [50],
+				//comp_name		           [161],
+				comp_name		           [300],
+				oper_id			           [21],
+				rep_date		           [20],
+				rep_date1		           [20], //added for globalisation
+
+	/* variables for command line paramters */							 
+				d_source_type		[2],
+				d_source_code		[12],
+				d_source_desc		[100], /*Modified By Manoj S for ML-MMOH-CRF-0752.6*/	
+				d_organism_code		[5],
+				d_organism_desc		[41],
+				d_antibiotic_code	[5],
+				d_antibiotic_desc	[41],
+				d_sensitivity_ind	[2],
+
+	/* variables for cursor informations */
+				d_patient_id			[21],		
+				d_specimen_no			[21],
+				d_group_test_code		[11],
+				d_test_code				[11],
+
+	/* for additional informations rl_request_header and mp_patient_mast/rl_patient_mast */
+				d_episode_type			[2],
+				d_episode_no			[9],
+				d_tfr_visit_no			[5],
+				d_organism_report_date  [20],
+				d_organism_report_date1  [20], //added for globalisation
+				d_date					[25],
+				rl_ordered_facility_id	[3],
+
+				d_patient_name			[240],
+				d_patient_name_1		[240],
+				d_patient_name_2		[240],
+				d_patient_name_3		[240],
+				d_patient_name_4		[240],
+		/***************** added for globalisation ***********/
+
+		l_translated_value		[600],
+		language_id				[5];
+		/***************** added for globalisation ***********/
+				
+long	organism_count = 0;
+long    d_sequence_no	= 0;
+int   l_count = 0;
+
+int i; // added for globalisation
+
+EXEC SQL END DECLARE SECTION;
+
+int		l_len = 30;
+char	l_delimeter;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H; 
+
+#include <winproc.h>
+
+#define REP_WIDTH 80
+#define VER  "VER : 1.10.01\n"
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1],
+	 hdr_line6[REP_WIDTH+1],
+	 hdr_line7[REP_WIDTH+1];
+
+//char rep_title1[] = "Infection Control Report";
+char rep_title1[200]; //added for globalisation
+char rep_title2[200];
+
+char d_sensitivity_desc	[15];
+
+FILE *f1;
+
+char string_var[100] ;
+char local_legend[50][600]; // added for globalisation
+
+int i, 
+	page_no = 0,
+    line_no = 0;
+
+char l_string[300];
+
+char filename[150];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+    if(argc < 5) {
+        disp_message(ERR_MESG,"RLRINFCN : Usage RLRINFCN userid/password source_type source_code date \n");
+        proc_exit();
+    } 
+  
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+	
+
+    strcpy(nd_operating_facility_id.arr, argv[5]);
+	nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr);
+	
+	strcpy(d_source_type.arr,argv[6]);
+    d_source_type.len = strlen(d_source_type.arr);
+
+	strcpy(d_source_code.arr,argv[7]);
+    d_source_code.len = strlen(d_source_code.arr);
+
+
+	strcpy(d_date.arr,argv[8]);
+    d_date.len = strlen(d_date.arr);
+
+	EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR)
+	 {
+        disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+        proc_exit();
+     } 
+    
+	set_meduser_role();
+/******* from here added for globalisation ********/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+    get_legend_value(32);
+/******* upto here added for globalisation ********/
+
+    fetch_sys_info();
+	
+    strcpy(filename,WORKING_DIR);
+    strcat(filename,"rlrinfcn.lis");
+
+    if( (f1=fopen(filename,"w")) == NULL) 
+	{
+        disp_message(ERR_MESG,"Errors in opening output file...\n"); 
+		proc_exit();
+    }  
+	else
+	{
+	     fprintf(f1,"%c&k4S",ESC);
+	}
+
+	decl_cur();
+	do_report();
+
+    //fprintf(f1,"%c&|3O",ESC);
+	fprintf(f1,"%cE",ESC);
+    fclose(f1);
+
+/******** commented on 29.06.2003 and replaced with new standard
+
+   	print_online(uid_pwd.arr,"RLRINFCN","O", "","rlrinfcn.lis","S");
+
+**************************/
+
+    
+
+///////////////////////////////////////  
+
+					 PrintDocument
+						   (
+							uid_pwd.arr,		//char	*PUidPwd;
+							nd_session_id.arr,	//char	*PSessionID;
+							nd_operating_facility_id.arr,	//char	*PFacilityID;
+							"RL",				//char	*PModuleID;
+							"RLRINFCN",			//char	*PDocumentID;
+							filename,			//char	*POnlinePrintFileNames;
+							"O",				//char	*PLocationTypes;
+							"",				//char	*PLocationCodes;
+							1,					//int		PNumOfCopies;
+							1,					//int		PPageFrom;
+							9999					//int		PPageTo;
+						   );
+						   
+///////////////////////////////////////
+
+	EXEC SQL COMMIT WORK RELEASE;
+	
+    return;
+}
+
+
+declare_control_cursor()
+{
+    EXEC SQL DECLARE CONTROL_CURSOR CURSOR FOR
+		SELECT sequence_no, organism_code, antibiotic_code, sensitivity_ind
+		  FROM RL_INFECTION_LIST_HDR
+		 WHERE added_date = TO_DATE(:d_date, 'DD/MM/YYYYHH24:MI:SS')
+		 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 ORDER BY organism_code, antibiotic_code, sensitivity_ind;
+
+/*
+			SOURCE_CODE =	 :d_source_code
+		   AND SOURCE_TYPE =	 :d_source_type;
+//		   AND NVL(total_report_count, 0) > NVL(organism_count, 0);
+
+*/
+
+	EXEC SQL OPEN control_cursor;
+
+		if (OERROR)	    
+		{
+			disp_message(ERR_MESG,"Error declaring cursor");
+			disp_message(ERR_MESG,sqlca.sqlerrm.sqlerrmc);
+			proc_exit();
+		}
+}
+
+decl_cur()
+{
+    EXEC SQL DECLARE STAT_CURSOR CURSOR FOR
+			SELECT PATIENT_ID,SPECIMEN_NO,TO_CHAR(ORGANISM_REPORT_DATE, 'dd/mm/yyyy hh24:mi')
+		  FROM RL_INFECTION_LIST_DTL
+		 WHERE sequence_no = :d_sequence_no
+		 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 ORDER BY 1;
+		 
+/**		 
+		 SOURCE_CODE =	 :d_source_code
+		   AND SOURCE_TYPE =	 :d_source_type
+		   AND ORGANISM_CODE =	 :d_organism_code
+           AND ANTIBIOTIC_CODE = :d_antibiotic_code
+		   AND SENSITIVITY_IND = :d_sensitivity_ind
+	  ORDER BY 1;
+***/
+
+		if (OERROR)	    
+		{
+			disp_message(ERR_MESG,"Error declaring cursor");
+			disp_message(ERR_MESG,sqlca.sqlerrm.sqlerrmc);
+			proc_exit();
+		}
+}
+
+
+fetch_stat_cursor()
+{
+  d_patient_id.arr[0]		      = '\0';
+  d_specimen_no.arr[0]			  = '\0';
+  d_organism_report_date.arr[0]   = '\0'; 
+  d_group_test_code.arr[0]		  = '\0';
+  d_test_code.arr[0]			  = '\0';
+
+  d_patient_id.len				= 0;
+  d_specimen_no.len				= 0;
+  d_organism_report_date.len    = 0; 
+  d_group_test_code.len		    = 0;
+  d_test_code.len				= 0;
+
+
+  EXEC SQL FETCH STAT_CURSOR INTO  :d_patient_id,
+								   :d_specimen_no,
+								   :d_organism_report_date;
+							
+  if (OERROR)	    
+	{
+		disp_message(ERR_MESG,"Error fetching cursor");
+		disp_message(ERR_MESG,sqlca.sqlerrm.sqlerrmc);
+		proc_exit();
+	}
+
+    			
+  if (NODATAFOUND)
+       return 0;
+
+  d_patient_id.arr[d_patient_id.len]						= '\0';
+  d_specimen_no.arr[d_specimen_no.len]						= '\0';
+  d_organism_report_date.arr[d_organism_report_date.len]	= '\0'; 
+  d_group_test_code.arr[d_group_test_code.len]				= '\0';
+  d_test_code.arr[d_test_code.len]							= '\0';
+
+ 
+  return 1;
+}
+
+fetch_control_cursor()
+{
+
+   d_organism_code.arr[0]	= '\0';
+   d_organism_code.len		= 0;
+   d_antibiotic_code.arr[0] = '\0';
+   d_antibiotic_code.len	= 0;
+   d_sensitivity_ind.arr[0]	= '\0';
+   d_sensitivity_ind.len	= 0;
+
+  EXEC SQL FETCH control_cursor INTO :d_sequence_no,   
+									:d_organism_code,
+									:d_antibiotic_code,
+									:d_sensitivity_ind;
+							
+  if (OERROR)	    
+	{
+		disp_message(ERR_MESG,"Error fetching cursor control");
+		disp_message(ERR_MESG,sqlca.sqlerrm.sqlerrmc);
+		proc_exit();
+	}
+
+    			
+  if (NODATAFOUND)
+       return 0;
+
+
+		d_organism_code.arr[d_organism_code.len]	= '\0';
+		d_antibiotic_code.arr[d_antibiotic_code.len] = '\0';
+		d_sensitivity_ind.arr[d_sensitivity_ind.len]	= '\0';
+   	
+
+ 
+  return 1;
+}
+
+
+do_report()
+{
+	int still_record_left;
+
+    
+    
+
+	declare_control_cursor();
+
+	while(fetch_control_cursor())
+	{
+
+/**************************
+		if (d_sensitivity_ind.arr[0] == 'S')
+			strcpy(d_sensitivity_desc, "Sensitive");
+		else if (d_sensitivity_ind.arr[0] == 'R')
+			strcpy(d_sensitivity_desc, "Resistant");
+		else if (d_sensitivity_ind.arr[0] == 'I')
+			strcpy(d_sensitivity_desc, "Intermediate");
+		else if (d_sensitivity_ind.arr[0] == 'N')
+			strcpy(d_sensitivity_desc, "Negative");
+		else if (d_sensitivity_ind.arr[0] == 'P')
+			strcpy(d_sensitivity_desc, "Positive");
+**************************/
+		chk_break(60);		
+
+		EXEC SQL OPEN STAT_CURSOR;
+
+   		while(fetch_stat_cursor())
+		{	
+			get_pat_dtls();
+			chk_break(2);
+			print_rec();
+		}
+
+		close_stat_cursor();
+	
+	}
+
+	close_control_cursor();
+}
+
+
+get_pat_dtls()
+{
+	d_episode_type.arr[0]	= '\0';
+	d_episode_type.len		= 0;
+	d_episode_no.arr[0]	    = '\0';
+	d_episode_no.len		= 0;
+	d_tfr_visit_no.arr[0]   = '\0'; 
+	d_tfr_visit_no.len		= 0;
+	d_organism_report_date.arr[0] = '\0';
+	d_organism_report_date.len = 0;
+	rl_ordered_facility_id.arr[0]	= '\0';
+	rl_ordered_facility_id.len	= 0;
+
+	EXEC SQL 
+			SELECT EPISODE_TYPE,EPISODE_NO,TFR_VISIT_NO,TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM/YYYY HH24:MI'),
+					OPERATING_FACILITY_ID
+			  INTO	:d_episode_type,
+					:d_episode_no,
+					:d_tfr_visit_no,
+					:d_organism_report_date,
+					:rl_ordered_facility_id
+			  FROM RL_REQUEST_HEADER
+			 WHERE SPECIMEN_NO = :d_specimen_no
+			 AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+
+    if(OERROR)
+	 {
+        disp_message(ORA_MESG,"get_pat_dtls (1st select) failed ");
+		disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+        proc_exit();
+     } 
+
+	d_episode_type.arr[d_episode_type.len]	 = '\0';
+	d_episode_no.arr[d_episode_no.len]	     = '\0';
+	d_tfr_visit_no.arr[d_tfr_visit_no.len]   = '\0'; 
+	d_organism_report_date.arr[d_organism_report_date.len] = '\0';
+	rl_ordered_facility_id.arr[rl_ordered_facility_id.len] = '\0';
+
+	if ( strcmp(d_episode_type.arr, "R") == 0) 
+		do_ref_patient();
+	else
+		do_mp_patient();
+
+}
+
+do_mp_patient()
+{
+	d_patient_name.arr[0] = '\0';
+	d_patient_name.len = 0;
+
+	EXEC SQL
+	SELECT DECODE(:language_id, 'en', SHORT_NAME, 'th', SHORT_NAME_LOC_LANG) SHORT_NAME
+	  INTO :d_patient_name
+	  FROM MP_PATIENT_MAST
+	 WHERE PATIENT_ID = :d_patient_id;   
+
+	if (OERROR)
+        disp_message(ERR_MESG, "SELECT failed on DO_MP_PATIENT table MP_PATIENT_MAST ");
+
+    if (NODATAFOUND)
+       disp_message(ERR_MESG, "No Record found in MP_PATIENT_MAST"); 
+
+	d_patient_name.arr[d_patient_name.len] = '\0';
+}
+
+
+do_ref_patient()
+{
+	d_patient_name.arr[0] = '\0';
+	d_patient_name.len = 0;
+
+	EXEC SQL
+	SELECT DECODE(:language_id, 'en', SHORT_NAME, 'th', SHORT_NAME_LOC_LANG) SHORT_NAME
+	  INTO :d_patient_name
+	  FROM RL_PATIENT_MAST
+	 WHERE PATIENT_ID = :d_patient_id;
+	 /* AND OPERATING_FACILITY_ID = :nd_operating_facility_id; */
+
+	if (OERROR)
+        disp_message(ERR_MESG, "SELECT failed on DO_REF_PATIENT table RL_PATIENT_MAST ");
+
+    if (NODATAFOUND)
+	    disp_message(ERR_MESG, "No Record found in RL_PATIENT_MAST"); 
+
+	d_patient_name.arr[d_patient_name.len] = '\0';
+}
+
+
+print_rec()
+{
+/************* not required **************
+		get_antibiotic_desc();
+
+		if (d_sensitivity_ind.arr[0] == 'S')
+			strcpy(d_sensitivity_desc, "Sensitive");
+		else if (d_sensitivity_ind.arr[0] == 'R')
+			strcpy(d_sensitivity_desc, "Resistant");
+		else if (d_sensitivity_ind.arr[0] == 'I')
+			strcpy(d_sensitivity_desc, "Intermediate");
+		else if (d_sensitivity_ind.arr[0] == 'N')
+			strcpy(d_sensitivity_desc, "Negative");
+		else if (d_sensitivity_ind.arr[0] == 'P')
+			strcpy(d_sensitivity_desc, "Positive");
+************ upto here ****************************/
+
+		l_delimeter = ' ';
+		rl_split_text(d_patient_name.arr, l_delimeter, l_len, d_patient_name_1.arr,
+			          d_patient_name_2.arr, d_patient_name_3.arr, d_patient_name_4.arr);
+
+		fprintf(f1,"%-21.21s%-31.31s%10.10s/%-9.9s\n",
+				d_patient_id.arr,d_patient_name_1.arr,d_tfr_visit_no.arr,d_episode_no.arr);
+        fprintf(f1,"%-21.21s%-31.31s\n"," ",d_patient_name_2.arr);
+		
+		EXEC SQL EXECUTE
+			DECLARE
+				t_date   date;
+			BEGIN
+				GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:d_organism_report_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+				:d_organism_report_date := to_char(t_date,'DD/MM/YYYY HH24:MI');
+			END;
+		END-EXEC;
+
+		fprintf(f1,"%-16.16s%s\n", d_specimen_no.arr, d_organism_report_date1.arr);
+
+		line_no += 3;
+
+		organism_count ++;
+}
+
+
+
+chk_break(int nol)
+{
+	if ((line_no + nol) >= MAX_LINES) 
+	{
+       line_no = 1;
+	   page_no ++;
+	   form_hdr();
+	   rep_hdr();
+	   col_heading();
+ 	}
+}
+
+col_heading()
+{
+    //fprintf(f1, "Patient ID           Name                           Visit Id/Episode No\n");
+    fprintf(f1, "%-10.10s           %-10.10s                     %-18.18s\n",local_legend[1], local_legend[2], local_legend[3]);//added for globalisation
+	//fprintf(f1, "Specimen No     Date\n");
+	fprintf(f1, "%-11.11s     %-4.4s\n", local_legend[4], local_legend[5]); //added for globalisation
+	fprintf(f1, "--------------------------------------------------------------------------------\n");
+	line_no += 3;
+}
+
+rep_hdr()
+{
+	
+  get_source_desc();
+//  get_antibiotic_desc();
+  get_organism_desc();
+
+  //fprintf(f1, "Source      : %-4.4s %s\n", d_source_code.arr, d_source_desc.arr);
+  fprintf(f1, "%-12.12s: %-4.4s %s\n", local_legend[6], d_source_code.arr, d_source_desc.arr);//added for globalisation
+/*  fprintf(f1, "Organism    : %-4.4s %s\n\n", d_organism_code.arr, 
+											d_organism_desc.arr);
+*/
+  fprintf(f1, "%-12.12s: %-4.4s %s\n\n", local_legend[7], d_organism_code.arr, 
+											d_organism_desc.arr); //added for globalisation
+//fprintf(f1, "Antibiotic  : %-4.4s %s\n", d_antibiotic_code.arr,
+//											d_antibiotic_desc.arr);
+
+//  fprintf(f1, "Sensitivity : %s\n\n", d_sensitivity_desc);
+
+  line_no += 3;
+
+}
+
+form_hdr()
+{
+    static int first = 1;
+    char buf[15];
+    int col;
+
+    if(first)
+	 {
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+		memset(hdr_line5,'-',REP_WIDTH);
+		hdr_line5[REP_WIDTH] = '\0';
+
+
+        strncpy(hdr_line1,"MDL : RL",8);
+        col = (int)(REP_WIDTH-strlen(comp_name.arr))/2;
+        strncpy(hdr_line1+col,comp_name.arr,strlen(comp_name.arr));
+
+		EXEC SQL EXECUTE
+			DECLARE
+				t_date   date;
+			BEGIN
+				t_date := GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+				:rep_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+			END;
+		END-EXEC;
+
+        col = (REP_WIDTH-(strlen(rep_date1.arr)+3));
+        strcpy(hdr_line1+col,rep_date1.arr);
+    
+        strncpy(hdr_line2,"OPR :",5);
+        strcpy(hdr_line2+6,oper_id.arr);
+
+     }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP : RLRINFCN",14);
+    strcpy(rep_title1,local_legend[8]); //added for globalisation
+    col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+    //sprintf(buf,"PAGE : %4d",page_no++);
+    sprintf(buf,"%-4.4s : %4d",local_legend[9], page_no++); //added for globalisation
+    strcpy(hdr_line3+(REP_WIDTH-(strlen(buf)+5)),buf);
+
+
+    if(first)
+        fprintf(f1,"%s\n",hdr_line1);
+    else
+		{
+			fprintf(f1,"\n");	
+			fprintf(f1,"\f%s\n",hdr_line1);
+		}      
+
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3);
+	fprintf(f1,"%s\n",hdr_line5);
+
+	line_no += 4;
+	first = 0;
+   }
+ 
+
+fetch_sys_info()
+{
+
+    EXEC SQL SELECT ACC_ENTITY_NAME,
+					TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+			INTO   :comp_name,
+				   :rep_date,
+				   :oper_id
+	     FROM   SY_ACC_ENTITY_lang_vw
+           WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+		   and language_id = :language_id;
+
+    if(OERROR)
+	    disp_message(ERR_MESG, "SELECT failed on table  SY_ACC_ENTITY");
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len]	 = '\0';
+    oper_id.arr[oper_id.len]     = '\0';
+}
+
+
+close_control_cursor()
+{
+	EXEC SQL CLOSE control_cursor;
+}
+
+close_stat_cursor()
+{
+	EXEC SQL OPEN stat_cursor;
+}
+
+get_antibiotic_desc()
+{
+	d_antibiotic_desc.arr[0]		= '\0';
+	d_antibiotic_desc.len			= 0;
+	
+	EXEC SQL SELECT long_desc
+			 INTO :d_antibiotic_desc
+			 FROM RL_ANTIBIOTIC_CODE_lang_vw
+			 WHERE antibiotic_code = :d_antibiotic_code
+			 and language_id = :language_id;
+
+
+	d_antibiotic_desc.arr[d_antibiotic_desc.len]	= '\0';
+}
+
+get_organism_desc()
+{
+	d_organism_desc.arr[0]		= '\0';
+	d_organism_desc.len			= 0;
+	
+	EXEC SQL SELECT long_desc
+			 INTO :d_organism_desc
+			 FROM RL_ORGANISM_CODE_lang_vw
+			 WHERE organism_code = :d_organism_code
+			 and language_id = :language_id;
+
+
+	d_organism_desc.arr[d_organism_desc.len]	= '\0';
+}
+
+get_source_desc()
+{
+	d_source_desc.arr[0]		= '\0';
+	d_source_desc.len			= 0;
+	
+	if (d_source_type.arr[0] == 'W')
+	{
+		EXEC SQL 
+		/*SELECT long_desc
+				 INTO :d_source_desc
+				 FROM IP_WARD
+				 WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+				 AND ward_code = :d_source_code;
+		*/
+		SELECT long_desc
+				 INTO :d_source_desc
+				 FROM IP_NURSING_UNIT_LANG_VW
+				 WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+				 AND NURSING_UNIT_code = :d_source_code
+				 and language_id = :language_id;
+
+	}
+	else if (d_source_type.arr[0] == 'C')
+	{
+		EXEC SQL SELECT long_desc
+				 INTO :d_source_desc
+				 FROM OP_CLINIC_lang_vw
+				 WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+				    AND clinic_code = :d_source_code
+					and language_id = :language_id;
+
+	}
+	else 
+	{
+		EXEC SQL SELECT long_desc
+				 INTO :d_source_desc
+				 FROM RL_REFERRAL_lang_vw
+				 WHERE referral_code = :d_source_code
+				 and language_id = :language_id;
+
+	}
+
+	d_source_desc.arr[d_source_desc.len]	= '\0';
+
+}
+
+/****************************** added for globalisation *****************************/
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRINFCN.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRINFCN.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+	}
+ }

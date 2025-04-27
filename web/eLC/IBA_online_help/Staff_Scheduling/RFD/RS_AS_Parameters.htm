@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>RS_AS_Parameters</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – Select a facility from the list of facilities in the enterprise level. The listed values are defined in the ‘Facility’ function of ‘Enterprise Management’ module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Overlap of Shifts in a Workplace</span> – Select the check box to allow overlapping of shifts in a workplace. This is validated in the function ‘Shift for Workplace’. If this check box is cleared, overlapping of different shift timings is not allowed and if shift timings overlap an alert is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Work Cycle Basis</span> – Select the work cycle basis as 1 weekly from the list. Work cycle basis is displayed as 1 weekly throughout the module. Work Cycle Basis is currently restricted to ‘1 Weekly’. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Period ahead for Work Schedule creation</span> – Enter the number of days in numeric format of three characters maximum length ahead for which a work schedule can be created. This is validated in the function ‘Generate Work Schedule’. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maximum continuous duration staff can work</span> – Enter the maximum time duration in hh:mm format for which the staffs can work continuously in a day. No working shift is allowed for the staff if the specified time limit is crossed. This is validated in the function ‘Manage Work Schedule’. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Staff substitution basis</p>
+<ol start="6">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Within same Grade</span> – Select the check box if substitution of staff is allowed within the same grade or clear the check box if not allowed. This is validated in the function ‘Manage Work schedule’ while swapping staff.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Low to High Grade</span> – Select the check box to allow substitution of staff from low grade to high grade or clear the check box if not allowed. This is validated in the function ‘Manage Work schedule’ while swapping staff.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">High to Low Grade</span> – Select the check box to allow substitution of staff from high grade to low grade or clear the check box if not allowed. This is validated in the function ‘Manage Work schedule’ while swapping staff.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Substitution is not allowed, if none of the check boxes are selected.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<ol start="9">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Attendance Feature Required</span> – Select the check box to enable the attendance feature in the facility or clear the check box to disable it. This is validated in the function ‘Record Attendance’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max duration from start of shift to mark attendance</span> – Enter the maximum duration from the start of the shift for which the attendance can be marked in hh:mm format. The attendance cannot be marked after the specified time limit. Field is enabled and mandatory if the above field ‘Attendance Feature Required’ is selected. This is validated in the function ‘Record attendance’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validate staff access rights by attendance</span> – Select the check box to validate access rights of staff by attendance or clear the check box. If the box is selected, the staff can login to the system only after attendance is marked or access is denied.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Validate staff access rights by work schedule</span> – Select the check box to validate access rights of staff by work schedule or clear the checkbox. If the box is selected, the staff is allowed to work in the assigned workplace only and staff is allowed to login to the system only during working hours scheduled to the staff.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Activities allowed on active shift: Duration from start of shift (hh:mm)</p>
+<ol start="13">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allocate</span> – Select the check box to allow allocation for an active shift or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which allocation can be performed after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Change</span> – Select the check box to allow change of shifts within a workplace or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which change of shifts can be performed after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Transfer</span> – Select the check box to allow transfer of shifts across a workplace or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which transfer of shifts can be performed after the start of the shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Swap</span> – Select the check box to allow swapping in a shift or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which swapping can be performed after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Overtime</span> – Select the check box to allow overtime for an active shift or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which overtime can be allotted after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Leave</span> – Select the check box to allow leave (current date) for an active shift or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which leave can be recorded after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cancel</span> – Select the check box to allow cancellation of shift for an active shift or clear the check box. This is validated in the function ‘Manage Work schedule’. On selecting the check box, the maximum duration before which an allocated shift can be cancelled after the start of shift should be mandatorily entered in hh:mm format.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+/*****************************************************************************/
+/*                            CHK_DOC.PC                                     */
+/*****************************************************************************/
+
+
+/* 
+#define DEBUG
+*/ 
+
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NO_DATA (sqlca.sqlcode == 1403)
+#define EQ ==
+#include <stdio.h>
+#include <string.h>
+//#include "sqlproto.h"
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR	sub_fm_doc_type[8],
+	sub_fm_date[12],
+	sub_to_doc_type[8],
+	sub_to_date[12],
+	sub_print_flag[2],
+	sub_msg_num[8],
+	sub_msg_desc[72],
+     	sub_doc_type_code[8],
+	sub_doc_date[14],
+	sub_doc_nature[4],
+	sub_gl_valid_flag[2],
+	sub_status[2],
+	sub_status1[2],
+	sub_dummy[2],
+	sub_main_acc1_code[8],
+	sub_main_acc2_code[6],
+	sub_dept_code[8],
+	sub_product_group_code[4],
+	sub_product_line_code[6],
+    sub_currency_code[5],
+    d_module_valid_id              [3],
+	sub_subledger_group_code[4],
+	sub_subledger_line_code[10],
+	sub_bank_recon_flag[2],
+	sub_hdr_print_flag[2],
+	sub_doc_print_flag[2],
+	sub_pgm_id[10];
+char prev_close_flg;
+
+extern VARCHAR d_session_id[16],
+	       d_pgm_date[14];
+
+long    sub_fm_doc_num,
+	sub_to_doc_num,
+	sub_doc_num,
+	sub_batch_num;
+
+int     sub_curr_month,
+	sub_curr_year,
+	sub_post_month,
+	sub_post_year,
+	sub_line_num;
+
+double  sub_local_amt = 0, 
+        sub_foreign_amt = 0, 
+		sub_comp_local_amt  = 0,
+		g_ctrl_foreign_amt = 0;
+
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+
+int  validate_doc ( long, char *, long,    char *, char *, 
+		    int,  int,    double,  char *, int),
+     process_doc ( int ),
+     fetch_doc_line () ;
+
+void declare_cursors(),
+     log_messg(char *);
+
+void err_mesg(char *, int, char *);
+int  get_message(char *, char *);
+int  equal(double, double);
+
+int validate_posting_acct( char *, char *, char *, char *, char *,
+		           char *, char *, char, char *, int *,  char *,
+		           char *);
+
+int  g_err_typ; 
+
+short g_err_flag;
+
+char  g_master_code[42],
+      g_err_id[8],
+      g_err_msg[72],
+      g_main_acc1_code[8],
+      g_main_acc2_code[6];    
+      
+
+double g_ctrl_amt,
+       g_tot_amt_dr,
+       g_tot_amt_cr,
+       g_hdr_ctrl_amt;
+
+/*************************************************/
+/*  The following extern variables must be       */
+/*  available in the calling program             */
+/*************************************************/
+
+    extern int d_curr_year;
+    extern int d_curr_month;
+    extern int d_num_of_acc_periods;
+
+    extern char d_prior_post;
+    extern char d_reverse_flag;
+    extern char g_pgm_id[10];
+/*************************************************/
+
+int  validate_doc(l_batch_num,l_doc_type_code,l_doc_num,l_doc_date,
+		  l_doc_nature,l_post_month,l_post_year,l_ctrl_amt,
+		  l_hdr_print_flag,val_type)
+
+char *l_doc_type_code,
+     *l_doc_nature,
+     *l_doc_date,
+     *l_hdr_print_flag;
+
+long l_batch_num,
+     l_doc_num;
+
+int  l_post_month,
+     l_post_year,
+     val_type;
+
+double l_ctrl_amt;
+{
+
+    static int decl_cur = 1;
+
+    strcpy(sub_doc_type_code.arr,l_doc_type_code);
+    strcpy(sub_doc_nature.arr,l_doc_nature);
+    strcpy(sub_doc_date.arr,l_doc_date);
+    strcpy(sub_hdr_print_flag.arr,l_hdr_print_flag);
+    sub_doc_type_code.len  = strlen(sub_doc_type_code.arr);
+    sub_doc_nature.len     = strlen(sub_doc_nature.arr);
+    sub_doc_date.len       = strlen(sub_doc_date.arr);
+    sub_hdr_print_flag.len = strlen(sub_hdr_print_flag.arr);
+
+    sub_batch_num  = l_batch_num;
+    sub_doc_num    = l_doc_num;
+    sub_post_month = l_post_month;
+    sub_post_year  = l_post_year;
+
+    strcpy(sub_pgm_id.arr,g_pgm_id);
+    sub_pgm_id.len = strlen(sub_pgm_id.arr);
+
+    g_hdr_ctrl_amt = l_ctrl_amt;
+    if(decl_cur) {
+        declare_cursors();
+	decl_cur = 0;
+    }
+
+    sub_curr_month = d_curr_month;
+    sub_curr_year  = d_curr_year;
+
+    if( process_doc(val_type) == -1) 
+        return -1;
+    else
+	return 0;
+}
+
+
+void declare_cursors() 
+{
+    EXEC SQL DECLARE GL_TXN_DOC_LINE_CUR CURSOR FOR
+	     SELECT  MAIN_ACC1_CODE,
+	             MAIN_ACC2_CODE,
+	             DEPT_CODE,
+	             PRODUCT_GROUP_CODE,
+	             PRODUCT_LINE_CODE ,
+	             SUBLEDGER_GROUP_CODE ,
+	             SUBLEDGER_LINE_CODE,
+		         NVL(LOCAL_AMT,0),
+		         LINE_NUM,
+                 FOREIGN_AMT,
+				 CURRENCY_CODE  ,
+                 trunc(FOREIGN_AMT * EXCHG_RATE , 2)
+				     
+	     FROM    GL_TXN_DOC_LINE
+	     WHERE   BATCH_NUM     = :sub_batch_num
+	     AND     DOC_TYPE_CODE = :sub_doc_type_code
+	     AND     DOC_NUM       = :sub_doc_num
+	     FOR UPDATE OF MAIN_ACC1_CODE;
+
+} /**** end function declare cursors ****/
+
+int process_doc(val_type) 
+int val_type;
+{
+	    g_err_flag = 0;
+	    g_ctrl_amt = 0;
+	    g_tot_amt_dr  = 0;
+	    g_tot_amt_cr  = 0;
+
+	    sub_line_num = 0;
+
+	    
+	    
+	    EXEC SQL SELECT PREV_YR_CLOSE_FLAG INTO
+	                    :prev_close_flg
+	              FROM  GL_PARAMETER;      
+
+	    EXEC SQL SELECT 'X'
+		     INTO   :sub_dummy
+		     FROM   SY_DOC_CONTROL
+		     WHERE  DOC_TYPE_CODE = :sub_doc_type_code
+		     AND    DOC_NUM       = :sub_doc_num;
+
+	    if(OERROR)
+                err_mesg("SELECT failed on table SY_DOC_CONTROL",0,"");
+
+	    if(sqlca.sqlcode EQ 0)
+		log_messg("GL3010");
+
+	    EXEC SQL SELECT GL_VALID_FLAG,
+			    DOC_PRINT_FLAG,
+			    NVL(STATUS,'A')
+		     INTO   :sub_gl_valid_flag,
+			    :sub_doc_print_flag,
+			    :sub_status
+		     FROM   GL_ACC_ENTITY_DOC_TYPE_VW
+		     WHERE  DOC_TYPE_CODE = :sub_doc_type_code;
+
+	    if(OERROR)
+                err_mesg("SELECT failed on table GL_ACC_ENTITY_DOC_TYPE_VW",0,"");
+
+	    if(NO_DATA)
+		log_messg("SY1610");
+
+	    else {
+
+	        if(sub_gl_valid_flag.arr[0] != 'Y')
+		    log_messg("GL1250");
+
+	        if(sub_status.arr[0] EQ 'S')
+		    log_messg("SY1640");
+	    }
+
+	    if(strcmp(sub_doc_nature.arr,"REV")  &&
+	       strcmp(sub_doc_nature.arr,"OPN")  &&
+	       strlen(sub_doc_nature.arr) > 0 )
+
+		   log_messg("GL1180");
+
+	    if(!strcmp(sub_doc_nature.arr,"OPN") && sub_post_month != 0)
+	       log_messg("GL2300");
+
+	    if(sub_post_month == 0 && strcmp(sub_doc_nature.arr,"OPN") )
+	       log_messg("GL2300");
+
+	    if(!strcmp(sub_doc_nature.arr,"REV") && d_reverse_flag != 'Y')
+	       log_messg("GL2280");
+
+     if(prev_close_flg == 'Y')
+        {
+           if(sub_post_year < sub_curr_year)
+	       log_messg("GL1595");        
+        }
+	 else
+		    if(sub_post_year < (sub_curr_year - 1))
+		    {
+              log_messg("GL7410");
+            }
+
+            if(sub_post_month  > d_num_of_acc_periods)
+		         log_messg("GL2290");
+
+	    if(sub_post_year == sub_curr_year && sub_post_month < sub_curr_month && d_prior_post != 'Y')
+		 log_messg("GL1310");
+
+		if(prev_close_flg == 'N')
+		  {
+            if(sub_post_year == (sub_curr_year - 1) && sub_post_month != d_num_of_acc_periods)
+            {             
+            log_messg("GL7400");
+            }
+          }
+
+	    EXEC SQL OPEN GL_TXN_DOC_LINE_CUR;
+
+	    while(fetch_doc_line()) {
+
+	        if(sub_post_month EQ 0) {
+    
+		    EXEC SQL SELECT 'X'
+			     INTO   :sub_dummy
+		             FROM   GL_ACC_CHART
+	    	             WHERE  MAIN_ACC1_CODE  = :sub_main_acc1_code 
+	    	             AND    MAIN_ACC2_CODE  = :sub_main_acc2_code 
+		             AND    ACC_NATURE_CODE = 'BS';
+    
+		    if(OERROR) 
+		        err_mesg("SELECT failed on table GL_ACC_CHART",0,"");
+    
+		    if(NO_DATA)
+		        log_messg("GL2170");
+	        }
+		 
+		
+		strcpy(d_module_valid_id.arr , "GL");
+
+		if(validate_posting_acct( sub_main_acc1_code.arr,
+			 		  sub_main_acc2_code.arr,
+			 		  sub_dept_code.arr,
+			 		  sub_product_group_code.arr,
+			 		  sub_product_line_code.arr,
+			 		  sub_subledger_group_code.arr,
+			 		  sub_subledger_line_code.arr,
+					  'Y',
+					  d_module_valid_id.arr,
+					  sub_post_year,
+					  sub_post_month,
+					  &g_err_typ,
+					  g_err_id,
+					  g_err_msg
+			    		  ) ==  -1) {
+
+		    if (g_err_typ) {  /* application error */
+       		        strcpy(g_err_msg,"Error in posting account : ");
+       		        strcat(g_err_msg,sub_main_acc1_code.arr);
+       		        strcat(g_err_msg,"-");
+       		        strcat(g_err_msg,sub_main_acc2_code.arr);
+       		        strcat(g_err_msg," ");
+       		        strcat(g_err_msg,sub_dept_code.arr);
+       		        strcat(g_err_msg," ");
+       		        strcat(g_err_msg,sub_product_group_code.arr);
+       		        strcat(g_err_msg,"-");
+       		        strcat(g_err_msg,sub_product_line_code.arr);
+       		        strcat(g_err_msg," ");
+       		        strcat(g_err_msg,sub_subledger_group_code.arr);
+       		        strcat(g_err_msg,"-");
+       		        strcat(g_err_msg,sub_subledger_line_code.arr);
+			log_messg(g_err_id);
+
+		    }
+
+	            else   /* oracle error */
+
+		        err_mesg(g_err_msg,0,"");
+
+
+		} /* end of if validate_posting_acct */ 
+/*
+		if(sub_post_year == sub_curr_year) {
+
+		    EXEC SQL SELECT 'X'
+			 INTO   :sub_dummy
+			 FROM   GL_PERIOD_ACC_BAL_LOCAL
+	                 WHERE  MAIN_ACC1_CODE       = :sub_main_acc1_code 
+	                 AND    MAIN_ACC2_CODE       = :sub_main_acc2_code 
+	                 AND    DEPT_CODE            = :sub_dept_code 
+	                 AND    PRODUCT_GROUP_CODE   = :sub_product_group_code 
+	                 AND    PRODUCT_LINE_CODE    = :sub_product_line_code 
+	                 AND    SUBLEDGER_GROUP_CODE = :sub_subledger_group_code
+	                 AND    SUBLEDGER_LINE_CODE  = :sub_subledger_line_code
+			 AND    POST_YEAR            = :sub_curr_year
+			 AND    POST_MONTH           = :sub_curr_month;
+
+		    if(OERROR)
+	                err_mesg("SELECT failed on table GL_PERIOD_ACC_BAL_LOCAL",0,"");
+		    if(NO_DATA)
+		        log_messg("GL2530");
+		}
+*/
+
+       if (strcmp(sub_currency_code.arr ,"\0") != 0)
+	   {
+
+	        EXEC SQL SELECT  nvl(status , 'N')
+			 INTO   :sub_status1
+			 FROM   SY_FOREIGN_CURRENCY
+			 where  currency_code = :sub_currency_code;
+
+			 if(OERROR)
+	                err_mesg("SELECT failed on table  SY_FOREIGN_CURRENCY",0,"");
+		    if(NO_DATA)
+		        log_messg("GL9023");
+
+
+	        if(sub_status1.arr[0] EQ 'S')
+		       log_messg("GL6054");
+
+		}
+
+  
+        /* if(sub_foreign_amt > 0)
+		{
+            if (sub_comp_local_amt !=  sub_local_amt)
+                 log_messg("GL9029");
+		} */
+
+		if(sub_local_amt > 0) {
+		    g_ctrl_amt += sub_local_amt;
+		    g_tot_amt_dr += sub_local_amt;
+		}
+		else
+		    g_tot_amt_cr += sub_local_amt;
+
+	    } /* end of fetch_doc_line()  */
+
+	    sub_line_num = 0;
+	    if(val_type && (sub_batch_num EQ 0))  { /* Posting */
+
+	        if(sub_doc_print_flag.arr[0] EQ 'Y' &&
+	           sub_hdr_print_flag.arr[0] != 'Y') 
+       		    log_messg("SY2370");
+
+	    }
+
+	    if(!equal(g_hdr_ctrl_amt , g_ctrl_amt))
+		log_messg("SY1600");
+
+	    if( !equal(g_tot_amt_dr , (g_tot_amt_cr * -1)) )
+		log_messg("SY1650");
+
+	    if(g_err_flag) 
+		return (-1);
+	    else 
+		return 0;
+
+} /**** end function process_doc() ****/
+
+int fetch_doc_line() 
+{
+
+	EXEC SQL FETCH GL_TXN_DOC_LINE_CUR INTO	
+	        :sub_main_acc1_code,
+			:sub_main_acc2_code,
+			:sub_dept_code,
+			:sub_product_group_code,
+			:sub_product_line_code,
+			:sub_subledger_group_code,
+			:sub_subledger_line_code,
+			:sub_local_amt,
+			:sub_line_num,
+			:sub_foreign_amt,
+			:sub_currency_code,
+			:sub_comp_local_amt;
+
+        if(OERROR) 
+	    err_mesg("FETCH failed on cursor GL_TXN_DOC_LINE",0,"");
+
+        if(NO_DATA) 
+		return 0;
+	
+	sub_main_acc1_code.arr[sub_main_acc1_code.len] = '\0';
+	sub_main_acc2_code.arr[sub_main_acc2_code.len] = '\0';
+	sub_dept_code.arr[sub_dept_code.len] = '\0';
+	sub_product_group_code.arr[sub_product_group_code.len] = '\0';
+	sub_product_line_code.arr[sub_product_line_code.len] = '\0';
+	sub_subledger_group_code.arr[sub_subledger_group_code.len] = '\0';
+	sub_subledger_line_code.arr[sub_subledger_line_code.len] = '\0';
+	sub_currency_code.arr[sub_currency_code.len] = '\0';
+	return 1;
+
+} /**** end function fetch_doc_line() ****/
+
+
+void log_messg(l_errid)
+char *l_errid;
+{
+    g_err_flag = 1;
+    if(sub_line_num > 0 && g_err_typ) {
+
+   	strcpy(sub_msg_desc.arr,g_err_msg);
+	sub_msg_desc.len = strlen(sub_msg_desc.arr);
+
+        EXEC SQL INSERT INTO GL_DOC_ERROR (
+                        PGM_ID,
+			SESSION_ID,
+			PGM_DATE, 
+                        DOC_TYPE_CODE,
+                        DOC_NUM,
+                        LINE_NUM,
+                        ERROR_CODE,
+                        ERROR_TEXT,
+                        BATCH_NUM )
+	         VALUES (:sub_pgm_id,
+			 :d_session_id,
+			 		 :d_pgm_date,
+	    	         :sub_doc_type_code,
+	    	         :sub_doc_num,
+	    	         :sub_line_num,
+	    	          NULL,
+	    	         :sub_msg_desc,
+		         :sub_batch_num
+		        );
+
+	g_err_typ=0;
+    }
+
+    strcpy(sub_msg_num.arr,l_errid);
+    get_message(sub_msg_num.arr,sub_msg_desc.arr);
+
+    sub_msg_num.len = strlen(sub_msg_num.arr);
+    sub_msg_desc.len = strlen(sub_msg_desc.arr);
+    EXEC SQL INSERT INTO GL_DOC_ERROR (
+                    PGM_ID,
+		    SESSION_ID,
+		    PGM_DATE,
+                    DOC_TYPE_CODE,
+                    DOC_NUM,
+                    LINE_NUM,
+                    ERROR_CODE,
+                    ERROR_TEXT,
+                    BATCH_NUM )
+	     VALUES (:sub_pgm_id,
+		     :d_session_id,
+		     :d_pgm_date,
+		     :sub_doc_type_code,
+		     :sub_doc_num,
+		     :sub_line_num,
+		     :sub_msg_num,
+		     :sub_msg_desc,
+		     :sub_batch_num
+		    );
+
+    if(OERROR) 
+	err_mesg("INSERT failed on table GL_DOC_ERROR",0,"");
+
+} /**** end function log_messg() ****/

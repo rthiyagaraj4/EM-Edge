@@ -1,0 +1,125 @@
+#include <windows.h>
+#include <winuser.h>
+#include <winspool.h>
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+HWND	hwnd;
+MSG	msg;
+WNDCLASS wndclass;
+HANDLE hPrinter;
+char string_var[1000];
+
+char pgm_id[150];
+char userpwd[150];
+char l_user_id[150];
+char l_password[150];
+char facility_id[10];
+char pgm_date[50];
+char l_priority[4];
+char ser_request[1000];
+char command_line[1000];
+int l_count = 0;
+
+// Main Window program
+int WINAPI WinMain(HINSTANCE  hInstance,HINSTANCE  hPrevInstance,
+    LPSTR  lpCmdLine,int  nShowCmd)
+{
+
+	char sep[3]= ";" ;
+	char *uid,*datetime, *user_id,*password, *facility, *pgmid ,*priority , *request;
+	int  start=1;
+	DWORD mcno = 20;
+	
+
+	user_id     =strtok(lpCmdLine,sep);
+	password=strtok(NULL,sep);
+	facility=strtok(NULL,sep);
+	request=strtok(NULL,sep);
+
+	 strcpy(l_user_id, user_id);
+	 strcpy(l_password, password);
+	 strcpy(facility_id, facility);
+	 strcpy(ser_request, request);
+
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc    = NULL;
+	wndclass.cbClsExtra		= 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.hInstance		= hInstance;
+	wndclass.hIcon			= NULL;  //LoadIcon ( NULL, IDI_APPLICATION );
+	wndclass.hCursor		= NULL;  //LoadCursor ( NULL, IDC_ARROW);
+//	wndclass.hbrBackground	= GetStockObject (WHITE_BRUSH);
+	wndclass.hbrBackground	= (HBRUSH) GetStockObject (LTGRAY_BRUSH);
+	wndclass.lpszMenuName	= NULL;
+	wndclass.lpszClassName	= "Printing Pc";
+	RegisterClass ( &wndclass );
+
+	hwnd = CreateWindow("Label Generation Server",(LPSTR)NULL,
+                         WS_POPUP | WS_DLGFRAME,170,190,300,100,
+                         (HWND)NULL,(HMENU)NULL,(HANDLE)hInstance,
+						 (LPSTR) lpCmdLine);
+
+
+   strcpy (command_line, "javaw URLRepSubmit ");
+   strcat(command_line, l_user_id);
+   strcat(command_line, " ");
+   strcat(command_line, l_password);
+   strcat(command_line, " ");
+   strcat(command_line, facility_id);
+   strcat(command_line, " ");
+   strcat(command_line, ser_request);
+
+   
+    get_count();
+
+	do_execute();
+
+
+	if (l_count = 0)
+		exit(0);
+    
+	return;
+  
+   exit(0);
+}   
+
+get_count()
+{
+
+	l_count = 1;
+}
+
+do_execute()
+{
+
+	if (l_count > 0)
+	{
+
+		WinExec(command_line, SW_SHOWNORMAL);	        
+
+		l_count = 0;
+
+		exit(0);
+	}
+	else
+	{
+		exit(0);
+	}
+
+
+}
+
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

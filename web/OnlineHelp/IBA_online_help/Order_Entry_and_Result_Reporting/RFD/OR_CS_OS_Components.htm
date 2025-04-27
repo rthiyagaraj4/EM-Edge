@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OR_CS_OS_Components</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Component</h1>
+<p class="BoldRFD" style="font-weight: normal;">Order catalogs are associated to the defined Order Set using the Component Tab. The Order Catalogs corresponding to the selected Order Category and Order Type get displayed. You have to select the required catalogs and include them under the defined Order Set. If an Order Set defined initially is selected as the Order Catalog, the Order Catalogs across all the Order Categories are displayed.</p>
+<p class="BoldRFD" style="font-weight: normal;">Two sub-tabs are provided under the Component tab, Select and Associate. The catalogs are displayed under the select tab. The Order Catalogs associated to the Order Set can be viewed under Associate tab.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">[Select] Tab</p>
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">[Select]</span> tab is selected, by default. English alphabets from A to Z are displayed and hyperlinked. Select the required alphabet and order catalogs starting with the selected alphabets are displayed. Order catalogs starting with numeric and special characters are grouped under ‘Others’ hyperlink. The screen as shown gets displayed on selecting an alphabet.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Catalogs</span> - Catalogs starting with the selected alphabet are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog</span> - Order catalogs starting with the selected alphabet are displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Seq No.</span> - Enter the sequence number in numeric format of three characters maximum length. The defined number indicates the order of appearance of the order catalog.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Type</span> - Select the order type from the list. The primary order type defined for the displayed order catalog is displayed, by default. The displayed order types are attached to the catalog in the function 'Order Catalog By Order Type'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Qty</span> - The behavior of the field depends on the characteristics of the order catalog. The value set for the order catalog is inherited and displayed. If the order catalog allows for an update, the quantity value can be changed or the field is defaulted to 'one' and as read-only. Enter the quantity in numeric format of four digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">UOM</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Unit of Measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Frequency</span> - The value set for the order catalog is displayed. The frequency values displayed are defined in the function 'Frequency Scope'. Select the required frequency.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Durn value/Durn Type</span> - The duration value set for the catalog is displayed. You can change the value and enter numeric value of three digits maximum length. The duration type as set for the catalog is displayed that cannot be changed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Time Frame (Hrs)</span> - Enter the time frame in numeric format of three digits maximum length. The value specified indicates execution time of the catalog. For example, during health checkup of a patient, Fasting Blood sugar is the first test performed when the patient reports for testing. Subsequently, PPBS is performed, followed by ECHO and TMT. Intervals at which these tests are to be performed are specified as time frames. In the example, order for order set is placed and FBS to be performed at 8:00 am (ordering time is taken as 00:00 hrs), the time frame is specified as 8 hrs, PPBS at 11:00 am, time frame would be set at 11 hrs and so on.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the value from the list provided. Required is displayed, by default. The other values displayed are Optional/Pre selected and Optional/De-selected. If 'Required' is the value, the selection of the order catalog is mandatory while placing an order. If 'Optional/Pre Selected' is the value, it is not mandatory to select the catalog while placing the order. The order catalog will be selected for ordering (check box against the order catalog will be selected), by default. For 'Optional/De-selected' as the value, selection of catalog is not mandatory while placing the order and the check box against the order catalog is cleared while placing the order.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include</span> - Select the check box to include the order catalog against it. The check box is cleared, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Comments</span> - Enter the comments to be included for the selected order set. On including the required order catalogs, you can view the same under 'Associate' tab.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">[Associate] Tab</p>
+<p class="BoldRFD" style="font-weight: normal;">On clicking the <span class="BoldNumberRFD">[Associate]</span> tab, the screen as shown below gets displayed. You can change/modify the set values under the tab.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

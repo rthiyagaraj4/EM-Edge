@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Purge Posted Document</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nPeriod End\nPurge Posted Document");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Purge Posted Document &#160;&#160;</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Delete</span> the posted documents from the database. The posted documents are permanently deleted from the database.</p>
+<p class="Text">Purge Posted Document function is used to delete the posted documents. You have to specify a date and the documents posted until the specified period are deleted from the database. Several <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">validations</a> are carried out before deleting the posted documents from the database.</p>
+<div class="droptext" id="POPUP1004988048" style="display: none;">
+<p class="BoldRFD">System checks for the following validations before purging the documents:</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The documents in Originating Transactions for the period less than or equal to the accepted processing period has to be posted.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The documents in Allocating Transactions for the period less than or equal to the accepted processing period has to be posted.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">There should be no receipts or refund documents for the period less than or equal to the accepted processing period.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">There should be no distributions in General Ledger interface, which has not been interfaced to General Ledger for the period less than or equal to the accepted processing period.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Post the bills dated as per the processing period.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If any of the above validation fails, system aborts the purge process. If all the above validations are successful, system proceeds with the following transactions:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">All posted documents less than or equal to the current processing period are deleted from Originating Transactions, Allocating Transactions, Receipts and Direct Billing Entries.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">General Ledger distributions until the processing period are deleted.</p>
+</li>
+</ul>
+</div>
+<h2>Purge Posted Document</h2>
+<p class="From">From the Period End, double-click Purge Posted Document.</p>
+<p class="Text">The Purge Posted Document screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the month and the year. The documents posted until the selected month and year gets deleted. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Run Process]</span> to delete the documents permanently from the database. A message pops-up requesting confirmation to purge the documents. Click <span class="BoldButton">[Yes]</span> to confirm, or <span class="BoldButton">[No]</span> to cancel the process.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Post Billing Transactions','Post_Billing_Transactions.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics2.gif" border="0" height="26" width="131" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP1004988048');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_BedChargeDisctRule_AdmissionDayBedChargeDisctRule</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Admission Day Bed Charge Discount Rule</h1>
+<p class="BoldRFD" style="font-weight: normal;">The Admission Day Bed Charge Discount Rule tab enables you to define charging rule, if the patient is admitted and discharged from the facility on the same day. The charging rule is applicable for the bed occupied, doctor's round, consumables used for patient's treatment, Workup and ICU charge. You can set the discount type and the discount value on the charge elements based on which the discount amount is calculated during patient discharge from the facility. This enables you to set parameters to charge a patient, if the patient is discharged from the facility on the same day, but exceeds the grace period set by the facility. This rule is enabled, if the patient is discharged within 24 hours and the check box 'Validate Discharge within 24 HRS' is cleared.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Type</span> – The Bed Type is displayed as ‘**’, by default. The discount rule is applicable for all the beds in the Nursing Unit. Click ‘Create Record’ icon to define the discount rule for a selected bed in the facility. Click <span class="BoldNumberRFD">[List of Values]</span> to select a Bed Type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The name of the logged in Facility is displayed, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Hours Stay</p>
+<ol start="3" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">From – To</span> – Enter the total number of days in numeric format. The beginning day has to start with ‘0’.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Charge Elements</p>
+<p class="BoldRFD"><span style="font-weight: normal;">The Charge Elements define the elements that are to be charged during discharge.</span></p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Element</span> – The system defined Charge Elements are ‘Bed Charge’, ‘Doctor Round Charge’, ‘Consumable Charge’, ‘Workup Charge’ and ‘ICU Charge’. The charges for these elements during a normal patient discharge are calculated based on the charge type and the discount type selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Type</span> – Select a value from the list. The values are system defined – ‘As Per Policy Setup’, ‘Charge to Patient Only’ and 'No Charge'. The elements are charged based on the policy coverage limit specified, if the value is selected as ‘As Per Policy Setup’. The elements are charged on the policy coverage limit specified, if the value is selected as ‘As Per Policy Setup’ and the patient is insured. If the patient is a non-insurance payer, the amount for the element is charged on the patient on the discharge day for normal discharge. Select 'No Charge', if the respective element is not to be charged.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Type</span> – Select a value from the list. The values are system defined – Percentage, Amount and Not Applicable. Percentage indicates that the percentage of the actual amount is deducted on the element for normal discharge. Amount indicates that the amount mentioned is deducted from the actual amount for the element during normal discharge. Select Not applicable, if discount is not applicable for the selected element.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount Value</span> – Enter the discount value in numeric format to indicate the amount to be deducted for the elements during discharge.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Posting Mode</span> - Select a value from the list to indicate the posting mode. System-defined values are 'As Discount' and 'As Net'. Select 'As Discount' to post the values as discount. For Example, if the charge computed is 100/- and discount amount &#160;given is 5/-, then while posting, the amount is displayed as 100/- and the discount amount is displayed as 5/-. Select 'As Net' to post the values as Net Amount. For Example, if the amount computed is 100/- and discount amount given is 5/-, then while posting, the net amount is displayed as 95/-.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Report Service</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Manager\nSMAdminSetup\nReport Service");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Report Service</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Create</span> a new Report Service for every module of Enterprise Management and <span class="RedItalic">Query</span> for a desired Report Service.</p>
+<p class="Text">Report Services are background processes of Oracle, created as services of the operating system of the application service in which Oracle 9i Application Server is installed.</p>
+<p class="Text"><span class="BoldButton">The working mechanism of the report service is given below:</span></p>
+<p class="Text">The report services are started as part of the application server startup. A report service can start up with one or more execution engines based on the parameter setup.</p>
+<p class="Text">When a report is to be executed, the report job is submitted to a report service with the required parameters. The submitted report is queued under the specified report service.</p>
+<p class="Text">The report service picks up the next job from its queue. If an execution engine already loaded is free, it executes the report using that execution engine.</p>
+<p class="Text">If no execution engines are free and if an additional engine can be started up based on the parameter setup, an additional execution engine is started and the report is executed.</p>
+<p class="Text">If no execution engines are free and the maximum limit of number of execution engines reached is based on the parameter setup, the report is not executed. Whenever, an execution engine becomes free, the report is picked up from the queue and executed.</p>
+<p class="Text">The report can be executed in synchronous or asynchronous mode.</p>
+<p class="Text" style="margin-left: 40px;">• In synchronous mode, the client, who requested for the report, waits till the report execution is completed by the report service.</p>
+<p class="Text" style="margin-left: 40px;">• In asynchronous mode, the client, who requested for the report, gains the control back on submission of the report and is free to perform any other activity.</p>
+<p class="Text" style="margin-left: 40px;">• In Enterprise Management, all the reports to be printed are executed in asynchronous mode and all the reports to be viewed are executed in synchronous mode.</p>
+<p class="Text"><span class="BoldButton">During the setup stage, the required report service is derived based on the following guidelines:</span></p>
+<p class="Text">The different printers used for printing various reports of Enterprise Management are identified.</p>
+<p class="Text">Distinct set of printers are derived at. For example, in an installation, HP 1100A, HP4050N, HP6L are the some models of printers in use.</p>
+<p class="Text">It is a good idea to classify the printers based on online and batch reports to be printed on them. Minimum of one report service for each of the printer model has to be defined. Separate report services has to be created for online and batch reports, even if these reports are printed on same model of the printers.</p>
+<p class="Text">Depending on the expected load of printers, more than one report service has to be created for same printer models and the report services has to be associated to the printer. You are able to associate only one report service to the printer. This means that all the reports printed on a printer are serviced through the same report service.</p>
+<p class="Text">Derived set of report services are to be created as services in the operating system of the application server using appropriate commands documented in the installation manual. It is also possible to distribute the report services to different print servers for load balancing purpose.</p>
+<p class="Text">The report services that are set-up on the application server(s) are to be created as entries in Enterprise Management. This function is used to create entries of the actual report services that are already created on the server.</p>
+<h2>Creating a Report Service</h2>
+<p class="From">From the SM Admin Setup &gt; Print Routing, select the Report Service function.</p>
+<p class="Text">The Report Service screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Create]</span> to invoke the Create screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/SM_AS_ReportService.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Apply]</span> to save a record or <span class="BoldButton">[Reset]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Query]</span> to search for an existing Report Service record.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Printer','Printer.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a1');
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

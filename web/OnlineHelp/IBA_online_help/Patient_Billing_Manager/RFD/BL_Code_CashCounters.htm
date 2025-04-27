@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>BL_Code_CashCounters</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to define a Cash Counter:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Counter Code</span> - Enter the alphanumeric code with two characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The Facility is defaulted to the logged in Facility.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cash Delivery Doc Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select the Cash Delivery Document Type. This is selected as the default document type for cash delivery.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter a Long Description of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter a Short Description of 15 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Company Code</span> - Enter the Company Code in alphanumeric format of five characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">External System Specific Refund Counter Only</span> - Select the check box if the Cash Counter is valid to generate slips for the refunds issued through external systems. Clear the check box, if the Cash Counter is not valid to generate slips for refunds issued through external systems. If the check box is cleared, you cannot use the function 'Generate Refund Slip for Ext. System' to generate slips.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Special Clinic</span> - Select the check box, if the Cash Counter is valid for special Outpatient Clinics.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Building Code</span> - &#160;Click <span class="BoldNumberRFD">[List of Values]</span> to select a Building Code. The description of the Building Code is displayed on selecting the code. &#160;The Cash Counter defined is valid for the selected Building Code. The values defined through 'Building in Facility' function in the Application Masters module are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Special and Normal Clinic</u></span> - Select this checkbox to generate bills/receipts/refunds of normal cash counter from special clinic cash counter. This check box is disabled by default. It is enabled only if the Special Clinic check box is selected. If the Special Clinic check box is selected, the check box is enabled. After selecting both check boxes, if you unselect the Special Clinic check box, the check box is also unselected and disabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Floor Code</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a Floor Code. The description of the Building Code is displayed on selecting the code. The Cash Counter defined is valid for the selected Floor Code. The values defined through 'Floor in Facility' function in the Application Masters module are listed.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Nature</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accounts</span> – Select Accounts, if the Accounts personnel have to use the Cash Counter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cashier</span> – Select Cashier, if the Cashier uses the Cash Counter. The Cashier transactions only are processed in the selected Cash Counter.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Credit Card Machine</p>
+<ol start="14" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Workstation ID</span> – Enter the Workstation ID in alphanumeric format of 30 characters maximum length. The Credit Card Machine is set as the default machine to accept the payments when the Credit Card is processed from the respective Workstation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Card M/c ID</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a Credit Card Machine. The ID of the Credit Card Machines associated to the facility while defining the Banks and Branches get listed. The Credit Card for the Workstation is processed at the associated Machine interface.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Process Receipts</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP/Day Care</span> – Select the check box to process the receipts for Inpatient or Daycare patients in the respective Cash Counter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP/Emg</span> - Select the check box to process the receipts for Outpatient or Emergency patients in the respective Cash Counter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext</span> – Select the check box to process the receipts for referral patients in the respective Cash Counter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow to Change Amt</span> – Select the check box to permit the Cashier to update the receipt amount in the respective Cash Counter.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Process Refunds</p>
+<ol start="20">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP/Day Care</span> – Select the check box to process refunds in the Cash Counter for Inpatient or Daycare patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP/Emg</span> – Select the check box to process refunds in the Cash Counter for Outpatients or Emergency patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext</span> - Select the check box to process refunds in the Cash Counter for referral patients.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow to Change Amt</span> – Select the check box to permit the Cashier in the Cash Counter to update the refund amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Allow Refund only in same shift</span> – Select the check box to permit the Cashier to refund the amount during the same shift in the Cash Counter. Clear the check box and the Cashier is able to issue a refund during any other shift at the Cash Counter.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Shift Time</p>
+<p class="BoldRFD"><span style="font-weight: normal;">A Cash Counter can operate in three different shifts. The timings for each of these shifts have to be defined.</span></p>
+<p class="BoldRFD">Shift 1</p>
+<ol start="25" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start Time</span> – Click Calendar function to select a date and time. The date and time indicates the start time for the first shift. The date has to be lesser or equal to the system date.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End Time</span> - Click Calendar function to select a date and time. The date and time indicates the end of Shift 1. The End Time has to be greater than the Start Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Logout Required</span> – Select the check box, if the Cashier has to logout of the Cash Counter at the end of the shift.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Shift 2</p>
+<ol start="28" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start Time</span> - Click Calendar function to select a date and time. The date and time indicates the start time for the second shift. If the Cash Counter operates in a single shift, do not enter a Start Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End Time</span> - Click Calendar function to select a date and time. The date and time indicates the end of Shift 2. The End Time has to be greater than the Start Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Logout Required</span> - Select the check box, if the Cashier has to logout of the Cash Counter at the end of the shift.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Shift 3</p>
+<ol start="31" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Start Time</span> - Click Calendar function to select a date and time. The date and time indicates the start time for the third shift. If the Cash Counter operates in a single shift, do not enter a Start Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">End Time</span> - Click Calendar function to select a date and time. The date and time indicates the end of shift 3. The End Time has to be greater than the Start Time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Logout Required</span> - Select the check box, if the Cashier has to logout of the Cash Counter at the end of the shift.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Handover &amp; Grace Limit</p>
+<p class="BoldRFD">Cash and Cheque</p>
+<ol start="34" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Text</span> - Enter the Cash limit in numeric format of 13 digits maximum length. Cashier is either alerted or a warning message is displayed when the mentioned amount is reached for Cash or Cheque transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Action</span> - Select an Action from the list. The system-defined values are 'Alert User', 'Block User' and 'NA'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Alert User - Select 'Alert User' to alert the Cashier when the Cash or Cheque limit is reached. You cannot select a Limit Indicator or specify the 'Grace Limit' when the 'Action' is selected as 'Alert User'. Limit Indicator is set as 'NA' automatically. On selecting 'Alert User' an alert message is displayed for every transaction when the handover limit is crossed. The transactions are blocked when the grace limit is reached.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Block User - Select 'Block User' to block the Cashier transactions when the Cash or Cheque limit is reached. You can set the 'Limit Indicator' as '%' or 'Amount' and specify the 'Grace Limit' when the 'Action' is selected as 'Block User'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">No Action - Select 'No Action' if action type is not valid. An alert or warning message is not displayed when the action is not selected.</p>
+</li>
+</ol>
+<ol start="36" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Limit Indicator</span> - Select a Limit Indicator from the list. The system-defined values are '%', "Amount' and 'N/A'. You can select the value as '%' or "Amount' only when the 'Action' is selected as 'Block User'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">% - Select '%' to block the cashier transactions when a percentage of the Cash or Cheque limit is reached.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Amount - Select 'Amount' to block the cashier transactions when the Cash or Cheque limit reaches the mentioned amount.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">N/A - Select the value as 'N/A', if limit indicator is not required. The value is automatically set to 'N/A' when the 'Action' is selected as 'Alert User' or 'N/A'. You can select the value as 'N/A' when you select the 'Action' as 'Block User'.</p>
+</li>
+</ol>
+<ol start="37" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Grace Limit</span> - Enter the Grace Limit in numeric format of 12 digits maximum length. You can specify the Grace Limit when the 'Action' is selected as 'Block User'. The Grace Limit should not exceed the Cash Limit.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Grace Limit has to be within the range '0-100' when the 'Limit Indicator' is selected as '%'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Grace Limit should not be greater than the Cash or Cheque limit when the 'Limit Indicator' is selected as 'Amount'.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Grace Limit cannot be recorded when the 'Limit Indicator' is selected as 'N/A'.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />An error message 'Grace Limit cannot be greater than Cheque Limit' is displayed if the Grace Limit is greater than the Cheque Limit.</p>
+<p class="Note">An error message 'Grace Limit cannot be greater than Cash Limit' is displayed if the Grace Limit is greater than the Cash Limit.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Document Types for Transactions</p>
+<ol start="38" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Inhouse Bill</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for Inhouse bill. The Inhouse bill is applicable for the inpatients. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discharge Bill</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for Discharge bill. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">U/c Advice</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for Undercharge Advice. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed. The Undercharge Advice text box has to be left blank, if Inpatients Billing is not enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Zero Bill –IP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to generate and print inpatient bills with zero amount. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed. The Zero Bill – IP text box has to be left blank, if zero bill generation/printing is not required.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP/Emg Bill</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for outpatient visit or emergency bills. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed. The OP/Emg Bill text box has to be left blank, if Outpatients Billing is not enabled. This covers both Cash memos and acknowledgement slips (for credit patients).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Zero Bill-OP/Emg</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to generate and print outpatient/emergency patient bills with zero amount. The Zero Bill-OP/Emg text field has to be left blank, if zero bill generation/printing is not required for outpatients/emergency patients. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ext. Bill</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for external patient bills. The external bill text box has to be left blank, if referral billing is not enabled. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Zero Bill – Ext</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to generate and print external patient bills with zero amount. The zero bill – ext text box has to be left blank, if zero bill generation/printing is not required for referrals. The Document Types defined in the Masters with Transaction Type as Invoice/Bill gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Credit Card Receipts</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for credit card receipts. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD" style="text-align: left;"><span class="UnderlineRFD">Credit Card Deposits</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for credit card deposits. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipts – IP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge inpatient receipts. The Receipts – IP text box has to be left blank, if inpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refunds – IP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge inpatient refunds. The Refunds – IP text box has to be left blank, if inpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Payments gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deposits – IP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge inpatient deposits. The Deposits– IP text box has to be left blank, if inpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipts – OP/Emg</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge outpatient/emergency patient receipts. The Receipts – OP/Emg text box has to be left blank, if outpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refunds – OP/Emg</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge outpatient/emergency patient refunds. The Refunds – OP/Emg text box has to be left blank, if outpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Payments gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deposits – OP/Emg</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge outpatient/emergency patient deposits. The Deposits – OP/Emg text box has to be left blank, if outpatient billing is not enabled. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Receipts – Ext</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge external patient receipts. The Receipts- Ext text box has to be left blank, if referral billing is not enabled. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refunds – Ext</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge external patient refunds. The text box Refunds - Ext has to be left blank, if Referral Billing is not enabled. The Document Types defined in the Masters with Transaction Type as Payments gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deposits – Ext</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type to acknowledge external patient deposits. The text box Deposits - Ext has to be left blank, if Referral Billing is not enabled. The Document Types defined in the Masters with Transaction Type as Payments gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Misc. Receipts</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for miscellaneous receipts that is non-patient related receipts. The Document Types defined in the Masters with Transaction Type as Receipts gets listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Misc. Refunds</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for miscellaneous refunds that is non-patient related refunds. The Document Types defined in the Masters with Transaction Type as Payments gets listed.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Deposit Refund Doc Types</p>
+<ol start="59" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund - IP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for deposit refund for Inpatients. The Document Types defined in the Masters with Transaction Type as Payments get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund - OP</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for deposit refund for Outpatients. The Document Types defined in the Masters with Transaction Type as Payments get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Refund - Ext</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select a default document type for deposit refund for External patients. The Document Types defined in the Masters with Transaction Type as Payments get listed.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

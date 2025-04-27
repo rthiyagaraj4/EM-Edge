@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<%
+String sStyle	=
+(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%request.setCharacterEncoding("UTF-8"); %>
+<link rel='stylesheet' type='text/css' href='../../eCommon/html/<%=sStyle%>'></link>
+<script language='javascript' src='../../eXH/js/MessageAuditLog.js'></script><script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+</head>
+<%
+		String url = "../../eCommon/jsp/commonToolbar.jsp?" ;
+		String params = request.getQueryString() ;
+		String source = url + params ;
+%>
+<iframe name='commontoolbarFrame' id='commontoolbarFrame'	src='<%=source%>' frameborder=0 scrolling='no' noresize  style='height:8vh;width:100vw'></iframe>
+<iframe name='f_query_add_mod' id='f_query_add_mod' src='../../eXH/jsp/ReportMsgAuditLog.jsp' frameborder=0 noresize scrolling='no' style='height:80vh;width:100vw'></iframe>
+<iframe name='messageFrame' id='messageFrame'	src='../../eCommon/jsp/MstCodeError.jsp' frameborder=0 noresize scrolling='' style='height:12vh;width:100vw'></iframe>
+</html>
+

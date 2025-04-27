@@ -1,0 +1,1442 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File	: rlrshist.pc
+   Author : Amjad Saiyed
+   Date Created  : 10/06/2001
+   Last Modified : 10/06/2001
+
+*  Ver 1.10.01
+   
+*  Purpose : To generate a report for Shift Wise Statistics of Specimens Received 
+
+*  Input Parameters :    
+              Command line inputs
+	
+		      1. Usr_id/Password
+              2. Session id
+		      3. Program Date
+                 Parameters from SY_PROG_PARAM table 
+              4. Preferred range of Section Codes.
+  
+*  Table Accessed : RL_REQUEST_HEADER,RL_TEST_RESULT,
+					RL_SECTION_CODE, RL_ONLINE_INSTRUMENT,
+					RL_ONLINE_INSTRUMENT_TEST,
+					OP_CLINIC, IP_WARD, RL_REFERRAL
+		    
+
+*  Output File : rlrshist.lis
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
+#include <rl.h> 
+#include <gl.h>
+#define REP_WIDTH 78
+#define MAX_LINES 50
+#define OERROR (sqlca.sqlcode < 0)
+#define NO_DATA_FOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+/*
+#define DEBUG 
+*/
+
+EXEC SQL BEGIN DECLARE SECTION;
+/* INPUT PARAMETERS TO MAIN */
+
+	VARCHAR  nd_operating_facility_id [3],
+	         uid_pwd		          [91],
+		     nd_user_id               [31],
+		     nd_session_id            [16],
+		     nd_pgm_date	          [20], 
+		     nd_user                  [15],
+             nd_file_no               [15],
+		     nd_file_name		      [150],
+			 d_version_no			  [20],
+			 l_malaysia_yn            [2],
+			 d_version  			  [20],
+			 l_translated_value		 [100],
+		       language_id			[5];
+
+
+/* Fields from table RL_SECTION_CODE */
+	 varchar      d_printer_name            [16];
+
+/* Fields from table SY_ACC_ENTITY*/
+	varchar 	d_acc_entity_name        [300],
+				//d_acc_entity_name        [61], 
+				d_user                   [21],
+				d_sysdate                [17],
+				d_sysdate1                [17];
+
+ /*INPUT PARAMETERS FROM SY_PROG_PARAM TABLE */
+	varchar nd_fm_section_code			[2],
+			nd_to_section_code			[2],
+	 		nd_fm_date					[17],	/* Modified length 11 to 17 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+			nd_fm_date1					[17],	/* Modified length 11 to 17 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+			nd_to_date					[17],	/* Modified length 11 to 17 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+			nd_to_date1					[17],	/* Modified length 11 to 17 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+			nd_source_type				[2],
+			nd_source_from				[10],
+			nd_priority					[2],
+			nd_test_code				[11],
+			nd_test_desc				[61],	/* Added by Durai Rajkumar against CRF-20236 on 24-Nov-08 */
+			nd_group_test_yn			[2];
+
+
+/* SQL statement storing in this Variable */
+   char sql_stmt	[500] ;
+
+	varchar d_section_code			[2],
+            d_urgent_indicator      [10],
+			d_prev_urgent_ind       [10],
+			d_section_desc			[41],
+			d_prev_section_code		[2],
+			d_specimen_no			[21],
+			d_specimen_date			[11],
+			d_prev_specimen_date	[11],
+			d_prev_specimen_date1	[11],
+			d_print_specimen_date	[11],
+			d_test_code				[11],
+			d_status				[2],
+			l_hmc_yn                [2];
+
+long l_shift_1_start_time,
+	 l_shift_2_start_time,
+	 l_shift_3_start_time;
+
+long l_specimen_time;
+
+long l_analyzer_count;
+
+int l_count = 0;
+
+int  l_tab_exists ;
+int i;
+char local_legend[100][100];
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+ 
+char string_var[100] ;
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1],
+     hdr_line5[REP_WIDTH+1];
+
+char rep_title1[60] ;
+char rep_title2[40];
+int rec_len;
+
+int line_no = 0;
+int page_no = 0 ;
+
+int d_request_1 = 0, d_analyzer_1 = 0, d_reported_1 = 0,
+	d_request_2 = 0, d_analyzer_2 = 0, d_reported_2 = 0,
+	d_request_3 = 0, d_analyzer_3 = 0, d_reported_3 = 0;
+
+long t_request_1 = 0, t_analyzer_1 = 0, t_reported_1 = 0,
+	t_request_2 = 0, t_analyzer_2 = 0, t_reported_2 = 0,
+	t_request_3 = 0, t_analyzer_3 = 0, t_reported_3 = 0;
+
+long g_request_1 = 0, g_analyzer_1 = 0, g_reported_1 = 0,
+	g_request_2 = 0, g_analyzer_2 = 0, g_reported_2 = 0,
+	g_request_3 = 0, g_analyzer_3 = 0, g_reported_3 = 0;
+
+
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+    void gen_file_name() ;
+    void get_header_dtls() ;
+	void get_shifts();
+
+   if(argc < 14) {
+     disp_message(ORA_MESG,"Usage rlrshist uid/passwd pgm_date from section code to section code from date to date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+   strcpy(nd_operating_facility_id.arr, argv[4]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr); 
+
+   strcpy(OUTPUT_FILE_NAME, argv[5]);
+
+   strcpy(nd_fm_section_code.arr, argv[6]);
+   nd_fm_section_code.len = strlen(nd_fm_section_code.arr); 
+
+   strcpy(nd_to_section_code.arr, argv[7]);
+   nd_to_section_code.len =	 strlen(nd_to_section_code.arr); 
+
+   strcpy(nd_fm_date.arr, argv[8]);
+   nd_fm_date.len = strlen(nd_fm_date.arr); 
+
+   strcpy(nd_to_date.arr, argv[9]);
+   nd_to_date.len = strlen(nd_to_date.arr); 
+
+   strcpy(nd_source_type.arr,argv[10]);
+   nd_source_type.len = strlen(nd_source_type.arr);
+   				
+   strcpy(nd_source_from.arr,argv[11]);
+   nd_source_from.len = strlen(nd_source_from.arr);
+      
+   strcpy(nd_priority.arr,argv[12]);
+   nd_priority.len = strlen(nd_priority.arr);
+
+   strcpy(nd_test_code.arr,argv[13]);
+   nd_test_code.len = strlen(nd_test_code.arr);
+   				
+   strcpy(nd_group_test_yn.arr,argv[14]);
+   nd_group_test_yn.len = strlen(nd_group_test_yn.arr); 
+   				
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+
+   if(OERROR)
+      disp_message(ORA_MESG,"Failed to connect using : \n");
+
+    #ifdef DEBUG
+      printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+    #endif  
+    
+	set_meduser_role();
+	strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+	get_legend_value(29);
+	get_shifts();
+
+	get_header_dtls() ;
+
+	gen_file_name(); 
+
+    do_report();
+
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL COMMIT WORK RELEASE;
+	   
+	fclose(f1);
+
+	return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}   
+
+
+/********************* CHECK PAGE BREAK ************************/
+chk_break(nol)
+{
+   if ((line_no + nol) >= MAX_LINES)
+   {
+	 form_hdr();
+	 print_column_heading();
+   }
+}
+
+/********************* FORM HDR ************************/
+form_hdr()
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+    
+        strcpy(rep_title2, local_legend[14] );
+        //Added by babu---------
+		
+        
+		
+		EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				
+				BEGIN
+				/* Added time portion against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_fm_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+				//:nd_fm_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				:nd_fm_date1 :=sm_convert_datetime_2t(to_date(:nd_fm_date,'DD/MM/YYYY HH24:MI'),:language_id);
+				END;
+			END-EXEC;
+
+		//End
+		strcat(rep_title2, " ");
+		strcat(rep_title2, nd_fm_date1.arr);
+        strcat(rep_title2, " ");
+		strcat(rep_title2,  local_legend[4] );
+		EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				BEGIN
+				/* Added time portion against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_to_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+				//:nd_to_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				:nd_to_date1 :=sm_convert_datetime_2t(to_date(:nd_to_date,'DD/MM/YYYY HH24:MI'),:language_id);
+				END;
+			END-EXEC;
+		strcat(rep_title2, " ");
+		strcat(rep_title2, nd_to_date1.arr);
+       
+		
+    if(first) 
+	{
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+        memset(hdr_line4,' ',REP_WIDTH+1);
+		memset(hdr_line5,'-',REP_WIDTH);
+		hdr_line5[REP_WIDTH] = '\0';
+
+        strncpy(hdr_line1,"MDL:RL",6);
+		col = (int)(REP_WIDTH - strlen(d_acc_entity_name.arr))/2;
+        //strncpy(hdr_line1 + col-1 ,d_acc_entity_name.arr,strlen(d_acc_entity_name.arr)); 
+		strncpy(hdr_line1 + col ,d_acc_entity_name.arr,strlen(d_acc_entity_name.arr));// Added by srinivas
+        EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				
+				BEGIN
+				t_date:=GET_LOCALE_DATE.GET_CURRENT_DATE(:language_id);
+				:d_sysdate1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+				END;
+
+			END-EXEC;
+		col = (REP_WIDTH-strlen(d_sysdate1.arr));
+		strcpy(hdr_line1+col,d_sysdate1.arr);
+    
+        strncpy(hdr_line2,"OPR:",4);
+        strcpy(hdr_line2+4,d_user.arr);
+
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    strncpy(hdr_line3,"REP:RLRSHIST",12);
+    strcpy(rep_title1, local_legend[21] );
+	col = (int)(REP_WIDTH-strlen(rep_title1))/2;
+    strncpy(hdr_line3+col,rep_title1,strlen(rep_title1));
+    sprintf(buf,"%s : %4d",local_legend[1],page_no++);
+	strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+    col = (int)(REP_WIDTH-strlen(rep_title2))/2;
+    strcpy(hdr_line4+col,rep_title2);
+
+    if(first)
+        fprintf(f1,"%s\n",hdr_line1);
+    else
+        fprintf(f1,"\f\n%s\n",hdr_line1);
+
+    fprintf(f1,"%s\n",hdr_line2);
+    fprintf(f1,"%s\n",hdr_line3);
+    fprintf(f1,"%s\n",hdr_line4);
+    fprintf(f1,"%s\n",hdr_line5);
+
+    first = 0;
+	line_no = 5;
+return 1;
+}
+
+/********************* PRINT END OF REPORT ************************/
+print_end_of_rep()
+{
+    int col;
+    char buff[REP_WIDTH+1];
+
+    memset(buff,' ',REP_WIDTH+1);
+    col = (int)(REP_WIDTH-19)/2;
+
+    strncpy(buff+col,"** END OF REPORT **",19);
+    fprintf(f1,"\n%s\n",buff);
+}
+
+/**********PRINT SPACE*************/
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(f1,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(f1,"%s","-");
+		}	
+	}
+}
+
+
+/************* get_params ***************/
+void get_params()
+{
+	nd_fm_section_code.arr[0] 		= '\0';
+	nd_fm_section_code.len			= 0 ;
+	nd_to_section_code.arr[0]		= '\0' ;
+	nd_to_section_code.len			= 0;
+	nd_fm_date.arr[0]				= '\0' ;
+	nd_fm_date.len					= 0 ;
+	nd_to_date.arr[0]				= '\0' ;
+	nd_to_date.len					= 0 ;	
+
+   if(OERROR)
+      disp_message(ORA_MESG,"get parameter function using : \n");
+
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+                   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4
+		    INTO 
+				:nd_operating_facility_id,
+				:nd_fm_section_code ,  
+				:nd_to_section_code ,
+				:nd_fm_date ,
+				:nd_to_date 
+         FROM SY_PROG_PARAM
+	     WHERE   UPPER(PGM_ID) = 'RLRSHIST'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+   
+	/*strcpy(first_date.arr,nd_fm_date.arr) ;*/
+   if(OERROR)
+      disp_message(ORA_MESG,"get_parameter_function2 : \n");
+   
+  nd_fm_section_code.arr[nd_fm_section_code.len] 		= '\0';
+  nd_to_section_code.arr[nd_to_section_code.len]		= '\0';
+  nd_fm_date.arr[nd_fm_date.len]						= '\0';
+  nd_to_date.arr[nd_to_date.len]						= '\0';
+
+  #ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf(" nd_fm_section_code = %s\n",nd_fm_section_code.arr);
+   printf(" nd_to_section_code = %s\n",nd_to_section_code.arr);
+   printf(" nd_fm_date = %s\n",nd_fm_date.arr);
+   printf(" nd_to_date = %s\n",nd_to_date.arr);
+   getchar();  
+#endif
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE FROM SY_PROG_PARAM
+	   WHERE UPPER(PGM_ID) = 'RLRSHIST'
+	         AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		 AND PGM_DATE = :nd_pgm_date;
+
+     return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit();
+}
+
+/************ GET_HEADER_DETAILS****************/
+void get_header_dtls()
+{
+     d_acc_entity_name.arr[0]   = '\0';
+	 d_acc_entity_name.len		= 0;
+	 d_user.arr[0]				= '\0';
+	 d_user.len                 = 0;
+	 d_sysdate.arr[0]			= '\0';
+	 d_sysdate.len              = 0;
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+   EXEC SQL SELECT ACC_ENTITY_NAME,
+		       USER,
+		       TO_CHAR(SYSDATE, 'DD/MM/YYYY')
+	    INTO :d_acc_entity_name,
+		 :d_user,
+		 :d_sysdate
+             FROM SY_ACC_ENTITY_LANG_VW
+             WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+			 AND LANGUAGE_ID = :language_id;
+
+ d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+#ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+
+/*************** GENERATE FILE NAME ***************/
+void gen_file_name()
+{
+
+ 	 /* For a constant file name (4 lines) */
+  	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+     nd_file_name.len = strlen(nd_file_name.arr);
+	 //strcat(nd_file_name.arr,"rlrshist.lis");
+	 strcat(nd_file_name.arr,OUTPUT_FILE_NAME);
+	 nd_file_name.len = strlen(nd_file_name.arr);
+
+	 if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit();
+     }
+}
+
+/*********** PRINT REPORT HEADER **************/
+void print_rep_header()
+{
+  char nd_fm_section_desc[10],
+       nd_to_section_desc[10],
+	   nd_source_type_desc[10],
+	   nd_source_from_desc[10],
+	   nd_priority_desc[10],
+	   nd_test_code_desc[11];	/* Added by Durai Rajkumar against CRF-20236 on 24-Nov-08 */
+
+  form_hdr();
+
+  if (strcmp(nd_fm_section_code.arr, "!") == 0)
+       strcpy(nd_fm_section_desc, "LOWEST");
+  else strcpy(nd_fm_section_desc, nd_fm_section_code.arr);
+
+ 
+  if (strcmp(nd_to_section_code.arr, "~") == 0)
+       strcpy(nd_to_section_desc, "HIGHEST");
+  else strcpy(nd_to_section_desc, nd_to_section_code.arr);
+
+  if (strcmp(nd_source_type.arr, "!") == 0)
+       strcpy(nd_source_type_desc, local_legend[26]);
+  else
+	   strcpy(nd_source_type_desc, nd_source_type.arr);
+
+  if (strcmp(nd_source_from.arr, "~~~~~~") == 0)
+       strcpy(nd_source_from_desc, local_legend[26]);
+  else
+       strcpy(nd_source_from_desc,nd_source_from.arr );
+
+  if (strcmp(nd_priority.arr, "!") == 0)
+       strcpy(nd_priority_desc, local_legend[26]);
+  else
+       strcpy(nd_priority_desc,nd_priority.arr);
+  
+  /* Added by Durai Rajkumar against CRF-20236 on 24-Nov-08 */
+  if (strcmp(nd_test_code.arr, "~~~~~~~~~~") == 0)
+	 strcpy(nd_test_code_desc, local_legend[26]);
+  else
+    strcpy(nd_test_code_desc,nd_test_code.arr);
+  /* Ends against CRF-20236 */
+  get_version_no();  
+  
+  fprintf(f1,"%s\n",d_version.arr);
+
+  fprintf(f1,"\n\n\n\n");
+  //fprintf(f1,"        ");
+  //fprintf(f1,"%s :\n",local_legend[2]);
+  //fprintf(f1,"        ");
+  //fprintf(f1,"------------------\n\n");
+  //fprintf(f1,"                ");
+  rec_len = strlen(local_legend[2]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"%s:\n", local_legend[2]);//added for glob
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  print_space(20, rec_len,0);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"\n\n");
+  //fprintf(f1,"                               ");
+  rec_len = strlen(local_legend[3]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  //fprintf(f1,"DEPARTMENT FROM : %s\n",local_legend[12], nd_fm_section_desc)
+  fprintf(f1,"%s : %s\n",local_legend[3], nd_fm_section_desc); 
+  rec_len = strlen(local_legend[4]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  //fprintf(f1,"TO : %s\n", nd_to_section_desc);
+  fprintf(f1,"%s : %s\n", local_legend[4],nd_to_section_desc);
+  //fprintf(f1,"                ");
+  //fprintf(f1,"PERIOD       FROM : %s\n", nd_fm_date1.arr);
+  rec_len = strlen(local_legend[25]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  
+  fprintf(f1,"%s : %s\n",local_legend[25], nd_fm_date1.arr);
+  //fprintf(f1,"                               ");
+  //fprintf(f1,"TO : %s\n", nd_to_date.arr);
+  //fprintf(f1,"                      ");
+  rec_len = strlen(local_legend[4]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"%s : %s\n",local_legend[4], nd_to_date1.arr);
+  rec_len = strlen(local_legend[15]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"%s : %s\n",local_legend[15], nd_source_type_desc);
+  //fprintf(f1,"                      ");
+  rec_len = strlen(local_legend[15]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"%s : %s\n",local_legend[16], nd_source_from_desc);
+  //fprintf(f1,"                         ");
+  rec_len = strlen(local_legend[17]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation	/* Modified length 40 to 20 against CRF-20236 by Durai Rajkumar on 24-Nov-08 */
+  fprintf(f1,"%s : %s\n",local_legend[17], nd_priority_desc);
+  /* Added by Durai Rajkumar against CRF-20236 on 24-Nov-08 */
+  rec_len = strlen(local_legend[29]);//added for globalisation
+  print_space(20, rec_len,1);//added for globalisation
+  fprintf(f1,"%s : %s",local_legend[29], nd_test_code_desc);
+  if (strcmp(nd_test_code.arr, "~~~~~~~~~~") != 0)
+  get_test_desc();
+  fprintf(f1,"   %s\n",nd_test_desc.arr);
+  /*Ends against CRF-20236 */
+  fprintf(f1,"\n");
+}
+
+/***************PRINT  COLUMN HEADING *************/
+print_column_heading()
+{
+ if (strcmp(l_malaysia_yn.arr, "Y") == 0)
+ {
+   fprintf(f1,"%-4.4s       %-8.8s       %-5.5s 1              %-5.5s 2             %-5.5s 3\n",local_legend[5],local_legend[17],local_legend[6],local_legend[6],local_legend[6]);
+   fprintf(f1,"------------------------------------------------------------------------------\n");
+   fprintf(f1,"                      <- %10.10s->     <- %10.10s->     <- %10.10s->\n",local_legend[7],local_legend[7],local_legend[7]);
+   fprintf(f1,"                     %-3.3s        %-4.4s     %-3.3s        %-4.4s     %-3.3s        %-4.4s\n",local_legend[18],local_legend[19],local_legend[18],local_legend[19],local_legend[18],local_legend[19]);
+   fprintf(f1,"------------------------------------------------------------------------------\n");
+ }
+ else
+ {
+   fprintf(f1,"%-4.4s                     %-5.5s 1              %-5.5s 2             %-5.5s 3\n",local_legend[5],local_legend[6],local_legend[6],local_legend[6]);
+   fprintf(f1,"------------------------------------------------------------------------------\n");
+   fprintf(f1,"                      <- %10.10s->     <- %10.10s->     <- %10.10s->\n",local_legend[7],local_legend[7],local_legend[7]);
+   fprintf(f1,"                      %-3.3s  %-4.4s  %-4.4s     %-3.3s  %-4.4s  %-4.4s     %-3.3s  %-4.4s  %-4.4s\n",local_legend[18],local_legend[19],local_legend[20],local_legend[18],local_legend[19],local_legend[20],local_legend[18],local_legend[19],local_legend[20]);
+   fprintf(f1,"------------------------------------------------------------------------------\n");
+ }
+
+ line_no += 5;
+return 1;
+}
+
+/************get_legend_value*******************/
+get_legend_value(int cou)
+ {
+     
+   
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRSHIST.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+
+ for (i=1; i<=cou; i++)
+	{
+
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRSHIST.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+
+	//disp_message(ERR_MESG,local_legend[i]);
+
+	}
+	
+
+ }
+
+/**********end********************8/
+/************* get_shifts ***************/
+void get_shifts()
+{
+
+	l_shift_1_start_time = 0;
+	l_shift_2_start_time = 0;
+	l_shift_3_start_time = 0;
+	l_hmc_yn.arr[0]      = '\0';
+	l_hmc_yn.len         = 0;
+
+   EXEC SQL SELECT to_number(to_char(A.shift_1_start_time,'SSSSS')), 
+				   to_number(to_char(A.shift_2_start_time,'SSSSS')), 
+	     		   to_number(to_char(A.shift_3_start_time,'SSSSS')),
+				   NVL(B.hmc_yn, 'N') 
+			INTO   :l_shift_1_start_time, 
+				   :l_shift_2_start_time,
+      		       :l_shift_3_start_time,
+				   :l_hmc_yn
+	        FROM   rl_param B, RL_PARAM_FOR_FACILITY A
+	   WHERE operating_facility_id = :nd_operating_facility_id;
+
+   if(OERROR)
+   {
+		EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+	   EXEC SQL SELECT to_number(to_char(shift_1_start_time,'SSSSS')), 
+				       to_number(to_char(shift_2_start_time,'SSSSS')), 
+               		   to_number(to_char(shift_3_start_time,'SSSSS')),
+			     	   NVL(hmc_yn, 'N') 
+				INTO   :l_shift_1_start_time, 
+					   :l_shift_2_start_time,
+      				   :l_shift_3_start_time,
+					   :l_hmc_yn
+				  FROM RL_PARAM;
+   }
+   l_hmc_yn.arr[l_hmc_yn.len] = '\0';
+return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"No Shifts Defined...Exiting..\n");
+   proc_exit();
+}
+
+/********* DECLARE SHIFT CURSOR **********/
+ dclr_shift_cursor()
+ {
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	if (strcmp(nd_test_code.arr,"~~~~~~~~~~") == 0) 
+	{
+		EXEC SQL DECLARE shift_cursor0 CURSOR FOR
+                 SELECT A.section_code, 
+						DECODE(A.urgent_indicator, 'R', :local_legend[22],'S',:local_legend[23],'U',:local_legend[24], :local_legend[22]),
+						to_char(A.spec_regd_date_time,'dd/mm/yyyy'),
+                        to_number(to_char(A.spec_regd_date_time,'sssss')),
+                        A.specimen_no,
+                 		A.status
+                 FROM   rl_request_header A
+                 WHERE  A.operating_facility_id = :nd_operating_facility_id
+                 AND    A.SPEC_REGD_DATE_TIME >= to_date(:nd_fm_date,'dd/mm/yyyy hh24:mi')		/* Time Portion is added against CRF-20236*/
+                 --AND    A.SPEC_REGD_DATE_TIME < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') + 1	/* Time Portion is added against CRF-20236*/
+				 AND    A.SPEC_REGD_DATE_TIME < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') --MODIFIED AGAINIST DATE RANGE ISSUE	ON 01/12/2010
+                 AND    A.section_code BETWEEN NVL(:nd_fm_section_code, '!')
+								  AND NVL(:nd_to_section_code, '~')
+                 AND    A.source_type = decode(:nd_source_type,'!',a.source_type,:nd_source_type)
+                 AND    A.source_code = decode(:nd_source_from,'~~~~~~',a.source_code,:nd_source_from)
+                 AND    A.URGENT_INDICATOR = decode(:nd_priority,'!',a.URGENT_INDICATOR,:nd_priority)
+                 AND    NVL(A.cancelled_yn,'N') <> 'Y'
+                 ORDER BY 1, TRUNC(A.spec_regd_date_time), 2;
+
+		EXEC SQL OPEN shift_cursor0;
+	}
+	else
+		{
+		if (strcmp(nd_group_test_yn.arr,"G") == 0) 
+		{
+		EXEC SQL DECLARE shift_cursor1 CURSOR FOR
+                 SELECT A.section_code, 
+						DECODE(A.urgent_indicator, 'R', :local_legend[22],'S',:local_legend[23],'U',:local_legend[24], :local_legend[22]),
+                        to_char(A.spec_regd_date_time,'dd/mm/yyyy'),
+                        to_number(to_char(A.spec_regd_date_time,'sssss')),
+                        A.specimen_no,
+                        B.test_code,
+                        B.result_status
+                 FROM   rl_request_detail B,rl_request_header A
+                 WHERE  B.specimen_no = A.specimen_no
+                 AND    B.operating_facility_id = :nd_operating_facility_id
+                 AND    B.operating_facility_id = A.operating_facility_id
+                 AND    B.test_code = decode(:nd_test_code,'~~~~~~~~~~', B.test_code,:nd_test_code)
+                 AND    A.SPEC_REGD_DATE_TIME >= to_date(:nd_fm_date,'dd/mm/yyyy hh24:mi')		/* Time Portion is added against CRF-20236*/
+                 --AND    A.SPEC_REGD_DATE_TIME < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') + 1	/* Time Portion is added against CRF-20236*/
+				 AND    A.SPEC_REGD_DATE_TIME < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') --MODIFIED AGAINIST DATE RANGE ISSUE	ON 01/12/2010
+                 AND    A.section_code BETWEEN NVL(:nd_fm_section_code, '!')
+								  AND NVL(:nd_to_section_code, '~')
+                 AND    A.source_type = decode(:nd_source_type,'!', A.source_type,:nd_source_type)
+                 AND    A.source_code = decode(:nd_source_from,'~~~~~~', A.source_code,:nd_source_from)
+                 AND    A.urgent_indicator = decode(:nd_priority,'!',A.urgent_indicator,:nd_priority)
+                 AND    NVL(A.cancelled_yn,'N') <> 'Y'
+                 AND    NVL(B.cancelled_yn,'N') <> 'Y'
+                 ORDER BY 1, TRUNC(A.spec_regd_date_time), 2;
+
+		EXEC SQL OPEN shift_cursor1;
+		}
+		else
+		if (strcmp(nd_group_test_yn.arr,"I") == 0) 
+			{
+			EXEC SQL DECLARE shift_cursor2 CURSOR FOR
+                     SELECT A.section_code, 
+							DECODE(A.urgent_indicator, 'R', :local_legend[22],'S',:local_legend[23],'U',:local_legend[24], :local_legend[22]),
+							to_char(A.spec_regd_date_time, 'dd/mm/yyyy'),
+                            to_number(to_char(A.spec_regd_date_time,'sssss')),
+                            A.specimen_no,
+                            B.test_code,
+                            B.status
+                     FROM   rl_test_result B, rl_request_header A
+                     WHERE  B.specimen_no = A.specimen_no
+                     AND    B.operating_facility_id = :nd_operating_facility_id
+                     AND    B.operating_facility_id = A.operating_facility_id
+                     AND    B.test_code = decode(:nd_test_code,'~~~~~~~~~~', B.test_code,:nd_test_code)
+                     AND    A.spec_regd_date_time >= to_date(:nd_fm_date,'dd/mm/yyyy hh24:mi')		/* Time Portion is added against CRF-20236*/
+                     --AND    A.spec_regd_date_time < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') + 1	/* Time Portion is added against CRF-20236*/
+					 AND    A.SPEC_REGD_DATE_TIME < to_date(:nd_to_date,'dd/mm/yyyy hh24:mi') --MODIFIED AGAINIST DATE RANGE ISSUE	ON 01/12/2010
+                     AND    A.section_code BETWEEN NVL(:nd_fm_section_code, '!')
+									  AND NVL(:nd_to_section_code, '~')
+                     AND    A.source_type = decode(:nd_source_type,'!', A.source_type,:nd_source_type)
+                     AND    A.source_code = decode(:nd_source_from,'~~~~~~',a.source_code,:nd_source_from)
+                     AND    A.urgent_indicator = decode(:nd_priority,'!', A.urgent_indicator, :nd_priority)
+                     AND    NVL(A.cancelled_yn,'N') <> 'Y'
+                     AND    NVL(B.cancelled_yn,'N') <> 'Y'
+                     ORDER BY 1, TRUNC(A.spec_regd_date_time), 2;
+
+			EXEC SQL OPEN shift_cursor2;
+		   }
+		   }
+
+#ifdef DEBUG
+    printf("leaving dclr_shift_cursor_cur()\n");
+    fflush(stdout);
+#endif
+  return 1;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_shift_cursor_cur() occured....\n");
+   proc_exit();	
+  }
+
+/*********** FETCH SHIFT CURSOR **********/
+int fetch_shift_cursor()
+{
+
+	d_section_code.arr[0]		= '\0';
+	d_section_code.len			= 0;
+
+	d_urgent_indicator.arr[0]	= '\0';
+	d_urgent_indicator.len		= 0;
+
+	d_specimen_date.arr[0]		= '\0';
+	d_specimen_date.len			= 0;
+		
+	d_specimen_no.arr[0]		= '\0';
+	d_specimen_no.len			= 0;
+	
+	l_specimen_time = 0;
+
+	d_test_code.arr[0]		    = '\0';
+	d_test_code.len		    = 0;
+
+
+	if (strcmp(nd_test_code.arr,"~~~~~~~~~~") == 0) 
+	{
+	    EXEC SQL FETCH shift_cursor0
+		          INTO	:d_section_code,
+				        :d_urgent_indicator,
+						:d_specimen_date,
+						:l_specimen_time,
+					    :d_specimen_no,
+						:d_status; 
+	}
+	else
+	{		
+		if (strcmp(nd_group_test_yn.arr,"G") == 0) 
+		{
+		EXEC SQL FETCH shift_cursor1
+              INTO	:d_section_code,
+			        :d_urgent_indicator,
+					:d_specimen_date,
+					:l_specimen_time,
+				    :d_specimen_no,
+					:d_test_code,
+					:d_status; 
+		}
+		else
+			if (strcmp(nd_group_test_yn.arr,"I") == 0) 
+			{
+		    EXEC SQL FETCH shift_cursor2
+			      INTO	:d_section_code,
+				        :d_urgent_indicator,
+						:d_specimen_date,
+						:l_specimen_time,
+						:d_specimen_no,
+						:d_test_code,
+						:d_status; 
+			}
+	}
+
+	if (OERROR)
+        err_mesg(ORA_MESG,"FETCH failed on cursor RL_SHIFT_WISE_STATISTICS");
+
+	if (NO_DATA_FOUND)
+		return 0;
+	
+	d_section_code.arr[d_section_code.len]			= '\0';
+	d_urgent_indicator.arr[d_urgent_indicator.len]  = '\0';
+	d_specimen_date.arr[d_specimen_date.len]		= '\0';
+	d_specimen_no.arr[d_specimen_no.len]			= '\0';
+	d_test_code.arr[d_test_code.len]				= '\0';
+	d_status.arr[d_status.len]						= '\0';
+
+	return 1;
+}
+
+close_shift_cursor()
+{
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+	if (strcmp(nd_test_code.arr,"~~~~~~~~~~") == 0) 
+	{
+		EXEC SQL CLOSE shift_cursor0;
+	}
+	else
+	{
+		if (strcmp(nd_group_test_yn.arr,"G") == 0) 
+		{
+			EXEC SQL CLOSE shift_cursor1;
+		}
+		else
+		if (strcmp(nd_group_test_yn.arr,"I") == 0) 
+		{
+			EXEC SQL CLOSE shift_cursor2;
+		}
+	}
+	return 1;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_shift_cursor_cur() occured....\n");
+   proc_exit();	
+}
+
+
+/*********** Get Analyzer Count **********/
+int get_analyzer_count()
+{
+	l_analyzer_count = 0;
+
+	if (strcmp(nd_test_code.arr,"~~~~~~~~~~") == 0) 
+	{
+	    EXEC SQL SELECT COUNT(1)
+				  INTO	:l_analyzer_count
+				  FROM RL_ONLINE_INSTRUMENT_TEST
+				 WHERE operating_facility_id = :nd_operating_facility_id
+				   AND test_code IN
+								  (SELECT test_code
+									 FROM RL_TEST_RESULT
+									WHERE specimen_no = :d_specimen_no
+									  AND operating_facility_id = :nd_operating_facility_id);
+	}
+	else
+	{		
+		if (strcmp(nd_group_test_yn.arr,"G") == 0)
+		{
+	    EXEC SQL SELECT COUNT(1)
+				  INTO	:l_analyzer_count
+				  FROM RL_ONLINE_INSTRUMENT_TEST
+				 WHERE operating_facility_id = :nd_operating_facility_id
+				   AND test_code IN
+								  (SELECT test_code
+									 FROM RL_TEST_RESULT
+									WHERE specimen_no = :d_specimen_no
+									  AND operating_facility_id = :nd_operating_facility_id
+									  AND group_test_code = :d_test_code);
+		}
+		else
+			if (strcmp(nd_group_test_yn.arr,"I") == 0)
+			{
+			EXEC SQL SELECT COUNT(1)
+				  INTO	:l_analyzer_count
+				  FROM RL_ONLINE_INSTRUMENT_TEST
+				 WHERE operating_facility_id = :nd_operating_facility_id
+				   AND test_code = :d_test_code;
+			}
+	}
+
+	if (OERROR)
+        l_analyzer_count = 0;
+
+	if (NO_DATA_FOUND)
+		l_analyzer_count = 0;
+	
+	return 1;
+}
+
+
+/*********** Do Count **********/
+int do_count()
+{
+	get_analyzer_count();
+
+	if ((l_specimen_time >= l_shift_1_start_time) && 
+		(l_specimen_time < l_shift_2_start_time))
+	 {
+		d_request_1 += 1;
+
+		if (l_analyzer_count > 0)
+		{
+		  d_analyzer_1 += 1;
+		}
+	
+		if ((strcmp(d_status.arr,"R") == 0) || (strcmp(d_status.arr,"P") == 0))
+		{
+			d_reported_1 += 1; 
+		}
+	 }
+	else 
+	if ((l_specimen_time >= l_shift_2_start_time) && 
+		(l_specimen_time < l_shift_3_start_time))
+	 {
+		d_request_2 += 1;
+		
+		if (l_analyzer_count > 0)
+		  {
+			 d_analyzer_2 += 1;
+		  }
+			
+		if ((strcmp(d_status.arr,"R") == 0) || (strcmp(d_status.arr,"P") == 0))
+		{
+			d_reported_2 += 1; 
+		}
+	 }
+	 else
+		{
+		d_request_3 += 1;
+		
+		if (l_analyzer_count > 0)
+		  {
+			 d_analyzer_3 += 1;
+		  }
+			
+		if ((strcmp(d_status.arr,"R") == 0) || (strcmp(d_status.arr,"P") == 0))
+		{
+			d_reported_3 += 1; 
+		}
+		}
+		
+return 1;
+}
+
+/********************* DO REPORT ************************/
+do_report()
+{
+	char first_time = 'Y';
+      
+	d_prev_section_code.arr[0]	= '\0';
+	d_prev_section_code.len		= 0;
+
+	d_prev_specimen_date.arr[0]	= '\0';
+	d_prev_specimen_date.len		= '\0';
+
+	d_print_specimen_date.arr[0] = '\0';
+	d_print_specimen_date.len = '\0';
+
+	page_no = 1;
+	line_no = 1;
+
+	print_rep_header();
+	line_no = 59;
+	chk_break(1);
+	d_request_1  = 0;
+	d_request_2  = 0; 
+	d_request_3  = 0; 
+	d_analyzer_1 = 0;
+	d_analyzer_2 = 0;
+	d_analyzer_3 = 0;
+	d_reported_1 = 0;
+	d_reported_2 = 0;
+	d_reported_3 = 0;
+
+	t_request_1 = 0;
+	t_analyzer_1 = 0;
+	t_reported_1 = 0;
+	t_request_2 = 0;
+	t_analyzer_2 = 0;
+	t_reported_2 = 0;
+	t_request_3 = 0;
+	t_analyzer_3 = 0;
+	t_reported_3 = 0;
+
+	g_request_1 = 0;
+	g_analyzer_1 = 0;
+	g_reported_1 = 0;
+	g_request_2 = 0;
+	g_analyzer_2 = 0;
+	g_reported_2 = 0;
+	g_request_3 = 0;
+	g_analyzer_3 = 0;
+	g_reported_3 = 0;
+
+    dclr_shift_cursor();
+   
+   while(fetch_shift_cursor())
+   {
+
+//   disp_message(ERR_MESG,d_specimen_date.arr);
+
+	   if (strcmp(d_prev_section_code.arr, d_section_code.arr) != 0)
+	   {
+		   strcpy(d_prev_section_code.arr, d_section_code.arr);
+		   d_prev_section_code.len = strlen(d_prev_section_code.arr);
+
+
+		   if (first_time == 'N')
+			{
+	    	   print_dtl();
+			   print_total();
+          	   strcpy(d_print_specimen_date.arr,"");
+		       d_print_specimen_date.len = strlen(d_print_specimen_date.arr);
+			   strcpy(d_prev_urgent_ind.arr,"");
+			   d_prev_urgent_ind.len = strlen(d_prev_urgent_ind.arr);
+      	    }
+
+		   strcpy(d_prev_specimen_date.arr,d_specimen_date.arr);
+		   d_prev_specimen_date.len = strlen(d_prev_specimen_date.arr);
+		   strcpy(d_prev_urgent_ind.arr, d_urgent_indicator.arr);
+		   d_prev_urgent_ind.len = strlen(d_prev_urgent_ind.arr);
+
+		   get_section_desc();
+		   print_dept_dtl();
+		   first_time = 'N';
+//		   disp_message(ERR_MESG,"Print DEPT ");
+		}
+ 	   else	
+		{
+			if (strcmp(d_prev_specimen_date.arr, d_specimen_date.arr) != 0)
+				{
+//   disp_message(ERR_MESG,"Print Dtl inside loop");
+
+			      print_dtl();			
+
+			      strcpy(d_prev_specimen_date.arr,d_specimen_date.arr);
+				  d_prev_specimen_date.len = strlen(d_prev_specimen_date.arr);
+
+			      strcpy(d_prev_urgent_ind.arr, d_urgent_indicator.arr);
+			      d_prev_urgent_ind.len = strlen(d_prev_urgent_ind.arr);
+
+				}
+				else
+				{
+                 if ( ( strcmp(l_malaysia_yn.arr, "Y") == 0)  && (strcmp(d_prev_urgent_ind.arr, d_urgent_indicator.arr) != 0 ) )
+				 {
+                   print_dtl();			
+				   strcpy(d_prev_urgent_ind.arr, d_urgent_indicator.arr);
+				   d_prev_urgent_ind.len = strlen(d_prev_urgent_ind.arr);
+				 }
+				}
+		}
+
+	do_count();  
+
+  }
+
+   print_dtl();			
+
+   print_total();
+
+   print_grand_total();
+
+   close_shift_cursor();
+
+return 1;
+}
+
+/************** PRINT DEPARTMENT COLUMN HEADING ***************/
+print_dept_dtl()
+{
+	chk_break(1);
+	fprintf(f1,"%-10.10s : %-40s\n",local_legend[9],d_section_desc.arr);
+	fprintf(f1,"-----------------------------------\n");
+    line_no += 2 ;
+	return 1;
+}
+
+get_section_desc()
+{
+	d_section_desc.arr[0]	= '\0';
+	d_section_desc.len		= 0;
+
+	EXEC SQL SELECT long_name 
+			 INTO :d_section_desc
+			 FROM RL_SECTION_CODE_LANG_VW
+			 WHERE section_code = :d_section_code
+			 AND language_id = :language_id;
+
+	d_section_desc.arr[d_section_desc.len]		= '\0';
+return 1;
+}
+get_test_desc()
+{
+	nd_test_desc.arr[0]	= '\0';
+	nd_test_desc.len		= 0;
+
+	 EXEC SQL SELECT long_desc
+			 INTO :nd_test_desc
+			 FROM  rl_test_code_lang_vw
+			 WHERE test_code   = :nd_test_code
+			   AND language_id = :language_id;
+	nd_test_desc.arr[nd_test_desc.len]		= '\0';
+return 1;
+}
+
+print_total()
+{
+	chk_break(6);
+
+	fprintf(f1,"            ------------------------------------------------------------------\n");
+
+	fprintf(f1,"%-5.5s        ",local_legend[10]);
+	if (strcmp(l_malaysia_yn.arr, "Y") == 0)
+	{
+	  fprintf(f1,"%-8s", " ");
+	  fprintf(f1,"%4d  %4s  %4d",
+			  t_request_1, " ", t_reported_1);
+	  fprintf(f1,"    %4d  %4s  %4d",
+			  t_request_2, " ", t_reported_2);
+	  fprintf(f1,"    %4d  %4s  %4d\n",
+			  t_request_3, " ", t_reported_3);				       
+
+	}
+	else
+	{
+	  fprintf(f1,"%4d  %4d  %4d",
+			  t_request_1, t_analyzer_1, t_reported_1);
+	  fprintf(f1,"    %4d  %4d  %4d",
+			t_request_2, t_analyzer_2, t_reported_2);
+	  fprintf(f1,"    %4d  %4d  %4d\n",
+			  t_request_3, t_analyzer_3, t_reported_3);				       
+	}
+	fprintf(f1,"            ------------------------------------------------------------------\n");
+
+	line_no += 3;
+
+	g_request_1 += t_request_1;
+	g_analyzer_1 += t_analyzer_1;
+    g_reported_1 += t_reported_1;
+
+	g_request_2 += t_request_2;
+	g_analyzer_2 += t_analyzer_2;
+    g_reported_2 += t_reported_2;
+
+	g_request_3 += t_request_3;
+	g_analyzer_3 += t_analyzer_3;
+    g_reported_3 += t_reported_3;
+
+	t_request_1 = 0;
+	t_analyzer_1 = 0;
+	t_reported_1 = 0;
+	t_request_2 = 0;
+	t_analyzer_2 = 0;
+	t_reported_2 = 0;
+	t_request_3 = 0;
+	t_analyzer_3 = 0;
+	t_reported_3 = 0;
+return 1;
+}
+
+
+print_grand_total()
+{
+	chk_break(5);
+
+	fprintf(f1, "\n\n");
+
+	fprintf(f1,"            ------------------------------------------------------------------\n");
+	fprintf(f1,"%-11.11s",local_legend[11]);
+
+	if (strcmp(l_malaysia_yn.arr, "Y") == 0)
+	{
+	  fprintf(f1,"%-8s", " ");
+	  fprintf(f1,"%6ld%6s%6ld",
+			  g_request_1, " ", g_reported_1);
+	  fprintf(f1,"  %6ld%6s%6ld",
+			  g_request_2, " ", g_reported_2);
+	  fprintf(f1,"  %6ld%6s%6d\n",
+			  g_request_3, " ", g_reported_3);				       
+	}
+	else
+	{
+	  fprintf(f1,"%6ld%6ld%6ld",
+			  g_request_1, g_analyzer_1, g_reported_1);
+	  fprintf(f1,"  %6ld%6ld%6ld",
+			  g_request_2, g_analyzer_2, g_reported_2);
+	  fprintf(f1,"  %6ld%6ld%6d\n",
+			  g_request_3, g_analyzer_3, g_reported_3);				       
+	}
+	fprintf(f1,"            ------------------------------------------------------------------\n");
+
+	line_no += 3;
+
+	g_request_1 = 0;
+	g_analyzer_1 = 0;
+	g_reported_1 = 0;
+	g_request_2 = 0;
+	g_analyzer_2 = 0;
+	g_reported_2 = 0;
+	g_request_3 = 0;
+	g_analyzer_3 = 0;
+	g_reported_3 = 0;
+
+return 1;
+}
+
+print_dtl()
+{
+	chk_break(1);
+	if (strcmp(l_malaysia_yn.arr, "Y") == 0)
+	{
+//sprintf(string_var, "s %s s %s", d_prev_specimen_date.arr, d_specimen_date.arr);
+//disp_message(ERR_MESG, string_var);
+      if (strcmp(d_print_specimen_date.arr, d_prev_specimen_date.arr) != 0)
+	  {
+        EXEC SQL EXECUTE
+				DECLARE
+				t_date   date;
+				
+				BEGIN
+				//GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:d_prev_specimen_date,'DD/MM/YYYY'), :language_id , t_date);
+				//:d_prev_specimen_date1 := to_char(t_date,'DD/MM/YYYY');
+				:d_prev_specimen_date1 :=sm_convert_date_2t(to_date(:d_prev_specimen_date,'DD/MM/YYYY'),:language_id);
+				END;
+			END-EXEC;
+		fprintf(f1, "%-10s %-8.8s  %4d  %4s  %4d",
+			d_prev_specimen_date1.arr, d_prev_urgent_ind.arr, 
+			d_request_1, " ", d_reported_1);
+
+	  }
+	  else
+	  {
+        fprintf(f1, "%-10s %-8.8s  %4d  %4s  %4d",
+			" ", d_prev_urgent_ind.arr, //HERE
+			d_request_1, " ", d_reported_1);
+	  }
+	  fprintf(f1, "    %4d  %4s  %4d",
+			d_request_2, " ", d_reported_2);
+	  fprintf(f1, "    %4d  %4s  %4d\n",
+			d_request_3, " ", d_reported_3);				       
+
+	}
+	else
+	{
+      fprintf(f1, "%-10s   %4d  %4d  %4d",
+			d_prev_specimen_date.arr, 
+			d_request_1, d_analyzer_1, d_reported_1);
+	fprintf(f1, "    %4d  %4d  %4d",
+			d_request_2, d_analyzer_2, d_reported_2);
+	fprintf(f1, "    %4d  %4d  %4d\n",
+			d_request_3, d_analyzer_3, d_reported_3);				       
+
+	}
+
+    strcpy(d_print_specimen_date.arr, d_prev_specimen_date.arr);
+	d_print_specimen_date.len = strlen(d_print_specimen_date.arr);
+
+	t_request_1 += d_request_1;
+	t_request_2 += d_request_2;  
+	t_request_3 += d_request_3;  
+
+	t_analyzer_1 += d_analyzer_1; 
+	t_analyzer_2 += d_analyzer_2; 
+	t_analyzer_3 += d_analyzer_3; 
+
+	t_reported_1 += d_reported_1; 
+	t_reported_2 += d_reported_2; 
+	t_reported_3 += d_reported_3; 	
+
+	
+	d_request_1  = 0;
+	d_request_2  = 0; 
+	d_request_3  = 0; 
+	d_analyzer_1 = 0;
+	d_analyzer_2 = 0;
+	d_analyzer_3 = 0;
+	d_reported_1 = 0;
+	d_reported_2 = 0;
+	d_reported_3 = 0;
+
+	line_no++;
+
+return 1;
+}
+
+
+get_version_no()
+{
+
+////////    This function is used to get the version number of the product.
+///////      Added by Srinivas on 1 July 2003
+
+     d_version_no.arr[0] = '\0';
+     d_version_no.len    =  0;
+	 l_malaysia_yn.arr[0] = '\0';
+	 l_malaysia_yn.len    = 0;
+
+     strcpy(d_version.arr,"VER : ");
+
+	 EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC;
+
+
+    if (l_tab_exists) 
+    {
+	    EXEC SQL SELECT VERSION_NO INTO :d_version_no 
+                 FROM   SM_INSTALLATION; 
+        d_version_no.arr[d_version_no.len] = '\0';
+    }
+    else
+	    strcpy(d_version_no.arr,"2.1");
+
+	    strcat(d_version.arr,d_version_no.arr);
+
+    if (l_tab_exists && strcmp(l_hmc_yn.arr, "Y") != 0 ) 
+      strcpy(l_malaysia_yn.arr,"Y");
+	else
+	  strcpy(l_malaysia_yn.arr,"N");
+
+
+    if (OERROR)
+	{
+	    strcpy(d_version_no.arr,"2.1");
+	    strcat(d_version.arr,d_version_no.arr);
+    }
+
+return 1;
+}
+//////////// UPTO HERE   
+
+
+
+
+#undef DEBUG
+#undef OERROR
+#undef NO_DATA_FOUND
+#undef MAX_LINES
+#undef VER
+
+

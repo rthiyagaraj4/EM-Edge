@@ -1,0 +1,380 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>DTM_OrderAuthorization</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Order Entry and Result Reporting\nTransaction\nDTM_OrderAuthorization");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Order Authorization &#160;</h1>
+<p class="Italic">From this function you can <span class="RedItalic">View</span>, <span class="RedItalic">Cancel</span>, <span class="RedItalic">Amend</span> and <span class="RedItalic">Authorize</span> orders pending for verification.</p>
+<p class="Text">The Order Authorization function is used by senior practitioners to verify and authorize orders placed by other logged in practitioners not privileged to authorize (such as junior practitioners). Using this function practitioners are allowed to amend or cancel orders if the order is not eligible for verification.</p>
+<h2>Authorizing Orders</h2>
+<p class="From">From the CA Transactions &gt; Clinician Access &gt; Desktop Menu &gt; Pending Activities &gt; Verifications, select the Order Authorization function. The Order Authorization screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Orders pending for authorization</a> are displayed for the default date range. Enter the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">query criteria</a> and click <span class="BoldButton">[Search]</span> to display and authorize specific orders. Click <span class="BoldButton">[Clear]</span> to clear the displayed data.</p>
+<div class="droptext" id="POPUP1004847868" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location Type</span> – ‘All’ is displayed, by default. Select the required Location Type from the list. The values displayed are All, Clinic, Day care, Emergency, Nursing Unit and Referral.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Location</span> – ‘All’ is displayed, by default. Depending on the value selected for Location Type, the <span class="BoldNumberRFD">[?]</span> function displays Locations. If Location Type is selected as ’Clinic’, <span class="BoldNumberRFD">[?]</span> function displays all the clinics of the logged in facility to which the logged in user has access. If the Location Type is ‘Nursing Unit’, <span class="BoldNumberRFD">[?]</span> function displays all the Nursing Units of the logged in facility to which the logged in user has access.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Period [From-To]</span> - The date range is displayed, by default. Enter a period in date format of dd/mm/yyyy. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Include Force Authorization</span> - Select the check box to list the orders which requires forced authorization. This check box is selected, by default. On selecting the 'Include Forced Authorization' check box a new list will displayed. Select &#160;the values from the list. The listed values are 'All', 'My Patient', 'My Related Patient' and 'My Location Patient'. If you select 'My Patient' the order displays for which the logged user is the attending practitioner.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Filter</span> - Select the values from the list to filter the orders. The listed item are All, Self, My Speciality and Specialty Specific. All is selected, by default.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">All</span> - Select 'All' from the list to display all orders including 'Self' and 'Specialty &#160;&#160;&#160;&#160;&#160;Specific' orders.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Self</span> - Select 'Self' from the list to display orders that are ordered on behalf of the logged in practitioner.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Specialty Specific</span> - Select 'Specialty Specific' from the list to display specialty specific orders. If the 'Specialty Specific' check box is selected in Order Catalog function then orders are called Specialty Specific Orders.</p>
+</li>
+</ol>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – Enter the Patient ID in alphanumeric format of maximum length as specified in the MP Parameter.</p>
+</li>
+</ol>
+</div>
+<div class="droptext" id="POPUP1004835664" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Status by Priority</span> - The number of orders requiring authorization against each priority is displayed. The displayed priorities are hyperlinked. The total number of orders requiring authorization of all the displayed priorities is shown against 'Al' hyperlink. Click on a priority to view the orders requiring authorization.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Status by Category</span> – The number of orders requiring authorization against each category is displayed. The displayed categories are hyperlinked. The total number of orders requiring authorization of all the displayed categories is shown against 'All' hyperlink. Click on a category to view the orders requiring authorization.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Authorize</span> – Select the check box to select orders for authorization. All the check boxes are cleared, by default. To authorize all the displayed orders, select the check box provided before ‘Authorize’ heading.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> - The priority of the order is displayed. The priorities displayed are Routine, Stat and Urgent.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordered At</span> - The date and time of ordering is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalogs</span> - The Order Catalog is displayed and hyperlinked. Click on the hyperlink to view/cancel/amend the order (based on the user access rights in CA Admin Setup, tasks are displayed).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Details</span> – The Order details displayed are the patient and encounter details. The patient details displayed are name of the Patient, Gender, Age and Patient ID. The encounter details displayed are Encounter ID and Name of the Daycare Unit/Emergency Unit/Nursing Unit/Clinic/Referral Location. Click Patient History hyperlink to view the patient history.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Dtls</span> – Click View/Edit hyperlink to view and record charge details.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click the Order Catalogs hyperlink and select the required option from the list to <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">View</a>, <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Cancel</a> and <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Amend</a> orders.</p>
+<div class="droptext" id="POPUP1004825956" style="display: none;">
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;">On clicking Amend option, search for Amend Practitioner screen gets displayed. Search for a practitioner to amend the order by clicking any one of the following options.</span></p>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a6">Attending</a></span></p>
+<div class="droptext" id="POPUP1004841307" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">On clicking the Attending radio button the name of the Attending Practitioner of the patient.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Instruction Mode from the list. The values for Instruction Mode populates from ‘Reason for Code’ function in OR Code Setup. On selecting the value from the Instruction Mode list, the corresponding text is displayed in the text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or click <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a7">Medical Team</a></span></p>
+<div class="droptext" id="POPUP1004842183" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">Click Medical Team radio button to select the Practitioner.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click any one radio button, either ‘Teams of Attending Practitioner’ or ‘Other Team’ to search for the Practitioner from a Medical Team.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[?]</span> function to select a Practitioner. This field is mandatory.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Instruction Mode from the list. The values for Instruction Mode populates from ‘Reason for Code’ in OR Code Setup. On selecting the value from the Instruction Mode list, the corresponding text is displayed in the text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or click <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a8">Location</a></span></p>
+<div class="droptext" id="POPUP1004838957" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">Click Location radio button to select the Practitioner from a location.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Location from <span class="BoldButton">[?]</span> function. The values for Location populates from ‘IP Code Setup’ in Inpatient and Day Care Management module.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[?]</span> function to select practitioner associated to the selected Location. This field is mandatory.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Instruction Mode from the list. The values for Instruction Mode populates from ‘Reason for Code’ in OR Code Setup. On selecting the value from the Instruction Mode list, the corresponding text is displayed in the text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a9">Specialty</a></span></p>
+<div class="droptext" id="POPUP1004807510" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">Click Specialty radio button to select the Practitioner from a Specialty.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Specialty from <span class="BoldButton">[?]</span> function. The values for Specialty populates from ‘Practitioner Setup’ in Application Master Setup.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the practitioner from <span class="BoldButton">[?]</span> function. Practitioners associated to the Specialty are listed. This field is mandatory.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Instruction Mode from the list. The values for Instruction Mode populates from ‘Reason for Code’ in OR Code Setup. On selecting the value from the Instruction Mode list, the corresponding text is displayed in the text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or click <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a10">Self</a></span></p>
+<div class="droptext" id="POPUP1004830978" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">Click 'Self' radio button to select the user as the Practitioner.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On clicking, Self radio button, the logged in user name is displayed by default in the Practitioner text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a11">All</a></span></p>
+<div class="droptext" id="POPUP1004841230" style="display: none;">
+<ol>
+<li class="p-Number">
+<p class="Number">Click All radio button to select a Practitioner from all the practitioners of Enterprise Management.</p>
+</li>
+<li class="p-Number">
+<p class="Number">On clicking the All radio button, search for the Practitioner by clicking <span class="BoldButton">[?]</span> function. This field is mandatory. The list of Practitioners is displayed from ‘Practitioner Setup’ in Application Master module.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the Instruction Mode from the list. The values for Instruction Mode populates from ‘Reason for Code’ in OR Code Setup. On selecting the value from the Instruction Mode list, the corresponding text is displayed in the text box.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[OK]</span> to confirm the selection or click <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+</ol>
+</div>
+<p style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;">After selecting the required criteria Place Orders screen displays to amend order details.</span></p>
+</div>
+<div class="droptext" id="POPUP1004839776" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">On clicking the Cancel option, the ‘Cancel Order’ screen is displayed.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">The screen displays Order ID, Order Category, Order Type, Priority, Patient, Encounter ID, Order Date Time, Order Status, Ordering Location, Ordering Practitioner, Ordering Facility, Performing Facility, Order Format, Clinical Comments and Order Placed By. The screen also displays the Order Catalog, Priority, Frequency, Start Date/Time, End Date/Time, Quality, Status, Format and Reason.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Format hyperlink to view the details in the Order Line Format screen. Click <span class="BoldNumberRFD">[Close]</span> to close the Order Line Format screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Schd]</span> hyperlink to view the Schedule Frequency of the order and click <span class="BoldNumberRFD">[Close]</span> to close the Schedule Frequency screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Preps, Dept Instrn, Pat Instrn hyperlink to view details, if recorded while creating the Order Catalog.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Select the check box to enter the Reason for cancellation of the order and Cancel Reason screen is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Select the required Cancel Reason from the list and the description of the selected reason is displayed which can be edited.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[OK]</span> to confirm the Reason. The [R] icon below the Reason check box becomes hyperlinked on confirming the reason. Click <span class="BoldNumberRFD">[R]</span> hyperlink to select another reason for cancelling.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">To allot the Reason for all the orders, select the check box provided before ‘Reason’ label.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Record Cancellation]</span> to cancel the order or <span class="BoldNumberRFD">[Close]</span> to close the Cancel Order Screen.</p>
+</li>
+</ol>
+</div>
+<div class="droptext" id="POPUP1004837617" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">On clicking the View option, the ‘View Order’ screen is displayed.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD">The screen displays Order ID, Order Category, Order Type, Priority, and Patient details, Encounter ID, Order Date Time, Order Status, Ordering Location, Ordering Practitioner, Ordering Facility, Performing Facility, Order Format, Clinician Comments and Order Placed By. The screen also displays the Order Catalog, Priority, Frequency, Start Date/Time, End Date/Time, Quantity, Status, Formats and Comments. The Order Status is shown as ‘Pend Auth’, indicating that order is pending for authorization.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Format hyperlink to view details in the Order Line Format screen. Click <span class="BoldNumberRFD">[Close]</span> to close the Order Line Format screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Schd]</span> hyperlink to view the Schedule Frequency of the order and <span class="BoldNumberRFD">[Close]</span> to close the Schedule Frequency screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click Preps, Dept Instrn, Pat Instrn hyperlink to view details if recorded while creating the Order Catalog.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[View Audit Trail]</span> to display View Audit Trail screen and view audit trail details. Click the Remark (R) hyperlink to display remarks for the order. Click <span class="BoldNumberRFD">[Close]</span> to close the remark screen. Click <span class="BoldNumberRFD">[x]</span> to exist from the View Audit Trail screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Close]</span> to close View Order screen.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click Patient History hyperlink under Order Details to view Clinical Events recorded for the patient.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click View/Edit hyperlink under Charge Details to view charge details of the patient. Charge 'Dtls' screen is displayed. Click <span class="BoldButton">[Record]</span> to record Charge Details. Click <span class="BoldButton">[Cancel]</span> to exit from the screen.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select the check box against the required orders for authorizing and click <span class="BoldButton">[Authorize]</span> to confirm authorization or click <span class="BoldButton">[Clear]</span> to clear the selected orders.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','PCM_Orders','PCM_Orders.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP1004835664');
+	TextPopupInit('a1','POPUP1004847868');
+	TextPopupInit('a3','POPUP1004837617');
+	TextPopupInit('a4','POPUP1004839776');
+	TextPopupInit('a5','POPUP1004825956');
+	TextPopupInit('a6','POPUP1004841307');
+	TextPopupInit('a7','POPUP1004842183');
+	TextPopupInit('a8','POPUP1004838957');
+	TextPopupInit('a9','POPUP1004807510');
+	TextPopupInit('a10','POPUP1004830978');
+	TextPopupInit('a11','POPUP1004841230');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a7','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a8','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a10','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a9','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a11','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

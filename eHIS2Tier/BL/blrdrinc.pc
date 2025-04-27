@@ -1,0 +1,562 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+*  File	: blrdrinc.pc
+   Author : Irfan
+   Date Created : 26/02/2000  
+                                    
+
+*  Ver 1.10.01
+   
+*  Purpose  : To generate a report for monthly income by Doctor.
+            
+*  Input Parameters : 
+                      Command line inputs
+				      1. Usr_id/Password
+                      2. Session id
+				      3. Program Date  
+
+                      Parameters from SY_PROG_PARAM table 
+                      4. Preferred range of Dates.
+                    
+  
+*  Table Accessed : BL_DCOTOR_INC_DTLS
+
+*  Output File : blrdrinc.lis
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <math.h>
+#include <string.h>       
+#include <bl.h>
+
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 4.1\n"        
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+       /* increased the length all varchar variables by one to take care */
+       /* for null termination */
+	VARCHAR uid_pwd		       [91],
+
+                /* from inc_by_doctor_cur */
+		d_row_code			[4],
+		nd_row_code         [4];		
+
+	int     d_column_seq = 0,
+			page_no,
+			line_no =0;
+			
+	double  d_inc_amount;
+	
+	VARCHAR
+		/* input parameters to main() */
+        nd_session_id      	[16],
+        nd_pgm_date	    	[20],
+
+		/* input parameters through from SY_PROG_PARAM */
+ 		nd_fm_month			[3],
+ 		nd_to_month		    [3],
+ 		nd_fm_year    	    [5],
+ 		nd_to_year    	    [5],
+		nd_operating_facility_id [3],
+		
+		/* from BL_DOCTOR_INC_ROW */
+        d_row_code_desc         [31],
+		
+		/* from BL_DOCTOR_INC_COL */
+        d_col_code_desc         [31],
+
+		/* for header routine */
+	    d_acc_entity_name        [41],
+		d_user                   [21],
+		d_sysdate                [17];
+
+char filename[150];
+char string_var[100];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+
+FILE *f1;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+  void  get_params(),
+  	get_header_dtls(),
+  	dclr_inc_by_doc_cur(),
+  	do_report();
+   
+   strcpy(filename,WORKING_DIR);
+   strcat(filename,"blrdrinc.lis");
+
+   if((f1 = fopen(filename, "w")) == NULL) {
+     disp_message(ERR_MESG,".... Error opening output file ....");
+     proc_exit();
+   } 
+
+   if(argc != 5) {
+     disp_message(ERR_MESG,"Usage iprdbdcw uid/passwd session_id pgm_date facility_id");
+     proc_exit();
+   }
+
+   strcpy(OUTPUT_FILE_NAME,"blrdrinc.lis");                                                    
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) {
+		disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+		proc_exit();
+    }
+
+   set_meduser_role();
+
+   get_params();
+
+   get_header_dtls();
+
+   dclr_inc_by_doc_cur();
+
+   do_report();
+
+   delete_all_data();
+
+  
+   EXEC SQL COMMIT WORK RELEASE;
+
+   fclose(f1);
+   return;
+   
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at main() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}   
+
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+				   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4
+
+            INTO  :nd_operating_facility_id,
+				  :nd_fm_month, 
+	        	  :nd_to_month, 
+                  :nd_fm_year,
+                  :nd_to_year
+            FROM SY_PROG_PARAM
+	    WHERE   PGM_ID = 'BLRDRINC'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+   nd_fm_month.arr[nd_fm_month.len]			  = '\0';
+   nd_to_month.arr[nd_to_month.len]			  = '\0';
+   nd_fm_year.arr[nd_fm_year.len]             = '\0';
+   nd_to_year.arr[nd_to_year.len]             = '\0';
+
+   strcpy(g_facility_id, nd_operating_facility_id.arr);
+   
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE SY_PROG_PARAM
+	   WHERE PGM_ID = 'BLRDRINC'
+	         AND SESSION_ID = :nd_session_id
+		 AND PGM_DATE = :nd_pgm_date;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_params() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+ 
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT ACCOUNTING_NAME, /* description of the institution */
+				   USER,
+				   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+		    INTO :d_acc_entity_name,
+				 :d_user,
+				 :d_sysdate
+            FROM SY_ACC_ENTITY
+			WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at get_header_dtls() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+ 
+
+/* function declares IP_DLY_CENSUS_BY_WARD_CUR cursor on the  */
+/* IP_DLY_CENSUS_BY_WARD					*/
+
+void dclr_inc_by_doc_cur()
+{
+ 
+  EXEC SQL DECLARE DCLR_INC_BY_DOC_CUR CURSOR FOR
+     SELECT     ROW_CODE,
+			    COLUMN_SEQ,
+				INC_AMOUNT
+     FROM       BL_DOCTOR_INC_DTLS
+	 WHERE      SESSION_ID = TO_NUMBER(:nd_session_id)
+	 AND		PGM_DATE   = :nd_pgm_date
+     ORDER BY ROW_CODE,COLUMN_SEQ;
+
+	 
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN DCLR_INC_BY_DOC_CUR;
+	
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_inc_by_doc_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+void dclr_col_desc_cur()
+{
+
+  EXEC SQL DECLARE DCLR_COL_DESC_CUR CURSOR FOR
+     SELECT     COLUMN_HEAD
+     FROM       BL_DOCTOR_INC_COL
+	 ORDER BY COLUMN_SEQ;
+	 
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN DCLR_COL_DESC_CUR;
+	
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at dclr_inc_by_doc_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+
+}
+
+/* prints the master-detail record until the cursor is empty */
+void do_report()
+{
+  void print_page_header();
+  void prepare_new_page();
+  void print_col_heading();
+  void print_detl_rec();
+  void end_report();
+
+  int fetch_inc_by_doc_cur();
+  int still_rec_left;
+
+  /* read the first cursor record */
+  still_rec_left = fetch_inc_by_doc_cur();
+
+  /* if no records selected print the column heading */
+
+    if(still_rec_left == 0)
+  {
+     print_page_header();
+   }
+   else
+   {
+	print_page_header();
+	print_col_heading();
+   }
+	
+   while(still_rec_left)
+   {
+	
+	if(line_no > MAX_LINES)  prepare_new_page();
+
+	if((strcmp(nd_row_code.arr,d_row_code.arr) != 0))
+    { 
+		fprintf(f1,"\n");
+	    line_no += 1;
+		select_row_desc();
+		fprintf(f1, "%-30s",d_row_code_desc.arr);
+	}	
+
+	strcpy(nd_row_code.arr,d_row_code.arr);
+    
+	print_detl_rec();
+
+       /* read the next cursor record */
+       still_rec_left = fetch_inc_by_doc_cur();
+
+    }
+
+
+end_report();
+
+}
+ 
+/* prepares for the new page */
+void prepare_new_page()
+{  line_no = 0;
+   if (page_no != 1) {
+      fprintf(f1,"");
+   }
+   print_page_header();
+   print_col_heading(); 
+}
+
+/* fetches the next record from fetch_inc_by_doc_cur  */
+/* returns 0 if the end of cursor is reached else returns 1. */
+int fetch_inc_by_doc_cur()
+{
+
+  d_row_code.arr[0]  = '\0';
+  d_row_code.len     = 0;
+
+  d_column_seq = 0;
+  d_inc_amount    = 0;
+
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+ 
+  EXEC SQL FETCH DCLR_INC_BY_DOC_CUR INTO
+				:d_row_code,
+				:d_column_seq,
+				:d_inc_amount;
+				
+  if (NODATAFOUND)
+    return 0;
+
+ d_row_code.arr[d_row_code.len]		        = '\0';
+ 
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at fetch_inc_by_doc_cur() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+int fetch_col_desc_cur()
+{
+
+  d_col_code_desc.arr[0]  = '\0';
+  d_col_code_desc.len     = 0;
+
+ 
+  EXEC SQL FETCH DCLR_COL_DESC_CUR INTO
+				:d_col_code_desc;
+				
+  if (NODATAFOUND)
+    return 0;
+
+    if(OERROR)
+		err_mesg("FETCH failed on cursor DCLR_COL_DESC_CUR ",0,"");
+
+ d_col_code_desc.arr[d_col_code_desc.len]		        = '\0';
+ 
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at FETCH_COL_DESC_CUR() occured....");
+   disp_message(ORA_MESG, sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+/* print the finishing line of the report */
+void end_report()
+{
+  
+  fprintf(f1,"\n\n\n\n");
+  fprintf(f1,"                                                   ");
+  fprintf(f1,"****** End of Report *******");
+  fprintf(f1,"");
+}
+
+
+/* to print the detailed record */
+void print_detl_rec()
+{ char s_net_amt[30];
+  
+     
+	 
+	 if(d_column_seq == -2 || d_column_seq == -1 || d_column_seq == 0)
+	 {
+			fprintf(f1,"%30.0lf",d_inc_amount);		
+			if (d_column_seq == 0)
+				fprintf(f1," ");
+	 }
+	 else
+	 {
+		print_formated(s_net_amt,d_inc_amount);
+ 		fprintf(f1, "%30s",s_net_amt);
+	 }
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ERR_MESG,"Oracle error at print_detl_rec() occured....");
+   disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+   proc_exit();
+}
+
+
+select_row_desc()
+{
+	d_row_code_desc.arr[0]  =	'\0';
+	d_row_code_desc.len     =    0;
+	
+	EXEC SQL SELECT ROW_HEAD
+	     INTO		:d_row_code_desc
+	     FROM		BL_DOCTOR_INC_ROW
+		 WHERE      ROW_CODE = :d_row_code;
+
+    if(OERROR)
+	    err_mesg("SELECT failed on table  BL_DOCTOR_INC_ROW",0,"");
+
+    d_row_code_desc.arr[d_row_code_desc.len] = '\0';    
+}
+
+delete_all_data()
+ {   
+		EXEC SQL 	DELETE FROM BL_DOCTOR_INC_DTLS
+		WHERE		SESSION_ID = TO_NUMBER(:nd_session_id)
+		AND			PGM_DATE   = :nd_pgm_date;
+
+   if(OERROR)
+	    err_mesg("DELETE failed on table BL_DOCTOR_INC_DTLS ",0,"");
+
+ }
+
+/* to print page headers the header details */ 
+void print_page_header()
+{
+  char nd_fm_month_desc  [20],
+       nd_to_month_desc  [20],
+       nd_fm_year_desc   [20],
+	   nd_to_year_desc   [20];
+  
+  
+ page_no += 1; 
+
+  if(strcmp(nd_fm_month.arr, "!!!") == 0)
+    strcpy(nd_fm_month_desc, "LOWEST");
+    else strcpy(nd_fm_month_desc,nd_fm_month.arr);
+
+  if(strcmp(nd_to_year.arr, "!!!") == 0)
+    strcpy(nd_to_year_desc, "LOWEST");
+    else strcpy(nd_to_year_desc,nd_to_year.arr);
+
+  if(strcmp(nd_to_month.arr, "~~~") == 0)
+    strcpy(nd_to_month_desc, "HIGHEST");
+    else strcpy(nd_to_month_desc,nd_to_month.arr);
+
+  if(strcmp(nd_to_year.arr, "~~~~~") == 0)
+    strcpy(nd_to_year_desc, "HIGHEST");
+    else strcpy(nd_fm_year_desc,nd_fm_year.arr);
+
+ fprintf(f1,"MDL : BL    ");
+ fprintf(f1,"                               ");  
+ fprintf(f1,"%-30s", d_acc_entity_name.arr);
+ fprintf(f1,"                             ");  
+ fprintf(f1,"Date :%s", d_sysdate.arr);
+ fprintf(f1,"\n");
+ fprintf(f1,"OPR : %s", d_user.arr);
+ fprintf(f1,"\n");
+ fprintf(f1,"REP : BLRDRINC");
+ fprintf(f1,"                           ");  
+ fprintf(f1,"MONTHLY REPORT - INCOME BY DOCTOR");
+ fprintf(f1,"                            ");  
+ fprintf(f1,"Page :%4d", page_no);
+ fprintf(f1,"\n");
+ fprintf(f1,"                                     ");  
+ fprintf(f1,"INCOME DATE FROM %s / %s ",nd_fm_month_desc,nd_fm_year_desc);
+ fprintf(f1," TO %s / %s\n",nd_to_month_desc,nd_to_year_desc);
+ fprintf(f1,"                                         ");  
+ fprintf(f1,"\n");
+ line_no += 5;
+}
+
+
+/* print the heading */
+
+void print_col_heading()
+{
+ int still_rec_left;
+
+ fprintf(f1,"Row Description                                       Visits                    Admissions                  Patient Days");
+ 
+ dclr_col_desc_cur();
+
+ while(fetch_col_desc_cur())
+ {
+	fprintf(f1,"%30s",d_col_code_desc.arr);
+ }
+		
+ fprintf(f1,"                      Total IP                      Total OP");
+  
+ fprintf(f1,"\n");
+ fprintf(f1,"\n");
+
+ line_no += 4;
+}
+
+print_formated(s_amt, l_amt)
+double l_amt;
+char *s_amt;
+{
+  if(l_amt < 0){
+     put_val(s_amt,-l_amt);
+     format_amt(s_amt);
+     strcat(s_amt,"-");
+   }
+ else {
+       put_val(s_amt,l_amt);
+       format_amt(s_amt);
+       strcat(s_amt," ");
+    }
+}
+

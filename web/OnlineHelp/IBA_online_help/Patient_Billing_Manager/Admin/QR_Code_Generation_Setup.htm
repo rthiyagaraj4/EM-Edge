@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>QR Code Generation Setup</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nAdmin\nQR Code Generation Setup");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2"></script>
+<h1>QR Code Generation Setup</h1>
+<p class="Italic">From this function, you can <span class="Asterisk">Generate</span> 
+ QR code to be printed in the bills.</p>
+<p class="Text">This function allows to configure QR code values in sequence 
+ to print in the bills. The created QR code can be printed on bills based 
+ on setup done in BL Parameters.</p>
+<p class="Text">The logged in user can do the set up separately for each 
+ facility. For multiple facility, user must change login to specific facility 
+ to make respective configuration.</p>
+<h2 class="Text">Generating QR Code Sequence</h2>
+<p class="From">From the Administration &gt; User Security, QR Code Generation 
+ Setup function.</p>
+<p class="Text">The QR Code Generation Setup screen gets displayed.</p>
+<ol>
+	<li class="p-Number"><p class="Number">Enter the details in the mandatory 
+	 (<span class="Asterisk">*</span>) fields found in the following Tab 
+	 pages.</p></li>
+</ol>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" id="a1" 
+					 style="position: relative;">Set Sequence tab</a> </p>
+<div class="droptext" id="POPUP654309033" style="display: none;">
+	<p class="BoldRFD">Enter the following details:</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Seq 
+		 No</u></span> – Enter the sequence number.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Value</u></span> 
+		 – Select the value from the LOV. This field is mandatory. The 
+		 system generated list of values are Hospital GSTIN, Customer GSTIN, 
+		 Patient ID, Encounter ID, Bill Date, Invoice Number, Total Bill 
+		 Net Amount, HSH Code, Total Service Count, Financial year, GST 
+		 Amount</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Description</u></span> 
+		 – On selecting the Value, the description gets displayed.</p></li>
+	</ol>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" id="a2" 
+					 style="position: relative;">Create Static Value tab</a></p>
+<div class="droptext" id="POPUP654590788" style="display: none;">
+	<p class="BoldRFD">User can create static QR code values by entering 
+	 ID, Description and values. The static values are not system generated.</p>
+	<p class="BoldRFD">&#160;Enter the following details:</p>
+	<ol>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Static 
+		 Value ID</u></span> – Enter the ID, maximum 6 characters.</p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Description</u></span> 
+		 – Enter the description value up to 100 characters. </p></li>
+		<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Value</u></span> 
+		 – Enter the value in the text field.</p></li>
+	</ol>
+	<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />Note: If any 
+	 static parameter selected for QR code sequence, then its Value will 
+	 be printed on the QR code scan. The system will not allow to delete 
+	 if any value is in use in QR Code Sequence.</p>
+</div>
+<ol start="2" type="1">
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Commit 
+	 Form]</span> or press <span class="BoldButton">[F10]</span> to save 
+	 the records or <span class="BoldButton">[Clear Record]</span> to clear 
+	 the entered data.</p></li>
+	<li class="p-Number"><p class="Number">Click <span class="BoldButton">[Execute 
+	 Query]</span> or press <span class="BoldButton">[F8]</span> to search 
+	 for existing records within the facility.</p></li>
+</ol>
+<p>&#160;</p>
+<hr align="center" />
+<p>&#160;</p>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP654309033');
+	TextPopupInit('a2','POPUP654590788');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

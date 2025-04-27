@@ -1,0 +1,615 @@
+
+/*    Preprocessor Directives   */
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+//#include <sqlca.h>      
+//#include <sqlda.h>
+#include <bl.h>  
+#define ONLINE_PRINTING 1     
+
+
+ 
+/* Macros */
+
+#define NODATAFOUND sqlca.sqlcode==1403
+#define OERROR (sqlca.sqlcode < 0) 
+#define MAX_LINES 55
+#define LENGTH_WORDS 65
+
+/* Declarations */     
+
+
+EXEC SQL BEGIN DECLARE SECTION;	
+
+	VARCHAR uid_pwd 	        	[91],	        	     
+		nd_facility_id			[3] ,		
+		nd_doc_type			[7],
+		nd_doc_num			[9],
+		nd_doc_date			[15],		
+		d_cash_counter			[5],
+		d_cash_counter_desc		[41],
+		d_trx_date			[11],
+		d_shift				[2],
+		nd_user				[31],
+  	    cond_amount         [500],
+		currency			[50],
+		nd_session			[20],
+		nd_pgm_date			[15],
+		nd_facility_name		[50],
+		nd_period			[10];		
+	
+	char    nd_filename		        [120];
+	char	l_mesg					[1000];
+	
+	VARCHAR  	nd_fmt_string[20];
+
+		double	nd_cash_amt		    	     ,
+		nd_credit_amt		     ,	
+		nd_cash_amt_can		    	     ,
+		nd_credit_amt_can,
+		d_counter_amt		= 0	     ,
+		receipt_amount		     ,
+		nd_receipt_total		  = 0,
+     	nd_total		          = 0;
+
+	int nd_no_decimal = 0;
+
+EXEC SQL END DECLARE SECTION;
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+		FILE *f1;
+		int page = 0;
+		int line = 0;
+
+void proc_main(argc, argv)
+	int argc;
+	char *argv[];
+{    
+   void prt_line(int l, char spl_symbol[1]);
+   void dec_cursor();
+   void open_cursor();
+   void close_cursor();
+   void page_hdr();
+   int  fetch_cursor();
+   void format_amt();
+   void print_words();
+  
+   void report_process();
+   void line_check();
+   
+
+/* INPUT ARGUMENT CHECK */
+
+      if(argc < 8) 
+     {
+     disp_message(ORA_MESG, "Usage BLRCAREC Uid/Passwd@DB  Session-Id Pgm-Date Operating-Facility Doc-Type Doc-Num Doc-Date");
+     proc_exit();
+     }
+     strcpy(g_pgm_id,argv[0]);
+
+     strcpy(uid_pwd.arr, argv[1]);
+     uid_pwd.len = strlen(uid_pwd.arr);      	 
+    
+     strcpy(nd_session.arr, argv[2]);
+     nd_session.len = strlen(nd_session.arr);      	  
+     strcpy(g_session_id,nd_session.arr);
+
+     strcpy(nd_pgm_date.arr, argv[3]);
+     nd_pgm_date.len = strlen(nd_pgm_date.arr);      	  
+     strcpy(g_pgm_date,nd_pgm_date.arr);
+
+     strcpy(nd_facility_id.arr, argv[4]);
+     nd_facility_id.len = strlen(nd_facility_id.arr);      	  
+     strcpy(g_facility_id,nd_facility_id.arr);
+
+     strcpy(nd_doc_type.arr,argv[6]);
+     nd_doc_type.len = strlen(nd_doc_type.arr);      	 
+   
+     strcpy(nd_doc_num.arr,argv[7]);
+     nd_doc_num.len = strlen(nd_doc_num.arr);      	 
+
+     strcpy(nd_doc_date.arr,argv[8]);
+     nd_doc_date.len = strlen(nd_doc_date.arr);      
+	 
+ 
+
+/* DB LOGIN */
+
+    EXEC SQL CONNECT :uid_pwd;
+    if (OERROR) 
+    {
+    	disp_message (ORA_MESG, "USERID/PASSWORD failed to Connect");
+        proc_exit();  
+    }	  	
+ 
+
+     set_meduser_role();
+
+/* OUTPUT FILE */
+	
+	strcpy(nd_filename,WORKING_DIR);   
+	strcat(nd_filename,argv[0]);        
+	strcat(nd_filename,".lis");
+	if((f1 = fopen(nd_filename, "w")) == NULL) 
+	{
+		disp_message (ERR_MESG, " Error opening output file ....");
+		proc_exit();
+        } 	  
+
+/* PROCESS */   
+
+    nd_facility_name.arr[0]	= '\0';
+	nd_facility_name.len    = 0;
+	nd_fmt_string.arr[0]    = '\0';
+	nd_fmt_string.len       = 0;
+    currency.arr[0]	        = '\0';
+	currency.len            = 0;
+
+
+    EXEC SQL SELECT base_currency_dec, accounting_name,base_currency
+	     INTO :nd_fmt_string, :nd_facility_name,:currency
+	     FROM sy_acc_entity
+	     WHERE acc_entity_id = :nd_facility_id;
+
+   if (sqlca.sqlcode < 0) 
+    {     disp_message (ORA_MESG, "Select Failed on SY_ACC_ENTITY");
+           proc_exit();
+     }
+	
+    nd_facility_name.arr[nd_facility_name.len]	= '\0';
+	nd_fmt_string.arr[nd_fmt_string.len] = '\0';
+    currency.arr[currency.len]			= '\0';
+
+    
+	nd_user.arr[0]	= '\0';
+	nd_user.len = 0;
+    nd_period.arr[0]= '\0';
+	nd_period.len = 0;
+
+	EXEC SQL SELECT USER,TO_CHAR(TO_DATE(:nd_doc_date,'DD/MM/YYYY'),'MM/YYYY')
+	     INTO :nd_user, :nd_period FROM DUAL;
+
+   if (sqlca.sqlcode < 0) 
+    {     disp_message (ORA_MESG, "Select Failed on DUAL");
+           proc_exit();
+     }
+
+
+    nd_user.arr[nd_user.len]	= '\0';
+    nd_period.arr[nd_period.len]= '\0';
+
+
+
+    EXEC SQL SELECT no_of_decimal
+         INTO :nd_no_decimal
+	     FROM sm_acc_entity_param
+         WHERE acc_entity_id = (SELECT acc_entity_code 
+							   FROM sy_acc_entity
+							  WHERE acc_entity_id = :nd_facility_id);  
+
+  if (sqlca.sqlcode < 0) 
+    {     disp_message (ORA_MESG, "Select Failed on SY_ACC_ENTITY_PARAM");
+           proc_exit();
+     }
+
+
+
+   report_process(); 
+ 
+/* CLOSE FILE */
+
+   EXEC SQL COMMIT WORK RELEASE; 
+
+   fclose(f1);   
+
+   return;
+   
+}
+
+void line_check()
+{
+   if (line > MAX_LINES)   
+    {
+      fprintf(f1,"\f");	
+      page_hdr();}
+}       
+	
+void prt_line(int line_length, char spl_symbol[1])
+{  
+ int i;  
+  for(i=1;i<=line_length;i=i+1)
+	 {fprintf(f1,spl_symbol);}
+}
+
+void dec_cursor()
+{ 
+
+  //sprintf(l_mesg,"Facility : %s   Doc Type : %s  Doc Num  %s ",nd_facility_id.arr,nd_doc_type.arr,nd_doc_num.arr);
+  //disp_message(ERR_MESG,l_mesg);
+
+  EXEC SQL DECLARE cash_control_cursor CURSOR FOR   	
+		SELECT  a.cash_counter_code		 cash_counter_code,
+			b.short_desc			 cash_counter_desc,	
+			TO_CHAR(a.trx_date,'dd/mm/yyyy') trx_date,
+			a.shift_id			 shift,
+			a.doc_amount			 doc_amount,
+			a.orig_doc_amount		 receipt_amount 
+		FROM    bl_cash_control_rcpt a,
+			bl_cash_counter	     b
+		WHERE   a.cash_counter_code = b.cash_counter_code	
+		AND	a.operating_facility_id = :nd_facility_id
+		AND	b.operating_facility_id = a.operating_facility_id
+		AND	a.doc_type_code         = :nd_doc_type
+		AND     a.doc_number		= :nd_doc_num
+		ORDER BY a.trx_date,a.shift_id;
+		//AND     trunc(a.doc_date)   = TO_DATE(:nd_doc_date,'dd/mm/yyyy')
+		//Commented, the program can be used only with doc type code and doc num
+		//No need to go for the above check in where condn.
+		
+
+return;
+ }
+
+void open_cursor()
+{ 
+ EXEC SQL OPEN cash_control_cursor;
+ if (sqlca.sqlcode < 0) 
+ {     disp_message (ORA_MESG, "Open cash_control_cursor Failed");
+       proc_exit();
+ }
+ 
+ return;
+ }
+
+int fetch_cursor()
+{ 
+    d_cash_counter.arr[0]		= '\0';
+    d_cash_counter_desc.arr[0]	= '\0';
+    d_trx_date.arr[0]			= '\0';    
+    d_shift.arr[0]				= '\0';	
+
+    d_cash_counter.len 			= 0;
+    d_cash_counter_desc.len		= 0;
+    d_trx_date.len				= 0;    
+    d_shift.len					= 0;	
+	
+    d_counter_amt				= 0;
+    receipt_amount				= 0;
+    nd_cash_amt					= 0;
+    nd_credit_amt				= 0;
+	nd_cash_amt_can				= 0;
+    nd_credit_amt_can			= 0;
+
+  EXEC SQL FETCH cash_control_cursor
+	   INTO	:d_cash_counter		,
+		:d_cash_counter_desc	,
+		:d_trx_date		,
+		:d_shift		,
+		:d_counter_amt		,
+		:receipt_amount		;
+
+    if (NODATAFOUND)
+		return 0;
+
+    d_cash_counter.arr[d_cash_counter.len]			= '\0';
+    d_cash_counter_desc.arr[d_cash_counter_desc.len]= '\0';
+    d_trx_date.arr[d_trx_date.len]					= '\0';    
+    d_shift.arr[d_shift.len]						= '\0';	
+
+    EXEC SQL SELECT SUM(NVL(bill_tot_amt,0)) INTO :nd_cash_amt
+		FROM bl_bill_hdr 
+		WHERE	cash_counter_facility_id = :nd_facility_id		
+		AND TRUNC(doc_date) = TO_DATE(:d_trx_date,'dd/mm/yyyy') 		
+		AND bill_nature_code = 'C'
+		AND cash_counter_code = :d_cash_counter
+		AND shift_id = :d_shift
+		// AND NVL(bill_status,'X') <> 'C'
+		AND cash_ctrl_doc_type_code = :nd_doc_type
+		AND cash_ctrl_doc_number = :nd_doc_num
+		AND trunc(cash_ctrl_doc_date) = TO_DATE(:nd_doc_date,'dd/mm/yyyy');
+
+	 if (sqlca.sqlcode < 0) 
+	 {     disp_message (ORA_MESG, "Select Failed on bl_bill_hdr");
+		   proc_exit();
+	 }
+
+	EXEC SQL SELECT SUM(NVL(a.bill_tot_amt,0)) INTO :nd_cash_amt_can
+		FROM bl_bill_hdr a, bl_cancelled_bills b
+		WHERE	b.cash_counter_facility_id = :nd_facility_id		
+		AND TRUNC(b.added_date) = TO_DATE(:d_trx_date,'dd/mm/yyyy') 		
+		AND a.bill_nature_code = 'C'
+		AND b.cash_counter_code = :d_cash_counter
+		AND b.shift_id = :d_shift
+		// AND NVL(bill_status,'X') = 'C'
+		AND b.cash_ctrl_doc_type_code = :nd_doc_type
+		AND b.cash_ctrl_doc_number = :nd_doc_num
+		AND trunc(b.cash_ctrl_doc_date) = TO_DATE(:nd_doc_date,'dd/mm/yyyy')
+		AND a.doc_type_code = b.doc_type_code
+		AND a.doc_num = b.doc_number;
+
+	if (sqlca.sqlcode < 0) 
+	 {     disp_message (ORA_MESG, "Select Failed bl_cancelled_bills");
+		   proc_exit();
+	 }
+
+		nd_cash_amt = nd_cash_amt + nd_cash_amt_can;
+
+    EXEC SQL SELECT SUM(NVL(bill_tot_amt,0)) INTO :nd_credit_amt
+		FROM bl_bill_hdr 
+		WHERE	cash_counter_facility_id = :nd_facility_id	
+		AND TRUNC(doc_date) = TO_DATE(:d_trx_date,'dd/mm/yyyy') 		
+		AND bill_nature_code = 'A'
+		AND cash_counter_code = :d_cash_counter
+		AND shift_id = :d_shift
+		AND NVL(bill_status,'X') <> 'C'
+		AND cash_ctrl_doc_type_code = :nd_doc_type
+		AND cash_ctrl_doc_number = :nd_doc_num
+		AND trunc(cash_ctrl_doc_date) = TO_DATE(:nd_doc_date,'dd/mm/yyyy');
+
+
+	if (sqlca.sqlcode < 0) 
+	 {     disp_message (ORA_MESG, "Select Failed bl_bill_hdr 2");
+		   proc_exit();
+	 }
+
+	EXEC SQL SELECT SUM(NVL(a.bill_tot_amt,0)) INTO :nd_credit_amt_can
+		FROM bl_bill_hdr a, bl_cancelled_bills b
+		WHERE	b.cash_counter_facility_id = :nd_facility_id		
+		AND TRUNC(b.added_date) = TO_DATE(:d_trx_date,'dd/mm/yyyy') 		
+		AND a.bill_nature_code = 'C'
+		AND b.cash_counter_code = :d_cash_counter
+		AND b.shift_id = :d_shift
+		// AND NVL(bill_status,'X') = 'A'
+		AND b.cash_ctrl_doc_type_code = :nd_doc_type
+		AND b.cash_ctrl_doc_number = :nd_doc_num
+		AND trunc(b.cash_ctrl_doc_date) = TO_DATE(:nd_doc_date,'dd/mm/yyyy')
+		AND a.doc_type_code = b.doc_type_code
+		AND a.doc_num = b.doc_number;
+
+	if (sqlca.sqlcode < 0) 
+	 {     disp_message (ORA_MESG, "Select Failed bl_cancelled_bills 2");
+		   proc_exit();
+	 }
+
+		nd_credit_amt = nd_credit_amt + nd_credit_amt_can;
+
+    return 1;
+}
+
+
+void close_cursor()
+{ 
+ EXEC SQL CLOSE cash_control_cursor;
+ return;
+ }
+
+void page_hdr()
+{
+	line = 0;
+	page = page +1;
+	fprintf(f1,"\n");
+	prt_line(25," ");
+	fprintf(f1,"%-31s\n",nd_facility_name.arr);
+	prt_line(25," ");
+	fprintf(f1,"CASH CONTROL RECEIPT\n");
+	prt_line(80,"-");
+	fprintf(f1,"\n\n");
+	fprintf(f1,"C.C.R. NO	: %-6s / %-9s",nd_doc_type.arr,nd_doc_num.arr);
+	fprintf(f1,"		DATE	: %-12s",nd_doc_date.arr);
+	fprintf(f1,"\n\n");
+	fprintf(f1,"PERIOD		: %-10s",nd_period.arr);
+	fprintf(f1,"\n\n");
+
+	fprintf(f1,"CASH COUNTER	: %-3s %-16.16s",d_cash_counter.arr,d_cash_counter_desc.arr);
+	fprintf(f1,"\n\n");
+	prt_line(80,"-");
+	fprintf(f1,"\n");
+	fprintf(f1,"TRX DATE SHIFT      CASH BILLS    CREDIT BILLS         RECEIPT          AMOUNT");
+	fprintf(f1,"\n");
+	fprintf(f1,"                        AMOUNT          AMOUNT          AMOUNT       COLLECTED");
+	fprintf(f1,"\n");
+	prt_line(80,"-");
+	fprintf(f1,"\n");
+	line = line + 10;
+}
+
+
+
+/*
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30], fstr_amt[30];
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);        
+        sprintf(str_amt,"%14s",s_amt);				
+		strcpy(fstr_amt,"(-)");
+		strcat(fstr_amt,str_amt);		
+		sprintf(str_amt,"%15s",fstr_amt);		
+        fprintf(f1,"%15s",str_amt);
+        }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+        fprintf(f1,"%15s",str_amt);
+     }
+ }
+*/
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30], fstr_amt[30];
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);        
+        sprintf(str_amt,"%14s",s_amt);				
+		ltrim (str_amt);		
+		rtrim (str_amt);		
+		strcpy(fstr_amt,"(-)");
+		strcat(fstr_amt,str_amt);		
+		ltrim (fstr_amt);		
+		rtrim (fstr_amt);
+		sprintf(str_amt,"%15s",fstr_amt);		
+        fprintf(f1,"%15s ",str_amt);
+        }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+        fprintf(f1,"%15s ",str_amt);
+     }
+
+}          
+
+
+ltrim(l_str)
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+
+rtrim(l_str)
+char *l_str;
+{
+  while (*l_str != '\0') *l_str++;
+  l_str--;
+  while (*l_str == ' ') *l_str--;
+  *(l_str+1) = '\0';
+}
+
+
+void print_words()
+{
+	char    corder_str    			[500], 
+		    amt_in_words	 		[10][133];
+	int	no_of_lines			     ,
+		inc = 0,
+		i,
+		nstart = 0;
+
+	if (nd_total < 0 ) 
+	    no_of_lines = print_in_words(-nd_total,LENGTH_WORDS,nd_fmt_string.arr,amt_in_words,nd_no_decimal);
+	else
+        no_of_lines = print_in_words(nd_total,LENGTH_WORDS,nd_fmt_string.arr,amt_in_words,nd_no_decimal);
+	   
+	
+	strcpy(cond_amount.arr,"\n AMOUNT IN WORDS :");
+	strcat(cond_amount.arr,currency.arr);
+	strcat (cond_amount.arr," ");
+
+	for (i=0;i<no_of_lines;i++)
+   	 { 
+	    if (i==0) strcat(cond_amount.arr,amt_in_words[i]);
+	    else
+		strcat(cond_amount.arr,amt_in_words[i]);
+         }
+	 inc = 0;
+	 nstart = 0;
+
+//cond_amount.len = strlen(cond_amount.arr);
+//cond_amount.arr[cond_amount.len]='\0';
+
+	 while (inc < strlen(cond_amount.arr))
+  	{
+		corder_str[0] = '\0';
+
+   		inc = nstart + inc;
+		nstart = split_text(cond_amount.arr,80,corder_str,&inc); 
+		inc = inc + 1;
+   		fprintf(f1,"%s",corder_str);
+		fprintf(f1,"\n");
+	}
+
+}
+
+void report_process()
+{        
+    int fetch_cursor_check;
+	dec_cursor();
+	open_cursor();
+	get_cash_counter();	
+	page_hdr();  	
+   
+	while(fetch_cursor())  
+	{
+		//disp_message(ERR_MESG,"1");
+		fprintf(f1,"%-10s ",d_trx_date.arr);
+		fprintf(f1,"%3s ",d_shift.arr);
+
+		print_formated(nd_cash_amt);	
+		print_formated(nd_credit_amt);
+		print_formated(receipt_amount);
+		print_formated(d_counter_amt);
+
+		nd_total 	= nd_total + d_counter_amt;
+		nd_receipt_total= nd_receipt_total + receipt_amount;
+		fprintf(f1,"\n");
+
+ 		line = line +1;
+		line_check();
+	}		
+
+	prt_line(80,"-");
+	fprintf(f1,"\n");
+	prt_line(37," ");
+	fprintf(f1," Total  : ");
+
+	print_formated(nd_receipt_total);
+
+	print_formated(nd_total);
+
+	line = line +1;
+	line_check();
+	fprintf(f1,"\n"); 	
+   	
+	print_words();
+	line = line +3;
+	line_check();
+
+	fprintf(f1,"\n");
+	prt_line(80,"-");	
+	fprintf(f1,"\n");
+	fprintf(f1,"FINANCE CASHIER : %-31s",nd_user.arr);	
+	close_cursor();
+}
+
+
+get_cash_counter()
+{
+    d_cash_counter.arr[0]			= '\0';
+    d_cash_counter_desc.arr[0]		= '\0';
+
+	EXEC SQL SELECT  a.cash_counter_code,
+					 b.short_desc
+			   INTO  d_cash_counter,
+					 d_cash_counter_desc				 	
+			   FROM  bl_cash_control_rcpt a,
+					 bl_cash_counter	  b
+		      WHERE  a.cash_counter_code	 = b.cash_counter_code	
+				AND	 a.operating_facility_id = :nd_facility_id
+				AND	 b.operating_facility_id = a.operating_facility_id
+				AND	 a.doc_type_code         = :nd_doc_type
+				AND  a.doc_number			 = :nd_doc_num
+		      ORDER 
+				 BY	 a.trx_date,a.shift_id;
+
+    d_cash_counter.arr[d_cash_counter.len]				= '\0';
+    d_cash_counter_desc.arr[d_cash_counter_desc.len]	= '\0';
+}

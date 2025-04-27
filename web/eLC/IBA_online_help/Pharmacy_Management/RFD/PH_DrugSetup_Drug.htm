@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>PH_DrugSetup_Drug</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to create a Drug:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Drug Code</span> – The behavior of the field depends on PH Parameter settings. If the generation of Drug Code is set as ‘System Generate Sequence’, this field is disabled and system generates the Drug Code. If the generation of Drug Code is ‘User Enterable’, this field is enabled and you have to enter Drug Code manually. Enter Drug Code in alphanumeric format of 10 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">In Formulary</span> – Select the check box to indicate that the defined Drug is to be stored in the hospital Pharmacy.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link to an existing Item</span> – The check box is enabled if ‘Drug and Item Code Link Required’ is applicable in PH Parameter. If the link is not required, the check box is disabled. Select the check box to link an existing Item to the Drug. If link to an existing item is to be established, ‘Item Code’ has to be entered compulsorily.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Item Code</span> - The Item Code field is enterable only when ‘Link to an Existing Item’ is selected. If linking is not allowed, the field is not applicable. Enter the Item Code in alphanumeric format of 20 characters maximum length or select the required code using <span class="BoldNumberRFD">[?]</span> function. The search screen displays and lists the Items defined as Drugs in ‘Inventory Management’ module ‘Item’ function. If a link between Drug and Item is required, Item Code is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Drug Description</span> – The Drug Description gets displayed on selecting Item Code (if applicable). You cannot change the displayed value. If Item Code is not applicable, enter the Drug description in alphanumeric format of 60 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Generic Name</span> – Enter the Generic Name in alphanumeric format of 40 characters maximum length or select the generic name of the defined drug using <span class="BoldNumberRFD">[?]</span> function. Generic Names are defined in the function ‘Generic Name’. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Compound</span> – Select the check box, if the defined Drug is a Generic Compound. Generic Ingredients can be specified if the Drug is a Generic Compound.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Form</span> – Select the form from list. The values displayed in the list are defined in the function ‘Form of Drug’. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Route</span> <span class="UnderlineRFD" style="text-decoration: none;">-</span> Select the Route from the list of values. If you want to default the Route at the time of prescription, select the Default Route checkbox and click <span style="font-weight: bold;"><b>[Apply]</b></span>.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Route</span> – Select the default route of the drug from the list. For the selected Form, the applicable routes as defined in the function ‘Route for Form’ are listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prompt Alert for Preferred Item</span> - Select the check box to prompt the alert ‘Drug Item is excluded from patient coverage or by hospital policy (Patient payable drug). If you would like to choose Preferred drug/item please click’ while placing the orders in Clinician Access module. An icon is displayed beside the Item or Drug if the preference basis is selected in the Patient Billing Manager module for the Item or Drug.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

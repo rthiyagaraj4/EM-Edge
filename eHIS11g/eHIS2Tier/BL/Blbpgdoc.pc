@@ -1,0 +1,825 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLBPGDOC.PC                                  */
+/* AUTHOR                : NITIN NAIK                                   */
+/* Converted To Windows  : Prasad B G S 3/7/96                          */
+/* DATE WRITTEN          : 20-JUN-1993                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */
+/*                                                                      */
+/*  FUNCTION             :                                              */  
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                      */
+/*         1.        BL_DCP_PENDING_DOC       Query/Delete              */
+/*         2.        BL_DCP_TRN               Query/Delete              */
+/*         3.        SY_PROG_CONTROL          Update/Lookup             */
+/*         4.        SY_PROG_MESG             Insert/Delete             */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+                                
+#include <stdio.h>    
+#include <math.h>
+#include <string.h>
+#include <bl.h>
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define TABLE_ALREADY_EXISTS (sqlca.sqlcode == -955)
+
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+
+/*
+#define DEBUG 0
+*/
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR uid_pwd                              [132];
+
+   VARCHAR  nd_session_id                       [16],
+            nd_pgm_date                         [25],
+            hosp_name                           [120],
+            date_time                           [20],
+            user_id                             [30];
+
+   VARCHAR  nd_purge_cutoff_date                [12],
+	   		nd_facility_id  [3],
+            nd_purge_flag                       [2],
+            nd_fm_patient_id                    [21],
+            nd_to_patient_id                    [21];
+
+  long      blparam_ret_full_set_doc_day;
+
+   VARCHAR  bldcp_pend_patient_id               [21],
+            bldcp_pend_org_doc_type_code        [7],
+            bldcp_pend_org_doc_number           [9],
+            bldcp_pend_org_doc_date             [11],
+            bldcp_pend_due_date                 [11],
+            bldcp_pend_pat_doc_reference        [11],
+            bldcp_pend_doc_nature_code          [5],
+            bldcp_pend_fully_settled_dat       [11],
+            bldcp_pend_last_doc_type_cod       [7],
+            bldcp_pend_last_doc_number          [9],
+            bldcp_pend_last_doc_date            [11],
+            bldcp_pend_main_acc1_code           [7],
+            bldcp_pend_main_acc2_code           [5],
+            bldcp_pend_dept_code                [7],
+            bldcp_pend_product_grp_cod       [4],
+            bldcp_pend_product_line_cod        [5],
+            bldcp_pend_subledger_grp_cod     [4],
+            bldcp_pend_subledger_lin_cod      [9],
+            bldcp_pend_episode_type             [2],
+            bldcp_pend_episode_id               [9],
+            bldcp_pend_visit_id                 [5],
+            bldcp_pend_rowid                    [19];
+
+   double   bldcp_pend_doc_amt,
+            bldcp_pend_doc_outst_amt;
+
+   VARCHAR  patfndt_black_listed_yn             [2],
+            patfndt_fin_remarks                 [41];
+   
+   VARCHAR  gl_posting_desc                     [64];
+
+   VARCHAR  mppat_short_name_loc_lang           [61],
+            mppat_short_name                    [61];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;   
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>  
+
+int delete_cnt = 0;
+
+char old_patient_id[21];
+char filename [150];
+char string_var [100];
+
+long pat_ctr, pat_pend_doc_ctr, pend_doc_ctr;
+
+FILE *fp;
+int lctr = 0,pctr =0;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+
+   if (argc < 5)
+   {
+      list_args(argc, argv);
+      proc_exit();
+   }
+
+   strcpy(g_pgm_id,"BLBPGDOC");
+ 
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   if(sql_connect() == -1)
+   {
+      disp_message(ORA_MESG,"Error in connecting to Oracle");
+      proc_exit();
+   }
+
+   set_meduser_role();
+   strcpy(g_pgm_date,argv[3]);
+
+   fetch_param();
+
+   /***** CHECKING FOR ACTIVE FLAG IN SY_PROG_CONTROL *****/
+
+   start_prog_msg();
+ 
+   fetch_desc();
+   fetch_bl_param();
+
+   delete_prog_param();
+   lock_tables();
+
+   open_files();
+   declare_cursors();
+   open_pending_doc();
+   pend_doc_ctr = 0;
+   old_patient_id[0] = '\0';
+   pat_ctr = 0;
+   pat_pend_doc_ctr = 0;
+   while (fetch_pending_doc())
+   {
+      pend_doc_ctr++;
+      get_other_details();
+      if (strcmp(old_patient_id,bldcp_pend_patient_id.arr))
+      {
+         pat_ctr++;
+         if (strlen(old_patient_id))
+            print_pat_footer();
+         print_pat_det();
+         strcpy(old_patient_id,bldcp_pend_patient_id.arr);
+      }
+      print_details();
+      if (nd_purge_flag.arr[0] == 'Y')
+      {
+              delete_pending_doc();
+              delete_bldcp_trn();
+      }
+      EXEC SQL COMMIT WORK;
+      if (OERROR)
+          err_mesg("COMMIT failed",0,"");
+   }
+   if (pend_doc_ctr > 0)
+   {
+      print_pat_footer();
+   }
+   print_report_footer();
+
+   print_end();
+
+   end_prog_msg();
+   EXEC SQL COMMIT WORK RELEASE;
+
+   return;
+}
+
+lock_tables()
+{
+   EXEC SQL LOCK TABLE BL_DCP_PENDING_DOC
+              IN EXCLUSIVE MODE NOWAIT;
+
+   if (RESOURCE_BUSY)
+         err_mesg("",1,"AR2200");
+   else if (OERROR)
+           err_mesg("LOCK failed on table BL_DCP_PENDING_DOC",0,"");
+ 
+   EXEC SQL LOCK TABLE BL_DCP_TRN
+              IN EXCLUSIVE MODE NOWAIT;
+
+   if (RESOURCE_BUSY)
+         err_mesg("",1,"AR2210");
+   else if (OERROR)
+           err_mesg("LOCK failed on table BL_DCP_TRN",0,"");
+
+}    
+
+fetch_param()
+{
+   nd_purge_cutoff_date.arr[0]  = '\0';
+   nd_fm_patient_id.arr[0]      = '\0';
+   nd_to_patient_id.arr[0]      = '\0';
+   nd_purge_flag.arr[0]         = '\0';
+	nd_facility_id.arr[0]  = '\0';
+
+
+   nd_purge_cutoff_date.len     = 0;
+   nd_fm_patient_id.len         = 0;
+   nd_to_patient_id.len         = 0;
+   nd_purge_flag.len            = 0;
+   nd_facility_id.len  = 0;
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID,PARAM1,PARAM2,
+                   PARAM3,  PARAM4
+            INTO   :nd_facility_id,:nd_purge_cutoff_date, 
+				   :nd_purge_flag,:nd_fm_patient_id,:nd_to_patient_id
+            FROM   SY_PROG_PARAM
+            WHERE  PGM_ID     = 'BLBPGDOC'
+            AND    SESSION_ID = :nd_session_id
+            AND    PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   nd_purge_cutoff_date.arr[nd_purge_cutoff_date.len] = 0;
+   nd_fm_patient_id.arr[nd_fm_patient_id.len]         = 0;
+   nd_to_patient_id.arr[nd_to_patient_id.len]         = 0;
+   nd_purge_flag.arr[nd_purge_flag.len]               = 0;
+  nd_facility_id.arr[nd_facility_id.len] = '\0';
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+}
+
+delete_prog_param()
+{
+   EXEC SQL DELETE
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'BLBPGDOC'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   EXEC SQL COMMIT WORK;
+
+   if (OERROR)
+         err_mesg("COMMIT failed",0,""); 
+}
+
+declare_cursors()
+{
+
+     EXEC SQL DECLARE BL_DCP_PENDING_DOC_CUR CURSOR FOR
+               SELECT PATIENT_ID,
+                      ORG_DOC_TYPE_CODE,
+                      ORG_DOC_NUMBER,
+                      TO_CHAR(ORG_DOC_DATE,'DD/MM/YYYY'),
+                      TO_CHAR(DUE_DATE,'DD/MM/YYYY'),
+                      PAT_DOC_REFERENCE,
+                      DOC_NATURE_CODE,
+                      DOC_AMT,
+                      DOC_OUTST_AMT,
+                      TO_CHAR(FULLY_SETTLED_DATE,'DD/MM/YYYY'),
+                      LAST_DOC_TYPE_CODE,
+		      LAST_DOC_NUMBER,
+                      TO_CHAR(LAST_DOC_DATE,'DD/MM/YYYY'),
+                      MAIN_ACC1_CODE,
+                      MAIN_ACC2_CODE,
+                      DEPT_CODE,
+                      PRODUCT_GROUP_CODE,
+                      PRODUCT_LINE_CODE,
+                      SUBLEDGER_GROUP_CODE,
+                      SUBLEDGER_LINE_CODE,
+		      EPISODE_TYPE,
+		      EPISODE_ID,
+		      VISIT_ID,
+                      ROWID
+               FROM   BL_DCP_PENDING_DOC
+               WHERE  operating_facility_id = :nd_facility_id AND
+			   DOC_OUTST_AMT = 0
+               AND    PATIENT_ID BETWEEN NVL(:nd_fm_patient_id,'!!!!!!!!!!')
+                                 AND     NVL(:nd_to_patient_id,'~~~~~~~~~~')
+               AND    TRUNC(FULLY_SETTLED_DATE) <= TO_DATE(:nd_purge_cutoff_date,
+                                                       'DD/MM/YYYY') -
+                                        NVL(:blparam_ret_full_set_doc_day,0)
+               ORDER BY PATIENT_ID, ORG_DOC_TYPE_CODE,ORG_DOC_NUMBER;
+
+     EXEC SQL DECLARE MP_PATIENT_MAST_CUR CURSOR FOR
+               SELECT SHORT_NAME_LOC_LANG, SHORT_NAME
+               FROM   MP_PATIENT_MAST
+               WHERE  PATIENT_ID = :bldcp_pend_patient_id;
+
+     EXEC SQL DECLARE BL_PATIENT_FIN_DTLS_CUR CURSOR FOR 
+               SELECT BLACK_LISTED_YN, FINANCIAL_REMARKS
+               FROM   BL_PATIENT_FIN_DTLS
+               WHERE  PATIENT_ID = :bldcp_pend_patient_id;
+
+     EXEC SQL DECLARE GL_POSTING_ACC_CUR CURSOR FOR
+               SELECT CONCAT_POST_ACC_DESC
+               FROM   GL_POSTING_ACC
+               WHERE  MAIN_ACC1_CODE       = :bldcp_pend_main_acc1_code
+               AND    MAIN_ACC2_CODE       = :bldcp_pend_main_acc2_code
+               AND    DEPT_CODE            = :bldcp_pend_dept_code
+               AND    PRODUCT_GROUP_CODE   = :bldcp_pend_product_grp_cod
+               AND    PRODUCT_LINE_CODE    = :bldcp_pend_product_line_cod
+               AND    SUBLEDGER_GROUP_CODE = :bldcp_pend_subledger_grp_cod
+               AND    SUBLEDGER_LINE_CODE  = :bldcp_pend_subledger_lin_cod;
+
+}
+
+get_other_details()
+{
+   mppat_short_name_loc_lang.arr[0] = '\0';
+   mppat_short_name_loc_lang.len    = 0;
+   mppat_short_name.arr[0]          = '\0';
+   mppat_short_name.len             = 0;
+
+   EXEC SQL OPEN MP_PATIENT_MAST_CUR;
+
+   if (OERROR)
+      err_mesg("OPEN failed on cursor MP_PATIENT_MAST_CUR",0,"");
+
+   EXEC SQL FETCH MP_PATIENT_MAST_CUR
+            INTO  :mppat_short_name_loc_lang, :mppat_short_name;
+ 
+   if (OERROR)
+      err_mesg("FETCH failed on cursor MP_PATIENT_MAST_CUR",0,"");
+
+   mppat_short_name_loc_lang.arr[mppat_short_name_loc_lang.len] = '\0';
+   mppat_short_name.arr[mppat_short_name.len]                   = '\0';
+
+   patfndt_black_listed_yn.arr[0] = '\0';
+   patfndt_fin_remarks.arr[0]     = '\0';
+   
+   patfndt_black_listed_yn.len    = 0;
+   patfndt_fin_remarks.len        = 0;
+
+
+   EXEC SQL OPEN BL_PATIENT_FIN_DTLS_CUR;
+   
+   if (OERROR)
+      err_mesg("OPEN failed on cursor BL_PATIENT_FIN_DTLS",0,"");
+
+   EXEC SQL FETCH BL_PATIENT_FIN_DTLS_CUR INTO :patfndt_black_listed_yn,
+                                               :patfndt_fin_remarks;
+   
+   if (OERROR)
+      err_mesg("FETCH failed on cursor BL_PATIENT_FIN_DTLS",0,"");
+
+   patfndt_black_listed_yn.arr[patfndt_black_listed_yn.len] = '\0';
+   patfndt_fin_remarks.arr[patfndt_fin_remarks.len]         = '\0';
+
+   gl_posting_desc.arr[0]    = '\0';
+   gl_posting_desc.len       = 0;
+
+   EXEC SQL OPEN GL_POSTING_ACC_CUR;
+
+   if (OERROR)
+      err_mesg("OPEN failed on cursor GL_POSTING_ACC_CUR",0,"");
+
+   EXEC SQL FETCH GL_POSTING_ACC_CUR
+            INTO :gl_posting_desc;
+
+   if (OERROR)
+      err_mesg("FETCH failed on cursor GL_POSTING_ACC_CUR",0,"");
+
+   gl_posting_desc.arr[gl_posting_desc.len] = '\0';
+}
+
+open_files()
+{
+//  char err_stmt[70];
+	
+	strcpy(filename,WORKING_DIR);
+    strcat(filename,"blbpgdoc.lis");
+
+   if ((fp = fopen(filename,"w")) == NULL)
+   {
+     //   sprintf(err_stmt,"Error while opening File %s","blbpgdoc.lis");
+	 sprintf(string_var,"Error while opening File %s",filename);
+	 disp_message(ERR_MESG,string_var);
+	      
+    //    err_mesg(err_stmt,0,"");
+        proc_exit();
+   }
+
+   print_title();
+   print_head();
+}
+
+print_title()
+{
+ 
+  fprintf(fp, "\n\nMDL : BL %38s  %-30s %34s  %-15s\n", "",
+                                        hosp_name.arr,"",date_time.arr);
+  fprintf(fp, "OPR : %-10s\n", user_id.arr);
+  fprintf(fp, "REP : %-8s %32s  %s %40s PAGE : %4d\n",
+        g_pgm_id,"","FULLY SETTLED DCP DOCUMENTS REPORT","",++pctr);
+  fprintf(fp, "%s%s%s\n",
+            "--------------------------------------------------------",
+            "--------------------------------------------------------",
+            "--------------------");
+  fprintf(fp,"VER : 1.10.01\n");
+  fflush(fp);
+
+  fprintf(fp,"\n\n\n\n %6s INPUT PARAMETERS :\n %6s ----------------\n\n",
+                                                                      "","");
+  fprintf(fp," %14s FACILITY ID         : %s\n\n","",nd_facility_id.arr); 
+  fprintf(fp," %14s PURGE DOCUMENTS     : %s\n\n","",nd_purge_flag.arr);
+  fprintf(fp," %14s PURGING CUTOFF DATE : %-10s\n\n","",
+                                                    nd_purge_cutoff_date.arr);
+  fprintf(fp," %14s PATIENT NO     FROM : %-10s\n","" ,nd_fm_patient_id.arr);
+  fprintf(fp," %14s                  TO : %-10s\n\n","",nd_to_patient_id.arr);
+
+  fflush(fp);
+}
+
+print_head()
+{
+  fprintf(fp, "\f\n\nMDL : BL %38s  %-30s %34s  %-15s\n", "",
+                                        hosp_name.arr,"",date_time.arr);
+  fprintf(fp, "OPR : %-10s\n", user_id.arr);
+  fprintf(fp, "REP : %-8s %32s  %s %40s PAGE : %4d\n",
+                       g_pgm_id,"","FULLY SETTLED DCP DOCUMENTS REPORT","",++pctr);
+  fprintf(fp, "%s%s%s\n",
+            "--------------------------------------------------------",
+            "--------------------------------------------------------",
+            "--------------------");
+  fprintf(fp, "DOC TYPE/NUMBER  DOC DATE   DUE DATE   DOC REFERENCE  ");
+  fprintf(fp, "DOC NATURE        DOC AMT  OUTSTANDING AMT  EPISODE TYPE/ID");
+  fprintf(fp, "  VISIT NO\n");
+  fprintf(fp, " %15s POSTING ACCOUNT & DESCRIPTION\n","");
+  fprintf(fp, " %26s LAST SETTL. DATE  LAST DOC TYPE/NUMBER  LAST DOC DATE\n",
+                                                                  "");
+  fprintf(fp, "%s%s%s\n",
+            "--------------------------------------------------------",
+            "--------------------------------------------------------",
+            "--------------------");
+  fflush(fp);
+  lctr = 10;
+}
+
+print_pat_det()
+{
+  if (lctr > 55 - 2) print_head();
+
+  fprintf(fp,"PATIENT NO : %-20s %-16.16s %-30.30s %1.1s %-40.40s\n\n",
+               bldcp_pend_patient_id.arr,mppat_short_name_loc_lang.arr,
+               mppat_short_name.arr, patfndt_black_listed_yn.arr,
+               patfndt_fin_remarks.arr);
+  lctr += 2;
+}
+
+print_pat_footer()
+{
+   if (lctr > 55 - 3) print_head();
+
+   fprintf(fp, "%s%s%s\n",
+            "--------------------------------------------------------",
+            "--------------------------------------------------------",
+            "--------------------");
+   fprintf(fp, "NUMBER OF DOCUMENTS PRINTED : %6ld\n\n", pat_pend_doc_ctr);
+   
+   lctr += 3;
+
+   pat_pend_doc_ctr = 0;
+}
+
+print_report_footer()
+{
+  if (lctr > 55 - 2) print_head();
+
+  fprintf(fp, "%s%s%s\n",
+            "--------------------------------------------------------",
+            "--------------------------------------------------------",
+            "--------------------");
+  fprintf(fp, "NUMBER OF PATIENTS : %6ld\n", pat_ctr);
+  lctr += 2;
+}
+
+print_end()
+{
+  if (lctr > 55 - 5) print_head();
+
+  fprintf(fp, "\n\n\n  %50s  **   END  OF  REPORT   ** \n\n","");
+  fflush(fp);
+  fclose(fp);
+}
+
+fetch_bl_param()
+{
+   EXEC SQL SELECT RET_FULL_SET_DOC_DAYS
+              INTO :blparam_ret_full_set_doc_day
+              FROM BL_PARAMETERS
+			  WHERE operating_facility_id = :nd_facility_id;
+  
+   if (OERROR)
+         err_mesg("SELECT failed on table BL_PARAMETERS",0,"");
+
+}
+
+fetch_desc()
+{
+   hosp_name.arr[0]      = '\0';
+   date_time.arr[0]      = '\0';
+   user_id.arr[0]        = '\0';
+
+   hosp_name.len      = 0;
+   date_time.len      = 0;
+   user_id.len        = 0;
+
+   EXEC SQL SELECT ACCOUNTING_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                   USER
+              INTO :hosp_name, :date_time, :user_id
+              FROM SY_ACC_ENTITY
+			  WHERE acc_entity_id = :nd_facility_id;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+   hosp_name.arr[hosp_name.len]           = '\0';
+   date_time.arr[date_time.len]           = '\0';
+   user_id.arr[user_id.len]               = '\0';
+}
+
+open_pending_doc()
+{
+   EXEC SQL OPEN BL_DCP_PENDING_DOC_CUR;
+
+   if (OERROR)
+      err_mesg("OPEN failed on cursor BL_DCP_PENDING_DOC_CUR",0,"");
+}
+
+fetch_pending_doc()
+{
+
+   bldcp_pend_patient_id.arr[0]           = '\0';
+   bldcp_pend_org_doc_type_code.arr[0]    = '\0';
+   bldcp_pend_org_doc_number.arr[0]       = '\0';
+   bldcp_pend_org_doc_date.arr[0]         = '\0';
+   bldcp_pend_due_date.arr[0]             = '\0';
+   bldcp_pend_pat_doc_reference.arr[0]    = '\0';
+   bldcp_pend_doc_nature_code.arr[0]      = '\0';
+   bldcp_pend_fully_settled_dat.arr[0]   = '\0';
+   bldcp_pend_last_doc_type_cod.arr[0]   = '\0';
+   bldcp_pend_last_doc_number.arr[0]      = '\0';
+   bldcp_pend_last_doc_date.arr[0]        = '\0';
+   bldcp_pend_main_acc1_code.arr[0]       = '\0';
+   bldcp_pend_main_acc2_code.arr[0]       = '\0';
+   bldcp_pend_dept_code.arr[0]            = '\0';
+   bldcp_pend_product_grp_cod.arr[0]   = '\0';
+   bldcp_pend_product_line_cod.arr[0]    = '\0';
+   bldcp_pend_subledger_grp_cod.arr[0] = '\0';
+   bldcp_pend_subledger_lin_cod.arr[0]  = '\0';
+   bldcp_pend_episode_type.arr[0]         = '\0';
+   bldcp_pend_episode_id.arr[0]           = '\0';
+   bldcp_pend_visit_id.arr[0]             = '\0';
+   bldcp_pend_rowid.arr[0]                = '\0';
+
+   bldcp_pend_patient_id.len              = 0;
+   bldcp_pend_org_doc_type_code.len       = 0;
+   bldcp_pend_org_doc_number.len          = 0;
+   bldcp_pend_org_doc_date.len            = 0;
+   bldcp_pend_due_date.len                = 0;
+   bldcp_pend_pat_doc_reference.len       = 0;
+   bldcp_pend_doc_nature_code.len         = 0;
+   bldcp_pend_fully_settled_dat.len      = 0;
+   bldcp_pend_last_doc_type_cod.len      = 0;
+   bldcp_pend_last_doc_number.len         = 0;
+   bldcp_pend_last_doc_date.len           = 0;
+   bldcp_pend_main_acc1_code.len          = 0;
+   bldcp_pend_main_acc2_code.len          = 0;
+   bldcp_pend_dept_code.len               = 0;
+   bldcp_pend_product_grp_cod.len      = 0;
+   bldcp_pend_product_line_cod.len       = 0;
+   bldcp_pend_subledger_grp_cod.len    = 0;
+   bldcp_pend_subledger_lin_cod.len     = 0;
+   bldcp_pend_episode_type.len            = 0;
+   bldcp_pend_episode_id.len              = 0;
+   bldcp_pend_visit_id.len                = 0;
+   bldcp_pend_rowid.len                   = 0;
+
+   bldcp_pend_doc_amt                     = 0;
+   bldcp_pend_doc_outst_amt               = 0;
+
+   EXEC SQL FETCH BL_DCP_PENDING_DOC_CUR
+             INTO :bldcp_pend_patient_id,
+                  :bldcp_pend_org_doc_type_code,
+                  :bldcp_pend_org_doc_number,
+                  :bldcp_pend_org_doc_date,
+                  :bldcp_pend_due_date,
+                  :bldcp_pend_pat_doc_reference,
+                  :bldcp_pend_doc_nature_code,
+                  :bldcp_pend_doc_amt,
+                  :bldcp_pend_doc_outst_amt,
+                  :bldcp_pend_fully_settled_dat,
+                  :bldcp_pend_last_doc_type_cod,
+                  :bldcp_pend_last_doc_number,
+                  :bldcp_pend_last_doc_date,
+                  :bldcp_pend_main_acc1_code,
+                  :bldcp_pend_main_acc2_code,
+                  :bldcp_pend_dept_code,
+                  :bldcp_pend_product_grp_cod,
+                  :bldcp_pend_product_line_cod,
+                  :bldcp_pend_subledger_grp_cod,
+                  :bldcp_pend_subledger_lin_cod,
+                  :bldcp_pend_episode_type,
+                  :bldcp_pend_episode_id,
+                  :bldcp_pend_visit_id,
+                  :bldcp_pend_rowid;
+
+if (OERROR)
+         err_mesg("FETCH failed on cursor BL_DCP_PENDING_DOC",0,"");
+
+bldcp_pend_patient_id.arr[bldcp_pend_patient_id.len]                     = '\0';
+bldcp_pend_org_doc_type_code.arr[bldcp_pend_org_doc_type_code.len]       = '\0';
+bldcp_pend_org_doc_number.arr[bldcp_pend_org_doc_number.len]             = '\0';
+bldcp_pend_org_doc_date.arr[bldcp_pend_org_doc_date.len]                 = '\0';
+bldcp_pend_due_date.arr[bldcp_pend_due_date.len]                         = '\0';
+bldcp_pend_pat_doc_reference.arr[bldcp_pend_pat_doc_reference.len]       = '\0';
+bldcp_pend_doc_nature_code.arr[bldcp_pend_doc_nature_code.len]           = '\0';
+bldcp_pend_fully_settled_dat.arr[bldcp_pend_fully_settled_dat.len]     = '\0';
+bldcp_pend_last_doc_type_cod.arr[bldcp_pend_last_doc_type_cod.len]     = '\0';
+bldcp_pend_last_doc_number.arr[bldcp_pend_last_doc_number.len]           = '\0';
+bldcp_pend_last_doc_date.arr[bldcp_pend_last_doc_date.len]               = '\0';
+bldcp_pend_main_acc1_code.arr[bldcp_pend_main_acc1_code.len]             = '\0';
+bldcp_pend_main_acc2_code.arr[bldcp_pend_main_acc2_code.len]             = '\0';
+bldcp_pend_dept_code.arr[bldcp_pend_dept_code.len]                       = '\0';
+bldcp_pend_product_grp_cod.arr[bldcp_pend_product_grp_cod.len]     = '\0';
+bldcp_pend_product_line_cod.arr[bldcp_pend_product_line_cod.len]       = '\0';
+bldcp_pend_subledger_grp_cod.arr[bldcp_pend_subledger_grp_cod.len] = '\0';
+bldcp_pend_subledger_lin_cod.arr[bldcp_pend_subledger_lin_cod.len]   = '\0';
+bldcp_pend_episode_type.arr[bldcp_pend_episode_type.len]                 = '\0';
+bldcp_pend_episode_id.arr[bldcp_pend_episode_id.len]                     = '\0';
+bldcp_pend_visit_id.arr[bldcp_pend_visit_id.len]                         = '\0';
+bldcp_pend_rowid.arr[bldcp_pend_rowid.len]                               = '\0';
+
+   if (LAST_ROW) return (0);
+   else return (1);
+}
+
+print_details()
+{
+   if (lctr > 55 - 3) print_head();
+
+   pat_pend_doc_ctr++;
+   fprintf(fp,"%-6s %8s  %-10s %-10s %-10s     %4s       ",
+             bldcp_pend_org_doc_type_code.arr, bldcp_pend_org_doc_number.arr,
+             bldcp_pend_org_doc_date.arr, bldcp_pend_due_date.arr,
+             bldcp_pend_pat_doc_reference.arr, bldcp_pend_doc_nature_code.arr);
+            
+      print_formated(bldcp_pend_doc_amt);    fprintf(fp,"  ");
+      print_formated(bldcp_pend_doc_outst_amt); fprintf(fp,"  ");
+
+   fprintf(fp," %-1s      %8s      %4s\n",
+             bldcp_pend_episode_type.arr, bldcp_pend_episode_id.arr,
+             bldcp_pend_visit_id.arr);
+
+   fprintf(fp," %15s %-6s-%-4s %-6s %-3s-%-4s %-3s-%-8s  ", "",
+             bldcp_pend_main_acc1_code.arr,
+             bldcp_pend_main_acc2_code.arr,
+             bldcp_pend_dept_code.arr,
+             bldcp_pend_product_grp_cod.arr,
+             bldcp_pend_product_line_cod.arr,
+             bldcp_pend_subledger_grp_cod.arr,
+             bldcp_pend_subledger_lin_cod.arr);
+
+   fprintf(fp,"%-s\n",gl_posting_desc.arr);
+
+   fprintf(fp," %25s  %-10s        %-6s %8s       %-10s\n", "",
+                            bldcp_pend_fully_settled_dat.arr,
+                            bldcp_pend_last_doc_type_cod.arr,
+                            bldcp_pend_last_doc_number.arr,
+                            bldcp_pend_last_doc_date.arr);
+   lctr += 3;
+   fflush(fp);
+}
+
+delete_pending_doc()
+{
+    if (nd_purge_flag.arr[0] != 'Y') 
+       return(0);
+    EXEC SQL DELETE BL_DCP_PENDING_DOC
+              WHERE ROWID = :bldcp_pend_rowid;
+
+    if (OERROR)
+         err_mesg("DELETE failed on table BL_DCP_PENDING_DOC",0,"");
+
+}
+
+delete_bldcp_trn()
+{
+   if (nd_purge_flag.arr[0] != 'Y') 
+      return(0);
+   EXEC SQL DELETE FROM BL_DCP_TRN
+             WHERE DOC_TYPE_CODE = :bldcp_pend_org_doc_type_code
+               AND DOC_NUMBER    = :bldcp_pend_org_doc_number;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table BL_DCP_TRN",0,"");
+
+}
+
+/************************* General Purpose Functions **************************/
+print_formated(loc_amount)
+double loc_amount;
+{
+   char out_str[30],out_str1[30];
+
+   if (loc_amount == 0)
+      fprintf(fp,"%-14s"," ");
+   else if (loc_amount > 0)
+   {
+      sprintf(out_str,"%11.2f",loc_amount);
+      ltrim(out_str);format_amt(out_str);
+      sprintf(out_str1,"%14s",out_str);
+      fprintf(fp,"%-14s",out_str1);
+   }
+   else
+   {
+      sprintf(out_str,"%11.2f",-loc_amount);
+      ltrim(out_str);format_amt(out_str);
+      sprintf(out_str1,"%14s",out_str);
+      fprintf(fp,"%-14sCR",out_str1);      
+   }
+}
+
+ltrim(l_str)
+char *l_str;
+{
+   char *ptr;
+   ptr = l_str;
+   while (*ptr== ' ') ptr++;
+   for(;*ptr!='\0';ptr++,l_str++)
+    *l_str = *ptr;
+   *l_str = '\0';
+}
+
+/* This function is now included in err_mesg.pc
+put_comma(str)
+char *str;
+{
+  int i,l,m,a,b,c;
+  float j,k;
+  char arr[120],o_arr[120],l_str1[10];
+  strcpy(arr,str);
+  strncpy(l_str1,arr + (strlen(arr) - 2),2);
+  l_str1[2] = '\0';
+  arr[strlen(str)-3] = '\0';
+  i = strlen(arr);
+  j = i;
+  k = j/3;
+  l = k;
+  m = i - (l*3);
+  if (i > 3)
+  {
+      for (a=0;a<m;a++)
+         o_arr[a] = arr[a];
+   if (m)
+   {
+     o_arr[m] = ','; b=m+1;
+   }
+   else b = m;
+  for (c=1,a=m;arr[a]!= '\0';a++,b++)
+  {
+     o_arr[b] = arr[a]; 
+     c++;
+     if (c > 3 && arr[a+1] != '\0')
+     {
+       o_arr[++b] = ','; c = 1;
+     }
+   }
+   o_arr[b] = '\0';
+  }
+  else
+      strcpy(o_arr,arr);
+   sprintf(str,"%s.%s",o_arr,l_str1);
+}
+*/
+
+list_args(arg_cnt, arg_list)
+int arg_cnt;
+char *arg_list[];
+{
+   int i;
+
+   disp_message(ERR_MESG,"Not enough Parameters for running this program");
+}
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}

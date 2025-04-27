@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<%--
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+--%>
+<%@ page import="eSS.*, eSS.Common.* , eCommon.Common.*, java.text.*, java.util.*" contentType="text/html;charset=UTF-8"%>
+<html>
+	<head>
+<%
+	request.setCharacterEncoding("UTF-8");
+	String sStyle			=		(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+		<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css'></link>
+		<script language='javascript' src='../../eCommon/js/ValidateControl.js'></script>
+		<script language='javascript' src='../../eCommon/js/common.js'></script>
+		<script language='javascript' src='../../eSS/js/IssueGroup.js'></script>
+		<script language='javascript' src='../../eSS/js/SsCommon.js'></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+	</head>
+	<%
+		String params		=		request.getQueryString() ;
+	%>
+	<iframe name='qryCriteriaIssueGroup' id='qryCriteriaIssueGroup' src="../../eSS/jsp/IssueGroupQueryCriteria.jsp?<%=params%>" frameborder=0  scrolling='no' style='height:90%;width:100vw'></iframe><iframe name='qryResultIssueGroup' id='qryResultIssueGroup' src='../../eCommon/html/blank.html' frameborder=0 noresize scrolling='no' style='height:100vh;width:100vw'></iframe>
+</html>
+

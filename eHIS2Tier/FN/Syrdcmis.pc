@@ -1,0 +1,370 @@
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                          */
+/******************************************************************************/
+/* PROGRAM NAME     : SYRDCMIS.PC                                             */
+/* AUTHOR           : NITIN KUMAR                                             */
+/* DATE WRITTEN     : 31-JAN-1993                                             */
+/*                                                                            */
+/* Coverted by      : C. Ganesan ( 02/07/1996 )                               */
+/*                                                                            */
+/* CALLED FROM      : SYRDCMIS.INP                                            */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                    SESSION_ID                                              */
+/*                    PGM_DATE IN 'DDMMYYHH24MISS' FORMAT                     */
+/*                                                                            */
+/* SY_PROG_PARAM      1. DOC_TYPE_CODE                                        */
+/*                    2. DOC_NUM_FM                                           */
+/*                    3. DOC_NUM_TO                                           */
+/*                                                                            */
+/* TABLED ACCESSED/ : SY_PROG_PARAM                                           */
+/*        UPDATED     SY_DOC_CONTROL                                          */
+/*                                                                            */
+/*                                                                            */
+/* FUNCTION         : This program prints a list of missing document          */
+/*                    numbers for a given document type code and              */
+/*                    document number range.                                  */
+/*                                                                            */
+/******************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd[40],
+	    d_session_id[16],
+	    d_pgm_date[14],
+        rep_date[20],
+        comp_name[50],
+        oper_id[10],
+	    d_doc_type_code[8],
+	    d_doc_num_fm[10],
+	    d_doc_num_to[10],
+	    d_doc_desc[32],
+		d_facility_id [3],
+		d_entity_code [5];
+
+    long    doc_num_fm,
+			doc_num_to,
+			doc_num;
+
+char filename[150];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *f1;
+
+int page_no,
+    line_no;
+
+long start_doc_num,
+     end_doc_num;
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+    if(argc !=5) {
+        disp_message(ERR_MESG, "SYRDCMIS : Usage SYRDCMIS userid/password session_id pgm_date facility_id");
+        proc_exit();
+    }
+
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"syrdcmis.lis");
+
+    if( (f1=fopen(filename,"w")) == NULL) {
+	disp_message(ORA_MESG,"Error in opening output file...");
+	proc_exit();
+    }
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+	    
+	
+
+
+	
+	
+	d_facility_id.arr[0] = '\0';
+	d_facility_id.len = 0;
+	d_entity_code.arr[0] = '\0';
+	d_entity_code.len = 0;
+
+
+    
+
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL CONNECT :uid_pwd;
+
+	set_meduser_role();
+
+
+    EXEC SQL SELECT	PARAM1, 
+					PARAM2,                 
+					PARAM3,
+					PARAM4,
+					PARAM5
+			 INTO   :d_doc_type_code,
+					:d_doc_num_fm,
+					:d_doc_num_to,
+					:d_facility_id,
+					:d_entity_code
+			 FROM   SY_PROG_PARAM
+			 WHERE  PGM_ID     = 'SYRDCMIS'
+			 AND    PGM_DATE   = :d_pgm_date
+			 AND    SESSION_ID = TO_NUMBER(:d_session_id);
+    
+    d_doc_type_code.arr[d_doc_type_code.len] = '\0';
+    d_doc_num_fm.arr[d_doc_num_fm.len] = '\0';
+    d_doc_num_to.arr[d_doc_num_to.len] = '\0';
+	d_facility_id.arr[d_facility_id.len] = '\0';
+	d_entity_code.arr[d_entity_code.len] = '\0';
+
+
+    EXEC SQL SELECT ACCOUNTING_NAME,
+					TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER 
+			 INTO   :comp_name,
+					:rep_date,
+					:oper_id
+			 FROM   SY_ACC_ENTITY
+			 WHERE	ACC_ENTITY_ID = :d_facility_id;
+
+	EXEC SQL SELECT LONG_DESC 
+			 INTO   :d_doc_desc
+			 FROM   SY_DOC_TYPE_MASTER
+			 WHERE  DOC_TYPE_CODE = :d_doc_type_code;
+
+   d_doc_desc.arr[d_doc_desc.len] = '\0';
+
+   EXEC SQL SELECT	TO_NUMBER(:d_doc_num_fm),
+					TO_NUMBER(:d_doc_num_to)
+			INTO    :doc_num_fm,
+					:doc_num_to
+			FROM   DUAL;
+
+    comp_name.arr[comp_name.len] = '\0';
+    rep_date.arr[rep_date.len] = '\0';
+    oper_id.arr[oper_id.len] = '\0';
+
+    page_no=1;
+    line_no=1;
+
+    start_doc_num = doc_num_fm;
+    end_doc_num = doc_num_to;
+
+    decl_curs();
+
+    put_inp_parm();
+
+	put_hdr();
+
+    while(fetch_rec()) {
+
+	if(line_no == 1)
+	    put_hdr();
+
+
+	if(start_doc_num == doc_num) {
+	    ++ start_doc_num;
+	    continue;
+	}
+	else {
+	   end_doc_num = doc_num  - 1;
+	   put_range();
+	   start_doc_num = doc_num+1;
+
+	   if(line_no == 55) {
+	       fprintf(f1,"");
+	       line_no = 1;
+               ++page_no;
+	   }
+	}
+
+    }
+
+    if(start_doc_num <= doc_num_to) {
+         end_doc_num = doc_num_to;
+         put_range();
+    }
+
+    EXEC SQL DELETE SY_PROG_PARAM
+         WHERE  PGM_ID     = 'SYRDCMIS' 
+         AND    PGM_DATE   = :d_pgm_date
+         AND    SESSION_ID = :d_session_id;
+
+    EXEC SQL COMMIT RELEASE;
+
+    fprintf(f1,"\n\n                                           ** END OF REPORT **\n");
+    fclose(f1);
+    return;
+    
+err_exit:
+
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    disp_message(ORA_MESG, "Oracle error occured...");
+    proc_exit();
+}
+
+
+decl_curs()
+{
+
+    EXEC SQL DECLARE SY_DOC_CONTROL_CUR CURSOR FOR
+	     SELECT  DOC_NUM
+	     FROM    SY_DOC_CONTROL
+	     WHERE   DOC_TYPE_CODE = :d_doc_type_code
+	     AND     DOC_NUM BETWEEN  :doc_num_fm AND :doc_num_to 
+		 AND	 ACC_ENTITY_CODE = :d_entity_code
+	     ORDER BY DOC_NUM;
+
+
+    EXEC SQL OPEN SY_DOC_CONTROL_CUR;
+
+}
+
+fetch_rec()
+{
+
+    EXEC SQL FETCH SY_DOC_CONTROL_CUR INTO :doc_num;
+
+    if(sqlca.sqlcode == 1403)
+       return 0;
+    
+    return 1;
+
+}
+         
+
+put_hdr()
+{
+    void  print_hospital_name();
+    //fprintf(f1,"MDL : SY                               %30s                                        Date : %s\n",comp_name.arr,rep_date.arr);
+
+	print_hospital_name(116,"SY",comp_name.arr,rep_date.arr);
+
+    fprintf(f1,"OPR : %s\n",oper_id.arr);
+
+        fprintf(f1,"REP : SYRDCMIS                              REPORT MISSING DOCUMENTS                                     PAGE : %4d\n",page_no);
+
+    fprintf(f1,"--------------------------------------------------------------------------------------------------------------------\n\n");
+
+    fprintf(f1,"DOCUMENT TYPE : %s   %s\n\n",d_doc_type_code.arr,d_doc_desc.arr);
+    fprintf(f1,"<--- DOCUMENT NUMBER --->                     <--- DOCUMENT NUMBER--->                    <--- DOCUMENT NUMBER --->\n");
+    fprintf(f1,"      FROM             TO                          FROM             TO                          FROM             TO\n");
+    fprintf(f1,"-------------------------------------------------------------------------------------------------------------------\n\n");
+
+    line_no=14;
+	
+}
+
+
+put_range()
+{
+
+    static i = 1;
+
+
+    switch(i) {
+
+	case  1 :
+            fprintf(f1,"%10ld     %10ld",start_doc_num,end_doc_num);
+	    ++i;
+	    break;
+
+	case  2 :
+            fprintf(f1,"                    %10ld     %10ld",start_doc_num,end_doc_num);
+	    ++i;
+	    break;
+
+	case  3 :
+            fprintf(f1,"                    %10ld     %10ld\n",start_doc_num,end_doc_num);
+	    i=1;
+	    ++line_no;
+	    break;
+
+    }
+
+}
+
+put_inp_parm()
+{
+
+  void print_hospital_name();
+    //fprintf(f1,"MDL : SY                               %30s                                         Date :%s\n",comp_name.arr,rep_date.arr);
+
+	print_hospital_name(115,"SY",comp_name.arr,rep_date.arr);
+
+
+    fprintf(f1,"OPR : %s\n",oper_id.arr);
+
+        fprintf(f1,"REP : SYRDCMIS                              REPORT MISSING DOCUMENTS                                    PAGE : %4d\n",page_no);
+
+    fprintf(f1,"-------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f1,"\n\n\n\n");
+    fprintf(f1,"\tINPUT PARAMETERS\n");
+    fprintf(f1,"\t----------------\n\n");
+    fprintf(f1,"\t\tDOCUMENT TYPE         : %s\n\n",d_doc_type_code.arr);
+    fprintf(f1,"\t\tDOCUMENT NUMBER FROM  : %s\n\n",d_doc_num_fm.arr);
+    fprintf(f1,"\t\t                  TO  : %s\n\n",d_doc_num_to.arr);
+    fprintf(f1,"");
+    ++page_no;
+
+}
+
+
+void print_hospital_name(nd_rep_width    ,
+                         nd_mod_id       ,
+                         nd_hospital_name,
+                         nd_date          )
+int  nd_rep_width;
+char nd_mod_id[3];
+char nd_hospital_name[31];
+char nd_date[17];
+{
+	int i = 0 , pos = 0 , len = 0, len_date = 0 , pos_date = 0;
+
+    /*Find the length of Hospital Name*/
+    for(len = 0; nd_hospital_name[len] != '\0'; len++);
+
+    /*Find the length of Date*/
+    for(len_date = 0; nd_date[len_date] != '\0'; len_date++);
+
+    len = len / 2;
+
+    pos = (nd_rep_width / 2	) - len;
+
+	pos_date = nd_rep_width - len_date;
+
+	fprintf(f1,"MDL : %2s",nd_mod_id);
+
+	for(i = 9; i < pos ; fprintf(f1," "),i++);
+
+	fprintf(f1,"%s",nd_hospital_name);
+
+	for(i = i + (len * 2) ; i < pos_date + 1; fprintf(f1," "),i++);
+
+    fprintf(f1,"%s\n",nd_date);
+}
+
+
+
+
+
+
+

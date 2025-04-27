@@ -1,0 +1,3132 @@
+/***************************************************************************** 
+
+*  File	         : rlrwlres.pc
+   Author        : Sheelvant   
+   Date Created  : 03/10/1996
+   Last Modified : 19/09/2000    ( Sheelvant )
+
+*  Ver 1.10.01
+   
+*  Purpose : To Create Worklist Date for the given Specimen Range     
+            
+*  Input Parameters : 
+                      Command line inputs
+		              1. Usr_id/Password
+                      2. Session id
+		              3. Program Date
+
+                      Parameters from SY_PROG_PARAM table 
+                      4. Preferred range of Specimen Numbers            
+                      5. Criteria Flag                                  
+                      6. Section Code                                   
+                      7. Worklist_name                                  
+                      8. Worklist Number                                
+                      9. Worklist Date                                  
+                      9. User Id                                        
+  
+*  Table Accessed : RL_WORKLIST_FMT_HDR,RL_WORKLIST_FMT_DTL,RL_TEST_RESULT,
+		    RL_WORKLIST_DTL
+
+*****************************************************************************/  
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+#define ESC 0x1B
+#define MAX_LINES 45
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+#define ONLINE_PRINTING 1
+/*
+#define DEBUG 
+*/
+EXEC SQL BEGIN DECLARE SECTION;
+
+       /* increased the length all varchar variables by one to take care */
+       /* for null termination */
+	VARCHAR   nd_operating_facility_id   [3],
+	          uid_pwd		             [91],
+			  nd_file_name               [150], 
+ 
+ 		/* from RL_WORKLIST_FMT_HDR */
+		d_worklist_name         [11],
+        d_criteria_flag   	    [2],
+		d_cup_indicators_1      [51],
+		d_cup_indicators_2      [51],
+		d_cup_indicators_3      [51],
+		d_cup_indicators_4      [51],
+		d_cup_indicators_5      [51],
+		d_added_by_id           [51],
+		rowid_wrk               [31],
+		
+        /* from RL_WORKLIST_FMT_DTL */
+		d_worklist_test_code	[11],
+		d_test_indicator	    [2],
+
+        /* from RL_REQUEST_DETAIL   */
+		d_req_dtl_test		    [11],
+
+        /* from RL_TEST_RESULT */     
+		d_specimen_no           [21],
+		d_prt_cup_no			[30],
+		d_patient_id            [31],
+		d_req_test_code		[11],
+		d_num_result		[16],
+		d_comm_result		[16],
+		d_test_result		[16],
+
+        /* from RL_QC_MATERIAL_TEST */
+		d_qc_test_code		[11],
+
+        /* from PATIENT MASTERS     */
+		d_date_of_birth		[11],
+		d_short_name   		[61],
+                d_nation                [5],
+				d_sex                   [2],
+				d_pat_mark              [2],
+				d_worklist_marker       [11],
+
+        /* from RL_REQUEST_HEADER   */
+		d_source_code 		    [11],
+		d_episode_type          [2],
+		d_spec_regd_date_time   [17],
+		d_consultant_code		[16],
+		d_urgent_indicator      [2],
+		d_request_comment_code1 [5],
+		d_request_comment_code2 [5],
+		d_request_comment_code3 [5],
+
+		/* from RL_REQUEST_COMMENT_CODE   */
+		d_request_comment_desc1 [42],  
+		d_request_comment_desc2 [42],  
+		d_request_comment_desc3 [42],  
+
+        /* from RL_WORKLIST_DTL for printing only     */
+		d_prt_specimen_no	[21],
+		d_prt_patient_id	[31],
+		d_print_cup_indicator   [2],
+
+        /* from RL_TEST_QUALITY_MAST */
+		d_qlty_test             [11],
+
+        /* Dummy Variable */     
+	    nd_chk_test_code	    [11],
+		nd_ins_specimen_no      [21], 
+		nd_ins_patient_id       [31], 
+
+
+		/*  For Patient Age SYSDATE, MTHS */
+			today				[30],
+			t_days				[30],
+			mths				[30],
+			mths1				[30],
+			t_age				[30],
+
+		
+		/* input parameters to main() */
+        nd_session_id      [16],
+		nd_pgm_date	       [20],
+		nd_file_no	       [15],
+
+		/******** parameters from SY_PROG_PARAM table ***********/
+		nd_section_code    	[2],
+		nd_worklist_name   	[11],
+		nd_worklist_date   	[11],
+		nd_criteria_flag   	[2],
+		nd_fr_specimen_no  	[21],
+		nd_to_specimen_no  	[21],
+		nd_print_yn             [2],
+		nd_user_id              [31],
+		rp_worklist_name        [11],     
+		rp_worklist_date        [11],
+		rp_reprint              [8],
+
+               /* variable for cursor */
+		nd_cur_specimen_no      [21],
+		nd_cur_patient_id       [31],
+
+	       /* for header routine */
+	       //d_acc_entity_name         [41],
+		   d_acc_entity_name         [300],
+	       d_user                    [31],
+	       d_sysdate                 [20],
+
+               /* Fields from table RL_SECTION__CODE */
+	       d_printer_name            [16],
+
+	       /* Fields used in get_test_result */
+               t_worklist_test           [11],
+	       t_numeric_result          [16],
+	       t_result_comment          [5],
+
+/*  New Fields from RL_WORKLIST_FMT_HDR  */
+		nd_cup_number		    [32],
+		nd_cup_indr				[32],
+		nd_spec_no				[32],
+		nd_wl_marker			[32],
+		nd_pat_id			    [32],
+		nd_pat_name	     		[61],
+		nd_age					[32],
+		nd_dob					[32],
+		nd_sex					[32],
+		nd_source				[32],
+		nd_consultant			[32],
+		nd_urgency				[32],
+		nd_comm_1				[32],
+		nd_comm_2				[32],
+		nd_comm_3				[32],
+		nd_spec_date			[32],
+		nd_heading				[20];
+
+float mt				;
+
+/* Fields from table SY_PROG_PARAM*/                          
+int  		nd_worklist_no;
+int             rp_worklist_no;
+/* Fields from table RL_WORKLIST_FMT_HDR */                          
+int  		d_worklist_no, d_no_of_cups,d_line_spacing;
+
+/* Fields from table RL_WORKLIST_FMT_DTL */                          
+int  		d_seq_no; 
+int             d_no_of_tests;
+int			tests;
+
+/* Fields from table RL_WORKLIST_DTL */                          
+char            d_prt_test_1_yn,d_prt_test_2_yn,d_prt_test_3_yn,
+                d_prt_test_4_yn,d_prt_test_5_yn,d_prt_test_6_yn,
+                d_prt_test_7_yn,d_prt_test_8_yn,d_prt_test_9_yn,
+                d_prt_test_10_yn,d_prt_test_11_yn,d_prt_test_12_yn,
+                d_prt_test_13_yn,d_prt_test_14_yn,d_prt_test_15_yn,
+                d_prt_test_16_yn,d_prt_test_17_yn,d_prt_test_18_yn,
+                d_prt_test_19_yn,d_prt_test_20_yn,d_prt_test_21_yn,
+                d_prt_test_22_yn,d_prt_test_23_yn,d_prt_test_24_yn,
+                d_prt_test_25_yn;
+  
+  
+/* Dummy Fields  */                                                  
+int  		ic;                                       
+int  		line_no,page_no,no_of_tests,tests_on_page;
+char            test_exists_in_specimen;
+char            sql_stmt[5000];
+char 		cup_ind;                                  
+char		nd_qc_code;
+char            dummy_test_array[25];
+char            cup_indicator[250];
+char            file_name[50],
+		file_name2[50];
+
+int stimulate = 0;
+int num[16];
+int cou[16];
+char word[16][32];
+char str_word[16][32];
+char temp_word[32];
+char detail[16][44];
+
+int l_count = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int       rec_inserted;
+int       specimen_over;
+int       mandatory_tests_exist;
+int       worklist_mandatory_tests_exist;
+char      worklist_test[25][11];
+char      worklist_ind[25][2];
+char      mandatory_ind[25];
+char      chk_mand_test[25];
+char      string_var[200];
+char      uline[6] = "_____";
+int       print_line;
+int       test_ctr;
+int       maxx = 0;
+
+int i =  0;
+int j = 0 ;
+int k = 0;
+int ctr = 0;
+int str_len = 0 ;
+int total = 0 ;
+int tot_tests = 0;
+char g_facility_id[50];
+
+FILE *f1,*f2;
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+  void  get_params(),
+  	get_header_dtls(),
+	dclr_request_detail_cur(),
+        dclr_worklist_dtl_cur(),
+        dclr_worklist_prt_dtl_cur(),
+        dclr_qc_matl_test_cur(),
+  	get_worklist_hdr(),
+	dclr_qlty_tests_cur(),
+  	do_report();
+	//get_dept_printer();
+
+	void print_hyphen(FILE *);
+	void patient_age();
+	void print_dtl(FILE *);
+	void sorting();
+	void reverse_sort();
+	void prepare_heading(FILE *);
+
+   if(argc < 4) {
+     disp_message(ERR_MESG,"Usage rlrwlres uid/passwd session_id pgm_date\n");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+   strcpy(nd_pgm_date.arr, argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+
+   strcpy(g_facility_id,' ');
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+
+   #ifdef DEBUG
+      printf("Connected to ORACLE as user: %s \n", uid_pwd.arr);
+   #endif  
+   
+   set_meduser_role();
+
+/*   printf("rlrwlres : Program Started.\n\n"); 
+*/
+
+   get_params();
+   gen_file_name();
+
+   strcpy(file_name,WORKING_DIR);
+   strcat(file_name,"rlrwlre2.lis");
+
+/*   increment_file_no();
+   sprintf(file_name, "a%s",nd_file_name);
+   sprintf(file_name2,"b%s",nd_file_name);
+*/
+
+  if((f2 = fopen(file_name, "w")) == NULL) 
+   {
+     sprintf(string_var,".... Error opening output file ....<%s>\n",file_name);
+	 disp_message(ERR_MESG,string_var) ;
+     proc_exit();
+   } 
+   else
+   {
+	     fprintf(f2,"%c&|26A",ESC);
+		 fprintf(f2,"%c&a90P",ESC);
+	     fprintf(f2,"%c&|1O",ESC);
+	     fprintf(f2,"%c&k4S",ESC);
+   }
+
+   if(strcmp(rp_reprint.arr,"REPRINT") == 0)
+   {
+      strcpy(nd_worklist_name.arr,rp_worklist_name.arr);
+      nd_worklist_name.len = strlen(rp_worklist_name.arr);
+      nd_worklist_no = rp_worklist_no;
+      strcpy(nd_worklist_date.arr,rp_worklist_date.arr);
+      nd_worklist_date.len = strlen(rp_worklist_date.arr);
+   }
+
+   dclr_worklist_dtl_cur();
+   dclr_qc_matl_test_cur();
+   dclr_worklist_prt_dtl_cur();
+   
+   get_worklist_hdr();
+
+   get_header_dtls();
+   dclr_qlty_tests_cur();
+   do_report();
+   //get_dept_printer();
+   
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK RELEASE;
+
+   /*printf("rlrwlres : Program Ended.\n\n"); */
+
+   /***** TO RESET THE PRINTER *********/
+   fprintf(f1,"%cE",ESC);
+   fprintf(f2,"%cE",ESC);
+
+   /**** FOR REVERSING THE LANDSCAPE PRINTING 
+   fprintf(f1,"%c&|3O",ESC);
+   fprintf(f2,"%c&|3O",ESC);
+   **********/
+
+   fclose(f1);
+   fclose(f2);
+   
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}   
+
+/* get the printer name */
+void get_dept_printer()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT  '1' INTO :d_printer_name
+            FROM    RL_SECTION_CODE
+	    WHERE   SECTION_CODE = :nd_section_code;
+
+  d_printer_name.arr[d_printer_name.len] = '\0';
+
+#ifdef DEBUG
+   printf("d_printer_name = %s\n", d_printer_name.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_dept_printer() occured....\n");
+   proc_exit();
+}
+
+/* get the parameters from the SY_PROG_PARM table and */
+/* delete the record after reading it.                 */
+void get_params()
+{
+		rp_worklist_name.arr[0] = '\0';
+		rp_worklist_name.len = 0;
+		rp_worklist_date.arr[0] = '\0';
+		rp_worklist_date.len = 0;
+		rp_reprint.arr[0] = '\0';
+		rp_reprint.len = 0;
+
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT OPERATING_FACILITY_ID,
+           PARAM1,
+		   PARAM2,
+		   PARAM3,
+		   PARAM4,
+		   PARAM5,
+		   PARAM6,
+		   PARAM7,
+		   PARAM8,
+		   UPPER(PARAM9),
+		   PARAM10,
+		   PARAM11,
+		   PARAM12,
+		   PARAM13
+           INTO 
+		   :nd_operating_facility_id,
+		   :nd_section_code ,  
+		   :nd_worklist_name,  
+		   :nd_worklist_no  ,
+		   :nd_worklist_date,
+		   :nd_criteria_flag,
+		   :nd_fr_specimen_no,
+		   :nd_to_specimen_no,
+		   :nd_print_yn,
+		   :nd_user_id,
+		   :rp_worklist_name,     
+		   :rp_worklist_no,
+		   :rp_worklist_date,
+		   :rp_reprint
+            FROM SY_PROG_PARAM
+	        WHERE   PGM_ID = 'RLRWLRES'
+		    AND SESSION_ID = TO_NUMBER(:nd_session_id)
+		    AND PGM_DATE = :nd_pgm_date;
+
+  nd_operating_facility_id.arr[nd_operating_facility_id.len] = '\0';
+  nd_section_code.arr[nd_section_code.len] 			= '\0';
+  nd_worklist_name.arr[nd_worklist_name.len] 			= '\0';
+  nd_worklist_date.arr[nd_worklist_date.len] 			= '\0';
+  nd_criteria_flag.arr[nd_criteria_flag.len] 			= '\0';
+  nd_fr_specimen_no.arr[nd_fr_specimen_no.len] 			= '\0';
+  nd_to_specimen_no.arr[nd_to_specimen_no.len] 			= '\0';
+  nd_print_yn.arr[nd_print_yn.len] 				= '\0';
+  nd_user_id.arr[nd_user_id.len] 				= '\0';
+  rp_worklist_name.arr[rp_worklist_name.len]			= '\0';     
+  rp_worklist_date.arr[rp_worklist_date.len]			= '\0';
+  rp_reprint.arr[rp_reprint.len]				= '\0';
+
+
+#ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf(" nd_section_code = %s\n",nd_section_code.arr);
+   printf(" nd_worklist_name = %s\n",nd_worklist_name.arr);
+   printf(" nd_worklist_no = %d\n",nd_worklist_no);
+   printf(" nd_worklist_date = %s\n",nd_worklist_date.arr);
+   printf(" nd_criteria_flag = %s\n",nd_criteria_flag.arr);
+   printf(" nd_fr_specimen_no = %s\n",nd_fr_specimen_no.arr);
+   printf(" nd_to_specimen_no = %s\n",nd_to_specimen_no.arr);
+   printf(" nd_print_yn = %s\n",nd_print_yn.arr);
+   printf(" nd_user_id = %s\n",nd_user_id.arr);
+   printf(" rp_worklist_name = %s\n",rp_worklist_name.arr);     
+   printf(" rp_worklist_no = %d\n",rp_worklist_no);
+   printf(" rp_worklist_date = %s\n",rp_worklist_date.arr);
+   printf(" rp_reprint = %s\n",rp_reprint.arr);
+#endif
+  
+  /* delete the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DELETE SY_PROG_PARAM
+	        WHERE PGM_ID = 'RLRWLRES'
+	        AND SESSION_ID = :nd_session_id
+		    AND PGM_DATE   = :nd_pgm_date;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_params() occured....\n");
+   proc_exit();
+}
+ 
+
+/* get the header details */
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(LPAD(ACC_ENTITY_NAME,
+		       TRUNC(15 + 0.5*LENGTH(ACC_ENTITY_NAME))),1,30),
+		   USER,
+		   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+	    INTO :d_acc_entity_name,
+		 :d_user,
+		 :d_sysdate
+            FROM SY_ACC_ENTITY
+            WHERE ACC_ENTITY_ID = :nd_operating_facility_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+#ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+ 
+
+/* get the WORKLIST Header detail from RL_WORKLIST_FMT_HDR */
+/* delete the record after reading it.                     */
+void get_worklist_hdr()
+{
+
+   nd_cup_number.arr[0] = '\0';
+   nd_cup_number.len = 0 ;
+   nd_cup_indr.arr[0] = '\0';
+   nd_cup_indr.len = 0 ;
+   nd_spec_no.arr[0] = '\0';
+   nd_spec_no.len = 0 ;
+   nd_wl_marker.arr[0] = '\0';
+   nd_wl_marker.len = 0 ;
+   nd_pat_id.arr[0] = '\0';
+   nd_pat_id.len = 0 ;
+   nd_pat_name.arr[0] = '\0';
+   nd_pat_name.len = 0 ;
+   nd_source.arr[0] = '\0';
+   nd_source.len = 0 ;
+   nd_consultant.arr[0] = '\0';
+   nd_consultant.len = 0 ;
+   nd_urgency.arr[0] = '\0';
+   nd_urgency.len = 0 ;	
+   nd_comm_1.arr[0] = '\0';
+   nd_comm_1.len = 0 ;	
+   nd_comm_2.arr[0] = '\0';
+   nd_comm_2.len = 0 ;	
+   nd_comm_3.arr[0] = '\0';
+   nd_comm_3.len = 0 ;	
+   nd_spec_date.arr[0] = '\0';
+   nd_spec_date.len = 0 ;	
+
+    for (i=0;i<16;i++)
+    {
+	   num[i] = 0;
+	   cou[i] = 0;
+	  
+	   strcpy(word[i],"0");
+    }
+
+   /* read the parameter record */
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT NO_OF_CUPS,
+		   LINE_SPACING,
+		   CUP_INDICATOR_1,
+		   CUP_INDICATOR_2,
+		   CUP_INDICATOR_3,
+		   CUP_INDICATOR_4,
+		   CUP_INDICATOR_5, 
+		 NVL(row_cup_number,0), NVL(col_cup_number,0),
+		 NVL(l_cup_number,'0'), NVL(row_cup_indr,0), NVL(col_cup_indr,0),
+		 NVL(l_cup_indr,'0'),NVL(row_wl_marker,0), NVL(col_wl_marker,0),
+		 NVL(l_wl_marker,'0'), NVL(row_spec_no,0), NVL(col_spec_no,0),
+		 NVL(l_spec_no,'0'),  NVL(row_patient_id,0), NVL(col_patient_id,0),
+		 NVL(l_patient_id,'0'), NVL(row_pat_name,0), NVL(col_pat_name,0),
+		 NVL(l_pat_name,'0'),NVL(row_age,0), NVL(col_age,0), NVL(l_age,'0'),
+		 NVL(row_dob,0), NVL(col_dob,0), NVL(l_dob,'0'), NVL(row_sex,0), NVL(col_sex,0),
+		 NVL(l_sex,'0'), NVL(row_source,0), NVL(col_source,0), NVL(l_source,'0'),
+		 NVL(row_consultant,0), NVL(col_consultant,0), NVL(l_consultant,'0'),
+		 NVL(row_urgency,0), NVL(col_urgency,0), NVL(l_urgency,'0'),
+		 NVL(row_comm_1,0), NVL(col_comm_1,0),NVL(l_comm_1,'0'), NVL(row_comm_2,0),
+		 NVL(col_comm_2,0), NVL(l_comm_2,0), NVL(row_comm_3,0), NVL(col_comm_3,0),
+ 	     NVL(l_comm_3,'0'), NVL(row_spec_date,0), NVL(col_spec_date,0),
+  	     NVL(l_spec_date,'0')
+            INTO 
+		:d_no_of_cups,
+		:d_line_spacing,
+		:d_cup_indicators_1,
+		:d_cup_indicators_2,
+		:d_cup_indicators_3,
+		:d_cup_indicators_4,
+		:d_cup_indicators_5,
+ :num[0], :cou[0], :nd_cup_number,
+ :num[1], :cou[1], :nd_cup_indr,
+ :num[2], :cou[2], :nd_wl_marker,
+ :num[3], :cou[3], :nd_spec_no,
+ :num[4], :cou[4], :nd_pat_id,
+ :num[5], :cou[5], :nd_pat_name,
+ :num[6], :cou[6], :nd_age,
+ :num[7], :cou[7], :nd_dob,
+ :num[8], :cou[8], :nd_sex,
+ :num[9], :cou[9], :nd_source,
+ :num[10], :cou[10], :nd_consultant,
+ :num[11], :cou[11], :nd_urgency,
+ :num[12], :cou[12], :nd_comm_1,
+ :num[13], :cou[13], :nd_comm_2,
+ :num[14], :cou[14], :nd_comm_3,
+ :num[15], :cou[15], :nd_spec_date
+            FROM RL_WORKLIST_FMT_HDR
+	    WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  AND SECTION_CODE  = :nd_section_code 
+	      AND WORKLIST_NAME = :nd_worklist_name;
+
+
+  d_cup_indicators_1.arr[d_cup_indicators_1.len]		= '\0';
+  d_cup_indicators_2.arr[d_cup_indicators_2.len]		= '\0';
+  d_cup_indicators_3.arr[d_cup_indicators_3.len]		= '\0';
+  d_cup_indicators_4.arr[d_cup_indicators_4.len]		= '\0';
+  d_cup_indicators_5.arr[d_cup_indicators_5.len]		= '\0';
+
+  strcpy(cup_indicator,d_cup_indicators_1.arr);
+  strcat(cup_indicator,d_cup_indicators_2.arr);
+  strcat(cup_indicator,d_cup_indicators_3.arr);
+  strcat(cup_indicator,d_cup_indicators_4.arr);
+  strcat(cup_indicator,d_cup_indicators_5.arr);
+
+  /*strncpy(cup_indicator,d_cup_indicators_1.arr,d_cup_indicators_1.len);
+  strncpy(cup_indicator+d_cup_indicators_2.len,d_cup_indicators_1.arr,d_cup_indicators_2.len);
+  strncpy(cup_indicator+d_cup_indicators_2.len,d_cup_indicators_1.arr,d_cup_indicators_3.len);
+  strncpy(cup_indicator+d_cup_indicators_2.len,d_cup_indicators_1.arr,d_cup_indicators_4.len);
+  strncpy(cup_indicator+d_cup_indicators_2.len,d_cup_indicators_1.arr,d_cup_indicators_5.len); */
+
+  nd_cup_number.arr[nd_cup_number.len] = '\0';
+  nd_cup_indr.arr[nd_cup_indr.len]	   = '\0';
+  nd_spec_no.arr[nd_spec_no.len]	   = '\0';
+  nd_wl_marker.arr[nd_wl_marker.len]   = '\0';
+  nd_pat_id.arr[nd_pat_id.len] = '\0';
+  nd_pat_name.arr[nd_pat_name.len]     = '\0';
+  nd_age.arr[nd_age.len]			   = '\0';
+  nd_dob.arr[nd_dob.len]			   = '\0';
+  nd_sex.arr[nd_sex.len]			   = '\0';
+  nd_source.arr[nd_source.len]		   = '\0';
+  nd_consultant.arr[nd_consultant.len] = '\0';
+  nd_urgency.arr[nd_urgency.len]	   = '\0';
+  nd_comm_1.arr[nd_comm_1.len]	       = '\0';
+  nd_comm_2.arr[nd_comm_2.len]	       = '\0';
+  nd_comm_3.arr[nd_comm_3.len]	       = '\0';
+  nd_spec_date.arr[nd_spec_date.len]   = '\0';
+
+
+#ifdef DEBUG
+   printf("**********Parameters from SY_PROG_PARAM *******************\n");
+   printf(" d_cup_indicators_1 = %s\n",d_cup_indicators_1.arr);
+   printf(" d_cup_indicators_2 = %s\n",d_cup_indicators_2.arr);
+   printf(" d_cup_indicators_3 = %s\n",d_cup_indicators_3.arr);
+   printf(" d_cup_indicators_4 = %s\n",d_cup_indicators_4.arr);
+   printf(" d_cup_indicators_5 = %s\n",d_cup_indicators_5.arr);
+   printf(" cup_indicator = %s\n",cup_indicator);
+
+#endif
+
+   strcpy(word[0], nd_cup_number.arr);
+   strcpy(word[1], nd_cup_indr.arr);
+   strcpy(word[2], nd_wl_marker.arr);
+   strcpy(word[3], nd_spec_no.arr);
+   strcpy(word[4], nd_pat_id.arr);
+   strcpy(word[5], nd_pat_name.arr);
+   strcpy(word[6], nd_age.arr);
+   strcpy(word[7], nd_dob.arr);
+   strcpy(word[8], nd_sex.arr);
+   strcpy(word[9], nd_source.arr);
+   strcpy(word[10], nd_consultant.arr);
+   strcpy(word[11], nd_urgency.arr);
+   strcpy(word[12], nd_comm_1.arr);
+   strcpy(word[13], nd_comm_2.arr);
+   strcpy(word[14], nd_comm_3.arr);
+   strcpy(word[15], nd_spec_date.arr);
+
+   strcpy(str_word[0], "nd_cup_number");
+   strcpy(str_word[1], "nd_cup_indr");
+   strcpy(str_word[2], "nd_wl_marker");
+   strcpy(str_word[3], "nd_spec_no");
+   strcpy(str_word[4], "nd_pat_id");
+   strcpy(str_word[5], "nd_pat_name");
+   strcpy(str_word[6], "nd_age");
+   strcpy(str_word[7], "nd_dob");
+   strcpy(str_word[8], "nd_sex");
+   strcpy(str_word[9], "nd_source");
+   strcpy(str_word[10], "nd_consultant");
+   strcpy(str_word[11], "nd_urgency");
+   strcpy(str_word[12], "nd_comm_1");
+   strcpy(str_word[13], "nd_comm_2");
+   strcpy(str_word[14], "nd_comm_3");
+   strcpy(str_word[15], "nd_spec_date");
+  
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_worklist_hdr() occured....\n");
+   proc_exit();
+}
+ 
+/* function declares cursor RL_WORKLIST_FMT_DTL */
+void dclr_worklist_dtl_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE WORKLIST_DTL_CUR CURSOR FOR
+         SELECT TEST_CODE,              
+         	SEQ_NO,                        
+	        TEST_INDICATOR             
+
+         FROM   RL_WORKLIST_FMT_DTL                        
+         WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 AND WORKLIST_NAME = :nd_worklist_name              
+         ORDER BY SEQ_NO ;                                     
+
+   /*  Done in Do Report   */
+   /*EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN TRN_ITEMS_CUR; */
+
+#ifdef DEBUG
+    printf("leaving dclr_worklist_dtl_cur()\n");
+    fflush(stdout);
+#endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_worklist_dtl_cur() occured....\n");
+   proc_exit();
+}
+
+void dclr_request_detail_cur()
+{
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE REQUEST_DETAIL CURSOR FOR
+         SELECT TEST_CODE              
+           FROM RL_REQUEST_DETAIL
+          WHERE PATIENT_ID = :d_prt_patient_id
+	      AND SPECIMEN_NO = :d_prt_specimen_no
+          AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  ORDER BY TEST_CODE;                                     
+#ifdef DEBUG
+    printf("leaving dclr_request_detail_cur()\n");
+    fflush(stdout);
+#endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_request_detail_cur() occured....\n");
+   proc_exit();
+}
+
+void open_request_detail_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN REQUEST_DETAIL;
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while open_request_detail_cur occured...\n");
+   proc_exit();
+}
+
+int fetch_request_detail_cur()
+{
+  d_req_dtl_test.arr[0]    = '\0';
+  d_req_dtl_test.len       = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH REQUEST_DETAIL INTO :d_req_dtl_test;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+  if (NODATAFOUND)
+    return 0;
+  d_req_dtl_test.arr[d_req_dtl_test.len]		= '\0';
+#ifdef DEBUG
+   printf("********* Details from RL_REQUEST_DETAIL**************\n");
+   printf(" d_req_dtl_test= %s\n", d_req_dtl_test.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_request_detail_cur() occured....\n");
+   proc_exit();
+}
+
+void close_request_detail_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CLOSE REQUEST_DETAIL;
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Close_request_detail_Cur() occured....\n");
+   proc_exit();
+}
+
+/* function declares cursor RL_WORKLIST_DTL */
+/* Used for Printing Worklist               */
+void dclr_worklist_prt_dtl_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE WORKLIST_PRT_DTL_CUR CURSOR FOR
+         SELECT WORKLIST_CUP_NO,        
+         	SPECIMEN_NO,                   
+	        PATIENT_ID,              
+		    WORKLIST_CUP_INDICATOR,
+	    	TEST_1_YN,
+	    	TEST_2_YN,
+	    	TEST_3_YN,
+	    	TEST_4_YN,
+	    	TEST_5_YN,
+	    	TEST_6_YN,
+	    	TEST_7_YN,
+	    	TEST_8_YN,
+	    	TEST_9_YN,
+	    	TEST_10_YN,
+	    	TEST_11_YN,
+	    	TEST_12_YN,
+	   	    TEST_13_YN,
+	    	TEST_14_YN,
+	   	    TEST_15_YN,
+	    	TEST_16_YN,
+	    	TEST_17_YN,
+	    	TEST_18_YN,
+	    	TEST_19_YN,
+	   	    TEST_20_YN,
+	    	TEST_21_YN,
+	    	TEST_22_YN,
+	  	    TEST_23_YN,
+	    	TEST_24_YN,
+	    	TEST_25_YN 
+          FROM RL_WORKLIST_DTL                        
+          WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+		  AND WORKLIST_NAME = :nd_worklist_name 
+	      AND WORKLIST_NO   = TO_NUMBER(:nd_worklist_no) 
+          AND TO_CHAR(WORKLIST_DATE,'DD/MM/YYYY') = 
+  	      TO_CHAR(TO_DATE(:nd_worklist_date,'DD/MM/YYYY'),'DD/MM/YYYY')
+          ORDER BY WORKLIST_CUP_NO;                             
+	      /*AND SPECIMEN_NO IS NOT NULL*/
+
+   /*  Done in Do Report   */
+   /*EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN TRN_ITEMS_CUR; */
+
+#ifdef DEBUG
+    printf("leaving dclr_worklist_prt_dtl_cur()\n");
+    fflush(stdout);
+#endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_worklist_prt_dtl_cur() occured....\n");
+   proc_exit();
+}
+
+void dclr_qlty_tests_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL DECLARE QLTY_TESTS_CUR CURSOR FOR
+         SELECT TEST_CODE              
+         FROM   RL_TEST_QUALITY_MAST                        
+         WHERE  OPERATING_FACILITY_ID = :nd_operating_facility_id
+		 AND SECTION_CODE = :nd_section_code
+	     AND  QLTY_CODE    = :nd_qc_code;
+
+   #ifdef DEBUG
+       printf("leaving dclr_qlty_tests_cur()\n");
+       fflush(stdout);
+   #endif
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_qlty_tests_cur() occured....\n");
+   proc_exit();
+}
+      
+/* function declares cursor RL_QC_MATERIAL_TEST */
+void dclr_qc_matl_test_cur()
+{
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL DECLARE QC_MATRL_TST_CUR CURSOR FOR
+      SELECT TEST_CODE              
+      FROM   RL_TEST_CODE                        
+      WHERE  TEST_CODE       = :nd_qc_code  ;          
+
+   /*  Done in Do Report   */
+   /*EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+     EXEC SQL OPEN TRN_ITEMS_CUR; */
+
+#ifdef DEBUG
+    printf("leaving dclr_qc_matrl_tst_cur()\n");
+    fflush(stdout);
+#endif
+ 
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_worklist_dtl_cur() occured....\n");
+   proc_exit();
+}
+
+/* prints the master-detail record until the cursor is empty */
+void do_report()
+{
+  void open_qlty_tests_cur();
+  void close_qlty_tests_cur();
+  void open_wrklst_dtl_cursor();
+  /*void open_qc_matrl_cursor();*/
+  /*void close_qc_matrl_cursor();*/
+  void initialize_worklist_array();
+  void copy_dummy_array();
+  void print_worklist();
+  int fetch_worklist_dtl_cur();
+  int fetch_qlty_tests_cur();
+  /*int fetch_qc_matrl_cur();*/
+  int still_wrk_test_left;
+  int still_qc_left;
+  int still_qlty_tests_left =0;
+  int rec_no;
+  int broken = 0;
+
+    initialize_worklist_array();
+    open_wrklst_dtl_cursor();
+
+    worklist_mandatory_tests_exist = 0;
+
+    still_wrk_test_left = fetch_worklist_dtl_cur();
+    while(still_wrk_test_left)    /* Worklist Test Details */
+    {
+      strcpy(worklist_test[d_seq_no-1],d_worklist_test_code.arr);
+      if (d_test_indicator.arr[0] == 'M' || d_test_indicator.arr[0] == 'O')
+      {
+	if(d_test_indicator.arr[0] == 'M')
+	   worklist_mandatory_tests_exist = 1;
+
+        strcpy(worklist_ind[d_seq_no-1],d_test_indicator.arr);
+        chk_mand_test[d_seq_no-1]=d_test_indicator.arr[0];
+      }
+      else
+      {
+        strcpy(worklist_ind[d_seq_no-1]," ");
+        chk_mand_test[d_seq_no-1]='N';
+      }
+      still_wrk_test_left = fetch_worklist_dtl_cur();
+    }
+    print_worklist();
+}
+
+/* function to print the worklist */
+void print_worklist()
+{  
+     int still_prt_specimen_left;
+     void open_wrklst_prt_dtl_cur();
+     void print_master_rec(FILE *);
+     void print_col_heading(FILE *); 
+     int fetch_specimen_prt_cur();
+     void prepare_new_page(FILE *);
+     void print_footer_rec(FILE *);
+     void end_report(FILE *);                   
+     void print_detl_rec();
+	 void get_request_comment1();
+	 void get_request_comment2();
+	 void get_request_comment3();
+	 void spacing(FILE *);
+
+     line_no = 0;
+
+     if (rec_inserted == 0 || strcmp(rp_reprint.arr,"REPRINT")==0)
+     {
+       page_no +=1;
+       no_of_tests = 0;
+       if(strcmp(rp_reprint.arr,"REPRINT") == 0)
+       {
+         strcpy(nd_worklist_name.arr,rp_worklist_name.arr);
+	     nd_worklist_name.len = strlen(rp_worklist_name.arr);
+	     nd_worklist_no = rp_worklist_no;
+	     strcpy(nd_worklist_date.arr,rp_worklist_date.arr);
+	     nd_worklist_date.len = strlen(rp_worklist_date.arr);
+       }
+       open_wrklst_prt_dtl_cur();
+       
+       tests_on_page = 16;
+       
+       print_master_rec(f1);
+       print_col_heading(f1); 
+
+       tests_on_page = 25;
+
+       if(d_no_of_tests > 16)
+       {
+	  print_master_rec(f2);
+	  print_col_heading(f2);
+       }
+       
+       still_prt_specimen_left = fetch_specimen_prt_cur();
+
+       /* process until first level break group arises */
+       while(still_prt_specimen_left) 
+       {
+          if((line_no + d_line_spacing) >= MAX_LINES)
+	  {
+            page_no += 1;
+	    no_of_tests = 0;
+	    print_footer_rec(f1);
+            prepare_new_page(f1);
+            tests_on_page = 16;
+            print_master_rec(f1);
+            print_col_heading(f1); 
+            tests_on_page = 25;
+	         if(d_no_of_tests > 16)
+	         {
+	           print_footer_rec(f2);
+               prepare_new_page(f2);
+	           print_master_rec(f2);
+	           print_col_heading(f2);
+             }
+	   }
+          print_detl_rec();
+          line_no += d_line_spacing;
+
+		   if(d_no_of_tests > 16)
+		    spacing(f2);
+		   else
+			spacing(f1);
+
+          still_prt_specimen_left = fetch_specimen_prt_cur();
+       }
+       if((line_no + d_line_spacing) >= MAX_LINES)
+       {
+         page_no += 1;
+         prepare_new_page(f1);
+         print_footer_rec(f1);
+         end_report(f1);
+	 if(d_no_of_tests > 16)
+	 {
+            prepare_new_page(f2);
+            print_footer_rec(f2);
+            end_report(f2);
+         }
+        }
+        else 
+        {
+	  for(;line_no < MAX_LINES;line_no++)
+	  {
+	     fprintf(f1,"\n");
+	     if(d_no_of_tests > 16)
+	     {
+	        fprintf(f2,"\n");
+             }
+          }
+          print_footer_rec(f1);
+          end_report(f1);
+	  if(d_no_of_tests > 16)
+	  {
+	     print_footer_rec(f2);
+             end_report(f2);
+          }
+        } 
+     }
+}
+
+/*This Procedure to open Quality Tests Cursor */
+void open_qlty_tests_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN QLTY_TESTS_CUR;
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Opening qlty tests cur occured...\n");
+   proc_exit();
+}
+
+
+/*This Procedure to open Worklist Cursor */
+void open_wrklst_dtl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN WORKLIST_DTL_CUR;
+   EXEC SQL SELECT NVL(COUNT(*),0) INTO :d_no_of_tests
+	      FROM RL_WORKLIST_FMT_DTL
+             WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+			 AND WORKLIST_NAME = :nd_worklist_name;
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Opening work list dtl cur occured...\n");
+   proc_exit();
+}
+
+/*This Procedure to open QC Material Test Cursor */
+void open_qc_matrl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN QC_MATRL_TST_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Opening QC Matrl Cur() occured....\n");
+   proc_exit();
+}
+
+
+/*This Procedure to open Worklist Detail Printing Cursor */
+void open_wrklst_prt_dtl_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL OPEN WORKLIST_PRT_DTL_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Opening Wrklst prt dtl Cur() occured....\n");
+   proc_exit();
+}
+
+/*This Procedure to Qlty Tests Cursor */
+void close_qlty_tests_cur()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CLOSE QLTY_TESTS_CUR;
+   return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Close Qlty Tests Cur() occured....\n");
+   proc_exit();
+}
+
+/*This Procedure to Close QC Material Test Cursor */
+void close_qc_matrl_cursor()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CLOSE QC_MATRL_TST_CUR;
+
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error while Close QC Matrl Cur() occured....\n");
+   proc_exit();
+}
+
+
+/* prepares for the new page */
+void prepare_new_page(afp)
+FILE *afp;
+{
+   fprintf(afp,"");
+   line_no = 0;
+}
+
+
+/* fetches the next record from CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_worklist_dtl_cur()
+{
+
+  d_worklist_test_code.arr[0]                                   = '\0';
+  d_test_indicator.arr[0]                                       = '\0';
+ 
+  d_worklist_test_code.len                                      = 0;
+  d_test_indicator.len                                          = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH WORKLIST_DTL_CUR INTO
+		:d_worklist_test_code,  
+		:d_seq_no ,             
+		:d_test_indicator;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+  if (NODATAFOUND)
+    return 0;
+
+
+  d_worklist_test_code.arr[d_worklist_test_code .len]		= '\0';
+  d_test_indicator.arr[d_test_indicator.len]			= '\0';
+
+
+#ifdef DEBUG
+   printf("********* Details from RL_WORKLIST_FMT_DTL**************\n");
+   printf(" d_worklist_test_code= %s\n", d_worklist_test_code.arr);
+   printf(" d_test_indicator= %s\n", d_test_indicator.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_wrklst_dtl_cur() occured....\n");
+   proc_exit();
+
+}
+
+/* Function to fetch data from QLTY_TEST_CUR  */
+int fetch_qlty_tests_cur()
+{
+  d_qlty_test.arr[0]                         = '\0';
+  d_qlty_test.len                            = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH QLTY_TESTS_CUR INTO
+		:d_qlty_test;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_qlty_test.arr[d_qlty_test .len]	 		= '\0';
+
+
+#ifdef DEBUG
+   printf("********* Details from RL_QC_MATERIAL_TEST *************\n");
+   printf(" d_qlty_test= %s\n", d_qlty_test.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_qlty_test_cur() occured....\n");
+   proc_exit();
+
+}
+
+/* fetches the next record from QC Material Test CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_qc_matrl_cur()
+{
+
+  d_qc_test_code.arr[0]	 			= '\0';
+
+  d_qc_test_code.len                            = 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH QC_MATRL_TST_CUR INTO
+		:d_qc_test_code;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_qc_test_code.arr[d_qc_test_code .len]	 		= '\0';
+
+
+#ifdef DEBUG
+   printf("********* Details from RL_QC_MATERIAL_TEST *************\n");
+   printf(" d_qc_test_code= %s\n", d_qc_test_code.arr);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_qc_matrl_cur() occured....\n");
+   proc_exit();
+
+}
+
+
+/* fetches the next record from CUR  */
+/* returns 0 if the end of cursor is reached */
+/* else returns 1.                           */
+int fetch_specimen_prt_cur()
+{
+
+  d_prt_specimen_no.arr[0]		 		= '\0';
+  d_prt_patient_id.arr[0]		 		= '\0';
+
+  d_prt_specimen_no.len		 			= 0;
+  d_prt_patient_id.len                		    	= 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH WORKLIST_PRT_DTL_CUR INTO
+		:d_prt_cup_no,       
+		:d_prt_specimen_no,  
+		:d_prt_patient_id,
+		:d_print_cup_indicator,
+		:d_prt_test_1_yn,
+		:d_prt_test_2_yn,
+		:d_prt_test_3_yn,
+		:d_prt_test_4_yn,
+		:d_prt_test_5_yn,
+		:d_prt_test_6_yn,
+		:d_prt_test_7_yn,
+		:d_prt_test_8_yn,
+		:d_prt_test_9_yn,
+		:d_prt_test_10_yn,
+		:d_prt_test_11_yn,
+		:d_prt_test_12_yn,
+		:d_prt_test_13_yn,
+		:d_prt_test_14_yn,
+		:d_prt_test_15_yn,
+		:d_prt_test_16_yn,
+		:d_prt_test_17_yn,
+		:d_prt_test_18_yn,
+		:d_prt_test_19_yn,
+		:d_prt_test_20_yn,
+		:d_prt_test_21_yn,
+		:d_prt_test_22_yn,
+		:d_prt_test_23_yn,
+		:d_prt_test_24_yn,
+		:d_prt_test_25_yn;
+
+#ifdef DEBUG
+         printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+#endif
+
+
+  if (NODATAFOUND)
+    return 0;
+
+
+  d_prt_specimen_no.arr[d_prt_specimen_no.len]			= '\0';
+  d_prt_patient_id.arr[d_prt_patient_id.len]			= '\0';
+  d_print_cup_indicator.arr[d_print_cup_indicator.len]          = '\0';
+
+
+#ifdef DEBUG 
+   printf("********* Details from RL_WORKLIST_DTL******************\n");
+   printf(" d_prt_cup_no        = %d\n",d_prt_cup_no);
+   printf(" d_prt_specimen_no   = <%s>\n",d_prt_specimen_no.arr);
+   printf(" d_prt_patient_id    = %s\n",d_prt_patient_id.arr);
+   printf(" d_prt_test_1_yn     = %c\n",d_prt_test_1_yn);
+   printf(" d_prt_test_2_yn     = %c\n",d_prt_test_2_yn);
+   printf(" d_prt_test_3_yn     = %c\n",d_prt_test_3_yn);
+   printf(" d_prt_test_4_yn     = %c\n",d_prt_test_4_yn);
+   printf(" d_prt_test_5_yn     = %c\n",d_prt_test_5_yn);
+   printf(" d_prt_test_6_yn     = %c\n",d_prt_test_6_yn);
+   printf(" d_prt_test_7_yn     = %c\n",d_prt_test_7_yn);
+   printf(" d_prt_test_8_yn     = %c\n",d_prt_test_8_yn);
+   printf(" d_prt_test_9_yn     = %c\n",d_prt_test_9_yn);
+   printf(" d_prt_test_10_yn     = %c\n",d_prt_test_10_yn);
+   printf(" d_prt_test_11_yn     = %c\n",d_prt_test_11_yn);
+   printf(" d_prt_test_12_yn     = %c\n",d_prt_test_12_yn);
+   printf(" d_prt_test_13_yn     = %c\n",d_prt_test_13_yn);
+   printf(" d_prt_test_14_yn     = %c\n",d_prt_test_14_yn);
+   printf(" d_prt_test_15_yn     = %c\n",d_prt_test_15_yn);
+   printf(" d_prt_test_16_yn     = %c\n",d_prt_test_16_yn);
+   printf(" d_prt_test_17_yn     = %c\n",d_prt_test_17_yn);
+   printf(" d_prt_test_18_yn     = %c\n",d_prt_test_18_yn);
+   printf(" d_prt_test_19_yn     = %c\n",d_prt_test_19_yn);
+   printf(" d_prt_test_20_yn     = %c\n",d_prt_test_20_yn);
+   printf(" d_prt_test_21_yn     = %c\n",d_prt_test_21_yn);
+   printf(" d_prt_test_22_yn     = %c\n",d_prt_test_22_yn);
+   printf(" d_prt_test_23_yn     = %c\n",d_prt_test_23_yn);
+   printf(" d_prt_test_24_yn     = %c\n",d_prt_test_24_yn);
+   printf(" d_prt_test_25_yn     = %c\n",d_prt_test_25_yn);
+#endif
+
+#ifdef DEBUG
+   printf("********* Details from RL_WORKLIST_DTL******************\n");
+   printf(" length of specimen  = %d\n",d_prt_specimen_no.len);
+#endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_prt_specimen_cur() occured....\n");
+   proc_exit();
+
+}
+
+
+
+/* to initialize worklist array with some default value */
+void initialize_worklist_array()
+{
+  int    i;
+
+  for (i=0;i<25;i++)
+  {
+    strcpy(worklist_test[i], "     ");
+    strcpy(worklist_ind[i]," ");
+    chk_mand_test[i]=' ';
+  }
+
+}
+
+
+/* to copy the worklist test indicators array to some dummy array     */
+/* before checking whether all tests is there in specimen     */
+void copy_dummy_array()                 
+{
+  int    i;
+
+  for (i=0;i<d_no_of_tests;i++)
+  {
+    /*dummy_test_array[i]=chk_mand_test[i]; */
+    mandatory_ind[i] = ' ';
+    dummy_test_array[i]='N';
+  }
+
+}
+
+/* print the master record */
+void print_master_rec(afp)
+FILE *afp;
+{
+  int    i;
+  int    j;
+  char l_str[2];
+
+  fprintf(afp,"\n");
+  fprintf(afp,"%-10s WORKLIST",nd_worklist_name.arr);
+  fprintf(afp,"\n");
+  fprintf(afp,"WORKLIST NUMBER : %-5d   ", nd_worklist_no);
+  fprintf(afp,"DATE : %-10s        ", nd_worklist_date.arr);
+
+  EXEC SQL SELECT USER INTO :nd_user_id FROM DUAL;
+  nd_user_id.arr[nd_user_id.len]   =  '\0';
+
+  d_added_by_id.arr[0] = '\0';
+  d_added_by_id.len    = 0;
+  EXEC SQL SELECT ADDED_BY_ID into :d_added_by_id
+	     FROM RL_WORKLIST_HDR
+            WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+			AND SECTION_CODE  = :nd_section_code 
+	        AND WORKLIST_NAME = :nd_worklist_name
+	        AND WORKLIST_NO   = :nd_worklist_no
+	        AND TRUNC(WORKLIST_DATE) = TO_DATE(:nd_worklist_date,
+						  'DD/MM/YYYY');
+  d_added_by_id.arr[d_added_by_id.len] = '\0';
+
+  fprintf(afp,"CREATED BY : %-20s ",d_added_by_id.arr);
+
+  if(strcmp(rp_reprint.arr,"REPRINT") == 0)
+     fprintf(afp,"REPRINTED ON : %-10s",d_sysdate.arr);
+  else
+     fprintf(afp,"  PRINTED ON : %-10s",d_sysdate.arr);
+     
+  fprintf(afp," ");
+  fprintf(afp,"PAGE : %4d", page_no);               
+  if(tests_on_page > 16)
+     fprintf(afp," B");
+  else
+     fprintf(afp," A");
+  fprintf(afp,"\n\n");
+  i = no_of_tests;
+  line_no += 12;
+  /***** IF THE TESTS HAS TO PRINT IN THE RIGHT SIDE
+	    THE NEXT PORTION (NEWLY ADDED PART)  HAS TO BE COMMENTED
+		OTHER WISE IT WILL PRINT IN LEFT SIDE
+		VERY NEXT TO LAST COLUMN OF 
+        LINE 1   ******/
+/********* N E W L Y A D D E D *******/
+sorting();
+j = 15;
+while(j >= 0)
+{
+	
+	if (num[j] == 1)
+	{
+	    tests = 0;
+		tests = cou[j];
+		tot_tests = get_col_length(j);
+		tests = tests + tot_tests + 1;
+		break;
+	
+	}
+
+	j--;
+
+}
+/********  UPTO HERE  FOR TEST CODE PRINTING IN LEFT SIDE ******/
+
+/***** THIS COMMENTED PORTION HAS TO MAKE EFFECTIVE
+		IF THE TESTS HAS TO PRINT IN RIGHT SIDE *****/ 
+
+/*
+  if (d_no_of_tests > 16)
+	  tests = 132 - ((16 * 6) - 1);
+  else
+      tests = 132 - ((d_no_of_tests * 6) - 1);
+*/
+
+
+  for (j=0;j<5;j++)
+  {
+/*    fprintf(afp,"                                        ");*/
+
+	 fprintf(afp, "%*.*s", tests, tests, "");
+
+    for (no_of_tests = i ; no_of_tests < tests_on_page ; no_of_tests++)
+    {
+      sprintf(l_str,"%c",worklist_test[no_of_tests][j]);
+      fprintf(afp,"%1s     ",l_str);
+    }
+    fprintf(afp,"\n");
+  }
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_master_rec() occured....\n");
+   proc_exit();
+}
+
+
+/******** GETTING COLUMN LENGTH   ********/
+int get_col_length(col_no)
+int col_no ;
+{
+
+ int str_len = 0;
+ 
+ if (strcmp(str_word[col_no],"nd_cup_number") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 3)
+   	   return str_len;
+	else 
+	   return 3 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_cup_indr") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 1)
+   	   return str_len;
+	else 
+	   return 1 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_wl_marker") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 1)
+   	   return str_len;
+	else 
+	   return 1 ;
+ }
+ 
+ else if (strcmp(str_word[col_no],"nd_spec_no") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 9)
+   	   return str_len;
+	else 
+	   return 9 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_pat_id") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 30)
+   	   return str_len;
+	else 
+	   return 30 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_pat_name") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 30)
+   	   return str_len;
+	else 
+	   return 30 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_age") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 9)
+   	   return str_len;
+	else 
+	   return 9 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_dob") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 10)
+   	   return str_len;
+	else 
+	   return 10 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_sex") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 1)
+   	   return str_len;
+	else 
+	   return 1 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_source") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 4)
+   	   return str_len;
+	else 
+	   return 4 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_consultant") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 6)
+   	   return str_len;
+	else 
+	   return 6 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_urgency") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 1)
+   	   return str_len;
+	else 
+	   return 1 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_comm_1") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 40)
+   	   return str_len;
+	else 
+	   return 40 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_comm_2") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 40)
+   	   return str_len;
+	else 
+	   return 40 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_comm_3") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 40)
+   	   return str_len;
+	else 
+	   return 40 ;
+ }
+ else if (strcmp(str_word[col_no],"nd_spec_date") == 0)
+ {
+    str_len = strlen(word[col_no]);
+    if (str_len > 19)
+   	   return str_len;
+	else 
+	   return 19 ;
+ }
+
+}
+
+/* to print the detailed record */
+void print_detl_rec()
+{ 
+    void print_detl_line(FILE *);
+	void print_detl(FILE *);
+	void print_all_tests(FILE *);		
+    int i;
+    int j = 0;
+    int  get_in_patient_dtl();
+	void get_general_patient_dtl(),
+	 get_referral_patient_dtl();
+
+
+
+    d_source_code.arr[0]		 		= '\0';
+    d_source_code.len		 			= 0;
+	d_consultant_code.arr[0]				= '\0';
+	d_consultant_code.len				= 0;
+	d_urgent_indicator.arr[0]				= '\0';
+	d_urgent_indicator.len				= 0;
+	d_request_comment_code1.arr[0] 		= '\0';
+	d_request_comment_code1.len			= 0;
+	d_request_comment_code2.arr[0] 		= '\0';
+	d_request_comment_code2.len			= 0;
+	d_request_comment_code3.arr[0] 		= '\0';
+	d_request_comment_code3.len			= 0;
+
+    d_episode_type.arr[0]                               = '\0';
+    d_episode_type.len                                  = 0;
+    d_spec_regd_date_time.arr[0]                        = '\0';
+    d_spec_regd_date_time.len                           = 0;
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SOURCE_CODE,
+		    EPISODE_TYPE,
+			CONSULTANT_CODE,
+			URGENT_INDICATOR,
+			REQUEST_COMMENT_CODE1,
+			REQUEST_COMMENT_CODE2,
+			REQUEST_COMMENT_CODE3,
+		    TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM/YYYY HH24:MI')
+	       INTO :d_source_code,
+		    :d_episode_type,
+			:d_consultant_code,
+			:d_urgent_indicator,
+			:d_request_comment_code1,
+			:d_request_comment_code2,
+			:d_request_comment_code3,
+		    :d_spec_regd_date_time
+	       FROM RL_REQUEST_HEADER   
+	       WHERE PATIENT_ID  = :d_prt_patient_id  
+		   AND SPECIMEN_NO = :d_prt_specimen_no
+		   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+    
+    d_source_code.arr[d_source_code.len] 		= '\0';
+    d_episode_type.arr[d_episode_type.len]              = '\0';
+    d_spec_regd_date_time.arr[d_spec_regd_date_time.len]= '\0';
+	d_consultant_code.arr[d_consultant_code.len] = '\0';
+	d_urgent_indicator.arr[d_urgent_indicator.len] ='\0';
+	d_request_comment_code1.arr[d_request_comment_code1.len] = '\0';
+	d_request_comment_code2.arr[d_request_comment_code2.len] = '\0';
+	d_request_comment_code3.arr[d_request_comment_code3.len] = '\0';
+
+    d_short_name.arr[0]		 			= '\0';
+    d_date_of_birth.arr[0]		 		= '\0';
+    d_nation.arr[0]                                     = '\0';
+
+    d_short_name.len		 			= 0;
+    d_date_of_birth.len                		    	= 0;
+    d_nation.len                                        = 0;
+
+	get_request_comment1();
+	get_request_comment2(); 
+ 	get_request_comment3(); 
+
+/************ ACTUAL ROYAL VERSION
+    if(strcmp(d_episode_type.arr,"I")==0 || strcmp(d_episode_type.arr,"O")==0
+		|| strcmp(d_episode_type.arr,"H")==0)
+    {
+       i = get_in_patient_dtl();
+       if(i==0)
+	 get_general_patient_dtl();
+    }
+    else
+       if(strcmp(d_episode_type.arr,"R")==0) 
+         get_referral_patient_dtl();
+**************/
+
+/** ACTUAL S.A VERSION  ****/
+if(   strcmp(d_episode_type.arr,"I")==0 
+	   || strcmp(d_episode_type.arr,"O")==0
+	   || strcmp(d_episode_type.arr,"H")==0 )
+    {
+       i = get_in_patient_dtl();
+       
+    }
+    else
+       if(strcmp(d_episode_type.arr,"R")==0) 
+         get_referral_patient_dtl();
+
+
+    no_of_tests = 16;
+    test_ctr=0;
+    print_detl_line(f1);
+    no_of_tests = 25;
+    if(d_no_of_tests > 16) 
+       print_detl_line(f2);
+
+    print_all_tests(f1);
+
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_detl_rec() occured....\n");
+   proc_exit();
+}
+
+/*
+void print_detl_rec()
+{ 
+    void print_detl_line(FILE *);
+	void print_detl(FILE *);
+	void print_all_tests(FILE *);		
+    int i;
+    int j = 0;
+    int  get_in_patient_dtl();
+    void get_general_patient_dtl(),
+	 get_referral_patient_dtl();
+
+    d_source_code.arr[0]		 		= '\0';
+    d_source_code.len		 			= 0;
+    d_episode_type.arr[0]                               = '\0';
+    d_episode_type.len                                  = 0;
+    d_spec_regd_date_time.arr[0]                        = '\0';
+    d_spec_regd_date_time.len                           = 0;
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SOURCE_CODE,
+		    EPISODE_TYPE,
+		    TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM')
+	       INTO :d_source_code,
+		    :d_episode_type,
+		    :d_spec_regd_date_time
+	       FROM RL_REQUEST_HEADER   
+	       WHERE PATIENT_ID  = :d_prt_patient_id  
+		   AND SPECIMEN_NO = :d_prt_specimen_no
+		   AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+    
+    d_source_code.arr[d_source_code.len] 		= '\0';
+    d_episode_type.arr[d_episode_type.len]              = '\0';
+    d_spec_regd_date_time.arr[d_spec_regd_date_time.len]= '\0';
+
+    d_short_name.arr[0]		 			= '\0';
+    d_date_of_birth.arr[0]		 		= '\0';
+    d_nation.arr[0]                                     = '\0';
+
+    d_short_name.len		 			= 0;
+    d_date_of_birth.len                		    	= 0;
+    d_nation.len                                        = 0;
+
+	get_request_comment1();
+	get_request_comment2(); 
+ 	get_request_comment3();
+
+	if(strcmp(d_episode_type.arr,"I")==0 || strcmp(d_episode_type.arr,"O")==0 || strcmp(d_episode_type.arr,"H")==0)
+    {
+       i = get_in_patient_dtl();
+       
+    }
+    else
+       if(strcmp(d_episode_type.arr,"R")==0) 
+         get_referral_patient_dtl();
+
+    no_of_tests = 16;
+    test_ctr=0;
+    print_detl_line(f1);
+    no_of_tests = 25;
+    if(d_no_of_tests > 16) 
+       print_detl_line(f2);
+return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at print_detl_rec() occured....\n");
+   proc_exit();
+}
+*/
+
+void get_request_comment1()
+{
+
+ d_request_comment_desc1.arr[0] = '\0';
+ d_request_comment_desc1.len = 0;
+                                                                                                            
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT request_comment
+               INTO :d_request_comment_desc1
+			FROM RL_REQUEST_COMMENT_CODE
+                        WHERE section_code = :nd_section_code
+						AND request_comment_code =
+						 :d_request_comment_code1 ;
+						
+
+    d_request_comment_desc1.arr[d_request_comment_desc1.len] = '\0';
+
+	
+	return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_request_comment1() occured....\n");
+   proc_exit();
+}
+
+void get_request_comment2()
+{
+
+ d_request_comment_desc2.arr[0] = '\0';
+ d_request_comment_desc2.len = 0;
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT REQUEST_COMMENT
+               INTO :d_request_comment_desc2
+			FROM RL_REQUEST_COMMENT_CODE
+			WHERE request_comment_code = 
+                                :d_request_comment_code2
+                         AND section_code =  :nd_section_code;
+
+    d_request_comment_desc2.arr[d_request_comment_desc2.len] = '\0';
+
+	return ;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_request_comment2() occured....\n");
+   proc_exit();
+}
+
+void get_request_comment3()
+{
+
+ d_request_comment_desc3.arr[0] = '\0';
+ d_request_comment_desc3.len = 0;
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT REQUEST_COMMENT
+               INTO :d_request_comment_desc3
+			FROM RL_REQUEST_COMMENT_CODE
+			WHERE request_comment_code = 
+                                :d_request_comment_code3
+                         AND section_code =  :nd_section_code;
+
+    d_request_comment_desc3.arr[d_request_comment_desc3.len] = '\0';
+
+	return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_request_comment3() occured....\n");
+   proc_exit();
+}
+
+int space_or_line(prt_yn,ind)
+char prt_yn;
+char ind;
+{
+    test_ctr++;
+    if(prt_yn == 'Y')
+       return 1;
+    else
+    {
+       if(prt_yn == 'N') 
+       {
+    	  if(ind == 'O' || ind == 'M')
+	     return 0;
+          else
+             return 1;
+       }
+    }
+}
+
+void get_test_result(i)
+int i;
+{
+   t_worklist_test.arr[0] = '\0';
+   t_numeric_result.arr[0] = '\0';
+   t_result_comment.arr[0] = '\0';
+   t_worklist_test.len = 0;
+   t_numeric_result.len = 0;
+   t_result_comment.len = 0;
+   strcpy(t_worklist_test.arr,worklist_test[i]);
+   t_worklist_test.len = strlen(t_worklist_test.arr);
+   if(print_line && (strcmp(t_worklist_test.arr,"     ") != 0))
+      strcpy(uline,"_____");
+   else
+      strcpy(uline,"     ");
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+ if(strcmp(t_worklist_test.arr,"     ") != 0)
+ {
+   EXEC SQL SELECT NUMERIC_RESULT,RESULT_COMMENT_CODE1 
+	      INTO :t_numeric_result,:t_result_comment
+	      FROM RL_TEST_RESULT
+             WHERE PATIENT_ID  = :d_prt_patient_id
+	         AND SPECIMEN_NO = :d_prt_specimen_no
+             AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+	         AND TEST_CODE   = :t_worklist_test;
+
+   t_numeric_result.arr[t_numeric_result.len] = '\0';
+   t_result_comment.arr[t_result_comment.len] = '\0';
+ }
+/*   printf("t_worklist_test = %s l = %d t_numeric_result = %s l = %d  t_result_comment = %s l = %d \n",t_worklist_test.arr,t_worklist_test.len,
+t_numeric_result.arr,t_numeric_result.len,
+t_result_comment.arr,t_result_comment.len);
+getchar(); */
+   if(t_numeric_result.len)
+      strcpy(uline,t_numeric_result.arr);
+   else
+      if(t_result_comment.len)
+         strcpy(uline,t_result_comment.arr);
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_test_result() occured....\n");
+   proc_exit();
+}
+
+void print_detl_line(afp)
+FILE *afp;
+{
+	/*void get_test_result();
+	void open_request_detail_cur();
+    int fetch_request_detail_cur();
+    void close_request_detail_cur();
+    int space_or_line();
+    int i=0,r=0;*/
+
+	print_dtl(afp);
+
+    /*
+	fprintf(afp,"%3d ", d_prt_cup_no);
+    fprintf(afp,"%c",d_print_cup_indicator.arr[0]);
+    fprintf(afp," %-10s",d_prt_specimen_no.arr);
+    fprintf(afp,"%-13s",d_prt_patient_id.arr);
+    fprintf(afp,"%-5s      ", d_source_code.arr);
+
+  if( no_of_tests < 25 )
+  { 
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_1_yn,worklist_ind[0][0]);
+    get_test_result(0);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_2_yn,worklist_ind[1][0]);
+    get_test_result(1);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_3_yn,worklist_ind[2][0]);
+    get_test_result(2);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_4_yn,worklist_ind[3][0]);
+    get_test_result(3);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_5_yn,worklist_ind[4][0]);
+    get_test_result(4);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_6_yn,worklist_ind[5][0]);
+    get_test_result(5);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_7_yn,worklist_ind[6][0]);
+    get_test_result(6);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_8_yn,worklist_ind[7][0]);
+    get_test_result(7);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_9_yn,worklist_ind[8][0]);
+    get_test_result(8);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_10_yn,worklist_ind[9][0]);
+    get_test_result(9);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_11_yn,worklist_ind[10][0]);
+    get_test_result(10);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_12_yn,worklist_ind[11][0]);
+    get_test_result(11);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_13_yn,worklist_ind[12][0]);
+    get_test_result(12);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_14_yn,worklist_ind[13][0]);
+    get_test_result(13);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_15_yn,worklist_ind[14][0]);
+    get_test_result(14);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_16_yn,worklist_ind[15][0]);
+    get_test_result(15);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+   }
+   else
+   {
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_17_yn,worklist_ind[16][0]);
+    get_test_result(16);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_18_yn,worklist_ind[17][0]);
+    get_test_result(17);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_19_yn,worklist_ind[18][0]);
+    get_test_result(18);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_20_yn,worklist_ind[19][0]);
+    get_test_result(19);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_21_yn,worklist_ind[20][0]);
+    get_test_result(20);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_22_yn,worklist_ind[21][0]);
+    get_test_result(21);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_23_yn,worklist_ind[22][0]);
+    get_test_result(22);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_24_yn,worklist_ind[23][0]);
+    get_test_result(23);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_25_yn,worklist_ind[24][0]);
+    get_test_result(24);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       fprintf(afp,"%-6s",uline);
+  }
+    fprintf(afp,"\n");
+  
+    fprintf(afp,"      %5s ",d_spec_regd_date_time.arr);
+    fprintf(afp,"%-15s %-10s", d_short_name.arr,d_date_of_birth.arr);
+    fprintf(afp,"\n");
+
+    fprintf(afp,"      ");
+    open_request_detail_cur();
+    r = fetch_request_detail_cur();
+    while(r)
+    {
+       fprintf(afp,"%-5.5s ",d_req_dtl_test.arr);
+       r = fetch_request_detail_cur();
+    }
+    fprintf(afp,"\n");
+    line_no++;
+    close_request_detail_cur();
+    for (i=0;i<d_line_spacing;i++)
+      fprintf(afp,"\n");
+	*/
+}
+
+/* Function to fetch the GENERAL PATIENT details */
+void get_general_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(SHORT_NAME,1,15),
+		   TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NATIONALITY_CODE,
+		   SEX 
+	      INTO :d_short_name, 
+		   :d_date_of_birth,
+		   :d_nation,
+		   :d_sex
+              FROM MP_PATIENT_MAST 
+	     WHERE PATIENT_ID = :d_prt_patient_id;
+
+  d_short_name.arr[d_short_name.len]     = '\0';
+  d_date_of_birth.arr[d_date_of_birth.len]                       = '\0';
+  d_nation.arr[d_nation.len]                 = '\0';
+  d_sex.arr[d_sex.len]					= '\0';
+
+  patient_age();
+
+  #ifdef DEBUG
+   printf("d_short_name= %s\n", d_short_name.arr);
+  #endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_general_patient_dtl() occured....\n");
+   proc_exit();
+}
+
+/* Function to fetch the REFERRAL PATIENT details */
+void get_referral_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(SHORT_NAME,1,15), 
+		   TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NATIONALITY_CODE,
+		   SEX
+	      INTO :d_short_name,
+		   :d_date_of_birth,
+		   :d_nation,
+		   :d_sex
+          FROM RL_PATIENT_MAST 
+	      WHERE PATIENT_ID = :d_prt_patient_id;
+		  /* AND OPERATING_FACILITY_ID = :nd_operating_facility_id;*/
+
+  d_short_name.arr[d_short_name.len]     = '\0';
+  d_date_of_birth.arr[d_date_of_birth.len]                       = '\0';
+  d_nation.arr[d_nation.len]                 = '\0';
+  d_sex.arr[d_sex.len]					= '\0';
+
+  patient_age();
+
+  #ifdef DEBUG
+   printf("d_short_name= %s\n", d_short_name.arr);
+  #endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_referral_patient_dtl() occured....\n");
+   proc_exit();
+}
+
+/* Function to fetch the INPATIENT details */
+int get_in_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SUBSTR(SHORT_NAME,1,15),
+		   TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NATIONALITY_CODE ,
+		   SEX
+	      INTO :d_short_name,
+		   :d_date_of_birth,
+		   :d_nation,
+		   :d_sex
+              FROM MP_PATIENT_MAST 
+	     WHERE PATIENT_ID = :d_prt_patient_id;
+
+  if (NODATAFOUND)
+    return 0;
+  d_short_name.arr[d_short_name.len]     = '\0';
+  d_date_of_birth.arr[d_date_of_birth.len]                       = '\0';
+  d_nation.arr[d_nation.len]                 = '\0';
+  d_sex.arr[d_sex.len]					= '\0';
+
+  patient_age();
+
+  #ifdef DEBUG
+   printf("d_short_name= %s\n", d_short_name.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_in_patient_dtl() occured....\n");
+   proc_exit();
+}
+
+
+/* print the heading */
+void print_col_heading(afp)
+FILE *afp;
+{
+ prepare_heading(afp);
+
+ /*
+ fprintf(afp,"\n");
+ fprintf(afp,"CUP   SPECIMEN  HOSPITAL NO. SRCE \n");
+ fprintf(afp,"------------------------------------------------------------");
+ fprintf(afp,"------------------------------------------------------------");
+ fprintf(afp,"----------------");
+ fprintf(afp,"\n");
+ */
+
+}
+
+
+
+/* to print the last line of the report */
+void print_footer_rec(afp)
+FILE *afp;
+{
+/*  fprintf(afp,"\n\n\n");*/
+  fprintf(afp,"------------------------------------------------------------");
+  fprintf(afp,"------------------------------------------------------------");
+  fprintf(afp,"----------------");
+  fprintf(afp,"\n\n");
+  fprintf(afp,"ENTERED BY : ________________________________________       ");
+  fprintf(afp,"DATE : _________");
+  fprintf(afp,"\n");
+  fprintf(afp,"------------------------------------------------------------");
+  fprintf(afp,"------------------------------------------------------------");
+  fprintf(afp,"----------------");
+
+}
+
+
+
+/* to print the last line of the report */
+void end_report(afp)
+FILE *afp;
+{
+  fprintf(afp,"\n");
+  fprintf(afp,"");
+}
+
+gen_file_name()
+{
+ 	 strcpy(nd_file_name.arr,WORKING_DIR) ;
+     nd_file_name.len = strlen(nd_file_name.arr);
+	 strcat(nd_file_name.arr,"rlrwlre1.lis");
+	 nd_file_name.len = strlen(nd_file_name.arr);
+	 if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit();
+     }
+   else
+   {
+	     fprintf(f1,"%c&|26A",ESC);
+		 fprintf(f1,"%c&a90P",ESC);
+	     fprintf(f1,"%c&|1O",ESC);
+	     fprintf(f1,"%c&k4S",ESC);
+   }
+}
+
+
+increment_file_no()
+{
+/* EXEC SQL UPDATE RL_PARAM
+		 SET PRINT_FILE_NO = NVL(PRINT_FILE_NO,0) + 1;*/
+
+if (OERROR)
+       disp_message(ERR_MESG,"Update failed on table RL_PARAM");
+
+EXEC SQL COMMIT WORK;
+      if (OERROR)
+         disp_message(ERR_MESG,"COMMIT failed");
+}
+
+/*------------------ REVERSE SORT ARRAY ------------------*/
+void reverse_sort()
+{
+
+  for(i=0;i<16;i++)
+  {
+    if (strcmp(str_word[i],"nd_cup_number") == 0)
+		strcpy(detail[i], d_prt_cup_no.arr);	
+	else if(strcmp(str_word[i],"nd_cup_indr") == 0) 
+		strcpy(detail[i], d_print_cup_indicator.arr);
+    else if(strcmp(str_word[i],"nd_wl_marker") == 0) 
+		strcpy(detail[i], d_pat_mark.arr);
+	else if(strcmp(str_word[i],"nd_spec_no") == 0) 
+		strcpy(detail[i], d_prt_specimen_no.arr);
+	else if(strcmp(str_word[i],"nd_pat_id") == 0) 
+		strcpy(detail[i], d_prt_patient_id.arr);
+	else if(strcmp(str_word[i],"nd_pat_name") == 0) 
+		strcpy(detail[i], d_short_name.arr);
+	else if(strcmp(str_word[i],"nd_age") == 0) 
+		strcpy(detail[i], t_age.arr);
+	else if(strcmp(str_word[i],"nd_dob") == 0) 
+		strcpy(detail[i], d_date_of_birth.arr);
+	else if(strcmp(str_word[i],"nd_sex") == 0) 
+		strcpy(detail[i], d_sex.arr);
+	else if(strcmp(str_word[i],"nd_source") == 0) 
+		strcpy(detail[i], d_source_code.arr);
+	else if(strcmp(str_word[i],"nd_consultant") == 0) 
+		strcpy(detail[i], d_consultant_code.arr);
+	else if(strcmp(str_word[i],"nd_urgency") == 0) 
+		strcpy(detail[i], d_urgent_indicator.arr);
+	else if(strcmp(str_word[i],"nd_comm_1") == 0) 
+		strcpy(detail[i], d_request_comment_desc1.arr);
+	else if(strcmp(str_word[i],"nd_comm_2") == 0) 
+		strcpy(detail[i], d_request_comment_desc2.arr);
+	else if(strcmp(str_word[i],"nd_comm_3") == 0) 
+		strcpy(detail[i], d_request_comment_desc3.arr);
+	else if(strcmp(str_word[i],"nd_spec_date") == 0) 
+		strcpy(detail[i], d_spec_regd_date_time.arr);
+  }
+
+
+}
+
+/*------------------ S O R T I N G ------------------*/
+void sorting()
+{
+	maxx = num[0] ;
+
+	for(i=0;i<16;i++)
+	{
+		for(j=i+1;j<16;j++)
+		{
+			if (((num[j] < num[i]) || (num[i] == 0))  && (num[j] > 0))
+			{
+				total  = num[i];
+				num[i] = num[j];
+				num[j] = total;
+
+				total  = cou[i];
+				cou[i] = cou[j];
+				cou[j] = total;
+			
+				strcpy(temp_word,word[i]);
+				strcpy(word[i], word[j]);
+				strcpy(word[j], temp_word);
+
+				strcpy(temp_word,detail[i]);
+				strcpy(detail[i], detail[j]);
+				strcpy(detail[j], temp_word);
+
+				strcpy(temp_word,str_word[i]);
+				strcpy(str_word[i], str_word[j]);
+				strcpy(str_word[j], temp_word);
+
+
+			}
+			else if (num[j] > num[i])
+			  maxx = num[j];
+		
+		}	
+	
+	}
+
+
+	for(i=0;i<16;i++)
+	{
+		for(j=i+1;j<16;j++)
+		{
+			if ((num[j] == num[i]) && (num[j] > 0))
+			{
+				if (((cou[j] < cou[i]) || (cou[i] == 0)) && (cou[j] > 0))
+				{
+				   total = cou[i];
+				   cou[i] = cou[j];
+				   cou[j] = total;
+
+				   strcpy(temp_word,word[i]);
+				   strcpy(word[i], word[j]);
+				   strcpy(word[j], temp_word);
+
+				   strcpy(temp_word,detail[i]);
+				   strcpy(detail[i], detail[j]);
+				   strcpy(detail[j], temp_word);
+
+				   strcpy(temp_word,str_word[i]);
+			  	   strcpy(str_word[i], str_word[j]);
+				   strcpy(str_word[j], temp_word);
+
+				}
+
+			}
+		
+		}	
+	
+	}
+
+	
+}
+
+/*-----------------------------------------------------*/
+void print_dtl(afp)
+FILE *afp;
+{
+
+	char fl_ag[3];
+	total = 0;
+	ctr   = 1;
+	strcpy(fl_ag, "F");
+	reverse_sort();
+	sorting();
+
+	for(i=1;i<=16;i++)
+	{
+
+	 
+	   k = i;
+
+	   for (j=0;j<16;j++)
+	   {
+		
+		  
+	      if (num[j] == ctr)
+	      {
+
+			  str_len = strlen(detail[j])  ;
+
+/*			  if ((strcmp(fl_ag,"F") == 0) && (str_len > 0) )*/
+		/**** CHANGED ON 13/12/1999 BECAUSE PREVIOUS COMMENTED IS FAILING
+			  BECAUSE OF VALUE IN str_len can be null AND
+			  IT WILL NOT SKIP THE LINE *****/
+
+			  if ((strcmp(fl_ag,"F") == 0))
+			  	strcpy(fl_ag, "T");
+			
+			  									 		
+			  if ((j > 0) && (num[j - 1] == num[j]))
+			  {
+			      total = cou[j - 1] ;
+			       str_len = strlen(detail[j - 1])  ;
+			  }
+			
+			  if ((j > 0) && (num[j - 1] == num[j]) > 0)
+			  {
+			     fprintf(afp,"%*s",(cou[j]   - (total + str_len)),"");
+  		         fprintf(afp,"%s", detail[j]);
+                     /*
+				 stimulate = (cou[j]   - (total + str_len));
+				 stimulate = stimulate + strlen(detail[j] + 1) ;
+                      */
+                 tot_tests = get_col_length(j);
+                 stimulate = (cou[j]   + tot_tests);
+
+				 /***** IF THE TESTS HAS TO PRINT IN THE RIGHT SIDE
+					    THE NEXT LINE HAS TO BE COMMENTED
+						OTHER WISE IT WILL PRINT IN LEFT SIDE
+						VERY NEXT TO LAST COLUMN OF 
+						LINE 1   ******/
+
+                 stimulate = stimulate - (cou[j] + strlen(detail[j]));
+                                                
+			  }
+			  else
+			  {
+				fprintf(afp,"%*s", cou[j] - 1, "");
+				fprintf(afp,"%s", detail[j]);
+          /*
+				stimulate = (cou[j]   - 1);
+				stimulate = stimulate + strlen(detail[j] + 1) ;
+           */
+                tot_tests = get_col_length(j);
+                stimulate = (cou[j]   + tot_tests);
+
+		   /***** IF THE TESTS HAS TO PRINT IN THE RIGHT SIDE
+		  	    THE NEXT LINE HAS TO BE COMMENTED
+				OTHER WISE IT WILL PRINT IN LEFT SIDE
+				VERY NEXT TO LAST COLUMN OF 
+				LINE 1   ******/
+
+                stimulate = stimulate - (cou[j] + strlen(detail[j]));
+
+			  }
+			  
+
+			  k = j ;		   
+			  str_len = 0;
+
+ 	/*	     if ((strlen(detail[j]) > 0) && (flag = 'F') && (num[j] > 0))
+  			      flag = 'T';	  */
+
+			  
+	      }
+		
+      }
+	
+	   i = k;
+	   
+	   if ((num[i] > 0) && (maxx >= num[i]))
+	   {
+
+		  if (num[i] == 1)
+		  {
+
+			print_hyphen(afp);
+			stimulate = 0;
+		  }
+		  	
+	      if (strcmp(fl_ag,"T") == 0)
+		  {
+		    
+			fprintf(afp,"\n");
+		    line_no++;
+			strcpy(fl_ag, "F");
+		  }
+	      total = 0;
+
+
+	  }
+
+	   ctr = ctr + 1 ;
+	   strcpy(fl_ag,"F");
+
+	}
+
+}
+
+void print_hyphen(afp)
+FILE *afp;
+{
+	void get_test_result();
+	int space_or_line();
+        int i=0,r=0;
+
+  fprintf(afp," ");
+
+  /***** IF THE TESTS HAS TO PRINT IN THE RIGHT SIDE
+	    THE NEXT TWO LINES HAS TO BE COMMENTED
+		OTHER WISE IT WILL PRINT IN LEFT SIDE
+		VERY NEXT TO LAST COLUMN OF 
+		LINE 1   ******/
+
+  fprintf(afp," ");
+
+  tests = stimulate ;
+
+  /*** THIS COMMENT PORTION HAS TO BE REMOVED 
+     IT THE TESTS HAS TO PRINT IN THE RIGHT
+	 SIDE   *****/
+
+
+/*
+  if (d_no_of_tests > 16)
+       tests = (132 - ((16 * 6) - 1)) - stimulate ;
+  else
+       tests = (132 - ((d_no_of_tests * 6) - 1)) - stimulate ;
+*/
+
+
+  fprintf(afp, "%*.*s", tests, tests, "");
+  
+
+  if( no_of_tests < 25 )
+  { 
+  	print_line = 0;
+    print_line = space_or_line(d_prt_test_1_yn,worklist_ind[0][0]);
+    get_test_result(0);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+	   if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_2_yn,worklist_ind[1][0]);
+	get_test_result(1);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_3_yn,worklist_ind[2][0]);
+	get_test_result(2);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_4_yn,worklist_ind[3][0]);
+	get_test_result(3);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_5_yn,worklist_ind[4][0]);
+	get_test_result(4);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_6_yn,worklist_ind[5][0]);
+	get_test_result(5);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_7_yn,worklist_ind[6][0]);
+	get_test_result(6);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_8_yn,worklist_ind[7][0]);
+	get_test_result(7);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_9_yn,worklist_ind[8][0]);
+	get_test_result(8);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_10_yn,worklist_ind[9][0]);
+	get_test_result(9);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_11_yn,worklist_ind[10][0]);
+	get_test_result(10);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_12_yn,worklist_ind[11][0]);
+	get_test_result(11);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_13_yn,worklist_ind[12][0]);
+	get_test_result(12);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_14_yn,worklist_ind[13][0]);
+	get_test_result(13);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_15_yn,worklist_ind[14][0]);
+	get_test_result(14);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_16_yn,worklist_ind[15][0]);
+	get_test_result(15);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-5.5s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-5.5s",uline);
+   }
+   else
+   {
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_17_yn,worklist_ind[16][0]);
+	get_test_result(16);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_18_yn,worklist_ind[17][0]);
+	get_test_result(17);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_19_yn,worklist_ind[18][0]);
+	get_test_result(18);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_20_yn,worklist_ind[19][0]);
+	get_test_result(19);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_21_yn,worklist_ind[20][0]);
+	get_test_result(20);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_22_yn,worklist_ind[21][0]);
+	get_test_result(21);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_23_yn,worklist_ind[22][0]);
+	get_test_result(22);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+		fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_24_yn,worklist_ind[23][0]);
+	get_test_result(23);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+    print_line = 0;
+    print_line = space_or_line(d_prt_test_25_yn,worklist_ind[24][0]);
+	get_test_result(24);
+    if(print_line  &&  test_ctr <= d_no_of_tests)
+       fprintf(afp,"%-6s",uline);
+    else
+       if (d_no_of_tests >= test_ctr)
+          fprintf(afp,"%-6s",uline);
+  }
+  
+
+}
+
+/* ------------ P R I N T T E S T S --------*/
+void print_all_tests(f1)
+FILE *f1;
+{
+
+    void open_request_detail_cur();
+    int fetch_request_detail_cur();
+    void close_request_detail_cur();
+
+	int print_line = 0;
+    int i=0,r=0;
+
+    open_request_detail_cur();
+    r = fetch_request_detail_cur();
+    while(r)
+    {
+       fprintf(f1,"%-5.5s ",d_req_dtl_test.arr);
+       r = fetch_request_detail_cur();
+    }
+    fprintf(f1,"\n");
+    line_no++;
+    close_request_detail_cur();
+
+	return;
+
+}
+
+
+/*------------------ H E A D I N G ------------------*/
+void prepare_heading(afp)
+FILE *afp;
+{
+
+    char heading[60] ;
+	int length = 0;
+
+	sorting();
+
+		
+    total = 0;
+	ctr   = 1;
+
+	for(i=1;i<=16;i++)
+	{
+	 
+	   k = i;
+
+	   for (j=0;j<16;j++)
+	   {
+		
+		
+	      if (num[j] == ctr) 
+	      {
+					
+			  if ((j > 0) && (num[j - 1] == num[j]) > 0)
+			  {
+
+			      total = cou[j - 1] ;
+				  str_len = strlen(word[j - 1])  ;
+				  
+			  }
+			
+			  if ((j > 0) && (num[j - 1] == num[j]) > 0)
+			  {
+			     fprintf(afp,"%*s",(cou[j]   - (total + str_len)),"");
+  		         fprintf(afp,"%s", word[j]);
+			  }
+			  else
+			  {
+				fprintf(afp,"%*s", cou[j] - 1, "");
+				fprintf(afp,"%s", word[j]);
+			  }
+
+			  k = j ;		   
+			  str_len = 0;
+			  
+	      }
+
+		  
+
+      }
+	
+	   i = k;
+
+	   if ((num[i] > 0) && (num[i] <= maxx))
+	   {
+     
+		  fprintf(afp,"\n");
+	      fprintf(afp,"-----------------------------------");
+	      fprintf(afp,"-----------------------------------");
+	      fprintf(afp,"-----------------------------------");
+	      fprintf(afp,"---------------------------");
+	      fprintf(afp,"\n");
+		  total = 0;
+		  line_no += 2;
+
+	  }
+
+	   ctr = ctr + 1 ;
+
+	}
+
+
+	return ;
+}
+
+
+/*----------- S P A C I N G ------------*/
+void spacing(afp)
+FILE *afp;
+{
+	 
+    for (i=0;i<d_line_spacing;i++)
+      fprintf(afp,"\n");
+}
+
+/*-------------   Age of Patient in Years, Months, Days --------------*/
+
+ void patient_age()
+ {
+
+		 float  lone = 0;
+		 float  num1 = 0, yrs = 0, 
+				tmp_mths = 0, 
+				tmp_days = 0;
+
+		 char st_r[50];
+
+	today.arr[0] = '\0';
+	today.len = 0;
+
+	mths.arr[0]  = '\0';
+	mths.len  = 0;
+
+	
+	EXEC SQL SELECT TO_CHAR(SYSDATE,'DD/MM/YYYY') INTO :today
+            FROM DUAL;                                        
+
+    EXEC SQL SELECT ABS(MONTHS_BETWEEN(
+		TO_DATE(:today,'DD/MM/YYYY'), 
+		TO_DATE(:d_date_of_birth, 'DD/MM/YYYY')))
+			INTO :mt FROM DUAL;
+
+			sprintf(mths.arr,"%f",mt);
+			strcpy(mths1.arr, mths.arr);
+
+        	today.arr[today.len] = '\0';
+							
+			lone = atoi(strtok(mths1.arr, ".")) ;
+
+		   if (lone > 0) 
+		   {
+			  num1 = lone/12 ;
+			  sprintf(t_age.arr, "%f", num1);
+			  yrs = atoi(strtok(t_age.arr, ".")) ;
+		   }
+		   else
+			  yrs = 0;
+            
+			tmp_mths   = atoi(mths1.arr) - (yrs * 12) ;
+			sprintf(t_age.arr, "%f", tmp_mths);
+			tmp_mths   = atoi(strtok(t_age.arr, "."));
+
+			if ((tmp_mths == 0)  && (yrs ==0))
+			{
+
+				EXEC SQL SELECT TO_CHAR(ROUND((TO_DATE(:today,'DD/MM/YYYY') -
+					TO_DATE(:d_date_of_birth, 'DD/MM/YYYY')),3))
+					INTO :t_days FROM DUAL;
+
+					tmp_days = atoi(strtok(t_days.arr,"."));
+			}
+			else
+				tmp_days = (atof(mths.arr) - atoi(mths1.arr)) * 31 ;
+				
+			sprintf(st_r, "%f", yrs);
+			strcpy(t_age.arr, strtok(st_r, "."));
+			sprintf(st_r, " %f", tmp_mths);
+			strcat(t_age.arr, strtok(st_r, "."));
+			sprintf(st_r, " %f", tmp_days);
+			strcat(t_age.arr, strtok(st_r, "."));
+				
+ }
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

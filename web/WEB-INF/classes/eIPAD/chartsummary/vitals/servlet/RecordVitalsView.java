@@ -1,0 +1,82 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+package eIPAD.chartsummary.vitals.servlet;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import eIPAD.chartsummary.vitals.request.*;
+import eIPAD.chartsummary.vitals.response.*;
+import eIPAD.chartsummary.vitals.bc.*;
+import eIPAD.chartsummary.common.healthobject.PatContext;
+import eIPAD.chartsummary.common.constants.*;
+
+/**
+ * Servlet implementation class RecordVitalsView 
+ */
+public class RecordVitalsView extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public RecordVitalsView() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		HttpSession session = request.getSession(false);
+		PatContext patientContext = null;
+		VitalsRequest oVitalsReq = new VitalsRequest();
+		if(session.getAttribute("PatientContext") != null)
+		{
+			patientContext = (PatContext)session.getAttribute("PatientContext");
+		}
+		String path = LocalizationConstants.RECORD_VITALS_VIEW;
+		oVitalsReq.setPatientContext(patientContext);
+		VitalsPanelResponse oVitalsPanelResponse = null;
+		VitalsBC oVitalsBC = new VitalsBC();
+		try
+		{
+			oVitalsPanelResponse = oVitalsBC.getPanelConfig(oVitalsReq);
+			
+		}
+		catch(Exception e)
+		{
+			
+		}
+		finally
+		{
+			request.setAttribute("VitalsPanelResponse", oVitalsPanelResponse);
+			RequestDispatcher rd = getServletContext().getRequestDispatcher(path);
+			rd.forward(request, response);
+		}
+		
+		
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
+
+}

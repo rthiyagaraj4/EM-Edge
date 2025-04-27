@@ -1,0 +1,12 @@
+<!-- Target to create the eAE related jars-->
+	<target name="create-ae-jars" description="Create all the eAE related jars  ">
+		<!-- Create the JSP jar -->
+		<stopwatch name="build.timer" action="elapsed"/>
+		<echo>Creating eae-jsp-${today}.jar</echo>
+		<jar destfile="${eHIS.temp.dir}/eae-jsp-${today}.jar" basedir="${eHIS.jsp.deploy.dir}" 		includes="_eae\_jsp\*.class"/>
+		<!-- Create the Servlet jar -->
+		<stopwatch name="build.timer" action="elapsed"/>
+		<echo>Creating eae-servlet-${today}.jar</echo>
+		<jar destfile="${eHIS.temp.dir}/eae-servlet-${today}.jar" basedir="${eHIS.web.deploy.dir}" 		includes="eAE\**\*.class" excludes="**/resources/*" />
+	</target>
+=======================================================

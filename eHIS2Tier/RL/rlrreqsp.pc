@@ -1,0 +1,1657 @@
+/****************************OCS MEDICOM ver 1.0*****************************
+   File	: rlrreqsp.pc
+   Author : Ananthi
+   Date Created  : 27/4/2002
+
+*  Ver 1.10.01
+   Modified      : HAMEED
+   Reason        : eHIS Upgrade
+   Modified      : SHRUTI (04/09/2003)
+   Reason        : ordered_facility_id
+   
+*  Purpose : To print request slip 
+
+*  Input Parameters : 
+                      Command line inputs
+
+		              1. Usr_id/Password
+                      2. Session id
+		              3. Program Date
+
+                      Parameters from SY_PROG_PARAM table 
+                      4. Preferred range of Specimen Numbers. 
+
+*  Table Accessed : RL_REQUEST_HEADER,RL_REQUEST_DETAIL,
+  		            MP_PATIENT_MAST, RL_PATIENT_MAST,SY_PHYSICIAN_MAST,
+				    RL_CONSULTANTS,OP_CLINIC,IP_WARD,RL_REFERRAL
+
+*  Output File : rlrreqsp_NUMBER.lis
+ ****************************************************************************/  
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "gl.h"
+
+#define MAX_LINES 55
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define VER  "VER : 1.10.01\n"
+#define ONLINE_PRINTING 1
+#define ESC 0x1B
+//#define DEBUG
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+       /* increased the length all varchar variables by one to take care */
+       /* for null termination */
+		VARCHAR nd_operating_facility_id [3],
+		        uid_pwd		             [91],
+                nd_file_name             [151],
+                nd_user	                 [31],
+                nd_file_no               [15],
+                nd_printer_name          [16],
+                nd_assign_to             [31],
+		        nd_trx_ind		         [2], 
+
+
+        /* Variables to recieve data from specimen register cursor*/ 
+		d_section_code			[3],
+	    d_specimen_no           [21],
+        d_spec_regd_date        [16],
+		d_spec_regd_date1       [16],
+		nd_spec_regd_date       [11],
+		d_consultant_code       [16],
+		d_source_code           [12],
+		d_source_type           [2],
+		d_test_code             [11],
+		d_test_desc             [41],
+        d_result_status         [2],
+		d_patient_id            [31],
+        d_patient_name          [240],
+		d_episode_type          [2],
+		d_request_comment_desc1 [41],
+		d_request_comment_desc2 [41],
+		d_request_comment_desc3 [41],
+		d_source_desc           [100],  /*Modified By Manoj S for ML-MMOH-CRF-0752.6*/
+		d_consultant_name       [40],/*Modified By nandhini against ML-MMOH-CRF-862 on 25/Jan/2018*/
+		d_sex                   [3],
+		d_specimen_type_desc    [40],
+		d_specimen_type_code    [5],
+		d_clinical_hist         [12000],
+		d_date_of_birth		[11],
+		d_actual_dob        [2],
+		rl_ordered_facility_id	[3],
+
+			/*Added to print order comments in Request Slip   (25/06/2002)*/
+			
+			d_order_type_code		[3],
+			d_order_comment_field	[100],
+			d_order_id				[21],
+			d_order_comments		[12000],
+			d_category_code			[5],
+			d_category_year			[5],
+			d_category_number		[30],
+
+            /* input parameters to main() */
+                nd_session_id      	[16],
+		        nd_pgm_date	   	[20],
+
+		/* For Patient Age SYSDATE, MTHS */
+			today				[30],
+			t_days				[30],
+			mths				[30],
+			mths1				[30],
+			t_age				[30],
+
+					d_national_id_num[21],
+					d_alt_id1_reqd_yn[2],
+					d_alt_id2_reqd_yn[2],
+					d_alt_id3_reqd_yn[2],
+					d_alt_id4_reqd_yn[2],
+					d_alt_id_num [20],
+					sql_stmt     [1000],
+
+
+			/* for header routine */
+				//d_acc_entity_name        [61],
+				d_acc_entity_name        [300],
+				d_user                   [31],
+				d_sysdate                [17];
+
+	VARCHAR	    l_translated_value		[500],  //added for globalisation
+			    language_id				[5]; //added for globalisation
+
+	int     i; //added for globalisation
+
+
+float mt;
+
+char includ;
+
+int l_count = 0;
+int l_tab_exists =0;
+
+/*Added to print order comments in Request Slip   (25/06/2002)*/
+//char d_order_comments		[10000];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+char rep_title[45];
+
+int   line_no=0, page_no=0;
+int   first_page_flag=1;
+
+FILE *f1;
+
+char local_legend[40][600];  //added for globalisation
+
+char string_var[100] ;
+char l_age_legend[5];
+char d_sex_desc[11];
+
+
+int ctr = 0,  len = 0;
+int r_ctr = 0;
+char l_string[300];
+char cl_string[300];
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{
+    void get_params(),
+  	     get_header_dtls(),
+  	     dclr_request_header(),
+	     dclr_request_detail(),
+	     dclr_clinical_hist(),
+		 dclr_order_comments(),
+  		 do_report();
+  if(argc < 3) 
+  {
+     disp_message(ERR_MESG,"Usage rlrreqsp uid/passwd session id pgm date");
+     proc_exit();
+   }
+
+   strcpy(uid_pwd.arr, argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr); 
+ 
+   strcpy(nd_session_id.arr, argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr); 
+
+
+   strcpy(nd_operating_facility_id.arr, argv[4]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr);
+
+   strcpy(d_specimen_no.arr, argv[5]);
+   d_specimen_no.len = strlen(d_specimen_no.arr); 
+ 
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL CONNECT :uid_pwd;  
+ 
+
+
+   EXEC SQL EXECUTE 
+	      begin
+			if SM_INSTALLATION_TAB_CHECK THEN
+			   :l_tab_exists := 1;
+			else
+			   :l_tab_exists := 0;
+			end if;
+		  end;
+	 END-EXEC; 
+
+   set_meduser_role();
+
+   /******* from here added for globalisation ********/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+   /******* upto here added for globalisation ********/
+
+   get_legend_value(21);  //added for globalisation
+
+   gen_file_name();
+   
+   get_header_dtls();
+   
+   dclr_request_header();
+
+   dclr_request_detail();
+
+   dclr_clinical_hist();
+
+   dclr_order_comments();
+
+   do_report();
+
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL COMMIT WORK RELEASE;
+
+   fclose(f1);
+   print_job();
+
+   return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at main() occured....\n");
+   proc_exit();
+}  
+
+
+
+/******** added for globalisation start ******************/
+
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:nd_operating_facility_id,:language_id,'RLRREQSP.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+		l_translated_value.arr[0]		= '\0';
+
+
+		EXEC SQL EXECUTE
+		BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRREQSP.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+		END;
+		END-EXEC;
+	
+		l_translated_value.arr[l_translated_value.len] = '\0';
+
+		//sp_message(ERR_MESG,l_translated_value.arr);
+
+		strcpy(local_legend[i],l_translated_value.arr);
+
+	}
+ }
+/******** added for globalisation end ******************/
+ 
+
+
+/* -------------- get the header details ---------------------- */
+
+void get_header_dtls()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT ACC_ENTITY_NAME, /* description of the institution */
+		   USER,
+		   TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI')
+	       INTO :d_acc_entity_name,
+	  	   :d_user,
+		   :d_sysdate
+           FROM SY_ACC_ENTITY_lang_vw
+           WHERE ACC_ENTITY_ID = :nd_operating_facility_id
+		   AND language_id = :language_id;
+
+  d_acc_entity_name.arr[d_acc_entity_name.len] = '\0';
+  d_user.arr[d_user.len]                       = '\0';
+  d_sysdate.arr[d_sysdate.len]                 = '\0';
+
+  #ifdef DEBUG
+   printf("d_acc_entity_name = %s\n", d_acc_entity_name.arr);
+   printf("d_user = %s\n", d_user.arr);
+   printf("d_sysdate = %s\n", d_sysdate.arr);
+  #endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_header_dtls() occured....\n");
+   proc_exit();
+}
+
+/*------------------------------------REQUEST_HEADER CURSOR------------------*/ 
+
+void dclr_request_header()
+{
+
+	d_patient_id.arr[0] = '\0';
+	d_episode_type.arr[0]	= '\0';
+	d_spec_regd_date.arr[0]	= '\0';
+	nd_spec_regd_date.arr[0]	= '\0';
+	d_source_type.arr[0]	= '\0';
+	d_source_code.arr[0]	= '\0';
+	d_consultant_code.arr[0]	= '\0';
+	d_request_comment_desc1.arr[0]	= '\0';
+	d_request_comment_desc2.arr[0]	= '\0';
+	d_request_comment_desc3.arr[0]	= '\0';
+	d_specimen_type_code.arr[0]	= '\0';
+	d_section_code.arr[0]		= '\0';
+	d_user.arr[0]				= '\0';
+	
+/*Added to print order comments in Request Slip  (25/06/2002)*/
+	d_category_code.arr[0]	= '\0';
+	d_category_year.arr[0]	= '\0';
+	d_category_number.arr[0]	= '\0';
+	d_order_type_code.arr[0]	= '\0';
+	d_order_id.arr[0]			= '\0';
+
+	d_category_code.len = 0;
+	d_category_year.len = 0;
+	d_category_number.len = 0;
+	
+	d_order_type_code.len = 0;
+	d_order_id.len		  = 0;
+/*Added to print order comments in Request Slip (25/06/2002)*/
+
+	d_spec_regd_date.len = 0;
+	nd_spec_regd_date.len = 0;
+	d_episode_type.len = 0;
+	d_source_type.len = 0;
+	d_source_code.len = 0;
+	d_consultant_code.len = 0;
+	d_request_comment_desc1.len = 0;
+	d_request_comment_desc2.len = 0;
+	d_request_comment_desc3.len = 0;
+    d_specimen_type_code.len = 0;
+	d_patient_id.len = 0;
+	d_section_code.len = 0;
+	d_user.len		   = 0;
+	
+
+   EXEC SQL SELECT  SECTION_CODE, PATIENT_ID, EPISODE_TYPE,TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM/YYYY HH24:MI'),
+			SOURCE_TYPE,SOURCE_CODE,CONSULTANT_CODE,REQUEST_COMMENT_DESC1,
+			REQUEST_COMMENT_DESC2,REQUEST_COMMENT_DESC3,SPECIMEN_TYPE_CODE,
+			ADDED_BY_ID ,TO_CHAR(SPEC_REGD_DATE_TIME,'DD/MM/YYYY'),
+			ORDER_TYPE_CODE, ORDER_ID,
+			CATEGORY_CODE ,CATEGORY_YEAR, CATEGORY_NUMBER,ORDERED_FACILITY_ID
+      INTO  :d_section_code, :d_patient_id, :d_episode_type,:d_spec_regd_date,:d_source_type,:d_source_code,:d_consultant_code,
+	        :d_request_comment_desc1, :d_request_comment_desc2,
+			:d_request_comment_desc3,:d_specimen_type_code,
+			:d_user,:nd_spec_regd_date,
+			:d_order_type_code, :d_order_id,
+			:d_category_code, :d_category_year, :d_category_number,:rl_ordered_facility_id
+	  FROM RL_REQUEST_HEADER
+      WHERE SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+	  AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+	
+  d_section_code.arr[d_section_code.len]	= '\0';
+  d_patient_id.arr[d_patient_id.len]	 = '\0';                           	    
+  d_episode_type.arr[d_episode_type.len] = '\0';
+  d_spec_regd_date.arr[d_spec_regd_date.len] = '\0';
+  nd_spec_regd_date.arr[nd_spec_regd_date.len] = '\0';
+  d_source_type.arr[d_source_type.len] = '\0';
+  d_source_code.arr[d_source_code.len] = '\0';
+  d_consultant_code.arr[d_consultant_code.len] = '\0';
+  d_request_comment_desc1.arr[d_request_comment_desc1.len] = '\0';
+  d_request_comment_desc2.arr[d_request_comment_desc2.len] = '\0';
+  d_request_comment_desc3.arr[d_request_comment_desc3.len] = '\0';
+  d_specimen_type_code.arr[d_specimen_type_code.len] = '\0';
+  d_user.arr[d_user.len]							 = '\0';
+  d_order_type_code.arr[d_order_type_code.len]				 = '\0';
+  d_order_id.arr[d_order_id.len]							 = '\0';
+  d_category_code.arr[d_category_code.len]							 = '\0';
+  d_category_year.arr[d_category_year.len]							 = '\0';
+  d_category_number.arr[d_category_number.len]							 = '\0';
+  rl_ordered_facility_id.arr[rl_ordered_facility_id.len]		= '\0';
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_request_header() occured....\n");
+   proc_exit();
+}
+
+/*--------------------------------- REQUEST DETAIL CURSOR -------------------*/
+void dclr_request_detail()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL DECLARE REQUEST_DETAIL CURSOR FOR
+     SELECT TEST_CODE
+     FROM   RL_REQUEST_DETAIL
+     WHERE  SPECIMEN_NO = TO_NUMBER(:d_specimen_no) 
+	 AND OPERATING_FACILITY_ID = :nd_operating_facility_id
+     AND NVL(cancelled_yn, 'N') <> 'Y';
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  #ifdef DEBUG
+    printf("leaving dclr_request_detail()\n");
+  #endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_request_detail() occured....\n");
+   proc_exit();
+}
+
+/*--------------------------------- CLINICAL HISTORY CURSOR -------------------*/
+
+void dclr_clinical_hist()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL DECLARE CLINICAL_HISTORY CURSOR FOR
+     SELECT SUBSTR(CLINICAL_TEXT, 1)
+     FROM   RL_PATIENT_CLINICAL_TEXT
+     WHERE  SPECIMEN_NO = TO_NUMBER(:d_specimen_no)
+	 AND OPERATING_FACILITY_ID = :nd_operating_facility_id;
+     
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  #ifdef DEBUG
+    printf("leaving dclr_clinical_hist()\n");
+  #endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_clinical_hist() occured....\n");
+   proc_exit();
+}
+
+/*Added to print order comments in Request Slip (25/06/2002)*/
+
+void dclr_order_comments()
+{
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+if (l_tab_exists)
+{
+
+ strcpy(sql_stmt.arr, "SELECT order_fields_display_text FROM OR_ORDER WHERE ORDER_TYPE_CODE = :d_order_type_code AND ORDER_ID = :d_order_id");
+ sql_stmt.len = strlen(sql_stmt.arr);
+
+}
+else
+{
+ strcpy(sql_stmt.arr, "SELECT order_comments FROM OR_ORDER WHERE  ORDER_TYPE_CODE = :d_order_type_code AND	  ORDER_ID		= :d_order_id");
+ sql_stmt.len = strlen(sql_stmt.arr);
+}
+
+  EXEC SQL PREPARE S FROM :sql_stmt;
+
+  EXEC SQL DECLARE ORDER_COMMENTS CURSOR FOR S;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  #ifdef DEBUG
+    printf("leaving leaving order_comments()\n");
+  #endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_order_commets() occured....\n");
+   proc_exit();
+}
+
+void open_order_comments()
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL OPEN ORDER_COMMENTS USING :d_order_type_code, :d_order_id;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  #ifdef DEBUG
+    printf("leaving leaving order_comments()\n");
+  #endif
+  return;
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at dclr_order_commets() occured....\n");
+   proc_exit();
+}
+
+/*----------------------------------------------------------------------*/
+
+/* prints the master-detail record until the cursor is empty */
+void do_report()
+{
+  
+  void prepare_new_page();
+  void print_hospital_name();
+  void print_detl_rec();
+  void get_referral_patient_dtl();
+  void get_phys_name();
+  void get_ref_phys_name();
+  void get_ward_desc();
+  void get_clinic_desc();
+  void get_ref_source();
+  void get_specimen_desc();
+  void get_test_desc();
+  int  get_patient_dtl(); 
+  void patient_age();
+  int  fetch_request_detail(); 
+  void end_report();
+  
+  first_page_flag = 1;
+  first_page_flag = 0;
+  
+  page_no += 1; /* icrement by 1 as it is moving to second page */
+
+  line_no = 0;
+
+  print_hospital_name(80,d_acc_entity_name.arr);
+  
+
+/*--------------- to get the patient name and physician name --------------------------*/
+  
+  if(strcmp(d_episode_type.arr,"I")==0 || strcmp(d_episode_type.arr,"O")==0 ||
+		strcmp(d_episode_type.arr,"H")==0)
+        { 
+		  get_patient_dtl();
+		  get_phys_name();
+		  }
+	else
+	    if(strcmp(d_episode_type.arr,"R")==0)
+           {
+		    get_referral_patient_dtl();
+			get_ref_phys_name();
+			}
+
+/*---------to get the source desc----------------- */
+  if (strcmp(d_source_type.arr,"W")==0)	
+     get_ward_desc();
+  else
+     if(strcmp(d_source_type.arr,"C")==0)
+	 get_clinic_desc();
+  else
+     if(strcmp(d_source_type.arr,"E")==0)
+	 get_ref_source();
+
+/*---------to get the specimen type  desc----------------- */
+
+  get_specimen_desc();
+
+/*---------------- get the age in years, months and days --------------------*/
+   patient_age();	
+    
+  if (strcmp(d_actual_dob.arr, "Y") == 0)
+		strcpy(l_age_legend, "");
+	else
+        strcpy(l_age_legend, "*");
+
+  if(d_sex.arr[0] == 'M')
+	   //strcpy(d_sex_desc,"MALE");
+       strcpy(d_sex_desc,local_legend[19]);
+
+	else
+		if(d_sex.arr[0] == 'F')
+			//strcpy(d_sex_desc,"FEMALE");
+			strcpy(d_sex_desc,local_legend[20]);
+
+		else
+			//strcpy(d_sex_desc,"Unknown");
+			strcpy(d_sex_desc,local_legend[21]);
+
+
+/* ------------------ printing data ------------------ */
+
+
+//Line 1
+
+  fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "Name: ");
+  fprintf(f1,"%4.4s : ", local_legend[1]); //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+  fprintf(f1,"%-60.60s\n",d_patient_name.arr); 
+
+  line_no += 1;
+
+// Line 2
+
+  fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "Age/Sex: ");
+  fprintf(f1,"%7.7s : ", local_legend[2]);  //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+
+  fprintf(f1, "%s ", l_age_legend);
+
+  fprintf(f1,"%s / %7.7s\n",t_age.arr,d_sex_desc); 
+
+
+  line_no += 1;
+
+//Line 3
+
+  fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "Patient Number: ");
+  fprintf(f1,"%14.14s : ", local_legend[3]);  //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+  fprintf(f1,"%-20.20s\n",d_patient_id.arr); 
+
+  line_no += 1;
+
+//Line 4
+ fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "NRIC/Alternate Id: ");
+  fprintf(f1,"%17.17s : ", local_legend[4]);  //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+  fprintf(f1,"%-20.20s\n",d_national_id_num.arr); 
+
+  line_no += 1;
+
+
+//Line 5
+  fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "Source: ");
+  fprintf(f1,"%6.6s : ", local_legend[5]);  //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+  fprintf(f1,"%s\n",d_source_desc.arr); 
+
+  line_no++;
+  
+//Line 6
+  fprintf(f1,"%c(s4B",ESC);
+  
+  //fprintf(f1, "Doctor: ");
+  fprintf(f1,"%6.6s : ", local_legend[6]);  //added for globalisation
+
+  fprintf(f1,"%c(s-3B",ESC); 
+  fprintf(f1,"%s\n",d_consultant_name.arr); 
+
+  line_no += 1;
+
+// Line 7
+
+  fprintf(f1,"%c(s4B",ESC);     
+  fprintf(f1, "------------------------------------------------------------------------------ \n");
+  fprintf(f1,"%c(s-3B",ESC);
+
+  line_no += 1;
+
+// Line 8
+
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Specimen No: ");
+   fprintf(f1,"%11.11s : ", local_legend[7]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+   fprintf(f1,"%s\n",d_specimen_no.arr); 
+
+   line_no += 1;
+
+/*Line added to print the category number */
+// Line 9
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Category No: ");
+   fprintf(f1,"%11.11s : ", local_legend[8]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+   fprintf(f1,"%s/%s/%s\n",d_category_code.arr, d_category_year.arr, d_category_number.arr); 
+
+   line_no += 1;
+
+// Line 10
+
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Specimen Type: ");
+   fprintf(f1,"%13.13s : ", local_legend[9]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+   fprintf(f1,"%s\n",d_specimen_type_desc.arr); 
+
+   line_no += 1;
+   	
+//Line 11
+
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Test: \n");
+   fprintf(f1,"%4.4s : \n", local_legend[10]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+
+   EXEC SQL OPEN REQUEST_DETAIL; 
+
+   while(fetch_request_detail())
+   {
+     
+     get_test_desc();
+     fprintf(f1,"      %s \n",d_test_desc.arr); 
+	 line_no++;
+   }
+
+   EXEC SQL CLOSE REQUEST_DETAIL; 
+  
+    fprintf(f1,"\n"); 
+    line_no += 1; 
+
+//Line 12
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Clinical Comments: \n");
+   fprintf(f1,"%17.17s : \n", local_legend[11]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+
+   line_no++;
+
+   if (strlen(d_request_comment_desc1.arr))
+   {
+		fprintf(f1,"      1 %s\n",d_request_comment_desc1.arr);  
+		line_no++;
+   }
+	if (strlen(d_request_comment_desc2.arr))
+	{
+		fprintf(f1,"      2 %s\n",d_request_comment_desc2.arr);  
+		line_no++;
+	}
+	if (strlen(d_request_comment_desc3.arr))
+	{
+		fprintf(f1,"      3 %s\n",d_request_comment_desc3.arr);  
+		line_no++;
+	}
+
+
+/*Added to print Order Comments in Request Slip (25/06/2002)*/
+
+//Line 13
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Order Comments: \n");
+   fprintf(f1,"%14.14s : \n", local_legend[12]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+
+   line_no++;
+
+//    EXEC SQL OPEN ORDER_COMMENTS; 
+   open_order_comments();
+   while(fetch_order_comments())
+   {
+		ctr = 0;
+		len = strlen(d_order_comments.arr);
+
+		split_text(d_order_comments.arr, 58, cl_string, &r_ctr);
+		chk_break(1);
+		fprintf(f1,"       %s\n",cl_string);
+		
+		line_no++;
+        strcpy(cl_string,"");   
+		while(r_ctr < len)
+		{	
+			
+			chk_break(1);
+			split_text(d_order_comments.arr, 58, cl_string, &r_ctr);
+			fprintf(f1,"       %s\n",cl_string);  
+
+		    strcpy(cl_string,"");  
+			line_no++;
+
+		}
+   }  
+
+
+  EXEC SQL CLOSE ORDER_COMMENTS; 
+
+   chk_break(2);
+
+  
+/* END Added to print Order Comments in Request Slip (25/06/2002)*/
+
+
+//Line 14
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Clinical History: \n");
+   fprintf(f1,"%16.16s : \n", local_legend[13]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+
+	line_no++;
+
+    EXEC SQL OPEN CLINICAL_HISTORY; 
+
+	r_ctr = 0;
+
+   while(fetch_clinical_hist())
+   {
+		ctr = 0;
+		len = strlen(d_clinical_hist.arr);
+
+        if (len) /////// added on 05.09.2005
+		{ 
+			strcpy(l_string,"");   
+			split_text(d_clinical_hist.arr, 58, l_string, &r_ctr);
+			chk_break(1);
+			fprintf(f1,"       %s\n",l_string);
+
+			line_no++;
+			strcpy(l_string,"");   
+			while(r_ctr < len)
+			{	
+				chk_break(1);
+				split_text(d_clinical_hist.arr, 58, l_string, &r_ctr);
+				fprintf(f1,"       %s\n",l_string);  
+
+	//		disp_message(ERR_MESG, l_string);
+				strcpy(l_string,"");  
+				line_no++;
+
+			}
+		}
+   }  
+
+
+  EXEC SQL CLOSE CLINICAL_HISTORY; 
+
+   chk_break(2);
+
+  fprintf(f1,"%c(s4B",ESC);     
+  fprintf(f1, "------------------------------------------------------------------------------ \n");
+  fprintf(f1,"%c(s-3B",ESC);
+
+// Line 15
+
+   fprintf(f1,"%c(s4B",ESC);
+   
+   //fprintf(f1, "Ordered by: ");
+   fprintf(f1,"%10.10s : ", local_legend[14]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+   fprintf(f1, "%-40.40s",d_consultant_name.arr);/*---Added by nandhini*/
+   
+        
+   fprintf(f1,"%c(s4B\n",ESC);
+   
+   //fprintf(f1, "  Entered By: ");
+   fprintf(f1,"%10.10s : ", local_legend[15]);  //added for globalisation
+
+   fprintf(f1,"%c(s-3B",ESC); 
+   fprintf(f1, "%-48.48s",d_user.arr);
+   
+   
+   EXEC SQL EXECUTE
+   DECLARE
+      t_date   date;
+   BEGIN
+      GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:d_spec_regd_date,'DD/MM/YYYY HH24:MI'), :language_id , t_date);
+	  :d_spec_regd_date1 := to_char(t_date,'DD/MM/YYYY HH24:MI');
+   END;
+   END-EXEC;
+
+   
+   //fprintf(f1, "%-16.16s", d_spec_regd_date.arr);
+   fprintf(f1, "%-16.16s", d_spec_regd_date1.arr);
+   
+
+   
+  #ifdef DEBUG
+      printf("entered do_report outside while()\n");
+      fflush(stdout);
+  #endif
+  
+ // end_report();
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*  Fetching rows from REQUEST_DETAIL for the REQUEST_HEADER read */
+
+int fetch_request_detail()
+
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL FETCH REQUEST_DETAIL INTO
+		 :d_test_code;
+
+  #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+  #endif
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_test_code.arr[d_test_code.len]='\0';
+
+#ifdef DEBUG
+ printf("d_test_code= %s\n",d_test_code.arr);
+#endif
+return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_request_detail() occured....\n");
+   proc_exit();
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*  Fetching rows from Clinical History  */
+
+int fetch_clinical_hist()
+
+{
+	d_clinical_hist.arr[0]	= '\0';
+	d_clinical_hist.len		= 0;
+
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH CLINICAL_HISTORY INTO
+		 :d_clinical_hist;
+ #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+   #endif
+
+  if (NODATAFOUND)
+    return 0;
+
+  d_clinical_hist.arr[d_clinical_hist.len]='\0';
+
+#ifdef DEBUG
+   printf("d_clinical_hist= %s\n",d_clinical_hist.arr);
+#endif
+
+return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_clinical_hist() occured....\n");
+   proc_exit();
+}
+
+
+/*---------------------------------------------------------------------------*/
+
+/* Added for Fetching rows from Order Comments  (25/06/2002)*/
+
+int fetch_order_comments()
+
+{
+  EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+  EXEC SQL FETCH ORDER_COMMENTS INTO
+		 :d_order_comments;
+ #ifdef DEBUG
+    printf("SQLCA code after fetch :%d\n", sqlca.sqlcode);
+   #endif
+
+
+  if (NODATAFOUND)
+		return 0;
+
+  d_order_comments.arr[d_order_comments.len]='\0';
+
+#ifdef DEBUG
+   printf("d_order_comments= %s\n",d_order_comments.arr);
+#endif
+
+return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at fetch_order_comments() occured....\n");
+   proc_exit();
+}
+
+
+/*---------------------------------------------------------------------------*/
+
+/* print the finishing line of the report */
+void end_report()
+{
+  fprintf(f1,"\n\n\n");
+  fprintf(f1,"\n");
+  fprintf(f1,"                                                   ");
+  fprintf(f1,"** End of Report **");
+  fprintf(f1,"\f");
+}
+
+
+/* Function to fetch the REFERRAL PATIENT details */
+void get_referral_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT DECODE(:language_id,'en',SUBSTR(SHORT_NAME,1,30),'th',SUBSTR(SHORT_NAME_LOC_LANG,1,25)),
+           TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NVL(ACTUAL_DOB_YN,'N'),
+		   SEX,NATIONAL_ID_NUM 
+		   INTO
+	           :d_patient_name,
+			   :d_date_of_birth,
+			   :d_actual_dob,
+			   :d_sex,
+			   :d_national_id_num
+            FROM RL_PATIENT_MAST
+	    WHERE PATIENT_ID = :d_patient_id;
+		/* AND OPERATING_FACILITY_ID = :nd_operating_facility_id; */
+
+  d_date_of_birth.arr[d_date_of_birth.len]     = '\0';
+  d_actual_dob.arr[d_actual_dob.len]     = '\0';
+  d_sex.arr[d_sex.len]     = '\0';
+  d_patient_name.arr[d_patient_name.len]     = '\0';
+  d_national_id_num.arr[d_national_id_num.len]	=	'\0'; 
+#ifdef DEBUG
+  printf("d_patient_name= %s\n", d_patient_name.arr);
+#endif
+
+  return;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_referral_patient_dtl() occured....\n");
+   proc_exit();
+}
+   
+/* Function to fetch the INPATIENT details */
+int get_patient_dtl()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   /*EXEC SQL SELECT SUBSTR(SHORT_NAME,1,25),
+           TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NVL(ACTUAL_DOB_YN,'N'),
+		   SEX,NATIONAL_ID_NUM INTO
+	       :d_patient_name,
+		   :d_date_of_birth,
+		   :d_actual_dob,
+		   :d_sex,
+           :d_national_id_num 
+		FROM MP_PATIENT_MAST 
+	    WHERE PATIENT_ID = :d_patient_id;*/ //changed for globalisation
+   EXEC SQL SELECT DECODE(:language_id,'en',SUBSTR(SHORT_NAME,1,25),'th',SUBSTR(SHORT_NAME_LOC_LANG,1,25)),
+           TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),
+		   NVL(ACTUAL_DOB_YN,'N'),
+		   SEX,NATIONAL_ID_NUM INTO
+	       :d_patient_name,
+		   :d_date_of_birth,
+		   :d_actual_dob,
+		   :d_sex,
+           :d_national_id_num 
+		FROM MP_PATIENT_MAST 
+	    WHERE PATIENT_ID = :d_patient_id;
+
+
+  if (NODATAFOUND)
+    return 0;
+  d_patient_name.arr[d_patient_name.len]     = '\0';
+  d_date_of_birth.arr[d_date_of_birth.len]     = '\0';
+  d_actual_dob.arr[d_actual_dob.len]     = '\0';
+  d_sex.arr[d_sex.len]     = '\0';
+  d_national_id_num.arr[d_national_id_num.len]	='\0';
+     if(l_tab_exists && strlen(d_national_id_num.arr) == 0) 
+	      {
+		   get_ip_national_id();
+		   strcpy(d_national_id_num.arr,d_alt_id_num.arr);
+		   }
+
+
+  #ifdef DEBUG
+   printf("d_patient_name= %s\n", d_patient_name.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_patient_dtl() occured....\n");
+   proc_exit();
+}
+    
+/* --------------------- get ward_desc --------------------------*/
+
+void get_ward_desc()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   /*EXEC SQL SELECT LONG_DESC
+            INTO
+	       :d_source_desc
+		    FROM IP_WARD
+	    WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+		AND WARD_CODE = :d_source_code;*/  // changed for globalisation
+	EXEC SQL SELECT LONG_DESC
+            INTO
+	       :d_source_desc
+		    FROM IP_NURSING_UNIT_LANG_VW
+	    WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+		AND NURSING_UNIT_CODE = :d_source_code
+		AND language_id = :language_id;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_source_desc.arr[d_source_desc.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_source_desc= %s\n", d_source_desc.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_ward_desc() occured....\n");
+   proc_exit();
+}
+    
+/* --------------------- get clinic_desc --------------------------*/
+
+void get_clinic_desc()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT LONG_DESC
+            INTO
+	       :d_source_desc
+		    FROM OP_CLINIC_LANG_VW
+	    WHERE FACILITY_ID = nvl(:nd_operating_facility_id,:rl_ordered_facility_id)
+		  AND CLINIC_CODE = :d_source_code
+		  AND language_id = :language_id;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_source_desc.arr[d_source_desc.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_source_desc= %s\n", d_source_desc.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_clinic_desc() occured....\n");
+   proc_exit();
+}
+    
+/* --------------------- get ref source desc --------------------------*/
+
+void get_ref_source()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT LONG_DESC
+            INTO
+	       :d_source_desc
+		    FROM RL_REFERRAL_lang_vw
+	    WHERE REFERRAL_CODE = :d_source_code
+		AND language_id = :language_id;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_source_desc.arr[d_source_desc.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_source_desc= %s\n", d_source_desc.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_ref_source() occured....\n");
+   proc_exit();
+}
+
+/* --------------------- get specimen type desc --------------------------*/
+
+void get_specimen_desc()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SPECIMEN_DESC
+            INTO
+	       :d_specimen_type_desc
+		    FROM RL_SPECIMEN_TYPE_CODE
+	    WHERE SPECIMEN_TYPE_CODE = :d_specimen_type_code;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_specimen_type_desc.arr[d_specimen_type_desc.len]     = '\0';
+
+  #ifdef DEBUG
+  // fprintf("d_specimen_type_desc= %s\n", d_specimen_type_desc.arr);
+   fprintf(f1, "d_specimen_type_desc= %s\n", d_specimen_type_desc.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_specimen_type() occured....\n");
+   proc_exit();
+}
+
+
+
+
+/*--------------------get national Id--------------------*/
+
+get_ip_national_id()
+{
+	d_alt_id1_reqd_yn.arr[0] = '\0';
+    d_alt_id1_reqd_yn.len    =  0;
+    d_alt_id2_reqd_yn.arr[0] = '\0';
+	d_alt_id2_reqd_yn.len    =  0;
+    d_alt_id3_reqd_yn.arr[0] = '\0';
+    d_alt_id3_reqd_yn.len    =  0;
+    d_alt_id4_reqd_yn.arr[0] = '\0';
+    d_alt_id4_reqd_yn.len    =  0;
+	d_alt_id_num.arr[0] = '\0';
+
+
+
+EXEC SQL SELECT ALT_ID1_REQD_YN,ALT_ID2_REQD_YN ,ALT_ID3_REQD_YN ,ALT_ID4_REQD_YN  INTO
+		d_alt_id1_reqd_yn,
+		d_alt_id2_reqd_yn,
+		d_alt_id3_reqd_yn,
+		d_alt_id4_reqd_yn
+		   FROM MP_PARAM;
+        d_alt_id1_reqd_yn.arr[d_alt_id1_reqd_yn.len] = '\0';
+		d_alt_id2_reqd_yn.arr[d_alt_id2_reqd_yn.len] = '\0';
+		d_alt_id3_reqd_yn.arr[d_alt_id3_reqd_yn.len] = '\0';
+		d_alt_id4_reqd_yn.arr[d_alt_id4_reqd_yn.len] = '\0';
+     if(strcmp(d_alt_id1_reqd_yn.arr,"Y") == 0)
+	   {
+	    EXEC SQL Select    ALTERNATE_ID_NUM  INTO :d_alt_id_num                
+                         From mp_patient_mast    where patient_id=:d_patient_id; 
+      
+		}
+      else if(strcmp(d_alt_id2_reqd_yn.arr,"Y")== 0)
+	    {
+	      EXEC SQL Select    ALTERNATE_ID2_NUM  INTO :d_alt_id_num                
+                         From mp_patient_mast    where patient_id=:d_patient_id; 
+       
+		 }
+	  else if(strcmp(d_alt_id3_reqd_yn.arr,"Y")== 0)
+	    {
+	       EXEC SQL Select    ALTERNATE_ID3_NUM  INTO :d_alt_id_num                
+                         From mp_patient_mast    where patient_id=:d_patient_id; 
+      
+		}
+    else if(strcmp(d_alt_id4_reqd_yn.arr,"Y")== 0)
+	    {
+	      EXEC SQL Select    ALTERNATE_ID4_NUM  INTO :d_alt_id_num                
+                         From mp_patient_mast    where patient_id=:d_patient_id; 
+           
+		 }
+		 d_alt_id_num.arr[d_alt_id_num.len] ='\0';
+
+}
+
+/* --------------------- get test_desc  --------------------------*/
+
+void get_test_desc()
+{
+   d_test_desc.arr[0] = '\0';
+   d_test_desc.len    = 0 ;
+ 
+
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT LONG_DESC
+            INTO
+	       :d_test_desc
+		    FROM RL_TEST_CODE_lang_vw
+	    WHERE TEST_CODE = :d_test_code
+		AND language_id = :language_id;
+
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_test_desc.arr[d_test_desc.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_test_desc= %s\n", d_test_desc.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_specimen_type() occured....\n");
+   proc_exit();
+}
+
+
+/* --------------------- get ref phys name  --------------------------*/
+
+void get_ref_phys_name()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   EXEC SQL SELECT SHORT_NAME
+            INTO
+	       :d_consultant_name
+		    FROM RL_CONSULTANTS_lang_vw
+	    WHERE REF_CONSULTANT_ID = :d_consultant_code
+		AND language_id = :language_id;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_consultant_name.arr[d_consultant_name.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_consultant= %s\n", d_consultant_name.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_ref_phys_name() occured....\n");
+   proc_exit();
+}
+
+/* --------------------- get phys name  --------------------------*/
+
+void get_phys_name()
+{
+   EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+   /*EXEC SQL SELECT SHORT_NAME
+            INTO
+	       :d_consultant_name
+		    FROM SY_PHYSICIAN_MAST
+	    WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+		  AND PHYSICIAN_ID = :d_consultant_code;*/
+	EXEC SQL SELECT DECODE(:language_id,'en',SHORT_NAME,'th',SHORT_NAME_LOC_LANG)
+            INTO
+	       :d_consultant_name
+		    FROM SY_PHYSICIAN_MAST
+	    WHERE FACILITY_ID = nvl(:rl_ordered_facility_id,:nd_operating_facility_id)
+		  AND PHYSICIAN_ID = :d_consultant_code;
+
+  if (NODATAFOUND)
+    return 0;
+  
+  d_consultant_name.arr[d_consultant_name.len]     = '\0';
+
+  #ifdef DEBUG
+   printf("d_consultant= %s\n", d_consultant_name.arr);
+  #endif
+
+  return 1;
+
+err_exit:
+   EXEC SQL WHENEVER SQLERROR CONTINUE;
+   EXEC SQL ROLLBACK WORK RELEASE;
+   disp_message(ORA_MESG,"Oracle error at get_phys_name() occured....\n");
+   proc_exit();
+}
+
+gen_file_name()
+{
+     nd_file_name.arr[0]   = '\0';
+     nd_file_name.len      = 0;
+	 strcpy(nd_file_name.arr,WORKING_DIR);
+	 strcat(nd_file_name.arr,"rlrreqsp.lis");
+    
+
+     if ((f1 = fopen(nd_file_name.arr,"w")) == NULL)
+     {
+       sprintf(string_var,"Error while opening file %s\n",nd_file_name.arr);
+	   disp_message(ERR_MESG,string_var) ;
+       proc_exit();
+     }
+	 
+}
+/*--------------------------------------------------------------------------*/
+
+void print_hospital_name(nd_rep_width    ,
+                         nd_hospital_name )
+int  nd_rep_width;
+char nd_hospital_name[31];
+{
+	int i = 0 , pos = 0 , len = 0 ;
+
+    /*Find the length of Hospital Name*/
+
+    for(len = 0; nd_hospital_name[len] != '\0'; len++);
+
+    len = len / 2;
+
+    pos = (nd_rep_width / 2	) - len;
+
+	for(i = 0; i < pos ; fprintf(f1," "),i++);
+    
+	fprintf(f1,"%c(s4B",ESC);     
+  	fprintf(f1,"%s",nd_hospital_name);
+	fprintf(f1,"%c(s-3B",ESC);
+	fprintf(f1,"\n");
+
+	line_no++;
+
+}
+
+/*-------------------------------------------------------------------------------*/
+chk_break(int lin)
+{
+   if ((line_no + lin) >= MAX_LINES)
+   {
+     fprintf(f1,"");
+	 line_no = 1;
+	print_hospital_name(80,d_acc_entity_name.arr);
+   }
+}
+
+/*---------------------------------------------------------------------------*/
+
+print_job()
+{
+/****** changed on 25/07/2002 for workstation based printing **************/
+//	print_online(uid_pwd.arr,"RLRREQSP","O",d_section_code.arr,"rlrreqsp.lis","S");
+
+	if (strcmp(nd_trx_ind.arr,"Y") == 0)
+
+/*************** commented on 29.06.2003 and replaced with new standard
+
+		print_online(uid_pwd.arr,"RLRREQSP","O",d_section_code.arr,"rlrreqsp.lis","S");
+
+************************/
+
+///////////////////////////////////////  
+
+					 PrintDocument
+						   (
+							uid_pwd.arr,		//char	*PUidPwd;
+							nd_session_id.arr,	//char	*PSessionID;
+							nd_operating_facility_id.arr,	//char	*PFacilityID;
+							"RL",				//char	*PModuleID;
+							"RLRREQSP",			//char	*PDocumentID;
+							nd_file_name.arr,			//char	*POnlinePrintFileNames;
+							"O",				//char	*PLocationTypes;
+							d_section_code.arr,				//char	*PLocationCodes;
+							1,					//int		PNumOfCopies;
+							1,					//int		PPageFrom;
+							9999					//int		PPageTo;
+						   );
+						   
+///////////////////////////////////////
+
+	else
+
+/*************** commented on 29.06.2003 and replaced with new standard
+
+		print_online(uid_pwd.arr,"RLRREQSP","O","","rlrreqsp.lis","S");
+
+***************************/
+
+///////////////////////////////////////  
+
+					 PrintDocument
+						   (
+							uid_pwd.arr,		//char	*PUidPwd;
+							nd_session_id.arr,	//char	*PSessionID;
+							nd_operating_facility_id.arr,	//char	*PFacilityID;
+							"RL",				//char	*PModuleID;
+							"RLRREQSP",			//char	*PDocumentID;
+							nd_file_name.arr,			//char	*POnlinePrintFileNames;
+							"O",				//char	*PLocationTypes;
+							"",				//char	*PLocationCodes;
+							1,					//int		PNumOfCopies;
+							1,					//int		PPageFrom;
+							9999					//int		PPageTo;
+						   );
+						   
+///////////////////////////////////////
+
+		
+}
+
+
+/*-------------   Age of Patient in Years, Months, Days --------------*/
+
+ void patient_age()
+ {
+
+		 float  lone = 0;
+		 float  num1 = 0, yrs = 0, 
+				tmp_mths = 0, 
+				tmp_days = 0;
+
+		 char st_r[50];
+
+	today.arr[0] = '\0';
+	today.len = 0;
+
+	mths.arr[0]  = '\0';
+	mths.len  = 0;
+
+	
+	EXEC SQL SELECT TO_CHAR(SYSDATE,'DD/MM/YYYY') INTO :today
+            FROM DUAL;                                        
+
+    EXEC SQL SELECT ABS(MONTHS_BETWEEN(
+		TO_DATE(:nd_spec_regd_date,'DD/MM/YYYY'), 
+		TO_DATE(:d_date_of_birth, 'DD/MM/YYYY')))
+			INTO :mt FROM DUAL;
+
+			sprintf(mths.arr,"%f",mt);
+			strcpy(mths1.arr, mths.arr);
+
+        	today.arr[today.len] = '\0';
+							
+			lone = atoi(strtok(mths1.arr, ".")) ;
+
+		   if (lone > 0) 
+		   {
+			  num1 = lone/12 ;
+			  sprintf(t_age.arr, "%f", num1);
+			  yrs = atoi(strtok(t_age.arr, ".")) ;
+		   }
+		   else
+			  yrs = 0;
+            
+			tmp_mths   = atoi(mths1.arr) - (yrs * 12) ;
+			sprintf(t_age.arr, "%f", tmp_mths);
+			tmp_mths   = atoi(strtok(t_age.arr, "."));
+
+			if ((tmp_mths == 0)  && (yrs ==0))
+			{
+
+				EXEC SQL SELECT TO_CHAR(ROUND((TO_DATE(:nd_spec_regd_date,'DD/MM/YYYY') -
+					TO_DATE(:d_date_of_birth, 'DD/MM/YYYY')),3))
+					INTO :t_days FROM DUAL;
+
+					tmp_days = atoi(strtok(t_days.arr,"."));
+			}
+			else
+				tmp_days = (atof(mths.arr) - atoi(mths1.arr)) * 31 ;
+				
+		    sprintf(st_r, "%f", yrs);
+			strcpy(t_age.arr, strtok(st_r, "."));
+			
+			//strcat(t_age.arr, "Y");
+            strcat(t_age.arr,local_legend[16]); //added for globalisation
+
+			sprintf(st_r, " %f", tmp_mths);
+			strcat(t_age.arr, strtok(st_r, "."));
+			
+			//strcat(t_age.arr, "M");
+			strcat(t_age.arr,local_legend[17]); //added for globalisation
+
+			sprintf(st_r, " %f", tmp_days);
+			strcat(t_age.arr, strtok(st_r, "."));
+			
+			//strcat(t_age.arr, "D ");
+			strcat(t_age.arr,local_legend[18]); //added for globalisation
+
+				
+ }
+
+
+/**************************select transaction based or not ***************/
+get_trans_ind()
+{
+	
+	nd_trx_ind.arr[0]		= '\0';
+	nd_trx_ind.len		= 0;
+
+	EXEC SQL  SELECT NVL(TRANSACTION_BASED_YN, 'N')
+	          INTO   :nd_trx_ind
+	          FROM   sy_online_print_id
+              WHERE  ONLINE_PRINT_NAME = 'RLRREQSP';
+
+	if(OERROR)
+	{
+	    disp_message(ERR_MESG,"SELECT failed on  SY_ON_LINE_PRINT_ID");
+		proc_exit();
+	}
+
+	nd_trx_ind.arr[nd_trx_ind.len]			= '\0';
+
+
+    if(NO_DATA_FOUND)
+		return 0;
+
+		
+	return 1;
+
+}
+
+/*** added for globalisation ******/
+print_space(int aa, int bb, int cc)
+{
+	if (cc ==1)
+	{
+  		for(i=1;i <= (aa - bb) ;i++)
+		{
+			fprintf(f1,"%s"," ");
+		}	
+	}
+	else if (cc ==0)
+	{
+  		for(i= (aa - bb);i <= aa ;i++)
+		{
+			fprintf(f1,"%s","-");
+		}	
+	}
+}
+/*** added for globalisation ******/
+
+
+#undef DEBUG
+#undef NODATAFOUND
+#undef MAX_LINES
+#undef VER

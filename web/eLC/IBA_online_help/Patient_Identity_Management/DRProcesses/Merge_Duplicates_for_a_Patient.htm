@@ -1,0 +1,491 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<!--(==============================================================)-->
+<!--(Document created with RoboEditor. )============================-->
+<!--(==============================================================)-->
+
+<head>
+
+<title>Merge Duplicates for a Patient</title>
+
+<!--(Meta)==========================================================-->
+
+<meta http-equiv=content-type content="text/html; charset=windows-1252">
+<meta name=generator content="RoboHELP by eHelp Corporation - www.ehelp.com">
+<meta name=generator-major-version content=0.1>
+<meta name=generator-minor-version content=1>
+<meta name=filetype content=kadov>
+<meta name=filetype-version content=1>
+<meta name=page-count content=1>
+<meta name=layout-height content=780>
+<meta name=layout-width content=723>
+
+
+<!--(Links)=========================================================-->
+
+<link rel="StyleSheet" href="../../default.css">
+
+
+
+</head>
+
+<!--(Body)==========================================================-->
+
+
+<body>
+
+<!--(Generated Script Links)========================================-->
+<!--(Generated Code)================================================-->
+<!--(WARNING: DO NOT EDIT OR DELETE THIS SECTION!)==================-->
+<!--begin!kadov{{===================================================-->
+<script type="text/javascript" language="JavaScript1.2" src="../../ehlpdhtm.js" x-save-method="compute-relative"></script>
+<script type="text/javascript"
+		language=JavaScript1.2>
+<!-- 
+if( typeof( kadovInitEffects ) != 'function' ) kadovInitEffects = new Function();if( typeof( kadovInitTrigger ) != 'function' ) kadovInitTrigger = new Function();if( typeof( kadovFilePopupInit ) != 'function' ) kadovFilePopupInit = new Function();if( typeof( kadovTextPopupInit ) != 'function' ) kadovTextPopupInit = new Function();
+ //-->
+</script>
+
+<!--}}end!kadov=====================================================-->
+<!--(==============================================================)-->
+
+
+<!--(Resources)=====================================================-->
+<!--(Generated Code)================================================-->
+<!--(WARNING: DO NOT EDIT OR DELETE THIS SECTION!)==================-->
+
+<div class=x-popup-text id=POPUP167483687  style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<p class=BoldRFD><span style="font-weight: normal;">The details of the 
+ patient are displayed in the text field.</span> </p>
+
+<ol>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Name 
+ in Local Language</span> - Select the check box to include Patient Name 
+ in local language as search criteria. This field is displayed, if ‘Accept 
+ Patient Name in Local Language’ check box is selected in Legal Names tab 
+ of MP Parameter in the Master Patient Index module.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Nationality</span> 
+ - Select the Nationality check box to consider Nationality as a criterion 
+ while searching for possible duplicates.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Name</span> 
+ - The name components (First/Second/Third/Family Name) set in Master Patient 
+ Index module are displayed. Select the check box against each component 
+ to include it as search condition.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Gender</span> 
+ - Select the Gender check box to consider Gender of patient as a criterion 
+ while searching for possible duplicates. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Search 
+ in all Facilities</span> - Select the check box to search for duplicate 
+ records across facilities or clear the check box to perform the search 
+ within the logged in facility. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Date 
+ of Birth</span> - The Date of Birth of the patient entered during patient 
+ registration is displayed </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>By</span> 
+ - Select the value from the list of valid values. The values displayed 
+ are Year, Year and Months and Days. The Year is selected, by default.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Primary 
+ Resi No.</span> - Select the Primary Residence Telephone Number check 
+ box to consider Residence Telephone Number as a criterion while searching 
+ for possible duplicates.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Other 
+ Resi No.</span> - Select the Other Residence Number check box to consider 
+ Other Contact Number as a criterion while searching for possible duplicates.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Area</span> 
+ – Select the Area check box to consider the Area as a criterion while 
+ searching for possible duplicates. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Other 
+ Alt ID</span> - The Alternate ID(s) set in Master Patient Index 
+ are listed. Select the Alternate ID from the list.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Soundex</span> 
+ - The Soundex can be selected as either 'None' or 'Generic'. This field 
+ is disabled if the ‘Name in Local Language’ is selected. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Date 
+ &amp;Time</span> - The Date and Time field is enabled only after clicking 
+ <span class=BoldNumberRFD>[Accept]</span>.</p></li>
+</ol>
+
+<p class=BoldRFD
+	style="font-weight: normal;">A check box is provided against each field 
+ in the ‘Duplicate Search Criteria’. On selecting the check boxes, you 
+ can specify the search criteria for searching duplicate records for the 
+ selected patient. The user has to select a minimum of three fields as 
+ search criteria.</p>
+<!--}}kadov-resources-end-->
+</div>
+
+<div class=x-popup-text
+id=POPUP169276273 style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<ol>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Click the Patient ID 
+ hyperlink from the Duplicate Groups frame to <a class=dropspot
+												x-use-popup=#POPUP171434611
+												x-popup-type=pulldown
+												href="javascript:kadovTextPopup(this)"
+												id=a3
+												style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">display 
+ the duplicate details</a><!--begin!kadov{{--><script type="text/javascript"
+														language=JavaScript1.2><!--
+kadovInitEffects('a3');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a3');
+//--></script><!--}}end!kadov--> 
+ in the Group Details frame. Click the + hyperlink from the Duplicate Groups 
+ frame to view the Patient Details recorded during registration. </p></li>
+</ol>
+
+<p class=BoldRFD>Or</p>
+
+<ol start=2
+	style="list-style: decimal;"
+	type=1>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Enter the desired Patient 
+ ID or select the Patient ID using the <span class=BoldNumberRFD>[?]</span> 
+ function. Click <span class=BoldNumberRFD>[Search]</span> to view the 
+ duplicate patient in the Group Details frame. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Click <span class=BoldNumberRFD>[Search 
+ Criteria]</span> to view the defined search criteria and <span class=BoldNumberRFD>[Close]</span> 
+ to exit from the Search Criteria screen.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Select at least two 
+ patients under the view heading and click <span class=BoldNumberRFD>[Duplicate 
+ Details]</span> to view Possible Duplicate Details. Click Patient ID hyperlink 
+ to view the patient details or click <span class=BoldNumberRFD>[Close]</span> 
+ to exit from the Possible Duplicate Details screen.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Click 'E' hyperlink 
+ to view previous encounter details of the patient. Click Encounter ID 
+ hyperlink to view the encounter details of the selected patient.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Click Patient ID hyperlink 
+ to view Patient details. The details entered while registering a patient 
+ is displayed.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Identify the patients 
+ as <a class=dropspot
+		x-use-popup=#POPUP171249031
+		x-popup-type=pulldown
+		href="javascript:kadovTextPopup(this)"
+		id=a4
+		style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">Main</a><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovInitEffects('a4');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a4');
+//--></script><!--}}end!kadov-->, 
+ <a class=dropspot
+	x-use-popup=#POPUP168844618
+	x-popup-type=pulldown
+	href="javascript:kadovTextPopup(this)"
+	id=a5
+	style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">Duplicate</a><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovInitEffects('a5');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a5');
+//--></script><!--}}end!kadov-->, 
+ <a class=dropspot
+	x-use-popup=#POPUP171475382
+	x-popup-type=pulldown
+	href="javascript:kadovTextPopup(this)"
+	id=a6
+	style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">Do not 
+ consider</a><!--begin!kadov{{--><script type="text/javascript"
+										language=JavaScript1.2><!--
+kadovInitEffects('a6');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a6');
+//--></script><!--}}end!kadov--> 
+ or <a class=dropspot
+		x-use-popup=#POPUP170390415
+		x-popup-type=pulldown
+		href="javascript:kadovTextPopup(this)"
+		id=a7
+		style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">Exclude</a><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovInitEffects('a7');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a7');
+//--></script><!--}}end!kadov-->. 
+ Select the desired option to identity the records. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD>Click <span class=BoldNumberRFD>[Apply]</span> 
+ to save the transaction or <span class=BoldNumberRFD>[Close]</span> to 
+ exit from the Identify Main/Duplicate Patient screen.</p></li>
+</ol>
+<!--}}kadov-resources-end-->
+</div>
+<!--begin!kadov{{===================================================-->
+<script type="text/javascript"
+		language=JavaScript1.2><!--
+kadovInitEffects('POPUP169276273');
+//--></script>
+<!--}}end!kadov=====================================================-->
+
+
+<div class=x-popup-text
+id=POPUP171434611
+ style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<ol>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Patient 
+ ID</span> - The Main Patient ID and the Duplicate Patient ID's followed 
+ by the Name of the patient, Age and Gender are displayed. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Main</span> 
+ - A tick mark is displayed for the main patient record.</p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Duplicate</span> 
+ - A tick mark is displayed for the duplicate records. </p></li>
+	
+	<li class=kadov-p-CNumberRFD><p class=NumberRFD><span class=UnderlineRFD>Do 
+ not consider</span> - A tick mark is displayed for records not considered.</p></li>
+</ol>
+
+<p>&nbsp;</p>
+<!--}}kadov-resources-end-->
+</div>
+
+<div class=x-popup-text id=POPUP171249031  style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<p class=BoldRFD><span class=UnderlineRFD>Main</span><span style="font-weight: normal;"> 
+ - Select the radio button to select the record as Main record. Only one 
+ main record can be selected.</span> </p>
+<!--}}kadov-resources-end-->
+</div>
+
+<div class=x-popup-text
+id=POPUP168844618
+ style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<p class=BoldRFD
+	style="font-weight: normal;"><span class=UnderlineRFD>Duplicate</span> 
+ – Select the radio button to select the record as duplicate record.</p>
+<!--}}kadov-resources-end-->
+</div>
+
+<div class=x-popup-text
+id=POPUP171475382
+ style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<p class=BoldRFD><span class=UnderlineRFD>Do Not Consider</span><span style="font-weight: normal;"> 
+ – Select the radio button not to consider the record as main/duplicate.</span> 
+ </p>
+<!--}}kadov-resources-end-->
+</div>
+
+<div class=x-popup-text
+id=POPUP170390415
+ style='display: none; position: absolute' >
+<!--kadov-resources-begin{{-->
+<p class=BoldRFD
+	style="font-weight: normal;"><span class=UnderlineRFD>Exclude</span> 
+ – Select the radio button to exclude the record from merge process.</p>
+<!--}}kadov-resources-end-->
+</div>
+
+<!--(End Resources)=================================================-->
+
+
+<h1>Merge Duplicates for a Patient</h1>
+
+<p class=Italic>From this function you can <span class=RedItalic>Merge</span> 
+ duplicates of a patient by searching for the possible duplicate. </p>
+
+<p class=Text>You can Search, View Possible Duplicates of a Patient using 
+ the user-specified Search Criteria, Identify main and duplicates and merge 
+ records using this function. You can perform all the DR Processes in this 
+ function. This function cannot be invoked if DR cycle is in progress. 
+ The access to this function is determined by the User Access Rights set 
+ for the logged-in User. If the rights are not defined or the right for 
+ the DR Process is set as ‘None’ for the logged in user, the user is denied 
+ access. The user is allowed to access this function only if the access 
+ rights to both the functions ‘Identify Main/Duplicates’ and ‘Merge Duplicates’ 
+ are defined.</p>
+
+<p class=Text>If the privilege level is set as Logged-in facility, you 
+ can perform the DR Process only for the Logged-in facility. If the privilege 
+ level is set as All Facilities, you are allowed to access the function 
+ and can perform the DR Process for all facilities.</p>
+
+<p class=Text>On invoking this function from the menu, if the DR Process 
+ is active or the cycle is still not closed, a message ‘The Cycle is already 
+ in progress’ is displayed. The DR Process has to be closed in the ‘Administer 
+ Search Process’ function.</p>
+
+<h2>Merging Duplicate Records for a Patient</h2>
+
+<p class=From>From the DR Processes, select the Merge Duplicates for a 
+ Patient function. </p>
+
+<p class=Text>The Merge Duplicates for a Patient screen gets displayed.</p>
+
+<ol>
+	
+	<li class=kadov-p-CNumber><p class=Number>Enter the Patient ID in alphanumeric 
+ format of maximum length as specified in the MP Parameter or select the 
+ Patient ID using the <span class=BoldButton>[?]</span> function. This 
+ field is mandatory. </p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click <span class=BoldButton>[Execute]</span> 
+ to invoke ‘Duplicate Search Criteria’ frame.</p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Select the desired (minimum 
+ three) <a class=dropspot
+			x-use-popup=#POPUP167483687
+			x-popup-type=pulldown
+			href="javascript:kadovTextPopup(this)"
+			id=a1
+			style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">search 
+ criteria</a><!--begin!kadov{{--><script type="text/javascript"
+										language=JavaScript1.2><!--
+kadovInitEffects('a1');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a1');
+//--></script><!--}}end!kadov-->. 
+ The buttons <span class=BoldButton>[Accept]</span>, <span class=BoldButton>[Identify 
+ Duplicate]</span>, <span class=BoldButton>[Start Now]</span> and <span 
+ class=BoldButton>[Start Later]</span> are disabled while specifying the 
+ search criteria.</p></li>
+</ol>
+
+<ol start=4
+	style="list-style: decimal;"
+	type=1>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click <span class=BoldButton>[Search]</span> 
+ to view the possible duplicate records. On searching, the possible duplicate 
+ patient details are displayed and <span class=BoldButton>[Accept]</span> 
+ option is enabled. </p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click ‘+’ hyperlink to view 
+ the patient details recorded during registration. </p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click <span class=BoldButton>[Accept]</span> 
+ to accept the searched records as duplicates. On accepting, this option 
+ is disabled and <span class=BoldButton>[Identify Duplicate]</span>, <span 
+ class=BoldButton>[Start Now]</span> and <span class=BoldButton>[Start 
+ Later]</span> options are enabled.</p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click <span class=BoldButton>[Identify 
+ Duplicate]</span> to identify Main/Duplicate patient records. The ‘<a 
+ class=dropspot
+	x-use-popup=#POPUP169276273
+	x-popup-type=pulldown
+	href="javascript:kadovTextPopup(this)"
+	id=a2
+	style="/*begin!kadov{{*/ position: relative; /*}}end!kadov*/ ">Identify 
+ Main/Duplicate Patients</a><!--begin!kadov{{--><script type="text/javascript"
+														language=JavaScript1.2><!--
+kadovInitEffects('a2');
+//--></script><!--}}end!kadov--><!--begin!kadov{{--><script 
+ type="text/javascript"
+	language=JavaScript1.2><!--
+kadovTextPopupInit('a2');
+//--></script><!--}}end!kadov-->’ 
+ function screen is invoked.</p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>On identifying the main and 
+ duplicate patients, click <span class=BoldButton>[Start Now]</span> to 
+ merge the duplicate records identified or enter the date and time and 
+ click <span class=BoldButton>[Start Later]</span> to start the merge process 
+ later.</p></li>
+	
+	<li class=kadov-p-CNumber><p class=Number>Click <span class=BoldButton>[Reset]</span> 
+ to clear the entered data.</p></li>
+</ol>
+
+<p>&nbsp;</p>
+
+<p class=Note><img src="../../Note.jpg" x-maintain-ratio="TRUE" style="border: none;
+							width: 39px;
+							height: 26px;
+							float: none;
+							border-style: none;
+							border-style: none;" width="39" height="26" border="0">To view the merge process details, invoke 
+ the ‘<a href="Administer_Search_Process.htm">Administer Search Process</a>’ 
+ function and view the merge details.</p>
+
+<p class=Note>The Merge process of the main and duplicate patient records 
+ begin when the user starts the duplicate merge Process in ‘<a href="../../System_Manager/BackgroundProcesses/Administer_Background_Processes.htm">Administer 
+ Background Process</a>’ function in System Manager Module.</p>
+
+
+<!--(HR)============================================================-->
+<hr style="/*begin!kadov{{*/ float: aligncenter; /*}}end!kadov*/ ">
+
+
+<p>
+<!--Metadata type="DesignerControl" startspan
+<object classid="clsid:FF80F713-5DC6-11D0-A7B4-00AADC53E937">
+<param name="_Version" value="65536" >
+<param name="_ExtentX" value="2117" >
+<param name="_ExtentY" value="556" >
+<param name="_StockProps" value="13" >
+<param name="ForeColor" value="0" >
+<param name="BackColor" value="13160660" >
+<param name="UseButton" value="-1" >
+<param name="UseText" value="0" >
+<param name="ControlLabel" value="Related Topics" >
+<param name="UseIcon" value="0" >
+<param name="Items" value="Administer Background Processes;../../System_Manager/BackgroundProcesses/Administer_Background_Processes.htm$$**$$Administer Search Process;Administer_Search_Process.htm$$**$$Identify Merge Duplicate Patients;Identify_Merge_Duplicate_Patients.htm$$**$$">
+<param name="Image" value>
+<param name="FontInfo" value="MS Sans Serif,8,0,," >
+<param name="_CURRENTFILEPATH" value="D:\My Folders\Online Help\27-03-2008\Brunei_Help\Preetha\OnlineHelp\iSOFT_online_help\Duplicate_Identity_Management\Processes\Merge_Duplicates_for_a_Patient.htm" >
+<param name="_ID" value="" >
+<param name="UseMenu" value="-1" >
+<param name="Frame" value="" >
+<param name="Window" value="" >
+</object> --><OBJECT
+  CLASSID="clsid:ADB880A6-D8FF-11CF-9377-00AA003B7A11"
+  ID="RelatedTopics"  TYPE="application/x-oleobject" >
+  <PARAM  NAME="Command"  VALUE="Related Topics,MENU">
+  <PARAM  NAME="Button"  VALUE="Text:Related Topics">
+  <PARAM  NAME="Font"  VALUE="MS Sans Serif,8,0,,">
+  <PARAM NAME="Item1" VALUE="Administer Background Processes;../../System_Manager/BackgroundProcesses/Administer_Background_Processes.htm">
+  <PARAM NAME="Item2" VALUE="Administer Search Process;Administer_Search_Process.htm">
+  <PARAM NAME="Item3" VALUE="Identify Merge Duplicate Patients;Identify_Merge_Duplicate_Patients.htm">
+</OBJECT>
+
+<!--Metadata type="DesignerControl" endspan-->
+ </p>
+
+</body>
+
+</html>

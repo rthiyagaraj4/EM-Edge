@@ -1,0 +1,864 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>AM_Code_DiscreteMeasure</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<p class="BoldRFD">Enter the following details to create a Discrete Measure record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">ID</span> - Enter the Discrete Measure ID in alphanumeric format of 15 characters maximum length. An ID is used to identify the Discrete Measure and it has to be unique. You cannot change it after creation. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> – Enter the long description of the Discrete Measure in alphanumeric format of 60 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> – Enter the short description of the Discrete Measure in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Component Type</span> – Select the required Component Type from the list of valid values. The listed values are 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Check Box</a>, Date, Date/Time, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Decimal Numeric</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Embedded Component</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Formula</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">Grid Component</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a10">Integer Numeric</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a6">List</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a7">Long Text</a>, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a8">Matrix Component</a>, Short Text, 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a9">Summary Component</a> and Time. The Component Type created is attached to any Service that is a part of a Healthcare Location Type (for example, Nursing Unit, Clinic, etc.). This is a mandatory field.</p>
+<div class="droptext" id="POPUP351967266" style="display: none;">
+<p class="BoldRFD">Numeric Map Digits</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max</span> – Enter the maximum allowable digits in numeric format of one digit maximum. The maximum allowable digits must be greater than or equal to the minimum allowable digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min</span> - Enter the minimum allowable digits in numeric format of one digit maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Decimal Numeric</span> – Enter the number of decimal positions in numeric format of two digits maximum length. The digits specified must be lesser than or equal to the difference of [Max - Min] digits specified.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The above values must be in between the range 1-9.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference Ranges</span> – Select the reference ranges from the list of valid values. The valid values are ‘Single’ and ‘Multiple’. This field displays ‘Single’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD">If the selected ‘Reference Range’ is ‘Single’, enter the following details:</p>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low - High)</span> – Enter the low value and the high value of the discrete measure. For example, for Blood Pressure, the low value can be set to 80 and the high value can be set to 110.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low - High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical Low and High values are as indicators when such situation arises, for example, for Blood Pressure, the Critical low value can be set as 70 and Critical high value can be set as 120.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Enter the Unit of measurement of the Discrete Measure in alphanumeric format of 10 characters maximum. For example, the Unit for Blood Pressure can be set as mm HG.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Numeric Prefix Required</span> - Select the check box to enter Numeric prefixes to discrete measure template.</p>
+</li>
+</ol>
+<p class="BoldRFD">The system displays [Numeric Details] if the selected ‘Reference Range’ is ‘Multiple’. <span style="font-weight: normal;">An example is to record the weight or height of patients of various age groups.</span></p>
+<p class="BoldRFD"><span style="font-weight: normal;">Click the</span> <span class="BoldNumberRFD">[Numeric Details]</span> <span style="font-weight: normal;">to display a Reference Ranges - Numeric Details screen.</span></p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – Select the Gender from the list of valid values. The valid values are ‘Male’, ‘Female’ and ‘Unknown’. This field displays ‘All’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">Start/End</span></p>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – Enter the age in numeric format of three digits maximum.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Select the Units from the list of valid values. The list of valid values include ‘Days’, ‘Months’ and ‘Years’. ‘Days’ is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sequence No</span> – Enter the sequence number in numeric format of two digits maximum.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low - High)</span> – Enter the low value and the high value of the Discrete Measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low - High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical low and high values are as indicators, when the recorded value is same or exceeds the entered Critical Low/High value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">UOM</span> – Enter the Unit of Measurement of the Discrete Measure in alphanumeric format of 10 characters maximum length. For example, the Unit of Measurement for weight can be set as ‘KGs’ or ‘Pounds’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> – Enter the default value, which has to appear while recording the vital signs.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">On entering the required details, click</span> <span class="BoldNumberRFD">[Select]</span> <span style="font-weight: normal;">and the system displays the entered values in the top half of the numeric details &#160;screen. Click</span> <span class="BoldNumberRFD">[Clear]</span> <span style="font-weight: normal;">to clear the values entered and on the press of</span> <span class="BoldNumberRFD">[OK]</span><span style="font-weight: normal;">, the control goes back to the Discrete Measure create screen. Click</span> <span class="BoldNumberRFD">[Cancel]</span> <span style="font-weight: normal;">to cancel the operation.</span></p>
+</div>
+<div class="droptext" id="POPUP356269207" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">On selecting the ‘Component Type’ as ‘Matrix Component’, &#160;<span class="BoldNumberRFD">[Define Matrix]</span> is displayed. Click <span class="BoldNumberRFD">[Define Matrix]</span> and Matrix Definition screen gets displayed.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Matrix Columns</span> - Enter the Matrix Columns in numeric format of two digits maximum length. Maximum number of columns is 10. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Matrix Column Span</span> – Enter the Matrix column Span in numeric format of two digits maximum length. Maximum value has to be nine. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Matrix Rows</span> – Enter the Matrix Rows in numeric format of one digit maximum length. Maximum number of columns is 10. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">On entering the details, click <span class="BoldNumberRFD">[Show Matrix]</span>.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Row Header/Column Header</span> – Enter the Column and Row header in alphanumeric format of 25 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[?]</span> <span class="BoldNumberRFD" style="font-weight: normal;">-</span> Click <span class="BoldNumberRFD">[?]</span> function to select the component for each Matrix field.</p>
+</li>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Show Preview] -</span> Click <span class="BoldNumberRFD">[Show Preview]</span> to view the Matrix.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[OK]</span> to Save the Matrix component defined. Click <span class="BoldNumberRFD">[Cancel]</span> to exit from the screen.</p>
+</div>
+<div class="droptext" id="POPUP350626389" style="display: none;">
+<p class="BoldRFD"><span style="font-weight: normal;">The descriptions are same as that of the Check Box, Date, Date and Time, Short Text and Time.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Free Text Template</span> – Select from the list of valid values. The values are listed from the master ‘Result Template’. The templates defined through the master can be associated to the Long Text using this function. The long text templates associated in this setup are available for the user during transactions.</p>
+</li>
+</ol>
+</div>
+<div class="droptext" id="POPUP356597462" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">On selection of the ‘Component Type’ as ‘List’, <span class="BoldNumberRFD">[Alpha Info]</span> gets displayed.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Associate Score</span> – Select the check box to associate numerical score for each value that user defines in the list item. If the check box is selected, the Score field gets displayed on clicking <span class="BoldNumberRFD">[Alpha Info]</span>.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link Standard Value</span> – Select the check box to link the standard value to the discrete measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Value Ref</span> – Click <span class="BoldNumberRFD">[?]</span> to select the pre-defined standard value.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Alpha Info]</span> to display the Alpha Info screen.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">ID</span> – Enter the ID for the list in alphanumeric format of four characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – Enter the description in alphanumeric format of 100 characters maximum length. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> – Select the check box to display the entered value as default, while making the selection or clear the check box. You can define one list item as default.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">On entering the required details, click <span class="BoldNumberRFD">[Select]</span> and the entered values are displayed in the top half of the Alpha Info screen.</p>
+<p class="BoldRFD" style="font-weight: normal;">On clicking the Serial Number hyperlink, the position of the record can be changed.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Clear]</span> to clear the values entered. Click <span class="BoldNumberRFD">[OK]</span> and the control goes back to the Discrete Measure create screen. Click Description hyperlink to access the record and change the description of the record. Click <span class="BoldNumberRFD">[Delete]</span> to remove the record. Click <span class="BoldNumberRFD">[Cancel]</span> to exit without saving the record.</p>
+</div>
+<div class="droptext" id="POPUP353311085" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;"><span style="font-weight: normal;">Numeric Map Digits</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max</span> – Enter the maximum allowable digits in numeric format of one digit maximum. The maximum allowable digits must be greater than or equal to the minimum allowable digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min</span> - Enter the minimum allowable digits in numeric format of one digit maximum.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Decimal Numeric</span> – Enter the number of decimal positions in numeric format of two digits maximum.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The above values must be in between 1-9.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference Ranges</span> – Select the Reference Ranges from the list of valid values. The valid values are ‘Single’ and ‘Multiple’. The system displays ‘Single’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD">If the selected ‘Reference Range’ is ‘Single’, enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low/High)</span> – Enter the low value and the high value of the discrete measure. For example, for Blood Pressure, the low value can be set to 80 and the high value can be set to 110.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low/High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical low and high values are as indicators, when such situation arises, for example, for Blood Pressure, the Critical low value can be set as 70 and Critical high value can be set as 120.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max/Min (Value)</span> – Enter the maximum and minimum value of the Discrete Measure in numeric format of nine characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Enter the Unit of Measurement of the Discrete Measure in alphanumeric format of 10 characters maximum length. For example, the unit for Blood Pressure can be set as mm HG.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Value</span> – Enter the default value, which has to appear while recording the data in the discrete measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Numeric Prefix Required</span> - Select the check box to enter numeric prefixes to Discrete Measure Template.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link Standard Value</span> – Select the check box to link standard value defined to the component.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Value Ref</span> – Click the <span class="BoldNumberRFD">[?]</span> function and select the Standard Value defined.</p>
+</li>
+</ol>
+<p class="BoldRFD">This field displays a [Numeric Details] button if the selected ‘Reference Range’ is ‘Multiple’. <span style="font-weight: normal;">An example is to record the Weight or Height of patients of various Age Groups.</span></p>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Numeric Details]</span> to display a Reference Ranges - Numeric Details screen.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – Select the Gender from the list of valid values. The valid values are ‘Male’, ‘Female’ and ‘Unknown’. This field displays ‘All’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD" style="font-weight: normal;">Start/End</span></p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – Enter the age in numeric format of three digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Select the units from the list of valid values. The list of valid values include ‘Days’, ‘Months’ and ‘Years’. ‘Days’ is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sequence No</span> – Enter the sequence number in numeric format of two digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low/High)</span> – Enter the low value and the high value of the Discrete Measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low/High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical low and high values are as indicators, when the recorded value is same or exceeds the entered Critical Low/High value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Unit of Measure</span> – Enter the Unit of Measurement of the Discrete Measure in alphanumeric format of 10 characters maximum. For example, the Unit of Measurement for weight set as ‘KGs’ or ‘Pounds’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> – Enter the default value, which has to appear while recording the Vital Signs.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">On entering, the required details, click <span class="BoldNumberRFD">[Select]</span> and the system displays the entered values in the top half of the screen.</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Click</span> <span class="BoldNumberRFD">[Clear]</span> <span style="font-weight: normal;">to clear the values entered and on clicking</span> <span class="BoldNumberRFD">[OK]</span> <span style="font-weight: normal;">the system saves the entered values and the control shifts back to the Discrete Measure create screen. Click</span> <span class="BoldNumberRFD">[Cancel]</span> <span style="font-weight: normal;">to close the screen without saving the record.</span></p>
+</div>
+<div class="droptext" id="POPUP353383050" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">On selecting the ‘Component Type’ as ‘Grid Component’ and clicking on <span class="BoldNumberRFD">[Define Grid]</span>, the system displays a Grid Component Definition screen.</p>
+<p class="BoldRFD">Component Definition</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Component</span> – Select the Component from the <span class="BoldNumberRFD">[?]</span> function. The Component Lookup screen is displayed on clicking the <span class="BoldNumberRFD">[?]</span> function. Enter the following to select a component.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Component ID</span> – Enter the Component ID in alphanumeric format of 15 digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Component Type</span> – Select the Type of Component from the list of values.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Component Prompt</span> – Enter the component prompt in alphanumeric format of 15 digits maximum length.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">On entering the above details, click <span class="BoldNumberRFD">[Search]</span> to view the list of components.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click the Component ID hyperlink to select the component. On selecting the component, it appears in the Component field under Component Definition.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Column Span</span> - Enter the column span in alphanumeric format of two characters maximum length. The maximum value for column span is 10.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Text Rows</span> – Enter the row span in alphanumeric format of one character maximum length. The value of the row span can be maximum two. This field is enabled only when you select the components of type ‘Short Text’.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">Click</span> <span class="BoldNumberRFD">[Add To Grid]</span> <span style="font-weight: normal;">to add the component to the List of Grid Components.</span></p>
+<p class="BoldRFD">Changing the column position of the component:</p>
+<p class="BoldRFD" style="font-weight: normal;">To change the position of any component in the grid, use the Column Position hyperlink.</p>
+<p class="BoldRFD" style="font-weight: normal;">If you want to change the position of the component, click the hyperlink of the desired component’s Column Position.</p>
+<p class="BoldRFD" style="font-weight: normal;">The system allows you to select the Column Position to which the desired component has to be moved.</p>
+<p class="BoldRFD" style="font-weight: normal;">‘+’ is a hyperlink. This is given to add a duplicate grid to the existing row. On clicking the hyperlink, the system adds a grid.</p>
+<p class="BoldRFD" style="font-weight: normal;">Note that there is a ‘-’ mark next to the ‘+’ mark in the newly added row. Click the ‘-’ mark to remove the added row.</p>
+<p class="BoldRFD" style="font-weight: normal;">Similar operations are done on a grid when it is used in the transactions.</p>
+<p class="BoldRFD">Modifying the component</p>
+<p class="BoldRFD" style="font-weight: normal;">To change the grid component, click the Column Header hyperlink to view the details of the component in the respective fields under Component Definition.</p>
+<p class="BoldRFD" style="font-weight: normal;">To modify the component, enter the details such as Component, Column Span or Text Rows and click <span class="BoldNumberRFD">[Modify]</span>.</p>
+<p class="BoldRFD" style="font-weight: normal;">To remove the component from the grid, click <span class="BoldNumberRFD">[Delete from Grid]</span>.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Clear]</span> to clear the values entered. Click <span class="BoldNumberRFD">[Save]</span> and the control goes back to the Discrete Measure create screen. Click <span class="BoldNumberRFD">[Cancel]</span> to cancel the operation.</p>
+</div>
+<div class="droptext" id="POPUP355711903" style="display: none;">
+<p class="BoldRFD">Numeric Map Digits</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max</span> – Enter the maximum allowable digits in numeric format of one digit maximum length. The maximum allowable digits must be greater than or equal to the minimum allowable digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min</span> - Enter the minimum allowable digits in numeric format of one digit maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Decimal Numeric</span> – Enter the number of decimal positions in numeric format of two digits maximum length. The digits specified must be lesser than or equal to the difference of [Max - Min] digits specified.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The above values must be in between the range 1-9.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference Ranges</span> – Select the reference ranges from the list of valid values. The valid values are ‘Single’ and ‘Multiple’. This field displays ‘Single’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD">If the selected ‘Reference Range’ is ‘Single’, enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low - High)</span> – Enter the low value and the high value of the discrete measure. For example, for Blood Pressure, the low value can be set to 80 and the high value can be set to 110.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low - High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical Low and High values are as indicators when such situation arises, for example, for Blood Pressure, the Critical low value can be set as 70 and Critical high value can be set as 120.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Enter the Unit of measurement of the Discrete Measure in alphanumeric format of 10 characters maximum length. For example, the Unit for Blood Pressure can be set as mm HG.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Numeric Prefix Required</span> - Select the check box to enter Numeric prefixes to discrete measure template.</p>
+</li>
+</ol>
+<p class="BoldRFD">The system displays [Numeric Details] if the selected ‘Reference Range’ is ‘Multiple’. <span style="font-weight: normal;">An example is to record the weight or height of patients of various age groups.</span></p>
+<p class="BoldRFD"><span style="font-weight: normal;">Click the</span> <span class="BoldNumberRFD">[Numeric Details]</span> <span style="font-weight: normal;">to display a Reference Ranges - Numeric Details screen.</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – Select the Gender from the list of valid values. The valid values are ‘Male’, ‘Female’ and ‘Unknown’. This field displays ‘All’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;"><span class="BoldNumberRFD">Start/End</span></p>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – Enter the age in numeric format of three digits maximum.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Select the Units from the list of valid values. The list of valid values include ‘Days’, ‘Months’ and ‘Years’. ‘Days’ is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sequence No</span> – Enter the sequence number in numeric format of two digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low/High)</span> – Enter the low value and the high value of the Discrete Measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low/High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical low and high values are as indicators, when the recorded value is same or exceeds the entered Critical Low/High value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">UOM</span> – Enter the Unit of Measurement of the Discrete Measure in alphanumeric format of 10 characters maximum length. For example, the Unit of Measurement for weight can be set as ‘KGs’ or ‘Pounds’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> – Enter the default value, which has to appear while recording the vital signs.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">On entering the required details, click</span> <span class="BoldNumberRFD">[Select]</span> <span style="font-weight: normal;">and the system displays the entered values in the top half of the numeric details &#160;screen. Click</span> <span class="BoldNumberRFD">[Clear]</span> <span style="font-weight: normal;">to clear the values entered and on the press of</span> <span class="BoldNumberRFD">[OK]</span><span style="font-weight: normal;">, the control goes back to the Discrete Measure create screen. Click</span> <span class="BoldNumberRFD">[Cancel]</span> <span style="font-weight: normal;">to cancel the operation.</span></p>
+</div>
+<div class="droptext" id="POPUP359884341" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Definition]</span> to define the component. On clicking the button, the system displays a screen. The displayed Paragraph Definition screen comprises of two areas, the Sentence Builder and the Preview Area.</p>
+<p class="BoldRFD" style="font-weight: normal;">You can build sentences and add component(s) into the sentence builder area by clicking <span class="BoldNumberRFD">[Add Component]</span>. The system displays a component lookup screen. Select the required component by clicking on the component ID. The system displays the selected component in the Sentence Builder section.</p>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Preview]</span> to view the final layout of the component added in the preview area. Once the required sentence is constructed, click <span class="BoldNumberRFD">[Save]</span> to save the component. The control shifts back to the discrete measure screen. Click <span class="BoldNumberRFD">[Apply]</span> to save the record.</p>
+</div>
+<div class="droptext" id="POPUP357848139" style="display: none;">
+<p class="BoldRFD">Numeric Map Digits</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max</span> – Enter the maximum allowable digits in numeric format of one digit maximum length. The maximum allowable digits must be greater than or equal to the minimum allowable digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Min</span> - Enter the minimum allowable digits in numeric format of one digit maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Decimal Numeric</span> – Enter the number of decimal positions in numeric format of two digits maximum length. The digits specified must be lesser than or equal to the difference of [Max - Min] digits specified.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The above values must be in between the range 1-9.</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference Ranges</span> – Select the Reference Ranges from the list of valid values. The valid values are ‘Single’ and ‘Multiple’. The system displays ‘Single’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD">If the selected ‘Reference Range’ is ‘Single’, enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low - High)</span> – Enter the low value and the high value of the discrete measure. For example, for Blood Pressure, the low value can be set to 80 and the high value can be set to 110.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low - High)</span> – Enter the Critical low value and Critical high value for Discrete Measure. The Critical low and high values are displayed as indicators, when such situation arises. For example, for Blood Pressure, the Critical low value can be set as 70 and Critical high value can be set as 120.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max/Min (Value)</span> – Enter the maximum and minimum value of Discrete Measure in numeric format of nine characters maximum length. The maximum and minimum value cannot be equal.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Enter the Unit of Measurement of Discrete Measure in alphanumeric format of 10 characters maximum length. For example, the unit for Blood Pressure can be set as mm HG.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Value</span> – Enter the default value, which has to appear while recording the data in the discrete measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Numeric Prefix Required</span> - Select the check box to enter numeric prefixes to Discrete Measure Template.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link Standard Value</span> – Select the check box to link standard value defined to the component.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Value Ref</span> – Click the <span class="BoldNumberRFD">[?]</span> function and select the Standard Value defined. You can select a value only if the 'Standard Value Ref' check box is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">This field displays a [Numeric Details] button if the selected ‘Reference Range’ is ‘Multiple’. <span style="font-weight: normal;">An example is to record the Weight or Height of patients of various Age Groups.</span></p>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Numeric Details]</span> to display a Reference Ranges - Numeric Details screen.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – Select a Gender from the list of valid values. The valid values are ‘Male’, ‘Female’ and ‘Unknown’. This field displays ‘All’, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span class="BoldNumberRFD">Start/End</span></p>
+<ol start="2" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – Enter the age in numeric format of three digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Units</span> – Select the units from the list of valid values. The list of valid values include ‘Days’, ‘Months’ and ‘Years’. ‘Days’ is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sequence No</span> – Enter the sequence number in numeric format of two digits maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reference (Low - High)</span> – Enter the low value and the high value of the Discrete Measure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Critical (Low - High)</span> – Enter the Critical low value and Critical high value for the Discrete Measure. The Critical low and high values are displayed as indicators, when the recorded value is same or exceeds the entered Critical Low/High value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Unit of Measure</span> – Enter the Unit of Measurement of the Discrete Measure in alphanumeric format of 10 characters maximum. For example, the Unit of Measurement for weight set as ‘KGs’ or ‘Pounds’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> – Enter the default value, which has to appear while recording the Vital Signs.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">On entering, the required details, click <span class="BoldNumberRFD">[Select]</span> and the system displays the entered values in the top half of the screen.</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Click</span> <span class="BoldNumberRFD">[Clear]</span> <span style="font-weight: normal;">to clear the values entered and on clicking</span> <span class="BoldNumberRFD">[OK]</span> <span style="font-weight: normal;">the system saves the entered values and the control shifts back to the Discrete Measure create screen. Click</span> <span class="BoldNumberRFD">[Cancel]</span> <span style="font-weight: normal;">to close the screen without saving the record.</span></p>
+</div>
+<div class="droptext" id="POPUP353374627" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link Standard Value</span> – Select the check box to link Standard Value to discrete measure. On selecting the check box, applicable categories are disabled except Notes Template.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Value Ref</span> – Click the <span class="BoldNumberRFD">[?]</span> function to select the pre-defined Standard Values. This field is mandatory when the 'Link Standard Value' check box is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The above explanations hold good for the Component Types ‘Check Box’, ‘Date’, ‘Date and Time’, ‘Short Text’ and ‘Time’.</p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> – Select the required Service from the list of valid values. The values defined through the &#160;'Discrete Measure' function are listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">History Type (Direct Recording)</span> – Select a History Type from the list of valid values. This reflects in the Clinical History of the patient. The displayed values are Free Documentation, Monitoring and Patient Care. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Confidential</span> – Select the check box if the order results are confidential. On selecting the check box and assigning the privilege to view the confidential result using the ‘Task for Resp/Reln’ function, a Practitioner can view the confidential results of an order in ‘Existing Orders’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> – Select the check box to enable the record. Clear the check box to disable the record. The check box is selected, by default. The enabled records are available in the transaction functions.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Applicable Categories</p>
+<ol start="9" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">All</span> - Select the check box to select all applicable categories. The check box is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Recording Vital</span> – Select the check box to enable the Discrete Measure while recording Vital Signs. The check box is selected, by default. Clear the check box to disable discrete measure while recording Vital Signs.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Recording Chart</span> - Select the check box to enable the Discrete Measure while recording charts in ‘Section for Chart’ function in Clinician Access Code Setup. The check box is selected, by default. Clear the check box to disable discrete measure while recording Charts.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Result Reporting</span> - Select the check box to enable Discrete Measure in ‘Order Catalog’ master function. The check box is selected, by default. Clear the check box to disable the discrete measure while Result Reporting.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Notes Template</span> - Select the check box to enable Discrete Measure while recording Notes in Clinician Access Code Setup. The check box is selected, by default. Clear the check box to disable the discrete measure while creating Notes Template.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">The table shows the categories that are applicable (enabled) on selecting the component types.</p>
+<p class="BoldRFD">&#160;</p>
+<div align="center" >
+<table cellspacing="0" width="81.745%">
+<col style="width: 24.466%;" />
+<col style="width: 17.945%;" />
+<col style="width: 17.549%;" />
+<col style="width: 19.13%;" />
+<col style="width: 20.91%;" />
+<tr valign="top">
+<td style="border: Solid 1px #000000;width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Category / Component</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Recording Vital</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Recording Chart</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Result Reporting</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Notes Template</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Check Box</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Date</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Date/Time</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Decimal Numeric</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Embedded Components</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Formula</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Grid Component</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Integer Numeric</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">List</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Long Text</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Matrix Component</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Short Text</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Summary Component</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">No</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 24.466%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Time</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.945%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 17.549%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 19.13%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 20.91%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Yes</p>
+</td>
+</tr>
+</table>
+</div>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP353374627');
+	TextPopupInit('a2','POPUP357848139');
+	TextPopupInit('a3','POPUP359884341');
+	TextPopupInit('a4','POPUP355711903');
+	TextPopupInit('a5','POPUP353383050');
+	TextPopupInit('a10','POPUP353311085');
+	TextPopupInit('a6','POPUP356597462');
+	TextPopupInit('a7','POPUP350626389');
+	TextPopupInit('a8','POPUP356269207');
+	TextPopupInit('a9','POPUP351967266');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a7','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a8','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a9','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a10','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

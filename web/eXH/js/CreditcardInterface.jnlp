@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp spec="1.0+"  href="CreditcardInterface.jnlp">
+<information>
+		<title>Creditcard Interface Testing</title>
+		<vendor>Enterprise Manager</vendor>
+		<description> EM External Application Communication </description>
+	</information>
+	<security>
+		<all-permissions />
+	</security>
+	<resources>
+		<j2se version="1.4+" />
+		<jar href="../../eXH/CreditcardPlugin/EM-CC-plugin.jar" main="true" />
+		<jar href="../../eXH/CreditcardPlugin/jssc.jar"/>
+	</resources>
+	<application-desc main-class="com.csc.eminterface.cc.Listener" >
+	<argument>8081</argument>
+	<argument>ePosTransaction</argument>
+	</application-desc>
+</jnlp>

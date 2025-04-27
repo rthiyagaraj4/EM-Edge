@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<%@ page contentType="text/html;charset=UTF-8" import ="java.sql.*,java.text.*,eCommon.XSSRequestWrapper" %>
+ 
+<%	    // Modified for CRF - SRR -0425 -- Order Catalog.
+
+
+		request.setCharacterEncoding("UTF-8");
+		request= new XSSRequestWrapper(request);
+		response.addHeader("X-XSS-Protection", "1; mode=block");
+		response.addHeader("X-Content-Type-Options", "nosniff");
+		String order_catalog_code=request.getParameter("order_catalog_code");
+		if(order_catalog_code==null) order_catalog_code="";
+		String mode_find=request.getParameter("mode_find");		
+		String clinic_code1=(String)request.getParameter("clinic_code1");
+		String practitioner_id1=(String)request.getParameter("practitioner_id1");
+
+		String clinic_code2=(String)request.getParameter("clinic_code2");
+		String practitioner_id2=(String)request.getParameter("practitioner_id2");
+
+		String or_catalogue_code=request.getParameter("or_catalogue_code")==null?"":request.getParameter("or_catalogue_code");
+
+		String Date=(String)request.getParameter("Date");
+		String Date1=(String)request.getParameter("Date1");
+		String pre_pat_alcn_catg_code = request.getParameter("pre_pat_alcn_catg_code");
+		if( pre_pat_alcn_catg_code == null) pre_pat_alcn_catg_code="";
+			String create_wait_list_yn=request.getParameter("create_wait_list_yn");
+			if(create_wait_list_yn ==null) create_wait_list_yn="";
+		String value12=(String)request.getParameter("value12");
+		String value13=(String)request.getParameter("value13");
+
+		String old_clinic=(String)request.getParameter("old_clinic");
+		if(old_clinic  == null || old_clinic.equals("null"))old_clinic="";
+
+		String old_practitioner=(String)request.getParameter("old_practitioner");
+		if(old_practitioner== null || old_practitioner.equals("null"))old_practitioner="";
+
+		String old_date=(String)request.getParameter("old_date");
+		if(old_date  == null || old_date.equals("null")) old_date="";
+
+		String old_from_time = request.getParameter("old_from_time");
+		if( old_from_time == null) old_from_time="";
+
+		String old_to_time = request.getParameter("old_to_time");
+		if( old_to_time == null) old_to_time="";
+
+		String valid_date = request.getParameter("valid_date");
+		if(( valid_date == null) || valid_date.equals(""))  valid_date=Date;
+		String ca_mode=(String)request.getParameter("ca_mode");
+		String ca_patient_id=(String)request.getParameter("ca_patient_id");
+		//Added for getting values for CallingMode 
+		String callingMode = request.getParameter("callingMode");
+		if (callingMode==null) callingMode = "";
+		String order_id=request.getParameter("order_id");
+		if(order_id==null) order_id="";
+		String order_line_num=request.getParameter("order_line_num");
+		if(order_line_num == null) order_line_num="";
+
+
+		String title=request.getParameter("title");
+		if(Date1==null || Date1.equals("null"))
+			Date1=Date;// to change
+
+		String oper_stn_id =request.getParameter("oper_stn_id");
+		if(oper_stn_id == null) oper_stn_id="";
+
+		String clinic_type1=request.getParameter("clinic_type1");
+		String res_type1=request.getParameter("res_type1");
+
+		String clinic_type2=request.getParameter("clinic_type2");
+		String res_type2=request.getParameter("res_type2");
+
+		if (clinic_type1==null) clinic_type1 = "C";
+		if (res_type1==null) res_type1 = "P";
+
+		if (clinic_type2==null) clinic_type2 = "C";
+		if (res_type2==null) res_type2 = "P";
+
+		//Added by Suman regd Sql tuning
+		String slot_appt_ctrl=request.getParameter("slot_appt_ctrl")==null?"":request.getParameter("slot_appt_ctrl");
+		String visit_limit_rule=request.getParameter("visit_limit_rule")==null?"":request.getParameter("visit_limit_rule");
+		String alcn_criteria=request.getParameter("alcn_criteria")==null?"":request.getParameter("alcn_criteria");
+		String override_no_of_slots_yn=request.getParameter("override_no_of_slots_yn")==null?"":request.getParameter("override_no_of_slots_yn");
+		String capture_fin_dtls_yn=request.getParameter("capture_fin_dtls_yn")==null?"N":request.getParameter("capture_fin_dtls_yn");
+		String min_ela_per_resc_noshow_in_day=request.getParameter("min_ela_per_resc_noshow_in_day")==null?"":request.getParameter("min_ela_per_resc_noshow_in_day");
+		String noshow_ctrl_by_splty_or_clinic=request.getParameter("noshow_ctrl_by_splty_or_clinic")==null?"":request.getParameter("noshow_ctrl_by_splty_or_clinic");
+		String contact_num_reqd_yn=request.getParameter("contact_num_reqd_yn")==null?"":request.getParameter("contact_num_reqd_yn");
+		String no_of_noshow_appts_for_alert=request.getParameter("no_of_noshow_appts_for_alert")==null?"":request.getParameter("no_of_noshow_appts_for_alert");
+		String per_chk_for_no_show_alert=request.getParameter("per_chk_for_no_show_alert")==null?"":request.getParameter("per_chk_for_no_show_alert");
+		// ends hre	
+		//MR by suman 
+		String req_id=request.getParameter("req_id");
+		if(req_id ==null) req_id="";
+
+	String install_yn_val=request.getParameter("install_yn_val");
+		if(install_yn_val ==null) install_yn_val="N";
+		String from_OR=request.getParameter("from_OR");
+		if(from_OR ==null)from_OR="N";
+		String visit_flag_OP=request.getParameter("visit_flag_OP");
+					if(visit_flag_OP==null) visit_flag_OP="N";	
+
+		String speciality=request.getParameter("speciality");
+		if(speciality ==null) speciality="";
+		String clinic_old=request.getParameter("clinic_old");
+		if(clinic_old ==null) clinic_old="";
+		String practitioner_old=request.getParameter("practitioner_old");
+		if(practitioner_old ==null) practitioner_old="";
+		String practitioner_type=request.getParameter("practitioner_type");
+		if(practitioner_type ==null) practitioner_type="";
+	//	String or_catalogue_code=request.getParameter("or_catalogue_code");
+	//	if(or_catalogue_code ==null) or_catalogue_code="";
+		String pref_start_date=request.getParameter("pref_start_date");
+		if(pref_start_date ==null) pref_start_date="";
+		String pref_end_date=request.getParameter("pref_end_date");
+		if(pref_end_date ==null) pref_end_date="";
+		String care_locn_ind=request.getParameter("care_locn_ind");
+		if(care_locn_ind ==null) care_locn_ind="";
+		String no_dwm=request.getParameter("no_dwm");
+		if(no_dwm ==null) no_dwm="";
+		String visittype=(String)request.getParameter("visittype");
+		if(visittype == null || visittype.equals("null")) visittype ="";
+		String dwm_desc=request.getParameter("dwm_desc");
+if(dwm_desc ==null) dwm_desc="";
+ String from_page=request.getParameter("from_page");
+if(from_page ==null) from_page="";
+
+
+//OPCheckout
+		String from_facility_id= request.getParameter("from_facility_id");
+		if(from_facility_id ==null) from_facility_id="";
+		String from_encounter_id= request.getParameter("from_encounter_id");
+		if(from_encounter_id ==null) from_encounter_id="";
+
+ String calledFrom    =   request.getParameter("calledFrom"); //Added by Sathish.S for IN020026 onMonday, March 22, 2010
+ if(calledFrom ==null) calledFrom="";
+
+  	String position			= checkForNull(request.getParameter("position"));
+	String addtl_splty		= checkForNull(request.getParameter("addtl_splty"));
+	String rule_appl_yn		= checkForNull(request.getParameter("rule_appl_yn"));
+	String patient_id_temp	= checkForNull(request.getParameter("patient_id_temp"));
+	String name_prefix_temp	= checkForNull(request.getParameter("name_prefix_temp"));
+	String first_name_temp	= checkForNull(request.getParameter("first_name_temp"));
+	String second_name_temp	= checkForNull(request.getParameter("second_name_temp"));
+	String third_name_temp	= checkForNull(request.getParameter("third_name_temp"));
+	String family_name_temp	= checkForNull(request.getParameter("family_name_temp"));
+	String name_suffix_temp	=checkForNull(request.getParameter("name_suffix_temp"));	
+	String name_prefix_oth_lang_temp	=checkForNull(request.getParameter("name_prefix_oth_lang_temp"));
+	String first_name_oth_lang_temp	=checkForNull(request.getParameter("first_name_oth_lang_temp"));
+	String second_name_oth_lang_temp	=checkForNull(request.getParameter("second_name_oth_lang_temp"));
+	String third_name_oth_lang_temp	=checkForNull(request.getParameter("third_name_oth_lang_temp"));
+	String family_name_oth_lang_temp	=checkForNull(request.getParameter("family_name_oth_lang_temp"));
+	String name_suffix_oth_lang_temp	=checkForNull(request.getParameter("name_suffix_oth_lang_temp"));
+	String gender_temp		= checkForNull(request.getParameter("gender_temp"));
+	String contact_no_temp	= checkForNull(request.getParameter("contact_no_temp"));
+	String nationality_code_temp	= checkForNull(request.getParameter("nationality_code_temp"));
+	String language_code_temp	= checkForNull(request.getParameter("language_code_temp"));
+	String term_set_id			= checkForNull(request.getParameter("term_set_id"));
+	String linking_code			= checkForNull(request.getParameter("linking_code")); 
+	String apptrefno			= checkForNull(request.getParameter("apptrefno")); 
+	String rd_appt_yn=request.getParameter("rd_appt_yn")==null?"N":request.getParameter("rd_appt_yn");
+%>
+<title><%=title%></title>
+
+<html>
+<iframe name='images' id='images' src='../../eOA/jsp/DisplayTabs.jsp?clinic_code1=<%=clinic_code1%>&practitioner_id1=<%=practitioner_id1%>&clinic_code2=<%=clinic_code2%>&callingMode=<%=callingMode%>&practitioner_id2=<%=practitioner_id2%>&Date=<%=Date%>&Date1=<%=Date1%>&value12=<%=value12%>&value13=<%=value13%>&old_clinic=<%=old_clinic%>&pre_pat_alcn_catg_code=<%=pre_pat_alcn_catg_code%>&ca_mode=<%=ca_mode%>&mode_find=<%=mode_find%>&install_yn_val=<%=install_yn_val%>&from_OR=<%=from_OR%>&visit_flag_OP=<%=visit_flag_OP%>&from_OR=<%=from_OR%>&speciality=<%=speciality%>&clinic_old=<%=clinic_old%>&practitioner_old=<%=practitioner_old%>&practitioner_type=<%=practitioner_type%>&or_catalogue_code=<%=or_catalogue_code%>&pref_start_date=<%=pref_start_date%>&pref_end_date=<%=pref_end_date%>&clinic_type=<%=care_locn_ind%>&no_dwm=<%=no_dwm%>&visittype=<%=visittype%>&dwm_desc=<%=dwm_desc%>&from_page=<%=from_page%>&noshow_ctrl_by_splty_or_clinic=<%=noshow_ctrl_by_splty_or_clinic%>&min_ela_per_resc_noshow_in_day=<%=min_ela_per_resc_noshow_in_day%>&contact_num_reqd_yn=<%=contact_num_reqd_yn%>&calledFrom=<%=calledFrom%>&position=<%=position%>&addtl_splty=<%=addtl_splty%>&rd_appt_yn=<%=rd_appt_yn%>' frameborder=no scrolling=no noresize style='height:4vh;width:100vw'></iframe>
+	<iframe name='queries' id='queries'src='../../eOA/jsp/MultiPract2Vw.jsp?clinic_code1=<%=clinic_code1%>&practitioner_id1=<%=practitioner_id1%>&clinic_code2=<%=clinic_code2%>&practitioner_id2=<%=practitioner_id2%>&Date=<%=Date%>&Date1=<%=Date1%>&value12=<%=value12%>&value13=<%=value13%>&valid_date=<%=valid_date%>&old_clinic=<%=old_clinic%>&old_practitioner=<%=old_practitioner%>&old_date=<%=old_date%>&old_from_time=<%=old_from_time%>&old_to_time=<%=old_to_time%>&old_date=<%=old_date%>&pre_pat_alcn_catg_code=<%=pre_pat_alcn_catg_code%>&ca_patient_id=<%=ca_patient_id%>&ca_mode=<%=ca_mode%>&callingMode=<%=callingMode%>&mode_find=<%=mode_find%>&clinic_type1=<%=clinic_type1%>&res_type1=<%=res_type1%>&clinic_type2=<%=clinic_type2%>&res_type2=<%=res_type2%>&or_catalogue_code=<%=or_catalogue_code%>&order_id=<%=order_id%>&order_line_num=<%=order_line_num%>&order_catalog_code=<%=order_catalog_code%>&oper_stn_id=<%=oper_stn_id%>&visit_limit_rule=<%=visit_limit_rule%>&slot_appt_ctrl=<%=slot_appt_ctrl%>&alcn_criteria=<%=alcn_criteria%>&override_no_of_slots_yn=<%=override_no_of_slots_yn%>&req_id=<%=req_id%>&install_yn_val=<%=install_yn_val%>&create_wait_list_yn=<%=create_wait_list_yn%>&visit_flag_OP=<%=visit_flag_OP%>&capture_fin_dtls_yn=<%=capture_fin_dtls_yn%>&from_page=<%=from_page%>&noshow_ctrl_by_splty_or_clinic=<%=noshow_ctrl_by_splty_or_clinic%>&min_ela_per_resc_noshow_in_day=<%=min_ela_per_resc_noshow_in_day%>&from_facility_id=<%=from_facility_id%>&from_encounter_id=<%=from_encounter_id%>&contact_num_reqd_yn=<%=contact_num_reqd_yn%>&no_of_noshow_appts_for_alert=<%=no_of_noshow_appts_for_alert%>&per_chk_for_no_show_alert=<%=per_chk_for_no_show_alert%>&speciality=<%=speciality%>&clinic_old=<%=clinic_old%>&practitioner_old=<%=practitioner_old%>&practitioner_type=<%=practitioner_type%>&pref_start_date=<%=pref_start_date%>&pref_end_date=<%=pref_end_date%>&clinic_type=<%=care_locn_ind%>&visittype=<%=visittype%>&no_dwm=<%=no_dwm%>&dwm_desc=<%=dwm_desc%>&calledFrom=<%=calledFrom%>&position=<%=position%>&rd_appt_yn=<%=rd_appt_yn%>&addtl_splty=<%=addtl_splty%>' frameborder=no scrolling=no noresize style='height:88vh;width:100vw'></iframe>
+
+	<iframe name='checkbox' id='checkbox' src='../../eOA/jsp/BrownCheckBoxDisplay.jsp'  frameborder=0 scrolling='no' style='height:4vh;width:100vw'>
+	<iframe name='tempStorageFrame' id='tempStorageFrame'src="../../eOA/jsp/OATempStorage.jsp?position=<%=position%>&addtl_splty=<%=addtl_splty%>&patient_id_temp=<%=patient_id_temp%>&name_prefix_temp=<%=name_prefix_temp%>&first_name_temp=<%=first_name_temp%>&second_name_temp=<%=second_name_temp%>&third_name_temp=<%=third_name_temp%>&family_name_temp=<%=family_name_temp%>&name_suffix_temp=<%=name_suffix_temp%>&name_prefix_oth_lang_temp=<%=name_prefix_oth_lang_temp%>&first_name_oth_lang_temp=<%=first_name_oth_lang_temp%>&second_name_oth_lang_temp=<%=second_name_oth_lang_temp%>&third_name_oth_lang_temp=<%=third_name_oth_lang_temp%>&family_name_oth_lang_temp=<%=family_name_oth_lang_temp%>&name_suffix_oth_lang_temp=<%=name_suffix_oth_lang_temp%>&gender_temp=<%=gender_temp%>&contact_no_temp=<%=contact_no_temp%>&rule_appl_yn=<%=rule_appl_yn%>&nationality_code_temp=<%=nationality_code_temp%>&language_code_temp=<%=language_code_temp%>&term_set_id=<%=term_set_id%>&linking_code=<%=linking_code%>&apptrefno=<%=apptrefno%>" frameborder=no scrolling=no noresize style='height:0vh;width:100vw'></iframe>
+
+
+</html>
+<%!
+
+public static String checkForNull(String inputString)
+{
+	return(((inputString==null) || (inputString.equals("null"))) ? "" : inputString);
+}
+
+public static String checkForNull(String inputString, String defaultValue)
+{
+	return(((inputString==null) || (inputString.equals("null"))) ? defaultValue : inputString);
+}
+%>
+

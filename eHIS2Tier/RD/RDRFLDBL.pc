@@ -1,0 +1,506 @@
+/************************************************************************************/
+/* Medicom-eHIS 4.1																	*/
+/*																					*/
+/************************************************************************************/
+/*	Program Name     : RDRFLDBL														*/
+/*																					*/
+/*	Author           : Rajanish Nambiar												*/
+/*																					*/
+/*	Date Created     : 06th Jan, 2004												*/
+/*																					*/
+/*	Called Forms     :																*/
+/*																					*/
+/*	Input Parameters : PGM_ID, USER_ID/PASSWORD, SESSION_ID, PGM_DATE, FACILITY_ID	*/
+/*                     FOLDER_NO, PRINTER_TYPE										*/
+/*																					*/
+/*	Function		 : This program print Folder Label with BarCode					*/
+/*																					*/
+/*																					*/
+/*	Date	  			Modified By			Reason									*/
+/*  --------------		----------------    ---------------------------------------	*/
+/*  06th Jan, 2004 		Rajanish Nambiar    Created									*/
+/*																					*/
+/************************************************************************************/
+
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+
+#include <stdio.h>  
+#include <string.h>
+#include <gl.h>
+#include <math.h>
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR nd_pgm_id			[9],
+		uid_pwd				[122], /* Length changed from 91 to 122 */
+		nd_session_id		[16],
+        nd_pgm_date			[13],
+		nd_facility_id		[3],
+		nd_no_copy			[2],
+		nd_printer_type		[2],
+		nd_folder_no		[21],
+
+		d_patient_id		[21],
+		d_facility_id		[3],
+		d_storage_locn_code	[7],
+		d_pat_name			[181],  /*Length changed from 61 to 181 for internationalisation*/
+        d_nat_id            [21], 
+		d_alt_id1_type      [5], 
+		d_alt_id1_no        [21], 
+		d_alt_id2_type      [5], 
+		d_alt_id2_no        [21],
+		
+        d_id_val			[301],  /*Length changed from 37 to 301 for internationalisation*/
+		d_date_of_birth		[11],
+		d_national_id_num	[16],
+		d_sex				[2],
+		d_facility_nm       [301],  /*Length changed from 31 to 301 for internationalisation*/
+		d_storage_nm		[301],  /*Length changed from 31 to 301 for internationalisation*/
+
+		p_language_id		   [3]
+	,   date_convert		   [21],
+		nd_temp_date		   [21],
+		nd_loc_date            [21],
+		l_translated_value	   [200];
+
+		int i=0,
+			time_flag = 0;
+
+char   string_var [100];
+
+float  mths,dys; 
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *f1;
+
+char filename[150];
+
+char loc_legend[999][200];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+	char  *command;
+	int	  i;
+	float yrs,days;
+	int   iyrs,imths,idays;
+	char  age[5];
+	void get_type();
+
+
+	if(argc < 7) {
+		disp_message(ERR_MESG,"RDRFLDBL : Usage - RDRFLDBL uid/pwd request_num\n");
+        proc_exit();
+	}
+		
+	strcpy(filename,WORKING_DIR);
+	strcat(filename,"RDRFLDBL.lis");
+
+	if ( ( f1 = fopen ( filename, "w" ) ) == NULL ) 
+	{
+		disp_message(ERR_MESG,"Error in opening output file...\n");
+		proc_exit();
+    }
+	
+	/*disp_message(ERR_MESG, "START");
+	disp_message(ERR_MESG, argv[0]);
+	disp_message(ERR_MESG, "0");
+	disp_message(ERR_MESG, argv[1]);
+	disp_message(ERR_MESG, "1");
+	disp_message(ERR_MESG, argv[2]);
+	disp_message(ERR_MESG, "2");
+	disp_message(ERR_MESG, argv[3]);
+	disp_message(ERR_MESG, "3");
+	disp_message(ERR_MESG, argv[4]);
+	disp_message(ERR_MESG, "4");
+	disp_message(ERR_MESG, argv[5]);
+	disp_message(ERR_MESG, "5");
+	disp_message(ERR_MESG, argv[6]);
+	disp_message(ERR_MESG, "6");
+	disp_message(ERR_MESG, "END");*/
+
+	strcpy(nd_pgm_id.arr,argv[0]);
+    nd_pgm_id.len = strlen(nd_pgm_id.arr);
+		
+	strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+		
+	strcpy(nd_session_id.arr, argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr); 
+	     
+    strcpy(nd_pgm_date.arr, argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+	     
+    strcpy(nd_facility_id.arr, argv[4]);
+    nd_facility_id.len = strlen(nd_facility_id.arr); 
+		 
+	strcpy(nd_folder_no.arr,argv[5]);
+    nd_folder_no.len = strlen(nd_folder_no.arr);
+	
+    strcpy(nd_printer_type.arr,argv[6]);
+    nd_printer_type.len = strlen(nd_printer_type.arr);
+	
+	EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+
+    EXEC SQL CONNECT :uid_pwd;
+	
+	set_meduser_role();
+
+	/*Code Included for internationalization*/
+	strcpy(p_language_id.arr,l_language_id.arr);
+	p_language_id.len = l_language_id.len;
+
+	fetch_legend_value();
+
+
+    d_patient_id.arr[0]			= '\0';
+	d_patient_id.len			= 0;
+    d_pat_name.arr[0]			= '\0';
+	d_pat_name.len				= 0;
+
+    d_nat_id.arr[0]			= '\0'; 
+    d_nat_id.len				= 0;
+	d_alt_id1_type.arr[0]			= '\0'; 
+	d_alt_id1_type.len				= 0;
+	d_alt_id1_no.arr[0]			= '\0'; 
+	d_alt_id1_no.len				= 0;
+	d_alt_id2_type.arr[0]			= '\0'; 
+	d_alt_id2_type.len				= 0;
+	d_alt_id2_no.arr[0]			= '\0';
+	d_alt_id2_no.arr[0]			= '\0';
+
+    d_facility_id.arr[0]		= '\0';
+	d_facility_id.len			= 0;
+	d_storage_locn_code.arr[0]	= '\0';
+	d_storage_locn_code.len		= 0;
+	d_facility_nm.arr[0]		= '\0';
+	d_facility_nm.len			= 0;
+	d_storage_nm.arr[0]			= '\0';
+	d_storage_nm.len			= 0;
+
+	EXEC SQL select folder_no, patient_id, facility_id, storage_locn_code
+			   into :nd_folder_no, :d_patient_id, :d_facility_id, :d_storage_locn_code
+               from rd_records_index
+			  where facility_id = :nd_facility_id
+			    and folder_no   = :nd_folder_no;
+
+	if(NO_DATA_FOUND)
+	{
+		disp_message(ERR_MESG,"No Data found in RD_RECORDS_INDEX");
+		proc_exit();
+    }
+
+	EXEC SQL select acc_entity_name
+			   into d_facility_nm   
+	           from sy_acc_entity_LANG_VW
+			  where acc_entity_id = :d_facility_id
+			  AND   LANGUAGE_ID = :p_language_id;
+	
+	if(NO_DATA_FOUND)
+	{
+		disp_message(ERR_MESG,"No Data found in SY_ACC_ENTITY");
+		proc_exit();
+    }
+
+	
+	EXEC SQL select long_desc 	
+			   into d_storage_nm		
+	           from rd_records_store_LANG_VW
+			  where operating_facility_id = :nd_facility_id
+			    and storage_locn_code     = :d_storage_locn_code
+				AND LANGUAGE_ID = :p_language_id;
+					
+	if(NO_DATA_FOUND)
+	{
+		disp_message(ERR_MESG,"No Data found in RD_RECORDS_STORE");
+		proc_exit();
+    }
+	
+	EXEC SQL SELECT DECODE(:p_language_id,'en',SHORT_NAME,SHORT_NAME_LOC_LANG) , 
+					NATIONAL_ID_NUM, ALTERNATE_ID_TYPE, ALTERNATE_ID_NUM, ALTERNATE_ID2_TYPE, ALTERNATE_ID2_NUM
+					//, TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),SEX, NATIONAL_ID_NUM 
+			   INTO :d_pat_name, 
+				    d_nat_id, d_alt_id1_type, d_alt_id1_no, d_alt_id2_type, d_alt_id2_no
+					//, :d_date_of_birth, :d_sex, :d_national_id_num   
+			   FROM MP_PATIENT_MAST //, MP_PARAM
+			  WHERE PATIENT_ID = :d_patient_id;
+
+    d_patient_id.arr[d_patient_id.len]			= '\0';
+    d_pat_name.arr[d_pat_name.len]				= '\0';
+    d_nat_id.arr[d_nat_id.len]					= '\0'; 
+	d_alt_id1_type.arr[d_alt_id1_type.len]		= '\0'; 
+	d_alt_id1_no.arr[d_alt_id1_no.len]			= '\0'; 
+	d_alt_id2_type.arr[d_alt_id2_type.len]		= '\0'; 
+	d_alt_id2_no.arr[d_alt_id2_no.len]			= '\0';
+    nd_folder_no.arr[nd_folder_no.len]					= '\0';
+	d_facility_id.arr[d_facility_id.len]				= '\0';
+	d_storage_locn_code.arr[d_storage_locn_code.len]    = '\0';
+	d_facility_nm.arr[d_facility_nm.len]				= '\0';
+	d_storage_nm.arr[d_storage_nm.len]					= '\0';
+
+    /*yrs= mths= days= imths= iyrs= idays= 0;
+    EXEC SQL SELECT ABS(MONTHS_BETWEEN(SYSDATE,TO_DATE(:d_date_of_birth,'DD/MM/YYYY')))
+			   INTO :mths
+	           FROM DUAL;
+    age[0] = '\0';
+
+	if(mths > 1 && mths <= 24) {
+       imths = mths;
+       sprintf(age,"%dM",imths);
+	}
+	else {
+		if(mths > 1) {
+			yrs= days=0;
+			imths = mths;
+        
+			if (imths > 0)
+				yrs = (int)mths/12;
+				iyrs = yrs;
+				imths = imths - (iyrs * 12);
+				days = (mths - (int)mths) * 31;
+				idays = days;
+		}
+		else {
+			EXEC SQL SELECT (SYSDATE - TO_DATE(:d_date_of_birth,'DD/MM/YYYY'))
+					   INTO :dys
+	                   FROM DUAL;
+			idays = dys;
+        }
+		if(iyrs != 0)
+			sprintf(age,"%dY",iyrs);
+        else if(imths != 0)
+            sprintf(age,"%dM",imths);
+        else
+            sprintf(age,"%dD",idays);
+	}*/
+
+get_type();
+
+  //fprintf(f1,"Folder No.  : %s \n",nd_folder_no.arr);
+	fprintf(f1,"%-12s: %s \n",loc_legend[1],nd_folder_no.arr);
+	print_barcode(f1, nd_folder_no.arr, 0, 0, 40, 150, atoi(nd_printer_type.arr));
+	fprintf(f1,"\n");
+  //fprintf(f1,"Patient ID  : %s \n",d_patient_id.arr);
+	fprintf(f1,"%-12s: %s \n",loc_legend[2],d_patient_id.arr);
+  //fprintf(f1,"      Name  : %s \n",d_pat_name.arr);
+	fprintf(f1,"%11s : %s \n",loc_legend[3],d_pat_name.arr);
+
+if (strlen(d_nat_id.arr) > 0 ) {
+	   fprintf(f1,"%-12s: %s \n",d_id_val.arr, d_nat_id.arr);
+}
+else if (strlen(d_nat_id.arr) == 0 ) {
+
+	if (strlen(d_alt_id1_no.arr) > 0 ) {
+	   fprintf(f1,"%-12s: %s \n",d_id_val.arr, d_alt_id1_no.arr);
+    }
+	else if (strlen(d_alt_id1_no.arr) == 0 )  {
+		if (strlen(d_alt_id2_no.arr) > 0 ) {
+			fprintf(f1,"%-12s: %s \n",d_id_val.arr, d_alt_id2_no.arr);
+		}
+	}
+} 
+
+
+  //fprintf(f1,"Facility    : %s \n",d_facility_nm.arr);
+	fprintf(f1,"%-12s: %s \n",loc_legend[4],d_facility_nm.arr);
+  //fprintf(f1,"Storage Locn: %s \n",d_storage_nm.arr);
+	fprintf(f1,"%-12s: %s \n",loc_legend[5],d_storage_nm.arr);
+		
+	fclose(f1);
+	
+	
+	PrintDocument
+	(
+		uid_pwd.arr,
+		nd_session_id.arr,
+		nd_facility_id.arr,
+		"RD",
+		"RDRFLDBL",
+		filename,
+		"O",
+		" ",
+		1,
+		1,
+		99
+	);
+			
+	EXEC SQL COMMIT WORK RELEASE;
+	return;
+
+	err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ORA_MESG,"Oracle error occured...\n");
+    sprintf(string_var,"%s\n",sqlca.sqlerrm.sqlerrmc);
+    disp_message(ORA_MESG,string_var);
+    proc_exit();
+
+}
+
+void get_type()
+{
+  
+  d_id_val.arr [0]   = '\0';
+  d_id_val.len       = 0;
+
+ if (strlen(d_nat_id.arr) > 0 ) {
+
+	   EXEC SQL SELECT NAT_ID_PROMPT
+			  INTO :d_id_val
+			  FROM MP_PARAM_LANG_VW
+			 WHERE MODULE_ID = 'MP'
+			 AND   LANGUAGE_ID = :p_language_id ;
+ }
+ else if (strlen(d_nat_id.arr) == 0 ) {
+     if (strlen(d_alt_id1_no.arr) > 0 ) {
+			  EXEC SQL SELECT SHORT_DESC
+			  INTO :d_id_val
+			  FROM MP_ALTERNATE_ID_TYPE_LANG_VW
+			 WHERE ALT_ID_TYPE = :d_alt_id1_type 
+			 AND   LANGUAGE_ID = :p_language_id;        
+     }
+	 else if (strlen(d_alt_id1_no.arr) == 0 ) {
+	      if (strlen(d_alt_id2_no.arr) > 0 ) {
+			  EXEC SQL SELECT SHORT_DESC
+			  INTO :d_id_val
+			  FROM MP_ALTERNATE_ID_TYPE_LANG_VW
+			  WHERE ALT_ID_TYPE = :d_alt_id2_type
+			  AND   LANGUAGE_ID = :p_language_id ;
+	 
+	      }
+	 }
+ }
+
+   
+
+/*   if ((d_nat_id.arr != '') &&  (d_alt_id1_no.arr=='') &&  (d_alt_id2_no.arr == '')) {
+	   EXEC SQL SELECT NAT_ID_PROMPT
+			  INTO :d_id_val
+			  FROM MP_PARAM_LANG_VW
+			 WHERE MODULE_ID = 'MP'
+			 AND   LANGUAGE_ID = :p_langauge_id ;
+   }
+   else if (d_alt_id1_no.arr != '' && d_nat_id.arr == '' ) {
+	   EXEC SQL SELECT SHORT_DESC
+			  INTO :d_id_val
+			  FROM MP_ALTERNATE_ID_TYPE_LANG_VW
+			 WHERE ALT_ID_TYPE = :d_alt_id1_no
+			 AND   LANGUAGE_ID = :p_language_id ;	
+   }
+   else if (d_alt_id2_no.arr != '' && d_nat_id.arr == '' && d_alt_id1_no.arr == '' ) {
+	   EXEC SQL SELECT SHORT_DESC
+			  INTO :d_id_val
+			  FROM MP_ALTERNATE_ID_TYPE_LANG_VW
+			 WHERE ALT_ID_TYPE = :d_alt_id2_no 
+			 AND   LANGUAGE_ID = :p_language_id;	
+   }
+
+*/
+  d_id_val.arr [ d_id_val.len ] = '\0';
+  //return;
+}
+
+
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+nd_temp_date.arr[nd_temp_date.len]='\0';
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}
+
+get_local_date()
+{
+
+
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+
+	
+	BEGIN
+	  
+       	get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);
+
+		IF :time_flag = 1 THEN
+		   :nd_loc_date := to_char(t_date,'DD/MM/YYYY HH24:MI');
+		   :time_flag := 0;
+		ELSE
+
+	       :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+
+		END IF;
+	
+
+	END;
+
+	END-EXEC;
+
+		nd_loc_date.arr[nd_loc_date.len]='\0';		     
+
+		if (OERROR)
+		disp_message(ERR_MESG,"Date conversion failed...\n");
+        //err_mesg("SELECTING Date failed",0,"");
+
+}
+
+fetch_legend_value()
+{
+	
+	int i=0;
+	EXEC SQL EXECUTE
+	BEGIN	      
+  	   sm_populate_report_legend.fetch_legend(:nd_facility_id,:p_language_id,'RDRFLDBL.LEGEND_');
+	END;
+	END-EXEC;
+
+
+
+	for (i=1; i<=100; i++)
+	{
+
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+       :l_translated_value := GET_LEGEND(LTRIM(RTRIM('RDRFLDBL.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//disp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(loc_legend[i],l_translated_value.arr);
+
+	}
+
+}

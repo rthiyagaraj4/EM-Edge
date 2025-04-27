@@ -1,0 +1,610 @@
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                        */
+/******************************************************************************/
+/* PROGRAM NAME     : blrvstsl.pc                                             */ 
+/* AUTHOR           : A.JEEVARATHNAM                                          */
+/* DATE WRITTEN     : 01-APR-1998                                             */
+/*                                                                            */
+/* CALLED FROM      : Visit Registration Form                                 */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                  : SESSION_ID (Ignored)                                    */
+/*                  : PGM_DATE   (Ignored)                                    */
+/*                  : ADMISSION NO                                            */
+/*                  : LAST ADMISSION NO                                       */
+/*                  : NOTES LOCATION CODE                                     */
+/*                  : CURRENT STATUS                                          */
+/*                                                                            */
+/*                                                                            */
+/* TABLES ACCESSED  : OP_VIST                                                 */
+/*        ACCESSED  : MP_PATIENT_MAST                                         */
+/*        ACCESSED  : OP_VISIT_TYPE                                           */
+/*        ACCESSED  : OP_CLINIC                                                 */
+/*                                                                            */
+/* OUTPUT FILE      : blrvstsl.lis                                            */
+/*                                                                            */
+/*                                                                            */
+/* FUNCTION         : This program prints Non Paying Patients Visit Slip      */
+/*                                                                            */
+/*                                                                            */
+/* VERSION          : 1.10.01                                                 */
+/* MODIFICATIONS    :                                                         */
+/*                                                                            */
+/******************************************************************************/
+
+/*
+#define DEBUG
+*/
+
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode==1403
+#define ESC 0x1B
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <bl.h>  
+//#include <op.h>
+
+#define INIT_MESG       "Non Paying Patients Slip Printing ..."
+#define ONLINE_PRINTING 1
+
+    
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR uid_pwd                         [42],
+
+	    /* from OP_VISIT      */
+	    d_patient_id                        [21],
+	    d_visit_regn_date_time              [20],
+
+		nd_session_id                       [16],
+		nd_pgm_date                         [16],
+		nd_sys_date							[16],
+		
+		d_trx_based		                    [2],
+        d_printer_type                      [2],
+
+		d_blng_grp_id                       [3],
+		nd_facility_id						[3],
+		nd_exemp_upto_date					[15],
+		d_cashfacility_id					[3],
+		nd_calling_pgm_id					[10],
+		nd_cahier_position					[100],
+		nd_file_name						[100],
+	    
+	    /* from MP_PATIENT_MAST  */
+	    d_sex                               [2],
+	    d_dob                               [15],
+	    d_short_name                        [61],
+	    d_first_name_loc_lang               [21],
+	    d_last_name_loc_lang                [21],
+	    d_mar_status_code                   [2],
+		d_added_by_id						[20],
+		nd_cashier_name						[100],
+	    d_ref_episode_type			[3],
+	    d_ref_episode_id			[10],
+	    d_ref_visit_id			[3],
+	    d_hosp_fee_exm_yn			[3],
+	    d_med_fee_exm_yn			[3],
+	    d_national_id_num                   [16],
+
+		/* from OP_CLINIC  */	    
+		d_clinic_code                       [5],
+		d_clinic_desc                       [16], 
+
+		/* from OP_VISIT_TYPE  */	    
+		d_visit_type_code                   [3],
+		d_visit_type_desc                   [16],
+		
+ 
+	    /* from MP_MARITAL_STATUS  */
+	    d_mar_status_desc                   [16],
+
+	    /* from NT_LOCATION  */
+	    d_note_loc_desc                     [16],
+
+	    /* dummy for Current Status Desc */
+	    d_current_status_desc               [16],
+
+	    /* Parameters passed    */
+	    d_episode_id                        [9],
+	    d_visit_id                          [5],
+	    
+	    /* from SY_ACC_ENTITY */
+	    d_header                            [61];
+
+	    /* Calculated fields */
+		
+
+		VARCHAR  nd_user_name[31];
+
+int    nd_trunc_total_months;
+float  nd_total_months,
+       nd_days_old;
+
+char   string_var[70];
+char   filename[150];
+char	nd_online_yn[1];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+FILE *f1;
+
+int page_no,
+    nd_age_years  = 0,
+    nd_age_months = 0,
+    nd_age_days   = 0;
+
+char outstr[100];
+
+char  *format_amt();      /* function in comma.c   */
+
+char  loc_concat_str[65],
+      eng_concat_str[65];
+
+void proc_main(argc,argv)
+int argc;
+
+char *argv[];
+{
+   
+  if(argc < 6) 
+  {
+      disp_message(ERR_MESG,"blrvstsl : Usage - blrvstsl userid/password Sess_ID, Pgm_date, Episode_id,Visit_id");
+      proc_exit();
+  }
+
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(nd_session_id.arr, argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr); 
+
+    strcpy(nd_pgm_date.arr, argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr); 
+
+    strcpy(nd_facility_id.arr, argv[4]);
+    nd_facility_id.len = strlen(nd_facility_id.arr);
+
+    strcpy(nd_calling_pgm_id.arr, argv[5]);
+    nd_calling_pgm_id.len = strlen(nd_calling_pgm_id.arr);
+ 
+    if (argc > 6) 
+   		strcpy(nd_file_name.arr,argv[6]);
+	else 
+		strcpy(nd_file_name.arr,"blrvstsl.lis");
+
+	   nd_file_name.len = strlen(nd_file_name.arr);
+	   nd_file_name.arr[nd_file_name.len] = '\0';
+    
+
+      strcpy(filename,WORKING_DIR);
+      strcat(filename,nd_file_name.arr);
+
+    if( (f1=fopen(filename,"w")) == NULL) 
+	{
+ 	    disp_message(ERR_MESG,"Error in opening output file...");
+	    proc_exit();
+    }
+
+
+
+	fprintf(f1,"%c(s11H",ESC);
+
+
+    
+    strcpy(outstr,"CONNECT failed for Oracle"); 
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL CONNECT :uid_pwd;
+
+    set_meduser_role();
+
+    if (OERROR) {
+       disp_message ( ORA_MESG, "USERID/PASSWORD failed to Connect");
+       proc_exit();
+   }
+
+                                                         
+ 	EXEC SQL SELECT to_char(sysdate,'dd/mm/yyyy HH24:MI'),substr(:uid_pwd,1,INSTR(:uid_pwd,'/')-1) into 
+        	      nd_sys_date,nd_user_name from dual;
+        	      
+        	      
+  	nd_user_name.arr[nd_user_name.len] = '\0';
+	nd_sys_date.arr[nd_sys_date.len] = '\0';  
+	
+	
+    EXEC SQL SELECT  PARAM1,PARAM2, 
+					 PARAM3,
+					 PARAM30
+              INTO   :d_episode_id,
+					 :d_visit_id, 
+					 :nd_exemp_upto_date,
+					 :nd_online_yn
+              FROM   SY_PROG_PARAM 
+              WHERE    PGM_ID        = 'BLRVSTSL' 
+	            AND    SESSION_ID    = to_number(:nd_session_id)
+	            AND    PGM_DATE      = :nd_pgm_date;
+
+
+    if (NODATAFOUND)
+	   {
+	       strcpy(outstr,"NO_DATA_FOUND for SY_PROG_PARAM"); 
+           goto err_exit;
+       	   }
+
+    if (OERROR) 
+	   {
+	       disp_message ( ORA_MESG, "SELECT failed, for SY_PROG_PARAM");
+           goto err_exit;
+	   }
+
+    EXEC SQL DELETE SY_PROG_PARAM
+		   WHERE  PGM_ID      =  'BLRVSTSL' 
+		   AND    SESSION_ID  = to_number(:nd_session_id)
+		   AND    PGM_DATE    = :nd_pgm_date;
+
+
+   if (OERROR) {
+      disp_message ( ORA_MESG, "DELETE failed on SY_PROG_PARAM");
+      proc_exit();
+      }
+
+   if (NODATAFOUND) {
+      disp_message ( ERR_MESG, "No Data Found in the SY_PROG_PARAM");
+      proc_exit();
+      }
+
+
+
+	/*------------------Start of Select Statements --------------------------*/
+
+    /*  Select from OP_VISIT  */
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT PATIENT_ID,   /* PATIENT ID  */
+	                CLINIC_CODE, 
+				    TO_CHAR(VISIT_REGN_DATE_TIME,'DD/MM/YYYY HH24:MI'),
+					VISIT_TYPE_CODE 
+      	       INTO :d_patient_id,
+			        :d_clinic_code,   
+			        :d_visit_regn_date_time,
+					:d_visit_type_code 
+         	   FROM OP_VISIT      
+	           WHERE  EPISODE_ID = :d_episode_id AND
+		              VISIT_ID   = :d_visit_id   AND
+					  FACILITY_ID = :nd_facility_id; 
+		    
+	    d_patient_id.arr[d_patient_id.len]                      = '\0';
+  	    d_visit_regn_date_time.arr[d_visit_regn_date_time.len]  = '\0';
+		d_clinic_code.arr[d_clinic_code.len]                    = '\0';
+        d_visit_type_code.arr[d_visit_type_code.len]            = '\0';
+
+strcpy(g_facility_id,nd_facility_id.arr);     
+
+    /* Select from MP_PATIENT_MAST    */
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SHORT_NAME,
+		       TO_CHAR(DATE_OF_BIRTH,'DD/MM/YYYY'),  
+		       TO_CHAR(MONTHS_BETWEEN(SYSDATE,DATE_OF_BIRTH)),
+		       TO_CHAR(TRUNC(MONTHS_BETWEEN(SYSDATE,DATE_OF_BIRTH))),
+		       SEX,                    /* SEX                 */
+		       FIRST_NAME_LOC_LANG,    /* FIRST_NAME_LOC_LANG */
+		       LAST_NAME_LOC_LANG,     /* LAST_NAME_LOC_LANG  */
+		       NATIONAL_ID_NUM,        /* NATIONAL_ID_NUM     */
+		       MAR_STATUS_CODE
+
+	     INTO  :d_short_name,
+		       :d_dob,
+		       :nd_total_months,
+		       :nd_trunc_total_months,
+		       :d_sex,        
+		       :d_first_name_loc_lang,
+		       :d_last_name_loc_lang,
+		       :d_national_id_num,
+		       :d_mar_status_code
+
+	     FROM   MP_PATIENT_MAST
+	     WHERE  PATIENT_ID = :d_patient_id;
+
+    d_short_name.arr[d_short_name.len]                     = '\0';
+    d_dob.arr[d_dob.len]                                   = '\0';
+    d_sex.arr[d_sex.len]                                   = '\0';
+    d_first_name_loc_lang.arr[d_first_name_loc_lang.len]   = '\0';
+    d_last_name_loc_lang.arr[d_last_name_loc_lang.len]     = '\0';
+    d_national_id_num.arr[d_national_id_num.len]           = '\0';
+    d_mar_status_code.arr[d_mar_status_code.len]           = '\0';
+
+    
+  /* calculating the age in terms of days, months and days */
+  nd_age_years  = (int) floor(nd_trunc_total_months / 12.0);
+  nd_age_months = (int) floor(nd_trunc_total_months - (nd_age_years * 12)); 
+
+  if ((nd_age_years == 0) && (nd_age_months == 0)){
+  /* if the patient is less than a month old */
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT TRUNC(SYSDATE - TO_DATE(:d_dob, 'DD/MM/YYYY'))
+               INTO :nd_days_old
+               FROM DUAL;
+    nd_age_days = (int) nd_days_old;
+   }
+   /* if the patient is more than a month old */
+   else nd_age_days   = (int) floor((nd_total_months - nd_trunc_total_months) * 31);
+
+/*  Fetch all description Fields    */
+    
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SHORT_DESC   
+		   	   INTO :d_clinic_desc
+          	   FROM OP_CLINIC       
+	           WHERE CLINIC_CODE  = :d_clinic_code
+			   and  FACILITY_ID  = :nd_facility_id; 
+	    
+    d_clinic_desc.arr[d_clinic_desc.len]  = '\0';
+
+
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SHORT_DESC  
+		   	   INTO :d_visit_type_desc
+          	   FROM OP_VISIT_TYPE   
+	           WHERE FACILITY_ID = :nd_facility_id and
+			   VISIT_TYPE_CODE  = :d_visit_type_code; 
+	    
+	    d_visit_type_desc.arr[d_visit_type_desc.len]  = '\0';
+        
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT SHORT_DESC     
+	           INTO   :d_mar_status_desc    
+	           FROM   MP_MARITAL_STATUS 
+	           WHERE  MAR_STATUS_CODE = :d_mar_status_code ;
+
+        d_mar_status_desc.arr[d_mar_status_desc.len]   = '\0';
+  
+        
+    
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL SELECT ACC_ENTITY_NAME
+	           INTO :d_header
+	           FROM SY_ACC_ENTITY
+			   WHERE ACC_ENTITY_ID = :nd_facility_id;
+
+    d_header.arr[d_header.len]                              = '\0'; 
+	          
+        
+        EXEC SQL WHENEVER SQLERROR GOTO err_exit; 
+        EXEC SQL SELECT  BLNG_GRP_ID
+		           INTO  :d_blng_grp_id
+	               FROM  BL_VISIT_FIN_DTLS 
+		           WHERE OPERATING_FACILITY_ID = :nd_facility_id
+				     AND EPISODE_ID    = to_number(:d_episode_id) 
+		             AND VISIT_ID      = to_number(:d_visit_id);
+	 
+    
+       d_blng_grp_id.arr[d_blng_grp_id.len]                = '\0';
+
+    		 
+       if (NODATAFOUND) 
+	   {
+		   strcpy(outstr,"NO_DATA_FOUND for BL_VISIT_FIN_DTLS"); 
+           goto err_exit;
+	   }
+
+    if (OERROR) 
+	   {
+           strcpy(outstr,"SELECT failed for BL_VISIT_FIN_DTLS"); 
+           goto err_exit;
+	   }
+    
+
+	 d_ref_episode_type.arr[0] ='\0';
+	 d_ref_episode_type.len=0;
+	 d_ref_episode_id.arr[0] ='\0';
+	 d_ref_episode_id.len=0;
+	 d_ref_visit_id.arr[0] ='\0';
+	 d_ref_visit_id.len=0;
+      EXEC SQL SELECT  EXM_REF_EPISODE_TYPE,EXM_REF_EPISODE_ID,EXM_REF_VISIT_ID
+		 INTO  :d_ref_episode_type,:d_ref_episode_id,:d_ref_visit_id
+	         FROM  BL_VISIT_EXM_FIN_DTLS 
+		 WHERE OPERATING_FACILITY_ID = :nd_facility_id
+		 AND EPISODE_ID    = to_number(:d_episode_id) 
+		 AND VISIT_ID      = to_number(:d_visit_id);
+    
+	d_ref_episode_type.arr[d_ref_episode_type.len] = '\0';
+	d_ref_episode_id.arr[d_ref_episode_id.len] = '\0';
+	d_ref_visit_id.arr[d_ref_visit_id.len] = '\0';
+	 
+	 d_hosp_fee_exm_yn.arr[0] ='\0';
+	 d_hosp_fee_exm_yn.len=0;
+	 d_med_fee_exm_yn.arr[0] ='\0';
+	 d_med_fee_exm_yn.len=0;
+	 
+	 d_added_by_id.arr[0] ='\0';
+	 d_added_by_id.len=0;
+
+    EXEC SQL SELECT  HOSP_FEE_EXEMPTED_YN,MED_FEE_EXEMPTED_YN,added_by_id
+		INTO  :d_hosp_fee_exm_yn,:d_med_fee_exm_yn,:d_added_by_id
+	               FROM  BL_VISIT_EXM_FIN_DTLS 
+		       WHERE OPERATING_FACILITY_ID = :nd_facility_id
+			AND episode_type=:d_ref_episode_type
+			AND EPISODE_ID    = :d_ref_episode_id
+		        AND VISIT_ID      = :d_ref_visit_id;
+	 
+	 d_hosp_fee_exm_yn.arr[d_hosp_fee_exm_yn.len] = '\0';
+	 d_med_fee_exm_yn.arr[d_med_fee_exm_yn.len] = '\0';
+	 d_added_by_id.arr[d_added_by_id.len] = '\0';
+
+
+/*-------------------End of Select Statements--------------------------------*/
+  
+   /* Line 1 Details  */  
+	fprintf(f1,"%-54.54s Date : %-16s\n"," ",nd_sys_date.arr);       
+    fprintf(f1,"%-28.28s %s\n"," ",d_header.arr);
+	fprintf(f1,"               VISIT SLIP - CREDIT / NON PAYING PATIENT \n");
+    fprintf(f1,"\n");          
+    fprintf(f1,"Patient No   : %-20s ",d_patient_id.arr);
+    fprintf(f1,"%-18.18s Visit No   : %-8s/"," ",d_episode_id.arr);
+	fprintf(f1,"%-4s \n",d_visit_id.arr);
+    fprintf(f1,"Patient Name : %-40.40s",d_short_name.arr);
+    fprintf(f1,"Visit Date : %-16s\n",d_visit_regn_date_time.arr);
+	fprintf(f1,"ID No        : %-15s ",d_national_id_num.arr);
+    fprintf(f1,"%-23.23s Visit Type : %-15s\n"," ",d_visit_type_desc.arr);
+    fprintf(f1,"Fin Class    : %-2s",d_blng_grp_id.arr);
+    fprintf(f1,"%-37.37s Clinic     : %-15s    \n"," ",d_clinic_desc.arr);
+    fprintf(f1,"__________________________________________________________________________________\n");
+
+    // fprintf(f1,"  Visit Charge Exempted upto %s",nd_exemp_upto_date.arr );  	 //commented by vani dated on 21/12/2009
+  	
+       
+	   /*********added by vani*** dated on 21/12/2009******/
+
+       if(strcmp(d_hosp_fee_exm_yn.arr,"Y")==0)
+       fprintf(f1,"\n  Hospital Fee Exempted upto %s\n",nd_exemp_upto_date.arr );
+
+		
+       if(strcmp(d_med_fee_exm_yn.arr,"Y")==0)
+       fprintf(f1,"  Medical Fee Exempted upto %s",nd_exemp_upto_date.arr );
+
+	  fprintf(f1,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	  fprintf(f1,"__________________________________________________________________________________\n");
+      fprintf(f1,"\n\n");
+	  fprintf(f1,"%-27.27s %23.23s----------------------------\n"," ","Signature");
+	  fprintf(f1,"\n\n");
+	  fprintf(f1,"%-41.41s %-s :"," ","Prepared BY"); 
+
+	  get_cashier_name();
+	  get_cashier_designation();
+	  
+	  if(strcmp(nd_cahier_position.arr,"\0")!=0)	  
+	  fprintf(f1,"\n%-42.42s (%-s) :"," ",nd_cahier_position.arr); 
+
+
+   /******************upto here ***********/
+
+
+    /* Skip Page  */
+    fprintf(f1,"");
+    
+/*-------------------End of Printing Statements------------------------------*/
+
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL COMMIT WORK RELEASE;
+
+
+	fprintf(f1,"%c(sl0H",ESC);
+
+    fclose(f1);
+
+
+if (nd_online_yn == 'Y')
+
+{
+	   PrintDocument
+	   (
+		uid_pwd.arr,		//char	*PUidPwd;
+		nd_session_id.arr,	//char	*PSessionID;
+		nd_facility_id.arr,	//char	*PFacilityID;
+		"BL",				//char	*PModuleID;
+		nd_calling_pgm_id.arr,			//char	*PDocumentID;
+		filename,			//char	*POnlinePrintFileNames;
+		"O",				//char	*PLocationTypes;
+		" ",				//char	*PLocationCodes;
+		1,					//int		PNumOfCopies;
+		1,					//int		PPageFrom;
+		9999					//int		PPageTo;
+		);
+}
+
+
+    return(0);
+
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    EXEC SQL ROLLBACK WORK RELEASE;
+    disp_message(ERR_MESG,"Oracle error occured...");
+    disp_message(ORA_MESG,sqlca.sqlerrm.sqlerrmc);
+    return;
+}
+
+get_cashier_name()
+{
+
+  nd_cashier_name.arr[0]='\0';
+  nd_cashier_name.len	  =0; 
+
+  
+
+  EXEC SQL SELECT DISTINCT APPL_USER_NAME
+  INTO  :nd_cashier_name
+  FROM   SM_APPL_USER
+  WHERE  APPL_USER_ID=:d_added_by_id;
+ 
+  if (OERROR)
+	  { 
+		disp_message (ERR_MESG,"FETCH FAILED FROM SM_APPL_USER TABLE");
+	  }
+ 
+  nd_cashier_name.arr[nd_cashier_name.len]='\0';
+   
+} 
+
+/* Getting designation of cashier */
+
+get_cashier_designation()
+{
+ 
+ 
+ nd_cahier_position.arr[0] ='\0';
+ nd_cahier_position.len	   = 0;
+
+
+ EXEC SQL EXECUTE
+    
+	DECLARE
+    nd_func_role  VARCHAR2(3);
+	
+	BEGIN
+		
+		SELECT FUNC_ROLE 
+		INTO nd_func_role
+        FROM SM_APPL_USER
+		WHERE  APPL_USER_ID=:d_added_by_id;
+       
+
+		//IF nd_func_role='O' THEN
+
+		SELECT long_desc 
+		INTO :nd_cahier_position
+		FROM sm_appl_user a,am_other_staff b,am_other_staff_type C
+		WHERE a.appl_user_id=:d_added_by_id
+		AND a.FUNC_ROLE='O'
+		AND b.OTHER_STAFF_ID = a.FUNC_ROLE_ID
+		AND c.OTHER_STAFF_TYPE = b.OTHER_STAFF_TYPE;
+
+	//	END IF;
+
+
+
+	END;
+
+END-EXEC;
+ 
+    
+    nd_cahier_position.arr[nd_cahier_position.len]='\0';
+
+ if (OERROR)
+	  { 
+		disp_message (ERR_MESG,"FETCH FAILED FROM SM_APPL_USER TABLE");
+	  }
+
+ 
+}     
+

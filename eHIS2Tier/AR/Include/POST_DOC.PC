@@ -1,0 +1,667 @@
+/*****************************************************************************/
+/*                           POST_DOC.PC                                     */
+/*****************************************************************************/
+      
+/*
+#define DEBUG
+*/
+
+#include <stdio.h>
+#include <string.h>
+                     
+/*---------------------------------*/  
+#define PC_START		1
+#define PC_END			2
+#define	INFO_MESG		3
+#define ERR_MESG		4
+#define ORA_MESG		5  
+
+void proc_main (int, char **);
+void disp_message ( int, char *);
+void open_log_file();
+void proc_exit();
+/*-----------------------------------*/                      
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR	sub_doc_type_code     [8],
+	        sub_main_acc1_code    [8],
+		sub_main_acc2_code        [6],
+	        sub_sum_acc1_code     [8],
+		sub_sum_acc2_code         [6],
+	        sub_acc1_code         [8],
+		sub_acc2_code             [6],
+		sub_dept_code             [11],
+		sub_product_group_code    [4],
+		sub_product_line_code     [6],
+		sub_subledger_group_code  [4],
+		sub_subledger_line_code   [10],
+		sub_acc_entity_code       [6],
+		sub_doc_date              [14],
+		sub_doc_ref               [12],
+		sub_narration_hdr         [52],
+		sub_narration             [52],
+		sub_doc_nature            [4],
+		sub_module_id             [4],
+		sub_txn_type_desc         [6],
+		sub_summ_flag             [2],
+		sub_bank_recon_flag       [2],
+
+		sub_foreign_curr_flag     [2],
+        sub_cust_supp_code        [9],
+		sub_currency_code         [7],
+
+		sub_dummy                 [2];
+
+    long      	sub_batch_num,
+		sub_doc_num;
+
+    int         sub_post_month,
+		sub_post_year,
+		sub_curr_month,
+		sub_curr_year,
+		sub_line_num,
+    	sub_month;
+
+/*---- Added by Venkat on 22/12/1999 ----*/
+		int  d_curr_year1;
+		int  d_curr_month1;
+/*---------------------------------------*/
+	
+    double      sub_local_amt, sub_exchg_rate,
+		sub_foreign_amt;         
+	char string_var[100]; /* for disp_message */	
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+/*#include "winproc.h" */
+
+/*************************************************/
+/*  The following extern variables must be       */
+/*  available in the calling program             */
+/*************************************************/
+
+    extern int  d_curr_year;
+    extern int  d_curr_month;
+    extern int  d_num_of_acc_periods;
+    extern char d_summ_flag;
+/*************************************************/
+
+int post_doc(l_batch_num,l_doc_type_code,l_doc_num,r_err_msg)
+
+char *l_doc_type_code,
+     *r_err_msg;
+
+
+long l_batch_num,
+     l_doc_num;
+
+/* function returns values 0 - Success  or  -1 - Failure */
+
+{
+
+    static int l_decl_cur = 1;
+
+    strcpy(sub_doc_type_code.arr,l_doc_type_code);
+    sub_doc_type_code.len = strlen(sub_doc_type_code.arr);
+
+    sub_batch_num = l_batch_num;
+    sub_doc_num   = l_doc_num;
+
+#ifdef DEBUG
+    disp_message(INFO_MESG,"POSTING DOCUMENT...\n");
+    sprintf(string_var,"doc_type_code = %s\n",sub_doc_type_code.arr);
+    disp_message(INFO_MESG,string_var);
+    sprintf(string_var,"doc_num       = %ld\n\n",sub_doc_num);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+
+/*--- Added by Venkat on 22/12/1999 for selecting the -----
+----- latest Acc.Month/Year from GL Parameter ------------*/
+ 
+    
+   EXEC SQL SELECT CURRENT_ACC_YEAR,CURRENT_ACC_MONTH
+                     INTO d_curr_year1, d_curr_month1
+                     FROM GL_PARAMETER;
+
+
+if((d_curr_year1 != d_curr_year) || (d_curr_month1 != d_curr_month)) 
+{
+    disp_message(ERR_MESG,"GL Month/Year end Process in Progress,Please exit!");
+	EXEC SQL ROLLBACK;
+  
+   end_prog_control();
+   EXEC SQL COMMIT WORK RELEASE;
+
+	proc_exit();
+} 
+
+ if(sqlca.sqlcode < 0) {
+	strcpy(r_err_msg,"SELECT failed on table GL_PARAMETER");
+	return (-1);
+    }
+
+
+/*---------------------------------------------------------*/
+
+
+    sub_curr_year = d_curr_year;
+    sub_curr_month = d_curr_month;
+
+  
+
+    EXEC SQL SELECT ACC_ENTITY_CODE,
+		    to_char(DOC_DATE,'DD/MM/YYYY'),
+		    DOC_REF,
+		    POST_MONTH,
+		    POST_YEAR,
+		    DOC_NATURE,
+		    MODULE_ID,
+		    TXN_TYPE_DESC,
+		    NARRATION
+	     INTO   
+		    :sub_acc_entity_code,
+		    :sub_doc_date,
+		    :sub_doc_ref,
+		    :sub_post_month,
+		    :sub_post_year,
+		    :sub_doc_nature,
+		    :sub_module_id,
+		    :sub_txn_type_desc,
+		    :sub_narration_hdr
+	     FROM   GL_TXN_DOC_HDR
+	     WHERE  BATCH_NUM     = :sub_batch_num
+	     AND    DOC_TYPE_CODE = :sub_doc_type_code
+	     AND    DOC_NUM       = :sub_doc_num;
+
+    if(sqlca.sqlcode < 0) {
+	strcpy(r_err_msg,"SELECT failed on table GL_TXN_DOC_HDR");
+	return (-1);
+    }
+
+    sub_module_id.arr[sub_module_id.len] = '\0';
+
+
+    if(!strcmp(sub_module_id.arr,"GL")) {
+
+
+
+#ifdef DEBUG
+    disp_message(INFO_MESG,"Inserting into SY_DOC_CONTROL...\n");
+#endif
+
+        EXEC SQL INSERT INTO SY_DOC_CONTROL (
+			     ACC_ENTITY_CODE,
+                             MODULE_ID,
+                             DOC_TYPE_CODE,
+                             DOC_NUM,
+                             DOC_DATE,
+                             POSTED_DATE,
+                             DOC_STATUS,
+                             NARRATION,
+                             POST_MONTH,
+                             POST_YEAR,
+                             CANCELLED_DATE ,
+                             ADDED_BY_ID,
+                             MODIFIED_BY_ID ,
+                             ADDED_DATE,
+                             MODIFIED_DATE	)
+	         VALUES   (  :sub_acc_entity_code,
+                             :sub_module_id,
+                             :sub_doc_type_code,
+                             :sub_doc_num,
+                             to_date(:sub_doc_date,'DD/MM/YYYY'),
+                             SYSDATE,
+                             'P',
+                             :sub_narration_hdr,
+                             :sub_post_month,
+                             :sub_post_year,
+                             '',
+                             USER,
+                             USER,
+                             SYSDATE,
+                             SYSDATE );
+
+        if(sqlca.sqlcode < 0) {
+	    strcpy(r_err_msg,"INSERT failed on table SY_DOC_CONTROL");
+	    return (-1);
+        }
+
+    } /* end of if module_id = GL */
+
+
+/*   if( (sub_post_year == sub_curr_year) &&
+       (sub_post_month <= sub_curr_month))    
+{*/ /* This is if loop is commented for HMC Customization*/
+
+
+        if(l_decl_cur) {
+    
+            EXEC SQL DECLARE GL_TXN_LINE_CUR CURSOR FOR
+	             SELECT  MAIN_ACC1_CODE,
+	                     MAIN_ACC2_CODE,
+	                     DEPT_CODE,
+	                     PRODUCT_GROUP_CODE,
+	                     PRODUCT_LINE_CODE ,
+	                     SUBLEDGER_GROUP_CODE ,
+	                     SUBLEDGER_LINE_CODE,
+		                 NARRATION,
+		                 LINE_NUM,
+		                 nvl(FOREIGN_AMT,0),
+		                 LOCAL_AMT,
+					     CURRENCY_CODE,
+					     EXCHG_RATE ,
+					     CUST_SUPP_CODE
+	             FROM    GL_TXN_DOC_LINE
+	             WHERE   BATCH_NUM     = :sub_batch_num
+		     AND     DOC_TYPE_CODE = :sub_doc_type_code
+	             AND     DOC_NUM       = :sub_doc_num
+	             FOR UPDATE OF MAIN_ACC1_CODE;
+        }
+    
+        EXEC SQL OPEN GL_TXN_LINE_CUR;
+      
+        
+		
+		while(fetch_txn_line()) {
+               
+
+	    EXEC SQL UPDATE GL_PERIOD_ACC_BAL_LOCAL
+	             SET    YEAR_BAL_DR          =  NVL(YEAR_BAL_DR,0)  + DECODE(SIGN(:sub_local_amt),1,:sub_local_amt,0),
+		                YEAR_BAL_CR          =   NVL(YEAR_BAL_CR,0) + DECODE(SIGN(:sub_local_amt),1,0,ABS(:sub_local_amt)),
+                        YEAR_BAL_DR_FC       =  NVL(YEAR_BAL_DR_FC,0)  + DECODE(SIGN(:sub_foreign_amt),1,:sub_foreign_amt,0),
+		                YEAR_BAL_CR_FC       =   NVL(YEAR_BAL_CR_FC,0) + DECODE(SIGN(:sub_foreign_amt),1,0,ABS(:sub_foreign_amt))
+	             WHERE  MAIN_ACC1_CODE       =  :sub_main_acc1_code
+	             AND    MAIN_ACC2_CODE       =  :sub_main_acc2_code
+	             AND    DEPT_CODE            =  :sub_dept_code
+	             AND    PRODUCT_GROUP_CODE   =  :sub_product_group_code
+	             AND    PRODUCT_LINE_CODE    =  :sub_product_line_code
+	             AND    SUBLEDGER_GROUP_CODE =  :sub_subledger_group_code
+	             AND    SUBLEDGER_LINE_CODE  =  :sub_subledger_line_code
+	             AND    POST_YEAR            =  :sub_post_year
+	             AND    POST_MONTH  BETWEEN :sub_post_month AND 12;
+
+            if(sqlca.sqlcode < 0) {
+                strcpy(r_err_msg,"UPDATE failed on table GL_PERIOD_ACC_BAL_LOCAL");
+	        return (-1);
+            }
+
+	    if(sub_post_month > 0) {
+
+	        EXEC SQL UPDATE GL_PERIOD_ACC_BAL_LOCAL
+	                 SET    MONTH_BAL_DR         =  NVL(MONTH_BAL_DR,0) + DECODE(SIGN(:sub_local_amt),1,:sub_local_amt,0),
+	                        MONTH_BAL_CR         =  NVL(MONTH_BAL_CR,0) + DECODE(SIGN(:sub_local_amt),1,0,ABS(:sub_local_amt)),
+                            MONTH_BAL_DR_FC      =  NVL(MONTH_BAL_DR_FC,0)  + DECODE(SIGN(:sub_foreign_amt),1,:sub_foreign_amt,0),
+   	                        MONTH_BAL_CR_FC      =  NVL(MONTH_BAL_CR_FC,0) + DECODE(SIGN(:sub_foreign_amt),1,0,ABS(:sub_foreign_amt))
+	                 WHERE MAIN_ACC1_CODE        =  :sub_main_acc1_code
+	                 AND    MAIN_ACC2_CODE       =  :sub_main_acc2_code
+	                 AND    DEPT_CODE            =  :sub_dept_code
+	                 AND    PRODUCT_GROUP_CODE   =  :sub_product_group_code
+	                 AND    PRODUCT_LINE_CODE    =  :sub_product_line_code
+	                 AND    SUBLEDGER_GROUP_CODE =  :sub_subledger_group_code
+	                 AND    SUBLEDGER_LINE_CODE  =  :sub_subledger_line_code
+	                 AND    POST_YEAR            =  :sub_post_year
+	                 AND    POST_MONTH           =  :sub_post_month;
+    
+                if(sqlca.sqlcode < 0) {
+                    strcpy(r_err_msg,"UPDATE failed on table GL_PERIOD_ACC_BAL_LOCAL");
+                    return (-1);
+                }
+
+	    } /* end of if sub_post_month > 0 */
+
+	    
+		EXEC SQL INSERT INTO GL_POSTED_TXN_CURRENT  (
+                                 ACC_ENTITY_CODE,
+                                 BATCH_NUM,
+                                 DOC_TYPE_CODE,
+                                 DOC_NUM,
+                                 LINE_NUM,
+                                 MAIN_ACC1_CODE,
+                                 MAIN_ACC2_CODE,
+                                 SUBLEDGER_GROUP_CODE,
+                                 SUBLEDGER_LINE_CODE,
+                                 DEPT_CODE,
+                                 PRODUCT_GROUP_CODE,
+                                 PRODUCT_LINE_CODE,
+                                 POST_YEAR,
+                                 POST_MONTH,
+                                 DOC_NATURE,
+                                 LOCAL_AMT,
+                                 FOREIGN_AMT,
+                                 DOC_DATE,
+                                 DOC_REF,
+                                 NARRATION,
+                                 POSTED_BY_ID,
+                                 POSTED_DATE,
+                                 MODULE_ID,
+                                 TXN_TYPE_DESC,
+                                 CUST_SUPP_CODE,
+								 CURRENCY_CODE , 
+								 EXCHG_RATE      ) 
+	            VALUES     ( :sub_acc_entity_code,	
+                                 :sub_batch_num,
+                                 :sub_doc_type_code,
+                                 :sub_doc_num,
+                                 :sub_line_num ,
+                                 :sub_main_acc1_code,
+                                 :sub_main_acc2_code,
+                                 :sub_subledger_group_code,
+                                 :sub_subledger_line_code,
+                                 :sub_dept_code,
+                                 :sub_product_group_code,
+                                 :sub_product_line_code,
+                                 :sub_post_year,
+                                 :sub_post_month,
+                                 :sub_doc_nature,
+                                 :sub_local_amt,
+                                 :sub_foreign_amt,
+                                 TO_DATE(:sub_doc_date,'DD/MM/YYYY'),
+                                 :sub_doc_ref,
+                                 :sub_narration,
+                                 USER,
+                                 SYSDATE,
+                                 :sub_module_id,
+                                 :sub_txn_type_desc,
+                                 :sub_cust_supp_code ,
+								 :sub_currency_code,
+								 :sub_exchg_rate) ;
+
+								 
+
+                if(sqlca.sqlcode < 0) {
+	            strcpy(r_err_msg,"INSERT failed on table GL_POSTED_TXN_CURRENT");
+	            return (-1);
+                }
+
+
+	     EXEC SQL SELECT NVL(BANK_RECONCILE_FLAG,'N')
+		     INTO   :sub_bank_recon_flag
+		     FROM   GL_POSTING_ACC
+		     WHERE  MAIN_ACC1_CODE       =  :sub_main_acc1_code
+		     AND    MAIN_ACC2_CODE       =  :sub_main_acc2_code
+	             AND    DEPT_CODE            =  :sub_dept_code
+	             AND    PRODUCT_GROUP_CODE   =  :sub_product_group_code
+	             AND    PRODUCT_LINE_CODE    =  :sub_product_line_code
+	             AND    SUBLEDGER_GROUP_CODE =  :sub_subledger_group_code
+	             AND    SUBLEDGER_LINE_CODE  =  :sub_subledger_line_code;
+
+	      if(sqlca.sqlcode < 0 )  {
+	          strcpy(r_err_msg,"SELECT failed on table GL_POSTING_ACC");
+		  return (-1);
+	      }
+
+  
+     if (strcmp(sub_bank_recon_flag.arr, "Y") == 0)
+    {
+		  EXEC SQL SELECT NVL(FOREIGN_CURRENCY_ACCT_YN,'N')
+		     INTO   :sub_foreign_curr_flag
+		     FROM   GL_ACC_CHART
+		     WHERE  MAIN_ACC1_CODE       =  :sub_main_acc1_code
+		     AND    MAIN_ACC2_CODE       =  :sub_main_acc2_code;
+
+	      if(sqlca.sqlcode < 0 )  
+		  {
+	          strcpy(r_err_msg,"SELECT failed on table GL_ACC_CHART");
+		      return (-1);
+	      }
+    }
+
+   if(sub_bank_recon_flag.arr[0] == 'Y' && (strcmp(sub_doc_nature.arr,"OPN")!= 0) ) 
+   {
+
+      if  (strcmp(sub_foreign_curr_flag.arr , "Y") == 0)
+	  {
+	         sub_local_amt  = sub_foreign_amt;
+	  }
+
+
+	           EXEC SQL INSERT INTO GL_BB_TXN_LINE (
+                                 ACC_ENTITY_CODE,
+                                 MAIN_ACC1_CODE,
+                                 MAIN_ACC2_CODE,
+                                 DEPT_CODE,
+                                 PRODUCT_GROUP_CODE,
+                                 PRODUCT_LINE_CODE,
+                                 SUBLEDGER_GROUP_CODE,
+                                 SUBLEDGER_LINE_CODE,
+                                 TXN_TYPE,
+                                 DOC_DATE,
+                                 DOC_REF,
+                                 DOC_AMT,
+                                 DOC_TYPE_CODE,
+                                 DOC_NUM,
+                                 RECONCILED_FLAG,
+                                 POST_MONTH,
+                                 POST_YEAR)
+		    VALUES     ( :sub_acc_entity_code,
+                                 :sub_main_acc1_code,
+                                 :sub_main_acc2_code,
+                                 :sub_dept_code,
+                                 :sub_product_group_code,
+                                 :sub_product_line_code,
+                                 :sub_subledger_group_code,
+                                 :sub_subledger_line_code,
+                                 'P',
+                                 TO_DATE(:sub_doc_date,'DD/MM/YYYY'),
+                                 :sub_doc_ref,
+                                 :sub_local_amt,
+                                 :sub_doc_type_code,
+                                 :sub_doc_num,
+				 'N',
+				 :sub_post_month,
+				 :sub_post_year);
+    
+                  if(sqlca.sqlcode < 0) {
+                    strcpy(r_err_msg,"INSERT failed on table GL_BB_TXN_LINE");
+                    return (-1);
+                  }
+
+	    } /* end of if bank_recon_flag = Y */
+
+
+            sub_summ_flag.arr[0] = '\0';
+            sub_summ_flag.len = 0;
+    
+#ifdef DEBUG
+    sprintf(string_var,"POST_DOC: Summary flag = %c\n",d_summ_flag);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+	    if(d_summ_flag == 'O') {
+    
+	         sub_summ_flag.arr[0] = 'Y';
+	         sub_summ_flag.len = 1;
+    
+	         if(process_summ(r_err_msg) == -1)
+		     return (-1);
+	    }
+
+        } /* end of while fetch_txn_line() */
+
+        EXEC SQL CLOSE GL_TXN_LINE_CUR;
+
+  /*}*/ /* This is if loop is commented for HMC Customization*//* end if current post month-year */
+
+    EXEC SQL UPDATE GL_PARAMETER
+	     SET ALLOC_JV_GEN_FLAG = NULL;
+
+    if(sqlca.sqlcode < 0) {
+         strcpy(r_err_msg,"UPDATE failed on table GL_PARAMETER");
+         return (-1);
+    }
+
+    if(strcmp(sub_module_id.arr,"GL")) { /* for all other modules */
+
+	EXEC SQL UPDATE GL_TXN_DOC_HDR
+		 SET    POSTED_FLAG = 'Y',
+			POSTED_BY   = USER,
+			POSTED_DATE = SYSDATE,
+			SUMMARY_PROCESSED_FLAG = :sub_summ_flag
+	         WHERE  BATCH_NUM     = :sub_batch_num
+	         AND    DOC_TYPE_CODE = :sub_doc_type_code
+	         AND    DOC_NUM       = :sub_doc_num;
+
+	if(sqlca.sqlcode < 0) {
+             strcpy(r_err_msg,"UPDATE failed on table GL_TXN_DOC_HDR");
+             return (-1);
+        }
+
+    }
+
+    return 0;
+
+} /**** end function post_doc ****/
+
+process_summ(l_err_msg)
+char *l_err_msg;
+{
+
+    static int decl_cur = 1;
+
+    if(decl_cur) {
+
+	EXEC SQL DECLARE GL_ACC_SUM_LINE_CUR CURSOR FOR
+		 SELECT  SUM_ACC1_CODE,
+			 SUM_ACC2_CODE
+		 FROM    GL_ACC_SUM_LINE
+		 WHERE   MAIN_ACC1_CODE = :sub_main_acc1_code
+		 AND     MAIN_ACC2_CODE = :sub_main_acc2_code;
+
+	decl_cur = 0;
+
+    }
+
+    EXEC SQL OPEN GL_ACC_SUM_LINE_CUR;
+
+    while(fetch_summ_acc()) {
+
+            process_posting_acc(sub_sum_acc1_code.arr,
+			     sub_sum_acc2_code.arr,
+			     sub_dept_code.arr,
+	                     sub_product_group_code.arr,
+	                     sub_product_line_code.arr,
+	                     sub_subledger_group_code.arr,
+	                     sub_subledger_line_code.arr,
+			     'Y',
+			     d_num_of_acc_periods,
+	                     sub_post_year);
+
+
+	       EXEC SQL UPDATE GL_PERIOD_ACC_BAL_LOCAL
+	                SET    YEAR_BAL_DR          =  NVL(YEAR_BAL_DR,0)  + DECODE(SIGN(:sub_local_amt),1,:sub_local_amt,0),
+	                       YEAR_BAL_CR          =  NVL(YEAR_BAL_CR,0) + DECODE(SIGN(:sub_local_amt),1,0,ABS(:sub_local_amt)),
+						   YEAR_BAL_DR_FC       =  NVL(YEAR_BAL_DR_FC,0)  + DECODE(SIGN(:sub_foreign_amt),1,:sub_foreign_amt,0),
+	                       YEAR_BAL_CR_FC       =  NVL(YEAR_BAL_CR_FC,0) + DECODE(SIGN(:sub_foreign_amt),1,0,ABS(:sub_foreign_amt))
+	                WHERE  MAIN_ACC1_CODE       =  :sub_sum_acc1_code
+	                AND    MAIN_ACC2_CODE       =  :sub_sum_acc2_code
+	                AND    DEPT_CODE            =  :sub_dept_code
+	                AND    PRODUCT_GROUP_CODE   =  :sub_product_group_code
+	                AND    PRODUCT_LINE_CODE    =  :sub_product_line_code
+	                AND    SUBLEDGER_GROUP_CODE =  :sub_subledger_group_code
+	                AND    SUBLEDGER_LINE_CODE  =  :sub_subledger_line_code
+	                AND    POST_YEAR            =  :sub_post_year
+	                AND    POST_MONTH  BETWEEN :sub_post_month AND 12;
+
+               if(sqlca.sqlcode < 0) {
+                   strcpy(l_err_msg,"UPDATE failed on table GL_PERIOD_ACC_BAL_LOCAL");
+	           return (-1);
+               }
+
+	       if(sub_post_month > 0) {
+
+	           EXEC SQL UPDATE GL_PERIOD_ACC_BAL_LOCAL
+	                SET   MONTH_BAL_DR          =  NVL(MONTH_BAL_DR,0) + DECODE(SIGN(:sub_local_amt),1,:sub_local_amt,0),
+	                      MONTH_BAL_CR          =  NVL(MONTH_BAL_CR,0) + DECODE(SIGN(:sub_local_amt),1,0,ABS(:sub_local_amt)),
+	                      MONTH_BAL_DR_FC       =  NVL(MONTH_BAL_DR_FC,0) + DECODE(SIGN(:sub_foreign_amt),1,:sub_foreign_amt,0),
+	                      MONTH_BAL_CR_FC       =  NVL(MONTH_BAL_CR_FC,0) + DECODE(SIGN(:sub_foreign_amt),1,0,ABS(:sub_foreign_amt))
+
+	                WHERE  MAIN_ACC1_CODE       =  :sub_sum_acc1_code
+	                AND    MAIN_ACC2_CODE       =  :sub_sum_acc2_code
+	                AND    DEPT_CODE            =  :sub_dept_code
+	                AND    PRODUCT_GROUP_CODE   =  :sub_product_group_code
+	                AND    PRODUCT_LINE_CODE    =  :sub_product_line_code
+	                AND    SUBLEDGER_GROUP_CODE =  :sub_subledger_group_code
+	                AND    SUBLEDGER_LINE_CODE  =  :sub_subledger_line_code
+	                AND    POST_YEAR            =  :sub_post_year
+	                AND    POST_MONTH           =  :sub_post_month;
+    
+                   if(sqlca.sqlcode < 0) {
+                       strcpy(l_err_msg,"UPDATE failed on table GL_PERIOD_ACC_BAL_LOCAL");
+                       return (-1);
+                   }
+
+		} /* end of if post_month > 0 */
+
+    } /* end of while fetch_summ_acc() */
+
+
+} /**** end of function process_summ() ****/
+
+fetch_txn_line()
+{
+
+  sub_exchg_rate = 0;
+
+    EXEC SQL FETCH GL_TXN_LINE_CUR INTO	
+        :sub_main_acc1_code,
+		:sub_main_acc2_code,
+		:sub_dept_code,
+		:sub_product_group_code,
+		:sub_product_line_code,
+		:sub_subledger_group_code,
+		:sub_subledger_line_code,
+		:sub_narration,
+		:sub_line_num,
+		:sub_foreign_amt,
+		:sub_local_amt,
+		:sub_currency_code,
+		:sub_exchg_rate,
+		:sub_cust_supp_code;
+	  
+	if(sqlca.sqlcode < 0)
+	    err_mesg("FETCH failed on cursor GL_TXN_LINE_CUR",0,"");
+
+        if(sqlca.sqlcode == 1403) 
+		return 0;
+	
+	sub_main_acc1_code.arr[sub_main_acc1_code.len] = '\0';
+	sub_main_acc2_code.arr[sub_main_acc2_code.len] = '\0';
+	sub_dept_code.arr[sub_dept_code.len] = '\0';
+	sub_product_group_code.arr[sub_product_group_code.len] = '\0';
+	sub_product_line_code.arr[sub_product_line_code.len] = '\0';
+	sub_subledger_group_code.arr[sub_subledger_group_code.len] = '\0';
+	sub_subledger_line_code.arr[sub_subledger_line_code.len] = '\0';
+	sub_currency_code.arr[sub_currency_code.len] = '\0';
+	sub_cust_supp_code.arr[sub_cust_supp_code.len] = '\0';
+
+	return 1;
+
+}
+
+fetch_summ_acc()
+{
+
+    EXEC SQL FETCH GL_ACC_SUM_LINE_CUR INTO	
+                :sub_sum_acc1_code,
+		:sub_sum_acc2_code;
+
+	if(sqlca.sqlcode < 0)
+	    err_mesg("FETCH failed on cursor GL_ACC_SUM_LINE_CUR",0,"");
+
+        if(sqlca.sqlcode == 1403) 
+		return 0;
+	
+	sub_sum_acc1_code.arr[sub_sum_acc1_code.len] = '\0';
+	sub_sum_acc2_code.arr[sub_sum_acc2_code.len] = '\0';
+
+#ifdef DEBUG
+    sprintf(string_var,"summ_acc1_code = <%s> summ_acc2_code = <%s>\n",sub_sum_acc1_code.arr,sub_sum_acc2_code.arr);
+    disp_message(INFO_MESG,string_var);
+#endif
+
+	return 1;
+
+}

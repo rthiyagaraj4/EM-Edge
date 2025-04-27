@@ -1,0 +1,492 @@
+/******************************************************************************/
+/* OCS MEDICOM VER 1.0                                                          */
+/******************************************************************************/
+/* PROGRAM NAME     : GLBPRBAL                                                */
+/* AUTHOR           : NITIN KUMAR                                             */
+/* DATE WRITTEN     : 17-FEB-1993                                              */
+/*                                                                            */
+/* CONVERTED BY     : C. Ganesan ( 29/01/96 )                                 */
+/*                                                                            */
+/* CALLED FROM      : GLBPRBAL.PC                                             */
+/*                                                                            */
+/* INPUT PARAMETERS : USER_ID/PASSWORD                                        */
+/*                                                                            */
+/* TABLED ACCESSED/ : GL_PARAMETER                                            */
+/*        UPDATED     SM_ACC_ENTITY_PARAM                                     */
+/*                    GL_POSTING_ACC                                          */
+/*                    GL_ACC_SUM_LINE                                         */
+/*                    GL_PERIOD_ACC_BAL_LOCAL                                 */
+/*                                                                            */
+/* FUNCTION         : This program selects all non-summary posting accounts   */
+/*                    from GL_POSTING_ACC and calls process_posting_acc       */
+/*                    function to create monthly records in GL_PERIOD_ACC_    */
+/*                    BAL_LOCAL.                                              */
+/*                    For each posting account it selects the summary         */
+/*                    accounts if any and calls process_posting_acc function  */
+/*                    with summary_acc_flag as 'Y'.                           */
+/*                                                                            */
+/******************************************************************************/
+      
+#define DEBUG
+
+#include <stdio.h>
+#include <string.h>
+#include "gl.h"
+#include "bl.h"
+                  
+#define VIEW_LOG_FILE    1                  
+EXEC SQL BEGIN DECLARE SECTION;
+
+varchar uid_pwd               [132],
+    nd_facility_id   [3],
+	d_session_id              [16],
+	d_pgm_date                [14],
+	d_main_acc1_code          [8],
+	d_main_acc2_code          [6],
+	d_sum_acc1_code           [8],
+	d_sum_acc2_code           [6],
+	d_dept_code               [11],
+	d_product_group_code      [4],
+	d_product_line_code       [6],
+	d_subledger_group_code    [4],
+	d_subledger_line_code     [10],
+        d_fm_main_acc1_code       [8],
+        d_fm_main_acc2_code       [6],
+        d_fm_dept_code            [11],
+        d_fm_product_group_code   [4],
+        d_fm_product_line_code    [6],
+        d_fm_subledger_group_code [4],
+        d_fm_subledger_line_code  [10],  
+        d_to_main_acc1_code       [8],
+        d_to_main_acc2_code       [6],
+        d_to_dept_code            [11],
+        d_to_product_group_code   [4],
+        d_to_product_line_code    [6],
+        d_to_subledger_group_code [4],
+        d_to_subledger_line_code  [10];
+        
+int     d_to_year ;
+
+int     d_curr_year,
+        d_curr_month,
+	d_num_of_acc_periods;
+
+char    d_dummy;
+
+char string_var [100];
+
+EXEC SQL END DECLARE SECTION;
+
+// EXEC ORACLE OPTION(HOLD_CURSOR = YES);
+// EXEC ORACLE OPTION(REBIND = NO);
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+void decl_curs(),
+     process_period(),
+     del_param();
+
+void chk_active();
+void start_prog_msg();
+void start_prog_control();
+void end_prog_msg();
+void end_prog_control();
+void err_mesg(char *, int, char *);
+int  get_message(char *, char *);
+
+void process_posting_acc  ( char *, char *, char *, char *,  char *,
+			    char *, char *, char,   int,     int);
+
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+
+{
+   
+    if(argc !=5) {
+        disp_message (ERR_MESG, "GLBPRBAL : Usage GLBPRBAL userid/password session_id pgm_date facility_id");
+        proc_exit();
+    }
+ 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+ 
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    strcpy(g_session_id,argv[2]);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+    strcpy(g_pgm_date,argv[3]);
+   
+    strcpy(g_pgm_id,"GLBPRBAL");
+    
+    EXEC SQL CONNECT :uid_pwd;	
+    
+    if(OERROR) {
+        disp_message (ORA_MESG, "Unable to connect to oracle.");
+        proc_exit();
+    }
+
+	set_meduser_role();
+
+    EXEC SQL SELECT  OPERATING_FACILITY_ID,
+	        NVL(PARAM1,'      '),     /* FM_MAIN_ACC1_CODE       */
+		    NVL(PARAM2,'~~~~~~'),     /* TO_MAIN_ACC1_CODE       */
+		    NVL(PARAM3,'    '),       /* FM_MAIN_ACC2_CODE       */
+		    NVL(PARAM4,'~~~~'),       /* TO_MAIN_ACC2_CODE       */
+		    NVL(PARAM5,'      '),     /* FM_DEPT_CODE            */
+		    NVL(PARAM6,'~~~~~~'),     /* TO_DEPT_CODE            */
+		    NVL(PARAM7,'   '),        /* FM_PRODUCT_GROUP_CODE   */     
+		    NVL(PARAM8,'~~~'),        /* TO_PRODUCT_GROUP_CODE   */
+		    NVL(PARAM9,'    '),       /* FM_PRODUCT_LINE_CODE    */
+		    NVL(PARAM10,'~~~~'),      /* TO_PRODUCT_LINE_CODE    */     
+		    NVL(PARAM11,'   '),       /* FM_SUBLEDGER_GROUP_CODE */
+		    NVL(PARAM12,'~~~'),       /* TO_SUBLEDGER_GROUP_CODE */
+		    NVL(PARAM13,'        '),  /* FM_SUBLEDGER_LINE_CODE  */
+		    NVL(PARAM14,'~~~~~~~~'),   /* TO_SUBLEDGER_LINE_CODE  */    
+		    SUBSTR(PARAM15,1,4)    
+		    
+		    INTO   :nd_facility_id,
+			:d_fm_main_acc1_code,
+		    :d_to_main_acc1_code,
+	            :d_fm_main_acc2_code,
+		    :d_to_main_acc2_code,
+		    :d_fm_dept_code,
+		    :d_to_dept_code,
+		    :d_fm_product_group_code,
+		    :d_to_product_group_code,
+		    :d_fm_product_line_code,
+		    :d_to_product_line_code,
+		    :d_fm_subledger_group_code,
+		    :d_to_subledger_group_code,
+		    :d_fm_subledger_line_code,
+		    :d_to_subledger_line_code ,
+		    :d_to_year
+	     FROM   SY_PROG_PARAM
+	     WHERE  PGM_ID     = 'GLBPRBAL'
+	     AND    PGM_DATE   = :d_pgm_date
+	     AND    SESSION_ID = TO_NUMBER(:d_session_id);
+
+    if(OERROR || NO_DATA_FOUND)
+	    err_mesg("SELECT failed on table  SY_PROG_PARAM",0,"");
+
+    d_fm_main_acc1_code.arr[d_fm_main_acc1_code.len]              = '\0'; 
+    d_fm_main_acc2_code.arr[d_fm_main_acc2_code.len]              = '\0'; 
+    d_fm_dept_code.arr[d_fm_dept_code.len]                        = '\0'; 
+    d_fm_product_group_code.arr[d_fm_product_group_code.len]      = '\0';
+    d_fm_product_line_code.arr[d_fm_product_line_code.len]        = '\0';
+    d_fm_subledger_group_code.arr[d_fm_subledger_group_code.len]  = '\0';
+    d_fm_subledger_line_code.arr[d_fm_subledger_line_code.len]    = '\0';
+    d_to_main_acc1_code.arr[d_to_main_acc1_code.len]              = '\0';
+    d_to_main_acc2_code.arr[d_to_main_acc2_code.len]              = '\0';
+    d_to_dept_code.arr[d_to_dept_code.len]                        = '\0';
+    d_to_product_group_code.arr[d_to_product_group_code.len]      = '\0';
+    d_to_product_line_code.arr[d_to_product_line_code.len]        = '\0';
+    d_to_subledger_group_code.arr[d_to_subledger_group_code.len]  = '\0';
+    d_to_subledger_line_code.arr[d_to_subledger_line_code.len]    = '\0';
+	nd_facility_id.arr[nd_facility_id.len] = '\0';
+    
+
+/*
+#ifdef DEBUG
+    printf("fm_account code = %s-%s %s %s-%s %s-%s\n",d_fm_main_acc1_code.arr,
+    d_fm_main_acc2_code.arr ,d_fm_dept_code.arr ,d_fm_product_group_code.arr,
+    d_fm_product_line_code.arr ,d_fm_subledger_group_code.arr , 
+    d_fm_subledger_line_code.arr);
+
+    printf("to_account code = %s-%s %s %s-%s %s-%s\n",d_to_main_acc1_code.arr,
+    d_to_main_acc2_code.arr ,d_to_dept_code.arr ,d_to_product_group_code.arr,
+    d_to_product_line_code.arr ,d_to_subledger_group_code.arr , 
+    d_to_subledger_line_code.arr);
+#endif
+*/
+    strcpy(g_pgm_id,"GLBPRBAL");
+
+    chk_active();
+    
+    start_prog_control();
+    start_prog_msg();
+
+    
+    EXEC SQL SELECT CURRENT_ACC_YEAR,
+		    CURRENT_ACC_MONTH
+	     INTO   :d_curr_year,
+		        :d_curr_month
+	     FROM   GL_PARAMETER;
+
+    if(OERROR)
+	err_mesg("SELECT failed on table GL_PARAMETER",0,"");
+
+     
+	    EXEC SQL SELECT NVL(NUM_OF_ACC_PERIODS,12)
+	     INTO   :d_num_of_acc_periods
+	     FROM   SM_ACC_ENTITY_PARAM;
+
+
+    if(OERROR)
+        err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+    decl_curs();
+
+    process_period();
+    end_prog_msg();
+    end_prog_control();
+    del_param();
+    
+    EXEC SQL COMMIT WORK RELEASE;
+    
+    return;
+    
+} /* end of main */
+
+void del_param()
+{
+    EXEC SQL DELETE SY_PROG_PARAM
+         WHERE  PGM_ID     = 'GLBPRBAL' 
+         AND    PGM_DATE   = :d_pgm_date
+         AND    SESSION_ID = :d_session_id;
+    if(OERROR) 
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,""); 
+
+}
+
+void decl_curs()
+{
+
+    EXEC SQL DECLARE GL_PERIOD_CUR CURSOR FOR
+	     SELECT  MAIN_ACC1_CODE,
+	             MAIN_ACC2_CODE,
+	             DEPT_CODE,
+	             PRODUCT_GROUP_CODE,
+	             PRODUCT_LINE_CODE ,
+	             SUBLEDGER_GROUP_CODE ,
+	             SUBLEDGER_LINE_CODE 
+	     FROM    GL_POSTING_ACC
+             WHERE   CONCAT_MAIN_CODE  BETWEEN 
+		     :d_fm_main_acc1_code||:d_fm_main_acc2_code AND
+		     :d_to_main_acc1_code||:d_to_main_acc2_code 
+             AND     DEPT_CODE BETWEEN  :d_fm_dept_code AND :d_to_dept_code
+             AND     CONCAT_PROD_CODE BETWEEN 
+                     :d_fm_product_group_code||:d_fm_product_line_code AND
+                     :d_to_product_group_code||:d_to_product_line_code
+             AND     CONCAT_SLEG_CODE BETWEEN 
+                     :d_fm_subledger_group_code||:d_fm_subledger_line_code AND
+                     :d_to_subledger_group_code||:d_to_subledger_line_code
+             AND     NVL(SUMMARY_ACC_FLAG,'N') <> 'Y'
+	     AND     NVL(STATUS,'X') <> 'S';
+  
+    EXEC SQL DECLARE PERIOD_UPD_CUR CURSOR FOR
+	     SELECT  STATUS
+	     FROM    GL_POSTING_ACC
+	     WHERE  MAIN_ACC1_CODE       =  :d_main_acc1_code
+	     AND    MAIN_ACC2_CODE       =  :d_main_acc2_code
+	     AND    DEPT_CODE            =  :d_dept_code
+	     AND    PRODUCT_GROUP_CODE   =  :d_product_group_code
+	     AND    PRODUCT_LINE_CODE    =  :d_product_line_code
+	     AND    SUBLEDGER_GROUP_CODE =  :d_subledger_group_code
+	     AND    SUBLEDGER_LINE_CODE  =  :d_subledger_line_code
+	     FOR    UPDATE OF STATUS;
+
+    EXEC SQL DECLARE GL_ACC_SUM_LINE_CUR CURSOR FOR
+	     SELECT  SUM_ACC1_CODE,
+		     SUM_ACC2_CODE
+	     FROM    GL_ACC_SUM_LINE
+	     WHERE   MAIN_ACC1_CODE = :d_main_acc1_code
+	     AND     MAIN_ACC2_CODE = :d_main_acc2_code;
+
+}
+
+fetch_period()
+{
+
+    EXEC SQL FETCH GL_PERIOD_CUR
+	     INTO  :d_main_acc1_code,
+	           :d_main_acc2_code,
+	           :d_dept_code,
+	           :d_product_group_code,
+	           :d_product_line_code,
+                   :d_subledger_group_code,
+                   :d_subledger_line_code;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor GL_PERIOD_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+       return 0;
+    
+    d_main_acc1_code.arr[d_main_acc1_code.len] = '\0';
+    d_main_acc2_code.arr[d_main_acc2_code.len] = '\0';
+    d_dept_code.arr[d_dept_code.len] = '\0';
+    d_product_group_code.arr[d_product_group_code.len] = '\0';
+    d_product_line_code.arr[d_product_line_code.len] = '\0';
+    d_subledger_group_code.arr[d_subledger_group_code.len] = '\0';
+    d_subledger_line_code.arr[d_subledger_line_code.len] = '\0';
+/*
+#ifdef DEBUG
+    printf("Account Code = %s-%s %s %s-%s %s-%s",d_main_acc1_code.arr,
+    d_main_acc2_code.arr ,d_dept_code.arr ,d_product_group_code.arr,
+    d_product_line_code.arr ,d_subledger_group_code.arr , 
+    d_subledger_line_code.arr);
+#endif
+*/
+    return 1;
+}
+
+lock_rec()
+{
+
+    EXEC SQL OPEN PERIOD_UPD_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor PERIOD_UPD_CUR",0,"");
+
+    EXEC SQL FETCH PERIOD_UPD_CUR
+	     INTO  :d_dummy;
+
+    if(OERROR)
+	err_mesg("FETCH failed on cursor PERIOD_UPD_CUR",0,"");
+
+    if(NO_DATA_FOUND)
+        return 0;
+/*
+#ifdef DEBUG
+    printf("Locked record ...\n");
+#endif
+*/
+    return 1;
+
+}
+
+fetch_summ_acc()
+{
+    
+    EXEC SQL FETCH GL_ACC_SUM_LINE_CUR INTO	
+                :d_sum_acc1_code,
+		:d_sum_acc2_code;
+
+	if(OERROR)
+	    err_mesg("FETCH failed on cursor GL_ACC_SUM_LINE_CUR",0,"");
+
+        if(NO_DATA_FOUND) 
+		return 0;
+	
+	d_sum_acc1_code.arr[d_sum_acc1_code.len] = '\0';
+	d_sum_acc2_code.arr[d_sum_acc2_code.len] = '\0';
+/*
+#ifdef DEBUG
+    printf("Summary account : %s-%s\n",d_sum_acc1_code.arr,d_sum_acc2_code.arr);
+#endif
+*/
+	return 1;
+}
+
+void process_period()
+{
+
+    EXEC SQL OPEN GL_PERIOD_CUR;
+
+    if(OERROR)
+	err_mesg("OPEN failed on cursor GL_PERIOD_CUR",0,"");
+
+    while(fetch_period()) {
+
+	if(lock_rec()) {
+
+	    EXEC SQL SELECT 'X'
+		     INTO   :d_dummy
+		     FROM   GL_PERIOD_ACC_BAL_LOCAL
+	             WHERE  MAIN_ACC1_CODE       = :d_main_acc1_code 
+	             AND    MAIN_ACC2_CODE       = :d_main_acc2_code 
+	             AND    DEPT_CODE            = :d_dept_code 
+	             AND    PRODUCT_GROUP_CODE   = :d_product_group_code 
+	             AND    PRODUCT_LINE_CODE    = :d_product_line_code 
+	             AND    SUBLEDGER_GROUP_CODE = :d_subledger_group_code
+	             AND    SUBLEDGER_LINE_CODE  = :d_subledger_line_code
+		 --    AND    POST_YEAR            = :d_curr_year
+		     AND    POST_YEAR            = :d_to_year 
+		     AND    POST_MONTH           = :d_curr_month;
+
+	    if(OERROR)
+		err_mesg("SELECT failed on table GL_PERIOD_ACC_BAL_LOCAL",0,"");
+     
+	    if(NO_DATA_FOUND)
+		{
+ 
+ 		 if(d_to_year > d_curr_year)
+		 { 
+     
+		 					 
+                process_posting_acc(d_main_acc1_code.arr,
+			            d_main_acc2_code.arr,
+			            d_dept_code.arr,
+	                            d_product_group_code.arr,
+	                            d_product_line_code.arr,
+	                            d_subledger_group_code.arr,
+	                            d_subledger_line_code.arr,
+			            'N',
+			            d_num_of_acc_periods,
+	                            d_curr_year);
+          }
+		  
+		   /*-- Modified by Venkat on 20/07/1999 ---*/	                            
+	         
+	                           
+							 
+ 			    process_posting_acc(d_main_acc1_code.arr,
+			            d_main_acc2_code.arr,
+			            d_dept_code.arr,
+	                            d_product_group_code.arr,
+	                            d_product_line_code.arr,
+	                            d_subledger_group_code.arr,
+	                            d_subledger_line_code.arr,
+			            'N',
+			            d_num_of_acc_periods,
+	                            d_to_year);
+         }               
+
+
+            EXEC SQL OPEN GL_ACC_SUM_LINE_CUR;
+
+	    if(OERROR)
+		err_mesg("OPEN failed on cursor GL_ACC_SUM_LINE_CUR",0,"");
+
+	    while(fetch_summ_acc()) 
+
+              /*  process_posting_acc(d_sum_acc1_code.arr,
+			            d_sum_acc2_code.arr,
+			            d_dept_code.arr,
+	                            d_product_group_code.arr,
+	                            d_product_line_code.arr,
+	                            d_subledger_group_code.arr,
+	                            d_subledger_line_code.arr,
+			            'Y',
+			            d_num_of_acc_periods,
+	                            d_curr_year);     */
+	                            
+
+								
+              process_posting_acc(d_sum_acc1_code.arr,
+			            d_sum_acc2_code.arr,
+			            d_dept_code.arr,
+	                            d_product_group_code.arr,
+	                            d_product_line_code.arr,
+	                            d_subledger_group_code.arr,
+	                            d_subledger_line_code.arr,
+			            'Y',
+			            d_num_of_acc_periods,
+	                            d_to_year); 
+
+	} /* end of if lock_rec */
+
+	EXEC SQL COMMIT WORK;
+
+    } /* end of while fetch_period */
+
+
+}

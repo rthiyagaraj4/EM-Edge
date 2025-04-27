@@ -1,0 +1,595 @@
+/************************************************************************/
+/*  OCS MEDICOM VER 1.10                                                */
+/************************************************************************/
+/* PROGRAM NAME          :	BLR00006.PC                                  */
+/* AUTHOR                :	HARISH. A                                   */
+/* DATE WRITTEN          :	25/11/2003                                  */
+/* DATE MODIFIED         :												*/
+/************************************************************************/
+
+
+#include <stdio.h>     
+#include <string.h>       
+#include <bl.h>  
+
+#define OERROR (sqlca.sqlcode < 0)
+#define NODATAFOUND sqlca.sqlcode == 1403
+#define RESOURCE_BUSY (sqlca.sqlcode == -54)
+#define INIT_MESG "Medical Report Printing In Progress"
+#define MAX_LINE 60
+#define LEGEND 1
+#define LENGTH_WORDS 80 
+#define ERR_MESG  4
+#define ESC     0x1B
+#define ONLINE_PRINTING 1
+#define DEBUG  1
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+	VARCHAR	uid_pwd				[132],
+			hosp_name			[120],
+			date_time			[20],
+			user_id				[20],
+			nd_pgm_date			[35],
+			nd_facility_name	[31],
+			nd_session_id		[16],
+			nd_calling_pgm_id	[20],
+			nd_facility_id		[3];
+
+	VARCHAR l_doc_type_code		[7],
+			l_doc_num			[9],
+			l_doc_srno			[3],
+			l_patient_id		[25],
+			l_episode_id		[15],
+			l_slmt_type_code	[4],
+			l_added_by_id		[35],
+			l_nric_num	[25],
+			l_short_name		[35],
+			l_facility_name		[50],
+			l_slmt_desc			[20],
+			l_currency			[20],
+			l_doc_date			[30],
+			l_translated_value	[201],
+			l_pk_value			[100],
+			p_language_id		[3],
+			p_opr_modules		[501],
+			p_mr_instal			[2],
+			p_int_mode			[2],
+			p_medical_officer	[16], 
+			p_report_type		[31], 
+			p_requestor			[31];
+
+	VARCHAR	nd_file_name [50],
+			nd_lang_id	[4];
+
+	char    filename[300];
+	char	l_mesg[300];
+	char    nd_lang_ind;
+	char    loc_legend[24][201];
+
+	int		l_decimal = 0;
+	int		l_page_no = 0;
+	int     l_line_no = 0;
+	int		i=0;
+
+	double  l_doc_amt = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *fp, *fp1;
+CHAR nd_str[1000];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+	char lv_msg[1024];
+	
+	if (argc != 8) 
+	{
+        disp_message (ERR_MESG,"Usage : BLR00006 username/pwd@connect_string session_id pgm_date facility_id Calling_Pgm_Id doc_type_Code doc_number\n");
+        proc_exit();
+	} 
+    
+	strcpy(uid_pwd.arr,argv[1]);
+	uid_pwd.len = strlen(uid_pwd.arr);
+
+	nd_session_id.arr[nd_session_id.len] = '\0';
+	strcpy(nd_session_id.arr,argv[2]);
+	nd_session_id.len = strlen(nd_session_id.arr);
+	nd_session_id.arr[nd_session_id.len] = '\0'; 
+
+	nd_pgm_date.len = 0;
+	nd_pgm_date.arr[nd_pgm_date.len] = '\0';
+   
+	strcpy(nd_pgm_date.arr,argv[3]);
+	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+	nd_pgm_date.arr[nd_pgm_date.len] = '\0';
+
+	strcpy(nd_facility_id.arr,argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+	nd_facility_id.arr[nd_facility_id.len] = '\0';
+
+	strcpy(nd_calling_pgm_id.arr,argv[5]);		
+	nd_calling_pgm_id.len = strlen(nd_calling_pgm_id.arr);	
+	nd_calling_pgm_id.arr[nd_calling_pgm_id.len] = '\0';
+
+
+	strcpy(l_doc_type_code.arr,argv[6]);		
+	l_doc_type_code.len = strlen(l_doc_type_code.arr);	
+	l_doc_type_code.arr[l_doc_type_code.len] = '\0';
+
+	strcpy(l_doc_num.arr,argv[7]);		
+	l_doc_num.len = strlen(l_doc_num.arr);	
+	l_doc_num.arr[l_doc_num.len] = '\0';
+
+
+	EXEC SQL CONNECT :uid_pwd;
+	
+	if(OERROR)
+	{
+		disp_message(ERR_MESG,"Error in connecting to Oracle\n");
+	
+		if (uid_pwd.len == 0)
+			disp_message(ERR_MESG,"Null oracle uid/pwd\n\n\n");
+	
+		proc_exit();
+	}
+
+	set_meduser_role();
+
+	strcpy(p_language_id.arr,l_language_id.arr);
+    p_language_id.len = l_language_id.len;
+    open_files(); 
+	
+	get_data_for_report();
+
+	//fetch_legend_value();
+
+	//get_req_rep_type_req_pract();
+
+	//print_medical_report();
+
+	fflush(fp);
+
+	fclose(fp);  
+
+	print_report();
+
+	EXEC SQL COMMIT WORK;
+	return 1;	
+}
+
+get_data_for_report()
+{
+	
+	EXEC SQL  DECLARE receipt_cursor CURSOR FOR SELECT
+					 doc_srno ,
+					 patient_id,
+			         episode_id,
+					 slmt_type_code,
+					 TO_CHAR(doc_date,'DD/MM/RRRR HH24:MI:SS'),
+					 added_by_id,
+					 doc_amt
+				FROM bl_receipt_refund_HDRDTL_VW
+			   WHERE doc_type_code = :l_doc_type_code
+			     AND doc_number    = :l_doc_num
+				 AND NVL(cancelled_ind,'N') != 'Y';		
+
+	if(sqlca.sqlcode == -54) 
+	{
+		/*sprintf(d_err_code,"%5d",sqlca.sqlerrd[2]);
+		disp_message(ERR_MESG,d_err_code);*/
+        EXEC SQL ROLLBACK WORK RELEASE;
+		proc_exit();
+	}    
+
+    if (OERROR)
+    {
+         err_mesg("DECLARE failed on cursor receipt_cursor",0,"");
+    }
+
+
+EXEC SQL OPEN receipt_cursor; 
+
+    if (OERROR)
+    {
+         err_mesg("OPEN failed on cursor receipt_cursor",0,"");
+
+    }	 
+  
+
+    while(fetch_receipt_cursor())
+	{
+
+	l_nric_num.arr[0]	= '\0';	
+	l_short_name.arr[0]			= '\0';
+
+	/*EXEC SQL SELECT national_id_num,
+					short_name
+			   INTO l_nric_num,
+			        l_short_name
+			   FROM mp_patient_mast
+			  WHERE patient_id = :l_patient_id;*/
+
+	EXEC SQL SELECT national_id_no,
+					substr(patient_name, 1, 60)
+			   INTO l_nric_num,
+			        l_short_name
+			   FROM mr_report_request_hdr
+			   WHERE facility_id = :nd_facility_id
+			   AND   (receipt_no	  = :l_doc_type_code||:l_doc_num or
+					  addl_receipt_no = :l_doc_type_code||:l_doc_num 
+					 );
+
+
+	if(OERROR)
+		err_mesg("SELECT failed on table MR_REPORT_REQUEST_HDR",0,"");
+
+	l_nric_num.arr[l_nric_num.len]= '\0';	
+	l_short_name.arr[l_short_name.len]			= '\0';
+
+	l_facility_name.arr[0]		= '\0';
+	l_currency.arr[0]			= '\0';
+
+	EXEC SQL SELECT acc_entity_name,
+				    base_currency
+			   INTO :l_facility_name,
+			        :l_currency
+			   FROM sy_acc_entity
+			  WHERE acc_entity_id = :nd_facility_id;
+
+	if (OERROR) 
+		err_mesg("SELECT failed on cursor SY_ACC_ENTITY",0,"");
+
+	l_facility_name.arr[l_facility_name.len]= '\0';
+	l_currency.arr[l_currency.len]          = '\0';
+
+	l_slmt_desc.arr[0] = '\0';
+
+	EXEC SQL SELECT short_desc
+	           INTO :l_slmt_desc
+			   FROM bl_slmt_type
+			  WHERE slmt_type_code  = :l_slmt_type_code
+			    AND acc_entity_code = (SELECT acc_entity_code
+				                         FROM sy_acc_entity
+										WHERE acc_entity_id = :nd_facility_id);
+	if (OERROR) 
+		err_mesg("SELECT failed on table BL_SLMT_TYPE",0,"");
+
+	l_slmt_desc.arr[l_slmt_desc.len] = '\0';
+	
+	fetch_legend_value();
+
+	get_req_rep_type_req_pract();
+
+	print_medical_report();
+
+	}
+
+	EXEC SQL CLOSE receipt_cursor;
+
+}
+
+
+fetch_receipt_cursor()
+{
+	l_doc_srno.arr[0]		= '\0';
+	l_patient_id.arr[0]		= '\0';
+	l_episode_id.arr[0]		= '\0';
+	l_slmt_type_code.arr[0]	= '\0';
+	l_doc_date.arr[0]		= '\0';
+	l_added_by_id.arr[0]	= '\0';	
+
+	l_doc_srno.len		    = 0;
+	l_patient_id.len		= 0;
+	l_episode_id.len		= 0;
+	l_slmt_type_code.len	= 0;
+	l_doc_date.arr[0]		= 0;
+	l_added_by_id.arr[0]	= 0;	
+
+
+	EXEC SQL fetch receipt_cursor INTO 
+					 :l_doc_srno,
+					 :l_patient_id,
+			         :l_episode_id,
+					 :l_slmt_type_code,
+					 :l_doc_date,
+					 :l_added_by_id	,
+					 :l_doc_amt;
+
+
+
+  if(sqlca.sqlcode == -54) 
+	{
+		/*sprintf(d_err_code,"%5d",sqlca.sqlerrd[2]);
+		disp_message(ERR_MESG,d_err_code);*/
+        EXEC SQL ROLLBACK WORK RELEASE;
+		proc_exit();
+	}   
+
+    if (OERROR)
+    {
+         err_mesg("FETCH failed on cursor receipt_cursor",0,"");
+    }
+
+	if (NODATAFOUND) 
+	  return(0);
+
+	l_patient_id.arr[l_patient_id.len]			= '\0';
+	l_episode_id.arr[l_episode_id.len]			= '\0';
+	l_slmt_type_code.arr[l_slmt_type_code.len]	= '\0';
+	l_doc_date.arr[l_doc_date.len]				= '\0';
+	l_added_by_id.arr[l_added_by_id.len]		= '\0';	
+
+	return(1);
+
+}
+
+fetch_legend_value()
+{
+	for(i=1;i<=24; i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLR00006.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len] = '\0';
+
+		//sprintf(l_mesg,"%s",l_pk_value.arr);
+		//disp_message(ERR_MESG,l_mesg);
+
+		l_translated_value.arr[0] = '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+
+		strcpy(loc_legend[i],l_translated_value.arr);
+
+		//sprintf(l_mesg,"Loc Legend[%d]  :  %s",i,loc_legend[i],loc_legend[i]);
+		//disp_message(ERR_MESG,l_mesg);
+
+	}
+}
+
+get_req_rep_type_req_pract()
+{
+	
+	p_opr_modules.arr[0]	= '\0';
+	p_mr_instal.arr[0]		= '\0';
+    p_int_mode.arr[0]		= '\0';
+
+	EXEC SQL EXECUTE
+	   BEGIN
+	      GET_OPERATIONAL_MODULES(:nd_facility_id,:p_opr_modules);	
+		
+		  if instr(:p_opr_modules,'MR|') > 0 then  				--27/10/2005
+	  		 :p_mr_instal := 'Y';
+		  else
+			 :p_mr_instal := 'N';
+		  end if;	 
+			
+	   END;
+	END-EXEC;
+
+	p_opr_modules.arr[p_opr_modules.len]	= '\0';
+	p_mr_instal.arr[p_mr_instal.len]		= '\0';
+
+	if (strcmp(p_mr_instal.arr, "Y")==0) 
+	{
+
+	   EXEC SQL  SELECT MEDREP_PAY_INT_MODE
+				 INTO   :p_int_mode
+				 FROM   MR_PARAMETER;
+	
+	   if(OERROR)
+	  	  strcpy(p_int_mode.arr, "N");   		
+
+	   p_int_mode.arr[p_int_mode.len] = '\0';	
+		
+	   if (strcmp(p_int_mode.arr, "B")==0)	
+	   {
+		  
+		  p_medical_officer.arr[0]	= '\0';
+		  p_report_type.arr[0]		= '\0';
+		  p_requestor.arr[0]		= '\0';
+
+
+		  EXEC SQL EXECUTE
+		  
+		     DECLARE
+			 p_requesting_pract_id		VARCHAR2(15);
+			 p_report_type_code			VARCHAR2(4);		
+			 p_requestor_code			VARCHAR2(10);
+			 	
+		     BEGIN
+		            SELECT Requesting_pract_id, Report_type_code, requestor_code
+					INTO   p_requesting_pract_id, p_report_type_code, p_requestor_code
+					FROM  MR_REPORT_REQUEST_HDR a
+					WHERE facility_id = :nd_facility_id
+					AND   nvl(patient_id,'X') = nvl(:l_patient_id,'X')
+					AND   (receipt_no	   = :l_doc_type_code||:l_doc_num or
+						   addl_receipt_no = :l_doc_type_code||:l_doc_num 
+						  );
+										
+					IF p_requesting_pract_id IS NOT NULL THEN
+						SELECT short_name 
+						INTO   :p_medical_officer
+						FROM   sy_physician_mast 
+						WHERE  facility_id  = :nd_facility_id 
+						AND    physician_id = p_requesting_pract_id;
+					END IF;
+
+					IF p_report_type_code IS NOT NULL THEN
+					   SELECT note_type_desc 
+					   INTO   :p_report_type
+					   FROM   ca_note_type 
+					   WHERE  note_type = p_report_type_code; 
+					END IF;
+
+					IF p_requestor_code IS NOT NULL THEN
+					   SELECT long_desc 
+					   INTO   :p_requestor
+					   FROM   mr_requestor  
+					   WHERE  facility_id = :nd_facility_id 
+					   AND    requestor_code = p_requestor_code;
+					END IF;
+
+			 EXCEPTION
+				WHEN NO_DATA_FOUND THEN
+					NULL;				
+		     END;
+		  END-EXEC;
+		  
+
+		  	
+	      if(OERROR)
+	  	     err_mesg("SELECT failed on table MR_REPORT_REQUEST_HDR",0,"");
+
+
+		  p_medical_officer.arr[p_medical_officer.len] = '\0';	
+		  p_report_type.arr[p_report_type.len]		   = '\0';	
+		  p_requestor.arr[p_requestor.len]			   = '\0';	
+	   }
+
+	}
+
+}
+
+
+print_medical_report()
+{
+	fprintf(fp,"%c&k4S\n\n\n",ESC); 	/* To Set compressed mode */	
+	print_report_section1();
+	print_report_section2();
+	print_report_section3();
+	//fprintf(fp,"%cE",ESC);		/* To Reset the Printer */
+	fprintf(fp,"%c@",ESC);	/* To Reset the Printer */
+}
+
+
+print_report_section1()
+{
+	fprintf(fp,"\t                       %-s\n\n",loc_legend[1]);
+	fprintf(fp,"\t%-s\n\n",loc_legend[2]);
+	fprintf(fp,"\t%-16.16s : %-15.15s     %-8.8s : %-s",loc_legend[3],l_slmt_desc.arr,loc_legend[4],l_currency.arr);
+	print_formated(l_doc_amt);
+	fprintf(fp,"\n");
+	fprintf(fp,"\t%-16.16s : %-6.6s/%-9.9s/%-3s    %-8.8s : %-s\n",loc_legend[5],l_doc_type_code.arr,l_doc_num.arr,l_doc_srno.arr,loc_legend[6],l_doc_date.arr);
+	fprintf(fp,"\t%-16.16s : %-s\n",loc_legend[7],l_patient_id.arr);
+	fprintf(fp,"\t%-16.16s : %-s\n",loc_legend[8],l_short_name.arr);
+	fprintf(fp,"\t%-16.16s : %-s\n",loc_legend[9],l_nric_num.arr);
+	fprintf(fp,"\t%-16.16s : %-s\n\n\n\n\n",loc_legend[10],l_added_by_id.arr);
+	fprintf(fp,"\t                                          %-s :_____________________\n",loc_legend[11]);
+	fprintf(fp,"\t__________________________________________________________________________\n");
+
+}
+
+print_report_section2()
+{
+	fprintf(fp,"\t%-s\n\n",loc_legend[12]);
+
+	fprintf(fp,"\t%-16.16s : %s\n",loc_legend[8],l_short_name.arr); 
+	fprintf(fp,"\t%-16.16s : %s\n",loc_legend[13], p_requestor.arr);					//29/10/2005
+	fprintf(fp,"\t%-16.16s : %s\n",loc_legend[14], p_report_type.arr);					//29/10/2005
+	fprintf(fp,"\t%-s : %s\n",loc_legend[15], p_medical_officer.arr);						//29/10/2005
+	//fprintf(fp,"\t%-16.16s : %s\n",loc_legend[9],l_nric_num.arr); 
+	fprintf(fp,"\t%-16.16s : \n",loc_legend[9]); 
+	fprintf(fp,"\t%-16.16s : \n",loc_legend[16]); 
+	fprintf(fp,"\t%-16.16s : \n",loc_legend[17]); 
+	fprintf(fp,"\t%-s : \n\n\n\n",loc_legend[18]); 
+
+	fprintf(fp,"\t%-16.16s :                        %-s :_____________________\n",loc_legend[19],loc_legend[11]);
+	fprintf(fp,"\t                                               %-s\n",loc_legend[20]);
+	fprintf(fp,"\t__________________________________________________________________________\n");
+}
+
+print_report_section3()
+{
+	fprintf(fp,"\t%-s\n\n",loc_legend[21]);
+	fprintf(fp,"\t%-s.\n\n\n\n\n",loc_legend[22]);
+	fprintf(fp,"\t%-s :\n\n",loc_legend[6]);
+	fprintf(fp,"\t                                          %-s :_____________________\n",loc_legend[11]);
+	fprintf(fp,"\t%-30.30s                      %s\n",l_facility_name.arr,loc_legend[23]);
+	fprintf(fp,"\t%-30.30s                      %s\n"," ",loc_legend[24]);
+}
+
+open_files()
+{
+   strcpy(filename,WORKING_DIR);
+
+   strcat(filename,"BLR00006.lis");
+
+   if ((fp = fopen(filename,"w")) == NULL)
+   {
+        err_mesg("Error while opening output file",0,"");
+        proc_exit();
+   }
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+	    strcat(s_amt,"-");
+        sprintf(str_amt,"%-14s",s_amt);
+		l_ltrim(s_amt);
+        fprintf(fp,"%-14s",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%-14s",s_amt);
+		l_ltrim(s_amt);
+        fprintf(fp,"%-14s ",str_amt);
+    }
+
+}
+
+print_report()
+{
+	PrintDocument(  uid_pwd.arr,		//char	*PUidPwd;
+					nd_session_id.arr,	//char	*PSessionID;
+					nd_facility_id.arr,	//char	*PFacilityID;
+					"BL",				//char	*PModuleID;
+					"BLR00006",			//char	*PDocumentID;
+					filename,			//char	*POnlinePrintFileNames;
+					"O",				//char	*PLocationTypes;
+					" ",				//char	*PLocationCodes;
+					1,					//int		PNumOfCopies;
+					1,					//int		PPageFrom;
+					9999);				//int		PPageTo;);
+
+}
+
+/*check_page_break()
+{
+	if(l_line_no + 4 >= 61)
+	{
+		fprintf(fp,"\f");
+		l_line_no = 0;
+	}
+}*/

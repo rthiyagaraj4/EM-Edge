@@ -1,0 +1,718 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRRATAU.PC                                  */
+/* AUTHOR                : S. SRIRAM                                    */
+/* DATE WRITTEN          : 24-JUL-1993                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */
+/*                                                                      */
+/*  FUNCTION              :                                              */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */  
+/*                                                                      */
+/*          1.         BL_RATE_AUDIT_HDR         Read                   */
+/*          2.         BL_RATE_AUDIT_DTL         Read                   */
+/*                                                                      */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+                      
+#include <stdio.h>
+#include <string.h>         
+#include "gl.h"
+#include "bl.h"         
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define INIT_MESG "Report Generation In Progress"
+
+int lctr = 0,pctr = 0;
+
+FILE *fp;
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR hosp_name        [135],
+            date_time        [20],
+            user_id          [40],
+            nd_session_id    [16],
+            nd_pgm_date      [25],
+            d_curr_pgm_name  [15],
+            nd_rep_type      [2],
+            nd_mod_date_fm   [17],
+            nd_mod_date_to   [17],
+            nd_mod_status    [2],
+            nd_mod_mode      [2],
+            nd_bill_serv_fm  [11],
+            nd_bill_serv_to  [11],
+		    nd_facility_id   [3],
+		    nd_ws_no         [31];
+
+
+   VARCHAR bl_au_blng_serv_code_from                   [11],
+           bl_au_blng_serv_code_to                     [11],
+           bl_au_serv_anal_grp1_from                   [7],
+           bl_au_serv_anal_grp1_to                     [7],
+           bl_au_serv_anal_grp2_from                   [7],
+           bl_au_serv_anal_grp2_to                     [7],
+           bl_au_markup_criteria_flag                  [2],
+           bl_au_markup_def_charge                     [23],
+           bl_au_markup_ip_rate                        [23],
+           bl_au_markup_op_rate                        [23],
+           bl_au_markup_ref_rate                       [23],
+           bl_au_records_read_num                      [23],
+           bl_au_records_updated_num                   [23],
+           bl_au_records_not_update_num               [23],
+           bl_au_modified_by_id                        [21],
+           bl_au_modified_date_time                    [19];
+
+   VARCHAR bl_dtl_blng_serv_code                       [11],
+           bl_dtl_old_def_charge                       [23],
+           bl_dtl_old_ip_rate                          [23],
+           bl_dtl_old_op_rate                          [23],
+           bl_dtl_old_ref_rate                         [23],
+           bl_dtl_new_def_charge                       [23],
+           bl_dtl_new_ip_rate                          [23],
+           bl_dtl_new_op_rate                          [23],
+           bl_dtl_new_ref_rate                         [23],
+           bl_dtl_modification_status                  [2],
+           bl_dtl_modification_mode                    [2],
+           bl_dtl_modified_by_id                       [21],
+           bl_dtl_modified_date_time                   [19],
+           nd_blng_serv_long_desc                      [41],
+           rec_ctr_str                                 [20];
+
+
+    char   nd_old_blng_serv_code                       [11];
+	char filename[30];
+
+    long   rec_ctr = 0,
+           dtl_rec_ctr = 0;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 5)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+ 
+    strcpy(g_pgm_id,"BLRRATAU");
+
+    if (sql_connect(argv[1]) == -1)
+    {
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+    }
+
+	set_meduser_role();
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    strcpy(g_session_id,nd_session_id.arr);
+
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+    strcpy(g_pgm_date,nd_pgm_date.arr);
+
+    start_prog_msg();
+
+    fetch_prog_param();
+
+    declare_cur();
+    fetch_hosp_name();
+    open_file();
+
+    if (nd_rep_type.arr[0] != 'D')
+    {
+        open_cur_hdr();
+        while(fetch_cur())
+        {
+          int dtl_ctr = 0;
+          rec_ctr++;
+          if (nd_rep_type.arr[0] != 'S')
+          {
+               if (nd_rep_type.arr[0] == 'B')
+                    print_hdr();
+               open_cur_dtl();
+               while (fetch_dtl())
+                  print_dtl(++dtl_ctr);
+               dtl_rec_ctr+=dtl_ctr;
+          }
+          if (nd_rep_type.arr[0] == 'S')
+               print_hdr();
+        }
+    }
+    else
+    {
+          int dtl_ctr = 0;
+          rec_ctr++;
+          open_cur_dtl();
+          while (fetch_dtl())
+             print_dtl(++dtl_ctr);
+          dtl_rec_ctr+=dtl_ctr;
+    }
+    end_of_rep();
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+}
+
+fetch_prog_param()
+{
+
+nd_rep_type.arr[0]       = '\0';
+nd_mod_date_fm.arr[0]    = '\0';
+nd_mod_date_to.arr[0]    = '\0';
+nd_mod_status.arr[0]     = '\0';
+nd_mod_mode.arr[0]       = '\0';
+nd_bill_serv_fm.arr[0]   = '\0';
+nd_bill_serv_to.arr[0]   = '\0';
+nd_facility_id.arr[0]      = '\0'; 
+nd_ws_no.arr[0]            = '\0';
+
+nd_rep_type.len          = 0;
+nd_mod_date_fm.len       = 0;
+nd_mod_date_to.len       = 0;
+nd_mod_status.len        = 0;
+nd_mod_mode.len          = 0;
+nd_bill_serv_fm.len      = 0;
+nd_bill_serv_to.len      = 0;
+nd_facility_id.len         = 0; 
+nd_ws_no.len               = 0;
+
+   EXEC SQL SELECT operating_facility_id,
+                   PARAM1,
+				   PARAM2,
+				   PARAM3,
+				   PARAM4,
+				   PARAM5,
+				   PARAM6,
+				   PARAM7,
+				   PARAM8
+              INTO :nd_facility_id,
+			       :nd_rep_type,   
+				   :nd_mod_date_fm, 
+				   :nd_mod_date_to,
+                   :nd_mod_status, 
+				   :nd_mod_mode,    
+				   :nd_bill_serv_fm,
+                   :nd_bill_serv_to,
+				   :nd_ws_no
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'BLRRATAU'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+   nd_rep_type.arr[nd_rep_type.len]               = '\0';
+   nd_mod_date_fm.arr[nd_mod_date_fm.len]         = '\0';
+   nd_mod_date_to.arr[nd_mod_date_to.len]         = '\0';
+   nd_mod_status.arr[nd_mod_status.len]           = '\0';
+   nd_mod_mode.arr[nd_mod_mode.len]               = '\0';
+   nd_bill_serv_fm.arr[nd_bill_serv_fm.len]       = '\0';
+   nd_bill_serv_to.arr[nd_bill_serv_to.len]       = '\0';
+   nd_facility_id.arr[nd_facility_id.len]         = '\0';
+   strcpy(g_facility_id,nd_facility_id.arr);  
+
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE PGM_ID     = 'BLRRATAU'
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+}
+
+declare_cur()
+{
+
+     EXEC SQL DECLARE BL_RATE_HDR_CUR CURSOR FOR
+               SELECT BLNG_SERV_CODE_FROM,
+                      BLNG_SERV_CODE_TO,
+                      SERV_ANAL_GRP1_FROM,
+                      SERV_ANAL_GRP1_TO,
+                      SERV_ANAL_GRP2_FROM,
+                      SERV_ANAL_GRP2_TO,
+                      MARKUP_CRITERIA_FLAG,
+                      TO_CHAR(MARKUP_DEF_CHARGE,'999,999,990.99'),
+                      TO_CHAR(MARKUP_IP_RATE,'999,990.99'),
+                      TO_CHAR(MARKUP_OP_RATE,'999,990.99'),
+                      TO_CHAR(MARKUP_REF_RATE,'999,990.99'),
+                      TO_CHAR(RECORDS_READ_NUM,'999,999,990'),
+                      TO_CHAR(RECORDS_UPDATED_NUM,'999,999,990'),
+                      TO_CHAR(RECORDS_NOT_UPDATED_NUM,'999,999,990'),
+                      MODIFIED_BY_ID,
+                      TO_CHAR(MODIFIED_DATE,'DD/MM/YYYY HH24:MI')
+                 FROM BL_RATE_AUDIT_HDR
+                WHERE MODIFIED_DATE BETWEEN
+                          TO_DATE(:nd_mod_date_fm,'DD/MM/YYYY HH24:MI')
+                      AND
+                          TO_DATE(:nd_mod_date_to,'DD/MM/YYYY HH24:MI')
+                ORDER BY MODIFIED_DATE,MODIFIED_BY_ID;
+
+     EXEC SQL DECLARE BL_RATE_DTL_CUR CURSOR FOR
+               SELECT BLNG_SERV_CODE,
+                      TO_CHAR(NVL(OLD_DEF_CHARGE,0),'999,999,990.99'),
+                      TO_CHAR(NVL(OLD_IP_RATE,0),'999,990.99'),
+                      TO_CHAR(NVL(OLD_OP_RATE,0),'999,990.99'),
+                      TO_CHAR(NVL(OLD_REF_RATE,0),'999,990.99'),
+                      TO_CHAR(NVL(NEW_DEF_CHARGE,0),'999,999,990.99'),
+                      TO_CHAR(NVL(NEW_IP_RATE,0),'999,990.99'),
+                      TO_CHAR(NVL(NEW_OP_RATE,0),'999,990.99'),
+                      TO_CHAR(NVL(NEW_REF_RATE,0),'999,990.99'),
+                      MODIFICATION_STATUS,
+                      MODIFICATION_MODE,
+                      MODIFIED_BY_ID,
+                      TO_CHAR(MODIFIED_DATE,'DD/MM/YYYY HH24:MI')
+                 FROM BL_RATE_AUDIT_DTL
+                WHERE MODIFIED_DATE = 
+                            NVL(TO_DATE(:bl_au_modified_date_time,
+                                            'DD/MM/YYYY HH24:MI'),
+                                           MODIFIED_DATE)
+                  AND MODIFIED_BY_ID      = NVL(:bl_au_modified_by_id,
+                                           MODIFIED_BY_ID)
+                  AND MODIFICATION_STATUS = NVL(:nd_mod_status,
+                                                 MODIFICATION_STATUS)
+                  AND MODIFICATION_MODE   = NVL(:nd_mod_mode,MODIFICATION_MODE)
+                ORDER BY BLNG_SERV_CODE;
+
+     EXEC SQL DECLARE BL_BLNG_DESC_CUR CURSOR FOR
+               SELECT LONG_DESC
+                 FROM BL_BLNG_SERV
+                WHERE BLNG_SERV_CODE = :bl_dtl_blng_serv_code;
+
+}
+
+open_cur_hdr()
+{
+    EXEC SQL OPEN BL_RATE_HDR_CUR;
+    if (OERROR)  err_mesg("OPEN failed on cursor BL_RATE_HDR_CUR",0,"");
+
+}
+
+open_cur_dtl()
+{
+    EXEC SQL OPEN BL_RATE_DTL_CUR;
+    if (OERROR)  err_mesg("OPEN failed on cursor BL_RATE_DTL_CUR",0,"");
+
+}
+
+end_of_rep()
+{
+fprintf(fp,"\n\n            TOTAL NUMBER OF RECORDS PRINTED : ");
+print_formated();
+fprintf(fp,"\n                                                      ***  END OF REPORT ***\n");
+}
+
+fetch_cur()
+{
+
+bl_au_blng_serv_code_from.arr[0]                                  = '\0';
+bl_au_blng_serv_code_to.arr[0]                                    = '\0';
+bl_au_serv_anal_grp1_from.arr[0]                                  = '\0';
+bl_au_serv_anal_grp1_to.arr[0]                                    = '\0';
+bl_au_serv_anal_grp2_from.arr[0]                                  = '\0';
+bl_au_serv_anal_grp2_to.arr[0]                                    = '\0';
+bl_au_markup_criteria_flag.arr[0]                                 = '\0';
+bl_au_markup_def_charge.arr[0]                                    = '\0';
+bl_au_markup_ip_rate.arr[0]                                       = '\0';
+bl_au_markup_op_rate.arr[0]                                       = '\0';
+bl_au_markup_ref_rate.arr[0]                                      = '\0';
+bl_au_records_read_num.arr[0]                                     = '\0';
+bl_au_records_updated_num.arr[0]                                  = '\0';
+bl_au_records_not_update_num.arr[0]                              = '\0';
+bl_au_modified_by_id.arr[0]                                       = '\0';
+bl_au_modified_date_time.arr[0]                                   = '\0';
+
+bl_au_blng_serv_code_from.len                                     = 0;
+bl_au_blng_serv_code_to.len                                       = 0;
+bl_au_serv_anal_grp1_from.len                                     = 0;
+bl_au_serv_anal_grp1_to.len                                       = 0;
+bl_au_serv_anal_grp2_from.len                                     = 0;
+bl_au_serv_anal_grp2_to.len                                       = 0;
+bl_au_markup_criteria_flag.len                                    = 0;
+bl_au_markup_def_charge.len                                       = 0;
+bl_au_markup_ip_rate.len                                          = 0;
+bl_au_markup_op_rate.len                                          = 0;
+bl_au_markup_ref_rate.len                                         = 0;
+bl_au_records_read_num.len                                        = 0;
+bl_au_records_updated_num.len                                     = 0;
+bl_au_records_not_update_num.len                                 = 0;
+bl_au_modified_by_id.len                                          = 0;
+bl_au_modified_date_time.len                                      = 0;
+
+
+     EXEC SQL FETCH BL_RATE_HDR_CUR
+               INTO :bl_au_blng_serv_code_from,
+                    :bl_au_blng_serv_code_to,
+                    :bl_au_serv_anal_grp1_from,
+                    :bl_au_serv_anal_grp1_to,
+                    :bl_au_serv_anal_grp2_from,
+                    :bl_au_serv_anal_grp2_to,
+                    :bl_au_markup_criteria_flag,
+                    :bl_au_markup_def_charge,
+                    :bl_au_markup_ip_rate,
+                    :bl_au_markup_op_rate,
+                    :bl_au_markup_ref_rate,
+                    :bl_au_records_read_num,
+                    :bl_au_records_updated_num,
+                    :bl_au_records_not_update_num,
+                    :bl_au_modified_by_id,
+                    :bl_au_modified_date_time;
+
+    if (OERROR) err_mesg("Error while fetching BL_RATE_HDR_CUR",0,"");
+
+bl_au_blng_serv_code_from.arr[bl_au_blng_serv_code_from.len]             = '\0';
+bl_au_blng_serv_code_to.arr[bl_au_blng_serv_code_to.len]                 = '\0';
+bl_au_serv_anal_grp1_from.arr[bl_au_serv_anal_grp1_from.len]             = '\0';
+bl_au_serv_anal_grp1_to.arr[bl_au_serv_anal_grp1_to.len]                 = '\0';
+bl_au_serv_anal_grp2_from.arr[bl_au_serv_anal_grp2_from.len]             = '\0';
+bl_au_serv_anal_grp2_to.arr[bl_au_serv_anal_grp2_to.len]                 = '\0';
+bl_au_markup_criteria_flag.arr[bl_au_markup_criteria_flag.len]           = '\0';
+bl_au_markup_def_charge.arr[bl_au_markup_def_charge.len]                 = '\0';
+bl_au_markup_ip_rate.arr[bl_au_markup_ip_rate.len]                       = '\0';
+bl_au_markup_op_rate.arr[bl_au_markup_op_rate.len]                       = '\0';
+bl_au_markup_ref_rate.arr[bl_au_markup_ref_rate.len]                     = '\0';
+bl_au_records_read_num.arr[bl_au_records_read_num.len]                   = '\0';
+bl_au_records_updated_num.arr[bl_au_records_updated_num.len]             = '\0';
+bl_au_records_not_update_num.arr[bl_au_records_not_update_num.len]     = '\0';
+bl_au_modified_by_id.arr[bl_au_modified_by_id.len]                       = '\0';
+bl_au_modified_date_time.arr[bl_au_modified_date_time.len]               = '\0';
+
+  return(LAST_ROW?0:1);
+}
+
+fetch_dtl()
+{
+bl_dtl_blng_serv_code.arr[0]                                      = '\0';
+bl_dtl_old_def_charge.arr[0]                                      = '\0';
+bl_dtl_old_ip_rate.arr[0]                                         = '\0';
+bl_dtl_old_op_rate.arr[0]                                         = '\0';
+bl_dtl_old_ref_rate.arr[0]                                        = '\0';
+bl_dtl_new_def_charge.arr[0]                                      = '\0';
+bl_dtl_new_ip_rate.arr[0]                                         = '\0';
+bl_dtl_new_op_rate.arr[0]                                         = '\0';
+bl_dtl_new_ref_rate.arr[0]                                        = '\0';
+bl_dtl_modification_status.arr[0]                                 = '\0';
+bl_dtl_modification_mode.arr[0]                                   = '\0';
+bl_dtl_modified_by_id.arr[0]                                      = '\0';
+bl_dtl_modified_date_time.arr[0]                                  = '\0';
+
+bl_dtl_blng_serv_code.len                                         = 0;
+bl_dtl_old_def_charge.len                                         = 0;
+bl_dtl_old_ip_rate.len                                            = 0;
+bl_dtl_old_op_rate.len                                            = 0;
+bl_dtl_old_ref_rate.len                                           = 0;
+bl_dtl_new_def_charge.len                                         = 0;
+bl_dtl_new_ip_rate.len                                            = 0;
+bl_dtl_new_op_rate.len                                            = 0;
+bl_dtl_new_ref_rate.len                                           = 0;
+bl_dtl_modification_status.len                                    = 0;
+bl_dtl_modification_mode.len                                      = 0;
+bl_dtl_modified_by_id.len                                         = 0;
+bl_dtl_modified_date_time.len                                     = 0;
+
+     EXEC SQL FETCH BL_RATE_DTL_CUR
+               INTO :bl_dtl_blng_serv_code,
+                    :bl_dtl_old_def_charge,
+                    :bl_dtl_old_ip_rate,
+                    :bl_dtl_old_op_rate,
+                    :bl_dtl_old_ref_rate,
+                    :bl_dtl_new_def_charge,
+                    :bl_dtl_new_ip_rate,
+                    :bl_dtl_new_op_rate,
+                    :bl_dtl_new_ref_rate,
+                    :bl_dtl_modification_status,
+                    :bl_dtl_modification_mode,
+                    :bl_dtl_modified_by_id,
+                    :bl_dtl_modified_date_time;
+
+   if (OERROR)
+         err_mesg("FETCH failed on cursor BL_RATE_DTL_CUR",0,"");
+
+bl_dtl_blng_serv_code.arr[bl_dtl_blng_serv_code.len]                     = '\0';
+bl_dtl_old_def_charge.arr[bl_dtl_old_def_charge.len]                     = '\0';
+bl_dtl_old_ip_rate.arr[bl_dtl_old_ip_rate.len]                           = '\0';
+bl_dtl_old_op_rate.arr[bl_dtl_old_op_rate.len]                           = '\0';
+bl_dtl_old_ref_rate.arr[bl_dtl_old_ref_rate.len]                         = '\0';
+bl_dtl_new_def_charge.arr[bl_dtl_new_def_charge.len]                     = '\0';
+bl_dtl_new_ip_rate.arr[bl_dtl_new_ip_rate.len]                           = '\0';
+bl_dtl_new_op_rate.arr[bl_dtl_new_op_rate.len]                           = '\0';
+bl_dtl_new_ref_rate.arr[bl_dtl_new_ref_rate.len]                         = '\0';
+bl_dtl_modification_status.arr[bl_dtl_modification_status.len]           = '\0';
+bl_dtl_modification_mode.arr[bl_dtl_modification_mode.len]               = '\0';
+bl_dtl_modified_by_id.arr[bl_dtl_modified_by_id.len]                     = '\0';
+bl_dtl_modified_date_time.arr[bl_dtl_modified_date_time.len]             = '\0';
+
+   return(LAST_ROW?0:1);
+}
+
+open_file()
+{
+
+
+	strcpy(filename,WORKING_DIR);
+    strcat(filename,"blrratau.lis");
+
+
+    if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file blrratau.lis");
+       proc_exit();
+    }
+    print_title();
+    print_head();
+}
+
+
+print_title()
+{
+fprintf(fp,
+"\fMDL : BL                                         %-30s                                        %-16s\n",
+hosp_name.arr,date_time.arr);
+fprintf(fp,"OPR : %-10s \n", user_id.arr);
+fprintf(fp,
+"REP : %-8s                  %-50s%-15s                         PAGE : %4d\n",
+"BLRRATAU","AUDIT TRAIL OF SERVICE RATE/CHARGE MODIFICATION - ",
+(nd_rep_type.arr[0] == 'S')?"SUMMARY":
+(nd_rep_type.arr[0] == 'D')?"DETAIL":"SUMMARY/DETAIL",
+++pctr);
+fprintf(fp,
+"-------------------------------------------------------------------------------------------------------------------------------------\n");
+fprintf(fp,"VER : 1.10.01\n");
+fflush(fp);
+
+fprintf(fp,"\n\n\n\n        INPUT PARAMETERS :\n        ----------------\n\n");
+fprintf(fp,"                REPORT TYPE            : %s\n\n",nd_rep_type.arr);
+fprintf(fp,"                MODIFICATION DATE FROM : %s\n",nd_mod_date_fm.arr);
+fprintf(fp,"                                  TO   : %s\n\n",nd_mod_date_to.arr);
+
+if (nd_rep_type.arr[0] != 'S')
+{
+fprintf(fp,"                MODIFICATION STATUS    : %s\n\n",nd_mod_status.arr);
+fprintf(fp,"                MODIFICATION MODE      : %s\n\n",nd_mod_mode.arr);
+fprintf(fp,"                BILLING SERVICE   FROM : %s\n\n",nd_bill_serv_fm.arr);
+fprintf(fp,"                                  TO   : %s\n\n",nd_bill_serv_to.arr);
+}
+}
+print_head()
+{
+fprintf(fp,
+"\fMDL : BL                                         %-30s                                        %-16s\n",
+hosp_name.arr,date_time.arr);
+fprintf(fp,"OPR : %-10s \n", user_id.arr);
+fprintf(fp,
+"REP : %-8s                  %-50s%-15s                         PAGE : %4d\n",
+"BLRRATAU","AUDIT TRAIL OF SERVICE RATE/CHARGE MODIFICATION - ",
+(nd_rep_type.arr[0] == 'S')?"SUMMARY":
+(nd_rep_type.arr[0] == 'D')?"DETAIL":"SUMMARY/DETAIL",
+++pctr);
+fprintf(fp,
+"-------------------------------------------------------------------------------------------------------------------------------------\n");
+if (nd_rep_type.arr[0] != 'D')
+{
+fprintf(fp,
+"MODIFN DATE TIME MODIFIED BY          BILLING SERVICE    ANALYSIS GRP 1    ANALYSIS GRP 2    MK\n");
+/***********
+"DD/MM/YYYY HH:MI 12345678901234567890 XXXXXX - XXXXXX XXXXXX - XXXXXX XXXXXX - XXXXXX    
+********/
+fprintf(fp,
+"                                        FROM   - TO       FROM   - TO        FROM   - TO     CR\n");
+fprintf(fp,
+"                      DEF CHARGE          IP RATE       OP RATE      REF RATE         REC READ    REC UPDATED   REC NOT UPDATED\n");
+}
+else
+{
+   fprintf(fp,"BLNG SERV DESCRIPTION                              STATUS MODE\n");
+}
+fprintf(fp,
+"-------------------------------------------------------------------------------------------------------------------------------------\n");
+fflush(fp);
+lctr = 8;
+}
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+    user_id.arr[0]   = '\0';
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+    user_id.len      = 0;
+
+/*-- Y2K correction. Format introduced for year as YYYY instead of YY 
+     VSK 15/11/1999 */
+
+    EXEC SQL SELECT ACC_ENTITY_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER
+               INTO :hosp_name, :date_time, :user_id
+               FROM SY_ACC_ENTITY
+			   WHERE acc_entity_id = :nd_facility_id;
+
+       if (OERROR) err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+hosp_name.arr[hosp_name.len]           = '\0';
+date_time.arr[date_time.len]           = '\0';
+user_id.arr[user_id.len]               = '\0';
+}
+
+print_hdr()
+{
+     char l_form_str[100];
+     strcpy(l_form_str,"%-16s %-20s %-10s %-10s %-6s   %-6s    %-6s   %-6s  %s\n");
+     fprintf(fp,l_form_str,
+     bl_au_modified_date_time.arr,
+     bl_au_modified_by_id.arr,
+     bl_au_blng_serv_code_from.arr,
+     bl_au_blng_serv_code_to.arr,
+     bl_au_serv_anal_grp1_from.arr,
+     bl_au_serv_anal_grp1_to.arr,
+     bl_au_serv_anal_grp2_from.arr,
+     bl_au_serv_anal_grp2_to.arr,
+     bl_au_markup_criteria_flag.arr);
+
+     strcpy(l_form_str,"%-16s %15s      %10s   %10s   %10s     %11s   %11s      %11s\n");
+
+     fprintf(fp,l_form_str,
+     " ",
+     bl_au_markup_def_charge.arr,
+     bl_au_markup_ip_rate.arr,
+     bl_au_markup_op_rate.arr,
+     bl_au_markup_ref_rate.arr,
+     bl_au_records_read_num.arr,
+     bl_au_records_updated_num.arr,
+     bl_au_records_not_update_num.arr);
+
+     fflush(fp);
+}
+
+print_dtl(dtl_ctr)
+int dtl_ctr;
+{
+   char l_form_str[100];
+   if (lctr > 52)
+   {
+       print_head();
+       if (nd_rep_type.arr[0] == 'B')
+            print_dtl_head();
+   }
+   else if (dtl_ctr == 1 && nd_rep_type.arr[0] == 'B')
+          print_dtl_head();
+
+   if (nd_rep_type.arr[0] == 'B')
+       fprintf(fp,"        ");
+
+   strcpy(l_form_str,"%-10s %-40s %s      %s \n");
+
+   if (nd_old_blng_serv_code[0] == '\0' ||
+       strcmp(nd_old_blng_serv_code,bl_dtl_blng_serv_code.arr) != 0);
+   {
+       strcpy(nd_old_blng_serv_code,bl_dtl_blng_serv_code.arr);
+       fetch_blng_desc();
+   }
+
+   fprintf(fp,l_form_str,
+      bl_dtl_blng_serv_code.arr,
+      nd_blng_serv_long_desc.arr,
+      bl_dtl_modification_status.arr,
+      bl_dtl_modification_mode.arr);
+
+   lctr++;
+   if (nd_rep_type.arr[0] == 'B') fprintf(fp,"        ");
+
+   fprintf(fp,"          DEF CHARGE        IP RATE        OP RATE       REF RATE\n");
+
+   if (nd_rep_type.arr[0] == 'B') fprintf(fp,"        ");
+
+   fprintf(fp,"OLD  %14s    %10s    %10s    %10s\n",
+      bl_dtl_old_def_charge.arr,
+      bl_dtl_old_ip_rate.arr,
+      bl_dtl_old_op_rate.arr,
+      bl_dtl_old_ref_rate.arr);
+
+   if (nd_rep_type.arr[0] == 'B') fprintf(fp,"        ");
+
+   fprintf(fp,"NEW  %14s    %10s    %10s    %10s\n\n",
+      bl_dtl_new_def_charge.arr,
+      bl_dtl_new_ip_rate.arr,
+      bl_dtl_new_op_rate.arr,
+      bl_dtl_new_ref_rate.arr);
+       
+   lctr+= 4;
+   fflush(fp);
+}
+
+print_dtl_head()
+{
+   fprintf(fp,"        BLNG SERV DESCRIPTION                              STATUS MODE\n\n");
+   fflush(fp);
+   lctr+=2;
+}
+
+fetch_blng_desc()
+{
+   EXEC SQL OPEN BL_BLNG_DESC_CUR;
+   if (OERROR)
+         err_mesg("OPEN failed on cursor BL_BLNG_DESC_CUR",0,"");
+
+   nd_blng_serv_long_desc.arr[0]  = '\0';
+   nd_blng_serv_long_desc.len     = 0;
+
+   EXEC SQL FETCH BL_BLNG_DESC_CUR
+             INTO :nd_blng_serv_long_desc;
+
+    if (OERROR)
+         err_mesg("FETCH failed on cursor BL_BLNG_DESC_CUR",0,"");
+
+    nd_blng_serv_long_desc.arr[nd_blng_serv_long_desc.len] = '\0';
+}
+
+print_formated()
+{
+
+    rec_ctr_str.arr[0] = '\0';
+    rec_ctr_str.len    = 0;
+
+    EXEC SQL SELECT TO_CHAR(DECODE(:nd_rep_type,'D',:dtl_rec_ctr,:rec_ctr),
+                         '999,999,990')
+               INTO :rec_ctr_str
+               FROM DUAL;
+
+   if (OERROR)
+         err_mesg("SELECT failed on table DUAL",0,"");
+
+   rec_ctr_str.arr[rec_ctr_str.len]     = '\0';
+
+   fprintf(fp,"%s\n",rec_ctr_str.arr);
+   fflush(fp);
+}

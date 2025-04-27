@@ -1,0 +1,967 @@
+/************************************************************************/
+/* OCS MEDICOM VER 2.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : DFR00004.PC                                  */
+/* CALLED FROM           : DFR00004.FMB                                 */
+/*                                                                      */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include <bl.h>
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define	MAX_LINES	42
+#define	REP_WIDTH	130
+#define ESC     0x1B
+
+#define INIT_MESG "Report Generation is in progress"
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR hosp_name								[120],
+            date_time                               [20],
+            user_id                                 [40],
+            nd_session_id                           [16],
+            nd_pgm_date                             [25],
+			p_facility_id							[3],
+            d_curr_pgm_name                         [15],
+			uid_pwd									[20],
+				lv_facility_id	   [3],
+			fr_doctor				[16],
+			d_doctor_name           [16],
+			fr_period				[8],
+			to_period				[8],
+			fr_revenu_cat			[11],
+			to_revenu_cat			[11],
+			nd_episode_type			[2],
+			d_process_mth_year		[10],
+			d_revenue_category		[11],
+			d_revenue_cate_desc		[16],
+			temp_revenue_category   [11],
+			temp_process_mth_year   [10],
+			temp_physician_id		[16],
+			d_blng_serv_code		[11],
+			d_trx_date				[11],
+			d_patient_id			[21],
+			d_episode_id			[9],	
+			d_visit_id				[5],
+			nd_repeat_grp			[2],
+			 l_translated_value		[201],	
+			 l_pk_value				[100],
+			 P_LANGUAGE_ID [3];
+		
+
+int d_qty , d_sub_tot_qty , d_gt_tot_qty ,i;
+
+double  d_gross_amt, d_discount_amt, d_net_amt, d_doct_reve_amt,d_asst_doct_reve_amt ,
+		 d_sub_gross_amt , d_sub_discount_amt ,d_sub_net_amt ,
+	    d_sub_doct_reve_amt , d_sub_asst_doct_reve_amt ,  d_gt_gross_amt ,
+	    d_gt_discount_amt , d_gt_net_amt , d_gt_doct_reve_amt , d_gt_asst_doct_reve_amt;
+ 
+int first = 0;
+							             
+		
+int rep_len=0;
+                       	
+char filename[150];
+char string_var[200];
+char  loc_legend[999][201];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+int    lctr = 0,pctr = 0;
+
+FILE *fp;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 4)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+
+	strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+ 
+    if (sql_connect() == -1)
+    {
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+    }
+
+
+
+    if (sqlca.sqlcode < 0 )
+	{
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+    }
+
+	set_meduser_role(); 
+
+	strcpy(P_LANGUAGE_ID.arr,l_language_id.arr);
+	P_LANGUAGE_ID.len = l_language_id.len;
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+		 strcpy(lv_facility_id.arr, argv[4]);
+    lv_facility_id.len = strlen(lv_facility_id.arr);
+    strcpy(g_facility_id, lv_facility_id.arr);
+
+    
+   fetch_prog_param();
+
+
+   declare_cursor();
+
+
+    open_det_cur();
+
+
+    open_file();
+
+
+	 fprintf(fp,"%c&l1O",ESC); /* Set Landscape*/ 
+	 fprintf(fp,"%c&a2L",ESC); 	/* To Set the Left margin */
+	 fprintf(fp,"%c(s15H",ESC); 	/* To set the font 	*/
+	 rep_len=160;
+	
+		
+    fetch_legend_value();
+
+	fetch_hosp_name();
+
+	print_first_page();
+
+
+    do_report();
+
+	
+
+	close_det_cur();
+
+	EXEC SQL DELETE SY_PROG_PARAM
+            WHERE PGM_ID   = 'DFR00004'
+            AND SESSION_ID = :nd_session_id
+            AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+
+    end_prog_msg();
+
+    EXEC SQL COMMIT WORK RELEASE;
+    if (OERROR)
+         err_mesg("COMMIT WORK RELEASE failed",0,"");
+
+
+    end_of_rep();
+
+}
+
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+fetch_prog_param()
+{
+		fr_doctor.arr[0]			= '\0';	
+		fr_period.arr[0]			= '\0';
+		to_period.arr[0]			= '\0';
+		fr_revenu_cat.arr[0]		= '\0';
+		to_revenu_cat.arr[0]		= '\0';
+		nd_episode_type.arr[0]		= '\0';
+		p_facility_id.arr[0]		= '\0';
+		nd_repeat_grp.arr[0]		= '\0';
+				
+
+
+		fr_doctor.len					= 0 ;	
+		fr_period.len					= 0 ;
+		to_period.len					= 0 ;
+		fr_revenu_cat.len				= 0 ;
+		to_revenu_cat.len				= 0 ;
+		nd_episode_type.len				= 0 ;
+		p_facility_id.len				= 0;
+		nd_repeat_grp.len				= 0 ;
+		
+		
+
+
+
+    EXEC SQL SELECT OPERATING_FACILITY_ID,
+					PARAM1,
+					PARAM2,
+					PARAM3,
+					PARAM4,
+					PARAM5,
+				    PARAM6,
+					PARAM7
+              INTO	:p_facility_id,
+					:fr_doctor,	
+					:fr_period,
+					:to_period,
+					:fr_revenu_cat,
+					:to_revenu_cat,
+					:nd_episode_type,
+					:nd_repeat_grp
+            FROM SY_PROG_PARAM
+            WHERE PGM_ID   = 'DFR00004'
+            AND SESSION_ID = :nd_session_id
+            AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+	
+			
+			p_facility_id.arr[p_facility_id.len] = '\0';
+			fr_doctor.arr[fr_doctor.len] = '\0' ;	
+			fr_period.arr[fr_period.len] = '\0';
+			to_period.arr[to_period.len] = '\0';
+			fr_revenu_cat.arr[fr_revenu_cat.len] = '\0';
+			to_revenu_cat.arr[to_revenu_cat.len] = '\0';
+			nd_episode_type.arr[nd_episode_type.len] = '\0' ;
+			nd_repeat_grp.arr[nd_repeat_grp.len]	 = '\0';
+			
+			
+
+
+}
+
+get_doct_desc()
+{
+
+	d_doctor_name.arr[0]  = '\0';
+	d_doctor_name.len  = 0;
+
+	EXEC SQL SELECT SHORT_NAME
+	         INTO   :d_doctor_name
+	FROM     SY_PHYSICIAN_MAST 
+	WHERE    FACILITY_ID = :p_facility_id
+	AND      PHYSICIAN_ID = :fr_doctor ;
+
+	d_doctor_name.arr[d_doctor_name.len] = '\0';
+	
+	if (OERROR)
+        err_mesg("SELECT failed on table SY_PHYSICIAN_MAST",0,"");
+
+  if (NOT_FOUND)
+        err_mesg("No Record found in SY_PHYSICIAN_MAST",0,"");
+}
+		
+declare_cursor()
+{
+
+   EXEC SQL DECLARE DF_SUMM_CUR CURSOR FOR
+   SELECT	A.REVENUE_CATEGORY, 
+			C.SHORT_DESC, 
+			A.PROCESSING_MONTH||'/'||A.PROCESSING_YEAR, 
+			A.BLNG_SERV_CODE, 
+			to_char(A.TRX_DATE, 'DD/MM/YYYY'),
+			A.PATIENT_ID, 
+			A.EPISODE_ID, 
+			A.VISIT_ID, 
+			SUM(NVL(A.SERV_QTY,0)) QTY,
+			SUM(NVL(A.GROSS_AMT,0)) GROSS_AMT, 
+			SUM(NVL(A.DISCOUNT_AMT,0)) DISCOUNT_AMT, 
+			SUM(NVL(A.NET_REVENUE_AMT,0)) NET_AMT, 
+			SUM(NVL(A.DR_REVENUE_AMT,0)) DR_REVENUE_AMT, 
+			SUM(NVL(A.SPLIT_AMT,0)) ASST_DOC_REV_AMT
+			FROM df_rev_folio_slmt_vw A, DF_REVENUE_CATEGORY C
+			WHERE A.REVENUE_CATEGORY      = C.REVENUE_CATEGORY
+			AND   A.PHYSICIAN_ID          = :fr_doctor
+			AND   A.REVENUE_CATEGORY BETWEEN NVL(:fr_revenu_cat, '!!!!!!!!!!') AND NVL(:to_revenu_cat, '~~~~~~~~~~')
+			AND   TO_DATE(A.PROCESSING_MONTH||'/'||A.PROCESSING_YEAR , 'MM/YYYY') BETWEEN to_date(:fr_period , 'MM/YYYY') AND TO_DATE(:to_period , 'MM/YYYY')
+			AND   A.EPISODE_TYPE = DECODE(:nd_episode_type, 'A', A.EPISODE_TYPE, :nd_episode_type)
+			--AND    NVL(A.DF_TRX_STATUS, 'N') != 'C'
+			GROUP BY A.REVENUE_CATEGORY, 
+					 C.SHORT_DESC, 
+					 A.PROCESSING_MONTH||'/'||A.PROCESSING_YEAR, 
+					 A.BLNG_SERV_CODE, 
+					 A.TRX_DATE, 
+					 A.PATIENT_ID, 
+					 A.EPISODE_ID, 
+					 A.VISIT_ID
+			ORDER BY A.REVENUE_CATEGORY, 
+					 A.PROCESSING_MONTH||'/'||A.PROCESSING_YEAR, 
+					 A.BLNG_SERV_CODE, 
+					 A.TRX_DATE,
+					 A.PATIENT_ID, 
+					 A.EPISODE_ID, 
+					 A.VISIT_ID ;
+     
+	if(OERROR)
+		err_mesg("DECLARE failed on cursor DF_SUMM_CUR",0,""); 
+
+
+ 
+	
+}
+
+
+open_det_cur()
+{
+	EXEC SQL OPEN DF_SUMM_CUR;
+
+		if(OERROR)
+			err_mesg("OPEN failed on cursor DF_SUMM_CUR",0,""); 
+
+
+			
+ 
+}
+
+
+close_det_cur()
+{
+
+	EXEC SQL CLOSE DF_SUMM_CUR;
+
+	 
+    
+}
+
+  
+fetch_df_summ_cur()
+{
+
+		 
+		d_process_mth_year.arr[0]	= '\0';
+		d_revenue_category.arr[0]	= '\0';
+		d_revenue_cate_desc.arr[0]	= '\0';
+		d_blng_serv_code.arr[0]		= '\0';
+		d_trx_date.arr[0]			= '\0';
+		d_patient_id.arr[0]			= '\0';
+		d_episode_id.arr[0]			= '\0';
+		d_visit_id.arr[0]			= '\0';
+ 
+ 
+
+		 
+		d_process_mth_year.len		= 0;
+		d_revenue_category.len		= 0;
+		d_revenue_cate_desc.len		= 0;
+		d_blng_serv_code.len		= 0;
+		d_trx_date.len				= 0;
+		d_patient_id.len			= 0;
+		d_episode_id.len			= 0;
+		d_visit_id.len				= 0;
+	 
+
+
+		d_qty						= 0; 
+		d_gross_amt					= 0;
+		d_discount_amt				= 0;
+		d_net_amt					= 0;
+		d_doct_reve_amt				= 0;
+		d_asst_doct_reve_amt		= 0;
+	 
+
+
+
+
+	EXEC SQL FETCH DF_SUMM_CUR
+               INTO 
+				:d_revenue_category,
+				:d_revenue_cate_desc,
+				:d_process_mth_year,
+				:d_blng_serv_code,
+				:d_trx_date,
+				:d_patient_id,
+				:d_episode_id,
+				:d_visit_id,
+				:d_qty,
+				:d_gross_amt,
+				:d_discount_amt,
+				:d_net_amt,
+				:d_doct_reve_amt,
+				:d_asst_doct_reve_amt;
+
+
+	if (OERROR)
+            err_mesg("FETCH failed on cursor DF_SUMM_CUR",0,"");
+
+
+ 
+	d_process_mth_year.arr[d_process_mth_year.len]		= '\0' ;
+	d_revenue_category.arr[d_revenue_category.len]		= '\0' ;
+	d_revenue_cate_desc.arr[d_revenue_cate_desc.len]	= '\0';
+	d_blng_serv_code.arr[d_blng_serv_code.len]			= '\0';
+	d_trx_date.arr[d_trx_date.len]						= '\0';
+	d_patient_id.arr[d_patient_id.len]					= '\0';
+	d_episode_id.arr[d_episode_id.len]					= '\0';
+	d_visit_id.arr[d_visit_id.len]						= '\0';
+ 
+	
+
+  
+	
+	return(LAST_ROW?0:1);
+
+  }
+
+
+
+
+open_file()
+{
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"DFR00004.lis");
+
+    if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file DFR00004.lis");
+       proc_exit();
+    }
+}
+
+
+
+do_report()
+{
+
+print_head();
+
+process_for_doctor();
+  
+
+  
+}
+
+
+process_for_doctor()
+{
+
+	first =0;
+	while(fetch_df_summ_cur())
+	{
+	check_line(1);
+		if (strcmp(temp_revenue_category.arr,d_revenue_category.arr)!=0) 
+		{
+			if (first == 1) 
+			{ 
+				print_rev_sub_tot();
+			} 
+		}
+
+
+		
+		if (strcmp(temp_revenue_category.arr,d_revenue_category.arr)!=0) 
+		{
+					//fprintf(fp,"Revenue category : %-10s(%-15s)",  d_revenue_category.arr ,d_revenue_cate_desc.arr );
+					fprintf(fp,"%-16s : %-10s(%-15s)",loc_legend[13], d_revenue_category.arr ,d_revenue_cate_desc.arr );
+
+					fprintf(fp , "\n" );
+					lctr = lctr + 1 ;
+		
+		}
+
+
+		if (lctr >= MAX_LINES)
+		{
+			next_page();
+			fprintf(fp,"%-16s : %-10s(%-15s)", loc_legend[13], d_revenue_category.arr ,d_revenue_cate_desc.arr );
+			fprintf(fp , "\n" );
+			lctr = lctr + 1 ;
+			print_details();
+		}
+		else
+		{
+			print_details();
+		}	
+	
+		
+
+		first=1;
+
+		strcpy(temp_revenue_category.arr,d_revenue_category.arr);
+		
+		d_sub_tot_qty = d_sub_tot_qty + d_qty; 
+		d_sub_gross_amt = d_sub_gross_amt + d_gross_amt;
+		d_sub_discount_amt = d_sub_discount_amt +  d_discount_amt;
+		d_sub_net_amt = d_sub_net_amt + d_net_amt;
+		d_sub_doct_reve_amt =  d_sub_doct_reve_amt + d_doct_reve_amt;
+		d_sub_asst_doct_reve_amt  = d_sub_asst_doct_reve_amt + d_asst_doct_reve_amt;
+
+		d_gt_tot_qty = d_gt_tot_qty + d_qty; 
+		d_gt_gross_amt = d_gt_gross_amt + d_gross_amt;
+		d_gt_discount_amt = d_gt_discount_amt +  d_discount_amt;
+		d_gt_net_amt = d_gt_net_amt + d_net_amt;
+		d_gt_doct_reve_amt =  d_gt_doct_reve_amt + d_doct_reve_amt;
+		d_gt_asst_doct_reve_amt  = d_gt_asst_doct_reve_amt + d_asst_doct_reve_amt;
+
+		 
+
+
+	}
+
+	 
+	print_rev_sub_tot();
+	grant_tot();
+
+
+	end_of_rep();
+
+}
+
+
+
+print_details()
+{
+check_line(1);
+fprintf(fp ,"%-7s  ", d_process_mth_year.arr);
+fprintf(fp ,"%-10s  ", d_blng_serv_code.arr);
+fprintf(fp ,"%-10s  ", d_trx_date.arr); 
+fprintf(fp ,"%-20s  ", d_patient_id.arr);
+fprintf(fp ,"%8s  ", d_episode_id.arr);
+fprintf(fp ,"%4s    ", d_visit_id.arr);
+fprintf(fp ,"%3d  ", d_qty);
+print_formated(d_gross_amt);
+print_formated(d_discount_amt);
+print_formated(d_net_amt);
+fprintf(fp,"   ");
+print_formated(d_doct_reve_amt);
+print_formated(d_asst_doct_reve_amt);
+fprintf(fp, "\n");
+lctr = lctr + 1 ;
+
+}
+
+ 
+print_rev_sub_tot() 
+{
+    check_line(3);
+    horz_skip(54) ;
+	print_line('-',106);
+    fprintf(fp, "\n");
+
+	//fprintf(fp , "%26s Revenue Category - %-10s - Total " , " " ,temp_revenue_category.arr) ;
+
+	fprintf(fp , "%26.26s %-16.16s - %-10.10s - %5.5s " , " " ,loc_legend[13],temp_revenue_category.arr,loc_legend[15]) ;
+
+    fprintf(fp , "       ");
+	fprintf(fp ,"%4d  ",d_sub_tot_qty);
+	print_formated(d_sub_gross_amt);
+	print_formated(d_sub_discount_amt);
+	print_formated(d_sub_net_amt);
+	fprintf(fp,"   ");
+	print_formated(d_sub_doct_reve_amt);
+	print_formated(d_sub_asst_doct_reve_amt);
+	
+    fprintf(fp, "\n");
+	
+    
+	d_sub_tot_qty = 0;
+	d_sub_gross_amt = 0;
+	d_sub_discount_amt = 0;
+	d_sub_net_amt = 0;
+	d_sub_doct_reve_amt = 0;
+	d_sub_asst_doct_reve_amt = 0 ;
+
+	horz_skip(54) ;
+	print_line('=',106);
+    fprintf(fp, "\n");
+
+	lctr = lctr + 3;
+}
+
+
+
+grant_tot()
+{
+   check_line(3);
+	//fprintf(fp , "%26s Grand Total                     " , " ");
+	fprintf(fp , "%26.26s %31.31s" , " ",loc_legend[38]);
+	fprintf(fp , "              ");
+	
+	fprintf(fp ,"%4d  ",d_gt_tot_qty);
+	print_formated(d_gt_gross_amt);
+	print_formated(d_gt_discount_amt);
+	print_formated(d_gt_net_amt);
+	fprintf(fp,"   ");
+	print_formated(d_gt_doct_reve_amt);
+	print_formated(d_gt_asst_doct_reve_amt);
+
+    fprintf(fp, "\n");
+	
+	print_line('-',rep_len);
+    fprintf(fp, "\n");
+
+	d_gt_tot_qty = 0;
+	d_gt_gross_amt = 0;
+	d_gt_discount_amt = 0;
+	d_gt_net_amt = 0;
+	d_gt_doct_reve_amt = 0;
+	d_gt_asst_doct_reve_amt = 0;
+	  
+}
+
+
+print_first_page()
+{
+
+int hosp_nm_len, rep_title_len = 10, s1,date_len,pgm_len;
+
+lctr=0;
+get_doct_desc();
+
+fprintf(fp, "\n");
+ 	fprintf(fp,"%-4s: DF",loc_legend[1]);
+	hosp_nm_len  =  hosp_name.len;
+	s1 = (rep_len-hosp_nm_len)/2;
+	horz_skip(s1-8);
+	fprintf(fp,"%s", hosp_name.arr);
+	s1 = (rep_len-s1-hosp_nm_len);
+	horz_skip(s1-24);
+
+		fprintf(fp,"%-s: %s",loc_legend[4],date_time.arr);
+		 
+
+  fprintf(fp, "\n");
+
+	fprintf(fp,"%-4s: %s",loc_legend[2],user_id.arr); 
+
+  fprintf(fp, "\n");
+ 
+   	fprintf(fp,"%-4s: %s",loc_legend[3],"DFR00004");
+ 
+
+  
+	rep_title_len = 66;
+	s1 = (rep_len-rep_title_len)/2;
+	horz_skip(s1);
+
+    fprintf(fp, "%22s : %-15s %-15s - %-8s " ,loc_legend[6], fr_doctor.arr ,d_doctor_name.arr,loc_legend[7]);
+
+	
+	 
+    horz_skip(7);
+
+  		fprintf(fp,"%-s: %4d",loc_legend[5],++pctr);
+
+    fprintf(fp, "\n");
+
+print_line('-',rep_len);
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+fprintf(fp,"VER : 4.1");
+fprintf(fp, "\n");
+fflush(fp);
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+fprintf(fp,"        INPUT PARAMETERS :");
+fprintf(fp, "\n");
+fprintf(fp,"        ----------------");
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+
+fprintf(fp,"%25s        : %s",loc_legend[8],fr_doctor.arr);
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+
+
+fprintf(fp,"%24s   %5s : %s",loc_legend[11],loc_legend[26],fr_period.arr);
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+fprintf(fp,"%24s   %5s : %s",loc_legend[11],loc_legend[27],to_period.arr);
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+if (strcmp(fr_revenu_cat.arr, "!!!!!!!!!!")  == 0)
+fprintf(fp,"%24s   %5s : %s",loc_legend[13],loc_legend[26],loc_legend[9]);
+else
+fprintf(fp,"%24s   %5s : %s",loc_legend[13],loc_legend[26],fr_revenu_cat.arr);
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+if (strcmp(to_revenu_cat.arr, "~~~~~~~~~~")  == 0)
+fprintf(fp,"%24s   %5s : %s",loc_legend[13],loc_legend[27],loc_legend[10]);
+else
+fprintf(fp,"%24s   %5s : %s",loc_legend[13],loc_legend[27],to_revenu_cat.arr);
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+
+
+if (strcmp(nd_episode_type.arr,"E")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[31]);
+
+if (strcmp(nd_episode_type.arr,"O")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[30]);
+
+if (strcmp(nd_episode_type.arr,"I")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[28]);
+
+if (strcmp(nd_episode_type.arr,"R")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[32]);
+
+if (strcmp(nd_episode_type.arr,"D")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[29]);
+
+if (strcmp(nd_episode_type.arr,"A")==0)
+fprintf(fp,"%31s  : %-s",loc_legend[14],loc_legend[33]);
+
+
+
+fprintf(fp, "\n");
+fprintf(fp, "\n");
+
+
+
+
+fprintf(fp,"\n\f");
+
+}
+
+
+
+
+print_head()
+{
+int hosp_nm_len, rep_title_len = 10, s1,date_len,pgm_len;
+
+    lctr=0;
+
+	get_doct_desc();
+
+
+fprintf(fp, "\n");
+ 	fprintf(fp,"%-4s: DF",loc_legend[1]);
+	hosp_nm_len  =  hosp_name.len;
+	s1 = (rep_len-hosp_nm_len)/2;
+	horz_skip(s1-8);
+	fprintf(fp,"%s", hosp_name.arr);
+	s1 = (rep_len-s1-hosp_nm_len);
+	horz_skip(s1-24);
+
+		fprintf(fp,"%-s: %s",loc_legend[4],date_time.arr);
+		 
+
+  fprintf(fp, "\n");
+
+	fprintf(fp,"%-4s: %s",loc_legend[2],user_id.arr); 
+
+  fprintf(fp, "\n");
+ 
+   	fprintf(fp,"%-4s: %s",loc_legend[3],"DFR00004");
+ 
+
+  
+	rep_title_len = 66;
+	
+	s1 = (rep_len-rep_title_len)/2;
+	horz_skip(s1);
+
+       fprintf(fp, "%22s : %-15s %-15s - %-8s " ,loc_legend[6], fr_doctor.arr ,d_doctor_name.arr,loc_legend[7]);
+
+
+
+	
+	 
+         horz_skip(7);
+
+
+  	fprintf(fp,"%-s: %4d",loc_legend[5],++pctr);
+
+    fprintf(fp, "\n");
+
+
+
+print_line('-',rep_len);
+fprintf(fp, "\n");
+
+//fprintf(fp , "Period   Billing     Trx.Date    Patient Date        Episode ID  Visit   Serv           Gross            Disc             Net     Doctor's Share    Asst. Doctor");
+
+fprintf(fp , "%-8s %-11s %-11s %-19s %-11s %-6s %-5s %15s %15s %15s%19s %15s",loc_legend[11],loc_legend[17],loc_legend[19],loc_legend[20],loc_legend[21],loc_legend[22],loc_legend[23],loc_legend[24],loc_legend[25],loc_legend[34],loc_legend[35],loc_legend[39]);
+
+
+fprintf(fp, "\n");
+fprintf(fp , "%9s%-11s %44s%4s%7s  %15s %15s %15s%19s %15s"," ",loc_legend[18]," ",loc_legend[42],loc_legend[41],loc_legend[36],loc_legend[36],loc_legend[36],loc_legend[40],loc_legend[40]);
+//fprintf(fp , "         Service                                                    ID    Qty          Amount          Amount          Amount             Amount    Share Amount");
+fprintf(fp, "\n");
+print_line('-',rep_len);
+fprintf(fp, "\n");
+lctr = 7 ;
+
+}
+
+ 
+
+
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+    user_id.arr[0]   = '\0';
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+    user_id.len      = 0;
+    EXEC SQL SELECT ACC_ENTITY_NAME, TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),USER
+             INTO :hosp_name, :date_time, :user_id
+             FROM SY_ACC_ENTITY_LANG_VW
+			 WHERE acc_entity_id =:lv_facility_id
+			 and LANGUAGE_ID=:P_LANGUAGE_ID ;
+
+       if (OERROR) err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+hosp_name.arr[hosp_name.len]           = '\0';
+date_time.arr[date_time.len]           = '\0';
+user_id.arr[user_id.len]               = '\0';
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+    char s_amt[30], str_amt[30];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+	strcat(s_amt,"-");
+        sprintf(str_amt,"%15s",s_amt);
+	l_ltrim(s_amt);
+        fprintf(fp,"%15s",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+	l_ltrim(s_amt);
+        fprintf(fp,"%15s",str_amt);
+    }
+
+}             
+
+
+check_line(skip) /* will check for MAX LINE before printing totals */
+int skip;
+{
+	if ((lctr + skip) >= MAX_LINES)
+	{
+		next_page(); 
+	}
+}
+
+next_page() /* will move the cursor to next page */
+{
+  
+	fprintf(fp,"\n\f");
+    print_head();
+	
+  
+  	
+}
+
+print_line(ch,n) /* this is to obtain required characters */
+  char ch;
+  int n;
+{
+	int i;
+	for(i=0;i<n;i++)
+	fprintf(fp,"%c",ch);  //fprintf(fp,"\n");
+	 
+}
+
+horz_skip(num) /* this is to obtain required blank space */
+int num;
+{
+	int i;
+	for(i=0;i<num;i++)fprintf(fp," ");
+}
+
+/*--------- OVER -------------*/
+
+
+
+
+fetch_legend_value()
+{
+	for(i=1;i<=300;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('DFR00004.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:lv_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:P_LANGUAGE_ID);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+
+
+
+
+
+
+end_of_rep()
+ {
+
+int  s1;
+
+    lctr=0;
+
+   fprintf(fp, "\n");
+   	s1 = (rep_len-22)/2;
+   horz_skip(s1);
+  fprintf(fp,"***  END OF REPORT ***");
+
+    fclose(fp);
+  fprintf(fp,"%cE",ESC); /* To Reset the Printer */ 
+  fflush(fp);
+ }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+ 
+
+<script>
+
+function callISiteRadiology() {
+	try{
+		Radiology.AddShelfMenuItem("EM Radiology Result Reporting")		
+		
+	}catch(Error){		
+        alert("Call failed:"+Error.message);          
+    }
+}
+
+function Radiology_EventShelfMenuSelected(MenuItem, CanvasPageID, ShelfID)
+{
+	if (MenuItem == "EM Radiology Result Reporting")
+	{	
+	var eventStr = "EventShelfMenuSelected: Menu Item = " + MenuItem + ",CanvasPage Id = " + CanvasPageID + ",Shelf Id = " + ShelfID;	
+	var loggedInUser = Radiology.GetCurrentUser();
+	loggedInUser = loggedInUser.toUpperCase();
+	var shelfstatusxml = Radiology.GetShelfStatus(ShelfID);
+	
+	var startpos = shelfstatusxml.indexOf("<x00080050>")+11	
+	var tmpstr = shelfstatusxml.substr(shelfstatusxml.indexOf("<x00080050>")+11)
+	var endpos = tmpstr.indexOf("</x00080050>")	
+	var accessionNumber = shelfstatusxml.substr(startpos,endpos)
+	var temp="&login_user="+loggedInUser+"&ext_appl_accession_num="+accessionNumber;
+		
+	var url ="http://<ApplicationServerIP>:<Port>/<ApplicationHomeName>/eCommon/jsp/RadiologyReport.jsp?function_id=RD_AUTH_RDOLGST&locale=en&facility_id=<facilityid>&responsibility_id=RADIOLOGIST";
+
+	var newURL = url + temp;
+
+	window.open(newURL);
+	}
+}
+
+</script>
+
+ 
+
+</head>
+
+<body onload="callISiteRadiology()">
+
+</body>
+
+</html>

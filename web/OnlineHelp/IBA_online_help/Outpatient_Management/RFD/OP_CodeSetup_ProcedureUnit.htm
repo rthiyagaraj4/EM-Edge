@@ -1,0 +1,430 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OP_CodeSetup_ProcedureUnit</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to create a Procedure Unit 
+ record:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Code</span> 
+	 - Enter the Location code in alphanumeric format of four characters 
+	 maximum length. A location code is to identify the Location and has 
+	 to be unique and cannot be changed after creation. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Type</span> 
+	 - Select the required Location Type from the list. The list displays 
+	 OT (All), OT (Specific) and Procedure Unit. This field is mandatory.</p></li>
+</ol>
+<p class="NumberRFD" style="margin-left: 40px;">• For Brunei users, a drop-down 
+ list appears next to Type field. The categories created in ‘Clinic Category’ 
+ master appear in the drop-down list. This field is non-mandatory. The 
+ default value is ‘Select’.</p>
+<ol start="3">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Long 
+	 Description</span> - Enter the long description of the Location in 
+	 alphanumeric format of 30 characters maximum length. This field is 
+	 mandatory.</p></li>
+</ol>
+<ol start="4">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Short 
+	 Description</span> - Enter the short description of the Location in 
+	 alphanumeric format of 15 characters maximum length. This field is 
+	 mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Physical 
+	 Location</span> - Enter the Physical Location of the Procedure Unit 
+	 in alphanumeric format of 40 characters maximum length. A Physical 
+	 Location is to identify the exact Location of the Procedure Unit.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> 
+	 - Select the check box to enable the record and clear this check box 
+	 to disable the record.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Applicable 
+	 to Radiology</u></span> – Select the Applicable to Radiology check box 
+	 to create Procedure Unit for booking radiology appointments. This 
+	 check box is cleared, by default. If the check box is selected:</p>
+	<ul>
+		<li class="p-BulletRFD"><p class="BulletRFD">Primary Resource Class 
+		 field is defaulted as ‘Equipment’ and disabled.</p></li>
+	</ul>
+	<ul>
+		<li class="p-BulletRFD"><p class="BulletRFD">Check in at Identification 
+		 field is defaulted to ‘Resource’ and disabled.</p></li>
+	</ul>
+	<ul>
+		<li class="p-BulletRFD"><p class="BulletRFD">All the fields in 
+		 the MR Section/ File Storage are disabled.</p></li>
+	</ul></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD"><span style="font-weight: normal;">Procedure Unit characteristics 
+ can be entered under two tabs, namely, ‘Characteristics’ and ‘Others’ 
+ tab.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Characteristics Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Working Days</p>
+<ol start="8" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Working 
+	 Days</span> - A Location can function on all or specific days of the 
+	 week. Select the appropriate check boxes to indicate the Location 
+	 working days. The Visit Registration and appointment processes are 
+	 used for a Location only on its working days. The default working 
+	 days are selected based on the day of week defined in System Manager 
+	 module.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Operating Time</p>
+<ol start="9" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Start</span> 
+	 – Enter the operating start time of the location in time format of 
+	 hh:mm. This field is optional.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">End</span> 
+	 - Enter the operating end time of the location in time format of hh:mm. 
+	 This field is optional. Operating End time has to be greater than 
+	 Operating Start Time.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Base 
+	 Slot/Slab Time</span> – Base slot/slab time is used to identify the 
+	 minimum unit of time frame used to book an appointment where multiple 
+	 Resources are involved by using multiples of the base time defined. 
+	 Enter the base slot/slab time in time format of hh:mm. This field 
+	 is optional.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Controls</p>
+<ol start="12" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Visit Registration</span> – Select the check box to Allow Visit Registration 
+	 for the defined Location.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Walk-in</span> – This field is enabled on selecting the ‘Allow Visit 
+	 Registration’ check box. Select the check box to allow walk-in’s to 
+	 be entertained to the defined location, or clear the check box.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Appointment</span> - This field is enabled on selecting the ‘Allow 
+	 Visit Registration’ check box for Procedure Units with level of care 
+	 set to ‘Ambulatory’. For locations with level of care set to ‘Emergency’ 
+	 the field is disabled. Select the check box to allow appointments 
+	 for the defined Location. If the check box is cleared, the time table 
+	 records cannot be set up for this Location in Appointment Scheduling 
+	 module and the appointments cannot be booked.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Referral</span> - Select the check box to indicate if referrals are 
+	 allowed in this Location. This field is enabled on selecting the ‘Allow 
+	 Visit Registration’ check box. Most locations allow visit registration 
+	 only on producing a referral identification number. If the check box 
+	 is cleared, the location does not support registration of visits for 
+	 referral patients.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Non-Referral</span> - This field is enabled on selecting the ‘Allow 
+	 Visit Registration’ check box. Select the check box to indicate if 
+	 non-referrals are allowed in this Location.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Age 
+	 Group</span> - Select the Age Group of patients who are eligible to 
+	 receive the services provided from the list of valid values. If this 
+	 value is set up, the Visit Registration process restricts the patients 
+	 based on their age and gender depending on the corresponding Age Group 
+	 parameters set in ‘Other Master Setup’ of Application Master module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD" style="text-align: left;"><span 
+	 style="text-decoration: underline; "><u>Diagnosis Not Mandatory During 
+	 Check Out</u></span> - &#160;Select the check box to make recording of 
+	 patient diagnosis as non-mandatory during OP check out in spite of 
+	 Diagnosis is configured as mandatory for OP patient in MDS for patient 
+	 class setup. By default, this check box is cleared and in enabled 
+	 mode. You can select it if required. This check box is available only 
+	 for users in Selayang.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Level 
+	 Of Care</span> - Select the Level of Care from the list of valid values. 
+	 This defines the level of care provided by the Procedure Unit. The 
+	 listed values are ‘Ambulatory’ and ‘Emergency’.</p></li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">If the Level of Care is 
+ set to ‘Ambulatory’, the applicable Visit Type Indicator check box, namely, 
+ ‘First’, ‘Follow up’, ‘Routine’, ‘Series’ and ‘Consult’ are selected by 
+ default. Clear the required field if necessary.</p>
+<p class="BoldRFD"><span style="font-weight: normal;">If the Level of Care 
+ is set to ‘Emergency’, the ‘Emergency’ check box in Applicable Visit Type 
+ Indicator is selected by default.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Others Tab</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Acct Department/Service</p>
+<ol start="20" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> 
+	 - Select the Specialty from the list of valid values. All the Specialties 
+	 created in Application Masters module with enabled check box selected 
+	 are listed. This field represents the Specialty, which is applicable 
+	 for the Procedure Unit. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Vital 
+	 Signs Battery</span> – Select the Vital Signs Battery from the list. 
+	 All the Discrete Measure of type ‘Vital Signs Battery’ setup in Application 
+	 Master module are displayed in the list. The Vital Sign Battery associated 
+	 with the Procedure Unit is used to record the Vital Signs of the patients 
+	 arriving into the Procedure Unit. This field is disabled, by default.</p></li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" alt="Note.jpg" style="border: none;" width="39" height="26" border="0" />Vital Signs Battery 
+ in Outpatient Management module is set at three different levels, namely, 
+ ‘Procedure Unit Setup’, ‘Visit Type for Location Setup’ and ‘OP Parameter 
+ Setup’. Vital Signs Battery set up is not mandatory while defining the 
+ ‘Procedure Unit’ and ‘Visit Type for Location’ but is mandatory while 
+ defining ‘OP Parameter’. The system first checks for Vital Signs Battery 
+ in the ‘Procedure Unit setup’. &#160;If it is not defined, the Vital Signs 
+ Battery Set in ‘Visit Type for Location’ is set as default. If Vital Signs 
+ Battery is not defined in Visit Type, the Vital Signs Battery set in ‘OP 
+ Parameter’ is displayed as default.</p>
+<ol start="22" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Account 
+	 Department</span> - Select the Account Department for the Location 
+	 from the list. The list of Account Departments displayed is limited 
+	 to the departments of the logged in facility as set in ‘Department 
+	 in facility’ of Application Masters module. This field is mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Section</span> 
+	 – Select the Section for the Location from the list. All the sections 
+	 associated to the selected Accounting Department in Application Masters 
+	 module are listed in the list.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Service</span> 
+	 - Select the Service from the list of valid values. This field represents 
+	 the Medical/Ancillary Service that is applicable to the Location. 
+	 The list of Services displayed is limited to the Services offered 
+	 by the selected department of the logged in facility. This field is 
+	 mandatory.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">MR 
+	 Section Type</span> – Select the MR Section Type from the values displayed, 
+	 namely, ‘Central’ or ‘Departmental’. This field is enabled only if 
+	 File Maintenance is set to ‘Multiple’ in MP Parameter (Logged in facility) 
+	 of Master Patient Index module or if File Maintenance is set to ‘Single’ 
+	 in MP Parameter of Master Patient Index module, this field is disabled. 
+	 The value ‘Departmental’ has to be selected when the Location maintains 
+	 an exclusive MR Section for the patient records and the value ‘Central’ 
+	 has to be selected when the Location uses a common centralized MR 
+	 Section. The MR Section value is displayed based on the value set 
+	 at the facility level and if these values are not set at the facility 
+	 level, the values set in MP Parameter are defaulted.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">MR 
+	 Section</span> – Select the MR Section from the list of valid values 
+	 to be associated to the Location. This is enabled only if MR Section 
+	 Type is selected as ‘Departmental’. This field represents the Medical 
+	 Records Section of the facility associated to the Procedure Unit. 
+	 The list of values displayed is limited to the MR Sections of the 
+	 logged in facility.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">File 
+	 Storage Location</span> – Select the File Storage Location to request 
+	 for files from the list. These values are displayed only if the Medical 
+	 File Management module is installed. On selection of MR Section Type 
+	 as ‘Central’ and all those File Storage Locations of identity is Procedure 
+	 Unit and belongs to the logged in facility are displayed. On selection 
+	 of MR Section Type as ‘Central’ and all those File Storage Locations 
+	 of identity is department and belongs to the logged in facility are 
+	 displayed.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Default 
+	 File Type</span> – Select the applicable File Type from the list of 
+	 values. The list of values is populated from the File Type function 
+	 defined in Master Patient Index module and is applicable when File 
+	 Maintenance is opted for single file maintenance in Master Patient 
+	 Index module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Auto 
+	 File Request</span> - Select the check box to automatically request 
+	 for files from Permanent MRD on Visit Registration to the defined 
+	 Procedure Unit, or the files has to be manually requested.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Applicable Visit Type Indicator</p>
+<ol start="30" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Emergency/First/Follow-up/Routine/Series/Consult</span> 
+	 – Select the check boxes to indicate whether each of these Visit Types 
+	 are applicable for the Location. If ‘Level of Care’ is selected as 
+	 ‘Emergency’, the ‘Emergency’ Visit Type check box is selected by default. 
+	 Select the other Visit Types applicable for the Location. If the ‘Level 
+	 of Care’ is set as ‘Ambulatory, all Visit Types except the ‘Emergency’ 
+	 Visit Type are selected by default or select the ‘Emergency’ Visit 
+	 Type if applicable for the Location.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Applicable Patient Class</p>
+<ol start="31" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Outpatient/Inpatient/Daycare/External</span> 
+	 - Select the check boxes to indicate whether of the patient classes 
+	 are applicable for this Location.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Resource Privileges</p>
+<ol start="32" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Primary 
+	 Resource Class/Type</span> - Select the Resource class and Resource 
+	 Type from the list. The values populated for Resource Class are ‘Practitioner’, 
+	 ‘Room’, ‘Equipment’ and ‘Others’ for Locations, which is based on 
+	 Ambulatory Level of Care, and value is ‘Practitioner’ for Locations, 
+	 which is based on Emergency Level of Care. Based on the value selected 
+	 in Resource Class, the values in Resource Type are filtered and populated 
+	 from Application Masters module.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Open 
+	 to All Resources</span> - Select the check box to indicate the Procedure 
+	 Unit is open to all primary resources of the facility. If the check 
+	 box is not selected, specific resources have to be associated to the 
+	 Procedure Unit using appropriate function. This field is applicable 
+	 when Resource Class is set to ‘Practitioner’. If level of care is 
+	 set to ‘Emergency’, the check box is selected and disabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Check 
+	 in at Identification</span> – Select the required value from the list. 
+	 If Primary Resource Class is ‘Practitioner’, the values are ‘Non-identifiable’ 
+	 and ‘Resource’. If Primary Resource Class is ‘Room’, the value is 
+	 set to ‘Resource’. If value is set to ‘Resource’, the same value has 
+	 to be identified at the time of Visit Registration. Otherwise, the 
+	 resource identification becomes optional at the time of Visit Registration 
+	 and the resources are identified before the consultation process is 
+	 started. This field is mandatory. If Level of Care is set to ‘Emergency’, 
+	 the value Non-identifiable is defaulted and disabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Select 
+	 Unassigned Patients</span> - Select the check box to indicate whether 
+	 unassigned patients can be selected from the Patient Queue for consultation 
+	 process. Based on the value selected, the attending Practitioner for 
+	 the encounter is automatically assigned based on who selects the patient. 
+	 If Level of Care is set to ‘Emergency’, the check box is selected 
+	 and disabled.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Allow 
+	 Consultation On</span> – Select the required value from the list. 
+	 The values displayed are ‘Checked-in’ and ‘Arrived’. Based on the 
+	 value selected the patient can be selected from the queue for consultation 
+	 by the Practitioner either on checking in or on arriving at the Procedure 
+	 Unit. The patient name is listed in the Clinician Access queue based 
+	 on the value selected.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Queue Numbering Controls</p>
+<ol start="37" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Numbering 
+	 Applicable</span> – Select the check box to assign numbering for the 
+	 Procedure Unit. Numbering is set according to the setup made in Queue 
+	 Numbering Control function.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Calculate 
+	 Wait Time based on Status</u></span> – Select the required value from 
+	 the drop-down list. The list values include Checked-In and Arrived 
+	 At Nursing Station. Based on the selected value, the patient Waiting 
+	 Time is calculated in the Manage Patient Queue. By default, the value 
+	 ‘Select’ is displayed. The ‘Calculate Wait Time based on Status’ configuration 
+	 done in OP Parameter will apply. If the setup is done in Procedure 
+	 Unit screen, this setup will take precedence. At any point of time, 
+	 the wait time will be calculated based on the latest configuration.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span style="text-decoration: underline; "><u>Contact 
+	 No</u></span> – Enter the contact number of the procedure unit in alpha 
+	 numeric format of maximum 15 characters. Special characters +(Plus) 
+	 and - (Hyphen) are only allowed.</p></li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Instructions tab</p>
+<p class="BoldRFD">&#160;</p>
+<ol start="40">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Serial 
+	 No</span> - Enter the Serial Number in numeric format of two digits 
+	 maximum length. You can record a maximum of 10 Serial Numbers. This 
+	 is a mandatory field.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Instruction 
+	 Description</span> - Enter the Instruction Description in alphanumeric 
+	 format of 200 characters maximum length or select the Instruction 
+	 Description using [?] function. This is a mandatory field.</p></li>
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Instruction 
+	 ID</span> -The corresponding Instruction ID is displayed on selecting 
+	 the Instruction Description.</p></li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click <span class="BoldNumberRFD">[Add]</span> 
+ to display the selected Patient Instruction to the list at the bottom 
+ of the screen.</p>
+<ol start="43" type="1">
+	<li class="p-NumberRFD"><p class="NumberRFD"><span class="UnderlineRFD">Default</span> 
+	 - Select the check box to default the selected patient instructions 
+	 while booking an appointment for the selected clinic.</p></li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">Click on Serial Number 
+ hyperlink to delete the record. Click <span class="BoldNumberRFD">[Clear]</span> 
+ to clear the selected details. Click <span class="BoldNumberRFD">[Delete]</span> 
+ to delete the record from the list.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

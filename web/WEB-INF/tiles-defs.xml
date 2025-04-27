@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+       "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+<tiles-definitions>
+	<definition name="masterlayout" path="../../../core/jsp/MasterTemplate.jsp">
+		<put name="toolbar" value="../../../eCommon/jsp/commonToolbar.jsp" />
+		<put name="content" value="../../../core/jsp/blank.jsp" />
+		<put name="messageFrame" value="../../../core/jsp/MessageFrame.jsp" />
+	</definition>
+	<definition name="placeDietOrderlayout" extends="masterlayout">
+		<put name="content" value="../../../eDS/WorkListOrder/jsp/WorkListMainFrames.jsp" />
+	</definition>
+
+	<definition name="lcwardmasterlayout" path="../../../eLC/core/jsp/LcWardMasterTemplate.jsp">
+		<put name="lcwardtoolbar" value="../../../eLC/core/jsp/LcWardToolbar.jsp" />
+				<put name="content" value="../../../core/jsp/blank.jsp" />
+		<put name="messageFrame" value="../../../eLC/core/jsp/MessageFrame.jsp" />
+	</definition>
+	<definition name="lclaundrymasterlayout" path="../../../eLC/core/jsp/LcLaundryMasterTemplate.jsp">
+		<put name="lclaundrytoolbar" value="../../../eLC/core/jsp/LcLaundryToolbar.jsp" />
+				<put name="content" value="../../../core/jsp/blank.jsp" />
+		<put name="messageFrame" value="../../../eLC/core/jsp/MessageFrame.jsp" />
+	</definition>
+ 
+</tiles-definitions>

@@ -1,0 +1,524 @@
+
+#define NO_DATA_FOUND (sqlca.sqlcode == 1403)
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+#define OERROR 		  (sqlca.sqlcode < 0)
+#define INIT_MESG "Label Printing"
+#define ESC 0x1B
+
+#include <stdio.h>  
+#include <string.h>
+#include <math.h>
+#include <malloc.h> 
+#include <rl.h>
+
+EXEC SQL BEGIN DECLARE SECTION;                  
+
+
+char
+		d_short_desc			 [100][16],	
+		d_added_date 			 [100][31], // modified by preetham increased character size
+		d_added_hour 			 [100][31], 
+		uid_pwd                  [42],							  
+		nd_ws_no				 [50],		
+		er_msg					 [171], 
+		nd_session_id            [50],
+		nd_printer_type          [2],
+		a_pgm_id				 [41],
+		er_msg                   [171], 
+
+/***************** variables added for label_cur cursor ***********/
+
+		p_specimen_no			 [15],
+		p_sample_id				 [10],
+		p_facility_id			 [4],
+		p_task_code				 [5],
+		p_count					 [5],
+		nd_print_source_type	 [2],
+		nd_print_source			 [5];
+	
+VARCHAR 
+		p_section_code			 [5],  // modified by dinesh/preetham on 21-01-2008 wrt ML-SD-SCF-2158
+		//d_facility_name			 [31],
+		d_facility_name			 [300],
+		nd_added_date			 [31], // modified by preetham increased character size
+		nd_added_date1			 [31], // added for globalisation
+		nd_added_hour			 [31], 
+		nd_added_hour1			 [31], // added for globalisation
+		nd_short_desc			 [16],							
+		language_id				 [5],/*****added for globalisation*****/
+		l_translated_value		 [500];/*****added for globalisation*****/
+
+  int    h_no_of_rec = 0,control_flag=0,er_msg_type = 0;	
+	int err_flag = 0;
+	int i; //added for globalisation
+
+
+EXEC SQL END DECLARE SECTION; 
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *f1;
+
+char filename[150];
+char filename1[150];
+char        string_var[100];
+
+char local_legend[2][500];//added for globalisation
+
+char *command;  
+char gtt_yn = 'N';
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+
+
+
+
+
+ err_flag = 0;
+
+    strcpy(filename,WORKING_DIR);
+
+    strcpy(uid_pwd,argv[1]);    
+
+  
+    EXEC SQL WHENEVER SQLERROR GOTO err_exit;
+    EXEC SQL CONNECT :uid_pwd;
+
+
+
+  if(argc != 11) 
+  {
+
+    ins_message(ERR_MESG,"RLRCNLBL : Usage - RLRCNLBL UID_PWD SESSION_ID PGM_ID SECTION_CODE SPECIMEN_NO SAMPLE_ID TASK_CODE COUNT FACILITY_ID WS_NO  arguments wrong\n");
+  }
+  
+
+
+	
+
+
+	strcpy(nd_session_id, argv[2]);
+
+	strcpy(a_pgm_id,argv[3]);    
+	
+	
+   	strcpy(filename1, a_pgm_id);    
+
+    strcat(filename, strcat(filename1, ".lis"));
+
+	
+
+    if (strcmp(strupr(a_pgm_id), "RLRCNLBL") == 0)
+    {
+
+	strcpy(nd_print_source, argv[4]);
+
+	strcpy(p_specimen_no, argv[5]);   
+	
+	 
+    strcpy(p_sample_id,argv[6]);
+
+	strcpy(p_task_code,argv[7]);
+
+	strcpy(p_count,argv[8]);
+	
+
+	strcpy(p_facility_id,argv[9]);    	
+
+	strcpy(nd_ws_no, argv[10]);
+	
+
+	 strcpy(nd_print_source_type, "O");
+     
+    }
+    
+
+   set_meduser_role();
+
+ /*********************** added for globalisation ******************************/
+    strcpy(language_id.arr,l_language_id.arr);
+	language_id.len =l_language_id.len;
+	language_id.arr[l_language_id.len]='\0';
+/*********************** added for globalisation ******************************/
+
+
+    get_facility_name();
+
+	get_legend_value(2);
+
+
+   get_printer_type();
+
+
+	
+
+	
+
+    if (strcmp(strupr(a_pgm_id), "RLRCNLBL") == 0)
+    {
+
+      dclr_un_screened_cur();
+      while(fetch_un_screened_cur())
+	  {	    
+	     sprintf(d_short_desc[h_no_of_rec],"%s",nd_short_desc.arr);
+
+			  EXEC SQL EXECUTE
+					DECLARE
+					t_date   date;
+					BEGIN
+					GET_LOCALE_DATE.CONVERT_TO_LOCALE_DATE (to_date(:nd_added_date,'DD/MM/YYYY'), :language_id , t_date);
+					:nd_added_date1 := to_char(t_date,'DD/MM/YYYY');
+					END;
+				END-EXEC;
+
+		//	sprintf(d_added_date[h_no_of_rec],"%s",nd_added_date.arr);
+			sprintf(d_added_date[h_no_of_rec],"%s",nd_added_date1.arr); //added for globalisation
+			sprintf(d_added_hour[h_no_of_rec],"%s",nd_added_hour.arr);
+        
+		h_no_of_rec = h_no_of_rec + 1;
+      }
+
+    }  
+
+	
+	
+
+
+    call_main_report();
+
+	
+	
+    
+	EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+
+err_exit:
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+	fclose(f1);    
+    EXEC SQL COMMIT WORK RELEASE;
+
+}
+
+
+
+
+
+get_facility_name()
+{
+	
+	EXEC SQL  SELECT facility_name
+	            INTO :d_facility_name
+	            FROM sm_facility_param_LANG_VW
+               WHERE facility_id = :p_facility_id
+			   and language_id = :language_id;
+
+	if(OERROR)	
+	{
+	sprintf(string_var,"%s get_facility_name()-> %s\n", p_facility_id, sqlca.sqlerrm.sqlerrmc);
+	ins_message(ORA_MESG, string_var);	
+		}
+
+	
+    if(NO_DATA_FOUND)    {        }
+}
+
+
+
+
+
+
+
+
+dclr_un_screened_cur()
+{
+  
+
+  
+	/*	EXEC SQL DECLARE c_scr CURSOR FOR				
+			select a.short_desc,
+			to_char(SYSDATE,'dd/mm/rrrr')
+			from rl_task_mast a,rl_sample_task_dtl b
+			where NVL(a.PRINT_CONTROL_SLIDES_YN,'N') ='Y' and
+			a.task_code=b.task_code and
+			b.SPECIMEN_NO =:p_specimen_no and
+			b.OPERATING_FACILITY_ID = :p_facility_id 	
+			//and b.SAMPLE_ID = :p_sample_id		
+			group by a.short_desc,to_char(SYSDATE,'dd/mm/rrrr'), a.slide_rule_count
+			having count(1) > a.slide_rule_count;
+
+			*/
+
+		/************** added by dinesh/preetham on 21-01-2008 wrt ML-SD-SCF-2158 ***********/
+			p_section_code.arr[0]	=	'\0';
+			p_section_code.len		= 0;
+
+			EXEC SQL SELECT section_code
+					INTO :p_section_code
+					FROM RL_REQUEST_HEADER
+					WHERE specimen_no = :p_specimen_no;
+
+			p_section_code.arr[p_section_code.len]	=	'\0';
+			p_section_code.len = strlen(p_section_code.arr);
+
+
+			if (OERROR) 
+			{     
+			  ins_message (ORA_MESG, "Select failed on the table RL_REQUEST_HEADER");   
+			}
+
+		/************** till here ***********/
+
+			EXEC SQL DECLARE c_scr CURSOR FOR				
+			select short_desc,to_char(sysdate,'dd/mm/rrrr') dd,to_char(sysdate,'hh24:mi:ss') hh from rl_task_mast 
+			where task_code = :p_task_code // modified by preetham on 11/10/2007 wrt CRF 20095 added time format
+            AND section_code = :p_section_code;  // modified by dinesh/preetham on 21/01/2008 wrt ML-SD-SCF-2158
+
+
+
+
+		EXEC SQL OPEN c_scr;
+
+		
+  
+    if (OERROR) 
+	{     
+	  ins_message (ORA_MESG, "OPEN Cursor c_scr Failed ");   
+    }
+
+}
+
+
+
+int fetch_un_screened_cur()
+{
+
+
+    EXEC SQL FETCH c_scr INTO
+                        :nd_short_desc,:nd_added_date,:nd_added_hour;
+ 
+
+
+
+
+    if (OERROR)
+	{
+		ins_message (ORA_MESG, "FETCH failed c2 ");    
+		return 0;
+      }
+
+    if (NO_DATA_FOUND)      return 0;
+
+
+  return 1;
+  
+}
+
+
+
+
+call_main_report()
+{
+  call_print_label();
+}
+
+set_fonts()
+{
+
+	fprintf(f1, "%c(s15H", ESC);/* Reduce the font size*/
+	fprintf(f1,"%c&a0L",ESC);/* This will make the left margin to reduce to 0 */
+	fprintf(f1,"%c&l0E\n",ESC);	/* This will make the top margin to reduce to 0 */
+	fprintf(f1,"%c&l12D",ESC);/* This will make no. of lines per inch to 8 */
+}
+
+
+call_print_label()
+{
+  int v_i = 0;
+  int v_j=0,cou;
+
+  cou=atoi(p_count); 
+ 
+
+  for (v_i=0;v_i<h_no_of_rec;v_i++)
+  {  
+   for(v_j=0;v_j<cou;v_j++)
+   {
+    if (strcmp(a_pgm_id,"RLRCNLBL") == 0  && control_flag == 0)
+    {
+      print_screened_label(v_i);
+	  control_flag=1;
+    }
+
+     if (strcmp(a_pgm_id,"RLRCNLBL") == 0 && control_flag == 1 )
+    {	  
+      print_screened_label(v_i);
+	  control_flag=0;
+    }   
+	}
+ }
+
+
+  
+}
+
+
+get_printer_type()
+{
+
+	  strcpy(nd_printer_type, "3");
+	  
+
+	  EXEC SQL SELECT NVL(printer_type, '1')
+  	           INTO  :nd_printer_type
+  	           FROM   SY_ONLINE_PRINT_ID
+	           WHERE  module_id = 'RL'
+	           AND    online_print_name = :a_pgm_id; 
+
+        if(NO_DATA_FOUND)
+   		strcpy(nd_printer_type, "3");
+		
+  	  if(OERROR)
+   		strcpy(nd_printer_type, "3");
+
+
+}
+
+
+
+print_screened_label(int v_ind)
+{
+
+if ( ( f1 = fopen ( filename, "w" ) ) == NULL ) 
+    {
+      ins_message(ERR_MESG,"Error in opening output file...\n");  
+    }
+
+ if ( strcmp(nd_printer_type,"3")!= 0)
+    {
+      fprintf(f1, "%cE", ESC);
+      set_fonts();
+    }	
+
+
+	fprintf(f1, "%-15.15s\n", d_facility_name.arr);
+	fprintf(f1, "%-15.15s\n", d_short_desc[v_ind]);
+	if(control_flag ==0)
+		//fprintf(f1,"%s\n","Negative");
+		fprintf(f1,"%-8.8s\n",local_legend[1]); //added for globalisation
+	else if(control_flag ==1)
+		//fprintf(f1,"%s\n","Positive");
+		fprintf(f1,"%-8.8s\n",local_legend[2]); //added for globalisation
+	fprintf(f1,"%s\n",d_added_date[v_ind]);
+	fprintf(f1,"%s\n",d_added_hour[v_ind]);
+
+
+	 if (strcmp(nd_printer_type,"3")!= 0)
+	  {	
+		fprintf(f1, "%cE", ESC);
+		set_fonts();
+	  }    
+fclose(f1);
+
+
+
+
+ if (err_flag == 0)
+    {
+       print_barcode_label(1);
+    }
+
+}
+
+
+/***************** Print BarCode Label ********************/
+print_barcode_label(int nolabel)
+ {
+    int i;
+    int WSPrintstatus;
+
+    for(i=0;i<nolabel;i++)
+		  {
+			/*sprintf(string_var, "@%s@%s@%s@%s@%s@%s@%s@%s@%s@%s",uid_pwd,nd_session_id,p_facility_id,a_pgm_id,filename,nd_print_source_type,nd_print_source,nd_ws_no,WORKING_DIR);
+				disp_message(ERR_MESG, string_var);
+				*/
+		 		
+					WSPrintstatus =		 WSPrintDocument
+						   (
+							uid_pwd,				//char	*PUidPwd;
+							nd_session_id,			//char	*PSessionID;
+							p_facility_id,			//char	*PFacilityID;
+							"RL",						//char	*PModuleID;
+							a_pgm_id,					//char	*PDocumentID;
+							filename,	    			//char	*POnlinePrintFileNames;
+							nd_print_source_type,	//char	*PLocationTypes;
+							nd_print_source,	    //char	*PLocationCodes;
+							1,					//int	PNumOfCopies;
+							1,							//int	PPageFrom;
+							9999,						//int	PPageTo;
+							nd_ws_no,				//char	*PWorkstationID
+							WORKING_DIR					//char	*PReportOutputDir
+						   );
+				  					   
+		  }
+ 
+ }
+
+
+/*--------------------------------------------------*/
+ins_message(int msg_type,char msg[])
+{
+  
+
+   strcpy(er_msg,msg);   
+   er_msg_type = msg_type;   
+
+   EXEC SQL INSERT INTO SY_PROG_MSG
+         (OPERATING_FACILITY_ID,PGM_ID,MSG_TYPE,MSG_NUM,MSG_DESC,MSG_DATE_TIME,SESSION_ID,PGM_DATE)
+   VALUES 
+         (:p_facility_id,'RLRCNLBL',:er_msg_type,NULL, SUBSTR(:er_msg, 1, 70),SYSDATE,USERENV('sessionid'),TO_CHAR(SYSDATE,'DD/MM/YYYY'));
+
+
+if (OERROR) 
+	{
+        
+    }
+
+   err_flag = 1;
+    
+}
+
+/****************************** added for globalisation *****************************/
+get_legend_value(int cou)
+ {
+	EXEC SQL EXECUTE
+	BEGIN
+	  SM_POPULATE_REPORT_LEGEND.FETCH_LEGEND (:p_facility_id,:language_id,'RLRCNLBL.LEGEND_');
+	END;
+	END-EXEC;
+
+	for (i=1; i<=cou; i++)
+	{
+	l_translated_value.arr[0]		= '\0';
+	
+	EXEC SQL EXECUTE
+	BEGIN
+               :l_translated_value :=    GET_LEGEND(LTRIM(RTRIM('RLRCNLBL.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009'))))));
+	END;
+	END-EXEC;
+	
+	l_translated_value.arr[l_translated_value.len] = '\0';
+
+	//sp_message(ERR_MESG,l_translated_value.arr);
+
+	strcpy(local_legend[i],l_translated_value.arr);
+	}
+ }
+

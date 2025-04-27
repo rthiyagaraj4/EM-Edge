@@ -1,0 +1,1769 @@
+/************************************************************************/
+/* OCS MEDICOM VER 4.1                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRRMLR2.PC                                  */
+/* AUTHOR                : Jagwinder Kaur                               */  
+/* DATE WRITTEN          : 10/06/2004                                   */      
+/************************************************************************/
+      
+	      
+#include <stdio.h>         
+#include <string.h>       
+#include <math.h> 
+#include <bl.h>
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define ROW_COUNT            (sqlca.sqlerrd[2])
+#define NODATAFOUND sqlca.sqlcode == 1403
+#define ONLINE_PRINTING 1
+
+/*
+#define DEBUG 0
+*/
+
+#define ESC     0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR     date							[20],
+            user_id                         [91],
+	        nd_pwd 							[91],
+		    nd_pwd1 						[132],
+            nd_session_id                   [16],
+            nd_pgm_date                     [25],
+            d_curr_pgm_name                 [15],
+			nd_report	         		    [20],
+			nd_facility				        [3],
+			nd_reminder_format_id			[21],
+			bl_reminder_format_id			[21],
+			bl_report_title_text			[101],
+			bl_header_line_01				[101],
+			bl_header_line_02				[101],
+			bl_header_line_03				[101],
+			bl_header_line_04				[101],
+			bl_header_line_05				[101],
+			bl_header_line_06				[101],
+			bl_header_line_07				[101],
+			bl_header_line_08				[101],
+			bl_header_line_09				[101],
+			bl_header_line_10				[101],
+			bl_body_line_01					[101],
+			bl_body_line_02					[101],
+			bl_body_line_03					[101],
+			bl_body_line_04					[101],
+			bl_body_line_05					[101],
+			bl_body_line_06					[101],
+			bl_body_line_07					[101],
+			bl_body_line_08					[101],
+			bl_body_line_09					[101],
+			bl_body_line_10					[101],
+			bl_body_line_11					[101],
+			bl_body_line_12					[101],
+			bl_body_line_13					[101],
+			bl_body_line_14					[101],
+			bl_body_line_15					[101],
+			bl_body_line_16					[101],
+			bl_body_line_17					[101],
+			bl_body_line_18					[101],
+			bl_body_line_19					[101],
+			bl_body_line_20					[101],
+			bl_footer_line_01				[101],
+			bl_footer_line_02				[101],
+			bl_footer_line_03				[101],
+			bl_footer_line_04				[101],
+			bl_footer_line_05				[101],
+			bl_footer_line_06				[101],
+			bl_footer_line_07				[101],
+			bl_footer_line_08				[101],
+			bl_footer_line_09				[101],
+			bl_footer_line_10				[101],
+			nd_doc_type_code				[7],
+			nd_doc_num						[9],
+			nd_patient_id					[21],
+			nd_cust_code					[9],
+			nd_reminder_no					[4],
+			column_var						[101],
+			nd_column_val					[1000],
+			str_var							[101],
+			str_var2						[101],
+			line_var						[101],
+			dup_var							[101],
+			lc_str_val						[101],
+			lc_str_var						[101],
+			tab_name						[31],
+			ls_str_var						[101],
+			lc_var							[3],
+			ls_char_var						[3],
+			ls_str							[101],
+			ls_var							[101],
+			nd_REGION_CODE					[100],
+			nd_RES_AREA_CODE				[100],
+			nd_RES_TOWN_CODE				[100],
+			nd_RES_COUNTRY_CODE				[100],
+			nd_PAT_REGION_CODE				[100],
+			nd_PAT_RES_AREA_CODE			[100],
+			nd_PAT_RES_TOWN_CODE			[100],
+			nd_PAT_COUNTRY_CODE				[100],
+			lc_splch_var					[101];
+		 
+    char	sql_stmt             [5000]; 			
+    varchar sql_stmt1            [1000],
+			sql_stmt2            [1000];
+	
+	char    string_arr	[1000], 
+		    new_str		[1001];	
+    char    st_var[50]; 
+
+   /*char    sql_stmt                      [5000], 			
+           sql_stmt1                     [100],
+           sql_stmt2                     [1000],
+		   string_arr					 [1000], 
+		   new_str						[1001];	*/
+
+int date_yn = 0,line_ctr = 0;
+int splch_pos,st_pos,spchar_type,bold_st = 0,font_st = 0;
+int spchar_pos = 0,spchar_pos1,ctr;
+int i,bl_doc_srl_no,pos_var,pos_var1,pos_var2,print_upto,pos_length,var_length;
+int l_pos,lv_var,j,len_lc_str_val,prt_len,print_upto_c,ld_var,char_pos;
+int ld_pos,ld_length,len=0;
+
+char nd_order_by,temp[50]="\0";
+char filename[150];
+char x_msg[200];
+char loc_legend[999][201];
+char l_mesg[200];
+char fm_date[11],to_date[11];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include <winproc.h>
+
+int    lctr = 0,pctr = 1,nvalid = 0,ncancel = 0;
+int    first = 1;
+
+FILE *fp;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 5)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+ 
+    strcpy(g_pgm_id,"BLRRMLR2");
+    strcpy(nd_pwd.arr,argv[1]);
+    strcpy(nd_pwd1.arr,argv[1]);
+    nd_pwd.len = strlen(nd_pwd.arr);
+    nd_pwd1.len = strlen(nd_pwd1.arr);
+
+    EXEC sql connect :nd_pwd;
+	  
+    if (sqlca.sqlcode < 0 )
+	{
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+        }
+
+		set_meduser_role(); 
+
+    	strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    	d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    	strcpy(nd_session_id.arr,argv[2]);
+    	nd_session_id.len = strlen(nd_session_id.arr);
+    	strcpy(g_session_id,nd_session_id.arr);
+
+    	strcpy(nd_pgm_date.arr,argv[3]);
+    	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+    	strcpy(g_pgm_date,nd_pgm_date.arr);
+
+    	strcpy(nd_facility.arr,argv[4]);
+    	nd_facility.len = strlen(nd_facility.arr);
+    	strcpy(g_facility_id,nd_facility.arr);
+
+	/*
+        if (argc == 5)
+	{
+	    strcpy(nd_report.arr,"BLRRMLR2");
+    	    nd_report.len = strlen(nd_report.arr);
+	    
+	}
+
+	if (argc > 5)
+	{
+	    strcpy(nd_report.arr,argv[5]);
+    	    nd_report.len = strlen(nd_report.arr);
+	}
+	*/
+
+	strcpy(nd_report.arr,argv[5]);
+        nd_report.len = strlen(nd_report.arr);
+	
+
+	declare_cur();
+
+    	open_file();
+		fprintf(fp,"%c(s13H",ESC); 	/* To set the font 			*/
+		open_cur();
+		print_body();    
+		fflush(fp);
+		close_cur();
+        end_of_rep();
+    EXEC SQL COMMIT WORK RELEASE;
+    if (OERROR)
+         err_mesg("COMMIT WORK RELEASE failed",0,"");
+}
+
+
+
+declare_cur()
+{  
+
+    EXEC SQL DECLARE BL_REM_LET_FORMAT_CUR CURSOR FOR 
+		SELECT	REMINDER_FORMAT_ID,
+				DOC_TYPE_CODE,
+				DOC_NUM,
+				REMINDER_NO
+				FROM BL_BILLS_FOR_REMINDER
+				WHERE (REMINDER_DISP_DOC_TYPE,REMINDER_DISP_DOC_NUMBER,REMINDER_DISP_DOC_SLNO) 
+				   IN ( SELECT	DOC_TYPE_CODE,
+								DOC_NUMBER,
+								DOC_SRL_NO
+						FROM BL_REM_LET_PROCESS_TEMP
+					    WHERE PROCESS_PGM_ID   = 'BLRRMLR2'
+						AND PROCESS_SESSION_ID = :nd_session_id
+						AND PROCESS_DATE_TIME  = :nd_pgm_date)
+			FOR UPDATE OF REMINDER_PRINTED_YN NOWAIT;
+
+
+		if (OERROR)
+			err_mesg("SELECT failed on table BL_BILLS_FOR_REMINDER",0,"");
+  
+}
+
+
+open_cur() 
+{
+	EXEC SQL OPEN BL_REM_LET_FORMAT_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor BL_REM_LET_FORMAT_CUR",0,"");
+}
+
+close_cur() 
+{
+    EXEC SQL DELETE BL_REM_LET_PROCESS_TEMP
+					    WHERE PROCESS_PGM_ID   = 'BLRRMLR2'
+						AND PROCESS_SESSION_ID = :nd_session_id
+						AND PROCESS_DATE_TIME  = :nd_pgm_date;
+    if (OERROR)
+        err_mesg("DELETE failed on table BL_REM_LET_PROCESS_TEMP",0,"");
+
+	EXEC SQL CLOSE BL_REM_LET_FORMAT_CUR;
+    
+}
+end_of_rep()
+{
+fclose(fp);
+
+  //    if (strcmp(nd_report.arr,"BLRRMLR2") == 0)
+//	   {
+		PrintDocument
+		(nd_pwd1.arr, //char *PUidPwd;
+		 nd_session_id.arr, //char *PSessionID;
+		 nd_facility.arr, //char *PFacilityID;
+		 "BL", //char *PModuleID;
+		 nd_report.arr, //char *PDocumentID;
+		 filename, //char *POnlinePrintFileNames;
+		 "O", //char *PLocationTypes;
+		 " ", //char *PLocationCodes;
+		 1, //int PNumOfCopies;
+		 1, //int PPageFrom;
+		 9999 //int PPageTo;
+		  );
+  //      }
+}
+fetch_cur()
+{
+	nd_reminder_format_id.arr[0]	= '\0';
+	nd_doc_type_code.arr[0]			= '\0';
+	nd_doc_num.arr[0]				= '\0';
+	nd_reminder_no.arr[0]			= '\0';
+	
+	nd_reminder_format_id.len	= 0;
+	nd_doc_type_code.len		= 0;
+	nd_doc_num.len				= 0;
+	nd_reminder_no.len			= 0;
+	
+     EXEC SQL FETCH BL_REM_LET_FORMAT_CUR 
+				 INTO	:nd_reminder_format_id,
+						:nd_doc_type_code,
+						:nd_doc_num,
+						:nd_reminder_no;
+	
+	 if (OERROR)
+         err_mesg("FETCH failed on cursor BL_REM_LET_FORMAT_CUR",0,"");
+
+	    	nd_reminder_format_id.arr[nd_reminder_format_id.len]= '\0';
+			nd_doc_type_code.arr[nd_doc_type_code.len]			= '\0';
+			nd_doc_num.arr[nd_doc_num.len]						= '\0';
+			nd_reminder_no.arr[nd_reminder_no.len]				= '\0';
+    return(LAST_ROW?0:1);
+}
+
+fetch_dtl()
+{
+bl_reminder_format_id.arr[0]	= '\0';
+bl_report_title_text.arr[0]		= '\0';
+bl_header_line_01.arr[0]		= '\0';
+bl_header_line_02.arr[0]		= '\0';
+bl_header_line_03.arr[0]		= '\0';
+bl_header_line_04.arr[0]		= '\0';
+bl_header_line_05.arr[0]		= '\0';
+bl_header_line_06.arr[0]		= '\0';
+bl_header_line_07.arr[0]		= '\0';
+bl_header_line_08.arr[0]		= '\0';
+bl_header_line_09.arr[0]		= '\0';
+bl_header_line_10.arr[0]		= '\0';
+bl_body_line_01.arr[0]			= '\0';
+bl_body_line_02.arr[0]			= '\0';
+bl_body_line_03.arr[0]			= '\0';
+bl_body_line_04.arr[0]			= '\0';
+bl_body_line_05.arr[0]			= '\0';
+bl_body_line_06.arr[0]			= '\0';
+bl_body_line_07.arr[0]			= '\0';
+bl_body_line_08.arr[0]			= '\0';
+bl_body_line_09.arr[0]			= '\0';
+bl_body_line_10.arr[0]			= '\0';
+bl_body_line_11.arr[0]			= '\0';
+bl_body_line_12.arr[0]			= '\0';
+bl_body_line_13.arr[0]			= '\0';
+bl_body_line_14.arr[0]			= '\0';
+bl_body_line_15.arr[0]			= '\0';
+bl_body_line_16.arr[0]			= '\0';
+bl_body_line_17.arr[0]			= '\0';
+bl_body_line_18.arr[0]			= '\0';
+bl_body_line_19.arr[0]			= '\0';
+bl_body_line_20.arr[0]			= '\0';
+bl_footer_line_01.arr[0]		= '\0';
+bl_footer_line_02.arr[0]		= '\0';
+bl_footer_line_03.arr[0]		= '\0';
+bl_footer_line_04.arr[0]		= '\0';
+bl_footer_line_05.arr[0]		= '\0';
+bl_footer_line_06.arr[0]		= '\0';
+bl_footer_line_07.arr[0]		= '\0';
+bl_footer_line_08.arr[0]		= '\0';
+bl_footer_line_09.arr[0]		= '\0';
+bl_footer_line_10.arr[0]		= '\0';
+str_var.arr[0]                  = '\0';				
+nd_patient_id.arr[0]			= '\0';
+nd_cust_code.arr[0]				= '\0';
+
+bl_report_title_text.len= 0;
+bl_header_line_01.len	= 0;
+bl_header_line_02.len	= 0;
+bl_header_line_03.len	= 0;
+bl_header_line_04.len	= 0;
+bl_header_line_05.len	= 0;
+bl_header_line_06.len	= 0;
+bl_header_line_07.len	= 0;
+bl_header_line_08.len	= 0;
+bl_header_line_09.len	= 0;
+bl_header_line_10.len	= 0;
+bl_body_line_01.len		= 0;
+bl_body_line_02.len		= 0;
+bl_body_line_03.len		= 0;
+bl_body_line_04.len		= 0;
+bl_body_line_05.len		= 0;
+bl_body_line_06.len		= 0;
+bl_body_line_07.len		= 0;
+bl_body_line_08.len		= 0;
+bl_body_line_09.len		= 0;
+bl_body_line_10.len		= 0;
+bl_body_line_11.len		= 0;
+bl_body_line_12.len		= 0;
+bl_body_line_13.len		= 0;
+bl_body_line_14.len		= 0;
+bl_body_line_15.len		= 0;
+bl_body_line_16.len		= 0;
+bl_body_line_17.len		= 0;
+bl_body_line_18.len		= 0;
+bl_body_line_19.len		= 0;
+bl_body_line_20.len		= 0;
+bl_footer_line_01.len	= 0;
+bl_footer_line_02.len	= 0;
+bl_footer_line_03.len	= 0;
+bl_footer_line_04.len	= 0;
+bl_footer_line_05.len	= 0;
+bl_footer_line_06.len	= 0;
+bl_footer_line_07.len	= 0;
+bl_footer_line_08.len	= 0;
+bl_footer_line_09.len	= 0;
+bl_footer_line_10.len	= 0;
+str_var.len				= 0;
+nd_patient_id.len		= 0;
+nd_cust_code.len		= 0; 
+
+     
+		EXEC SQL SELECT	A.PATIENT_ID,
+						A.CUST_CODE
+				INTO :nd_patient_id,
+					 :nd_cust_code                     
+			FROM BL_BILL_HDR A
+            WHERE A.DOC_TYPE_CODE = :nd_doc_type_code
+            AND A.DOC_NUM = :nd_doc_num;
+
+		if (OERROR)
+			err_mesg("SELECT failed on table BL_BILL_HDR 1 ",0,"");
+
+        EXEC SQL SELECT REGION_CODE,RES_AREA_CODE, RES_TOWN_CODE 
+		         into :nd_REGION_CODE,
+				 	  :nd_RES_AREA_CODE,
+					  :nd_RES_TOWN_CODE  
+                 FROM SM_FACILITY_PARAM
+				 WHERE FACILITY_ID = :nd_facility;
+
+		if (OERROR)
+			err_mesg("SELECT failed on table SM_FACILITY_PARAM FOR REGION",0,"");
+
+        EXEC SQL SELECT REGION_CODE,RES_AREA_CODE, RES_TOWN_CODE,NATIONALITY_CODE
+		         into :nd_PAT_REGION_CODE,
+				 	  :nd_PAT_RES_AREA_CODE,
+					  :nd_PAT_RES_TOWN_CODE,
+					  :nd_PAT_COUNTRY_CODE 
+                 FROM MP_PATIENT
+				 WHERE PATIENT_ID = :nd_patient_id;
+
+		if (OERROR)
+			err_mesg("SELECT failed on table MP_PATIENT FOR REGION",0,"");
+
+
+      EXEC SQL SELECT	REMINDER_FORMAT_ID,
+				REPORT_TITLE_TEXT,
+				HEADER_LINE_01,
+				HEADER_LINE_02,
+				HEADER_LINE_03,
+				HEADER_LINE_04,
+				HEADER_LINE_05,
+				HEADER_LINE_06,
+				HEADER_LINE_07,
+				HEADER_LINE_08,
+				HEADER_LINE_09,
+				HEADER_LINE_10,
+				BODY_LINE_01,
+				BODY_LINE_02,
+				BODY_LINE_03,
+				BODY_LINE_04,
+				BODY_LINE_05,
+				BODY_LINE_06,
+				BODY_LINE_07,
+				BODY_LINE_08,
+				BODY_LINE_09,
+				BODY_LINE_10,
+				BODY_LINE_11,
+				BODY_LINE_12,
+				BODY_LINE_13,
+				BODY_LINE_14,
+				BODY_LINE_15,
+				BODY_LINE_16,
+				BODY_LINE_17,
+				BODY_LINE_18,
+				BODY_LINE_19,
+				BODY_LINE_20,
+				FOOTER_LINE_01,
+				FOOTER_LINE_02,
+				FOOTER_LINE_03,
+				FOOTER_LINE_04,
+				FOOTER_LINE_05,
+				FOOTER_LINE_06,
+				FOOTER_LINE_07,
+				FOOTER_LINE_08,
+				FOOTER_LINE_09,
+				FOOTER_LINE_10
+			INTO :bl_reminder_format_id,
+					:bl_report_title_text,
+					:bl_header_line_01,
+					:bl_header_line_02,
+					:bl_header_line_03,
+					:bl_header_line_04,
+					:bl_header_line_05,
+					:bl_header_line_06,
+					:bl_header_line_07,
+					:bl_header_line_08,
+					:bl_header_line_09,
+					:bl_header_line_10,
+					:bl_body_line_01,
+					:bl_body_line_02,
+					:bl_body_line_03,
+					:bl_body_line_04,
+					:bl_body_line_05,
+					:bl_body_line_06,
+					:bl_body_line_07,
+					:bl_body_line_08,
+					:bl_body_line_09,
+					:bl_body_line_10,
+					:bl_body_line_11,
+					:bl_body_line_12,
+					:bl_body_line_13,
+					:bl_body_line_14,
+					:bl_body_line_15,
+					:bl_body_line_16,
+					:bl_body_line_17,
+					:bl_body_line_18,
+					:bl_body_line_19,
+					:bl_body_line_20,
+					:bl_footer_line_01,
+					:bl_footer_line_02,
+					:bl_footer_line_03,
+					:bl_footer_line_04,
+					:bl_footer_line_05,
+					:bl_footer_line_06,
+					:bl_footer_line_07,
+					:bl_footer_line_08,
+					:bl_footer_line_09,
+					:bl_footer_line_10
+		FROM BL_REM_LET_FORMAT
+		WHERE REMINDER_FORMAT_ID = :nd_reminder_format_id
+		AND APPL_TRX_IND = 'B'
+		AND STATUS IS NULL;
+            
+
+       if (OERROR)
+            err_mesg("SELECT failed on cursor BL_REM_LET_FORMAT",0,"");
+
+
+
+		
+bl_report_title_text.arr[bl_report_title_text.len]		= '\0';
+bl_header_line_01.arr[bl_header_line_01.len]		= '\0';
+bl_header_line_02.arr[bl_header_line_02.len]		= '\0';
+bl_header_line_03.arr[bl_header_line_03.len]		= '\0';
+bl_header_line_04.arr[bl_header_line_04.len]		= '\0';
+bl_header_line_05.arr[bl_header_line_05.len]		= '\0';
+bl_header_line_06.arr[bl_header_line_06.len]		= '\0';
+bl_header_line_07.arr[bl_header_line_07.len]		= '\0';
+bl_header_line_08.arr[bl_header_line_08.len]		= '\0';
+bl_header_line_09.arr[bl_header_line_09.len]		= '\0';
+bl_header_line_10.arr[bl_header_line_10.len]		= '\0';
+bl_body_line_01.arr[bl_body_line_01.len]			= '\0';
+bl_body_line_02.arr[bl_body_line_02.len]			= '\0';
+bl_body_line_03.arr[bl_body_line_03.len]			= '\0';
+bl_body_line_04.arr[bl_body_line_04.len]			= '\0';
+bl_body_line_05.arr[bl_body_line_05.len]			= '\0';
+bl_body_line_06.arr[bl_body_line_06.len]			= '\0';
+bl_body_line_07.arr[bl_body_line_07.len]			= '\0';
+bl_body_line_08.arr[bl_body_line_08.len]			= '\0';
+bl_body_line_09.arr[bl_body_line_09.len]			= '\0';
+bl_body_line_10.arr[bl_body_line_10.len]			= '\0';
+bl_body_line_11.arr[bl_body_line_11.len]			= '\0';
+bl_body_line_12.arr[bl_body_line_12.len]			= '\0';
+bl_body_line_13.arr[bl_body_line_13.len]			= '\0';
+bl_body_line_14.arr[bl_body_line_14.len]			= '\0';
+bl_body_line_15.arr[bl_body_line_15.len]			= '\0';
+bl_body_line_16.arr[bl_body_line_16.len]			= '\0';
+bl_body_line_17.arr[bl_body_line_17.len]			= '\0';
+bl_body_line_18.arr[bl_body_line_18.len]			= '\0';
+bl_body_line_19.arr[bl_body_line_19.len]			= '\0';
+bl_body_line_20.arr[bl_body_line_20.len]			= '\0';
+bl_footer_line_01.arr[bl_footer_line_01.len]		= '\0';
+bl_footer_line_02.arr[bl_footer_line_02.len]		= '\0';
+bl_footer_line_03.arr[bl_footer_line_03.len]		= '\0';
+bl_footer_line_04.arr[bl_footer_line_04.len]		= '\0';
+bl_footer_line_05.arr[bl_footer_line_05.len]		= '\0';
+bl_footer_line_06.arr[bl_footer_line_06.len]		= '\0';
+bl_footer_line_07.arr[bl_footer_line_07.len]		= '\0';
+bl_footer_line_08.arr[bl_footer_line_08.len]		= '\0';
+bl_footer_line_09.arr[bl_footer_line_09.len]		= '\0';
+bl_footer_line_10.arr[bl_footer_line_10.len]		= '\0';
+nd_patient_id.arr[nd_patient_id.len]				= '\0';
+nd_cust_code.arr[nd_cust_code.len]					= '\0'; 
+		
+}
+
+
+print_head()
+{
+    
+    if (bl_header_line_01.arr[0] != '\0')
+      {
+		print_line(bl_header_line_01.arr);  //PRADEEP
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_02.arr[0] != '\0')
+      {
+		
+		print_line(bl_header_line_02.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_03.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_03.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_04.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_04.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_05.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_05.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_06.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_06.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_07.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_07.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_08.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_08.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_09.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_09.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+	if (bl_header_line_10.arr[0] != '\0')
+      {
+	  
+		print_line(bl_header_line_10.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+       }
+    
+	if (bl_report_title_text.arr[0] != '\0')
+      {
+	  
+        fprintf(fp,"%c(s3B",ESC); 
+		
+  		print_line(bl_report_title_text.arr);
+		
+		fprintf(fp,"%c(s-3B",ESC); /* release bold style */
+		fprintf(fp,"\n\n");
+		
+		line_ctr++;
+		
+		line_ctr++;
+	
+       }
+}
+
+print_body()
+{
+
+  while(fetch_cur())
+  {
+  
+    fetch_dtl();
+  
+    print_head();
+
+   	if (bl_body_line_01.arr[0] != '\0')
+      {
+		print_line(bl_body_line_01.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_02.arr[0] != '\0')
+      {
+		print_line(bl_body_line_02.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_03.arr[0] != '\0')
+      {
+		print_line(bl_body_line_03.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_04.arr[0] != '\0')
+      {
+		print_line(bl_body_line_04.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_05.arr[0] != '\0')
+      {
+		print_line(bl_body_line_05.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_06.arr[0] != '\0')
+      {
+		print_line(bl_body_line_06.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_07.arr[0] != '\0')
+      {
+		print_line(bl_body_line_07.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_08.arr[0] != '\0')
+      {
+		print_line(bl_body_line_08.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_09.arr[0] != '\0')
+      {
+		print_line(bl_body_line_09.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_10.arr[0] != '\0')
+      {
+		print_line(bl_body_line_10.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_11.arr[0] != '\0')
+      {
+		print_line(bl_body_line_11.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_12.arr[0] != '\0')
+      {
+		print_line(bl_body_line_12.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_13.arr[0] != '\0')
+      {
+		print_line(bl_body_line_13.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_14.arr[0] != '\0')
+      {
+		print_line(bl_body_line_14.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_15.arr[0] != '\0')
+      {
+		print_line(bl_body_line_15.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_16.arr[0] != '\0')
+      {
+		print_line(bl_body_line_16.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_17.arr[0] != '\0')
+      {
+		print_line(bl_body_line_17.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_18.arr[0] != '\0')
+      {
+		print_line(bl_body_line_18.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_19.arr[0] != '\0')
+      {
+		print_line(bl_body_line_19.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_body_line_20.arr[0] != '\0')
+      {
+		print_line(bl_body_line_20.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	
+	if (bl_footer_line_01.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_01.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_02.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_02.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_03.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_03.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_04.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_04.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_05.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_05.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_06.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_06.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_07.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_07.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_08.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_08.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_09.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_09.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+	if (bl_footer_line_10.arr[0] != '\0')
+      {
+		print_line(bl_footer_line_10.arr);
+		
+		fprintf(fp,"\n");
+		line_ctr++;
+		check_page_end(1,0);
+       }
+
+   fprintf(fp,"\f");
+   pctr = 1;
+   line_ctr = 2;
+
+	EXEC SQL UPDATE BL_BILLS_FOR_REMINDER
+			 SET REMINDER_PRINTED_YN = 'Y'
+			 WHERE DOC_TYPE_CODE=:nd_doc_type_code
+			 AND DOC_NUM=:nd_doc_num;
+
+     if (OERROR)
+        err_mesg("update failed on table BL_BILLS_FOR_REMINDER",0,"");
+
+	
+  
+ }	  /* end of while loop  */
+}     /* end of procedure   */
+
+
+int char_position(ls_var,lc_var,ld_var)
+char ls_var[101];
+char lc_var[3];
+int ld_var;
+{
+ ls_str_var.arr[0] = '\0';
+ ls_str_var.len = 0;
+
+ ls_char_var.arr[0] = '\0';
+ ls_char_var.len = 0;
+
+ strcpy(ls_str_var.arr,ls_var);
+ strcpy(ls_char_var.arr,lc_var);
+
+ ls_str_var.len = strlen(ls_str_var.arr);
+ ls_char_var.len = strlen(ls_char_var.arr);
+
+  
+ EXEC SQL select instr(:ls_str_var,:ls_char_var,:ld_var)
+	         into :char_pos
+			 from dual;
+ 
+ if (OERROR)
+        err_mesg("SELECT failed on table DUAL",0,"");
+
+ 
+ ld_var = 0;
+ return(char_pos);
+}
+
+char put_string(ls_var,ld_pos,ld_length)
+char ls_var[101];
+int ld_pos,ld_length;
+{
+ ls_str_var.arr[0] = '\0';
+ ls_str_var.len = 0;
+
+ strcpy(ls_str_var.arr,ls_var);
+ ls_str_var.len = strlen(ls_str_var.arr);
+
+// ls_str_var.arr[ls_str_var.len] = '\0';
+
+ EXEC SQL select substr(:ls_str_var,:ld_pos,:ld_length)
+	         into :ls_str
+			 from dual;
+
+ ls_str.arr[ls_str.len] = '\0';
+
+ if (OERROR)
+        err_mesg("SELECT failed on table DUAL",0,"");
+
+ return(ls_str.arr);
+ 
+}
+
+
+check_splch(str_var1)
+char str_var1[101];
+{
+ prt_len = 0;
+ spchar_pos = 0;
+ spchar_pos1 = 0;
+ lc_str_val.arr[0]	='\0';
+ lc_str_val.len		= 0;
+ lc_str_var.arr[0]	='\0';
+ lc_str_var.len		= 0;
+ 
+ ctr = 1;
+ print_upto_c = 0;
+ strcpy(lc_str_val.arr,str_var1);
+ lc_str_val.len = strlen(lc_str_val.arr);
+ len_lc_str_val = strlen(lc_str_val.arr);
+
+ while(ctr <= len_lc_str_val)
+ {
+ prt_len = 0;
+ spchar_pos = 0;
+ spchar_pos1 = 0;
+ 
+ 
+ spchar_pos = chk_esc_pos(lc_str_val.arr,ctr);
+ 
+ spchar_pos1 = chk_nwln_pos(lc_str_val.arr,ctr);
+ if (spchar_pos1 > 0  && spchar_pos1 <= spchar_pos)
+   {
+   spchar_pos = spchar_pos1;
+   spchar_type = 1;
+   }
+
+ spchar_pos1 = chk_cp_nwln_pos(lc_str_val.arr,ctr);
+ if (spchar_pos1 > 0 && spchar_pos1 <= spchar_pos)
+   {
+   spchar_pos = spchar_pos1;
+   spchar_type = 2;
+   }
+
+ 
+ spchar_pos1 = chk_tab_pos(lc_str_val.arr,ctr);
+ if (spchar_pos1 > 0 && spchar_pos1 <= spchar_pos)
+   {
+   spchar_pos = spchar_pos1;
+   spchar_type = 3;
+   }
+
+ spchar_pos1 = chk_bold_pos(lc_str_val.arr,ctr);
+ if (spchar_pos1 > 0 && spchar_pos1 <= spchar_pos)
+   {
+   spchar_pos = spchar_pos1;
+   spchar_type = 4;
+   }
+
+ spchar_pos1 = chk_font_pos(lc_str_val.arr,ctr);
+ if (spchar_pos1 > 0 && spchar_pos1 <= spchar_pos)
+   {
+   spchar_pos = spchar_pos1;
+   spchar_type = 5;
+   }
+
+ if (spchar_pos == 0)   
+ {
+ lc_str_var.arr[0]	='\0';
+ lc_str_var.len		= 0;
+ prt_len = len_lc_str_val - print_upto_c ;
+
+ put_string(lc_str_val.arr,print_upto_c + 1,prt_len);
+ strcpy(lc_str_var.arr,ls_str.arr);
+
+ lc_str_var.len=strlen(lc_str_var.arr);
+
+ fprintf(fp,"%s",lc_str_var.arr);
+
+ ctr = len_lc_str_val+1;
+ print_upto_c = len_lc_str_val;
+ }
+ else
+ {
+ lc_str_var.arr[0]	='\0';
+ lc_str_var.len		= 0;
+
+ prt_len = spchar_pos - print_upto_c -1;
+ 
+ put_string(lc_str_val.arr,print_upto_c+1,prt_len);
+ strcpy(lc_str_var.arr,ls_str.arr);
+ lc_str_var.len = strlen(lc_str_var.arr);
+
+  fprintf(fp,"%s",lc_str_var.arr);
+  
+  if (spchar_type == 1)
+  {
+  fprintf(fp,"\n");
+  line_ctr++;
+  }
+
+  if (spchar_type == 2)
+  {
+  fprintf(fp,"\n");
+  line_ctr++;
+  }
+
+  if (spchar_type == 3)
+  fprintf(fp,"        ");
+
+  if (spchar_type == 4)
+  {
+	if (bold_st)
+	{
+	fprintf(fp,"%c(s-3B",ESC); /* release bold style */
+	bold_st = 0;
+	}
+    else
+	{
+	fprintf(fp,"%c(s3B",ESC); 	/* To set Bold style 			*/
+	bold_st = 1;
+	}
+  }
+
+  if (spchar_type == 5)
+  {
+	if (font_st)
+	{
+	fprintf(fp,"%c(s13H",ESC); 	/* To set the font 			*/
+	font_st = 0;
+	}
+    else
+	{
+	fprintf(fp,"%c(s10H",ESC); 	/* To set the font 			*/
+	font_st = 1;
+	}
+  }
+
+
+  ctr = spchar_pos+2;
+  print_upto_c = spchar_pos+1;
+  }  
+ }
+}
+
+int chk_tab_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\t',:st_pos)
+   into :splch_pos
+   from dual;
+
+ if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+		 
+ return(splch_pos);
+}
+
+int chk_nwln_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\n',:st_pos)
+   into :splch_pos
+   from dual;
+
+  if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+
+ return(splch_pos);
+}
+
+int chk_cp_nwln_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\N',:st_pos)
+   into :splch_pos
+   from dual;
+
+ if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+		 
+ return(splch_pos);
+}
+
+int chk_bold_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\b',:st_pos)
+   into :splch_pos
+   from dual;
+
+  if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+ return(splch_pos);
+}
+
+int chk_font_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\f',:st_pos)
+   into :splch_pos
+   from dual;
+
+  if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+
+ return(splch_pos);
+}
+
+int chk_esc_pos(str_var2,st_pos)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'\',:st_pos)
+   into :splch_pos
+   from dual;
+
+  if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+
+ return(splch_pos);
+}
+
+int chk_date_yn(str_var2)
+char str_var2[101];
+{
+lc_splch_var.arr[0] = '\0';
+lc_splch_var.len = 0;
+splch_pos = 0;
+
+ strcpy(lc_splch_var.arr,str_var2);
+ lc_splch_var.len = strlen(lc_splch_var.arr);
+ 
+ EXEC SQL select instr(:lc_splch_var,'DATE',1)
+   into :splch_pos
+   from dual;
+
+  if (OERROR)
+        err_mesg("SELECT chk_tab_pos failed on table DUAL",0,"");
+
+ return(splch_pos);
+}
+
+print_line(line_var)
+varchar line_var[101];
+{
+
+	dup_var.arr[0] = '\0';
+	dup_var.len = 0;
+
+    pos_var  = 0;
+	pos_var1 = 0;
+	pos_var2 = 0;
+	print_upto = 0;
+	lv_var  = 1;
+	i = 0;
+
+	
+	strcpy(dup_var.arr,line_var);
+	dup_var.len = strlen(dup_var.arr);
+	var_length = strlen(dup_var.arr);
+	pos_var = char_position(dup_var.arr,"+",1);
+
+	while(i < var_length)
+	{ 
+	
+	if (pos_var == 0)
+	{
+    pos_length = var_length - i + 2;
+
+	put_string(dup_var.arr,i,pos_length);
+	
+	strcpy(str_var.arr,ls_str.arr);
+
+	str_var.len= strlen(str_var.arr);
+	
+	check_splch(str_var.arr);
+	pos_var1 = 0;
+	pos_var2 = 0;
+	i = var_length;
+	}
+
+	if (pos_var != 0 && pos_var1 == 0)
+	{	    
+	pos_var1 = pos_var;
+
+	pos_length = pos_var1-print_upto-1;	
+
+    put_string(dup_var.arr,print_upto+1,pos_length);
+    strcpy(str_var.arr,ls_str.arr);
+	str_var.len = strlen(str_var.arr);
+	check_splch(str_var.arr);
+
+    print_upto = pos_var1 - 1;
+	i = pos_var1+1;
+	pos_var2 = char_position(dup_var.arr,"+",i);
+
+     if (pos_var2 == 0)
+	 {
+	  pos_length = var_length - pos_var1 + 1;
+      put_string(dup_var.arr,pos_var1,pos_length);
+      strcpy(str_var.arr,ls_str.arr);
+	  str_var.len = strlen(str_var.arr);
+
+	  check_splch(str_var.arr);
+	  print_upto = var_length+1;
+	  i = var_length+1;
+     }
+
+    }
+
+    if (pos_var2 != 0)
+	{
+    nd_column_val.arr[0] = '\0';
+	nd_column_val.len = 0;
+	column_var.arr[0] = '\0';
+	column_var.len = 0;
+	tab_name.arr[0] = '\0';
+	tab_name.len = 0;
+	
+    //strcpy(sql_stmt," ");
+	//strcpy(sql_stmt1," ");
+//	strcpy(sql_stmt2," ");
+sql_stmt1.arr[0] = '\0';
+sql_stmt1.len = 0;
+sql_stmt2.arr[0] = '\0';
+sql_stmt2.len = 0;
+
+
+	pos_length = pos_var2 - pos_var1 - 1;
+
+    column_var.arr[0] = '\0';
+	column_var.len = 0;
+	
+	 put_string(dup_var.arr,pos_var1+1,pos_length);
+     strcpy(column_var.arr,ls_str.arr);
+	 column_var.len = strlen(column_var.arr);
+	 date_yn = chk_date_yn(column_var.arr);
+
+	  EXEC SQL SELECT  
+	           decode(:date_yn,0,'select to_char(ltrim('|| LET_MAPPED_COL_NAME || ')) from '|| LET_MAPPED_TABLE_NAME ||' WHERE ',
+										 'select to_char('|| LET_MAPPED_COL_NAME || ',''DD/MM/YYYY'') from '|| LET_MAPPED_TABLE_NAME ||' WHERE '),LET_MAPPED_TABLE_NAME
+					into  :sql_stmt1,tab_name
+                    FROM BL_REM_LET_MAPPING_COL
+                    WHERE LET_COLUMN_ID = :column_var
+					AND APPL_TRX_IND = 'B';
+ 
+ if (OERROR)
+        err_mesg("SELECT failed on table BL_REM_LET_MAPPING_COL",0,"");
+
+	len = strlen(sql_stmt1.arr);
+	sql_stmt1.arr[sql_stmt1.len]  ='\0';
+//	sprintf(temp,"%d",len);
+//	disp_message(ERR_MESG,temp);
+
+	/*EXEC SQL SELECT 'select to_char('|| LET_MAPPED_COL_NAME || ') from '|| LET_MAPPED_TABLE_NAME ||' WHERE ',LET_MAPPED_TABLE_NAME
+			 into  :sql_stmt1,tab_name
+			 FROM BL_REM_LET_MAPPING_COL    //nd_doc_type_type
+			 WHERE LET_COLUMN_ID = :column_var;
+      */  
+
+    tab_name.arr[tab_name.len] = '\0';
+	
+
+	if(strcmp(tab_name.arr,"BL_BILL_HDR") == 0 || strcmp(tab_name.arr,"BL_BILL_DCP_DTL_VW") == 0) 
+	{
+    //strcpy(sql_stmt2.arr, "DOC_TYPE_CODE = :nd_doc_type_code and DOC_NUM = to_number(:nd_doc_num)");
+	strcpy(sql_stmt2.arr, "DOC_TYPE_CODE = ");
+	strcat(sql_stmt2.arr,"'");
+	strcat(sql_stmt2.arr,nd_doc_type_code.arr);
+	strcat(sql_stmt2.arr,"' and DOC_NUM = to_number('");
+    strcat(sql_stmt2.arr,nd_doc_num.arr);
+    strcat(sql_stmt2.arr,"')");
+	}
+	
+	if(strcmp(tab_name.arr,"MP_PATIENT_MAST") == 0) 
+	{
+    //strcpy(sql_stmt2.arr, "PATIENT_ID = :nd_patient_id ");
+ 	 strcpy(sql_stmt2.arr, "PATIENT_ID = ");
+	 strcat(sql_stmt2.arr,"'");
+     strcat(sql_stmt2.arr,nd_patient_id.arr);
+	 strcat(sql_stmt2.arr,"'");
+
+	}
+
+	if(strcmp(tab_name.arr,"BL_BILLS_FOR_REMINDER") == 0) 
+	{
+    //strcpy(sql_stmt2.arr, "DOC_TYPE_CODE = :nd_doc_type_code and DOC_NUM = to_number(:nd_doc_num) and reminder_no = to_number(:nd_reminder_no)");
+	strcpy(sql_stmt2.arr, "DOC_TYPE_CODE = ");
+	strcat(sql_stmt2.arr,"'");
+	strcat(sql_stmt2.arr,nd_doc_type_code.arr);
+	strcat(sql_stmt2.arr,"' and DOC_NUM = to_number('");
+    strcat(sql_stmt2.arr,nd_doc_num.arr);
+    strcat(sql_stmt2.arr,"')");
+	strcat(sql_stmt2.arr," and reminder_no = to_number('");
+    strcat(sql_stmt2.arr,nd_reminder_no.arr);
+    strcat(sql_stmt2.arr,"')");
+	//disp_message(ERR_MESG,sql_stmt2.arr);
+	}
+
+	if(strcmp(tab_name.arr,"SY_ACC_ENTITY") == 0) 
+	{
+    //strcpy(sql_stmt2.arr, "ACC_ENTITY_ID = :nd_facility");
+	strcpy(sql_stmt2.arr, "ACC_ENTITY_ID = ");
+	strcat(sql_stmt2.arr,"'");
+	strcat(sql_stmt2.arr,nd_facility.arr);
+    strcat(sql_stmt2.arr,"'");
+	}
+	
+    if(strcmp(tab_name.arr,"SM_FACILITY_PARAM") == 0) 
+	{
+    //strcpy(sql_stmt2.arr, "FACILITY_ID = :nd_facility");
+	strcpy(sql_stmt2.arr, "FACILITY_ID = ");
+	strcat(sql_stmt2.arr,"'");
+	strcat(sql_stmt2.arr,nd_facility.arr);
+    strcat(sql_stmt2.arr,"'");
+    }
+
+	if(strcmp(tab_name.arr,"MP_PAT_OTHER_DTLS") == 0) 
+	{
+     //strcpy(sql_stmt2.arr, "PATIENT_ID = :nd_patient_id");
+     strcpy(sql_stmt2.arr, "PATIENT_ID = ");
+	 strcat(sql_stmt2.arr,"'");
+	 strcat(sql_stmt2.arr,nd_patient_id.arr);
+	 strcat(sql_stmt2.arr,"'");
+    }
+	
+	if (strcmp(tab_name.arr,"MP_RES_AREA")==0)
+	{
+	 //strcpy(sql_stmt2.arr, "RES_AREA_CODE=:nd_PAT_RES_AREA_CODE");
+     strcpy(sql_stmt2.arr, "RES_AREA_CODE = ");
+	 strcat(sql_stmt2.arr,"'");
+	 strcat(sql_stmt2.arr,nd_PAT_RES_AREA_CODE.arr);
+	 strcat(sql_stmt2.arr,"'");
+	}
+    
+	if (strcmp(tab_name.arr,"MP_COUNTRY")==0)
+	{
+     //strcpy(sql_stmt2.arr, "COUNTRY_CODE=:nd_PAT_COUNTRY_CODE"); 
+     strcpy(sql_stmt2.arr, "COUNTRY_CODE = ");
+	 strcat(sql_stmt2.arr,"'");
+	 strcat(sql_stmt2.arr,nd_PAT_COUNTRY_CODE.arr);
+	 strcat(sql_stmt2.arr,"'");
+    } 
+
+	if (strcmp(tab_name.arr,"MP_RES_TOWN")==0)
+	{
+	 //strcpy(sql_stmt2.arr, "RES_TOWN_CODE=:nd_PAT_RES_TOWN_CODE");
+     strcpy(sql_stmt2.arr, "RES_TOWN_CODE = ");
+	 strcat(sql_stmt2.arr,"'");
+	 strcat(sql_stmt2.arr,nd_PAT_RES_TOWN_CODE.arr);
+	 strcat(sql_stmt2.arr,"'");
+
+	}
+
+ 	if(strcmp(tab_name.arr,"MP_REGION") == 0) 
+	{
+     //strcpy(sql_stmt2.arr, "REGION_CODE = :nd_REGION_CODE");
+     strcpy(sql_stmt2.arr, "REGION_CODE = ");
+	 strcat(sql_stmt2.arr,"'");
+	 if (strcmp(column_var.arr,"MAIL_REGION_NAME")==0)
+	   strcat(sql_stmt2.arr,nd_PAT_REGION_CODE.arr);
+     else
+	   strcat(sql_stmt2.arr,nd_REGION_CODE.arr);
+	    
+	 strcat(sql_stmt2.arr,"'");
+	}
+    
+	if(strcmp(tab_name.arr,"MP_RES_AREA") == 0) 
+	{
+ 	 //strcpy(sql_stmt2.arr, "RES_AREA_CODE = :nd_RES_AREA_CODE"); 
+     strcpy(sql_stmt2.arr, "RES_AREA_CODE  = ");
+	 strcat(sql_stmt2.arr,"'");
+	 if (strcmp(column_var.arr,"MAIL_AREA_NAME")==0)
+	  strcat(sql_stmt2.arr,nd_PAT_RES_TOWN_CODE.arr);
+     else
+	  strcat(sql_stmt2.arr,nd_RES_AREA_CODE.arr);
+	 strcat(sql_stmt2.arr,"'");
+	}
+    
+	if(strcmp(tab_name.arr,"MP_RES_TOWN") == 0) 
+	{
+	 //strcpy(sql_stmt2.arr, "RES_TOWN_CODE = :nd_RES_TOWN_CODE"); 
+     strcpy(sql_stmt2.arr, "RES_TOWN_CODE   = ");
+	 strcat(sql_stmt2.arr,"'");
+	 
+	 if (strcmp(column_var.arr,"MAIL_TOWN_NAME")==0)
+	  strcat(sql_stmt2.arr,nd_PAT_RES_TOWN_CODE.arr);
+     else
+	  strcat(sql_stmt2.arr,nd_RES_TOWN_CODE.arr);
+
+	 strcat(sql_stmt2.arr,"'");    
+	 }
+
+    if(strcmp(tab_name.arr,"AR_CUSTOMER") == 0) 
+	{
+     //strcpy(sql_stmt2.arr, "CUST_CODE = :nd_cust_code");
+     strcpy(sql_stmt2.arr, "CUST_CODE   = ");
+	 strcat(sql_stmt2.arr,"'");
+	 strcat(sql_stmt2.arr,nd_cust_code.arr);
+	 strcat(sql_stmt2.arr,"'");       
+	}
+
+
+	strcpy(sql_stmt,sql_stmt1.arr);
+
+	strcat(sql_stmt,sql_stmt2.arr); 
+
+sql_stmt[strlen(sql_stmt)]='\0';    
+
+//	sql_stmt[sql_stmt.len] = '\0';
+
+//disp_message(ERR_MESG,sql_stmt);
+	//strcpy(sql_stmt,sql_stmt);
+
+EXEC SQL EXECUTE
+	BEGIN
+	 EXECUTE IMMEDIATE :sql_stmt INTO :nd_column_val;
+	END;
+END-EXEC;
+
+    //nd_column_val.arr[0] = '\0';
+	//nd_column_val.len = 0;
+    
+if (OERROR)
+	 {
+	  sprintf(st_var,"%d",sqlca.sqlcode);
+	  column_var.arr[0] = '\0';
+	  column_var.len = 0;
+	
+      pos_length = pos_var2 - pos_var1 + 1;
+	  put_string(dup_var.arr,pos_var1,pos_length);
+      strcpy(column_var.arr,ls_str.arr);
+	 
+	  column_var.len = strlen(column_var.arr);
+	  if((strcmp(st_var,"-1405")!=0))
+       fprintf(fp,"%s",column_var.arr);
+
+	 }
+else
+{
+	nd_column_val.arr[nd_column_val.len] = '\0';
+	fprintf(fp,"%-s",nd_column_val.arr);
+
+}
+
+//	EXEC SQL PREPARE SELECT_REM FROM :sql_stmt;
+//disp_message(ERR_MESG,"ST PREPARED");
+/*	if (OERROR)
+	 {
+	  column_var.arr[0] = '\0';
+	  column_var.len = 0;
+	
+      pos_length = pos_var2 - pos_var1 + 1;
+	  put_string(dup_var.arr,pos_var1,pos_length);
+      strcpy(column_var.arr,ls_str.arr);
+	 
+	  column_var.len = strlen(column_var.arr);
+      fprintf(fp,"%s",column_var.arr);
+
+	 }
+    else
+	{
+	EXEC SQL DECLARE SELECT_REM_CUR CURSOR FOR SELECT_REM;
+
+    if (OERROR)
+        err_mesg("Declare failed on SELECT_REM_CUR",0,"");
+//disp_message(ERR_MESG,"BEFORE IF");
+	if(strcmp(tab_name.arr,"BL_BILL_HDR") == 0 || strcmp(tab_name.arr,"BL_BILL_DCP_DTL_VW") == 0) 
+	{
+	//disp_message(ERR_MESG,"INSIDE IF");
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_doc_type_code,:nd_doc_num;
+    }
+//disp_message(ERR_MESG,"AFTER IF");
+   	if(strcmp(tab_name.arr,"MP_PATIENT_MAST") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_patient_id;
+
+    if(strcmp(tab_name.arr,"SM_FACILITY_PARAM") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_facility;
+
+    if (strcmp(column_var.arr,"MAIL_REGION_NAME")==0)
+	{
+    if(strcmp(tab_name.arr,"MP_REGION") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_PAT_REGION_CODE;
+	}
+	else
+	{
+    if(strcmp(tab_name.arr,"MP_REGION") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_REGION_CODE;
+    }
+
+    if(strcmp(tab_name.arr,"MP_COUNTRY") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_PAT_COUNTRY_CODE;
+
+
+   if (strcmp(column_var.arr,"MAIL_AREA_NAME")==0)
+    {
+	if(strcmp(tab_name.arr,"MP_RES_AREA") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_PAT_RES_TOWN_CODE;
+	}
+	else
+	{
+	if(strcmp(tab_name.arr,"MP_RES_AREA") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_RES_AREA_CODE;
+    }
+
+	if (strcmp(column_var.arr,"MAIL_TOWN_NAME")==0)
+	{
+	 if(strcmp(tab_name.arr,"MP_RES_TOWN") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_PAT_RES_TOWN_CODE;
+	}
+	else
+	{
+	 if(strcmp(tab_name.arr,"MP_RES_TOWN") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_RES_TOWN_CODE;
+    }   
+
+
+  if(strcmp(tab_name.arr,"BL_BILLS_FOR_REMINDER") == 0) 
+
+
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_doc_type_code,:nd_doc_num,:nd_reminder_no;
+
+
+
+	if(strcmp(tab_name.arr,"SY_ACC_ENTITY") == 0) 
+
+	EXEC SQL OPEN SELECT_REM_CUR using 
+				:nd_facility;
+
+	if(strcmp(tab_name.arr,"MP_PAT_OTHER_DTLS") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_patient_id;
+
+
+	if(strcmp(tab_name.arr,"AR_CUSTOMER") == 0) 
+	EXEC SQL OPEN SELECT_REM_CUR using 
+	           :nd_cust_code;
+
+
+	if (OERROR)
+        err_mesg("Open failed on SELECT_REM_CUR",0,"");
+
+    nd_column_val.arr[0] = '\0';
+	nd_column_val.len = 0;
+    
+	
+	//EXEC SQL FETCH SELECT_REM_CUR INTO :nd_column_val;
+//disp_message(ERR_MESG,nd_column_val.arr);
+    if (OERROR)
+        err_mesg("fetch failed on SELECT_REM_CUR",0,"");
+	
+	nd_column_val.arr[nd_column_val.len] = '\0';
+	fprintf(fp,"%-s",nd_column_val.arr);
+ 
+	}
+
+	*/
+
+	print_upto = pos_var2;
+	i = pos_var2+1;  
+
+    //EXEC SQL CLOSE SELECT_REM_CUR;
+    pos_var1 = 0;
+	pos_var2 = 0;
+	pos_var = char_position(dup_var.arr,"+",i);
+    }
+   } 
+
+} 
+	
+open_file()
+{
+
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"BLRRMLR2.lis");
+
+    if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file BLRRMLR2.lis");
+       proc_exit();
+    }
+
+}
+
+check_page_end(l_lead_lines, l_print_flag)
+int l_lead_lines;
+int	l_print_flag;
+{
+	if(l_print_flag==1)
+		l_lead_lines=l_lead_lines+10;
+
+	if((line_ctr+l_lead_lines)> 55) 
+	{
+		fprintf(fp,"%-70s %s %d\n"," ","Contd...",++pctr);
+		fprintf(fp,"\f");
+		fprintf(fp,"%-45s Page : %d\n\n"," ",pctr);
+		line_ctr = 2;
+		print_head();
+	}
+}
+
+

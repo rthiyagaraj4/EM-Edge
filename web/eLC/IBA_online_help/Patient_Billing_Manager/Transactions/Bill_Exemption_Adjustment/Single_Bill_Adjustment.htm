@@ -1,0 +1,553 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Single Bill Adjustment</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nTransactions\nBill Exemption Adjustment\nSingle Bill Adjustment");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Single Bill Adjustment</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Adjust</span> the bill amount for a relevant patient. You can <span class="RedItalic">Query</span> to view the outstanding bill amount for all the services availed from the facility.</p>
+<p class="Text">Bill Adjustment function is used to adjust or modify the outstanding bill amount for a patient. You can also view the adjustments against a bill or cancel the adjustments. An authorized User only can adjust the bill amount. The user is able to login and adjust the bill amount only when the ‘Bill Adjustment’ check box is selected in the ‘Users for Authorization/Refund/Cash Counters’ function in the Administration menu. The ‘Bill Adjustment Doc Type’ selected under the ‘Adj/Exmptn’ tab in the BL Parameters function gets displayed. A document reference number is generated on committing the record. You can adjust the amount for the outstanding bills, which are not settled. The bill amount, which is adjusted, gets displayed in different color.</p>
+<h2>Bill Adjustment</h2>
+<p class="From">From the Transactions &gt; Bill Exemption/Adjustment, double-click Bill Adjustment Function.</p>
+<p class="Text">The Bill Adjustment screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">You can create, cancel and view the bill adjustment details for a patient using the following tab pages:</p>
+</li>
+</ol>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Create</a></p>
+<div class="droptext" id="POPUP240510302" style="display: none;">
+<p><span class="BoldNumberRFD">Patient Details</span></p>
+<p class="BoldRFD">The outstanding bill details associated to the selected patient get displayed.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> - Select a Patient Number for transaction or use the Lookup function to select a patient. You can search for a relevant patient ID in the 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">lookup</a> screen. Click [Enter Query], enter the search criteria and click [Execute Query] or press [F8] to select a patient ID. The patient details get populated in the respective fields.</p>
+<div class="droptext" id="POPUP239636701" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">General sub-tab</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – Enter the Patient ID in alphanumeric format of 10 characters maximum length. The records matching the patient ID entered get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">NRIC (National Registration Identity Card)</span> – Enter the National ID in numeric format of 15 digits maximum length. The records matching the National ID of the patient recorded during registration get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Passport Details</span> – Enter the passport details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Title</span> - Enter the Title in alphanumeric format of 15 digits maximum length. The records matching the Title of the patient recorded during registration get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Last Name</span> – Enter the last name of the patient to search for a specific patient record. The records matching the patient’s family name get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">First Name</span> – Enter the first name of the patient to search for a specific patient record. The records matching the patient’s first name get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Contact No</span> - Enter the contact number of the patient to search for a specific patient record.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Contact Mode</span> – Select the Contact Mode from the drop-down list. The listed values are E-Mail, Fax, HP, Mobile No, Other, Police, Postal, Primary Resi No, Tel (Home) and Tel (Office).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nationality</span> – Click [List of Values] to select the nationality.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Birth Date</span> – Select the Birth Date using the calendar function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Place of Birth</span> – Click [List of Values] to select place of birth.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gender</span> – Select Gender from the drop-down.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Race</span> - Click [List of Values] to select Race.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order By</span> – Select Order By from the drop-down list. The listed values are Patient ID, Patent Name, Sex, Date of Birth and NRIC. The patient details are ordered based on the selected value.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click [Search] to view the patient details or click [Cancel] to close the screen.</p>
+</li>
+</ol>
+<p class="NumberRFD"><span class="BoldNumberRFD">Additional sub-tab</span></p>
+<ol start="16">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Option</span> – The value NORMAL is selected by default. You cannot modify the data.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deceased Only</span> – Select this check box to query only the deceased patient details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Suspended Only</span> – Select this check box to query only the suspended patient details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Inactive Only</span> - Select this check box to query only the inactive patient details.</p>
+</li>
+</ol>
+<p class="NumberRFD"><span class="BoldNumberRFD">Patient Details grid</span></p>
+<ol start="20" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> - The patient ID is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">National ID</span> - The national ID of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Citizen ID</span> - The citizen ID of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Last Name (Loc)</span> - The last name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">First Name (Loc)</span> - The first name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Second Name (Loc)</span> - The second name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Third Name (Loc)</span> - The third name of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Title (Loc)</span> - The title of the patient family is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Family Name</span> – The name of the patient family is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">First Name</span> - The first name of the patient family is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Second Name</span> – The second name of the patient family is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Third Name</span> – The third name of the patient family is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prefix</span> – The prefix number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Government No</span> – The Government number is displayed</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Expatriate No</span> – The expatriate number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pat Series</span> – The patient series is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – The patient gender is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Res Tel Num</span> –The residence telephone number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Inpatient</span> – Select this check box if the patient is an inpatient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Deceased</span> – Select this check box if patient is deceased.</p>
+</li>
+</ol>
+<p class="BoldRFD">The following color codes are used to identify the patient status:</p>
+<p class="BoldRFD">&#160;&#160;<img src="../../../De.jpg" style="border: none;" alt="De.jpg" height="22" width="50" border="0" /> &#160;- Deceased patients.</p>
+<p class="BoldRFD">&#160;&#160;<img src="../../../Ina.jpg" style="border: none;" alt="Ina.jpg" height="22" width="53" border="0" /> - Inactive patients.</p>
+<p class="BoldRFD">&#160;&#160;<img src="../../../Sus.jpg" style="border: none;" alt="Sus.jpg" height="22" width="50" border="0" /> &#160;- Suspended patients.</p>
+</div>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> - The patient name is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – The patient gender is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – The patient Age is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total Amount</span> – The total amount gets displayed automatically based on the adjustment amount against the outstanding bills.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Ref</span> – Enter the Document Reference details in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – Click Calendar function to select a transaction date. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – The reason selected while logging in to adjust the bill details get displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> – Enter the Remarks in alphanumeric format of 100 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Authorize]</span> – Click [Authorize] to 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">login</a> and to adjust the amount for the outstanding bills.</p>
+<div class="droptext" id="POPUP347101123" style="display: none;">
+<p class="NumberRFD"><span class="BoldNumberRFD">Enter the following details:</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">User ID</span> – Enter the User name in alphanumeric format. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">PIN No</span> – Enter the PIN number for the selected patient. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – Click [List of Values] to select a Reason for exemption. The reasons defined using the function ‘Reasons for Billing Actions’ in the Masters with the ‘Bill Exemption’ check box as selected get listed. This is a mandatory field.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+<p class="BoldRFD">Outstanding Bills</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select All</span> – Select this check box to select all the records to be adjusted for outstanding bill.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Select</span> – Select the check box to enter the percentage of amount to be adjusted for each outstanding bill. If the check box is cleared, you cannot enter the percentage value to adjust the bill details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Number</span> – The document type and the number for the outstanding document get displayed. The date when the document number was generated for the respective outstanding document also gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – Select the document date using calendar function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> – The Episode Type gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Billing Grp – The Billing Group for the selected outstanding document gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust Code</span> – The Customer Code associated to the selected outstanding document gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Outstanding Amt</span> – The outstanding amount for the selected document type gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%age</span> – Enter the percentage of amount in numeric format. The adjustment amount is calculated as the percentage of the actual amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment Amt</span> – The adjustment amount gets displayed automatically based on the percentage and the actual outstanding amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> – Enter the remarks in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">BG</span> – The description for the respective Billing Group gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust</span> – The description for the respective Customer code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> – The total amount adjusted against the outstanding bills of a patient gets displayed.</p>
+</li>
+</ol>
+<p class="NumberRFD">Click <img src="../../../button.jpg" style="border: none;" alt="button.jpg" width="22" height="23" border="0" /> to view the outstanding bill in detail. The Outpatient Query page gets displayed listing the amount against the services availed from the facility.</p>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">Cancel</a></p>
+<div class="droptext" id="POPUP348834288" style="display: none;">
+<p class="BoldRFD">Click Cancel to cancel the bill adjustments recorded using the Create tab.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select and to cancel a document number. The document numbers created using the Create tab for the patients’ get listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – The documented date is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> – The patient number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> – The patient Name is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – The patient’s gender is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – The patient’s age is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Ref</span> – The document reference number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – The reason entered during creation is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> – The remarks entered during creation is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Cancel</span> – The reason for cancel is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cancellation Remarks</span> – Enter the cancellation remarks in alphanumeric format of 100 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">Click <span class="BoldNumberRFD">[Execute Query]</span> or press <span class="BoldNumberRFD">[F8]</span> to view the adjustment details recorded against an outstanding bill. The outstanding amount to be paid by the patient on cancelling the adjustment against an outstanding bill amount gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Authorize]</span> – Click <span class="BoldNumberRFD">[Authorize]</span> to login and to cancel the bill adjustments for the selected patient; a confirmation screen pops-up. Click <span class="BoldNumberRFD">[Yes]</span> to cancel the adjustments or <span class="BoldNumberRFD">[No]</span> to abort the process and to exit from the screen.</p>
+</li>
+</ol>
+<p class="BoldRFD">Adjustment Bills</p>
+<ol start="14">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> – The document type and the number for the outstanding document get displayed. The date when the document number was generated for the respective outstanding document also gets displayed. This is mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Date</span> – Select the document date using calendar function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> – The Episode Type gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Grp</span> – The Billing Group for the selected outstanding document gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust Code</span> – The Customer Code associated to the selected outstanding document gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment Amt</span> – The adjustment amount gets displayed automatically based on the percentage and the actual outstanding amount.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Outstanding amount after cancellation</span> – The outstanding amount after cancellation for the selected document type gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Group Desc</span> – The description for the respective Billing Group gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust</span> – The description for the respective Customer code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Total</span> – The total amount adjusted against the outstanding bills of a patient gets displayed.</p>
+</li>
+</ol>
+</div>
+<p class="Text">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">View</a></p>
+<div class="droptext" id="POPUP347550154" style="display: none;">
+<p class="BoldRFD">Enter the following details to search for a patient record and to view the exemption details:</p>
+<p class="BoldRFD">Search</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> – Enter the Patient ID or click <span class="BoldNumberRFD">[List of Values]</span> to search for a patient record using the lookup screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Name</span> - The patient Name is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sex</span> – The sex of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Age</span> – The age of the patient is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjustment Doc. [From–To]</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select a range of documents generated for the adjustments granted to the selected patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjust. Doc. Date [From–To]</span> – Click Calendar function to select the date range. The document reference numbers generated during the selected date range for the selected patient get displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Search]</span> – Click <span class="BoldNumberRFD">[Search]</span> to view the exemption details and the respective outstanding bill details against which the adjustment is granted.</p>
+</li>
+</ol>
+<p class="BoldRFD">Adjustment Details</p>
+<ol start="8">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient No</span> – The patient number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> – The document number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – The document date is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document Ref</span> – The document reference is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Date</span> – The adjustment date is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – The bill adjustment reason is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Status</span> – The status of the bill adjustment is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Created By</span> – The name of the person who has done the bill adjustment is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cancelled By</span> – The name of the person who has cancelled the bill adjustment is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Authorized By</span> – The name of the person who has authorized the bill adjustment is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> – The remarks of the bill adjustment is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason</span> – The reason for bill adjustment is displayed.</p>
+</li>
+</ol>
+<p class="BoldRFD">Bill Details</p>
+<ol start="20">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Document No</span> – The document number is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Doc Date</span> – The document date is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Type</span> - The Episode Type is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Episode Id</span> – The Episode Id is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Visit Id</span> – The visit id is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Grp</span> – Billing Group for the selected outstanding document gets displayed</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cust Code</span> – The description for the respective Customer code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Adjust/Exempt Amt</span> -The adjust/exempt amount is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Group</span> - Billing Group for the selected outstanding document gets displayed</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Customer</span> - The name of the customer is displayed.</p>
+</li>
+</ol>
+</div>
+<ol start="2" type="1">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> to record the details or <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Counseling Details','../../CodeSetup/Counseling_Details.htm','Exemption Setup','../../CodeSetup/Exemption_Setup.htm');return false;" title="Related Topics"><img src="../../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Discharge Bill Cum Receipt','../IP_Cashier/Discharge_Bill_Cum_Receipt.htm','List of Adjustments/Exemptions','List_of_Adjustments_Exemptions.htm','Re-Print Adjustment/Exemption Doc','Re-Print_Adjustment_Exemption_Doc.htm');return false;" title="See Also"><img src="../../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a3','POPUP240510302');
+	TextPopupInit('a1','POPUP239636701');
+	TextPopupInit('a2','POPUP347101123');
+	TextPopupInit('a4','POPUP348834288');
+	TextPopupInit('a5','POPUP347550154');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

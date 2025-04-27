@@ -1,0 +1,776 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>MPI_Admin_MP Parameter</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details to define MP Parameter values:</p>
+<p class="BoldRFD">&#160;</p>
+<p><span class="UnderlineRFD">Patient Administration tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Numbering</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID Length</span> – Enter the Patient ID Length in numeric format of two digits maximum length. This field is mandatory. Once set, this value cannot be changed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Numbering Control</span> – Select the required Numbering Control. The following values are displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">By Site</span> - Select ‘By Site’ to control the Patient Number generation at the level of the Site.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">By Facility</span> - Select ‘By Facility’ to control the Patient Number generation at the level of the Facility.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">By Combination</span> - Select ‘By Combination’ to control the Patient Number generation at either Site or Facility level.</p>
+</li>
+</ol>
+<ol start="3">
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD" style="font-weight: normal;"><span class="UnderlineRFD">Alternate ID1 Rule Applicable</span> – Select the check box if Patient ID generation is based on the Alternate ID1 Rule.</p>
+</li>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Single Patient Numbering Applicable</span> - Select the check box, if Single Patient Numbering is applicable for the facility. Clear the check box, if universal numbering scheme is not applicable. If this check box is selected, the ‘Alternate ID1 Rule for Patient Numbering’ section is disappeared in Patient Series function. The check box is cleared, by default.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">The value set for patient numbering influence the Patient Series function.</p>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD">National ID Checks</p>
+<ol start="5">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> – Select the check box to accept National ID during patient registration. On selecting the check box, all the fields under National ID checks are enabled. If National ID is not applicable for the enterprise, clear the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Alphanumeric</span> - If 'Accept' check box is selected under National ID Checks then the 'Accept Alphanumeric' check box is enabled. Select the 'Accept Alphanumeric' check box to enable entering alphanumeric characters for National ID. This is one time setup and should be setup at the time of installation which cannot be altered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Prompt</span> – Enter the label for National ID in alphanumeric format of 15 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required for all Series</span> – Select the check box if National ID is to be made mandatory for all the Patient Series selected during registration, or clear the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the National ID length in numeric format of two digits maximum length. Once it is set, this value cannot be changed. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">External Interface Required</span> – Select the check box, to indicate that the external interface is required. An external interface icon gets displayed in all the registration functions. The facility can use the external interface for fetching details of the patient during registration. Clear the check box, if external interface is not required. If 'External Interface Required' check box is selected, the Enterprise Management application is interfaced with an external application to verify the patient details based on the Check Digit Scheme or Invoke Routine selected.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">An icon is displayed in the following functions while selecting the Prompt set for National ID check.</p>
+<ul>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Register Patient &#160;in Master Patient Index</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Patient Search</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Change Patient Details in Master Patient Index</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Schedule Appointment in Appointment Scheduling</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Create Booking in Inpatient and Daycare Management</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Register Patient Referral in Inpatient Management and Outpatient Management</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Register Attendance in Accident and Emergency</p>
+</li>
+<li style="font-weight: normal;" class="p-BulletRFD">
+<p class="BulletRFD">Register Visit in Ambulatory Care Management</p>
+</li>
+</ul>
+<p class="BoldRFD" style="font-weight: normal;">Patient details are displayed on using the Icon and selecting the ID.</p>
+<ol start="11" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Length</span> – Select the check box, if the National ID length needs to be checked during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Digit Scheme</span> – Select the value from the list. The listed values are defined in the function “Check Digit Scheme”. The selected check digit scheme authenticates the entered National ID during registration. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoke Routine</span> – Select the check box, to invoke a Routine.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Routine Name</span> – If the ‘Invoke Routine’ field is selected, the Routine Name gets enabled. Select the required Routine Name to be invoked from list. The listed values are pre-defined. Routine is a defined procedure that retrieves demographics of patient from external source based on the common unique identifier.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Change Allowed for Series</span> – If 'Required for all Series' is selected, the list values populated are National ID Series, All Series and New Born Series, otherwise, only the National ID Series is populated. Select the required value from the list. National ID can be changed for the selected Patient Series.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Series</p>
+<ol start="16" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">General</span> - Select the General Series from the list. The selected Patient Series is made default during Patient Registration. Patient Series belonging to the 'General Series Type' and 'Unrestricted Series Type' are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">New Born</span> - Select the New Born Series from the list. The selected series is made default during Newborn Registration. Patient series belonging to the 'Newborn Series Type' and 'Unrestricted Series Type' are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">With National ID</span> - Select the National ID Series from the list. The selected series will be defaulted during patient registration. Patient Series belonging to the 'National ID Series Type' and 'Unrestricted Series Type' are listed. This field is enabled only when 'Accept' is selected in National ID checks.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Emergency</span> – Select the Emergency Series from the list. The selected series will be defaulted during Emergency registration. Patient Series belonging to the 'Emergency Series Type' and 'Unrestricted Series Type' are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">With Alternate ID</span> - Select the Alternate ID Series from the list. The selected series will be defaulted during patient registration. Patient Series belonging to the 'Alternate ID Series Type' and 'Unrestricted Series Type' are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default</span> - Select the value from the list. The listed values are General, Alternate ID and National ID. The selected Patient Series is prompted at the time of Patient Registration. This field is mandatory.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<div align="center" >
+<table cellspacing="0" width="66.667%">
+<col style="width: 50%;" />
+<col style="width: 50%;" />
+<tr valign="top">
+<td style="border: Solid 1px #000000;width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Default</p>
+</td>
+<td style="border-top: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD">Register Patient Screen</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">General</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Register patient screen gets displayed on invoking Register Patient/Rapid Registration function.</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">National ID</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">National ID window gets displayed before register patient screen on invoking Register Patient/Rapid Registration function.</p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-left: Solid 1px #000000; border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Alternate ID</p>
+</td>
+<td style="border-right: Solid 1px #000000; border-bottom: Solid 1px #000000; width: 50%; padding-right: 10px; padding-left: 10px;">
+<p class="BoldRFD" style="font-weight: normal;">Alternate ID window gets displayed before register patient screen on invoking Register Patient/Rapid Registration function.</p>
+</td>
+</tr>
+</table>
+</div>
+<p>&#160;</p>
+<p class="BoldRFD">Medical Records Administration</p>
+<p class="BoldRFD" style="font-weight: normal;">The Medical Records Administration allows you to specify rules to manage medical records and default settings.</p>
+<ol start="22">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Create File</span> <span class="UnderlineRFD" style="text-decoration: none;">-</span> Select the Create File check box to create Patient File. The other fields in the section are enabled only if the Create File check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">File Maintenance</span> – Select one of the displayed options.</p>
+</li>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Single</span> – Select this option to maintain single file for each patient.</p>
+</li>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Multiple</span> – Select this option to maintain multiple files for each patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">File Numbering Control</span> - Select one of the options provided.</p>
+</li>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Allow Separate MRN</span> – Select this option to maintain a unique medical record number for each patient. The generated MRN is different from the Patient ID. If file maintenance is 'Single' and this option is selected, a unique Medical Record number is generated for the patient. If file maintenance is 'Multiple' and this option is selected, for each encounter, a unique Medical Record number is generated for the patient.</p>
+</li>
+<li type="1" class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Keep File Number same as Patient ID</span> – Select this option to maintain File Number same as the Patient ID.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Create File During</p>
+<ol start="25" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Registration</span> – Select the check box, to generate patient file during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">IP Admission</span> - Select the check box, to generate patient file during Inpatient Admission.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OP Visit Registration</span> – Select the check box, to generate patient file during Outpatient Visit Registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">EM Register Attendance</span> – Select the check box, to generate patient file during Emergency Register Attendance.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Day Care Admission</span> - Select the check box, to generate patient file during Day Care Admission.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Family/Organization</p>
+<ol start="30" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maintain Family Link</span> – Select the check box to Maintain Family Link. If family link is maintained, then Head patient details are captured during patient registration and the field ‘Valid for Head Patient Id’ appears in the function ‘Patient series’. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Maintain Organization Membership</span> – Select the check box if Organization Membership is applicable during patient registration. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Relationship for Organization Member</span> – Select the Relationship for Organization Member from the list. The values are populated from Relationship function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alternate ID Type for Membership ID</span> – Select the Alternate ID Type from the list of Alternate ID's. This field is enabled on selecting ‘Maintain Organization Membership’ check box.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p><span class="UnderlineRFD">Legal Names tab</span></p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Patient Name in Local Language</span> – Select the check box, to capture patient name in local language. On selecting the check box ‘Legend for Loc Language’ and ‘Patient Name Derivation Logic’ For Loc Lang fields are enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Soundex Type</span> - Select the Default Soundex Type. The listed values are ‘Generic’ and 'Ethnic’.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Patient Name as Multi parts</span> – To accept various components of the patient’s name, Select the check box. If allowed, the following components are enabled:</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Prefix</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">First Name</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Second Name</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Third Name</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Family Name</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Suffix</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">&#160;</p>
+<p class="BoldRFD" style="font-weight: normal;">If this box is cleared, only the “Prefix”, “Family Name” and “Suffix” are available for selection.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Prefix</p>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> - Select the check box, to accept Prefix of the patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> – Enter the maximum Length of ‘Prefix’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box, to make entry of prefix mandatory during Patient Registration. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordering</span> – Enter the Order Number to display the Name fields in order.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the legend for the Prefix in alphanumeric format of 15 characters maximum length. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for ‘Prefix’ in local language of 15 characters maximum length. This field is enabled, if 'Accept Patient Name in Local Language’ is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">First Name</p>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> - Select the check box, to accept the First Name of the Patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the maximum Length of ‘First Name’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box to make the entry of the First Name mandatory during Patient Registration. This field is enabled if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordering</span> - Specify the order of appearance of the First Name. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the Legend for the First Name in alphanumeric format of 15 characters maximum length. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for the ‘First Name’ in local language of 15 characters maximum length. This field is enabled, if ‘Accept Patient Name in Local Language’ is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Second Name</p>
+<ol start="16">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> - Select the check box, to accept the Second Name of the Patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the maximum length of ‘Second Name’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box, to make the entry of the Second Name mandatory during Patient Registration. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordering</span> - Specify the order of appearance of the Second Name. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the Legend for the second Name in alphanumeric format of 15 characters maximum length. This field is enabled, if 'Accept’ is checked.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for the ‘Second Name’ in local language of 15 characters maximum length. This field is enabled, if ‘Accept Patient Name in Local Language’ is checked.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Third Name</p>
+<ol start="22">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> - Select the check box, to accept the Third Name of the Patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the maximum length of ‘Third Name’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box, to make the entry of the Third Name mandatory during Patient Registration. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordering</span> - Specify the order of appearance of the Third Name. This field is enabled if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the Legend for the Third Name in alphanumeric format of 15 characters maximum length. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for the ‘Third Name’ in local language of 15 characters maximum length. This field is enabled, if ‘Accept Patient Name in Local Language’ is selected.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The rules specified for 'Third Name' in this tab influence the function 'Standard Other Name' under MP Code Setup.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Family Name</p>
+<ol start="28">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> - Select the check box, to accept the ‘Family Name’ of the Patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the maximum length of ‘Family Name’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box to make the entry of the Family Name mandatory during Patient Registration. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Ordering</span> - Specify the order of appearance of the Family Name. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the Legend for the Family Name in alphanumeric format of 15 characters maximum length. This field is enabled, if 'Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for the ‘Family Name’ in local language of 15 characters maximum length. This field is enabled, if ‘Accept Patient Name in Local Language’ is selected.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The rules specified for 'Family Name' in this tab influence the Standard Family Name function under MP Code Setup.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Suffix</p>
+<ol start="34">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept</span> &#160;- Select the check box to accept ‘Suffix’ of the patient during registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the maximum length of ‘Suffix’ in digits.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - Select the check box, to make entry of Suffix mandatory during Patient Registration. &#160;This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend</span> - Enter the legend for the Suffix in alphanumeric format of 15 characters maximum length. This field is enabled, if ‘Accept’ is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend for Loc Lang</span> – Enter the legend for ‘Suffix’ in local language of 15 characters maximum length. This field is enabled, if 'Accept Patient Name in Local Language’ is selected.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The rules specified for 'Suffix' in this tab influence the 'Suffix' function under MP Code Setup.</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Name Derivation Logic</p>
+<p class="BoldRFD" style="font-weight: normal;">Enter the Patient name Derivation Logic in alphanumeric format of 100 characters maximum length. The logic defined is used to build patient name during Patient Registration. For example, a Patient, ‘Mr. Tom Allen’ has three parts in his name, which are ‘Mr.’, ‘Tom’ and 'Allen’. Define the logic to derive each part of the name and combine them to form a full name. The derivation logic for the name MR. Tom Allen Solly is “PR(MR)+&lt;.&gt;+1N(Tom)+&lt;&gt;+ 2N(Allen)+&lt;&gt;+ FN(Solly)”, where ‘PR’ stands for Prefix, ‘1N’ stands for First Name, 2N stands for Second Name, &lt;&gt; for space and ‘FN’ stands for Family Name. Name derivation logic is based on the parts applicable to the site.</p>
+<ol start="39">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">For English</span> - Enter the ‘Patient Name Derivation Logic’ in alphanumeric format of 100 characters maximum length For English.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">For Loc Lang</span> - Enter the ‘Patient Name Derivation Logic’ in alphanumeric format of 100 characters maximum length For Local Language. This field is applicable provided 'Accept Patient Name in Local Language' is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Patient Name in English</span> – Enter the ‘Default Patient Name’ that is to be displayed in English.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="BoldRFD">Patient Long Name Derivation Logic</p>
+<p class="BoldRFD" style="font-weight: normal;">Enter the Patient Long Name Derivation &#160;Logic in alphanumeric format of 280 characters maximum length. The logic defined is to capture the long name of patients in registration. Patient Long Name Derivation Logic is based on the parts applicable to the site.</p>
+<ol start="42">
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>For English</u></span> - Enter the ‘Patient Long Name Derivation Logic’ in alphanumeric format of 280 characters maximum length For English.</p>
+</li>
+<li style="font-weight: normal;" class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">For Loc</span> <span style="text-decoration: underline;"><u>Lang</u></span> - Enter the ‘Patient Long Name Derivation Logic’ in alphanumeric format of 280 characters maximum length For Local Language.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p><span class="UnderlineRFD">Alternate ID Checks tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Alternate ID</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Type</span> - Select the Alternate ID Type from the list. Maximum of four Alternate ID Types can be set. The values are listed from 'Alternate ID Type’ function. Setting up of first Alternate ID Type is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Required</span> - To make entry of Alternate ID mandatory during Patient Registration, select the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length</span> - Enter the length of Alternate ID in numeric format of two characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Length</span> - To validate length of the Alternate ID during Patient Registration, select check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Unique</span> - To validate uniqueness of the entered Alternate ID during patient registration, select the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Expiry Date</span> - &#160;Select the check box, to enable expiry date entry during Patient Registration for the selected Alternate ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Exp</span> - If ‘Accept Expiry Date’ is selected, this field gets enabled. To verify expiry date of the Alternate ID entered during registration, click the check box.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Grace Days</span> - Enter the Grace Days in numeric format of three digits maximum length. Grace days can be entered when “Check Exp” is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alert in Adv.</span> - &#160;Select the check box, to alert in advance expiry of the Alternate ID.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">No. of Days</span> - If ‘Alert in Adv.’ is selected, the number of days can be entered. Enter the number of days for displaying an alert in advance in numeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Check Digit</span> – Select a Check Digit scheme from the list. Check digit schemes defined in the function 'Check Digit Scheme' are listed. The scheme validates the Alternate ID entered during patient registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Invoke Routine</span> – Select the check box, to invoke a routine.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Routine Name</span> – If ‘Invoke Routine’ is selected, this field gets enabled. Select a Routine Name from list. The listed values are pre-defined. Routine names are defined procedure that retrieves demographics of patient from external source based on the common unique identifier.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept for Other Patient Series</span> – Select the check box, to accept Alternate ID for other patient series during registration. This field appears only for Alternate ID1. If this value is set, Alternate ID can be accepted for patient series other than alternate patient series type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Alphanumeric</span> – To accept the Alternate ID in alphanumeric format, select the check box. If cleared, the Alternate ID has to be entered only in the numeric format. This field appears only for Alternate ID1. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Change Allowed</span> – Select the check box if change is to be allowed for Alternate ID during patient registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">E</span><span style="text-decoration: underline;"><u>xact Search</u></span> – Select this check box if you want to search for the exact configured alternate ID. For example, if you configure the ‘Service Number’ as an alternate ID, the system searches for the exact service number of the patient in Patient Search screen. Else, the system searches for the values starting with the given service number.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Other Alt ID</span> – Check the box to accept the other Alternate ID during patient registration.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You can define four types of Alternate ID's. The defined Alternate ID's can be entered while registering a patient.</p>
+<p>&#160;</p>
+<p><span class="UnderlineRFD">New Born tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Single Stage New Born Registration Applicable</span> - Select the check box to perform newborn registration in a single stage. Clear the check box to perform newborn registration in multiple stages.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD">A<span class="UnderlineRFD">llow Registration Within [] days/hours of Birth Date</span> – Specify the period within which newborn has to be registered from the date of birth. Enter the period in numeric format of two digits maximum length. On entering the period, specify either days/hours from the list provided. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Subsequent Regn of Multiple Birth Within [] Hours</span> – Specify the period within which subsequent registration of multiple birth is allowed. Enter the period in numeric format of two digits maximum length. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">S</span><span style="text-decoration: underline;"><u>ubsequent Regn of Multiple Birth Within [] Weeks -</u></span> Specify the period within which subsequent registration of multiple birth is allowed till a maximum period of 38 weeks. The option to specify the period is available in Weeks and Hours. Based on the option selected, the corresponding validation is performed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Series Same as Mother Series</span> – Check the box, if Patient Series of the newborn and mother patient are to be same. During newborn registration, Patient Series of the newborn will be defaulted with the Patient Series of the mother patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Review Mother-baby link before Regn</span> – Check the box, if the Mother-Baby link needs to be reviewed before registration. A chart containing mother details and child/children delivered by her previously is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Display New Born Age in Hrs When age is less than or equal to</span> - Enter the newborn’s age in numeric characters up to a maximum of 72 hours. It allows you to define the time limit in hrs depending on which the age of newborn is displayed in hrs, in the patient banner.</p>
+</li>
+<li class="p-BoldRFD">
+<p class="BoldRFD" style="font-weight: normal;"><span class="UnderlineRFD">Age Limit of Mother</span></p>
+<ol start="10">
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Min</span> – Enter the Minimum Age of the mother in numeric format of two digits maximum length. The specified age is validated during newborn registration.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Max</span> - Enter the Maximum Age of the mother in numeric format of two digits maximum length. The specified age is validated during newborn registration. The maximum age must be greater than the minimum age.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Minimum Cut-Off</span> - Enter the Cut-Off Age of the mother in numeric format of two digits maximum length. The specified age is validated during newborn registration. The entered value must be less than or equal to Minimum age specified for the mother.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD"><span class="UnderlineRFD">Minimum Age of Father</span> – Enter the Minimum Age of the Father in numeric format of two digits maximum length. The specified age is validated during newborn registration.</p>
+</li>
+</ol>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">New Born Father Name Mandatory</span> – Select the check box to make the New Born Father Name Mandatory in the Register Newborn function. . If you select the check box, the father name is mandatory irrespective of the setup of name field in legal name setup of MP Parameter function. Clear the check box not to make the New Born Father Name Mandatory in the Register Newborn function. If you clear the check box, all the name components of the father are optional.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Change of Data allowed after finalization</span> – Select the check box to modify the finalized newborn records in the Maintain Birth Register function. You cannot modify the details of records of finalized stillbirth details. This is a one time setup.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Name Components for Live Birth</span> – Select the check box to display the mother name as the default name of the newborn baby in the Register Newborn function, if the value in the Outcome field is selected as Live. If the outcome is selected as Still Birth, the default name is based on the Default name prefix setup. If the gender of the newborn is selected as Unknown, the prefix must be selected manually. The name prefix gets changed when the gender of the newborn is changed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Modify Mother Details in Multiple Birth’s</u></span> – Select the check box to modify the mother details for second child birth and subsequent new born registration in Register New Born, Register New Born for Inpatient and Maternity Consultation screens. By default, this check box is not selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Range Values</p>
+<ol start="13">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Weight (Minimum/Maximum)</span> – The minimum and maximum weight of the newborn can be specified in numeric format of six digits maximum length respectively. The maximum value must be greater than the minimum value. The specified range is validated during newborn registration. Select the unit of measurement for recording the weight. The displayed values are 'KG' and 'LB'. (Kilogram and Pound).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Length (Minimum/Maximum)</span> – The minimum and maximum length of the newborn can be specified in numeric format of six digits maximum length. The maximum value must be greater than the minimum value. The specified range is validated during newborn registration. Select the unit of measurement for recording the length. The displayed values are 'Cm' and 'Inch'. (Centimeter and Inch).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Head Circumference (Minimum/Maximum)</span> – The minimum and maximum head circumference of the newborn can be specified in numeric format of six digits maximum length. The maximum value must be greater than the minimum value. The specified range is validated during newborn registration. Select the unit of measurement for recording the head circumference. The displayed values are 'Cm' and 'Inch'. (Centimeter and Inch).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Chest Circumference (Minimum/Maximum)</span> – The minimum and maximum chest circumference of the newborn can be specified in numeric format of six digits maximum length. The maximum value must be greater than the minimum value. The specified range is validated during newborn registration. The unit of measurement specified for head circumference is applicable to chest circumference.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Gestation</span> – Specify the minimum and maximum gestation period in numeric format of three digits maximum length. The maximum value must be greater than the minimum value. The specified range is validated during newborn registration. Specify the gestation period in days or weeks.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Period Between Two Deliveries</span> - Specify the period between two deliveries in numeric format of three digits maximum length. The specified period is validated during newborn registration.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Name Prefix</p>
+<ol start="19">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Male</span> – Select the Prefix for male child from the list. The values defined in the function 'Name Prefix' are available for selection. The specified value is defaulted for male child during newborn registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Female</span> – Select the Prefix for female child from the list. The values defined in the function 'Name Prefix' are available for selection. The specified value is defaulted for female child during newborn registration.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Name Suffix</p>
+<ol start="21">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Male</span> – Select the Suffix for male child from the list. The values defined in the function 'Name Suffix' are available for selection. The specified value is defaulted for male child during newborn registration.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Female</span> - Select the Suffix for female child from the list. The values defined in the function 'Name Suffix' are available for selection. The specified value is defaulted for female child during newborn registration.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Relationship</p>
+<ol start="23">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Male</span> – Select the default relationship the male child shares with its head patient (mother) during newborn registration. The listed values are defined in the function Relationship.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Female</span> – Select the default relationship the female child shares with its head patient (mother) during newborn registration. The listed values are defined in the function Relationship.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Unknown</span> - Select the default relationship the child with unknown gender shares with its head patient during newborn registration. The listed values are defined in the function Relationship.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default Newborn</p>
+<ol start="26">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Race and Nationality setup of Newborn as per</span> – Select the value from the list to display the Default Race and Nationality of the newborn in Register Newborn function. The listed values are Father Details, Mother Details and MP Parameter Details. The value Father Details is displayed by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Still Born Prefix</span> – Select the value to prefix for a Still Born. The value defined is defaulted during the newborn registration in ‘Register New Born’ function.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD"><span class="UnderlineRFD">Others Tab</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">General</p>
+<ol start="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Max Patient Age</span> – Enter the Maximum Patient Age in numeric format of three characters maximum length. The entered value is validated during patient registration.</p>
+</li>
+</ol>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Default Alt ID1 Value in Emp.ID</span> – Select the check box, to make Employee ID same as Alternate ID1 while registering a patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Apply Eligibility Rules by Patient Category</span> – Select the check box, to enable ‘Expiry applicability’ in Patient Category masters. If the check box is selected the ‘Entitlement Plan’ and ‘Patient Category by Organization Membership’ Master functions are available in MP Code setup.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Suspending Service to Patient</span> – Select the check box, to indicate suspending of service to patient is allowed. The function ‘Suspend/Reinstate Patient’ can be invoked, if the check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Appt Ref No/Referral ID in Register Patient</span> – Select the check box, to Accept Appointment Reference and Referral ID while registering a Patient using Register Patient function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Accept Password in Change Patient Details</span> – Select the check box, to accept password while changing the patient details using the ‘Change Patient Details’ function under MP Transaction. The system prompts for the User password while trying to change the patient details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Race Required During Registration</span> - Select the check box if capturing 'Race' details is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Round off DOB for Estimated Age</u></span> - Select the checkbox to set up default round off date of birth.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Mandatory fields during Registration</u></span> – Displays the following options: Race, Religion, Country, Region, Mobile number, and Email ID . Select the check box against the fields that you want to be mandatory while registering a patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Patient Series Access by User</u></span> – Select this check box to define the patient series to be available for the user during registration in the ‘Patient Series for User’ screen. If this check box is cleared, you will not be able to access the ‘Patient Series for User function. An error message ‘This function is not applicable since Patient Series Access by User is not checked in MP Parameter’ is displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Synchronise contact details to Appointment</u></span> – Select this check box to synchronise the changes done in contact address in MPI with the Appointment Scheduling. The change reflects in all current and future appointments. If this check box is not selected, the changes done in contact address in MPI will not be synchronised with Appointment Scheduling. By default, this check box is not selected. When an appointment is booked without Patient ID, the contact details in MPI will not get updated since there is no patient ID. At a later stage, if the appointment without Patient ID is merged with a Patient ID, all the contact details available in the MPI will take precedence and get updated in Appointment.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>&#160;Update Patient Details in Referral</u></span> – Select this check box to update the patient details in all referral transactions if the patient details are updated in Change Patient screen or using ‘Synchronise Contact Details to Appointment’ parameter in OA module.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Auto Cancel Future Appointments/Waitlists/Bookings/Referrals of Deceased Patients</p>
+<ol start="13">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Consider Patients deceased before [ ] Days</u></span> – Specify the period to consider the deceased patients for cancelling the future appointments, IP booking, waitlist and referral. Enter a numeric value of maximum three digit length i.e., from ‘0’ to ‘999’. If the value zero is entered, the system considers the patients deceased till the current day for auto closure. This field is blank by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Reason for Cancellation</u></span> – Select the Reason for Cancellation from the list. The reason defined in the Application Master for auto cancel of appointments/waitlists/bookings is listed for selection. This field becomes mandatory only when value is entered in the ‘Consider Patients deceased before [ ] Days’ field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Consider Deceased Patients Released only through Mortuary</u></span> – This field is available only when Mortuary Management module is available in the site. The system validates the deceased patients released through Mortuary for auto closure only when this check box is selected and a value is entered in the ‘Consider Patients deceased before [ ] Days’ text box.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Default</p>
+<ol start="16">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nationality</span> – Select the Nationality from the list. The selected Nationality is made default during Patient Registration and other functions. The listed values are defined in the ‘Country’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Race</span> - Select the Race from the list. The selected Race is made default during Patient Registration and other functions where it is being referred. The values are listed from ‘Race’ function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Language</span> - Select the Patient Language using <span class="BoldNumberRFD">[?]</span> function. The selected Patient Language is made default during Patient Registration and other functions. The listed values are defined in the Patient Language function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Religion</span> - Select the Patient Religion using <span class="BoldNumberRFD">[?]</span> function. The selected Religion is made default during Patient Registration and other functions. The listed values are defined in the Religion function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Patient Search tab</u></span> – Select the Patient Search tab value from the list. The listed values are ‘Basic’ and ‘Advanced’. The selected values get defaulted in all patient search criteria.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Additional Fields tab</p>
+<ol start="21" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Legend (Field1-5)</span> – Enter the legend for the field in alphanumeric format of 15 characters maximum length. The defined field Legends appears in respective section selected for the legend while registering a patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Field Size</span> - Enter the size of the field in numeric format of two digits in maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Section</span> – Select the Section from the list. The Sections defined are Demographics, Contact Addresses, Related Contacts and Others The defined field is displayed under the specified section in the Register Patient function.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+/**
+ * 
+ */
+package portalrefimpl.schedule.rescheduleappointment.response;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import portalrefimpl.common.response.BaseResponse;
+
+/**
+ * This is the response class for the reschedule appointment service
+ * This class extends BaseResponse
+ * @author GRamamoorthy
+ *
+ */
+@XmlRootElement(name="RescheduleAppointmentResponse")
+public class RescheduleAppointmentResponse extends BaseResponse {
+
+	private String appointmentReferenceNumber = null;
+
+	/**
+	 * @return the appointmentReferenceNumber
+	 */
+	@XmlElement(name="AppointmentReferenceNumber")
+	public String getAppointmentReferenceNumber() {
+		return appointmentReferenceNumber;
+	}
+
+	/**
+	 * @param appointmentReferenceNumber the appointmentReferenceNumber to set
+	 */
+	public void setAppointmentReferenceNumber(String appointmentReferenceNumber) {
+		this.appointmentReferenceNumber = appointmentReferenceNumber;
+	}
+	
+}

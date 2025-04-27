@@ -1,0 +1,1239 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                    */
+/************************************************************************/
+/* PROGRAM NAME          : GLOCBACC.PC                                  */
+/* AUTHOR                : S. SRIRAM                                     */
+/* DATE WRITTEN          : 19-NOV-1992                                  */
+/*                                                                      */
+/*                                                                      */
+/*  CALLED FROM          :                                                */
+/*                                                                      */
+/*  FUNCTION             :   Creates combination of records in          */
+/*                           GL_ACC_COMBINATION                         */
+/*                           ( Changed to GL_POSTING_ACC )              */
+/*                                                                      */
+/*  PROGRAMMED BY        :                                              */
+/*                                                                      */
+/*  Date                 :   21-NOV-92                                  */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                      */
+/*          1.        GL_POSTING_ACC          Query/Insert              */
+/*          2.        GL_ACC_CHART               Lookup                 */
+/*          3.        SY_DEPT                    Lookup                 */
+/*          4.        GL_PARAMETER               Lookup                 */
+/*          5.        GL_PRODUCT_GROUP           Lookup                 */
+/*          6.        GL_PRODUCT_LINE            Lookup                 */
+/*          7.        GL_MAIN_SUBLEDGER          Lookup                 */
+/*          8.        GL_SUBLEDGER_GROUP         Lookup                 */
+/*          9.        GL_SUBLEDGER_LINE          Lookup                 */
+/*         10.        GL_COMBINATION_TEMP   Insert/Lookup/Delete        */
+/*         11.        SY_PROG_MSG                Insert                 */
+/*         12.        SY_PROG_CONTROL         Query/Update              */
+/*                                                                      */
+/*  PARAMETERS           :                                              */
+/*                                                                      */
+/*      S. No.       Field Names                Default Values          */
+/*                                                                      */
+/*          1.  MAIN_ACC1_CODE From                Spaces               */
+/*          2.  MAIN_ACC1_CODE To                 '~~~~~~'              */
+/*          3.  MAIN_ACC2_CODE From                Spaces               */
+/*          4.  MAIN_ACC2_CODE To                  '~~~~'               */
+/*          5.  DEPT_CODE From                     Spaces               */
+/*          6.  DEPT_CODE To                       '~~~~'               */
+/*          7.  PRODUCT_GROUP_CODE From            Spaces               */
+/*          8.  PRODUCT_GROUP_CODE To               '~~~'               */
+/*          9.  PRODUCT_LINE_CODE From             Spaces               */
+/*         10.  PRODUCT_LINE_CODE To               '~~~~'               */
+/*         11.  SUBLEDGER_GROUP_CODE From          Spaces               */
+/*         12.  SUBLEDGER_GROUP_CODE To            '~~~'                */
+/*         13.  SUBLEDGER_LINE_CODE From           Spaces               */
+/*         14.  SUBLEDGER_LINE_CODE To            '~~~~~~~~'            */
+/*                                                                      */
+/*                                                                      */
+/* DATE MODIFIED         : 14-FEB-1993                                  */
+/* CHANGES MADE          : NEW POSTING LOGIC                            */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+
+#include "gl.h" 
+#include "bl.h"
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+/*
+#define DEBUG 0
+*/
+#define SL_APPL  (d_subledger_applicable_flag.arr[0] == 'Y')
+#define SL_ENTRY (d_subledger_entry_flag.arr[0] == 'Y')
+
+#define DP_APPL  (d_dept_applicable_flag.arr[0] == 'Y')
+#define DP_ENTRY (d_dept_entry_flag.arr[0] == 'Y')
+
+#define PR_APPL  (d_prod_grp_applicable_flg.arr[0] == 'Y')
+#define PR_ENTRY (d_prod_entry_flag.arr[0] == 'Y')  
+
+#define VIEW_LOG_FILE     1
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+   VARCHAR uid_pwd[40];  
+                                                    /* LENGTH */
+   VARCHAR  nd_session_id                [16],      
+            nd_fm_main_acc1_code         [8],       /*   6    */
+            nd_to_main_acc1_code         [8],       /*   6    */
+            nd_fm_main_acc2_code         [6],       /*   4    */
+            nd_to_main_acc2_code         [6],       /*   4    */
+            nd_fm_dept_code              [11],       /*   6    */
+            nd_to_dept_code              [11],       /*   6    */
+            nd_fm_product_group_code     [4],       /*   3    */
+            nd_to_product_group_code     [4],       /*   3    */
+            nd_fm_product_line_code      [6],       /*   4    */
+            nd_to_product_line_code      [6],       /*   4    */
+            nd_fm_subledger_group_code   [4],       /*   3    */
+            nd_to_subledger_group_code   [4],       /*   3    */
+            nd_fm_subledger_line_code    [10],      /*   8    */
+            nd_to_subledger_line_code    [10],      /*   8    */
+ 
+            d_subledger_applicable_flag  [2],       /*   1    */
+            d_dept_applicable_flag       [2],       /*   1    */
+            d_prod_grp_applicable_flg    [2],    /*   1    */
+            d_main_acc1_code             [8],       /*   6    */
+            d_main_acc2_code             [6],       /*   4    */
+            d_subledger_entry_flag       [2],       /*   1    */
+            d_dept_entry_flag            [2],       /*   1    */
+            d_prod_entry_flag            [2],       /*   1    */
+            d_summary_acc_flag           [2],       /*   1    */
+            d_dept_code                  [11],       /*   6    */
+            d_product_group_code         [4],       /*   3    */
+            d_product_line_code          [6],       /*   4    */
+            d_subledger_group_code       [4],       /*   3    */
+            d_subledger_line_code        [10],      /*   8    */
+	        d_pgm_date                   [14],      /*   12   */
+            dummy                        [10][3],
+			d_dummy						 [1], 	
+ 
+            d_acc_flag                   [2],
+
+            d_main_desc                  [16],
+            d_dept_desc                  [16],
+            d_product_desc               [16],
+            d_subledger_desc             [16],
+            d_bank_reconcile_flag        [3],
+            d_default_dept_code          [11],
+            d_default_prod_group_code    [4],
+            d_default_prod_line_code     [7],
+            d_default_sleg_group_code    [4],
+            d_default_sleg_line_code     [9],
+            d_default_dept_desc          [16],
+            d_default_prod_desc          [16],
+            d_default_sleg_desc          [16],
+            d_default_delimiter          [3],
+			p_facility_id                [3], 
+		    p_acc_entity_code            [5],
+			nd_acc_entity_code           [4];
+
+      int   d_dept_length,
+            d_prod_group_length,
+            d_prod_line_length,
+            d_subl_group_length,
+            d_subl_line_length,
+            d_post_month,
+            d_post_year;
+
+      int   nd_count ;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+#include "winproc.h"
+
+int fetch_acc_chart(),
+    fetch_dept(),
+    fetch_product_group(),
+    fetch_product_line(),
+    fetch_main_subledger(),
+    fetch_combination_temp(),
+    fetch_dept(),
+    sql_connect();
+
+long fetch_subledger_group(),
+     fetch_subledger_line();
+     
+
+void declare_cursors(),
+     fetch_param(),
+     open_acc_chart_cur(),
+     open_dept_cur(),
+     open_product_group(),
+     open_product_line(),
+     open_subledger_group(),
+     open_subledger_line(),
+     create_posting_acc(),
+     start_prog_msg(),
+     start_prog_control(),
+     end_prog_control(),
+     open_main_subledger(),
+     create_gl_comb_temp(),
+     open_combination_temp(),
+     delete_comb_temp(),
+     del_param();
+
+void chk_active();
+void start_prog_msg();
+void start_prog_control();
+void end_prog_msg();
+void end_prog_control();
+void err_mesg(char *, int, char *);
+int  get_message(char *, char *);
+
+
+int  eof_dept,
+     eof_product,
+     ins_comb,
+     dept_ctr;
+     
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+   
+   if (argc != 5)
+   {
+      disp_message ( ERR_MESG, "Usage glocbacc uid/passwd session_id pgm_date facility_id");
+      proc_exit();
+   }
+
+
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+   strcpy(g_pgm_id,"GLOCBACC");
+
+   strcpy(d_pgm_date.arr,argv[3]);
+   d_pgm_date.len = strlen(d_pgm_date.arr);
+   strcpy(g_pgm_date,argv[3]);
+
+   if(sql_connect() == -1)
+   {
+      disp_message (ERR_MESG, "Error in connecting to Oracle");
+      if (uid_pwd.len == 0)
+         disp_message (ERR_MESG, "Null oracle uid/pwd");
+      proc_exit();
+   }
+
+ 
+
+    set_meduser_role();
+ chk_active();
+
+   EXEC SQL SELECT OPERATING_FACILITY_ID , PARAM1,PARAM2,PARAM3,PARAM4,PARAM5,PARAM6,
+                   PARAM7,PARAM8,PARAM9,PARAM10,PARAM11,PARAM12,
+                   PARAM13,PARAM14 
+              INTO :p_facility_id,
+			       :nd_fm_main_acc1_code,
+                   :nd_fm_main_acc2_code,
+                   :nd_to_main_acc1_code,
+                   :nd_to_main_acc2_code,
+                   :nd_fm_dept_code,
+                   :nd_to_dept_code,
+                   :nd_fm_product_group_code,
+                   :nd_fm_product_line_code,
+                   :nd_to_product_group_code,
+                   :nd_to_product_line_code,
+                   :nd_fm_subledger_group_code,
+                   :nd_fm_subledger_line_code,
+                   :nd_to_subledger_group_code,
+                   :nd_to_subledger_line_code 
+              FROM SY_PROG_PARAM
+             WHERE PGM_ID     = 'GLOCBACC' 
+               AND SESSION_ID = :nd_session_id 
+	       AND PGM_DATE   = :d_pgm_date;
+
+  
+
+    if (OERROR) err_mesg("Error while Fetching the Parameters",0,"");
+
+    if (NOT_FOUND) 
+    {
+      char err_msg[68];
+      sprintf (err_msg, "Session_id <%s> & Pgm_id GLOCBACC\n",nd_session_id.arr);
+      disp_message (ERR_MESG, err_msg);
+      err_mesg("Record not existing in Parameter Table\n",0,"");
+    } 
+
+ nd_fm_main_acc1_code.arr[nd_fm_main_acc1_code.len]             = '\0';
+ nd_to_main_acc1_code.arr[nd_to_main_acc1_code.len]             = '\0';
+ nd_fm_main_acc2_code.arr[nd_fm_main_acc2_code.len]             = '\0';
+ nd_to_main_acc2_code.arr[nd_to_main_acc2_code.len]             = '\0';
+ nd_fm_dept_code.arr[nd_fm_dept_code.len]                       = '\0';
+ nd_to_dept_code.arr[nd_to_dept_code.len]                       = '\0';
+ nd_fm_product_group_code.arr[nd_fm_product_group_code.len]     = '\0';
+ nd_to_product_group_code.arr[nd_to_product_group_code.len]     = '\0';
+ nd_fm_product_line_code.arr[nd_fm_product_line_code.len]       = '\0';
+ nd_to_product_line_code.arr[nd_to_product_line_code.len]     = '\0';
+ nd_fm_subledger_group_code.arr[nd_fm_subledger_group_code.len] = '\0';
+ nd_to_subledger_group_code.arr[nd_to_subledger_group_code.len] = '\0';
+ nd_fm_subledger_line_code.arr[nd_fm_subledger_line_code.len]   = '\0';
+ nd_to_subledger_line_code.arr[nd_to_subledger_line_code.len]   = '\0';
+
+/*
+
+#ifdef DEBUG
+
+   printf("acc1 fr is <%s>\n",nd_fm_main_acc1_code.arr);
+   printf("acc1 to is <%s>\n",nd_to_main_acc1_code.arr);
+   printf("acc2 fr is <%s>\n",nd_fm_main_acc2_code.arr);
+   printf("acc2 to is <%s>\n",nd_to_main_acc2_code.arr);
+   printf("dept fr is <%s>\n",nd_fm_dept_code.arr);
+   printf("dept to is <%s>\n",nd_to_dept_code.arr);
+   printf("prod grp fr is <%s>\n",nd_fm_product_group_code.arr);
+   printf("prod grp to is <%s>\n",nd_to_product_group_code.arr);
+   printf("prod line fr is <%s>\n",nd_fm_product_line_code.arr);
+   printf("prod line to is <%s>\n",nd_to_product_line_code.arr);
+   printf("subledger gr fr is <%s>\n",nd_fm_subledger_group_code.arr);
+   printf("subledger gr to is <%s>\n",nd_to_subledger_group_code.arr);
+   printf("subledger ln fr is <%s>\n",nd_fm_subledger_line_code.arr);
+   printf("subledger ln to is <%s>\n",nd_to_subledger_line_code.arr);
+
+#endif
+*/
+
+
+      
+
+
+   fetch_acc_entity();
+
+
+
+   start_prog_control();
+   start_prog_msg();
+   fetch_param();
+   declare_cursors();
+
+   open_acc_chart_cur();
+
+/*
+#ifdef DEBUG
+  printf("After opening cursor\n");
+#endif
+*/
+
+   while (fetch_acc_chart())
+   {
+/*
+#ifdef DEBUG
+  printf("After fetching Main acc <%s> - <%s>\n",d_main_acc1_code.arr,
+                  d_main_acc2_code.arr);
+#endif
+*/
+       eof_dept = eof_product = ins_comb = 1;
+       dept_ctr = 0;
+       if ((!DP_APPL) || (!DP_ENTRY)) 
+           eof_dept = 0;
+       else
+           open_dept_cur();
+/*
+#ifdef DEBUG
+   printf("Dept entry flag is <%s> Prod ent is <%s> subl entry is <%s>\n",
+       d_dept_entry_flag.arr,d_prod_entry_flag.arr,d_subledger_entry_flag.arr);
+#endif
+*/
+
+      if ((d_dept_entry_flag.arr[0] == 'N') && 
+          (d_prod_entry_flag.arr[0] == 'N') &&
+          (d_subledger_entry_flag.arr[0] == 'N'))
+      {
+/*
+#ifdef DEBUG
+    printf("DEPT & PROD & SL ENTRY FLAG is 'N'\n");
+#endif
+*/
+           strcpy(d_dept_code.arr,"");
+           d_dept_code.len = strlen(d_dept_code.arr);
+           strcpy(d_product_group_code.arr,"");
+           d_product_group_code.len = strlen(d_product_group_code.arr);
+           strcpy(d_product_line_code.arr,"");
+           d_product_line_code.len = strlen(d_product_line_code.arr);
+           strcpy(d_subledger_group_code.arr,"");
+           d_subledger_group_code.len = strlen(d_subledger_group_code.arr);
+           strcpy(d_subledger_line_code.arr,"");
+           d_subledger_line_code.len = strlen(d_subledger_line_code.arr);
+           create_posting_acc();
+           ins_comb = 0;
+       }
+       else
+       {
+          if ((d_dept_entry_flag.arr[0] == 'Y') || 
+              (d_prod_entry_flag.arr[0] == 'Y')) 
+          {
+              strcpy(d_subledger_group_code.arr,"");
+              d_subledger_group_code.len = 0;
+              strcpy(d_subledger_line_code.arr,"");
+              d_subledger_line_code.len = 0;
+
+              while (eof_dept != 0 || eof_product != 0)
+              {
+                if (eof_dept)
+                {
+                     eof_dept = fetch_dept();
+                     dept_ctr ++;
+                }
+/*
+#ifdef DEBUG
+    printf("eof_dept is <%d> dept_ctr is <%d>\n",eof_dept,dept_ctr);
+#endif
+*/
+                if ((!eof_dept) && dept_ctr > 1) break;
+ 
+                if ((!PR_APPL) || (!PR_ENTRY))
+                    eof_product = 0;
+                else
+                {
+                    open_product_group();
+                    while ((eof_product = fetch_product_group()) != 0)
+                    {
+                        open_product_line();
+                        while (fetch_product_line())
+                        {
+                             if (!SL_ENTRY)
+                                 create_posting_acc();
+                             else
+                                 create_gl_comb_temp();
+                           ins_comb = 0;
+                        }
+                     }
+                 }
+/*
+#ifdef DEBUG
+    printf("ins comb is <%d> eof_dept is <%d>\n",ins_comb,eof_dept);
+#endif
+*/
+                 if ((d_dept_entry_flag.arr[0] == 'Y') || 
+                      (d_prod_entry_flag.arr[0] == 'Y'))
+                 {
+/*
+#ifdef DEBUG
+  printf("Insert for dept only...\n");
+#endif
+*/
+                     if (ins_comb && eof_dept)
+                     {
+                         strcpy(d_product_group_code.arr,"");
+                         d_product_group_code.len = 0;
+                         strcpy(d_product_line_code.arr,"");
+                         d_product_line_code.len = 0;
+                         if (!SL_ENTRY)
+                            create_posting_acc();
+                         else
+                            create_gl_comb_temp();
+                     }
+                 }
+              }
+          }
+          if (SL_APPL && SL_ENTRY)
+          {
+/*
+#ifdef DEBUG
+   printf("Creating recs for SL\n");
+#endif
+*/
+              strcpy(d_dept_code.arr,"");
+              d_dept_code.len = strlen(d_dept_code.arr);
+              strcpy(d_product_group_code.arr,"");
+              d_product_group_code.len = strlen(d_product_group_code.arr);
+              strcpy(d_product_line_code.arr,"");
+              d_product_line_code.len = strlen(d_product_line_code.arr);
+    
+              open_main_subledger();
+              while (fetch_main_subledger())
+              {
+                     if (fetch_subledger_group() == 0  ||
+                             fetch_subledger_line() == 0)
+                          continue;       /* Subl Group / Line is suspended */
+
+                  if (PR_ENTRY || DP_ENTRY)
+                  {
+/*
+#ifdef DEBUG
+     printf("Before open comb temp\n");
+#endif 
+*/
+                      open_combination_temp();
+                      while (fetch_combination_temp())
+                         create_posting_acc();
+                  }
+                  else
+                       create_posting_acc();
+              }
+          }
+       }
+       
+       delete_comb_temp();
+
+       EXEC SQL COMMIT WORK;
+
+       if (OERROR) err_mesg("Error while Commiting...\n",0,"");
+    }
+    end_prog_msg();
+    end_prog_control();
+    del_param();
+    EXEC SQL COMMIT WORK RELEASE;
+    return;
+}
+ 
+void declare_cursors()
+{
+
+    EXEC SQL DECLARE   GL_ACC_CHART_CUR CURSOR FOR
+              SELECT   MAIN_ACC1_CODE,
+                       MAIN_ACC2_CODE,
+                       SUBLEDGER_ENTRY_FLAG,
+                       DEPT_ENTRY_FLAG,
+                       PROD_ENTRY_FLAG,
+                       SUMMARY_ACC_FLAG,
+                       BANK_RECONCILE_FLAG,
+                       SHORT_DESC
+                FROM   GL_ACC_CHART
+               WHERE   MAIN_ACC1_CODE||MAIN_ACC2_CODE >= 
+                               NVL(:nd_fm_main_acc1_code,'      ')||
+                               NVL(:nd_fm_main_acc2_code,'    ')
+                 AND   MAIN_ACC1_CODE||MAIN_ACC2_CODE <= 
+                               NVL(:nd_to_main_acc1_code,'~~~~~~')||
+                               NVL(:nd_to_main_acc2_code,'~~~~')
+                 AND   NVL(SUMMARY_ACC_FLAG,'X')  != 'Y'
+                 AND   STATUS IS NULL;
+
+    EXEC SQL DECLARE   SY_DEPT_CUR CURSOR FOR
+              SELECT   DISTINCT DEPT_CODE, SHORT_DESC
+                FROM   SY_DEPT
+               WHERE   DEPT_CODE >= NVL(:nd_fm_dept_code,'      ')
+                 AND   DEPT_CODE <= NVL(:nd_to_dept_code,'~~~~~~')
+                 AND   STATUS IS NULL;
+
+    EXEC SQL DECLARE   GL_PRODUCT_GROUP_CUR CURSOR FOR
+              SELECT   PRODUCT_GROUP_CODE, SHORT_DESC
+                FROM   GL_PRODUCT_GROUP
+               WHERE   PRODUCT_GROUP_CODE >=
+                              NVL(:nd_fm_product_group_code,'   ')
+                 AND   PRODUCT_GROUP_CODE <=
+                              NVL(:nd_to_product_group_code,'~~~')
+                 AND   STATUS IS NULL;
+
+    EXEC SQL DECLARE   GL_PRODUCT_LINE_CUR CURSOR FOR
+              SELECT   PRODUCT_LINE_CODE, SHORT_DESC
+                FROM   GL_PRODUCT_LINE
+               WHERE   PRODUCT_GROUP_CODE = :d_product_group_code
+                 AND   PRODUCT_GROUP_CODE||PRODUCT_LINE_CODE >=
+                              NVL(:nd_fm_product_group_code,'   ')||
+                              NVL(:nd_fm_product_line_code,'    ')
+                 AND   PRODUCT_GROUP_CODE||PRODUCT_LINE_CODE <=
+                              NVL(:nd_to_product_group_code,'~~~')||
+                              NVL(:nd_to_product_line_code,'~~~~')
+                 AND   STATUS IS NULL;
+
+    EXEC SQL DECLARE   GL_SUBLEDGER_GROUP_CUR CURSOR FOR
+              SELECT   'X'
+                FROM   GL_SUBLEDGER_GROUP
+               WHERE   SUBLEDGER_GROUP_CODE = :d_subledger_group_code
+                 AND   STATUS IS NULL;
+
+    EXEC SQL DECLARE   GL_SUBLEDGER_LINE_CUR CURSOR FOR
+              SELECT   SHORT_DESC
+                FROM   GL_SUBLEDGER_LINE
+               WHERE   SUBLEDGER_GROUP_CODE = :d_subledger_group_code
+                 AND   SUBLEDGER_LINE_CODE  = :d_subledger_line_code
+                 AND   STATUS IS NULL;
+
+     EXEC SQL DECLARE  GL_MAIN_SUBLEDGER_CUR CURSOR FOR
+               SELECT  SUBLEDGER_GROUP_CODE,
+                       SUBLEDGER_LINE_CODE
+                 FROM  GL_MAIN_SUBLEDGER
+                WHERE  MAIN_ACC1_CODE = :d_main_acc1_code
+                  AND  MAIN_ACC2_CODE = :d_main_acc2_code
+                  AND  SUBLEDGER_GROUP_CODE ||SUBLEDGER_LINE_CODE >=
+                       NVL(:nd_fm_subledger_group_code,'   ')||
+                       NVL(:nd_fm_subledger_line_code,'         ')
+                  AND  SUBLEDGER_GROUP_CODE || SUBLEDGER_LINE_CODE <=
+                       NVL(:nd_to_subledger_group_code,'~~~')||
+                       NVL(:nd_to_subledger_line_code,'~~~~~~~~');
+
+     EXEC SQL DECLARE  GL_COMBINATION_TEMP_CUR CURSOR FOR
+               SELECT  DEPT_CODE,
+                       PRODUCT_GROUP_CODE,
+                       PRODUCT_LINE_CODE,
+                       DEPT_DESC,
+                       PROD_DESC
+                 FROM  GL_COMBINATION_TEMP
+                WHERE  MAIN_ACC1_CODE = :d_main_acc1_code
+                  AND  MAIN_ACC2_CODE = :d_main_acc2_code;
+}
+
+void fetch_param()
+{
+
+  d_prod_group_length              = 0;
+  d_prod_line_length               = 0;
+  d_subl_group_length              = 0;
+  d_subl_line_length               = 0;
+  d_post_month                     = 0;
+  d_post_year                      = 0;
+
+  d_dept_applicable_flag.arr[0]          ='\0';
+  d_prod_grp_applicable_flg.arr[0] = '\0';
+  d_subledger_applicable_flag.arr[0]     = '\0';
+
+  d_default_dept_code.arr[0]             = '\0';
+  d_default_prod_group_code.arr[0]       = '\0';
+  d_default_prod_line_code.arr[0]        = '\0';
+  d_default_sleg_group_code.arr[0]       = '\0';
+  d_default_sleg_line_code.arr[0]        = '\0';
+  d_default_dept_desc.arr[0]             = '\0';
+  d_default_prod_desc.arr[0]             = '\0';
+  d_default_sleg_desc.arr[0]             = '\0';
+  d_default_delimiter.arr[0]             = '\0';
+
+  d_subledger_applicable_flag.len        = 0;
+  d_prod_grp_applicable_flg.len    = 0;
+  d_dept_applicable_flag.len             = 0;
+
+  d_default_dept_code.len                = 0;
+  d_default_prod_group_code.len          = 0;
+  d_default_prod_line_code.len           = 0;
+  d_default_sleg_group_code.len          = 0;
+  d_default_sleg_line_code.len           = 0;
+  d_default_dept_desc.len                = 0;
+  d_default_prod_desc.len                = 0;
+  d_default_sleg_desc.len                = 0;
+  d_default_delimiter.len                = 0;
+
+   EXEC SQL SELECT   SUBLEDGER_APPLICABLE_FLAG,
+                     DEPT_APPLICABLE_FLAG,
+                     PRODUCT_GROUP_APPLICABLE_FLAG,
+                     PRODUCT_GROUP_CODE_LNGTH,
+                     PRODUCT_LINE_CODE_LNGTH,
+                     SUBLEDGER_GROUP_CODE_LNGTH,
+                     SUBLEDGER_LINE_CODE_LNGTH,
+                     DEFAULT_DEPT_CODE,
+                     DEFAULT_PROD_GROUP_CODE,
+                     DEFAULT_PROD_LINE_CODE,
+                     DEFAULT_SLEG_GROUP_CODE,
+                     DEFAULT_SLEG_LINE_CODE,
+                     DEFAULT_DEPT_DESC,
+                     DEFAULT_PROD_DESC,
+                     DEFAULT_SLEG_DESC,
+                     DEFAULT_DELIMITER,
+                     CURRENT_ACC_MONTH,
+                     CURRENT_ACC_YEAR
+              INTO
+                     :d_subledger_applicable_flag,
+                     :d_dept_applicable_flag,
+                     :d_prod_grp_applicable_flg,
+                     :d_prod_group_length,
+                     :d_prod_line_length,
+                     :d_subl_group_length,
+                     :d_subl_line_length,
+                     :d_default_dept_code,
+                     :d_default_prod_group_code,
+                     :d_default_prod_line_code,
+                     :d_default_sleg_group_code,
+                     :d_default_sleg_line_code,
+                     :d_default_dept_desc,
+                     :d_default_prod_desc,
+                     :d_default_sleg_desc,
+                     :d_default_delimiter,
+                     :d_post_month,
+                     :d_post_year
+              FROM   GL_PARAMETER;
+
+    if (OERROR) err_mesg("Error while Fetching Parameters..",0,"");
+
+d_dept_applicable_flag.arr[d_dept_applicable_flag.len]                   = '\0';
+d_prod_grp_applicable_flg.arr[d_prod_grp_applicable_flg.len] = '\0';
+d_subledger_applicable_flag.arr[d_subledger_applicable_flag.len]         = '\0';
+
+d_default_prod_group_code.arr[d_default_prod_group_code.len] = '\0';
+d_default_prod_line_code.arr[d_default_prod_line_code.len]   = '\0';
+d_default_sleg_group_code.arr[d_default_sleg_group_code.len] = '\0';
+d_default_sleg_line_code.arr[d_default_sleg_line_code.len]   = '\0';
+d_default_dept_desc.arr[d_default_dept_desc.len]             = '\0';
+d_default_prod_desc.arr[d_default_prod_desc.len]             = '\0';
+d_default_sleg_desc.arr[d_default_sleg_desc.len]             = '\0';
+d_default_delimiter.arr[d_default_delimiter.len]             = '\0';
+
+    if (NOT_FOUND)
+    {
+       err_mesg("No Record Exists in GL_PARAMETER",0,"");
+    }
+
+   EXEC SQL SELECT   DEPT_CODE_LENGTH
+              INTO   :d_dept_length
+              FROM   SM_ACC_ENTITY_PARAM;
+
+    if (OERROR) err_mesg("Error while Fetching Parameters..-SM_ACC_ENTITY_PARAM",0,"");
+
+    if (NOT_FOUND)
+    {
+       err_mesg("No Record Exists in SM_ACC_ENTITY_PARAM",0,"");
+    }
+
+   if (!DP_APPL)
+       d_dept_length   = 6; 
+   if (!SL_APPL)
+   {
+      d_subl_group_length = 3;
+      d_subl_line_length  = 8;
+   }
+   if (!PR_APPL)
+   {
+      d_prod_group_length = 3;
+      d_prod_line_length  = 4;
+   }
+}
+
+void open_acc_chart_cur()
+{
+    EXEC SQL OPEN GL_ACC_CHART_CUR;
+    if (OERROR) err_mesg("Error while opening GL_ACC_CHART_CURSOR..",0,"");
+}
+
+int fetch_acc_chart()
+{
+ 
+    d_main_acc1_code.arr[0]       = '\0';
+    d_main_acc2_code.arr[0]       = '\0';
+    d_subledger_entry_flag.arr[0] = '\0';
+    d_dept_entry_flag.arr[0]      = '\0';
+    d_prod_entry_flag.arr[0]      = '\0';
+    d_summary_acc_flag.arr[0]     = '\0';
+    d_bank_reconcile_flag.arr[0]  = '\0';
+    d_main_desc.arr[0]            = '\0';
+
+    d_main_acc1_code.len          = 0;
+    d_main_acc2_code.len          = 0;
+    d_subledger_entry_flag.len    = 0;
+    d_dept_entry_flag.len         = 0;
+    d_prod_entry_flag.len         = 0;
+    d_summary_acc_flag.len        = 0;
+
+    d_bank_reconcile_flag.len     = 0;
+    d_main_desc.len               = 0;
+
+    EXEC SQL FETCH   GL_ACC_CHART_CUR
+              INTO   :d_main_acc1_code,
+                     :d_main_acc2_code,
+                     :d_subledger_entry_flag,
+                     :d_dept_entry_flag,
+                     :d_prod_entry_flag,
+                     :d_summary_acc_flag,
+                     :d_bank_reconcile_flag,
+                     :d_main_desc;
+
+    if (OERROR) err_mesg("Error while Fetching GL_ACC_CHART_CURSOR..",0,"");
+
+    d_main_acc1_code.arr[d_main_acc1_code.len]             = '\0';
+    d_main_acc2_code.arr[d_main_acc2_code.len]             = '\0';
+    d_subledger_entry_flag.arr[d_subledger_entry_flag.len] = '\0';
+    d_dept_entry_flag.arr[d_dept_entry_flag.len]           = '\0';
+    d_prod_entry_flag.arr[d_prod_entry_flag.len]           = '\0';
+    d_summary_acc_flag.arr[d_summary_acc_flag.len]         = '\0';
+    d_bank_reconcile_flag.arr[d_bank_reconcile_flag.len]   = '\0';
+    d_main_desc.arr[d_main_desc.len]                       = '\0';
+ 
+    if (LAST_ROW)
+        return (0);
+    else
+        return (1);
+}
+
+void open_dept_cur()
+{
+    EXEC SQL OPEN SY_DEPT_CUR;
+    if (OERROR) err_mesg("Error while opening SY_DEPT_CUR..",0,"");
+}
+
+int fetch_dept()
+{
+    if (eof_dept == 0)
+        return 0;
+  
+    d_dept_code.arr[0] = '\0';
+    d_dept_desc.arr[0] = '\0';
+    d_dept_code.len    = 0;
+    d_dept_desc.len    = 0;
+
+
+    EXEC SQL FETCH SY_DEPT_CUR
+              INTO :d_dept_code,
+                   :d_dept_desc;
+
+
+    if (OERROR) err_mesg("Error while Fetching SY_DEPT_CUR..",0,"");
+
+    d_dept_code.arr[d_dept_code.len] = '\0';
+    d_dept_desc.arr[d_dept_desc.len] = '\0';
+
+    if (LAST_ROW)
+        return(0);
+    else
+        return(1);
+}
+
+void open_product_group()
+{
+
+    EXEC SQL OPEN GL_PRODUCT_GROUP_CUR;
+    if (OERROR) err_mesg("Error while opening GL_PRODUCT_GROUP_CUR",0,"");
+}
+
+int fetch_product_group()
+{
+    d_product_group_code.arr[0] = '\0';
+    d_product_group_code.len    = 0;
+
+    EXEC SQL FETCH   GL_PRODUCT_GROUP_CUR
+              INTO   :d_product_group_code;
+
+    if (OERROR) err_mesg("Error while fetching GL_PRODUCT_GROUP_CUR",0,"");
+  
+    d_product_group_code.arr[d_product_group_code.len] = '\0';
+
+    if (LAST_ROW)
+       return(0);
+    else 
+       return(1); 
+}
+
+
+void open_product_line()
+{
+   EXEC SQL OPEN GL_PRODUCT_LINE_CUR;
+
+   if (OERROR) err_mesg("Error while opening GL_PRODUCT_LINE_CUR",0,"");
+}
+
+int fetch_product_line()
+{
+    d_product_line_code.arr[0]  = '\0';
+    d_product_desc.arr[0]       = '\0';
+
+    d_product_line_code.len     = 0;
+    d_product_desc.len          = 0;
+
+    EXEC SQL FETCH   GL_PRODUCT_LINE_CUR
+              INTO   :d_product_line_code,
+                     :d_product_desc;
+
+   if (OERROR) err_mesg("Error while fetching GL_PRODUCT_LINE_CUR",0,"");
+
+   d_product_line_code.arr[d_product_line_code.len]  = '\0';
+   d_product_desc.arr[d_product_desc.len]            = '\0';
+   
+   if (LAST_ROW)
+      return(0);
+   else 
+      return(1); 
+}
+void open_main_subledger()
+{
+/*
+#ifdef DEBUG
+   printf("Inside open main_subl\n");
+   printf("main - <%s><%d>   <%s><%d>\n",
+                  d_main_acc1_code.arr,d_main_acc1_code.len,
+                  d_main_acc2_code.arr,d_main_acc2_code.len);
+   printf(" nd fm sl is <%s><%d> - <%s><%d>\n",
+                  nd_fm_subledger_group_code.arr,nd_fm_subledger_group_code.len,
+                  nd_fm_subledger_line_code.arr,nd_fm_subledger_line_code.len);
+
+   printf(" nd to sl is <%s><%d> - <%s><%d>\n",
+                  nd_to_subledger_group_code.arr,nd_to_subledger_group_code.len,
+                  nd_to_subledger_line_code.arr,nd_to_subledger_line_code.len);
+#endif
+*/
+
+     EXEC SQL OPEN GL_MAIN_SUBLEDGER_CUR;
+   
+     if (OERROR)
+         err_mesg("OPEN failed on cursor GL_MAIN_SUBLEDGER_CUR",0,"");
+}
+
+int fetch_main_subledger()
+{
+    d_subledger_group_code.arr[0] = '\0';
+    d_subledger_line_code.arr[0]  = '\0';
+
+    d_subledger_group_code.len    = 0;
+    d_subledger_line_code.len     = 0;
+
+    EXEC SQL FETCH   GL_MAIN_SUBLEDGER_CUR
+              INTO   :d_subledger_group_code,
+                     :d_subledger_line_code;
+
+    if (OERROR) err_mesg("Error while fetching GL_MAIN_SUBLEDGER_CUR",0,"");
+  
+    d_subledger_group_code.arr[d_subledger_group_code.len] = '\0';
+    d_subledger_line_code.arr[d_subledger_line_code.len]   = '\0';
+
+    if (LAST_ROW)
+       return(0);
+    else 
+       return(1); 
+}
+
+void open_subledger_group()
+{
+   EXEC SQL OPEN GL_SUBLEDGER_GROUP_CUR;
+
+   if (OERROR) err_mesg("Error while opening GL_SUBLEDGER_GROUP_CUR",0,"");
+}
+
+
+long fetch_subledger_group()
+{
+    open_subledger_group();
+
+    EXEC SQL FETCH   GL_SUBLEDGER_GROUP_CUR
+              INTO   :dummy;
+
+    if (OERROR) err_mesg("Error while fetching GL_SUBLEDGER_GROUP_CUR",0,"");
+  
+    return(sqlca.sqlerrd[2]);
+}
+
+void open_subledger_line()
+{
+   EXEC SQL OPEN GL_SUBLEDGER_LINE_CUR;
+
+   if (OERROR) err_mesg("Error while opening GL_SUBLEDGER_LINE_CUR",0,"");
+}
+
+long  fetch_subledger_line()
+{
+    open_subledger_line();
+
+    d_subledger_desc.arr[0]       = '\0';
+    d_subledger_desc.len          = 0;
+
+    EXEC SQL FETCH   GL_SUBLEDGER_LINE_CUR
+              INTO   :d_subledger_desc;
+
+   if (OERROR) err_mesg("Error while fetching GL_SUBLEDGER_LINE_CUR",0,"");
+
+   d_subledger_desc.arr[d_subledger_desc.len]  = '\0';
+   
+   return(sqlca.sqlerrd[2]);
+}
+
+void create_posting_acc()
+{
+   if (d_dept_code.arr[0] == '\0')
+   {
+       strcpy(d_dept_code.arr,d_default_dept_code.arr);
+       d_dept_code.len = strlen(d_dept_code.arr);
+   }
+
+   if (d_subledger_group_code.arr[0] == '\0')
+   {
+       strcpy(d_subledger_group_code.arr,d_default_sleg_group_code.arr);
+       d_subledger_group_code.len = strlen(d_subledger_group_code.arr);
+
+       strcpy(d_subledger_line_code.arr,d_default_sleg_line_code.arr);
+       d_subledger_line_code.len = strlen(d_subledger_line_code.arr);
+   }
+
+   if (d_product_group_code.arr[0] == '\0')
+   {
+       strcpy(d_product_group_code.arr,d_default_prod_group_code.arr);
+       d_product_group_code.len = strlen(d_product_group_code.arr);
+
+       strcpy(d_product_line_code.arr,d_default_prod_line_code.arr);
+       d_product_line_code.len = strlen(d_product_line_code.arr);
+   }
+
+
+  if (d_dept_desc.len == 0)
+  {
+      strcpy(d_dept_desc.arr,d_default_dept_desc.arr);
+      d_dept_desc.len = strlen(d_dept_desc.arr);
+  }
+  if (d_product_desc.len == 0)
+  {
+      strcpy(d_product_desc.arr,d_default_prod_desc.arr);
+      d_product_desc.len = strlen(d_product_desc.arr);
+  }
+  if (d_subledger_desc.len == 0)
+  {
+      strcpy(d_subledger_desc.arr,d_default_sleg_desc.arr);
+      d_subledger_desc.len = strlen(d_subledger_desc.arr);
+  }
+
+   EXEC SQL SELECT  'X' 
+			  INTO  :d_dummy
+              FROM  GL_POSTING_ACC
+             WHERE  MAIN_ACC1_CODE       = :d_main_acc1_code
+               AND  MAIN_ACC2_CODE       = :d_main_acc2_code
+               AND  DEPT_CODE            = :d_dept_code
+               AND  PRODUCT_GROUP_CODE   = :d_product_group_code
+               AND  PRODUCT_LINE_CODE    = :d_product_line_code
+               AND  SUBLEDGER_GROUP_CODE = :d_subledger_group_code 
+               AND  SUBLEDGER_LINE_CODE  = :d_subledger_line_code;
+
+   if (OERROR) err_mesg("Error while checking GL_POSTING_ACC",0,"");
+
+   if (NOT_FOUND)
+   {
+/*
+#ifdef DEBUG
+   printf("Before inserting into GL_POSTING_ACC..\n");
+   printf("\n <%s> - <%s> - <%s> - <%s> - <%s> - <%s> - <%s>\n",
+                    d_main_acc1_code.arr,
+                    d_main_acc2_code.arr,
+                    d_dept_code.arr,
+                    d_subledger_group_code.arr, 
+                    d_subledger_line_code.arr, 
+                    d_product_group_code.arr,
+                    d_product_line_code.arr);
+#endif
+*/
+
+/* Commented on 17/06/2004 by Suresh Kumar G, since this part is still waiting for
+   approval from HMC. 	
+	
+	//Added on 04/03/2004 for Issue #7361
+
+	EXEC SQL SELECT  COUNT(1) 
+			  INTO  nd_count
+              FROM  GL_ASSOC_POSTING_ACC
+             WHERE  MAIN_ACC1_CODE       = :d_main_acc1_code
+               AND  MAIN_ACC2_CODE       = :d_main_acc2_code
+               AND  DEPT_CODE            = :d_dept_code
+               AND  PRODUCT_GROUP_CODE   = :d_product_group_code
+               AND  PRODUCT_LINE_CODE    = :d_product_line_code
+               AND  SUBLEDGER_GROUP_CODE = :d_subledger_group_code 
+               AND  SUBLEDGER_LINE_CODE  = :d_subledger_line_code;      
+    
+   if (nd_count > 0 )  
+     {
+*/
+	   EXEC SQL INSERT INTO GL_POSTING_ACC
+						   (ACC_ENTITY_CODE,
+				  MAIN_ACC1_CODE,
+						MAIN_ACC2_CODE,
+						DEPT_CODE,
+						SUBLEDGER_GROUP_CODE, 
+						SUBLEDGER_LINE_CODE, 
+						PRODUCT_GROUP_CODE,
+						PRODUCT_LINE_CODE,
+						CONCAT_MAIN_CODE,
+						CONCAT_PROD_CODE,
+						CONCAT_SLEG_CODE,
+						CONCAT_POST_ACC_CODE,
+						MAIN_DESC,
+						DEPT_DESC,
+						PROD_DESC,
+						SLEG_DESC,
+						CONCAT_POST_ACC_DESC,
+						SUMMARY_ACC_FLAG,
+						BANK_RECONCILE_FLAG,
+				  ADDED_BY_ID,
+						ADDED_DATE,
+						POST_MONTH,
+						POST_YEAR
+					   )
+				VALUES ( :nd_acc_entity_code,
+						:d_main_acc1_code,
+						:d_main_acc2_code,
+						:d_dept_code,
+						:d_subledger_group_code, 
+						:d_subledger_line_code, 
+						:d_product_group_code,
+						:d_product_line_code,
+
+						:d_main_acc1_code||:d_main_acc2_code,
+
+						:d_product_group_code||:d_product_line_code,
+
+						:d_subledger_group_code||:d_subledger_line_code, 
+
+						:d_main_acc1_code||'-'||:d_main_acc2_code||' '||
+						:d_dept_code ||' '||
+						:d_product_group_code||'-'||:d_product_line_code||' '||
+						:d_subledger_group_code||'-'||:d_subledger_line_code, 
+						:d_main_desc,
+						:d_dept_desc,
+						:d_product_desc,
+						:d_subledger_desc,
+						:d_main_desc||:d_default_delimiter||
+						:d_dept_desc||:d_default_delimiter||
+						:d_product_desc||:d_default_delimiter||
+						:d_subledger_desc,
+						:d_summary_acc_flag,
+						:d_bank_reconcile_flag,
+				  USER,
+				  SYSDATE,
+						:d_post_month,
+						:d_post_year
+						);
+		if (OERROR) err_mesg("Error while Inserting into GL_POSTING_ACC",0,"");
+     //}
+
+   }
+}   
+
+int sql_connect()
+{
+
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0) 
+      return(-1);
+  return(0);
+}
+
+void del_param()
+{
+	EXEC SQL DELETE SY_PROG_PARAM
+	         WHERE  PGM_ID     = 'GLOCBACC' 
+		 AND    SESSION_ID = :nd_session_id 
+	         AND    PGM_DATE   = :d_pgm_date;
+    if(OERROR) 
+	err_mesg("Deleting records from SY_PROG_PARAM",0,""); 
+}
+
+
+void create_gl_comb_temp()
+{
+/*
+#ifdef DEBUG
+   printf("Inside create gl_comb_temp\n");
+#endif
+*/
+
+    EXEC SQL INSERT INTO GL_COMBINATION_TEMP
+                (
+                 MAIN_ACC1_CODE,
+                 MAIN_ACC2_CODE,
+                 DEPT_CODE,
+                 PRODUCT_GROUP_CODE,
+                 PRODUCT_LINE_CODE,
+                 DEPT_DESC,
+                 PROD_DESC
+                )
+              VALUES 
+                (
+                 :d_main_acc1_code,
+                 :d_main_acc2_code,
+                 :d_dept_code,
+                 :d_product_group_code,
+                 :d_product_line_code,
+                 :d_dept_desc,
+                 :d_product_desc
+                );
+ 
+      if (OERROR)
+         err_mesg("INSERT failed on table GL_COMBINATION_TEMP",0,"");
+/*
+#ifdef DEBUG
+   printf("No of recs inserted is <%d>\n",sqlca.sqlerrd[2]);
+   printf("main acc is <%s><%d> - <%s><%d>\n",
+                  d_main_acc1_code.arr,d_main_acc1_code.len,
+                  d_main_acc2_code.arr,d_main_acc2_code.len);
+#endif
+*/
+}
+
+
+void open_combination_temp()
+{
+     EXEC SQL OPEN GL_COMBINATION_TEMP_CUR;
+     if (OERROR)
+         err_mesg("OPEN failed on cursor GL_COMBINATION_TEMP_CUR",0,"");
+}
+
+int fetch_combination_temp()
+{
+/*
+#ifdef DEBUG
+   printf("Inside fetch combination_temp \n");
+#endif
+*/
+    d_dept_code.arr[0]           = '\0';
+    d_product_group_code.arr[0]  = '\0';
+    d_product_line_code.arr[0]   = '\0';
+    d_dept_desc.arr[0]           = '\0';
+    d_product_desc.arr[0]        = '\0';
+
+    d_dept_code.len              = 0;
+    d_product_group_code.len     = 0;
+    d_product_line_code.len      = 0;
+    d_dept_desc.len              = 0;
+    d_product_desc.len           = 0;
+
+     EXEC SQL FETCH GL_COMBINATION_TEMP_CUR
+               INTO :d_dept_code,
+                    :d_product_group_code,
+                    :d_product_line_code,
+                    :d_dept_desc,
+                    :d_product_desc;
+
+   if (OERROR)
+         err_mesg("FETCH failed on cursor GL_COMBINATION_TEMP_CUR",0,"");
+
+     d_dept_code.arr[d_dept_code.len]                    = '\0';
+     d_product_group_code.arr[d_product_group_code.len]  = '\0';
+     d_product_line_code.arr[d_product_line_code.len]    = '\0';
+     d_dept_desc.arr[d_dept_desc.len]                    = '\0';
+     d_product_desc.arr[d_product_desc.len]              = '\0';
+
+/*
+#ifdef DEBUG
+   printf(" %d records fetched \n",sqlca.sqlerrd[2]);
+#endif
+*/
+
+     if (LAST_ROW)
+        return(0);
+     else
+        return(1);
+}
+
+void delete_comb_temp()
+{
+       EXEC SQL DELETE GL_COMBINATION_TEMP;
+
+       if (OERROR)
+            err_mesg("DELETE failed on table GL_COMBINATION_TEMP",0,"");
+}
+
+fetch_acc_entity()
+{
+
+ EXEC SQL SELECT   ACC_ENTITY_CODE
+              INTO     :nd_acc_entity_code
+              FROM SY_ACC_ENTITY
+			  where  acc_entity_id = :p_facility_id;
+
+   
+   
+    if (OERROR)
+        err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+
+		nd_acc_entity_code.arr[nd_acc_entity_code.len]                    = '\0';
+
+
+
+}

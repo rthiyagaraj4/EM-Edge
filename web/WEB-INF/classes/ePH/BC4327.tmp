@@ -1,0 +1,2302 @@
+/*******************************************************************************
+ * Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ *  
+ * Warning: This computer program is protected by copyright law and international treaties.
+ * Unauthorized reproduction or distribution of this program, or any portion of it, 
+ * may result in severe civil and criminal penalties, and will be prosecuted to 
+ * the maximum extent possible under the law.
+ ******************************************************************************/
+/*
+--------------------------------------------------------------------------------------------------------------
+Date			Edit History      Name			Description
+--------------------------------------------------------------------------------------------------------------
+?				100					?           created
+09/05/2017      GHL-SCF-1193  IN064097  SOFIA       RTN_MED_NO is empty when encounterID not there  
+01/09/2017      GHL-SCF-1234   65133              	 Drugs are not showing in RETURN MEDICATION screen. 
+07/09/2017      ICN   			65168       				Drugs are not showing in RETURN MEDICATION screen. 
+29/01/2018     Aissist id 	  974547(KDAH-SCF-0467)            Return Medication Search is slow  when ward return check box is checked.
+---------------------------------------------------------------------------------------------------------------
+*/
+package ePH ;
+import java.io.Serializable ;
+import java.util.* ;
+import java.sql.* ;
+//import javax.rmi.PortableRemoteObject ;
+//import javax.naming.InitialContext ;
+import ePH.Common.* ;
+import eCommon.Common.* ;
+import ePH.ReturnMedication.*;
+import javax.servlet.* ;
+import javax.servlet.http.*;
+
+public class ReturnMedicationBean extends PhAdapter implements Serializable {
+
+//	protected String remarks		= "";
+//	protected String disp_locn_code	= "";
+//	protected String drugcodes		= "";
+	protected String user_name		= "";
+	protected String password		= "";
+	protected String st_doc_type	= "";
+	protected String curr_date		= "";
+	protected String encounter_id	= "";
+	protected String disp_locn_code = "";
+	protected ArrayList  billing_details= null ;	//billing_details type changed  from String to ArrayList  for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+	protected String disp_cash_coll_stage = "";
+	protected String token_series_code = "";
+	protected String issue_uom_by	   = "";
+	protected String FormStore	       = "";
+	protected String eff_status	       = "";
+	protected String orderingfacilityid= "";
+	protected String Login_disp_locn_code= "";
+	protected String rtn_medn_no       = "";
+	protected String patCat       = "";
+	private Hashtable recordSet		   = new Hashtable();
+	protected String Facility_Flag = "";//Bru-HIMS-CRF-091 & SPIR-IN029957 -- Added Facility_Flag for MutiFacility
+	protected String getTradeName_Flag		= "";//AMS-SCF-0190-IN038440.
+	protected String dispTranSeqNo = "";
+	protected String directDispTranSeqNo = "";
+	protected String retn_Medn_Num = "";//Added for GHL-SCF-1193
+	//Added for GHL-CRF-0413.8 start
+	ArrayList newBarcodeArry = new ArrayList();
+	boolean flag_empty=false;
+	
+	public boolean isFlag_empty() {
+		return flag_empty;
+	}
+
+	public void setFlag_empty(boolean flag_empty) {
+		this.flag_empty = flag_empty;
+	}
+	//Added for GHL-CRF-0413.8 end
+
+	
+	public void setNewBarcodeArry(ArrayList BarcodeArry){
+		this.newBarcodeArry =BarcodeArry;
+	}
+   public ArrayList getNewBarcodeArry(){
+	   return newBarcodeArry;
+   }
+	//HashMap barcode_data	=	new HashMap();
+	public ReturnMedicationBean(){
+		//Constructor
+		try{
+			doCommon() ;
+		}
+		catch(Exception e) {
+			e.printStackTrace(); 
+		}
+	}
+
+	/* Over-ridden Adapter methods start here */
+	private void doCommon() throws Exception {
+	}
+
+	public void clear() {
+		super.clear() ;
+		this.disp_locn_code	= "";
+		this.encounter_id	= "";
+		this.billing_details = null;
+		this.eff_status="";
+		this.rtn_medn_no = "";
+		this.st_doc_type="";
+		if(this.recordSet !=null)
+			this.recordSet.clear();
+	}
+
+	/* Over-ridden Adapter methods endS here */
+	/* Function specific methods start */
+
+	public String getLoggedInFacility(){
+		return login_facility_id;
+	}
+	
+	private String getStockDocType() {
+		return this.st_doc_type;
+	}
+
+	public String getRtn_medn_no() {
+		return this.rtn_medn_no;
+	}
+	//Added for GHL-SCF-1193 Start
+	public String getRetnMednNo() {
+		return this.retn_Medn_Num;
+	}
+	
+	public void setRetnMednNo(String retn_Medn_Num) {
+		this.retn_Medn_Num = retn_Medn_Num;
+	}
+	
+	public void clearRetnMednNo(){
+		this.retn_Medn_Num = "";
+	}//Added for GHL-SCF-1193 End
+
+	private void setCurrDate(String curr_date) {
+		this.curr_date	=	curr_date;
+	}
+
+	private void setEncounter(String encounter_id) {
+		this.encounter_id	=	encounter_id;
+	}
+
+	private String getEncounter() {
+		return this.encounter_id;
+	}
+
+	private String getCurrDate() {
+		return this.curr_date;
+	}
+
+	public void setDispLocnCode(String displocncode){
+			this.disp_locn_code=displocncode;
+	}
+	public String getDispLocnCode(){
+			return disp_locn_code;
+	}
+
+	public void setLoginDispLocnCode(String Login_disp_locn_code){
+			this.Login_disp_locn_code=Login_disp_locn_code;
+	}
+	public String getLoginDispLocnCode(){
+			return Login_disp_locn_code;
+	}
+
+	public void setBLDetails(ArrayList billing_details){
+		this.billing_details = billing_details;
+	}
+	public ArrayList getBLDetails(){
+		return 	billing_details;
+	}
+
+	public void setDispCashCollStage(String disp_cash_coll_stage){
+		this.disp_cash_coll_stage = disp_cash_coll_stage;
+	}
+	public String getDispCashCollStage(){
+		return 	this.disp_cash_coll_stage;
+	}
+	public void setTokenSeriesCode(String token_series_code){
+		this.token_series_code = token_series_code;
+	}
+	public String getTokenSeriesCode(){
+		return 	token_series_code;
+	}
+
+	public void setFromStore(String FormStore) {
+		this.FormStore	=	FormStore;
+	}
+
+	public String getFromStore() {
+		return this.FormStore;
+	}
+
+	public void setOrderingFacilityID(String orderingfacilityid) {
+		this.orderingfacilityid	=	orderingfacilityid;
+	}
+
+	public String getOrderingFacilityID() {
+		return this.orderingfacilityid;
+	}
+	
+	public void setEffstatus(String eff_status) {
+		this.eff_status	=	eff_status;
+	}
+
+	public String getEffstatus() {
+		return this.eff_status;
+	}
+
+	public void setPatientCategory(String patCat) {
+		this.patCat	=	patCat;
+	}
+
+	public String getPatientCategory() {
+		return this.patCat;
+	}
+	//Bru-HIMS-CRF-091 & SPIR-IN029957 -- Added Getter/Setter for Facility_Flag.
+	public void setFacility_Flag(String Facility_Flag){
+		 this.Facility_Flag=Facility_Flag;
+	}
+	
+	public String getFacility_Flag(){
+		return this.Facility_Flag;
+	}
+	
+	//Added for  AMS-SCF-0190 IN038440 - start
+	public void setTradeName_Flag(String TradeName_Flag){
+		this.getTradeName_Flag=TradeName_Flag;
+	}
+	
+	public String getTradeName_Flag(){
+		return this.getTradeName_Flag;
+	}
+	//Added for  AMS-SCF-0190 IN038440 - end
+	public String getDispTranSeqNo() {//added for MMS-QH-CRF-0201 [IN:052255] 
+		return dispTranSeqNo;
+	}
+
+
+	public void setDispTranSeqNo(String dispTranSeqNo) {//added for MMS-QH-CRF-0201 [IN:052255] 
+		this.dispTranSeqNo = dispTranSeqNo;
+	}
+	
+
+	public String getDirectDispTranSeqNo() {//added for MMS-QH-CRF-0201 [IN:052255] 
+		return directDispTranSeqNo;
+	}
+
+
+	public void setDirectDispTranSeqNo(String directDispTranSeqNo) {//added for MMS-QH-CRF-0201 [IN:052255] 
+		this.directDispTranSeqNo = directDispTranSeqNo;
+	} 
+	public void setAll( Hashtable recordSet ) {
+		/* This function also is called by the controller when apply is pressed 
+		recordSet is nothing but a hashtable containing all form values
+		
+		*/
+		if(recordSet.containsKey("mode"))
+			setMode((String)recordSet.get("mode")) ;
+		this.recordSet = recordSet;
+	}
+
+	public void setStockDocType(String patient_class) {
+		Connection conn								= null;
+		PreparedStatement pstmt_st_doc_type			=	null;
+		ResultSet resSet							=	null;
+		
+		try {
+			conn				=	getConnection();
+			pstmt_st_doc_type	= conn.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_DISP_MEDICATION_SELECT56") ) ;
+
+			if(patient_class.equals("I")) {
+				pstmt_st_doc_type.setString(1,"RTIP");
+			}
+			else {
+				pstmt_st_doc_type.setString(1,"RTOP");
+			}
+			pstmt_st_doc_type.setString(2,login_facility_id);
+			pstmt_st_doc_type.setString(3,login_facility_id);
+			resSet				= pstmt_st_doc_type.executeQuery() ;
+			if(resSet.next() && resSet!=null ) {
+				st_doc_type	=	(String)resSet.getString("ST_DOC_TYPE_CODE");
+			}
+			//setStockDocType(st_doc_type);
+		}
+		catch(Exception e){
+				e.printStackTrace();
+		}
+		finally{	
+			try {
+				closeConnection( conn );
+				closeResultSet( resSet ) ;
+				closeStatement( pstmt_st_doc_type ) ;
+			}
+			catch(Exception es) { 
+				es.printStackTrace();
+			}
+		}
+		//return st_doc_type;
+	}
+
+	public HashMap modify() {
+
+	//	HashMap result	=	new HashMap();
+		HashMap tabData	=	new HashMap();
+		HashMap sqlMap	=	new HashMap();
+		HashMap map		=	new HashMap();
+		ArrayList datarr	=	null;
+		HashMap hmHeader	=	new HashMap();
+		HashMap hmHeader_dtls	=	new HashMap(); // added forSRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+		HashMap BaseAndIssueUOMQty =new HashMap();
+		//  variables for Stock component
+		ArrayList tot_values	=	new ArrayList();
+		HashMap insertDetailGrp	=	new HashMap(); // added forSRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+		HashMap insertExpGrp	=	new HashMap(); // added forSRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+		ArrayList insertDetail	=	new ArrayList();
+		ArrayList insertExp		=	new ArrayList();
+		HashMap hmDetail		=	null;
+		HashMap hmExp			=	null;
+		HashMap hmhdrDtlKeyMap	=	new HashMap();
+		HashMap hmDtlGrp	=	new HashMap();
+		HashMap hmExpGrp	=	new HashMap();
+		ArrayList dtlKeyList	=	new ArrayList();
+		ArrayList tmpInsertExp = null;
+		ArrayList EncList      =new ArrayList();//Added for KDAH-SCF-0452
+		ArrayList EncListGroup      =new ArrayList();//Added for KDAH-SCF-0452
+		List hdrKeyList =null;
+		String enc_patient_class ="";
+		String enc_id            ="";
+		String previousEncId	 ="";
+		String hdrKey            ="";
+		String dtlKey            ="";
+        Connection connection		        = null ;  
+		PreparedStatement pstmt_select1		= null;
+		ResultSet rset						= null;
+		String bl_interface_yn				= "";
+		boolean retMedRestrStage = false; // Added for GHL-CRF-0412.3
+		String eff_status=(String)recordSet.get("eff_status");
+		String totalRows1=CommonBean.checkForNull((String)recordSet.get("totalRows1"));
+		float tot_item_qty=0;
+		float mm_trn_qty=0;
+		String take_home_yn="";// added for skr-scf-0591
+		String dis_charge_ind="";// added for skr-scf-0591
+		String orig_enc_patient_class ="";//Added for KDAH-SCF-0452
+		//Adding start for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+		PreparedStatement pstmt_blflag     = null ;
+		ResultSet resultSet_blflag        = null ;
+		String bl_result="";
+        String bl_recal_flag="N";
+		//Adding end for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+
+		tabData.put("flag","test flag");
+		tabData.put("result",new Boolean(false));
+		tabData.put("message","message");
+	    tabData.put("FACILITY_ID",login_facility_id);
+	    tabData.put("EFF_STATUS",eff_status);
+	    tabData.put("Rej_Qty_Value", (String)recordSet.get("rej_qty")); // Added for GHL-SCF-790 [IN:046481]
+		tabData.put( "PROPERTIES", getProperties() );
+		tabData.put( "REMARKS", CommonBean.checkForNull((String)recordSet.get("remarks")));		
+		tabData.put( "login_by_id", login_by_id.trim() );
+		tabData.put( "login_at_ws_no",login_at_ws_no.trim());
+		tabData.put("Facility_Flag",getFacility_Flag());//Bru-HIMS-CRF-091 & SPIR-IN029957 -- Mapped Facility_Flag to EJB.
+		String rows=CommonBean.checkForNull((String)recordSet.get("totalrows"));
+		if(!rows.equals("")){
+			tabData.put( "TOTALROWS", rows);
+		}
+		else if(rows.equals("")){
+			tabData.put( "TOTALROWS", totalRows1);
+		}
+		tabData.put( "LANGUAGEID",getLanguageId());		
+		tabData.put( "TOKEN_SERIES_CODE",this.getTokenSeriesCode());
+		tabData.put( "DISP_LOCN_CODE",this.getDispLocnCode());
+		tabData.put( "PATIENT_ID",(String)recordSet.get("patientid"));
+		tabData.put( "DISP_CASH_COLL_STAGE",getDispCashCollStage());
+		tabData.put( "Ordering_facility_id",this.orderingfacilityid.trim());
+		tabData.put( "Login_disp_locn_code",this.Login_disp_locn_code.trim());
+		ArrayList alSalBinLocationCode = null; //added for KDAH-SCF-0252 [IN:050489]
+        try{
+			/*enc_id =this.getEncounter();
+			if(enc_id.equals("")||enc_id.equals("11111")){
+				 enc_id ="";
+				 enc_patient_class="R";	
+			}
+			else{
+				enc_patient_class       =   getEncounterPatientClass(encounter_id);
+			}*/
+			//tabData.put( "ENCOUNTER_ID",this.getEncounter());
+			//tabData.put( "ENCOUNTER_ID",enc_id);
+			enc_patient_class = getPatientCategory();
+			bl_interface_yn  =   checkforbillinginterface(enc_patient_class); // enc_patient_class added for SRR20056-SCF-7639 ICN027720
+			tabData.put( "PATIENT_CLASS",enc_patient_class);
+
+			connection			= getConnection() ;
+			pstmt_select1	    = connection.prepareStatement(PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_SELECT12"));
+			int selectedRows = 0; // Added for GHL-CRF-0413.8
+			String disp_bill_stage = "";//KAUH-SCF-0320
+			if(eff_status.equals("E")){
+				int totalRows2=Integer.parseInt(totalRows1);
+				int count1 =0;
+				HashMap hmWardRetDetails = new HashMap();
+				HashMap hmWardRetExpDetails = new HashMap();
+				HashMap hmTmpExp =null;
+				//Added for  AMS-SCF-0038 [IN:030868] -Start
+				ArrayList alWardRetDetails = null;
+				String wardRetKey ="", tmpwardRetKey="";
+				boolean recUpdate = false, wardRetKeyFound=false; // wardRetKeyFound added for KDAH-SCF-0252 [IN:050489]
+				int accptQty=0, tmpAccptQty=0;
+				String sAccptQty="",  stmpAccptQty="";
+				//Added for  AMS-SCF-0038 [IN:030868] -End
+				for (int i=1;i<=totalRows2;i++ ){
+					bl_recal_flag="N";//Added for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+					disp_bill_stage = "";//KAUH-SCF-0320
+					disp_bill_stage=getDispLocnBillStage((String)recordSet.get("store_code"+i),(String)recordSet.get("dispno"+i),login_facility_id);//KAUH-SCF-0320
+					if(recordSet.get("barcodeFlag").toString().equals("Y") ){ // If, else condition added for GHL-CRF-0413.8 , if condition for GHL-CRF-0413.8 and else for existing functionality  - Start
+					 if(recordSet.get("check_name"+i).toString().equals("Y")){
+						 selectedRows++; 
+						 datarr	=	new ArrayList();
+						wardRetKeyFound = false; 
+						
+						if(!recordSet.get("AcceptedQty"+i).toString().equals("0"))
+							recUpdate = true;
+						else
+							recUpdate = false;	
+						enc_id = (String)recordSet.get("encounter_id"+i);
+						if(enc_id.equals("")||enc_id.equals("11111")){
+							 enc_id ="";
+							 enc_patient_class="R";
+						}
+					
+						if(!previousEncId.equals(enc_id)){
+							if(bl_interface_yn.equals("Y")){
+								try{
+								getBillingUpdateLock(connection, login_facility_id, (String)tabData.get("PATIENT_ID"), enc_id);
+								}catch(Exception e){
+									map.put( "result", new Boolean( false ) ) ;	
+									map.put( "message", e.getMessage() ) ;
+									throw new Exception();
+									
+								}
+								
+							}
+						}
+						//Adding start for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						 if(EncList.size()>0 && EncList.contains(enc_id) ){
+							 bl_recal_flag="Y";
+						 }else{
+							 bl_recal_flag="N";
+						 }
+							if( bl_recal_flag.equals("N")){
+					                pstmt_blflag = connection.prepareStatement("SELECT BL_CHK_PKG_PAT_RECALC_YN(?,?,?,?,?) RESULT_FLAG from dual");
+									pstmt_blflag.setString(1,"PH");
+									pstmt_blflag.setString(2,login_facility_id);
+									pstmt_blflag.setString(3,(String)recordSet.get("patientid"));
+									pstmt_blflag.setString(4,(String)recordSet.get("doc_type"+i));
+									pstmt_blflag.setString(5,(String)recordSet.get("doc_no"+i)); //drug_class
+									
+									resultSet_blflag = pstmt_blflag.executeQuery() ;
+												
+									if(resultSet_blflag!=null && resultSet_blflag.next()){
+										bl_result =resultSet_blflag.getString("RESULT_FLAG");
+										
+									}
+                               if(bl_result.equals("Y")){
+								   bl_recal_flag="Y";
+									   EncList.add(enc_id);
+									   orig_enc_patient_class  = getEncounterPatientClass(enc_id, (String)recordSet.get("patientid"));
+									   if(EncListGroup.size()>0){
+											String curr_enc=(String)EncListGroup.get(0);
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											  EncListGroup.clear();
+											  EncListGroup.add(curr_enc+"#"+orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+										}else{
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											   EncListGroup.add(orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+											}
+										
+								}
+							}
+						 }
+									closeStatement(pstmt_blflag);
+									closeResultSet(resultSet_blflag);
+								//Adding end for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						previousEncId = enc_id;
+						tabData.put( "PATIENT_CLASS",enc_patient_class);
+						hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+						dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ;
+
+						 if((((String)recordSet.get("acknow_ledg"+i)).equals("A"))||(((String)recordSet.get("acknow_ledg"+i)).equals("R")) ){
+							//datarr	=	new ArrayList();
+							datarr.add((String)recordSet.get("dispno"+i));
+							datarr.add((String)recordSet.get("bin_location_code"+i));
+							datarr.add((String)recordSet.get("srlno"+i));
+							datarr.add((String)recordSet.get("srlnobatch"+i));
+							datarr.add((String)recordSet.get("actualReturn"+i));
+							datarr.add((String)recordSet.get("item_code"+i));
+							datarr.add((String)recordSet.get("acknow_ledg"+i));
+							datarr.add((String)recordSet.get("remarks_desc"+i));
+							datarr.add((String)recordSet.get("return_reason_code"+i));
+							datarr.add((String)recordSet.get("ret_doc_no"+i));
+							datarr.add((String)recordSet.get("ret_doc_line_no"+i));
+							datarr.add((String)recordSet.get("store_code"+i));
+							datarr.add((String)recordSet.get("AcceptedQty"+i));
+							datarr.add((String)recordSet.get("RejectedQty"+i));
+							datarr.add((String)recordSet.get("BalanceQty"+i));
+
+							datarr.add((String)recordSet.get("batch_id"+i));
+							datarr.add((String)recordSet.get("expiry_date"+i));
+							datarr.add((String)recordSet.get("disp_qty"+i));
+							datarr.add((String)recordSet.get("uom_code"+i));
+							datarr.add((String)recordSet.get("modified_date"+i)); 
+							datarr.add(hdrKey); 
+							datarr.add(dtlKey); 
+							datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						    datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+						}
+
+						if(recordSet.get("acknow_ledg"+i).toString().equals("P") && ( !recordSet.get("AcceptedQty"+i).toString().equals("0") || !recordSet.get("RejectedQty"+i).toString().equals("0"))){
+							//datarr	=	new ArrayList();
+							datarr.add((String)recordSet.get("dispno"+i));
+							datarr.add((String)recordSet.get("bin_location_code"+i));
+							datarr.add((String)recordSet.get("srlno"+i));
+							datarr.add((String)recordSet.get("srlnobatch"+i));
+							datarr.add((String)recordSet.get("actualReturn"+i));
+							datarr.add((String)recordSet.get("item_code"+i));
+							datarr.add((String)recordSet.get("acknow_ledg"+i));
+							datarr.add((String)recordSet.get("remarks_desc"+i));
+							datarr.add((String)recordSet.get("return_reason_code"+i));
+							datarr.add((String)recordSet.get("ret_doc_no"+i));
+							datarr.add((String)recordSet.get("ret_doc_line_no"+i));
+							datarr.add((String)recordSet.get("store_code"+i));
+							datarr.add((String)recordSet.get("AcceptedQty"+i));
+							datarr.add((String)recordSet.get("RejectedQty"+i));
+							datarr.add((String)recordSet.get("BalanceQty"+i));
+							
+							datarr.add((String)recordSet.get("batch_id"+i));
+							datarr.add((String)recordSet.get("expiry_date"+i));
+							datarr.add((String)recordSet.get("disp_qty"+i));
+							datarr.add((String)recordSet.get("uom_code"+i));
+							datarr.add((String)recordSet.get("modified_date"+i)); 
+							datarr.add(hdrKey); 
+							datarr.add(dtlKey); 
+							datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						    datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+						}
+						
+						if(recUpdate){
+							wardRetKey = (String)recordSet.get("dispno"+i)+"_"+(String)recordSet.get("srlno"+i)+"_"+(String)recordSet.get("bin_location_code"+i)+"_"+(String)recordSet.get("batch_id"+i)+"_"+(String)recordSet.get("expiry_date"+i); //(String)recordSet.get("srlnobatch"+i)+"_"+ //added for KDAH-SCF-0252 [IN:050489]//batch_id added for AMRI-SCF-0414 [IN:058529] and AMRI-SCF-0378 [IN:055710] // (String)recordSet.get("expiry_date"+i) Added for AMRI-SCF-0538
+							sAccptQty= (String)recordSet.get("AcceptedQty"+i);
+							if(sAccptQty ==null || sAccptQty.equals(""))
+								sAccptQty = "0";
+							accptQty= Integer.parseInt(sAccptQty);
+
+							if(hmWardRetDetails.containsKey(wardRetKey)){
+								alWardRetDetails = (ArrayList)hmWardRetDetails.get(wardRetKey);
+								stmpAccptQty= (String)alWardRetDetails.get(12);
+								if(stmpAccptQty ==null || stmpAccptQty.equals(""))
+									stmpAccptQty = "0";
+								tmpAccptQty= Integer.parseInt(stmpAccptQty)+accptQty;
+								alWardRetDetails.set(12,tmpAccptQty+"");
+							}
+							else
+								alWardRetDetails = new ArrayList(datarr);
+						
+							hmWardRetDetails.put(wardRetKey, alWardRetDetails);
+						}		
+
+						tabData.put("RECORD"+selectedRows,datarr); 
+						count1++;
+						if(eff_status.equals("E")&&(((String)recordSet.get("acknow_ledg"+i)).equals("A"))||(((String)recordSet.get("acknow_ledg"+i)).equals("P"))) {
+						 // Header Detail
+							if(hmHeader.size()==0 || !hmHeader.containsKey(hdrKey)){ 
+								hmHeader_dtls	=	new HashMap();
+								hmHeader_dtls.put("facility_id",login_facility_id);
+								hmHeader_dtls.put("doc_type_code",this.getStockDocType());   
+								hmHeader_dtls.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));//Added for KDAH-SCF-0452
+								hmHeader_dtls.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+								hmHeader_dtls.put("doc_date",getCurrDate());
+								hmHeader_dtls.put("doc_ref","");
+								hmHeader_dtls.put("store_code",(String)recordSet.get("store_code"+i));
+								hmHeader_dtls.put("patient_id",(String)recordSet.get("patientid"));
+								hmHeader_dtls.put("encounter_id",enc_id);
+								hmHeader_dtls.put("finalized_yn","Y");
+								hmHeader_dtls.put("gl_interfaced_yn","N");
+								hmHeader_dtls.put("trn_type","SRT");
+								hmHeader_dtls.put("remarks","");				
+								hmHeader_dtls.put("item_class_code","");
+								hmHeader_dtls.put("module_id","PH");
+								tabData.put( "STORE_CODE",(String)recordSet.get("store_code"+i));	   
+									hmHeader_dtls.put("billable_trn_yn",bl_interface_yn);
+									hmHeader_dtls.put("sal_trn_type",enc_patient_class);
+								dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);
+								if(dis_charge_ind.equals("D"))
+									take_home_yn="Y";
+								else
+									take_home_yn="N";
+								hmHeader_dtls.put("take_home_yn",take_home_yn);	
+								hmHeader.put(hdrKey, hmHeader_dtls); 
+							}
+							// Item Detail
+							if(hmDtlGrp.size()==0 || !hmDtlGrp.containsKey(dtlKey)){ 
+								hmDetail		=	new HashMap();
+								
+								hmDetail.put("dtlKey",dtlKey);
+								hmDetail.put("facility_id",login_facility_id);
+								hmDetail.put("doc_type_code",this.getStockDocType());  
+								hmDetail.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+								hmDetail.put("item_code", (String)recordSet.get("item_code"+i));
+								hmDetail.put("stock_item_yn","Y");   
+								BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+								hmDetail.put("item_qty",(String)BaseAndIssueUOMQty.get("ISSUE_QTY"));
+								hmDetail.put("mm_trn_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+								hmDetail.put("uom_code",CommonBean.checkForNull((String)recordSet.get("uom_code"+i))); 
+								hmDetail.put("remarks","");
+								hmDetail.put("sales_doc_type_code",(String)recordSet.get("doc_type"+i));
+								hmDetail.put("sal_doc_no",(String)recordSet.get("doc_no"+i)); 
+								hmDetail.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i)); 
+								hmDetail.put("sal_facility_id",login_facility_id);
+								hmDetail.put("FACILITY_STR_FOR_BL",login_facility_id+"|"+(String)tabData.get( "FACILITY_ID" ));
+								hmDetail.put("disp_bill_stage",disp_bill_stage); //added for KAUH-SCF-0320
+								dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);
+								if(dis_charge_ind.equals("D"))
+									take_home_yn="Y";
+								else
+									take_home_yn="N";
+								hmDetail.put("take_home_yn",take_home_yn);
+				 
+								if(bl_interface_yn.equals("Y") && datarr!=null && datarr.size()>0){
+									pstmt_select1.setString(1,(String)datarr.get(0));
+									pstmt_select1.setString(2,(String)datarr.get(2));
+									pstmt_select1.setString(3,(String)tabData.get( "FACILITY_ID" ));
+									rset	=	pstmt_select1.executeQuery();
+									if(rset.next()){
+										hmDetail.put("p_overridden_excl_incl_ind",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_VALUE")));
+										hmDetail.put("p_overridden_action_reason",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_REASON")));
+									} 
+									closeResultSet( rset );				
+								}
+								hmDtlGrp.put(dtlKey, hmDetail);
+								if(hmhdrDtlKeyMap.size()==0 || !hmhdrDtlKeyMap.containsKey(hdrKey)){
+									dtlKeyList = new ArrayList();
+									dtlKeyList.add(dtlKey);
+									hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+								}
+								else{
+									dtlKeyList = new ArrayList((ArrayList)hmhdrDtlKeyMap.get(hdrKey));
+									dtlKeyList.add(dtlKey);
+									hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+								}
+							}
+							else{
+								hmDetail = (HashMap)hmDtlGrp.get(dtlKey);
+								BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+								tot_item_qty = Float.parseFloat(hmDetail.get("item_qty")==null?"0":(String)hmDetail.get("item_qty"));
+								mm_trn_qty = Float.parseFloat(hmDetail.get("mm_trn_qty")==null?"0":(String)hmDetail.get("mm_trn_qty"));
+								tot_item_qty += Float.parseFloat((BaseAndIssueUOMQty.get("ISSUE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("ISSUE_QTY")));
+								mm_trn_qty += Float.parseFloat((BaseAndIssueUOMQty.get("BASE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("BASE_QTY")));
+								hmDetail.put("item_qty",tot_item_qty+"");
+								hmDetail.put("mm_trn_qty", mm_trn_qty+"");
+								hmDtlGrp.put(dtlKey, hmDetail);
+							}
+							accptQty =0;
+							if(hmWardRetExpDetails.containsKey(wardRetKey)){
+								hmExp = new HashMap((HashMap)hmWardRetExpDetails.get(wardRetKey));
+								accptQty = Integer.parseInt((String)hmExp.get("ret_item_qty"));
+								alSalBinLocationCode = (ArrayList)hmExp.get("sal_bin_location_code");
+							}
+							else{
+								hmExp			=	new HashMap();
+								alSalBinLocationCode = new ArrayList();
+							}
+							alSalBinLocationCode.add((String)recordSet.get("sal_bin_location_code"+i));
+							alSalBinLocationCode.add((String)BaseAndIssueUOMQty.get("BASE_QTY"));
+							hmExp.put("facility_id",login_facility_id);
+							hmExp.put("doc_type_code",this.getStockDocType());
+							hmExp.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							hmExp.put("store_code", (String)recordSet.get("store_code"+i));
+							hmExp.put("item_code", (String)recordSet.get("item_code"+i));
+							hmExp.put("batch_id",(String)recordSet.get("batch_id"+i));
+							hmExp.put("trade_id",(String)recordSet.get("trade_id"+i));
+							hmExp.put("sal_bin_location_code",alSalBinLocationCode); 
+							hmExp.put("bin_location_code",(String)recordSet.get("bin_location_code"+i));
+							hmExp.put("expiry_date_or_receipt_date",(String)recordSet.get("expiry_date"+i));
+							accptQty +=Integer.parseInt((String)BaseAndIssueUOMQty.get("BASE_QTY"));
+							hmExp.put("ret_item_qty",accptQty+"");
+							hmExp.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));
+							hmExp.put("sal_doc_no",(String)recordSet.get("doc_no"+i));
+							hmExp.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i));  
+							hmExp.put("WARDRETKEY",wardRetKey); 
+							hmWardRetExpDetails.put(wardRetKey,hmExp); 
+							hmExp.put("sal_facility_id",login_facility_id);
+							
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmDetail.put("take_home_yn",take_home_yn);	
+							if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){
+								insertExp = new ArrayList();
+								insertExp.add(hmExp);
+								hmExpGrp.put(dtlKey, insertExp);
+							}
+							else{
+								insertExp = new ArrayList((ArrayList)hmExpGrp.get(dtlKey));
+								int expindx=0;
+								for(expindx=0; expindx < insertExp.size(); expindx++){
+									hmTmpExp =(HashMap)insertExp.get(expindx);
+									tmpwardRetKey =(String)hmTmpExp.get("WARDRETKEY");
+									if(wardRetKey.equals(tmpwardRetKey)){
+										wardRetKeyFound = true; 
+										break;
+									}
+								}
+								if(wardRetKeyFound)
+									insertExp.set(expindx, hmExp);
+								else
+									insertExp.add(hmExp);
+									
+								hmExpGrp.put(dtlKey, insertExp);
+								wardRetKeyFound = false;
+							}
+						} //END IF 
+				//	}
+				 }
+				else{
+					datarr	=	new ArrayList();
+					wardRetKeyFound = false; //added for KDAH-SCF-0252 [IN:050489]
+					
+					if(!recordSet.get("AcceptedQty"+i).toString().equals("0"))//Added for  AMS-SCF-0038 [IN:030868] -Start
+						recUpdate = true;
+					else
+						recUpdate = false;	//Added AMS-SCF-0038 [IN:030868] - End
+					enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979 //moved from down for AMRI-SCF-0376 [IN:055578] -start
+					if(enc_id.equals("")||enc_id.equals("11111")){
+						 enc_id ="";
+						 enc_patient_class="R";
+					}
+				
+					if(!previousEncId.equals(enc_id)){
+						if(bl_interface_yn.equals("Y")){// added for KDAH-SCF-0322
+							try{
+							getBillingUpdateLock(connection, login_facility_id, (String)tabData.get("PATIENT_ID"), enc_id);
+							}catch(Exception e){
+								map.put( "result", new Boolean( false ) ) ;	
+								map.put( "message", e.getMessage() ) ;
+								throw new Exception();
+								
+							}
+							
+						}
+					}
+					//Adding start for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						if(EncList.size()>0 && EncList.contains(enc_id) ){
+							 bl_recal_flag="Y";
+						 }else{
+							 bl_recal_flag="N";
+						 }
+							if( bl_recal_flag.equals("N")){
+					                pstmt_blflag = connection.prepareStatement("SELECT BL_CHK_PKG_PAT_RECALC_YN(?,?,?,?,?) RESULT_FLAG from dual");
+									pstmt_blflag.setString(1,"PH");
+									pstmt_blflag.setString(2,login_facility_id);
+									pstmt_blflag.setString(3,(String)recordSet.get("patientid"));
+									pstmt_blflag.setString(4,(String)recordSet.get("doc_type"+i));
+									pstmt_blflag.setString(5,(String)recordSet.get("doc_no"+i)); //drug_class
+									
+									resultSet_blflag = pstmt_blflag.executeQuery() ;
+												
+									if(resultSet_blflag!=null && resultSet_blflag.next()){
+										bl_result =resultSet_blflag.getString("RESULT_FLAG");
+										
+									}
+                               if(bl_result.equals("Y")){
+								   bl_recal_flag="Y";
+									   EncList.add(enc_id);
+									   orig_enc_patient_class  = getEncounterPatientClass(enc_id, (String)recordSet.get("patientid"));
+									   if(EncListGroup.size()>0){
+											String curr_enc=(String)EncListGroup.get(0);
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											  EncListGroup.clear();
+											  EncListGroup.add(curr_enc+"#"+orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+										}else{
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											   EncListGroup.add(orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+											}
+										
+								}
+						 }
+									closeStatement(pstmt_blflag);
+									closeResultSet(resultSet_blflag);
+									//Adding end for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+					 
+					previousEncId = enc_id;
+					tabData.put( "PATIENT_CLASS",enc_patient_class);
+					hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+					dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ;//moved from down for AMRI-SCF-0376 [IN:055578] -end
+
+					 if((((String)recordSet.get("acknow_ledg"+i)).equals("A"))||(((String)recordSet.get("acknow_ledg"+i)).equals("R")) ){
+						//datarr	=	new ArrayList();
+						datarr.add((String)recordSet.get("dispno"+i));
+						datarr.add((String)recordSet.get("bin_location_code"+i));
+						datarr.add((String)recordSet.get("srlno"+i));
+						datarr.add((String)recordSet.get("srlnobatch"+i));
+						datarr.add((String)recordSet.get("actualReturn"+i));
+						datarr.add((String)recordSet.get("item_code"+i));
+						datarr.add((String)recordSet.get("acknow_ledg"+i));
+						datarr.add((String)recordSet.get("remarks_desc"+i));
+						datarr.add((String)recordSet.get("return_reason_code"+i));
+						datarr.add((String)recordSet.get("ret_doc_no"+i));
+						datarr.add((String)recordSet.get("ret_doc_line_no"+i));
+						datarr.add((String)recordSet.get("store_code"+i));
+						datarr.add((String)recordSet.get("AcceptedQty"+i));
+						datarr.add((String)recordSet.get("RejectedQty"+i));
+						datarr.add((String)recordSet.get("BalanceQty"+i));
+
+						datarr.add((String)recordSet.get("batch_id"+i));
+						datarr.add((String)recordSet.get("expiry_date"+i));
+						datarr.add((String)recordSet.get("disp_qty"+i));
+						datarr.add((String)recordSet.get("uom_code"+i));
+						datarr.add((String)recordSet.get("modified_date"+i)); //added for SKR-SCF-0393 [IN:030939] //19
+						datarr.add(hdrKey); //added for AMRI-SCF-0376 [IN:055578] //20
+						datarr.add(dtlKey); //added for AMRI-SCF-0376 [IN:055578] //21
+						datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+					}
+
+					if(recordSet.get("acknow_ledg"+i).toString().equals("P") && ( !recordSet.get("AcceptedQty"+i).toString().equals("0") || !recordSet.get("RejectedQty"+i).toString().equals("0"))){
+						//datarr	=	new ArrayList();
+						datarr.add((String)recordSet.get("dispno"+i));
+						datarr.add((String)recordSet.get("bin_location_code"+i));
+						datarr.add((String)recordSet.get("srlno"+i));
+						datarr.add((String)recordSet.get("srlnobatch"+i));
+						datarr.add((String)recordSet.get("actualReturn"+i));
+						datarr.add((String)recordSet.get("item_code"+i));
+						datarr.add((String)recordSet.get("acknow_ledg"+i));
+						datarr.add((String)recordSet.get("remarks_desc"+i));
+						datarr.add((String)recordSet.get("return_reason_code"+i));
+						datarr.add((String)recordSet.get("ret_doc_no"+i));
+						datarr.add((String)recordSet.get("ret_doc_line_no"+i));
+						datarr.add((String)recordSet.get("store_code"+i));
+						datarr.add((String)recordSet.get("AcceptedQty"+i));
+						datarr.add((String)recordSet.get("RejectedQty"+i));
+						datarr.add((String)recordSet.get("BalanceQty"+i));
+						
+						datarr.add((String)recordSet.get("batch_id"+i));
+						datarr.add((String)recordSet.get("expiry_date"+i));
+						datarr.add((String)recordSet.get("disp_qty"+i));
+						datarr.add((String)recordSet.get("uom_code"+i));
+						datarr.add((String)recordSet.get("modified_date"+i)); //added for SKR-SCF-0393 [IN:030939]
+						datarr.add(hdrKey); //added for AMRI-SCF-0376 [IN:055578] //20
+						datarr.add(dtlKey); //added for AMRI-SCF-0376 [IN:055578] //21
+						datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+					}
+					
+					if(recUpdate){//Added for AMS-SCF-0038 [IN:030868] -Start
+						wardRetKey = (String)recordSet.get("dispno"+i)+"_"+(String)recordSet.get("srlno"+i)+"_"+(String)recordSet.get("bin_location_code"+i)+"_"+(String)recordSet.get("batch_id"+i)+"_"+(String)recordSet.get("expiry_date"+i); //(String)recordSet.get("srlnobatch"+i)+"_"+ //added for KDAH-SCF-0252 [IN:050489]//batch_id added for AMRI-SCF-0414 [IN:058529] and AMRI-SCF-0378 [IN:055710] // +"_"+(String)recordSet.get("expiry_date"+i) Added for AMRI-SCF-0538
+						sAccptQty= (String)recordSet.get("AcceptedQty"+i);
+						if(sAccptQty ==null || sAccptQty.equals(""))
+							sAccptQty = "0";
+						accptQty= Integer.parseInt(sAccptQty);
+
+						if(hmWardRetDetails.containsKey(wardRetKey)){
+							alWardRetDetails = (ArrayList)hmWardRetDetails.get(wardRetKey);
+							stmpAccptQty= (String)alWardRetDetails.get(12);
+							if(stmpAccptQty ==null || stmpAccptQty.equals(""))
+								stmpAccptQty = "0";
+							tmpAccptQty= Integer.parseInt(stmpAccptQty)+accptQty;
+							alWardRetDetails.set(12,tmpAccptQty+"");
+						}
+						else
+							alWardRetDetails = new ArrayList(datarr);
+					
+						hmWardRetDetails.put(wardRetKey, alWardRetDetails);
+					}		//Added for AMS-SCF-0038 [IN:030868] -End
+
+					tabData.put("RECORD"+i,datarr);
+					count1++;
+					/*enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+					if(enc_id.equals("")||enc_id.equals("11111")){
+						 enc_id ="";
+						 enc_patient_class="R";
+					}
+					tabData.put( "PATIENT_CLASS",enc_patient_class);
+					hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+					dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ;*///move to above for AMRI-SCF-0376 [IN:055578]
+					if(eff_status.equals("E")&&(((String)recordSet.get("acknow_ledg"+i)).equals("A"))||(((String)recordSet.get("acknow_ledg"+i)).equals("P"))) {
+					 // Header Detail
+						if(hmHeader.size()==0 || !hmHeader.containsKey(hdrKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmHeader_dtls	=	new HashMap();
+							hmHeader_dtls.put("facility_id",login_facility_id);
+							hmHeader_dtls.put("doc_type_code",this.getStockDocType()); //uncommented to get return doc type 
+							hmHeader_dtls.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i)); //Uncommented  for KDAH-SCF-0452
+							hmHeader_dtls.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							hmHeader_dtls.put("doc_date",getCurrDate());
+							hmHeader_dtls.put("doc_ref","");
+							hmHeader_dtls.put("store_code",(String)recordSet.get("store_code"+i));
+							hmHeader_dtls.put("patient_id",(String)recordSet.get("patientid"));
+							//hmHeader.put("encounter_id",this.getEncounter());
+							hmHeader_dtls.put("encounter_id",enc_id);
+							hmHeader_dtls.put("finalized_yn","Y");
+							hmHeader_dtls.put("gl_interfaced_yn","N");
+							hmHeader_dtls.put("trn_type","SRT");
+							hmHeader_dtls.put("remarks","");				
+							hmHeader_dtls.put("item_class_code","");
+							hmHeader_dtls.put("module_id","PH");
+							tabData.put( "STORE_CODE",(String)recordSet.get("store_code"+i));	   
+						  // if(bl_interface_yn.equals("Y")){
+								hmHeader_dtls.put("billable_trn_yn",bl_interface_yn);
+								hmHeader_dtls.put("sal_trn_type",enc_patient_class);
+						  // }
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);//added for [IN:045323] MMS BETA ADHOC Testing -start
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmHeader_dtls.put("take_home_yn",take_home_yn);	//added for [IN:045323] MMS BETA ADHOC Testing -end
+							hmHeader.put(hdrKey, hmHeader_dtls); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						}
+						// Item Detail
+						if(hmDtlGrp.size()==0 || !hmDtlGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmDetail		=	new HashMap();
+							//insertDetail	=	new ArrayList();
+							hmDetail.put("dtlKey",dtlKey); //added for AMRI-SCF-0376 [IN:055578]
+							hmDetail.put("facility_id",login_facility_id);
+							hmDetail.put("doc_type_code",this.getStockDocType()); // (String)recordSet.get("doc_type"+i) 
+							hmDetail.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							//hmDetail.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));
+							//hmDetail.put("doc_srl_no",count1+"");
+							hmDetail.put("item_code", (String)recordSet.get("item_code"+i));
+							hmDetail.put("stock_item_yn","Y");   
+							BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+							hmDetail.put("item_qty",(String)BaseAndIssueUOMQty.get("ISSUE_QTY"));
+							hmDetail.put("mm_trn_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+							//hmDetail.put("item_qty",(String)recordSet.get("actualReturn"+i));
+							hmDetail.put("uom_code",CommonBean.checkForNull((String)recordSet.get("uom_code"+i))); 
+							hmDetail.put("remarks","");
+							hmDetail.put("sales_doc_type_code",(String)recordSet.get("doc_type"+i));
+							hmDetail.put("sal_doc_no",(String)recordSet.get("doc_no"+i)); 
+							hmDetail.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i)); 
+							hmDetail.put("sal_facility_id",login_facility_id);//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+							hmDetail.put("FACILITY_STR_FOR_BL",login_facility_id+"|"+(String)tabData.get( "FACILITY_ID" )); //this.orderingfacilityid.trim() changed to login_facility_id
+							hmDetail.put("disp_bill_stage",disp_bill_stage); //added for KAUH-SCF-0320
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmDetail.put("take_home_yn",take_home_yn);	// addeding end for skr-scf-0591
+			 
+							if(bl_interface_yn.equals("Y") && datarr!=null && datarr.size()>0){
+								pstmt_select1.setString(1,(String)datarr.get(0));
+								pstmt_select1.setString(2,(String)datarr.get(2));
+								pstmt_select1.setString(3,(String)tabData.get( "FACILITY_ID" ));
+								rset	=	pstmt_select1.executeQuery();
+								if(rset.next()){
+									hmDetail.put("p_overridden_excl_incl_ind",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_VALUE")));
+									hmDetail.put("p_overridden_action_reason",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_REASON")));
+								} 
+								closeResultSet( rset );				
+							}
+							hmDtlGrp.put(dtlKey, hmDetail); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							//dtlKeyList.add(dtlKey);
+						//insertDetail.add(hmDetail);
+						// added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							/*if(hmDtlGrp.size()>0 || !hmDtlGrp.containsKey(dtlKey)){
+								insertDetail = new ArrayList();
+								insertDetail.add(hmDetail);
+								hmDtlGrp.put(dtlKey, insertDetail);
+							}
+							else{
+								insertDetail = new ArrayList((ArrayList)hmDtlGrp.get(dtlKey));
+								insertDetail.add(hmDetail);
+								hmDtlGrp.put(dtlKey, insertDetail);
+							}*/
+							//dtlKeyList.add(dtlKey);
+							if(hmhdrDtlKeyMap.size()==0 || !hmhdrDtlKeyMap.containsKey(hdrKey)){
+								dtlKeyList = new ArrayList();
+								dtlKeyList.add(dtlKey);
+								hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+							}
+							else{
+								dtlKeyList = new ArrayList((ArrayList)hmhdrDtlKeyMap.get(hdrKey));
+								dtlKeyList.add(dtlKey);
+								hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+							}
+						}
+						else{
+							hmDetail = (HashMap)hmDtlGrp.get(dtlKey);
+							//hmDetail = (HashMap)insertDetail.get(0);
+							BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+							tot_item_qty = Float.parseFloat(hmDetail.get("item_qty")==null?"0":(String)hmDetail.get("item_qty"));
+							mm_trn_qty = Float.parseFloat(hmDetail.get("mm_trn_qty")==null?"0":(String)hmDetail.get("mm_trn_qty"));
+							tot_item_qty += Float.parseFloat((BaseAndIssueUOMQty.get("ISSUE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("ISSUE_QTY")));
+							mm_trn_qty += Float.parseFloat((BaseAndIssueUOMQty.get("BASE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("BASE_QTY")));
+							hmDetail.put("item_qty",tot_item_qty+"");
+							hmDetail.put("mm_trn_qty", mm_trn_qty+"");
+							hmDtlGrp.put(dtlKey, hmDetail);
+						}
+						//if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						accptQty =0;
+						if(hmWardRetExpDetails.containsKey(wardRetKey)){
+							hmExp = new HashMap((HashMap)hmWardRetExpDetails.get(wardRetKey));
+							accptQty = Integer.parseInt((String)hmExp.get("ret_item_qty"));
+							alSalBinLocationCode = (ArrayList)hmExp.get("sal_bin_location_code");//added for KDAH-SCF-0252 [IN:050489]
+						}
+						else{
+							hmExp			=	new HashMap();
+							alSalBinLocationCode = new ArrayList(); //added for KDAH-SCF-0252 [IN:050489]
+						}
+						alSalBinLocationCode.add((String)recordSet.get("sal_bin_location_code"+i));//added for KDAH-SCF-0252 [IN:050489]
+						alSalBinLocationCode.add((String)BaseAndIssueUOMQty.get("BASE_QTY"));//added for KDAH-SCF-0252 [IN:050489]
+						//insertExp		=	new ArrayList();
+						hmExp.put("facility_id",login_facility_id);
+						hmExp.put("doc_type_code",this.getStockDocType());//(String)recordSet.get("doc_type"+i)
+						hmExp.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+						//hmExp.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));		
+						//hmExp.put("doc_srl_no",count1+"");
+						hmExp.put("store_code", (String)recordSet.get("store_code"+i));
+						hmExp.put("item_code", (String)recordSet.get("item_code"+i));
+						hmExp.put("batch_id",(String)recordSet.get("batch_id"+i));
+						hmExp.put("trade_id",(String)recordSet.get("trade_id"+i));
+						//hmExp.put("sal_bin_location_code",(String)recordSet.get("sal_bin_location_code"+i)); //Commented for KDAH-SCF-0252 [IN:050489]
+						hmExp.put("sal_bin_location_code",alSalBinLocationCode); //added for KDAH-SCF-0252 [IN:050489]
+						hmExp.put("bin_location_code",(String)recordSet.get("bin_location_code"+i));
+						hmExp.put("expiry_date_or_receipt_date",(String)recordSet.get("expiry_date"+i));
+						//BaseAndIssueUOMQty = (HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+						accptQty +=Integer.parseInt((String)BaseAndIssueUOMQty.get("BASE_QTY"));
+						hmExp.put("ret_item_qty",accptQty+"");
+						//hmExp.put("ret_item_qty",(String)recordSet.get("actualReturn"+i));
+						hmExp.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));
+						hmExp.put("sal_doc_no",(String)recordSet.get("doc_no"+i));
+						hmExp.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i));  //Added for SKR-SCF-0625 [35212]
+						hmExp.put("WARDRETKEY",wardRetKey); //Added for AMS-SCF-0038 [IN:030868]
+						hmWardRetExpDetails.put(wardRetKey,hmExp); //Added for AMS-SCF-0038 [IN:030868]
+						hmExp.put("sal_facility_id",login_facility_id);//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+						
+						dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+						if(dis_charge_ind.equals("D"))
+							take_home_yn="Y";
+						else
+							take_home_yn="N";
+						hmDetail.put("take_home_yn",take_home_yn);	// addeding end for skr-scf-0591
+						//insertExp.add(hmExp);
+						//hmExpGrp.put(dtlKey, hmExp); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						//}
+						if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){
+							insertExp = new ArrayList();
+							insertExp.add(hmExp);
+							hmExpGrp.put(dtlKey, insertExp);
+						}
+						else{
+							insertExp = new ArrayList((ArrayList)hmExpGrp.get(dtlKey));
+							int expindx=0;
+							for(expindx=0; expindx < insertExp.size(); expindx++){
+								hmTmpExp =(HashMap)insertExp.get(expindx);
+								//Added for  AMS-SCF-0038 [IN:030868] -Start
+								tmpwardRetKey =(String)hmTmpExp.get("WARDRETKEY");
+								if(wardRetKey.equals(tmpwardRetKey)){
+									wardRetKeyFound = true; //added for KDAH-SCF-0252 [IN:050489]
+									break;
+								}//Added for  AMS-SCF-0038 [IN:030868] -End
+							}
+							if(wardRetKeyFound)//added for KDAH-SCF-0252 [IN:050489]
+								insertExp.set(expindx, hmExp);
+							else
+								insertExp.add(hmExp);
+								
+							hmExpGrp.put(dtlKey, insertExp);
+							wardRetKeyFound = false; //added for KDAH-SCF-0252 [IN:050489]
+						}
+					} //END IF 
+				 } // If, else condition added for GHL-CRF-0413.8 , if condition for GHL-CRF-0413.8 and else for existing functionality - End
+				} //END FOR LOOP
+				hdrKeyList = new ArrayList(hmHeader.keySet());
+				for(int encCount=0; encCount<hdrKeyList.size(); encCount++){ //ENCOUNTER BASED HEADER FOR LOOP added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+					hdrKey = (String) hdrKeyList.get(encCount);
+					//insertDetail = new ArrayList();
+					tmpInsertExp = new ArrayList();
+					dtlKeyList = (ArrayList)hmhdrDtlKeyMap.get(hdrKey);
+					for(int dtlindx=0; dtlindx < dtlKeyList.size(); dtlindx++){
+						hmDetail = new HashMap();
+						hmExp = new HashMap();
+						hmDetail = (HashMap)hmDtlGrp.get(dtlKeyList.get(dtlindx));
+						tmpInsertExp = (ArrayList)hmExpGrp.get(dtlKeyList.get(dtlindx));
+						hmDetail.put("doc_srl_no",(dtlindx+1)+"");
+						//hmExp.put("doc_srl_no",(dtlindx+1)+"");
+					/*	for(int i=0; i < insertDetail.size();i++){
+							hmDetail = new HashMap();
+							hmDetail= (HashMap)insertDetail.get(i);
+							hmDetail.put("doc_srl_no",(dtlindx+1)+"");
+							//insertDetail.add(hmDetail);
+						}*/
+						for(int i=0;i< tmpInsertExp.size(); i++){
+							hmExp = new HashMap();
+							hmExp = (HashMap)tmpInsertExp.get(i);
+							hmExp.put("doc_srl_no",(dtlindx+1)+"");
+							//insertExp.set(i,hmExp);
+							if(insertExpGrp.size()==0 || !insertExpGrp.containsKey(hdrKey)){
+								insertExp = new ArrayList();
+								insertExp.add(hmExp);
+								insertExpGrp.put(hdrKey, insertExp);
+							}
+							else{
+								insertExp = new ArrayList((ArrayList)insertExpGrp.get(hdrKey));
+								insertExp.add(hmExp);
+								insertExpGrp.put(hdrKey, insertExp);
+							}
+						}
+					//}
+						if(insertDetailGrp.size()==0 || !insertDetailGrp.containsKey(hdrKey)){
+							insertDetail = new ArrayList();
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(hdrKey, insertDetail);
+						}
+						else{
+							insertDetail = new ArrayList((ArrayList)insertDetailGrp.get(hdrKey));
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(hdrKey, insertDetail);
+						}
+					}	
+				}
+				tot_values.add(hmHeader);
+				tot_values.add(insertDetailGrp);
+				tot_values.add(insertExpGrp);
+				tabData.put( "STOCK_VALS", tot_values);
+				tabData.put( "WARDRETDETAILS", hmWardRetDetails);
+				tabData.put( "ENCLISTGROUP", EncListGroup);//Added for KDAH-SCF-0452
+			}//END IF
+			if(eff_status.equals("D")){
+				int totalrows=Integer.parseInt(rows);
+				int count =0;
+				
+				ArrayList retMedRestr = getDischargeStage(login_facility_id, (String)recordSet.get("encounter_id"+"1"),(String)recordSet.get("patientid"));  // Added for GHL-CRF-0412.3 -Start
+					
+				if(retMedRestr!=null && retMedRestr.size()>0){
+					if(retMedRestr.size()>2){
+		              if(retMedRestr.get(2).equals("I") && ((retMedRestr.get(0).equals("Y") || retMedRestr.get(1).equals("7"))))
+	          	         retMedRestrStage=true;
+	                  else if(retMedRestr.get(2).equals("P") && (retMedRestr.get(1).equals("7")))
+	          	         retMedRestrStage=true;
+					}
+	           else if(retMedRestr.get(0).equals("08") && (retMedRestr.get(1).equals("I")|| retMedRestr.get(1).equals("P") || retMedRestr.get(1).equals("D")))
+	          	  retMedRestrStage=true;	
+				}
+	        	 
+				if(retMedRestrStage){
+						map.put( "result", new Boolean( false ) ) ;	
+						map.put( "message", getMessage(getLanguageId(),"CANNOT_RETURN","PH"));
+						throw new Exception();		
+				}   // Added for GHL-CRF-0412.3 - End
+				for (int i=1;i<=totalrows ;i++ ){
+						disp_bill_stage = "";//KAUH-SCF-0320
+					disp_bill_stage=getDispLocnBillStage((String)recordSet.get("store_code"+i),(String)recordSet.get("dispno"+i),login_facility_id);//KAUH-SCF-0320
+					if(recordSet.get("barcodeFlag").toString().equals("Y") ){ // If, else condition added for GHL-CRF-0413.8 , if condition for GHL-CRF-0413.8 and else for existing functionality  - Start
+						if(recordSet.get("check_return_name"+i).toString().equals("Y") ){ // If, else condition added for GHL-CRF-0413.8 , if condition for GHL-CRF-0413.8 and else for existing functionality  - Start
+							 selectedRows++; 
+							enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979 //moved from down for AMRI-SCF-0376 [IN:055578]  -start
+					if(enc_id.equals("")||enc_id.equals("11111")){
+						 enc_id ="";
+						 enc_patient_class="R";
+					}
+					if(!previousEncId.equals(enc_id)){
+						if(bl_interface_yn.equals("Y")){// added for KDAH-SCF-0322
+							try{
+							getBillingUpdateLock(connection, login_facility_id, (String)tabData.get("PATIENT_ID"), enc_id);
+							}catch(Exception e){
+								map.put( "result", new Boolean( false ) ) ;	
+								map.put( "message", e.getMessage() ) ;
+								throw new Exception();
+								
+							}
+							
+						}
+					}
+					//Adding start for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						 if(EncList.size()>0 && EncList.contains(enc_id) ){
+							 bl_recal_flag="Y";
+						 }else{
+							 bl_recal_flag="N";
+						 }
+							if( bl_recal_flag.equals("N")){
+							
+					                pstmt_blflag = connection.prepareStatement("SELECT BL_CHK_PKG_PAT_RECALC_YN(?,?,?,?,?) RESULT_FLAG from dual");
+									pstmt_blflag.setString(1,"PH");
+									pstmt_blflag.setString(2,login_facility_id);
+									pstmt_blflag.setString(3,(String)recordSet.get("patientid"));
+									pstmt_blflag.setString(4,(String)recordSet.get("doc_type"+i));
+									pstmt_blflag.setString(5,(String)recordSet.get("doc_no"+i)); //drug_class
+									
+									resultSet_blflag = pstmt_blflag.executeQuery() ;
+												
+									if(resultSet_blflag!=null && resultSet_blflag.next()){
+										bl_result =resultSet_blflag.getString("RESULT_FLAG");
+										
+									}
+                               if(bl_result.equals("Y")){
+								   bl_recal_flag="Y";
+									   EncList.add(enc_id);
+									   orig_enc_patient_class  = getEncounterPatientClass(enc_id, (String)recordSet.get("patientid"));
+									   if(EncListGroup.size()>0){
+											String curr_enc=(String)EncListGroup.get(0);
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											  EncListGroup.clear();
+											  EncListGroup.add(curr_enc+"#"+orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+										}else{
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											   EncListGroup.add(orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+											}
+										
+								}
+						 }
+									closeStatement(pstmt_blflag);
+									closeResultSet(resultSet_blflag);
+									//Adding end for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						
+					previousEncId = enc_id;
+					tabData.put( "PATIENT_CLASS",enc_patient_class);
+					hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+					dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ; //moved from down for AMRI-SCF-0376 [IN:055578]  -end
+					datarr	=	new ArrayList();
+					if( !((String)recordSet.get("actualReturn"+i)).equals("") && !((String)recordSet.get("actualReturn"+i)).equals("0") ) {
+						datarr.add((String)recordSet.get("dispno"+i)); //0
+						datarr.add((String)recordSet.get("bin_location_code"+i));
+						datarr.add((String)recordSet.get("srlno"+i));
+						datarr.add((String)recordSet.get("srlnobatch"+i));
+						datarr.add((String)recordSet.get("actualReturn"+i));
+						datarr.add((String)recordSet.get("item_code"+i));
+						datarr.add((String)recordSet.get("store_code"+i));
+						
+						datarr.add((String)recordSet.get("batch_id"+i));
+						datarr.add((String)recordSet.get("expiry_date"+i));
+						datarr.add((String)recordSet.get("disp_qty"+i));
+						datarr.add((String)recordSet.get("uom_code"+i));
+						datarr.add((String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+						datarr.add(hdrKey); //added for AMRI-SCF-0376 [IN:055578] //12
+						datarr.add(dtlKey); //added for AMRI-SCF-0376 [IN:055578] //13
+						datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+				
+						tabData.put("RECORD"+selectedRows,datarr); 
+						count++;
+						/*enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						if(enc_id.equals("")||enc_id.equals("11111")){
+							 enc_id ="";
+							 enc_patient_class="R";
+						}
+						tabData.put( "PATIENT_CLASS",enc_patient_class);
+						hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+						dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ;*/
+						// Header Detail
+						if(hmHeader.size()==0 || !hmHeader.containsKey(hdrKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmHeader_dtls	=	new HashMap();
+							hmHeader_dtls.put("facility_id",login_facility_id);
+							hmHeader_dtls.put("doc_type_code",this.getStockDocType());
+							hmHeader_dtls.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));//Added for KDAH-SCF-0452
+							hmHeader_dtls.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							hmHeader_dtls.put("doc_date",getCurrDate());
+							hmHeader_dtls.put("doc_ref","");
+							hmHeader_dtls.put("store_code",(String)recordSet.get("store_code"+i));
+							hmHeader_dtls.put("patient_id",(String)recordSet.get("patientid"));
+							//hmHeader_dtls.put("encounter_id",this.getEncounter());
+							hmHeader_dtls.put("encounter_id",enc_id);
+							hmHeader_dtls.put("finalized_yn","Y");
+							hmHeader_dtls.put("gl_interfaced_yn","N");
+							hmHeader_dtls.put("trn_type","SRT");
+							hmHeader_dtls.put("remarks","");				
+							hmHeader_dtls.put("item_class_code","");
+							hmHeader_dtls.put("module_id","PH");
+
+							tabData.put( "STORE_CODE",(String)recordSet.get("store_code"+i));	   
+						   //if(bl_interface_yn.equals("Y")){
+								 hmHeader_dtls.put("billable_trn_yn",bl_interface_yn);
+								 hmHeader_dtls.put("sal_trn_type",enc_patient_class);
+						   //}
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);//added for [IN:045323] MMS BETA ADHOC Testing -start
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmHeader_dtls.put("take_home_yn",take_home_yn);	//added for [IN:045323] MMS BETA ADHOC Testing -end
+							hmHeader.put(hdrKey, hmHeader_dtls); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						}
+						// Item Detail
+						if(hmDtlGrp.size()==0 || !hmDtlGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmDetail		=	new HashMap();
+							//insertDetail	=	new ArrayList();
+
+							hmDetail.put("dtlKey",dtlKey); //added for AMRI-SCF-0376 [IN:055578]
+							hmDetail.put("facility_id",login_facility_id);
+							hmDetail.put("doc_type_code",this.getStockDocType()); // (String)recordSet.get("doc_type"+i)
+							hmDetail.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							//hmDetail.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));
+							hmDetail.put("doc_srl_no",count+"");
+							hmDetail.put("item_code", (String)recordSet.get("item_code"+i));
+							hmDetail.put("stock_item_yn","Y");   
+							BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+							hmDetail.put("item_qty",(String)BaseAndIssueUOMQty.get("ISSUE_QTY"));
+							hmDetail.put("mm_trn_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+							//hmDetail.put("item_qty",(String)recordSet.get("actualReturn"+i));
+							hmDetail.put("uom_code",CommonBean.checkForNull((String)recordSet.get("uom_code"+i))); 
+							hmDetail.put("remarks","");
+							hmDetail.put("sales_doc_type_code",(String)recordSet.get("doc_type"+i));
+							hmDetail.put("sal_doc_no",(String)recordSet.get("doc_no"+i)); 
+							hmDetail.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i)); 
+							hmDetail.put("disp_bill_stage",disp_bill_stage);//added for KAUH-SCF-0320 
+							hmDetail.put("sal_facility_id",(String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.							
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmDetail.put("take_home_yn",take_home_yn);	// addeding end for skr-scf-0591
+							if( !(getFacility_Flag().equals("Y"))){
+								hmDetail.put("FACILITY_STR_FOR_BL",this.orderingfacilityid.trim()+"|"+(String)tabData.get( "FACILITY_ID" ));
+							}
+							else{
+								hmDetail.put("FACILITY_STR_FOR_BL",(String)recordSet.get("Ord_Facility_id"+i)+"|"+(String)tabData.get( "FACILITY_ID" ));
+							}
+							if(bl_interface_yn.equals("Y") && datarr!=null && datarr.size()>0){
+								
+								pstmt_select1.setString(1,(String)datarr.get(0));
+								pstmt_select1.setString(2,(String)datarr.get(2));
+								pstmt_select1.setString(3,(String)tabData.get( "FACILITY_ID" ));
+								rset	=	pstmt_select1.executeQuery();
+								if(rset.next()){
+									hmDetail.put("p_overridden_excl_incl_ind",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_VALUE")));
+									hmDetail.put("p_overridden_action_reason",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_REASON")));
+								} 
+								closeResultSet( rset );				
+							}
+							hmDtlGrp.put(dtlKey, hmDetail); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							/*if(hmDtlGrp.size()>0 || !hmDtlGrp.containsKey(dtlKey)){
+								insertDetail = new ArrayList();
+								insertDetail.add(hmDetail);
+								hmDtlGrp.put(dtlKey, insertDetail);
+							}
+							else{
+								insertDetail = new ArrayList((ArrayList)hmDtlGrp.get(dtlKey));
+								insertDetail.add(hmDetail);
+								hmDtlGrp.put(dtlKey, insertDetail);
+							}*/
+							//dtlKeyList.add(dtlKey);
+							if(hmhdrDtlKeyMap.size()==0 || !hmhdrDtlKeyMap.containsKey(hdrKey)){
+								dtlKeyList = new ArrayList();
+								dtlKeyList.add(dtlKey);
+								hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+							}
+							else{
+								dtlKeyList = new ArrayList((ArrayList)hmhdrDtlKeyMap.get(hdrKey));
+								dtlKeyList.add(dtlKey);
+								hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+							}
+						}
+						else{
+							hmDetail = (HashMap)hmDtlGrp.get(dtlKey);
+							//hmDetail = (HashMap)insertDetail.get(0);
+							BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+							tot_item_qty = Float.parseFloat(hmDetail.get("item_qty")==null?"0":(String)hmDetail.get("item_qty"));
+							mm_trn_qty = Float.parseFloat(hmDetail.get("mm_trn_qty")==null?"0":(String)hmDetail.get("mm_trn_qty"));
+							tot_item_qty += Float.parseFloat((BaseAndIssueUOMQty.get("ISSUE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("ISSUE_QTY")));
+							mm_trn_qty += Float.parseFloat((BaseAndIssueUOMQty.get("BASE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("BASE_QTY")));
+							hmDetail.put("item_qty",tot_item_qty+"");
+							hmDetail.put("mm_trn_qty", mm_trn_qty+"");
+							hmDtlGrp.put(dtlKey, hmDetail);
+						}
+						//hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+						//insertDetail.add(hmDetail);
+						// added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						/*if(insertDetailGrp.size()==0 || !insertDetailGrp.containsKey(dtlKey)){
+							insertDetail= new ArrayList();
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(dtlKey,insertDetail );
+						}
+						else{
+							insertDetail = new ArrayList((ArrayList)insertDetailGrp.get(dtlKey));
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(dtlKey,insertDetail);
+						}*/
+						// Batch Details
+						//if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmExp			=	new HashMap();
+							alSalBinLocationCode = new ArrayList();//added for KDAH-SCF-0252 [IN:050489] -start
+							alSalBinLocationCode.add((String)recordSet.get("sal_bin_location_code"+i));
+							alSalBinLocationCode.add((String)BaseAndIssueUOMQty.get("BASE_QTY"));//added for KDAH-SCF-0252 [IN:050489] -end
+							//insertExp		=	new ArrayList();
+							hmExp.put("facility_id",login_facility_id);
+							hmExp.put("doc_type_code",this.getStockDocType());//(String)recordSet.get("doc_type"+i)
+							hmExp.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							//hmExp.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));		
+							hmExp.put("doc_srl_no",count+"");
+							hmExp.put("store_code", (String)recordSet.get("store_code"+i));
+							hmExp.put("item_code", (String)recordSet.get("item_code"+i));
+							hmExp.put("batch_id",(String)recordSet.get("batch_id"+i));
+							hmExp.put("trade_id",(String)recordSet.get("trade_id"+i));
+							//hmExp.put("sal_bin_location_code",(String)recordSet.get("sal_bin_location_code"+i));//Commented for KDAH-SCF-0252 [IN:050489]
+							hmExp.put("sal_bin_location_code",alSalBinLocationCode);//added for KDAH-SCF-0252 [IN:050489]
+							hmExp.put("bin_location_code",(String)recordSet.get("bin_location_code"+i));
+							hmExp.put("expiry_date_or_receipt_date",(String)recordSet.get("expiry_date"+i));
+							BaseAndIssueUOMQty = (HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+							hmExp.put("ret_item_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+							//hmExp.put("ret_item_qty",(String)recordSet.get("actualReturn"+i));
+							hmExp.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));
+							hmExp.put("sal_doc_no",(String)recordSet.get("doc_no"+i));				
+							hmExp.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i));  //Added for SKR-SCF-0625 [35212]
+							hmExp.put("sal_facility_id",(String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+							//hmExpGrp.put(dtlKey, hmExp); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							
+							dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+							if(dis_charge_ind.equals("D"))
+								take_home_yn="Y";
+							else
+								take_home_yn="N";
+							hmDetail.put("take_home_yn",take_home_yn); // addeding end for skr-scf-0591
+						//}
+						if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){
+							insertExp = new ArrayList();
+							insertExp.add(hmExp);
+							hmExpGrp.put(dtlKey, insertExp);
+						}
+						else{
+							insertExp = new ArrayList((ArrayList)hmExpGrp.get(dtlKey));
+							insertExp.add(hmExp);
+							hmExpGrp.put(dtlKey, insertExp);
+						}
+						//insertExp.add(hmExp);
+					}
+				}
+				}
+				else{
+					enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979 //moved from down for AMRI-SCF-0376 [IN:055578]  -start
+					if(enc_id.equals("")||enc_id.equals("11111")){
+						 enc_id ="";
+						 enc_patient_class="R";
+					}
+					if(!previousEncId.equals(enc_id)){
+						if(bl_interface_yn.equals("Y")){// added for KDAH-SCF-0322
+							try{
+							getBillingUpdateLock(connection, login_facility_id, (String)tabData.get("PATIENT_ID"), enc_id);
+							}catch(Exception e){
+								map.put( "result", new Boolean( false ) ) ;	
+								map.put( "message", e.getMessage() ) ;
+								throw new Exception();
+								
+							}
+							
+						}
+					}
+					//Adding start for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+						 if(EncList.size()>0 && EncList.contains(enc_id) ){
+							 bl_recal_flag="Y";
+							 }else{
+								 bl_recal_flag="N";
+							 }
+							if( bl_recal_flag.equals("N")){
+							
+					                pstmt_blflag = connection.prepareStatement("SELECT BL_CHK_PKG_PAT_RECALC_YN(?,?,?,?,?) RESULT_FLAG from dual");
+									pstmt_blflag.setString(1,"PH");
+									pstmt_blflag.setString(2,login_facility_id);
+									pstmt_blflag.setString(3,(String)recordSet.get("patientid"));
+									pstmt_blflag.setString(4,(String)recordSet.get("doc_type"+i));
+									pstmt_blflag.setString(5,(String)recordSet.get("doc_no"+i)); 
+									
+									resultSet_blflag = pstmt_blflag.executeQuery() ;
+												
+									if(resultSet_blflag!=null && resultSet_blflag.next()){
+										bl_result =resultSet_blflag.getString("RESULT_FLAG");
+										
+									}
+                               if(bl_result.equals("Y")){
+								   bl_recal_flag="Y";
+									   EncList.add(enc_id);
+									   orig_enc_patient_class  = getEncounterPatientClass(enc_id, (String)recordSet.get("patientid"));
+									   if(EncListGroup.size()>0){
+											String curr_enc=(String)EncListGroup.get(0);
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											  EncListGroup.clear();
+											  EncListGroup.add(curr_enc+"#"+orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+										}else{
+											String visit_id="";
+											String episode_id="";
+											if(!orig_enc_patient_class.equals("I") && !orig_enc_patient_class.equals("D")){
+												if (!enc_id.equals("") && !enc_id.equals(null)) {
+													episode_id = enc_id.substring(0, (enc_id.length() - 4)); 
+													visit_id = enc_id.substring(enc_id.length() - 4); 
+												}
+												}else{
+													episode_id = enc_id;
+													visit_id = "";
+												}
+											   EncListGroup.add(orig_enc_patient_class+"~"+episode_id+"~"+visit_id);
+											}
+										
+								}
+						 }
+							closeStatement(pstmt_blflag);
+							closeResultSet(resultSet_blflag);
+							//Adding end for KDAH-SCF-0469,KDAH-SCF-507 and KDAH-SCF-508 
+					   
+					previousEncId = enc_id;
+					tabData.put( "PATIENT_CLASS",enc_patient_class);
+					hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+					dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ; //moved from down for AMRI-SCF-0376 [IN:055578]  -end
+					datarr	=	new ArrayList();
+					if( !((String)recordSet.get("actualReturn"+i)).equals("") && !((String)recordSet.get("actualReturn"+i)).equals("0") ) {
+						datarr.add((String)recordSet.get("dispno"+i)); //0
+						datarr.add((String)recordSet.get("bin_location_code"+i));
+						datarr.add((String)recordSet.get("srlno"+i));
+						datarr.add((String)recordSet.get("srlnobatch"+i));
+						datarr.add((String)recordSet.get("actualReturn"+i));
+						datarr.add((String)recordSet.get("item_code"+i));
+						datarr.add((String)recordSet.get("store_code"+i));
+						
+						datarr.add((String)recordSet.get("batch_id"+i));
+						datarr.add((String)recordSet.get("expiry_date"+i));
+						datarr.add((String)recordSet.get("disp_qty"+i));
+						datarr.add((String)recordSet.get("uom_code"+i));
+						datarr.add((String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+						datarr.add(hdrKey); //added for AMRI-SCF-0376 [IN:055578] //12
+						datarr.add(dtlKey); //added for AMRI-SCF-0376 [IN:055578] //13
+						datarr.add((String)recordSet.get("order_id"+i)); //Added for GHL-SCF-1084
+						datarr.add((String)recordSet.get("order_line_no"+i)); //Added for GHL-SCF-1084
+				
+						tabData.put("RECORD"+i,datarr);
+						count++;
+						/*enc_id = (String)recordSet.get("encounter_id"+i); // added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+						if(enc_id.equals("")||enc_id.equals("11111")){
+							 enc_id ="";
+							 enc_patient_class="R";
+						}
+						tabData.put( "PATIENT_CLASS",enc_patient_class);
+						hdrKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i) ;
+						dtlKey = enc_id+recordSet.get("doc_type"+i)+recordSet.get("doc_no"+i)+recordSet.get("sal_doc_srlno"+i) ;*/
+						// Header Detail
+						if(hmHeader.size()==0 || !hmHeader.containsKey(hdrKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							hmHeader_dtls	=	new HashMap();
+							hmHeader_dtls.put("facility_id",login_facility_id);
+							hmHeader_dtls.put("doc_type_code",this.getStockDocType());
+							hmHeader_dtls.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));//Added for KDAH-SCF-0452
+							hmHeader_dtls.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+							hmHeader_dtls.put("doc_date",getCurrDate());
+							hmHeader_dtls.put("doc_ref","");
+							hmHeader_dtls.put("store_code",(String)recordSet.get("store_code"+i));
+							hmHeader_dtls.put("patient_id",(String)recordSet.get("patientid"));
+							//hmHeader_dtls.put("encounter_id",this.getEncounter());
+							hmHeader_dtls.put("encounter_id",enc_id);
+							hmHeader_dtls.put("finalized_yn","Y");
+							hmHeader_dtls.put("gl_interfaced_yn","N");
+							hmHeader_dtls.put("trn_type","SRT");
+							hmHeader_dtls.put("remarks","");				
+							hmHeader_dtls.put("item_class_code","");
+							hmHeader_dtls.put("module_id","PH");
+
+								tabData.put( "STORE_CODE",(String)recordSet.get("store_code"+i));	   
+							   //if(bl_interface_yn.equals("Y")){
+									 hmHeader_dtls.put("billable_trn_yn",bl_interface_yn);
+									 hmHeader_dtls.put("sal_trn_type",enc_patient_class);
+							   //}
+								dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);//added for [IN:045323] MMS BETA ADHOC Testing -start
+								if(dis_charge_ind.equals("D"))
+									take_home_yn="Y";
+								else
+									take_home_yn="N";
+								hmHeader_dtls.put("take_home_yn",take_home_yn);	//added for [IN:045323] MMS BETA ADHOC Testing -end
+								hmHeader.put(hdrKey, hmHeader_dtls); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							}
+							// Item Detail
+							if(hmDtlGrp.size()==0 || !hmDtlGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+								hmDetail		=	new HashMap();
+								//insertDetail	=	new ArrayList();
+
+								hmDetail.put("dtlKey",dtlKey); //added for AMRI-SCF-0376 [IN:055578]
+								hmDetail.put("facility_id",login_facility_id);
+								hmDetail.put("doc_type_code",this.getStockDocType()); // (String)recordSet.get("doc_type"+i)
+								hmDetail.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+								//hmDetail.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));
+								hmDetail.put("doc_srl_no",count+"");
+								hmDetail.put("item_code", (String)recordSet.get("item_code"+i));
+								hmDetail.put("stock_item_yn","Y");   
+								BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+								hmDetail.put("item_qty",(String)BaseAndIssueUOMQty.get("ISSUE_QTY"));
+								hmDetail.put("mm_trn_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+								//hmDetail.put("item_qty",(String)recordSet.get("actualReturn"+i));
+								hmDetail.put("uom_code",CommonBean.checkForNull((String)recordSet.get("uom_code"+i))); 
+								hmDetail.put("remarks","");
+								hmDetail.put("sales_doc_type_code",(String)recordSet.get("doc_type"+i));
+								hmDetail.put("sal_doc_no",(String)recordSet.get("doc_no"+i)); 
+								hmDetail.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i)); 
+								hmDetail.put("disp_bill_stage",disp_bill_stage); //added for KAUH-SCF-0320
+								hmDetail.put("sal_facility_id",(String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.							
+								dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+								if(dis_charge_ind.equals("D"))
+									take_home_yn="Y";
+								else
+									take_home_yn="N";
+								hmDetail.put("take_home_yn",take_home_yn);	// addeding end for skr-scf-0591
+								if( !(getFacility_Flag().equals("Y"))){
+									hmDetail.put("FACILITY_STR_FOR_BL",this.orderingfacilityid.trim()+"|"+(String)tabData.get( "FACILITY_ID" ));
+								}
+								else{
+									hmDetail.put("FACILITY_STR_FOR_BL",(String)recordSet.get("Ord_Facility_id"+i)+"|"+(String)tabData.get( "FACILITY_ID" ));
+								}
+								if(bl_interface_yn.equals("Y") && datarr!=null && datarr.size()>0){
+									
+									pstmt_select1.setString(1,(String)datarr.get(0));
+									pstmt_select1.setString(2,(String)datarr.get(2));
+									pstmt_select1.setString(3,(String)tabData.get( "FACILITY_ID" ));
+									rset	=	pstmt_select1.executeQuery();
+									if(rset.next()){
+										hmDetail.put("p_overridden_excl_incl_ind",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_VALUE")));
+										hmDetail.put("p_overridden_action_reason",checkForNull(rset.getString("BL_INCL_EXCL_OVERRIDE_REASON")));
+									} 
+									closeResultSet( rset );				
+								}
+								hmDtlGrp.put(dtlKey, hmDetail); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+								/*if(hmDtlGrp.size()>0 || !hmDtlGrp.containsKey(dtlKey)){
+									insertDetail = new ArrayList();
+									insertDetail.add(hmDetail);
+									hmDtlGrp.put(dtlKey, insertDetail);
+								}
+								else{
+									insertDetail = new ArrayList((ArrayList)hmDtlGrp.get(dtlKey));
+									insertDetail.add(hmDetail);
+									hmDtlGrp.put(dtlKey, insertDetail);
+								}*/
+								//dtlKeyList.add(dtlKey);
+								if(hmhdrDtlKeyMap.size()==0 || !hmhdrDtlKeyMap.containsKey(hdrKey)){
+									dtlKeyList = new ArrayList();
+									dtlKeyList.add(dtlKey);
+									hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+								}
+								else{
+									dtlKeyList = new ArrayList((ArrayList)hmhdrDtlKeyMap.get(hdrKey));
+									dtlKeyList.add(dtlKey);
+									hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+								}
+							}
+							else{
+								hmDetail = (HashMap)hmDtlGrp.get(dtlKey);
+								//hmDetail = (HashMap)insertDetail.get(0);
+								BaseAndIssueUOMQty=(HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+								tot_item_qty = Float.parseFloat(hmDetail.get("item_qty")==null?"0":(String)hmDetail.get("item_qty"));
+								mm_trn_qty = Float.parseFloat(hmDetail.get("mm_trn_qty")==null?"0":(String)hmDetail.get("mm_trn_qty"));
+								tot_item_qty += Float.parseFloat((BaseAndIssueUOMQty.get("ISSUE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("ISSUE_QTY")));
+								mm_trn_qty += Float.parseFloat((BaseAndIssueUOMQty.get("BASE_QTY")==null?"0":(String)BaseAndIssueUOMQty.get("BASE_QTY")));
+								hmDetail.put("item_qty",tot_item_qty+"");
+								hmDetail.put("mm_trn_qty", mm_trn_qty+"");
+								hmDtlGrp.put(dtlKey, hmDetail);
+							}
+							//hmhdrDtlKeyMap.put(hdrKey, dtlKeyList);
+							//insertDetail.add(hmDetail);
+							// added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+							/*if(insertDetailGrp.size()==0 || !insertDetailGrp.containsKey(dtlKey)){
+								insertDetail= new ArrayList();
+								insertDetail.add(hmDetail);
+								insertDetailGrp.put(dtlKey,insertDetail );
+							}
+							else{
+								insertDetail = new ArrayList((ArrayList)insertDetailGrp.get(dtlKey));
+								insertDetail.add(hmDetail);
+								insertDetailGrp.put(dtlKey,insertDetail);
+							}*/
+							// Batch Details
+							//if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){ // ||!hmHeader.containsKey(hdrKey) added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+								hmExp			=	new HashMap();
+								alSalBinLocationCode = new ArrayList();//added for KDAH-SCF-0252 [IN:050489] -start
+								alSalBinLocationCode.add((String)recordSet.get("sal_bin_location_code"+i));
+								alSalBinLocationCode.add((String)BaseAndIssueUOMQty.get("BASE_QTY"));//added for KDAH-SCF-0252 [IN:050489] -end
+								//insertExp		=	new ArrayList();
+								hmExp.put("facility_id",login_facility_id);
+								hmExp.put("doc_type_code",this.getStockDocType());//(String)recordSet.get("doc_type"+i)
+								hmExp.put("sales_doc_no",(String)recordSet.get("doc_no"+i));
+								//hmExp.put("doc_srl_no",(String)recordSet.get("srlnobatch"+i));		
+								hmExp.put("doc_srl_no",count+"");
+								hmExp.put("store_code", (String)recordSet.get("store_code"+i));
+								hmExp.put("item_code", (String)recordSet.get("item_code"+i));
+								hmExp.put("batch_id",(String)recordSet.get("batch_id"+i));
+								hmExp.put("trade_id",(String)recordSet.get("trade_id"+i));
+								//hmExp.put("sal_bin_location_code",(String)recordSet.get("sal_bin_location_code"+i));//Commented for KDAH-SCF-0252 [IN:050489]
+								hmExp.put("sal_bin_location_code",alSalBinLocationCode);//added for KDAH-SCF-0252 [IN:050489]
+								hmExp.put("bin_location_code",(String)recordSet.get("bin_location_code"+i));
+								hmExp.put("expiry_date_or_receipt_date",(String)recordSet.get("expiry_date"+i));
+								BaseAndIssueUOMQty = (HashMap)getBaseAndIssueUOMQty((String)recordSet.get("item_code"+i),  (String)recordSet.get("store_code"+i), (String)recordSet.get("actualReturn"+i),  (String)recordSet.get("uom_code"+i));
+								hmExp.put("ret_item_qty",(String)BaseAndIssueUOMQty.get("BASE_QTY"));
+								//hmExp.put("ret_item_qty",(String)recordSet.get("actualReturn"+i));
+								hmExp.put("sal_doc_type_code",(String)recordSet.get("doc_type"+i));
+								hmExp.put("sal_doc_no",(String)recordSet.get("doc_no"+i));				
+								hmExp.put("sal_doc_srl_no",(String)recordSet.get("sal_doc_srlno"+i));  //Added for SKR-SCF-0625 [35212]
+								hmExp.put("sal_facility_id",(String)recordSet.get("Sal_Facility_id"+i));//IN33996-SCF:PH-Bru-HIMS-CRF-091-Issue-02, Setting Sale Facility to EJB.
+								//hmExpGrp.put(dtlKey, hmExp); //added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+								
+								dis_charge_ind=(String)recordSet.get("dis_charge_ind"+i);// added for skr-scf-0591
+								if(dis_charge_ind.equals("D"))
+									take_home_yn="Y";
+								else
+									take_home_yn="N";
+								hmDetail.put("take_home_yn",take_home_yn); // addeding end for skr-scf-0591
+							//}
+							if(hmExpGrp.size()==0 || !hmExpGrp.containsKey(dtlKey)){
+								insertExp = new ArrayList();
+								insertExp.add(hmExp);
+								hmExpGrp.put(dtlKey, insertExp);
+							}
+							else{
+								insertExp = new ArrayList((ArrayList)hmExpGrp.get(dtlKey));
+								insertExp.add(hmExp);
+								hmExpGrp.put(dtlKey, insertExp);
+							}
+							//insertExp.add(hmExp);
+					
+						}
+			}
+			}
+				hdrKeyList = new ArrayList(hmHeader.keySet());
+				for(int encCount=0; encCount<hdrKeyList.size(); encCount++){ //ENCOUNTER BASED HEADER FOR LOOP added for SRR20056-SCF-7454 IN027501 & SRR20056-SCF-7717 IN027979
+					hdrKey = (String) hdrKeyList.get(encCount);
+					//insertDetail = new ArrayList();
+					tmpInsertExp = new ArrayList();
+					dtlKeyList = (ArrayList)hmhdrDtlKeyMap.get(hdrKey);
+					for(int dtlindx=0; dtlindx < dtlKeyList.size(); dtlindx++){
+						hmDetail = new HashMap();
+						hmExp = new HashMap();
+						hmDetail = (HashMap)hmDtlGrp.get(dtlKeyList.get(dtlindx));
+						tmpInsertExp = (ArrayList)hmExpGrp.get(dtlKeyList.get(dtlindx));
+						hmDetail.put("doc_srl_no",(dtlindx+1)+"");
+						//hmExp.put("doc_srl_no",(dtlindx+1)+"");
+					/*	for(int i=0; i < insertDetail.size();i++){
+							hmDetail = new HashMap();
+							hmDetail= (HashMap)insertDetail.get(i);
+							hmDetail.put("doc_srl_no",(dtlindx+1)+"");
+							//insertDetail.add(hmDetail);
+						}*/
+						for(int i=0;i< tmpInsertExp.size(); i++){
+							hmExp = new HashMap();
+							hmExp = (HashMap)tmpInsertExp.get(i);
+							hmExp= (HashMap)tmpInsertExp.get(i);
+							hmExp.put("doc_srl_no",(dtlindx+1)+"");
+							//insertExp.set(i,hmExp);
+							if(insertExpGrp.size()==0 || !insertExpGrp.containsKey(hdrKey)){
+								insertExp = new ArrayList();
+								insertExp.add(hmExp);
+								insertExpGrp.put(hdrKey, insertExp);
+							}
+							else{
+								insertExp = new ArrayList((ArrayList)insertExpGrp.get(hdrKey));
+								insertExp.add(hmExp);
+								insertExpGrp.put(hdrKey, insertExp);
+							}
+						}
+					//}
+						if(insertDetailGrp.size()==0 || !insertDetailGrp.containsKey(hdrKey)){
+							insertDetail = new ArrayList();
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(hdrKey, insertDetail);
+						}
+						else{
+							insertDetail = new ArrayList((ArrayList)insertDetailGrp.get(hdrKey));
+							insertDetail.add(hmDetail);
+							insertDetailGrp.put(hdrKey, insertDetail);
+						}
+					}
+				}
+				tot_values.add(hmHeader);
+				tot_values.add(insertDetailGrp);
+				tot_values.add(insertExpGrp);
+				tabData.put( "STOCK_VALS", tot_values);
+				tabData.put( "ENCLISTGROUP", EncListGroup);//Added for KDAH-SCF-0452
+			}//END IF
+			tabData.put( "BARCODE_TOTALROWS", selectedRows); // Added for GHL-CRF-0413.8
+			tabData.put( "BARCODE_FLAG", recordSet.get("barcodeFlag")); // Added for GHL-CRF-0413.8
+			//sqlMap.put("SQLUPDATE1", PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_UPDATE1" ) );
+			sqlMap.put("SQL_PH_RET_MEDN_GET_BAL_QTY", "SELECT  sum( RETURNED_QTY)  TOT_RTN_QTY FROM PH_DISP_DRUG_BATCH WHERE FACILITY_ID=? AND DISP_NO=? AND SRL_NO=? AND SRL_NO_BATCH=?  "); //Added for SRR-SCF20056-7701 @ Siriraj War Room UAT5
+			sqlMap.put("SQLUPDATE1", "UPDATE PH_DISP_DRUG_BATCH SET RETURNED_QTY=NVL(RETURNED_QTY,0)+NVL(?,0),RTN_BIN_LOCATION_CODE=?,MODIFIED_BY_ID = ?, MODIFIED_DATE = SYSDATE, MODIFIED_AT_WS_NO = ? , MODIFIED_FACILITY_ID = ? ,RET_TO_DISP_LOCN_CODE =? WHERE DISP_NO=? AND SRL_NO=? AND SRL_NO_BATCH=? AND FACILITY_ID=?");
+			sqlMap.put("SQLUPDATE2", PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_UPDATE2" ) );
+			sqlMap.put("SQL_PH_RET_MEDN_UPDATE3", PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_UPDATE3" ) );
+			sqlMap.put("SQL_PH_RET_MEDN_INSERT1", PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_INSERT1" ) );
+			sqlMap.put("SQL_PH_RET_MEDN_SELECT10", PhRepository.getPhKeyValue( "SQL_PH_RET_MEDN_SELECT10" ) );
+			sqlMap.put("SQL_PH_REG_PRESCRIPTIONS_UPDATE_TOKEN_SERIES",PhRepository.getPhKeyValue( "SQL_PH_REG_PRESCRIPTIONS_UPDATE_TOKEN_SERIES"));
+			sqlMap.put("SQL_PH_REG_PRESCRIPTIONS_SELECT15",PhRepository.getPhKeyValue( "SQL_PH_REG_PRESCRIPTIONS_SELECT15"));
+				 
+			Object home = com.ehis.eslp.ServiceLocator.getInstance().getHome(PhRepository.getPhKeyValue( "JNDI_PH_ReturnMedication" ),ReturnMedicationHome.class,getLocalEJB());
+			Object busObj =(home.getClass().getMethod("create",null)).invoke(home,null);
+			Object argArray[] =new Object[2];
+			argArray[0]= tabData;
+			argArray[1]=sqlMap;
+			Class  paramArray[] = new Class[2];
+			paramArray[0]= tabData.getClass();
+			paramArray[1] = sqlMap.getClass();
+			map = (HashMap)(busObj.getClass().getMethod("modify",paramArray)).invoke(busObj,argArray);
+			(busObj.getClass().getMethod("remove",null)).invoke(busObj,null);
+
+			if( ((Boolean) map.get( "result")).booleanValue() )	{
+				map.put( "result", new Boolean(true)) ;
+				map.put( "message", getMessage(getLanguageId(),(String) map.get( "msgid"),"PH") ) ;
+				map.put( "flag", (String) map.get( "flag") ) ;
+				this.rtn_medn_no=(String) map.get( "rtn_medn_no");
+				//Added for GHL-SCF-1193 Start
+				setRetnMednNo(rtn_medn_no);
+				//Added for GHL-SCF-1193 End
+				if(bl_interface_yn.equals("Y")&& !enc_patient_class.equals("I")&& !enc_patient_class.equals("D")){
+					setBLDetails((ArrayList) map.get( "bl_det"));
+				}
+			}
+			else{	
+				map.put( "message", (String)map.get("msgid") ) ;
+			}
+		}
+		catch (Exception e){
+			System.err.println("Error in Return medicatoin Bean tabData="+tabData+"\n recordSet="+recordSet);
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				closeResultSet( rset );				
+				closeStatement( pstmt_select1 ) ;
+				closeConnection( connection );	
+
+			}
+			catch ( Exception fe ) {
+				fe.printStackTrace() ;
+			}
+		}
+		return map;
+	 }
+
+	public String getSysdate(){
+		Connection connection       = null ;
+        PreparedStatement pstmt     = null ;
+        ResultSet resultSet         = null ;
+		String sys_date				= "";
+		try{
+			connection				= getConnection() ;
+			//String str_qry			= PhRepository.getPhKeyValue("SQL_PH_PRESCRIPTION_SELECT54");
+			String str_qry			= "SELECT to_char(SYSDATE,'dd/mm/yyyy') SYS_DATE from dual";
+			pstmt					= connection.prepareStatement(str_qry) ;
+			resultSet				= pstmt.executeQuery();
+				if(resultSet!=null && resultSet.next()){
+						sys_date	=	resultSet.getString("SYS_DATE");
+				}
+		}catch ( Exception e ) {
+				sys_date+=e.toString();
+                e.printStackTrace() ;
+
+		}finally {
+			try{
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}catch(Exception es){
+				es.printStackTrace();
+			}
+        }
+		return sys_date;
+	}
+
+
+	public void getTokenSeries(String patCat) { // Parameter patCat added for SRR20056-SCF-7639 ICN027720
+		Connection connection		=	null ;
+		PreparedStatement pstmt		=	null ;
+		ResultSet resultSet			=	null ;        
+    	token_series_code	        =   "";
+		disp_cash_coll_stage        =	"";
+
+		try{
+			connection			= getConnection() ;
+			pstmt				= connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_DISP_MEDICATION_SELECT73B") ) ;
+			pstmt.setString(1,login_facility_id);
+			pstmt.setString(2,this.Login_disp_locn_code);
+			pstmt.setString(3,login_at_ws_no);
+			pstmt.setString(4,getLanguageId());
+			resultSet	= pstmt.executeQuery();
+			while( resultSet != null && resultSet.next() ) {
+				//token_series_desc   =   checkForNull(resultSet.getString("DESCRIPTION"));
+				token_series_code     =   checkForNull(resultSet.getString("TOKEN_SERIES_CODE"));
+				if(patCat!=null && patCat.equals("O"))  //if block and else condition added for SRR20056-SCF-7639 ICN027720
+					disp_cash_coll_stage  =   checkForNull(resultSet.getString("DISP_CASH_COLL_STAGE_OP"));
+				else
+					disp_cash_coll_stage  =   checkForNull(resultSet.getString("DISP_CASH_COLL_STAGE"));
+				setDispCashCollStage(disp_cash_coll_stage);
+				if(disp_cash_coll_stage.equals("D")||disp_cash_coll_stage.equals("X")){
+					token_series_code ="";
+				}
+			}	
+			setTokenSeriesCode(token_series_code);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+ 	    finally {
+			try{
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}catch(Exception es){es.printStackTrace();
+			}
+		}
+	}
+
+	private String getBillingDetails(Connection connection,String login_facility_id,String Store_code,String doc_type_code,String doc_no,String login_by_id,String login_at_ws_no,String patient_id ,String encounter_id ){
+	  
+              HashMap message_bill  =   new HashMap();
+	     	  String p_charge_amt   =   "99999";
+ 
+	          String msg            =   "";
+              String	hmResult	=	"";
+			  CallableStatement callableStatement = null;
+			  StringBuffer gross_charge_display_str  = new StringBuffer();
+			   String sal_trn_type ="";
+		  
+		  try{
+			    sal_trn_type=getEncounterPatientClass(encounter_id, patient_id); //patient_id added for [IN:035667] 
+                callableStatement	= connection.prepareCall("{ call ST_BL_BILL_GEN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) }");
+      			callableStatement.setString(1, login_facility_id); 
+      			callableStatement.setString(2, Store_code);
+               	callableStatement.setString(3, doc_type_code+"-"+doc_no );
+     			callableStatement.setString(4, login_by_id);//login_by_id
+     			callableStatement.setString(5, login_at_ws_no);
+     			callableStatement.setFloat(6,  Float.parseFloat(p_charge_amt));
+         		callableStatement.setString(7, patient_id);
+            	callableStatement.setString(8, sal_trn_type);
+        		callableStatement.setString(9, encounter_id);
+	
+				callableStatement.registerOutParameter(10, Types.VARCHAR);
+				callableStatement.registerOutParameter(11, Types.VARCHAR);
+				callableStatement.registerOutParameter(12, Types.VARCHAR);
+				callableStatement.registerOutParameter(13, Types.VARCHAR);
+				callableStatement.registerOutParameter(14, Types.VARCHAR);
+				callableStatement.registerOutParameter(15, Types.VARCHAR);
+				callableStatement.setString(16, "PH");
+				callableStatement.setString(17,  "N");
+				callableStatement.registerOutParameter(18, Types.VARCHAR);
+				callableStatement.execute();
+
+			    /*message_bill.put("l_slmt_reqd_yn" , checkForNull((String)callableStatement.getString(10)));
+			    message_bill.put("l_bill_doc_type" , checkForNull((String)callableStatement.getString(11)));
+			    message_bill.put("l_bill_doc_num" , checkForNull((String)callableStatement.getString(12)));
+                message_bill.put("v_blng_group_id" , checkForNull((String)callableStatement.getString(13)));
+			    message_bill.put("error_id" , checkForNull((String)callableStatement.getString(14)));
+			    message_bill.put("error_id_txt" , checkForNull((String)callableStatement.getString(15)));
+			   */
+			    message_bill.put("l_slmt_reqd_yn" , (String)callableStatement.getString(10));
+			    message_bill.put("l_bill_doc_type" , (String)callableStatement.getString(11));
+			    message_bill.put("l_bill_doc_num" , (String)callableStatement.getString(12));
+                message_bill.put("v_blng_group_id" , (String)callableStatement.getString(13));
+			    message_bill.put("error_id" , (String)callableStatement.getString(14));
+				message_bill.put("p_call_disc_function_yn" , (String)callableStatement.getString(18)==null?"N":(String)callableStatement.getString(18));
+				String err_text = (String)callableStatement.getString(15)==null?"":(String)callableStatement.getString(15);			
+			    message_bill.put("error_id_txt" , err_text);
+	   
+				if((checkForNull((String)message_bill.get("error_msg"))) !=""){
+					msg = (String)message_bill.get("error_id") + "  " + (String)message_bill.get("error_msg"); 
+					throw new Exception(msg +"  -   doc_no:" + doc_no);
+				}		
+			}
+			catch(Exception ex)	{
+				ex.printStackTrace();
+			}
+			finally{
+				try{
+				closeStatement(callableStatement);
+				}
+				catch(Exception es){es.printStackTrace();}
+			    callableStatement = null;				
+		    }
+		       /* hmResult.put("l_bill_doc_num",(String)message_bill.get("l_bill_doc_num"));
+				hmResult.put("l_bill_doc_type",(String)message_bill.get("l_bill_doc_type"));
+				hmResult.put("l_slmt_reqd_yn",(String)message_bill.get("l_slmt_reqd_yn"));
+	            hmResult.put("v_blng_group_id",(String)message_bill.get("v_blng_group_id"));
+		*/
+	 
+		//    	gross_charge_display_str.append((String)message_bill.get("l_bill_doc_num")).append(",").append((String)message_bill.get("l_bill_doc_type")).append(",").append((String)message_bill.get("v_blng_group_id")).append(",").append((String)message_bill.get("error_id_txt"));
+		gross_charge_display_str.append((String)message_bill.get("l_bill_doc_num")).append(",").append((String)message_bill.get("l_bill_doc_type")).append(",").append((String)message_bill.get("v_blng_group_id")).append(",").append((String)message_bill.get("p_call_disc_function_yn")).append(",").append((String)message_bill.get("l_slmt_reqd_yn")).append(",").append(doc_type_code+"-"+doc_no).append(",").append(patient_id).append(",").append(encounter_id).append(",").append(sal_trn_type).append(",").append((String)message_bill.get("error_id_txt"));
+	 
+		hmResult = gross_charge_display_str.toString();
+
+		return hmResult;	
+   }
+
+	public  String checkPharmacist(){
+		//	CHECK WHETHER LOGGED-IN USER IS PHARMACIST OR NOT.
+		Connection connection	= null;
+		PreparedStatement pstmt	= null;
+		ResultSet resultSet		= null;
+		try{
+			connection	= getConnection() ;
+            pstmt = connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT3") ) ;
+			pstmt.setString(1,login_by_id.trim());
+            resultSet = pstmt.executeQuery() ;
+			if ( resultSet.next() ) {
+				return "Y" ;
+			}
+		
+		}
+		catch ( Exception e ) {
+			e.printStackTrace() ;
+			return e.toString();
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+				}
+			catch(Exception es) {
+				es.printStackTrace(); 
+			}
+		}
+		return "N";
+	}
+
+	public  String checkRights(){
+		//		CHECK WHETHER LOGGED-IN USER has dispense rights for ip or for op
+		Connection connection	= null;
+		PreparedStatement pstmt	= null;
+		ResultSet resultSet		= null;
+		try{
+			connection	= getConnection() ;
+            pstmt = connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT9") ) ;
+			pstmt.setString(1,login_by_id.trim());
+            resultSet = pstmt.executeQuery() ;
+			if ( resultSet.next() ) {
+				return "Y" ;
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace() ;
+			return e.toString();
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}
+			catch(Exception es) {
+				es.printStackTrace();
+			}
+		}
+		return "N";
+	}
+
+	public  String checkOR(){
+		//CHECK WHETHER OR MODULE IS INSTALLED OR NOT.
+
+		Connection connection	= null;
+		PreparedStatement pstmt	= null;
+		ResultSet resultSet		= null;
+		try{
+			connection	= getConnection() ;
+			pstmt = connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_DISP_MEDICATION_SELECT2") ) ;
+			resultSet = pstmt.executeQuery() ;
+			if ( resultSet.next() ) {
+				return "Y" ;
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace() ;
+			return e.toString();
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+				}
+			catch(Exception es) { 
+				es.printStackTrace();
+			}
+		}
+		return "N";
+	}
+
+
+	public ArrayList getDispLocn(String Category,String locale){
+		Connection connection	= null;
+		PreparedStatement pstmt	= null;
+		ResultSet resultSet		= null;
+		ArrayList result=new ArrayList();
+	   StringBuffer sql						 = new StringBuffer();
+	  
+        try {
+            connection = getConnection() ;
+			//	To get the dispense locations associated with the user
+			sql.append(PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT2"));
+			if (Category.equals("I")){
+				sql.append(" AND a.ip_allow_drug_return_yn='Y' and  b.IP_ACCEPT_MEDN_RTN_YN ='Y'");
+			}
+			else if (Category.equals("O")){
+				sql.append(" AND a.allow_drug_return_yn='Y' and b.ACCEPT_MEDN_RTN_YN ='Y'");
+			}
+			pstmt= connection.prepareStatement(  sql.toString()) ;
+			pstmt.setString(1,Category);
+			pstmt.setString(2,login_facility_id);
+			pstmt.setString(3,login_by_id.trim());
+			pstmt.setString(4,login_at_ws_no.trim());
+			pstmt.setString(5,locale);
+
+            resultSet = pstmt.executeQuery() ;
+            while ( resultSet.next() ) {
+				result.add(resultSet.getString("DISP_LOCN_CODE"));
+				result.add(resultSet.getString("SHORT_DESC"));
+			}
+		}
+		catch ( Exception e ) {
+			result.add(e.toString());
+			e.printStackTrace() ;
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}
+			catch(Exception es) { 
+				es.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public ArrayList getUserDetails(){
+        Connection connection	= null;
+        PreparedStatement pstmt	= null;
+        ResultSet resultSet		= null;
+		 ArrayList result=new ArrayList();
+        try {
+            connection = getConnection() ;
+
+			pstmt = connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT1") ) ;
+			pstmt.setString(1,login_by_id.trim());
+            resultSet = pstmt.executeQuery() ;
+            if ( resultSet.next() ) {
+				this.user_name=resultSet.getString("APPL_USER_NAME");
+				this.password=resultSet.getString("PASSWORD");
+				result.add(this.user_name);
+				result.add(this.password);
+				result.add(login_by_id);
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace() ;
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}
+			catch(Exception es) {
+				es.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+ 	/*getting BinLocation details  */
+
+	public ArrayList getBinDetails(String drugcodes,String displocn,String locale){       	    
+   		Connection connection	= null;
+        PreparedStatement pstmt	= null;
+        ResultSet resultSet		= null;
+		HashMap records=null;
+		ArrayList result=new ArrayList();
+        try {
+            connection = getConnection() ;
+
+			//pstmt = connection.prepareStatement( PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT1") ) ;
+			pstmt = connection.prepareStatement("SELECT b.bin_location_code, b.short_desc,(CASE WHEN (a.item_code = c.item_code AND a.store_code = c.store_code AND a.bin_location_code = c.bin_location_code) THEN 'Y' ELSE 'N' END) default_yn  FROM st_item_store_bin_locn a, mm_bin_location_lang_vw b, st_item_store c WHERE a.item_code = ? AND a.store_code = ? AND a.eff_status = 'Y' AND a.store_code = b.store_code AND a.bin_location_code = b.bin_location_code AND a.item_code = c.item_code AND a.store_code = c.store_code AND b.language_id = ?") ;
+			pstmt.setString(1,drugcodes.trim());
+			pstmt.setString(2,displocn.trim());
+			pstmt.setString(3,locale.trim());
+            resultSet = pstmt.executeQuery() ;
+            while (resultSet.next()) {
+				records=new HashMap();
+				records.put("bin_location_code",checkForNull(resultSet.getString("bin_location_code")));			
+				records.put("short_desc",checkForNull(resultSet.getString("short_desc")));
+				records.put("Default_YN",checkForNull(resultSet.getString("Default_YN")));
+				result.add(records);				
+			}
+		}
+		catch ( Exception e ) {
+			e.printStackTrace() ;
+		}
+		finally {
+			try {
+				closeResultSet( resultSet ) ;
+				closeStatement( pstmt ) ;
+				closeConnection( connection );
+			}
+			catch(Exception es) {
+				es.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	public ArrayList getDrugDetails(String patientid,String drugcode,String nationalid,String healthcard,String dispno,String cutoff,String orderid,String displocn,String patcat, String encounter_id, String locale,String medn_rtn_after_bill_gen, String blDocType, String blDocNo ){ //code 'String medn_rtn_after_bill_gen added for FD-JD-CRF-0178[IN039208] // String blDocType, String blDocNo added for MMS-DM-CRF-0039 [IN:055958]
+		Connection connection	= null;
+        PreparedStatement pstmt	= null;
+        ResultSet resultSet		= null;
+		StringBuffer sbsql	= new StringBuffer(); //changed to StringBuffer MMS-DM-CRF-0039 [IN:055958] -SQL Tuning
+		String ackWC="";//Added for GHL-CRF-0399.2
+		ArrayList result=new ArrayList();
+		int cnt	=	1;
+		String oldpatcat = patcat;
+		String ack_required = checkToProceed(login_facility_id.trim());//added for mms-kh-crf-0014
+        try {
+            connection = getConnection() ;
+           // boolean siteAck = eCommon.Common.CommonBean.isSiteSpecific(connection, "PH","WARD_ACK"); // Added for GHL-CRF-0399.2
+            
+			if (getEffstatus().equals("D")) {
+				//String sql=PhRepository.getPhKeyValue("SQL_PH_RET_MEDN_SELECT5") ;
+				// fix for SRR20056-SCF-7414, Incident No. 27456start
+				if(patcat!=null && patcat.equalsIgnoreCase("O")){
+					patcat = "'OP', 'EM', 'XT'";
+				}
+				else if (patcat!=null && patcat.equalsIgnoreCase("I") ){
+					patcat = "'IP', 'DC'";
+					if(ack_required.equals("Y")){//siteAck changed to ack_required for mms-kh-crf-0014
+						ackWC="and f.ward_acknowledge = 'A'";
+					}
+				}
+				// fix for SRR20056-SCF-7414, Incident No. 27456 end
+
+				if(!getFacility_Flag().equals("Y")){//, mp_patient c REMOVED FOR KDAH-ICN-0007
+					sbsql.append(" SELECT DISTINCT disp_drug_code, d.drug_desc,(select SHORT_NAME from am_trade_name_lang_vw where trade_id=f.trade_id and language_id=?) TRADE_NAME FROM (SELECT drug_desc drug_desc, drug_code drug_code ,content_in_pres_base_uom content_in_pres_base_uom,STOCK_UOM,PRES_BASE_UOM  FROM ph_drug_lang_vw WHERE drug_code BETWEEN NVL ('', '%%') AND NVL ('',drug_code) AND language_id = ? UNION SELECT NVL (short_name, long_name) drug_desc,tpn_regimen_code drug_code,nvl(content_in_base_unit,1) content_in_pres_base_uom,NULL,NULL FROM ph_tpn_regimen_lang_vw   WHERE tpn_regimen_code BETWEEN NVL ('', '%%') AND NVL ('', tpn_regimen_code) and standard_regimen_yn = 'Y' and language_id = ?) d,ph_disp_dtl a, ph_disp_hdr b,ph_disp_drug_batch F ");//drug_code BETWEEN NVL ('', '%%') AND NVL ('',drug_code) AND  added for performance tunning
+					if(medn_rtn_after_bill_gen.equals("N")) //code added for FD-JD-CRF-0178[IN039208]
+						sbsql.append(" , BL_PATIENT_CHARGES_INTERFACE g, BL_PATIENT_CHARGES_FOLIO folio");				
+					
+					//AND c.patient_id = b.patient_id removed for KDAH-ICN-0007
+					sbsql.append(" WHERE a.facility_id = b.facility_id AND a.disp_no = b.disp_no   AND b.patient_id = ?  and b.order_id  in (select order_id from or_order where patient_id=? and NVL(iv_prep_yn,'X') not in('2','4','6','8','0') and order_category ='PH' AND ordering_facility_id = ? ) "+ackWC+" "); //(select SHORT_NAME from am_trade_name_lang_vw where trade_id=f.trade_id and language_id=?) TRADE_NAME added for  AMS-SCF-0190 IN038440 && ',BL_PATIENT_CHARGES_FOLIO' added for FD-JD-CRF-0178[IN039208]
+				 
+					if(oldpatcat!=null && oldpatcat.equalsIgnoreCase("O"))  // Only for outpatient cutoff date AMS-CRF-0172
+						sbsql.append(" AND a.added_date >=  TO_DATE (?, 'dd/mm/yyyy hh24:mi') ");
+					sbsql.append(" AND a.disp_drug_code = d.drug_code AND a.facility_id = ? AND b.order_id = NVL (?, b.order_id) AND a.disp_no = NVL (?, a.disp_no) AND a.disp_drug_code = NVL (?, a.disp_drug_code)AND a.disp_locn_code = NVL (?, a.disp_locn_code) AND  (select sum(disp_qty) from ph_disp_dtl where  order_id = a.order_id and order_line_no = a.order_line_no) > (NVL ((SELECT SUM (returned_qty) FROM ph_disp_dtl WHERE  order_id = a.order_id AND order_line_no = a.order_line_no), 0) + Ceil(NVL((select TOT_ADMINISTERED_QTY from ph_patient_drug_profile where patient_id = b.patient_id and orig_order_id = a.order_id and orig_order_line_no =a.order_line_no),0)/decode(d.content_in_pres_base_uom,1,NVL ((SELECT EQVL_VALUE FROM AM_UOM_EQVL WHERE UOM_CODE = D.PRES_BASE_UOM AND EQVL_UOM_CODE = D.STOCK_UOM),1),d.content_in_pres_base_uom ))+ NVL ((SELECT SUM (rej_qty) FROM ph_ward_return_dtl WHERE disp_no = b.disp_no AND srl_no = f.srl_no AND srl_no_batch = f.srl_no_batch AND disp_no BETWEEN NVL ('', '%%') AND NVL ('', disp_no)), 0 ) + NVL ((SELECT SUM (returned_qty) FROM ph_ward_return_dtl WHERE  disp_no = b.disp_no and srl_no = f.srl_no AND srl_no_batch = f.srl_no_batch AND store_acknowledge_status IS NULL AND disp_no BETWEEN NVL ('', '%%') AND NVL ('', disp_no)), 0 )) AND EXISTS (  SELECT * FROM ph_disp_drug_batch X, ST_ITEM Y  WHERE disp_no = a.disp_no AND ((( use_after_expiry_yn = 'N' AND SYSDATE < expiry_date) OR( use_after_expiry_yn = 'N' AND EXPIRY_YN='N')) or  (USE_AFTER_EXPIRY_YN ='Y') ) AND X.ITEM_CODE =Y.ITEM_CODE  AND facility_id = a.facility_id AND srl_no = a.srl_no) AND b.patient_class in (?) AND f.facility_id=a.facility_id AND f.DISP_LOCN_CODE=a.disp_locn_code AND f.disp_no=a.disp_no AND f.srl_no=a.srl_no  "); //a.disp_qty replaced with  (select sum(disp_qty) from ph_disp_dtl where order_id = a.order_id and order_line_no = a.order_line_no)    a.returned_qty replaced with (SELECT SUM (returned_qty) FROM ph_disp_dtl WHERE order_id = a.order_id AND order_line_no = a.order_line_no) && 'order by d.drug_desc"'code removed for FD-JD-CRF-0178[IN039208] //IN050139 sum(disp_qty) & SUM (returned_qty) calulcation changed from ph_disp_dtl to ph_disp_drug_batch//AND disp_no BETWEEN NVL ('', '%%') AND NVL ('', disp_no) added for performance tuning //  FROM ph_disp_dtl WHERE order_id = a.order_id AND order_line_no = a.order_line_no changed to 'from ph_disp_drug_batch where DISP_NO = a.DISP_NO and SRL_NO = a.SRL_NO' for ML-BRU-SCF-1880 
+					//disp_no = a.DISP_NO AND removed for SKR-SCF-1241 NVL condtion added for SKR-SCF-1251 AND TBMC-SCF-0077
+					//sql += " AND a.disp_drug_code = d.drug_code AND a.facility_id = ? AND b

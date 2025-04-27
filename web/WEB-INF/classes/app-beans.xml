@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+<!-- lookup Definitions -->
+	<bean id="lookupDelegator"
+		class="com.iba.framework.lookup.pojo.business.LookupDelegate" singleton="false">
+		<property name="facade">
+			<ref bean="lookupFacade" />
+		</property>
+	</bean>
+
+	<bean id="lookupFacade"
+		class="com.iba.framework.lookup.pojo.business.LookupFacade" singleton="false" >
+		<property name="objectFactory">
+			<ref bean="lookupDAOFactory" />
+		</property>
+	</bean>
+
+ 	<bean id="lookupDAOFactory"
+		class="com.iba.framework.lookup.pojo.dao.LookupDAOFactory" >
+		<property name="targetBeanName"><idref local="lookupDAOImpl"/></property>
+	</bean> 
+		
+	<bean id="lookupDAOImpl"
+		class="com.iba.framework.lookup.pojo.dao.LookupDAOImpl" singleton="false">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<!--  Beans for ABM module start here -->
+	<bean id="patCheckInStatus" class="eIP.advbedmgmt.transaction.canceladmission.PatientCheckInAllowedBean" singleton="true" >
+	</bean>
+	
+	<bean id="basicBedDetails" class="eIP.advbedmgmt.transaction.floorlayout.bc.BedDetailsBC" singleton="true" >
+	</bean>
+	<bean id="bedColor" class="eIP.advbedmgmt.common.bedcolor.bc.BedColorBC" singleton="true" >
+	</bean>
+	
+	<bean id="bedLegend" class="eIP.advbedmgmt.common.bedlegend.bc.BedLegendBC" singleton="true" >
+	</bean>
+	
+	<bean id="bedDimension" class="eIP.advbedmgmt.setup.beddimension.bc.BedDimensionBC" singleton="true" >
+	</bean>
+	
+	<bean id="rbtList" class="eIP.advbedmgmt.transaction.rolebasedaccess.bc.TransactionListBC" singleton="true" >
+	</bean>
+	
+	<bean id="osRetrieveBC" class="eIP.advbedmgmt.common.operatorstation.bc.OsRetrieveBC" singleton="true" >
+	</bean>
+	
+<!--  Beans for ABM module end here-->
+	
+</beans>

@@ -1,0 +1,189 @@
+package jsp_servlet._ebl._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import webbeans.eCommon.*;
+import java.util.*;
+import java.sql.*;
+import java.text.*;
+
+public final class __blinsrcmparammain extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eBL/jsp/BLInsRCMParamMain.jsp", 1725423205467L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "ISO-8859-1".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 ="\r\n<HTML>\r\n\r\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\r\n\t<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\' type=\'text/css\'/>\t\t\r\n\t<script language=\'javascript\' src=\'../../eBL/js/BLInsRCMParam.js\'></script>\r\n\t<script language=\"javascript\" src=\"../../eCommon/js/common.js\"></script>\r\n\t<script src=\'../../eCommon/js/ValidateControl.js\' language=\'javascript\'></script>\r\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\r\n";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\r\n<FRAMESET ROWS =\'6%,87%,7%\' framespacing=0>\r\n\t<FRAME name=\'commontoolbarFrame\' src=\'";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 ="\'  frameborder=0 scrolling=\'no\' noresize>\r\n\t<FRAME name=\'BLInsRCMParamDtls\' src=\'../../eBL/jsp/BLInsRCMParamDtls.jsp\' frameborder=0 scrolling=\'\' noresize>\r\n\t<FRAME name=\'messageFrame\' src=\'../../eCommon/jsp/MstCodeError.jsp\' frameborder=0 noresize scrolling=\'auto\' noresize>\r\n</FRAMESET>\r\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\r\n\t<script>\r\n\t\talert(getMessage(\'BL0968\',\'BLEXT\'));\r\n\t\tdocument.location.href=\'../../eCommon/jsp/dmenu.jsp\';\r\n\t</script>\r\n\t";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\r\n</HTML>\r\n\r\n";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            _bw.write(_wl_block0Bytes, _wl_block0);
+
+	String sStyle =		(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String params = request.getQueryString();
+	if(params==null || params.equals("")) params="";
+	String function_id=request.getParameter("function_id");
+	if(function_id==null || function_id.equals("")) function_id="";
+	String url = "../../eCommon/jsp/MstCodeToolbar.jsp?home_required_yn=Y";
+	String source = url + params;
+	
+	String userId = (String) session.getAttribute("login_user");
+	String responsibility_id=(String)session.getAttribute("responsibility_id");	
+	String facility_id  =  (String) session.getValue("facility_id") ;
+	System.err.println("userId BLApprStatusTrackMain.jsp=>"+userId);
+	System.err.println("responsibility_id "+responsibility_id);
+	System.err.println("facility_id "+facility_id);	
+
+	/*
+	String functionID	= 	"EBL_RCM_PARAMETERS";
+	String privilegeID	= 	"RCM_PARAMETERS"; */
+	String functionID	= 	"EBL_RCM_TRX";
+	String privilegeID	= 	"RCM_TRANSACTIONS"; //MOHE-CRF-0166
+	String privilegeYN = "N";
+	String allowedYN = "N";
+	String validUserYN = "N";
+	Connection con = null;
+	CallableStatement cstmt1 = null;
+	
+	try
+	{
+		con	=	ConnectionManager.getConnection(request);
+		cstmt1 = con.prepareCall("{ call BLPOLICYUSERACCESSDTLS.get_bl_privlege_yn(?,?,?,?,?,sysdate,?,?)}");
+		cstmt1.setString(1, facility_id);			
+		cstmt1.setString(2, userId);			
+		cstmt1.setString(3, responsibility_id);			
+		cstmt1.setString(4, functionID);			
+		cstmt1.setString(5, privilegeID);	
+		cstmt1.registerOutParameter(6, java.sql.Types.VARCHAR);
+		cstmt1.registerOutParameter(7, java.sql.Types.VARCHAR);
+		cstmt1.execute();	
+		
+		privilegeYN = cstmt1.getString(6);
+		allowedYN = cstmt1.getString(7);
+		
+		if(privilegeYN.equals("Y") && allowedYN.equals("Y"))
+		{
+			validUserYN = "Y";
+		}
+		else
+		{			
+			validUserYN="N";
+		} 
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+if("Y".equals(validUserYN)){
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            out.print( String.valueOf(source));
+            _bw.write(_wl_block5Bytes, _wl_block5);
+}else{
+            _bw.write(_wl_block6Bytes, _wl_block6);
+ } 
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+}
+	catch(Exception ee)
+	{
+		System.err.println("Exception in BLInsRCMParamMain.jsp: "+ee);	
+	}
+	finally
+	{		
+		if(cstmt1 != null) 	
+		{
+			cstmt1.close(); 	
+		}
+		if(con!=null)
+		{
+			ConnectionManager.returnConnection(con, request);
+		}
+	}
+System.err.println("In BLInsRCMParamMain.jsp end1");			
+
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

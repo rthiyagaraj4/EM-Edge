@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>CS_OperationsProcedures</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> - Enter the specialty or select the specialty using the <span class="BoldNumberRFD">[?]</span> function. The specialties created in the Specialties function are listed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Diagnosis Coding Scheme</span> - The Diagnosis Coding Scheme is displayed and disabled as defined for the selected Specialty.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operation Code</span> - Enter the Operation code in alphanumeric format of 10 characters maximum length if the Diagnosis Coding Scheme is User Defined. You can select the required Operation Code based on the Diagnosis Coding Scheme if not User Defined. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Enabled</span> - Select the check box to enable this record. Only enabled records are available in the transactions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the Long Description for the Operation in alphanumeric format of 60 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter the Short Description for the Operation in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Operation Type</span> - Select the Operation Type to which this operation belongs using the <span class="BoldNumberRFD">[?]</span> function. The Operation Types are created in the 'Operation Types' function. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Link Catalog</span> - Select the check box to link an order catalog for the operation/procedure.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Type</span> - This field is disabled if Link Catalog check box is selected. Select the Order Type from the list. The Order Types associated to the Specialty in 'Order Type for Specialty' function is displayed. This is a mandatory field. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Catalog Cross Reference</span> - This field is enabled if the 'Link Catalog' check box is selected. Select the required Order Catalog to associate the operation using the <span class="BoldNumberRFD">[?]</span> function. The Order Catalogs created with Order Category 'OT Surgery' and associated to the Order Types linked to the selected Specialty are displayed for selection. The Order Catalogs are created in the Results and Reports module. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Duration</span> - Enter the duration required for the operation in hh:mm format. This is a mandatory field. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Side Applicable</span> - Select the check box to indicate that the operation has to be performed on a particular side of the body (right/left). For example, if the operation is Amputation of Leg, the check box must be selected to indicate whether the operation is performed on the left leg or right leg. This is an important parameter that will be invoked in the Booking and OT Slate functions.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pre-Operative Checklist</span> - Select the Pre-Operative Checklist using the <span class="BoldNumberRFD">[?]</span> function. The checklists are created in the Checklist function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Post-Operative Checklist</span> - Select the Post-Operative Checklist using the <span class="BoldNumberRFD">[?]</span> function. The checklists are created in the Checklist function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Swab &amp; Instrument Count</span> - Select the Swab and Instrument Count using the <span class="BoldNumberRFD">[?]</span> function. The swab and instrument counts are created in the Swab Count Template function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Category</span> - Select the required category using the <span class="BoldNumberRFD">[?]</span> function. The operation categories are created in the Operation Category function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sub Category</span> - Select the sub category using the <span class="BoldNumberRFD">[?]</span> function. The operation sub categories are created in the Operation Sub-category function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Instructions</span> - Standard Instructions are displayed on selection of Order Catalog. Order Catalogs are created for all the orderables and the standard instructions for each orderable is defined in the Order Catalog function of the Results and Reports module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Standard Instructions in Local Language</span> - Standard Instructions in local language are displayed on selection of Order Catalog.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

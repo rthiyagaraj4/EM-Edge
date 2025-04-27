@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Register Visit to Procedure Unit</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Outpatient Management\nTransaction\nRegister Visit to Procedure Unit");
+addAvenueInfo("Outpatient Management","Outpatient_Management/Transaction/Register_Visit.htm","Outpatient_Management/Transaction/Revise_Visit.htm");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Register Visit to Procedure Unit</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Register</span> a visit for an Outpatient visiting a Procedure Unit.</p>
+<p class="Text">Register Visit to Procedure Unit function is used when a patient arrives at a registration desk as an Outpatient in a Location. Visits are registered for walk-in patients, referral patients, patients with appointment number and invited patients from waiting list. Patients visiting Locations are identified by two unique identifiers. The first is to identify the patient using Patient Identification Number (Patient ID) and the other is to identify the visit using an Encounter Identification Number (Encounter ID). An Encounter ID is generated on completing the process of Visit Registration. This function allows you to perform a Visit Registration and generate outputs required for managing the patient after registration. The Register Visit to Procedure Unit screen has three tabs, namely, Invitation List, Appointment List and Add Visit.</p>
+<p class="Text">&#160;</p>
+<p class="Text"><span class="RFDhyperlinkBackground">'Register Visit to Procedure Unit' function is similar to 'Register Visit' function. 'Register Visit' function allows registering Visits to Clinics and 'Register Visit to Procedure Unit' function allows registering Visits to Procedure Units.</span></p>
+<h2>Registering a Visit to Procedure Unit</h2>
+<p class="From">From the OP Transactions, select the Register Visit to Procedure Unit function.</p>
+<p class="Text">The Register Visit to Procedure Unit screen gets displayed.</p>
+<p class="Text">&#160;</p>
+<p class="Text"><span class="BoldButton">Select patients for Visit Registration from the following tabs:</span></p>
+<p class="Text"><a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/OP_RV_InvitationListTab.htm',600,400);return false;">Invitation List</a></p>
+<p class="Text"><a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/OP_RV_AppointmentListTab.htm',600,400);return false;">Appointment List</a></p>
+<p class="Text"><a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/OP_RV_AddVisitTab.htm',600,400);return false;">Add Visit</a></p>
+<p class="Text">&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />When a patient is selected for registering a visit, the system prompts with the following:</p>
+<p class="Note">• If patient has any active encounter as an Inpatient, the system prompts a message ‘Patient is currently an Inpatient’.</p>
+<p class="Note">• If patient has any outstanding amount, the system pops-up window for Credit Authorization which displays the outstanding amount.</p>
+<p class="Note">• If in OP Parameter ‘External Interface for Privilege’ is selected, you can use the external interface for fetching details of the patient during registration and validate the privilege conditions while registering a visit for a patient. If cleared, you can proceed with normal registration. If the patient is eligible for privileges, you can register visit, or the system alerts you with a message.</p>
+<p class="Note">• The patient must have a National ID or the system alerts the user with a message that ‘National ID cannot be Null’ even if the patient is eligible for coverage.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Create Waitlist','../../Appointment_Scheduling/Transaction/Create_Waitlist.htm','Invite Waiting List Patients','../../Appointment_Scheduling/Transaction/Invite_Waiting_List_Patients.htm','OA Parameter','../../Appointment_Scheduling/AdminSetup/OA_Parameter.htm','OP Parameter','../AdminSetup/OP_Parameter.htm','Procedure Unit','../CodeSetup/Procedure_Unit.htm','Register Patient','../../Master_Patient_Index/Transaction/Register_Patient.htm','Schedule Appointment','../../Appointment_Scheduling/Transaction/Schedule_Appointment.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Manage Patient Queue','Manage_Patient_Queue.htm');return false;" title="See Also"><img src="../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<p>&#160;</p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div><script type="text/javascript" language="JavaScript1.2">
+//<![CDATA[
+        if( typeof( FilePopupInit ) != 'function' ) FilePopupInit = new Function();
+        FilePopupInit('a1');
+        FilePopupInit('a2');
+        FilePopupInit('a3');
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,1987 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRCOUPN.PC                                  */
+/* AUTHOR                : K.SARAVANAN                                  */
+/* DATE WRITTEN          : 13-AUG-2003                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */ 
+/*                                                                      */
+/*  FUNCTION             :                                              */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */ 
+/*                                                                      */
+/*        S. No.     TABLENAMES             INPUT/OUTPUT                */
+/*                                                                      */
+/*         1.        BL_RECEIPT_REFUND_DTL     Query/Update             */
+/*         2.        SY_PROG_CONTROL           Update/Lookup            */
+/*         3.        SY_PROG_MESG                Insert                 */
+/*                                                                      */
+/*  PARAMETERS           :             -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+//#include <sqlca.h>
+//#include <sqlda.h>
+#include <bl.h>
+
+
+/*
+#define OERROR (sqlca.sqlcode < 0)
+*/
+
+#define LAST_ROW (sqlca.sqlcode == 1403)
+
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+
+#define MAX_LINES 80
+
+#define INIT_MESG       "Printing Coupon in progress"
+#define ONLINE_PRINTING 1
+/*
+#define DEBUG 1
+*/
+
+#define SKIP_1 3
+#define SKIP_2 64
+#define SKIP_3 3
+#define SKIP_4 10
+#define SKIP_4_1 2
+#define SKIP_5 22
+#define SKIP_6 15
+#define SKIP_6_1 15
+#define SKIP_7 3
+#define SKIP_8 13
+#define SKIP_9 10
+#define ESC    0x1B
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+
+   VARCHAR uid_pwd      [132],
+           hosp_name    [120],
+           date_time    [20],
+           user_id      [20],
+           nd_pgm_date  [35],
+	   nd_facility_name[31],
+	   nd_calling_pgm_id[51],
+	   nd_logo_pgm_id[1000],
+	   nd_service_desc[41],
+	   nd_recpt_nature_code[3],
+	   nd_blng_grp   [3],
+	   nd_hcard_status[12],	
+	   nd_service_code[11],
+	   nd_hcard_num[21],
+	   
+	   nd_hcard_expiry_date[15],
+	   nd_cash_counter_desc [16],
+	   l_printer_ids[1000],
+	   l_printer_names[1000],
+	   l_printer_types[1000],
+	   l_queue_names[1000],
+	   l_no_of_copies[1000],
+	   l_errortext[1000],
+	   l_logo_yniflaser[2],
+	   LOGO_DIR[1000],
+	   l_logo_name[1000],
+	   l_errorlevel[10],
+	   l_sysmessageid[10],
+	   nd_hosp_name[1000],
+	   nd_hosp_name1[1000];
+   VARCHAR nd_session_id    [16],
+	   nd_facility_id	[3] ,
+           nd_fm_doc_type   [7],
+           nd_to_doc_type   [7],
+           nd_fm_doc_num    [10],
+           nd_to_doc_num    [10],
+           nd_fm_doc_date   [12],
+		   cur_str          [8],
+		   sub_cur_str      [8],	   
+           nd_to_doc_date   [12];
+
+   VARCHAR fm_doc_type_code                             [7],
+           fm_doc_number                                [9],
+		   to_doc_type_code                             [7],
+           to_doc_number                                [9],
+           d_doc_date                                  [13],
+           d_trx_date_time                             [17],
+           d_patient_id                                [21],
+           d_patient_name                              [201],
+           d_patient_name_loc_lang                     [61],
+           d_episode_id									[9],
+           d_visit_id									[5],
+           d_doc_type_code								[7],
+           d_doc_number									[9],
+		   d_doc_srno								[3],
+	   nd_reportid									[20],
+	   nd_ws_no[30];
+
+   char		d_episode_type,
+			nd_print_flag,
+			nd_lang_ind,
+			nd_rec_ref_flag,
+			online_batch_flag,
+			nd_online_print_yn,
+			d_err_code[30];
+
+   double	d_doc_amt,
+			nd_dep_amt;
+
+   int	nd_no_of_decimal,
+		nd_dep_status = 0,l_dmp = 0, l_lsr = 0,
+		l_margin_len= 30;
+
+	VARCHAR		nd_file_name [50],
+				nd_lang_id	[4],
+				l_temp_loc_legend[201],
+				loc_legend1	[201],
+				loc_legend2	[201],
+				loc_legend3	[201],
+				loc_legend4	[201],
+				loc_legend5	[201],
+				loc_legend6	[201],
+				loc_legend7	[201],
+				loc_legend8	[201],
+				loc_legend9	[201],
+				loc_legend10[201],
+				loc_legend11[201],
+				loc_legend12[201],
+				loc_legend13[201],
+				loc_legend14[201],
+				                       /*--------20/09/2005----*/
+				loc_legend15[201],
+				loc_legend16[201],
+				loc_legend17[201],
+				loc_legend18[201],
+				loc_legend19[201],
+				loc_legend20[201],
+				loc_legend21[201],
+				loc_legend22[201],
+				loc_legend23[201],
+				loc_legend24[201],
+				loc_legend25[201],
+				loc_legend26[201],
+				loc_legend27[201],
+				loc_legend28[201],
+				loc_legend35[201],
+				loc_legend36[201];
+				
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+FILE *fp;
+int lctr = 0,pctr =0;
+
+char filename[150];
+char l_epi_barcode[50],
+     l_rec_barcode[50];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+
+   char lv_msg[1024];
+
+   disp_message(ERR_MESG," caliing BLRCOUPON");
+
+   if (argc < 6) {
+        disp_message(ERR_MESG,"BLRCOUPN : Usage BLRCOUPN userid/password session_id pgm_date facility_id nd_calling_pgm_id [filename]\n");
+        proc_exit();
+    } 
+    
+   strcpy(uid_pwd.arr,argv[1]);
+   uid_pwd.len = strlen(uid_pwd.arr);
+
+   strcpy(g_session_id,argv[2]);
+   strcpy(nd_session_id.arr,argv[2]);
+   nd_session_id.len = strlen(nd_session_id.arr);
+
+   strcpy(g_pgm_id,"BLRCOUPN"); 
+
+   if(sql_connect() == -1)
+   {
+      disp_message(ERR_MESG,"Error in connecting to Oracle\n");
+      if (uid_pwd.len == 0)
+         disp_message(ERR_MESG,"Null oracle uid/pwd\n\n\n");
+      proc_exit();
+   }
+
+   set_meduser_role();
+   
+
+   strcpy(g_pgm_date,argv[3]);
+   strcpy(nd_pgm_date.arr,argv[3]);
+   nd_pgm_date.len = strlen(nd_pgm_date.arr);
+
+   strcpy(nd_facility_id.arr,argv[4]);
+
+   nd_facility_id.len  = strlen(nd_facility_id.arr);
+   strcpy(g_facility_id,nd_facility_id.arr);
+
+   strcpy(nd_calling_pgm_id.arr,argv[5]);
+
+   nd_calling_pgm_id.len  = strlen(nd_calling_pgm_id.arr);
+   nd_calling_pgm_id.arr[nd_calling_pgm_id.len] = '\0';
+
+
+   if (argc > 6) 
+		strcpy(nd_file_name.arr,argv[6]);
+   else
+		strcpy(nd_file_name.arr,"blrcoupn.lis");
+	
+	nd_file_name.len  = strlen(nd_file_name.arr);
+
+  
+
+
+	//open_files(); 
+
+	fetch_prog_param();
+
+	//fetch_currency();
+
+	get_printer_type();	
+
+	l_logo_yniflaser.arr[0] = 'N';
+
+	//get_logo_dtl();	
+	
+	//This logic is shifted to Report Writer
+
+	get_left_margin();	
+
+	fetch_currency();
+
+        open_files(); 	
+
+ disp_message(ERR_MESG," caliing decl_coupon_cur");
+	decl_coupon_cur();
+
+	disp_message(ERR_MESG," after caliing decl_coupon_cur");
+
+	while(fetch_coupon_cur())
+	{
+
+	   disp_message(ERR_MESG," enter in while");
+
+		disp_message(ERR_MESG,d_doc_srno.arr);
+
+		nd_lang_id.arr[0] = '\0';
+		nd_lang_id.len = 0;
+
+		EXEC SQL EXECUTE
+			BEGIN
+			blcommon.get_language_ind_id
+				(
+					:nd_facility_id,
+					:d_patient_id,
+					:nd_lang_ind,
+					:nd_lang_id				
+				);
+			END;
+			END-EXEC;
+ 
+		nd_lang_id.arr[strlen(nd_lang_id.arr)] = '\0';
+
+		fetch_legend_value();		
+
+		if (loc_legend36.arr[0] != '\0')
+		{
+			d_patient_name.arr[0] = '\0';
+			d_patient_name.len  = 0;        			
+			
+
+			EXEC SQL SELECT lpad(' ',round((:l_margin_len-length(rtrim(:loc_legend36||short_name)))/2),' ')||(rtrim(:loc_legend36||short_name))
+			INTO :d_patient_name
+			FROM MP_PATIENT_MAST
+			WHERE PATIENT_ID = :d_patient_id;
+
+			 if(OERROR)
+			 {   
+				err_mesg("SELECT failed on table MP_PATIENT_MAST",0,"");
+			 }
+	    
+			 d_patient_name.arr[d_patient_name.len]  = '\0';
+			 
+		}
+
+		if (l_lsr != 0 && l_dmp == 0)
+			{
+			    if ( l_logo_yniflaser.arr[0] != 'Y')			    
+			    {
+			      fprintf(fp,"%c&a20L",ESC); 	/* To Set the Left margin */
+			      fprintf(fp,"%c(s12H",ESC); 	/* To set the font size	  */
+			      fprintf(fp,"%c(s3B",ESC); 	/* To set Bold style 	  */	      
+			     }
+			}		
+			else
+			{
+				fprintf(fp,"%cM",ESC); 	/* To Set compressed mode */
+			}			
+
+		//fprintf(fp,"%cM",ESC); 	/* To Set compressed mode */
+		print_coupon();
+		if ( l_logo_yniflaser.arr[0] != 'Y')			    
+			fprintf(fp,""); /* Page break  */
+
+		if (l_lsr != 0 && l_dmp == 0)
+			{
+			     if ( l_logo_yniflaser.arr[0] != 'Y')			    
+				fprintf(fp,"%cE",ESC);  /* To Reset Printer */			
+			}
+	}
+       
+	fclose(fp);	
+     
+        
+	if (nd_online_print_yn == 'Y')
+	{
+		if (l_logo_yniflaser.arr[0] != 'Y')
+		{
+		   PrintDocument
+		   (
+			uid_pwd.arr,		//char	*PUidPwd;
+			nd_session_id.arr,	//char	*PSessionID;
+			nd_facility_id.arr,	//char	*PFacilityID;
+			"BL",				//char	*PModuleID;
+			nd_calling_pgm_id.arr,			//char	*PDocumentID;
+			filename,			//char	*POnlinePrintFileNames;
+			"O",				//char	*PLocationTypes;
+			" ",				//char	*PLocationCodes;
+			1,					//int		PNumOfCopies;
+			1,					//int		PPageFrom;
+			9999					//int		PPageTo;
+			);
+		}
+	}
+	else
+	{
+		if (l_lsr != 0 && l_dmp == 0 && l_logo_yniflaser.arr[0] == 'Y')
+		{		
+
+		l_errortext.arr[0] = '\0';
+		l_errortext.len = 0;			
+
+		EXEC SQL EXECUTE
+		DECLARE
+			l_print_status BOOLEAN;
+		BEGIN		
+	
+			 
+			APPPRINT.SUBMIT_ORACLE_REPORT
+				 (:nd_ws_no,
+				  :nd_facility_id,
+				  'BL',
+				  :nd_logo_pgm_id,
+				  'P', --p_report_option
+				  '',  --p_outputfile_format
+				  '',  --p_outputfile_name
+				  'O',
+				  ' ', --p_location_code
+				  NULL, --:l_printer_names,
+				  NULL,
+				  NULL, --p_page_from
+				  NULL, --p_page_to
+				  NULL, --p_print_mode
+				  'P_FILE_NAME='||:nd_file_name||'+'||'P_LOGO_NAME='||:l_logo_name, --p_param_list
+				  l_print_status, --OUT BOOLEAN,
+				  :l_errortext);								
+				  
+		
+		END;
+		END-EXEC;
+
+		if (l_errortext.arr[0] != '\0')
+		{
+			disp_message(ERR_MESG,l_errortext.arr);			
+			proc_exit(0);
+			
+		}
+	
+
+	     }
+	}
+
+	
+
+ 
+   EXEC SQL COMMIT WORK RELEASE;
+   return;
+}
+
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+
+  return(0);
+}
+
+open_files()
+{
+  
+if (LOGO_DIR.arr[0] != '\0') 
+   strcpy(filename,LOGO_DIR.arr);
+else 
+   strcpy(filename,WORKING_DIR);
+
+   strcat(filename,nd_file_name.arr);
+
+   strcpy ( OUTPUT_FILE_NAME, filename );
+
+   if ((fp = fopen(filename,"w")) == NULL)
+   {
+        err_mesg("Error while opening output file",0,"");
+        proc_exit();
+   }
+
+}
+
+fetch_prog_param()
+{
+	fm_doc_type_code.arr[0]	= '\0';
+	fm_doc_number.arr[0]	= '\0';
+	to_doc_type_code.arr[0]	= '\0';
+	to_doc_number.arr[0]	= '\0';
+	nd_ws_no.arr[0]		= '\0';
+	nd_logo_pgm_id.arr[0]	= '\0';
+
+	fm_doc_type_code.len	= 0;
+	fm_doc_number.len	= 0;
+	to_doc_type_code.len	= 0;
+	to_doc_number.len	= 0;
+	nd_ws_no.len		= 0;
+	nd_logo_pgm_id.len	= 0;
+
+	EXEC SQL SELECT PARAM1, PARAM2, PARAM3, PARAM4, NVL(PARAM30,'Y'),
+			PARAM29,PARAM28
+	INTO	:fm_doc_type_code, :fm_doc_number, :to_doc_type_code,
+			:to_doc_number, :nd_online_print_yn,
+			:nd_ws_no,
+			:nd_logo_pgm_id
+	FROM SY_PROG_PARAM
+	WHERE PGM_ID = 'BLRCOUPN'
+	AND PGM_DATE = :nd_pgm_date
+	AND SESSION_ID = :nd_session_id;
+
+	fm_doc_type_code.arr[fm_doc_type_code.len]	= '\0';
+	fm_doc_number.arr[fm_doc_number.len]		= '\0';
+	to_doc_type_code.arr[to_doc_type_code.len]	= '\0';
+	to_doc_number.arr[to_doc_number.len]		= '\0';
+	nd_ws_no.arr[nd_ws_no.len] = '\0';
+	nd_logo_pgm_id.arr[nd_logo_pgm_id.len]		= '\0';
+
+	if (strlen(to_doc_number.arr) == 0)
+		strcpy(to_doc_number.arr,fm_doc_number.arr);
+
+	to_doc_number.len = strlen(to_doc_number.arr);
+
+	disp_message(ERR_MESG," In sy_prog_param");
+
+}
+
+get_logo_dtl()
+{
+	
+	  l_logo_yniflaser.arr[0] = 'N';
+
+	  l_errorlevel.arr[0] = '\0';
+	  l_errorlevel.len = 0;
+
+	  l_sysmessageid.arr[0] = '\0';
+	  l_sysmessageid.len = 0;
+
+	  l_errortext.arr[0] = '\0';
+	  l_errortext.len = 0;
+			
+
+	   if (l_lsr != 0 && l_dmp == 0)
+	   {
+		EXEC SQL EXECUTE	
+		BEGIN			
+		
+			
+			BLOPIN.GET_PRINT_SETUP_COL_VALUE(
+				:nd_facility_id,
+				'BLRCOUPN',
+				'PRINT_LOGO_YN_IF_LASER',
+				:l_logo_yniflaser,
+				:l_errorlevel,
+				:l_sysmessageid,
+				:l_errortext) ;
+				
+			:l_logo_yniflaser := nvl(:l_logo_yniflaser,'N');
+
+			if :l_sysmessageid is not null then
+				:l_errorlevel := '10';
+				:l_errortext := blcommon.get_error_text(:l_sysmessageid);
+			end if;
+
+		END;
+		END-EXEC;
+
+		if (strcmp(l_errorlevel.arr,"10") == 0 && l_errortext.arr[0] != '\0')
+		{
+			disp_message(ERR_MESG,l_errortext.arr);
+			proc_exit(0);
+		}
+
+		l_errorlevel.arr[0] = '\0';
+		l_errorlevel.len = 0;
+
+		l_sysmessageid.arr[0] = '\0';
+		l_sysmessageid.len = 0;
+
+		l_errortext.arr[0] = '\0';
+		l_errortext.len = 0;
+	
+		
+		if (l_logo_yniflaser.arr[0] == 'Y')
+		{
+			EXEC SQL EXECUTE	
+			BEGIN				
+				BLOPIN.GET_PRINT_SETUP_COL_VALUE(
+					:nd_facility_id,
+					'BLRRECLO',
+					'LOGO_NAME',
+					:l_logo_name,
+					:l_errorlevel,
+					:l_sysmessageid,
+					:l_errortext) ;
+				
+
+				if :l_sysmessageid is not null then
+					:l_errorlevel := '10';
+					:l_errortext := blcommon.get_error_text(:l_sysmessageid);
+				end if;
+
+			END;
+			END-EXEC;
+			if (strcmp(l_errorlevel.arr,"10") == 0 && l_errortext.arr[0] != '\0')
+			{
+				disp_message(ERR_MESG,l_errortext.arr);
+				proc_exit(0);
+			}
+
+			LOGO_DIR.arr[0] = '\0';
+			LOGO_DIR.len = 0;
+
+		       l_errorlevel.arr[0] = '\0';
+		       l_errorlevel.len = 0;
+
+		       l_sysmessageid.arr[0] = '\0';
+		       l_sysmessageid.len = 0;
+
+		       l_errortext.arr[0] = '\0';
+		       l_errortext.len = 0;	
+
+			if (nd_online_print_yn == 'N')
+			{			
+				EXEC SQL EXECUTE	
+				BEGIN				
+					WORKSTATION.GET_WS_PARAM(
+						:nd_ws_no,				
+						'BLLOGODIR',
+						:LOGO_DIR,
+						:l_errortext);			
+					if :l_errortext is not null then 
+						:l_errortext	:= 'BLLOGODIR:'||:l_errortext;
+					end if;
+
+				END;
+				END-EXEC;
+				if (l_errortext.arr[0] != '\0')
+				{
+					disp_message(ERR_MESG,l_errortext.arr);
+					proc_exit(0);
+				}		
+			}
+		}
+	    }
+   }
+
+
+get_printer_type()
+{
+	EXEC SQL EXECUTE
+	DECLARE
+		l_sys_mesg_id VARCHAR2(10);
+		l_err_level VARCHAR2(10);
+		l_err_text VARCHAR2(1000);
+		l_document_value blcommon.rectype_Tab;
+		l_format_type VARCHAR2(200);
+		l_report_tool_ind VARCHAR2(1);
+	BEGIN
+		blcommon.get_doc_print_format_Tab(
+     			:nd_facility_id,
+			:nd_calling_pgm_id,
+			l_document_value,
+			l_sys_mesg_id,
+			l_err_level,
+			l_err_text);						
+		
+		FOR i IN l_document_value.FIRST..l_document_value.LAST LOOP
+			if  l_document_value(i).id = 'FORMAT_TYPE' then
+				l_format_type := l_document_value(i).value;
+			end if;				
+			
+			if l_document_value(i).id = 'REPORT_TOOL_IND' then 
+				l_report_tool_ind := l_document_value(i).value;
+			end if;		 	
+		END LOOP;		
+
+		if l_format_type = 'DMP_PREPRINTED' then
+			:l_dmp := 1;
+			:l_lsr := 0;
+		elsif l_format_type in('LASER_WITH_LOGO','LASER_WITHOUT_LOGO') then
+			:l_dmp := 0;
+			:l_lsr := 1;
+		else
+			:l_dmp := 0;
+			:l_lsr := 0;
+		end if;
+		
+
+		if :l_dmp = 0 and :l_lsr = 0 then
+
+			APPPRINT.GET_ROUTING_PRINTERS(
+				 :nd_ws_no,
+				 :nd_facility_id,
+				 'BL',
+				 :nd_calling_pgm_id,
+				 'O',
+				 ' ',
+				 :l_printer_ids,
+				 :l_printer_names,
+				 :l_printer_types ,
+				 :l_queue_names,
+				 :l_no_of_copies,
+				 :l_errortext);		 
+
+				 :l_dmp := NVL(instr(:l_printer_types,'D'),0);
+				 :l_lsr := NVL(instr(:l_printer_types,'S'),0);			 
+
+				 if :l_dmp != 0 and :l_lsr != 0 then 
+				    :l_dmp := 0;
+				    --if there is a laser setup, then output format will be laser
+				 end if;	
+
+				 if :l_dmp = 0 and :l_lsr = 0 then 
+				    :l_lsr := 1;
+				    --Default is Laser Format
+				 end if;	 		 
+		end if;
+		
+	   END;
+	   END-EXEC;
+
+		if ( l_errortext.arr[0] != '\0')
+		{
+			l_errortext.arr[0] = '\0';
+			l_errortext.len = 0;
+		}         
+		
+
+
+}
+
+get_left_margin()
+{
+
+	if (l_lsr != 0 && l_dmp == 0)
+	  {
+		if (l_logo_yniflaser.arr[0] == 'Y')			    
+			l_margin_len = 40;				
+		else
+			l_margin_len = 30;
+
+	  }
+}
+
+
+fetch_currency()
+{
+	char out_str[10][133];
+   char s_amt[20];
+   int  length_str[10];
+   int  i = 0,no_of_lines = 0;
+   char epi_visit[14];
+
+   cur_str.arr[0]   = '\0';
+   cur_str.len      =  0;   
+   sub_cur_str.arr[0]   = '\0';
+   sub_cur_str.len      = 0;
+
+   nd_hosp_name.arr[0] = '\0';
+   nd_hosp_name.len = 0;            
+
+   nd_hosp_name1.arr[0] = '\0';
+   nd_hosp_name1.len = 0;            
+
+   
+   exec sql select	base_currency,
+					base_currency_dec ,
+	lpad(' ',round((46-length(ACC_ENTITY_NAME))/2),' ')||UPPER(ACC_ENTITY_NAME) ,
+	lpad(' ',round((:l_margin_len-length(ACC_ENTITY_NAME))/2),' ')||UPPER(ACC_ENTITY_NAME) 
+            into	:cur_str,
+					:sub_cur_str
+					,:nd_hosp_name,:nd_hosp_name1
+  	    from sy_acc_entity
+	    where acc_entity_id = :nd_facility_id;
+
+   if (sqlca.sqlcode == 1403)
+	{ 
+		err_mesg("No base currency in table SY_ACC_ENTITY",0,"");
+	}
+
+   if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on table  SY_ACC_ENTITY",0,"");
+	}
+   
+   cur_str.arr[cur_str.len]  = '\0';
+   sub_cur_str.arr[sub_cur_str.len] = '\0';
+   nd_hosp_name.arr[nd_hosp_name.len] = '\0';
+    nd_hosp_name1.arr[nd_hosp_name1.len] = '\0';
+}
+
+decl_coupon_cur()
+{
+	
+	EXEC SQL DECLARE COUPON_REC CURSOR FOR
+	 SELECT DOC_TYPE_CODE, DOC_NUMBER,DOC_SRNO, EPISODE_TYPE, PATIENT_ID, 
+			EPISODE_ID, VISIT_ID, DOC_AMT, TO_CHAR(DOC_DATE,'DD-MON-YYYY'), PRINT_FLAG
+	 FROM	BL_RECEIPT_REFUND_HDRDTL_VW
+	 WHERE	DOC_TYPE_CODE = :fm_doc_type_code
+	 AND	DOC_NUMBER BETWEEN to_number(:fm_doc_number) AND to_number(:to_doc_number)
+	 AND	REC_REF_FORMAT_IND = 'C';
+
+	/*
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("DECLARE CURSOR failed on table BL_RECEIPT_REFUND_DTL",0,"");
+	}
+	*/
+
+disp_message(ERR_MESG," in declare cursor ");
+
+	EXEC SQL OPEN COUPON_REC;
+	
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("OPEN CURSOR failed on table BL_RECEIPT_REFUND_DTL",0,"");
+	}
+
+}
+
+fetch_coupon_cur()
+{
+	d_doc_type_code.arr[0]	= '\0';
+	d_doc_number.arr[0]		= '\0';
+	d_doc_srno.arr[0]		= '\0';
+	d_patient_id.arr[0]		= '\0';
+	d_episode_id.arr[0]		= '\0';
+	d_visit_id.arr[0]		= '\0';
+	d_doc_date.arr[0]		= '\0';
+
+	d_doc_type_code.len		= 0;
+	d_doc_number.len		= 0;
+	d_doc_srno.len			= 0;
+	d_patient_id.len		= 0;
+	d_episode_id.len		= 0;
+	d_visit_id.len			= 0;
+	d_doc_date.len			= 0;
+
+	EXEC SQL FETCH COUPON_REC INTO	
+			:d_doc_type_code,
+			:d_doc_number,
+			:d_doc_srno,
+			:d_episode_type,
+			:d_patient_id, 
+			:d_episode_id, 
+			:d_visit_id,
+			:d_doc_amt, 
+			:d_doc_date,
+			:nd_print_flag;
+	
+	if (OERROR)
+		err_mesg("FETCH failed on cursor COUPON_REC"," ",0);
+	
+	d_doc_type_code.arr[d_doc_type_code.len]= '\0';
+	d_doc_number.arr[d_doc_number.len]		= '\0';
+	d_doc_srno.arr[d_doc_srno.len]			= '\0';
+	d_patient_id.arr[d_patient_id.len]		= '\0';
+	d_episode_id.arr[d_episode_id.len]		= '\0';
+	d_visit_id.arr[d_visit_id.len]			= '\0';
+	d_doc_date.arr[d_doc_date.len]			= '\0';
+
+	disp_message(ERR_MESG,d_doc_srno.arr);
+	disp_message(ERR_MESG,d_doc_number.arr);
+		disp_message(ERR_MESG,"in fetch");
+
+	return(LAST_ROW?0:1);	 
+}
+
+print_coupon()
+{
+	int len1 = 0, i=0;;
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+	   //if (l_lsr != 0 && l_dmp == 0)
+	   //{	
+		if (l_logo_yniflaser.arr[0] != 'Y')			    
+			fprintf(fp,"%c(s8H",ESC);		
+		
+		prt_space();
+		fprintf(fp,"%-50.50s\n",loc_legend13.arr);
+
+		prt_space();
+		fprintf(fp,"%-50.50s\n",loc_legend12.arr);
+
+		prt_space();
+		fprintf(fp,"%-50.50s\n\n\n\n",nd_hosp_name1.arr);		
+
+		if (l_logo_yniflaser.arr[0] != 'Y')			    
+			fprintf(fp,"%c(s12H",ESC);
+	   //}      
+
+	   if ( l_logo_yniflaser.arr[0] != 'Y')			    
+	   {
+	      fprintf(fp,"%c&a28L",ESC); 	/* To Set the Left margin */
+
+	      //fprintf(fp,"%c&d0D",ESC);	/* set Underline mode   */
+	      fprintf(fp,"%c(s11H",ESC); 	/* To set the font size	*/
+	    }
+	      prt_space();
+	      fprintf(fp,"%-s",loc_legend10.arr);		     
+
+	     if ( l_logo_yniflaser.arr[0] != 'Y')			    
+	     {
+	      fprintf(fp,"%c(s12H",ESC); 	/* To set the font size	*/
+	      //fprintf(fp,"%c&d@",ESC); 		/* release underline mode */
+	     }
+
+	      /*
+	      len1 = 19 - loc_legend10.len;
+
+	      if (len1 > 0)
+	      {
+	         for (i=0;i<len1;i++)
+		 {
+		     fprintf(fp,"%-s"," ");		     
+		 }
+	      }            	  
+	      fprintf(fp," %-17.17s %-20.20s\n"," ",loc_legend11.arr);		     
+	      */	      
+	      
+
+	      fprintf(fp," %-s\n",loc_legend11.arr);		     
+	}
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+		prt_space();
+		fprintf(fp,"%-s\n",loc_legend1.arr);
+	}
+	else
+	{
+		fprintf(fp,"   %-s\n",loc_legend1.arr);
+	}
+
+	/*if (nd_print_flag == 'Y')
+		fprintf(fp,"     %-s\n\n\n\n\n\n\n\n\n",loc_legend9.arr);
+	else
+		fprintf(fp,"\n\n\n\n\n\n\n\n\n");*/
+
+	//COPY not required and hence commented.
+
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+
+		fprintf(fp,"\n\n\n\n\n");
+	}
+	else
+	{
+		fprintf(fp,"\n\n\n\n\n\n\n\n\n");
+	}
+
+	// Shifted above as per phase-3 ench
+	/*
+	if (l_lsr != 0 && l_dmp == 0)
+	{	
+		if (l_logo_yniflaser.arr[0] != 'Y')			    
+			fprintf(fp,"%c(s8H",ESC);
+
+		fprintf(fp,"%-80.80s\n",loc_legend13.arr);
+		fprintf(fp,"%-80.80s\n",loc_legend12.arr);
+		fprintf(fp,"%-80.80s\n\n",nd_hosp_name1.arr);		
+
+		if (l_logo_yniflaser.arr[0] != 'Y')			    
+			fprintf(fp,"%c(s12H",ESC);
+	}
+	*/
+
+	if (l_lsr != 0 && l_dmp == 0)
+	{	 
+	   if ( l_logo_yniflaser.arr[0] != 'Y')			    
+	     fprintf(fp,"%c&a28L",ESC); 	/* To Set the Left margin */
+	}	
+	
+	prt_space();
+
+	disp_message(ERR_MESG,d_doc_srno.arr);
+	fprintf(fp,"%15.15s : %-s/%-s/%-s\n",loc_legend2.arr, d_doc_type_code.arr,d_doc_number.arr,d_doc_srno.arr);
+	
+	prt_space();
+	
+	fprintf(fp,"%15.15s : %-s\n\n\n",loc_legend3.arr, d_doc_date.arr);
+
+	
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+		prt_space();
+		fprintf(fp,"%s %s",loc_legend35.arr,cur_str.arr);
+	}
+	else
+	{
+		fprintf(fp,"          ** %s",cur_str.arr);
+	}
+
+	print_formated(d_doc_amt);
+
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+		fprintf(fp,"\n\n\n");
+	}
+	else
+	{
+		fprintf(fp,"** \n\n\n");
+	}
+	
+	prt_space();
+	fprintf(fp,"%-50.50s\n",loc_legend4.arr);
+
+	prt_space();
+	fprintf(fp,"%-50.50s\n",loc_legend5.arr);
+
+	prt_space();
+	fprintf(fp,"%-50.50s\n\n\n",loc_legend6.arr);
+
+	if (d_patient_name.arr[0] != '\0')
+	{
+		prt_space();
+		fprintf(fp,"%-s\n",d_patient_name.arr);		
+	}
+	else
+	{
+		fprintf(fp,"\n");
+	}
+
+	prt_space();
+	fprintf(fp,"%15.15s : %-20s\n",loc_legend7.arr, d_patient_id.arr);
+
+	prt_space();
+	fprintf(fp,"%15.15s : %-8s",loc_legend8.arr, d_episode_id.arr);
+
+	if (d_episode_type == 'O' || d_episode_type == 'E' ) // EPNH 14/10/2004 
+		fprintf(fp,"/%-4s\n",d_visit_id.arr);
+	else
+		fprintf(fp,"\n");
+
+	if (l_lsr != 0 && l_dmp == 0)
+	{
+	    if( loc_legend15.arr[0] != '\0' || loc_legend16.arr[0] != '\0' ||
+	        loc_legend17.arr[0] != '\0' || loc_legend18.arr[0] != '\0' || 
+	        loc_legend19.arr[0] != '\0' || loc_legend20.arr[0] != '\0' ||
+	        loc_legend21.arr[0] != '\0' || loc_legend22.arr[0] != '\0' ||
+	        loc_legend23.arr[0] != '\0' || loc_legend24.arr[0] != '\0' ||
+	        loc_legend25.arr[0] != '\0' || loc_legend26.arr[0] != '\0' ||
+	        loc_legend27.arr[0] != '\0' || loc_legend28.arr[0] != '\0' )
+	       {
+		 
+	              /*--------20/09/2005----*/
+
+		      if ( l_logo_yniflaser.arr[0] != 'Y')
+		      {
+ 				fprintf(fp,"%c9",ESC);          /* To Release the margin */		
+				fprintf(fp,"%c(s8H",ESC); 	/* To set the font size	  */
+				fprintf(fp,"%c(s3B",ESC); 	/* To set Bold style 	  */
+		      }
+
+				    fprintf(fp,"\n\n\n\n\n\n\n\n\n\n\n\n"); 
+
+			            fprintf(fp,"\n"); 
+
+				    if(loc_legend15.arr[0] != '\0' )
+			            fprintf(fp,"%-s\n\n",loc_legend15.arr);    
+		     if ( l_logo_yniflaser.arr[0] != 'Y')
+		     {
+				fprintf(fp,"%c(s12.5H",ESC); 	/* To set the font size	  */
+		     }
+
+		      			if(loc_legend16.arr[0] != '\0')
+			    		fprintf(fp,"%-s\n",loc_legend16.arr);
+
+					if(loc_legend17.arr[0] != '\0')
+		  			fprintf(fp,"%-s\n",loc_legend17.arr);
+
+					if(loc_legend18.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend18.arr);
+
+					if(loc_legend19.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend19.arr);
+
+					if(loc_legend20.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend20.arr);
+
+					if(loc_legend21.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend21.arr);
+
+					if(loc_legend22.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend22.arr);
+                           
+	                                //fprintf(fp,"\n"); 
+			  
+					if(loc_legend23.arr[0] != '\0' )
+                    			fprintf(fp,"%-s\n",loc_legend23.arr);
+
+					if(loc_legend24.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend24.arr);
+
+					if(loc_legend25.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend25.arr);
+
+					if(loc_legend26.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend26.arr);
+
+					if(loc_legend27.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend27.arr);
+
+					if(loc_legend28.arr[0] != '\0' )
+					fprintf(fp,"%-s\n",loc_legend28.arr);
+			if ( l_logo_yniflaser.arr[0] != 'Y')
+			{			
+				fprintf(fp,"%c(s12H",ESC); 	/* To set the font size	  */			
+			}
+
+				fprintf(fp,"\n");
+
+              }
+
+            else
+	      {
+	      		fprintf(fp,"\n\n\n\n\n\n\n\n\n\n");
+              }
+		 fprintf(fp,"\n");
+		 fprintf(fp,"%-s\n",loc_legend14.arr);
+		 fprintf(fp,"\n");
+  	    }
+       
+	
+	if (nd_print_flag != 'Y')
+		update_rec();
+	
+}
+
+fetch_legend_value()
+{
+	loc_legend1.arr[0]		= '\0';
+	loc_legend2.arr[0]		= '\0';
+	loc_legend3.arr[0]		= '\0';
+	loc_legend4.arr[0]		= '\0';
+	loc_legend5.arr[0]		= '\0';
+	loc_legend6.arr[0]		= '\0';
+	loc_legend7.arr[0]		= '\0';
+	loc_legend8.arr[0]		= '\0';
+	loc_legend9.arr[0]		= '\0';
+	loc_legend10.arr[0]		= '\0';
+	loc_legend11.arr[0]		= '\0';
+	loc_legend12.arr[0]		= '\0';
+	loc_legend13.arr[0]		= '\0';
+	loc_legend14.arr[0]		= '\0';
+	                                          /*--------20/09/2005----*/
+	loc_legend15.arr[0]		= '\0';
+	loc_legend16.arr[0]		= '\0';
+	loc_legend17.arr[0]		= '\0';
+	loc_legend18.arr[0]		= '\0';
+	loc_legend19.arr[0]		= '\0';
+	loc_legend20.arr[0]		= '\0';
+	loc_legend21.arr[0]		= '\0';
+	loc_legend22.arr[0]		= '\0';
+	loc_legend23.arr[0]		= '\0';
+	loc_legend24.arr[0]		= '\0';
+	loc_legend25.arr[0]		= '\0';
+	loc_legend26.arr[0]		= '\0';
+	loc_legend27.arr[0]		= '\0';
+	loc_legend28.arr[0]		= '\0';
+
+	loc_legend35.arr[0]		= '\0';
+	loc_legend36.arr[0]		= '\0';
+
+                                                   /*--------up to here----*/
+	loc_legend1.len			= 0;
+	loc_legend2.len			= 0;
+	loc_legend3.len			= 0;
+	loc_legend4.len			= 0;
+	loc_legend5.len			= 0;
+	loc_legend6.len			= 0;
+	loc_legend7.len			= 0;
+	loc_legend8.len			= 0;
+	loc_legend9.len			= 0;
+	loc_legend10.len		= 0;
+	loc_legend11.len		= 0;
+	loc_legend12.len		= 0;
+	loc_legend13.len		= 0;
+	loc_legend14.len		= 0;
+						/*--------20/09/2005----*/
+	loc_legend15.len		= 0;
+	loc_legend16.len		= 0;
+	loc_legend17.len		= 0;
+	loc_legend18.len		= 0;
+	loc_legend19.len		= 0;
+	loc_legend20.len		= 0;
+	loc_legend21.len		= 0;
+	loc_legend22.len		= 0;
+	loc_legend23.len		= 0;
+	loc_legend24.len		= 0;
+	loc_legend25.len		= 0;
+	loc_legend26.len		= 0;
+	loc_legend27.len		= 0;
+	loc_legend28.len		= 0;
+
+	loc_legend35.len		= 0;
+	loc_legend36.len		= 0;
+
+						/*--------up to here----*/
+
+	EXEC SQL select rtrim(COLUMN_VALUE)
+				into :loc_legend1
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_010' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend1
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_010';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 1",0,"");
+	}
+
+	loc_legend1.arr[loc_legend1.len]		= '\0';
+
+	strcpy(l_temp_loc_legend.arr,loc_legend1.arr);
+	l_temp_loc_legend.len = strlen(l_temp_loc_legend.arr);
+
+	EXEC SQL SELECT RTRIM(SUBSTR(fee_act_legend_value,1,30))
+	           INTO :loc_legend1
+			   FROM bl_fee_act_legends
+			  WHERE legend_id = 'COUPON.LEGEND_010'
+			    AND  report_id = 'BLRCOUPN'
+			    AND :d_doc_amt
+			BETWEEN amt_range_fr
+			    AND amt_range_to;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		loc_legend1.arr[0]		= '\0';
+		strcpy(loc_legend1.arr,l_temp_loc_legend.arr);
+		loc_legend1.len = strlen(loc_legend1.arr);
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend2
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_020' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend2
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_020';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 2",0,"");
+	}
+
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend3
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_030' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend3
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_030';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 3",0,"");
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend4
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_040' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend4
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_040';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 4",0,"");
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend5
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_050' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend5
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_050';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 5",0,"");
+	}
+
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend6
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_060' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend6
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_060';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 6",0,"");
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend7
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_070' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend7
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_070';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 7",0,"");
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend8
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_080' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend8
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_080';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 8",0,"");
+	}
+
+	EXEC SQL select rtrim(substr(COLUMN_VALUE,1,50))
+				into :loc_legend9
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_999' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend9
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_090';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 9",0,"");
+	}
+
+
+	EXEC SQL select rtrim(COLUMN_VALUE)
+				into :loc_legend10
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_100' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend10
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_100';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 10",0,"");
+	}
+
+
+	EXEC SQL select rtrim(COLUMN_VALUE)
+				into :loc_legend11
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_110' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend11
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_110';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 11",0,"");
+	}
+
+
+	EXEC SQL select /*rtrim(substr(COLUMN_VALUE,1,50))*/
+	lpad(' ',round((:l_margin_len-length(rtrim(substr(COLUMN_VALUE,1,50))))/2),' ')||UPPER(rtrim(substr(COLUMN_VALUE,1,50)))	
+				into :loc_legend12
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_120' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+	
+		EXEC SQL select /*dflt_legend_value*/
+			lpad(' ',round((:l_margin_len-length(rtrim(substr(dflt_legend_value,1,50))))/2),' ')||UPPER(rtrim(substr(dflt_legend_value,1,50)))			
+			into :loc_legend12
+			from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_120';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 12",0,"");
+	}
+
+
+
+	EXEC SQL select /*rtrim(substr(COLUMN_VALUE,1,50))*/
+	lpad(' ',round((:l_margin_len-length(rtrim(substr(COLUMN_VALUE,1,50))))/2),' ')||UPPER(rtrim(substr(COLUMN_VALUE,1,50)))	
+				into :loc_legend13
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_130' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+	
+		EXEC SQL select /*dflt_legend_value*/
+				lpad(' ',round((:l_margin_len-length(rtrim(substr(dflt_legend_value,1,50))))/2),' ')||UPPER(rtrim(substr(dflt_legend_value,1,50)))				
+				into :loc_legend13
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_130';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 13",0,"");
+	}
+
+
+	EXEC SQL select  /*rtrim(substr(COLUMN_VALUE,1,60))*/ COLUMN_VALUE
+				into :loc_legend14
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_140' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend14
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_140';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 14",0,"");
+	}
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend15
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_150' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend15
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_150';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 15",0,"");
+	}
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend16
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_160' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend16
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_160';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 16",0,"");
+	}
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend17
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_170' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend17
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_170';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 17",0,"");
+	}
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend18
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_180' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend18
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_180';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 18",0,"");
+	}
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend19
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_190' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend19
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_190';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 19",0,"");
+	}
+
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend20
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_200' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend20
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_200';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 20",0,"");
+	}
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend21
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_210' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend21
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_210';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 21",0,"");
+	}
+
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend22
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_220' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend22
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_220';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 22",0,"");
+	}
+
+
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend23
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_230' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend23
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_230';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 23",0,"");
+	}
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend24
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_240' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend24
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_240';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 24",0,"");
+	}
+
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend25
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_250' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend25
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_250';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 25",0,"");
+	}
+
+
+
+	
+
+ EXEC SQL select  COLUMN_VALUE
+				into :loc_legend26
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_260' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend26
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_260';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 26",0,"");
+	}
+
+
+
+
+ EXEC SQL select COLUMN_VALUE
+				into :loc_legend27
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_270' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend27
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_270';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 27",0,"");
+	}
+
+
+
+
+ EXEC SQL select  COLUMN_VALUE
+				into :loc_legend28
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_280' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend28
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_280';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 28",0,"");
+	}
+
+
+
+EXEC SQL select  COLUMN_VALUE
+				into :loc_legend35
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_350' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend35
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_350';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 35",0,"");
+	}
+
+
+	EXEC SQL select  COLUMN_VALUE
+				into :loc_legend36
+				from SM_RECORD_TRANS_DATA a,sm_lang_legend b
+				where MODULE_ID = 'SM' 
+				and	TABLE_ID = 'SM_LANG_LEGEND'
+				and COLUMN_ID = 'DFLT_LEGEND_VALUE'
+				and PK_VALUE = LEGEND_ID
+				and LEGEND_ID = 'COUPON.LEGEND_360' 
+				and LANGUAGE_ID = :nd_lang_id;
+
+	if (sqlca.sqlcode == 1403 )
+	{
+		EXEC SQL select dflt_legend_value into :loc_legend36
+					from sm_lang_legend
+					where LEGEND_ID = 'COUPON.LEGEND_360';
+	}
+
+	if (sqlca.sqlcode < 0)
+	{   
+		err_mesg("SELECT failed on LEGEND 36",0,"");
+	}
+
+
+
+
+	loc_legend1.arr[loc_legend1.len]		= '\0';
+	loc_legend2.arr[loc_legend2.len]		= '\0';
+	loc_legend3.arr[loc_legend3.len]		= '\0';
+	loc_legend4.arr[loc_legend4.len]		= '\0';
+	loc_legend5.arr[loc_legend5.len]		= '\0';
+	loc_legend6.arr[loc_legend6.len]		= '\0';
+	loc_legend7.arr[loc_legend7.len]		= '\0';
+	loc_legend8.arr[loc_legend8.len]		= '\0';
+	loc_legend9.arr[loc_legend9.len]		= '\0';
+	loc_legend10.arr[loc_legend10.len]		= '\0';
+	loc_legend11.arr[loc_legend11.len]		= '\0';
+	loc_legend12.arr[loc_legend12.len]		= '\0';
+	loc_legend13.arr[loc_legend13.len]		= '\0';
+	loc_legend14.arr[loc_legend14.len]		= '\0';
+									/*--------20/09/2005----*/
+	loc_legend15.arr[loc_legend15.len]		= '\0';
+	loc_legend16.arr[loc_legend16.len]		= '\0';
+	loc_legend17.arr[loc_legend17.len]		= '\0';
+	loc_legend18.arr[loc_legend18.len]		= '\0';
+	loc_legend19.arr[loc_legend19.len]		= '\0';
+	loc_legend20.arr[loc_legend20.len]		= '\0';
+	loc_legend21.arr[loc_legend21.len]		= '\0';
+	loc_legend22.arr[loc_legend22.len]		= '\0';
+	loc_legend23.arr[loc_legend23.len]		= '\0';
+	loc_legend24.arr[loc_legend24.len]		= '\0';
+	loc_legend25.arr[loc_legend25.len]		= '\0';
+	loc_legend26.arr[loc_legend26.len]		= '\0';
+	loc_legend27.arr[loc_legend27.len]		= '\0';
+	loc_legend28.arr[loc_legend28.len]		= '\0';
+
+	loc_legend35.arr[loc_legend35.len]		= '\0';
+	loc_legend36.arr[loc_legend36.len]		= '\0';
+								/*--------20/09/2005----*/
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+		strcat(s_amt,"-");
+        sprintf(str_amt,"%-s",s_amt);
+        fprintf(fp,"%-s",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%-s",s_amt);
+        fprintf(fp,"%-s ",str_amt);
+    }
+}
+
+update_rec()
+{
+    EXEC SQL UPDATE BL_RECEIPT_REFUND_HDR
+             SET PRINT_FLAG = 'Y'
+             WHERE DOC_TYPE_CODE = :d_doc_type_code
+			 AND DOC_NUMBER	= :d_doc_number;
+
+    if (OERROR)
+	{   
+         err_mesg("UPDATE failed on table BL_RECEIPT_REFUND_HDR",0,"");
+	}
+}
+prt_space()
+{
+	if (l_lsr != 0 && l_dmp == 0 && l_logo_yniflaser.arr[0] == 'Y')
+	{
+		fprintf(fp,"                      ");
+	}
+}
+
+
+

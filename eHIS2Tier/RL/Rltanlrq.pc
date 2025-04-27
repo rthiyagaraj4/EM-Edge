@@ -1,0 +1,270 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.6                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : RLTANLRQ                                     */
+/* DESCRIPTION			 : Add Analyzer code to RL_ANALYZER_REQUESTS	*/
+/* AUTHOR                : S. SHEELVAN                                  */
+/* DATE WRITTEN          : 03-09-1997                                   */
+/************************************************************************/
+
+#include <stdio.h>
+#include <string.h>
+#include "rl.h"
+#define NODATAFOUND                     (sqlca.sqlcode == 1403)
+#define OERROR 				(sqlca.sqlcode < 0)
+#define LAST_ROW 			(sqlca.sqlcode == 1403)
+#define NOT_FOUND 			(sqlca.sqlerrd[2] == 0)
+#define TABLE_ALREADY_EXISTS 		(sqlca.sqlcode == -955)
+#define RESOURCE_BUSY        		(sqlca.sqlcode == -54)
+
+#define DEBUG 				0
+
+#define SPOOL_DIR			""	
+#define VIEW_LOG_FILE 1
+#define ONLINE_PRINTING 1
+
+
+
+EXEC SQL BEGIN DECLARE SECTION;  
+
+
+   VARCHAR nd_operating_facility_id			  [5],		  
+		   nd_priority				  [5],		   
+		   uid_pwd			          [132],		   		   
+		   d_sleep_secs				  [10],
+		   prg_start_date		          [31],
+		   er_msg				  [71];
+	   
+
+
+       int er_msg_type = 0;
+
+/***** ADDED ON 05/11/2002 BACKGROUND PROCESS MONITOR **********/
+	VARCHAR    d_machine_name	       [150];
+
+	int p_count = 0;
+/***** UPTO HERE ADDED ON 05/11/2002 BACKGROUND PROCESS MONITOR **********/
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+/*---------------------------------------------------------------------------*/
+/* Start of logic -----------------------------------------------------------*/
+
+int i = 0, ctr = 0;
+int err_flag = 0;
+DWORD sleep_sec = 0;
+
+char string_var [1000];
+
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{ 
+printf("In main()\n");
+#ifdef DEBUG
+   printf("In main()\n");
+#endif
+
+   if (argc < 6)
+   {
+    int i = 0;
+      ins_message(ERR_MESG,"Not enough Parameters for running this program\n");
+      proc_exit();
+   }
+  
+/************* 18.06.2003    
+   strcpy(prg_start_date.arr,argv[2]);
+   prg_start_date.len = strlen(argv[2]);
+***********/
+
+
+   strcpy(nd_operating_facility_id.arr, argv[4]);
+   nd_operating_facility_id.len = strlen(nd_operating_facility_id.arr);
+
+   strcpy(nd_priority.arr, argv[5]);
+   nd_priority.len = strlen(nd_priority.arr);
+
+
+
+   if(sql_connect(argv[1]) == -1)
+   {
+      ins_message(ERR_MESG,"OERROR in connecting to Oracle\n");
+      proc_exit();
+   }
+    
+   set_meduser_role();
+
+//dclr_instruments_with_common_tests();
+   process_rec();
+
+   EXEC SQL COMMIT WORK RELEASE;
+   if (OERROR)
+     ins_message(ORA_MESG,"ROLLBACK WORK RELEASE failed");
+
+   return;
+}
+/*---------------------------------------------------------------------------*/
+/* Loop which checks the status in rl_param and continues -------------------*/
+
+process_rec()
+{  
+  
+
+#ifdef DEBUG
+   printf("In Process_rec()\n");
+#endif
+
+   while (get_sleep_secs())
+   { 
+
+    insert_process_monitor();
+
+	EXEC SQL EXECUTE				
+		BEGIN
+		RL_ANALYZER_IDENTIFY(:nd_operating_facility_id);
+		END;
+	END-EXEC;
+	
+       if (OERROR)      ins_message(ORA_MESG,"COMMIT WORK failed");
+     
+       if (sleep_sec)        Sleep(sleep_sec);
+   }
+
+   fflush(stdout);
+}
+/*---------------------------------------------------------------------------*/
+/* procedure to check status for running this background program ------------*/
+int get_sleep_secs()
+{
+    d_sleep_secs.arr[0]			= '\0';
+	d_sleep_secs.len			= 0;
+
+	d_machine_name.arr[0]		= '\0';
+	d_machine_name.len			= 0;
+
+    EXEC SQL
+     SELECT processing_interval
+	   INTO :d_sleep_secs
+	   FROM SY_PROG_ID
+	  WHERE PGM_ID = 'RLTANLRQ';
+
+
+    EXEC SQL
+     SELECT  machine_name
+	   INTO :d_machine_name
+	   FROM SY_BG_PROCESS_CONTROL
+	  WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id		 
+	    AND PGM_ID = 'RLTANLRQ'
+	    AND STARTED_DATE IS NOT NULL;
+/************ 18.06.2003
+	    AND STARTED_DATE = TO_DATE(:prg_start_date,
+		                           'DDMMYYHH24MISS');
+****************/
+
+//// added on 18.06.2003 following sql
+
+
+    if(NOT_FOUND) 
+	{
+	    return 0;
+	}
+    else 
+	{
+	    d_sleep_secs.arr[d_sleep_secs.len] = '\0';
+		d_machine_name.arr[d_machine_name.len]	= '\0';
+        sleep_sec = (DWORD) atol(d_sleep_secs.arr);
+	    return 1;
+	}    
+}
+
+
+/* Procedure to connec to ORACLE -------------------------------------------*/
+
+sql_connect(l_nd_ap_uid_pwd)
+char l_nd_ap_uid_pwd[];
+{
+#ifdef DEBUG
+   printf("In sql_connect()\n");
+#endif
+
+  strcpy(uid_pwd.arr,l_nd_ap_uid_pwd);
+  uid_pwd.len = strlen(uid_pwd.arr);
+
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)      return(-1);
+  return(0);
+}
+
+
+/*----------------------------------------------------------*/
+
+ins_message(int msg_type,char msg[])
+{
+   er_msg.arr[0] = '\0';
+   er_msg.len = 0;
+   
+   er_msg_type = 0;
+
+   strcpy(er_msg.arr,msg);
+   er_msg.len = strlen(msg);
+ 
+   er_msg_type = msg_type;
+   EXEC SQL
+   INSERT INTO SY_PROG_MSG
+          (OPERATING_FACILITY_ID,PGM_ID,MSG_TYPE,MSG_NUM,MSG_DESC,MSG_DATE_TIME,SESSION_ID,PGM_DATE)
+   VALUES 
+          (:nd_operating_facility_id,'RLTANLRQ',:er_msg_type,NULL,
+		   :er_msg,SYSDATE,USERENV('sessionid'),
+		   TO_CHAR(SYSDATE,'DD/MM/YYYY'));
+   err_flag = 1;
+}
+
+/*------------------------------------------------------------*/
+insert_process_monitor()
+{
+	
+	p_count = 0;
+
+
+	EXEC SQL SELECT COUNT(1) INTO :p_count
+	FROM RL_ANALYZER_PROGRAMS_LOG WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+	AND analyzer_name = 'RLTANLRQ';
+
+	if (p_count == 0)
+	{
+		EXEC SQL INSERT INTO RL_ANALYZER_PROGRAMS_LOG
+				(OPERATING_FACILITY_ID,analyzer_name, 
+				machine_name, last_run_at,
+				ADDED_AT_WS_NO,
+				ADDED_FACILITY_ID,
+				MODIFIED_AT_WS_NO,
+				MODIFIED_FACILITY_ID)
+				VALUES
+				(:nd_operating_facility_id,'RLTANLRQ', 
+				:d_machine_name, SYSDATE,
+				sys_context('USERENV','IP_ADDRESS'),
+				:nd_operating_facility_id,
+				sys_context('USERENV','IP_ADDRESS'),
+				:nd_operating_facility_id);
+	}
+	else
+	{
+		EXEC SQL UPDATE RL_ANALYZER_PROGRAMS_LOG
+				 SET last_run_at = SYSDATE,
+						machine_name = :d_machine_name
+				 WHERE OPERATING_FACILITY_ID = :nd_operating_facility_id
+				 AND analyzer_name = 'RLTANLRQ';	
+
+	}
+
+	EXEC SQL COMMIT WORK;
+
+}
+/*------------------------------------------------------------*/

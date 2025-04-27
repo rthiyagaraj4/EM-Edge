@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>PCM_MaintainDeathRegister</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Clinician Access\nTransactions\nPCM_MaintainDeathRegister");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Maintain Death Register</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Maintain</span> the death register of a deceased patient.</p>
+<p class="Text">This function is used to record the cause of death in the eventuality of the patient expiry occurring in the hospital during an active encounter. The function is applicable only after a patient’s encounter is closed with the Disposition Type which has a deceased Indicator.</p>
+<h2>Maintaining Death Register</h2>
+<p class="From">From the CA Transactions &gt; Clinician Access &gt; Desktop Menu &gt; select required patient &gt; Patient Chart Menu &gt; Outcomes, select Maintain Death Register.</p>
+<p class="Text">The Death Register screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. 
+<a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/CA_PCM_MaintainDeathRegister.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">[Authorize Mode]</a></span> to record any sensitive diagnosis.</p>
+<div class="droptext" id="POPUP241717717" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">In case a sensitive diagnosis needs to be recorded, the logged in user has to be authorized to record such a diagnosis. If an unauthorized user tries to record a sensitive diagnosis, the system stops the user from recording the same.</p>
+<p class="BoldRFD" style="font-weight: normal;">To record a sensitive diagnosis, click <span class="BoldNumberRFD">[Authorized Mode]</span>, which invokes the Enter/Edit Sensitive Diagnosis screen.</p>
+<p class="BoldRFD" style="font-weight: normal;">Enter the password in alphanumeric format of eight characters maximum length to edit or enter the sensitive diagnosis. After entering the password, click <span class="BoldNumberRFD">[OK]</span> to confirm or click <span class="BoldNumberRFD">[Cancel]</span> to cancel the current job and the control shifts back to the Death Register screen. The <span class="BoldNumberRFD">[Authorize Mode]</span> is displayed as <span class="BoldNumberRFD">[Normal Mode]</span>.</p>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Add]</span> to add the diagnosis selected to the 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Diagnosis Details</a> section at the bottom of the screen. The newly added diagnosis is hyperlinked. This part of the screen may already contain diagnosis that has been recorded either during discharge or during an encounter of the patient.</p>
+<div class="droptext" id="POPUP349181307" style="display: none;">
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Diagnosis Code</span> - The code for the diagnosis recorded is displayed. This code is based on the coding scheme chosen in MR parameter.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The description of the diagnosis code as set up in the ICD master is displayed. If an ‘*’ is displayed against the description, this denotes that the diagnosis has been recorded as a primary diagnosis.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Cause of Death</span> – This field appears selected indicating that the diagnosis is identified as the reason for death of the patient. Clear the check box to indicate that the diagnosis recorded is not the cause of death of the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Add to Problem List</span> – Select the check box if the selected diagnosis has to be included in the medical record of the patient.</p>
+</li>
+</ol>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Record]</span> to record save the details entered or <span class="BoldButton">[Cancel]</span> to exit from the screen. On clicking <span class="BoldButton">[Record]</span>, a message to finalize the recording is displayed. Click <span class="BoldButton">[OK]</span> to finalize the death details or <span class="BoldButton">[Cancel]</span> save the death details without finalizing the record.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Terminology Code','../../Medical_Records/TerminologySet/Terminology_Code.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP241717717');
+	TextPopupInit('a3','POPUP349181307');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

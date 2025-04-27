@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 1.0//EN" "http://www.getahead.ltd.uk/dwr/dwr10.dtd">
+<dwr>
+	<allow>
+		<create creator="new" javascript="MessageReader">
+			<param name="class" value="com.iba.framework.core.pojo.web.MessageReader" />
+		</create>
+		<create creator="new" javascript="LcDateFormat">
+			<param name="class" value="com.iba.ehis.lc.core.util.LcDateFormat" />
+		</create>
+
+		<create creator="spring" javascript="ActionType">
+			<param name="beanName" value="/ReasonAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="LaundryUser">
+			<param name="beanName" value="/LaundryUserAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="Stock">
+			<param name="beanName" value="/StandardStockAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="LinenRequest">
+			<param name="beanName" value="/RequestForLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="LinenIssue">
+			<param name="beanName" value="/IssueOfLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="RequestForCleaning">
+			<param name="beanName" value="/RequestForCleaningLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="DeliverLinen">
+			<param name="beanName" value="/DeliverCleanedLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="CleanLinen">
+			<param name="beanName" value="/EnterCleanedLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="QueryStockStatus">
+			<param name="beanName" value="/QueryStockStatusAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+
+		<create creator="spring" javascript="WriteOffLinen">
+			<param name="beanName" value="/WriteOffLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="MendingRequest">
+			<param name="beanName" value="/SendLinenForMendingAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="MendingReceipt">
+			<param name="beanName" value="/IssueLinenAfterMendingAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="LodgeComplaint">
+			<param name="beanName" value="/LodgeComplaintAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="LoanLinen">
+			<param name="beanName" value="/LoanLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="ReturnofLinentoLaundry">
+			<param name="beanName" value="/ReturnofLinentoLaundryAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="ReceiveLoanedLinenList">
+			<param name="beanName" value="/ReceiveLoanedLinenAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<create creator="spring" javascript="ReceiveLinen">
+			<param name="beanName" value="/ReceiveLinenAtLaundryAction" />
+			<param name="location" value="spring-struts_LC.xml" />
+		</create>
+		<convert converter="bean" match="com.iba.framework.lookup.vo.LookupVO" />
+		<convert converter="bean" match="com.iba.ehis.lc.standardStock.vo.StandardStockVO" />
+		<convert converter="bean" match="com.iba.ehis.lc.requestForLinen.vo.RequestForLinenMainVO" />
+		<convert converter="bean" match="com.iba.ehis.lc.issueOfLinen.vo.IssueOfLinenMainVO" />
+		<convert converter="bean" match="com.iba.ehis.lc.enterCleanedLinen.vo.EnterCleanedLinenVO" />
+		<convert converter="bean" match="com.iba.framework.core.util.DTO" />
+		
+	</allow>
+</dwr>

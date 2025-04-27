@@ -1,0 +1,1462 @@
+/************************************************************************/
+/* OCS MEDICOM VER 4.1                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLR00037.PC                                  */
+/* AUTHOR                : D. Ganesh Murthi                             */  
+/* DATE WRITTEN          : 26/10/2003                                   */      
+/************************************************************************/
+          
+#include <stdio.h>         
+#include <string.h>   
+#include <bl.h>       
+#include <math.h> 
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define ROW_COUNT            (sqlca.sqlerrd[2])
+
+/*
+#define DEBUG 0
+*/
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+VARCHAR     hosp_name                       [120],
+			date							[20],
+            date_time                       [20],
+            user_id                         [91],
+	        nd_pwd 							[91],
+            nd_session_id                   [16],
+            nd_pgm_date                     [25],
+            d_curr_pgm_name                 [15],
+			nd_forthe_month					[20],
+			nd_facility				        [3],
+			bl_trx_date				        [30],
+			bl_mn_cancel_trx_date           [30],
+			bl_pmn_cancel_trx_date          [30],
+			bl_bank_name                    [31],
+			bl_doc_type				        [7],
+			bl_mn_cancel_doc_type           [7],
+			bl_pmn_cancel_doc_type          [7],
+			bl_acct_code			        [11],
+			bl_mn_cancel_acct_code		    [11],
+			bl_pmn_cancel_acct_code		    [11],
+			bl_year_acct_code		        [11],
+			bl_open_acct_code		        [11],
+
+			p_language_id						[3],
+			bl_main_acc_code			       [11],
+			
+			bl_first_acc_code			       [11],
+			bl_second_acc_code			       [11],
+			bl_third_acc_code			       [11],
+			bl_fourth_acc_code			       [11],
+			bl_first_prt_code			       [11],
+			bl_second_prt_code			       [11],
+			bl_third_prt_code			       [11],
+			bl_fourth_prt_code			       [11],
+			bl_opbal_acc_code                  [11],
+
+			bl_bank_code                       [7],
+			bl_bank_batch_doctype			   [7],
+			bl_bank_docdate                    [20],
+			bl_bank_in_docno                   [21],
+			bl_slmt_typecod                    [3],
+			bl_ext_acct_facility_id		       [3],
+			bl_ext_acct_dept_code		       [11],
+			l_slmt_desc						   [20],
+			l_aggr_acc_code					   [15],
+			l_currency						   [10],
+			l_translated_value				   [201],
+			l_cash_book_acc_desc			   [16],
+			l_month_year                       [10],
+			l_pk_value						   [100];
+
+int			bl_acc_seq;
+int         bl_main_seq;
+int         bl_doc_num;
+int         bl_doc_srno;
+int         bl_mn_cancel_doc_num; 
+int         bl_pmn_cancel_doc_num;
+int         nd_lead_spaces;
+int			x_count;
+int         bl_seq_num;
+int         bl_yrcl_seq_num;
+int			i,j=0;
+
+int			cancel_rec;
+int			pcancel_rec;
+int         bank_rec;
+int         bl_bank_batch_docno;
+int         field_position;
+
+double      bl_doc_amt,
+			bl_mn_cancel_doc_amt,
+			bl_pmn_cancel_doc_amt,
+			bl_yrclose_amount,
+			bl_yr_bank_amt,
+			bl_yrclose_bankamt,
+			bl_dd_rcpt_amt,
+			bl_mn_opbal_amt,
+			bl_open_amount,
+			bl_dd_pmnt_amt,
+			bl_dd_tot_pmnt_amt,
+			bl_first_opbal,
+			bl_second_opbal,
+			bl_third_opbal,
+			bl_fourth_opbal,
+			bl_other_opbal,
+			bl_total_opbal,
+			bl_day_colln_amt,
+			bl_day_colln_amt1,
+			bl_day_colln_amt2,
+			bl_day_colln_amt3,
+			bl_day_colln_amt4,
+			bl_day_colln_amt5,
+			
+			bl_mn_ccolln_amt,
+			bl_mn_ccolln_amt1,
+			bl_mn_ccolln_amt2,
+			bl_mn_ccolln_amt3,
+			bl_mn_ccolln_amt4,
+			bl_mn_ccolln_amt5,
+
+            bl_pmn_ccolln_amt,
+			bl_pmn_ccolln_amt1,
+			bl_pmn_ccolln_amt2,
+			bl_pmn_ccolln_amt3,
+			bl_pmn_ccolln_amt4,
+			bl_pmn_ccolln_amt5,
+
+			bl_mnth_colln_amt,
+			bl_mnth_colln_amt1,
+			bl_mnth_colln_amt2,
+			bl_mnth_colln_amt3,
+			bl_mnth_colln_amt4,
+			bl_mnth_colln_amt5,
+
+			bl_yr_colln_amt,
+			bl_yr_colln_amt1,
+			bl_yr_colln_amt2,
+			bl_yr_colln_amt3,
+			bl_yr_colln_amt4,
+			bl_yr_colln_amt5,
+
+			bl_bank_total_colln_amt, 
+			bl_bank_in_amt,
+			bl_mnth_bank_amt,
+			bl_yr_bank_amt,
+
+			bl_dd_canc_rcpt_amt,
+            bl_mm_canc_rcpt_amt,
+            bl_yy_canc_rcpt_amt,
+	
+			l_page_total  =0,
+			l_page_total1 =0,
+			l_page_total2 =0,
+			l_page_total3 =0,
+			l_page_total4 =0,
+			l_page_total5 =0,
+			
+			l_day_accross_total,
+			l_month_accross_total,
+			l_year_accross_total,
+			l_aggr_acc_amt,
+			
+			l_total_cancellation1,
+			l_total_cancellation2,
+			l_total_cancellation3,
+			l_total_cancellation4,
+			l_total_cancellation5,
+			l_total_cancellation;
+
+char filename[150];
+char x_msg[200];
+char loc_legend[999][201];
+char l_mesg[200];
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+
+#include <winproc.h>
+
+int    lctr = 0,pctr = 0,nvalid = 0,ncancel = 0;
+
+FILE *fp;
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    if (argc < 5)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+ 
+    strcpy(g_pgm_id,"BLR00037");
+    strcpy(nd_pwd.arr,argv[1]);
+    nd_pwd.len = strlen(nd_pwd.arr);
+
+    EXEC sql connect :nd_pwd;  
+    set_meduser_role(); 
+	strcpy(p_language_id.arr,l_language_id.arr);
+	  
+    if (sqlca.sqlcode < 0 )
+	{
+        disp_message(ORA_MESG,"Error in connecting to Oracle");
+        proc_exit();
+        }
+
+    	strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    	d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    	strcpy(nd_session_id.arr,argv[2]);
+    	nd_session_id.len = strlen(nd_session_id.arr);
+    	strcpy(g_session_id,nd_session_id.arr);
+
+    	strcpy(nd_pgm_date.arr,argv[3]);
+    	nd_pgm_date.len = strlen(nd_pgm_date.arr);
+    	strcpy(g_pgm_date,nd_pgm_date.arr);
+
+    	strcpy(nd_facility.arr,argv[4]);
+    	nd_facility.len = strlen(nd_facility.arr);
+    	strcpy(g_facility_id,nd_facility.arr);
+
+    	strcpy(nd_forthe_month.arr,argv[5]);
+    	nd_forthe_month.len = strlen(nd_forthe_month.arr);
+
+    //	start_prog_msg();
+
+    	declare_cur();
+
+    	fetch_hosp_name();
+
+    	open_file();
+     
+    	fetch_legend_value();
+		
+		open_hdr();
+
+		main_acct_select();
+        
+	    print_rec();
+
+	    end_of_rep();
+
+    //	end_prog_msg();
+
+    EXEC SQL COMMIT WORK RELEASE;
+    if (OERROR)
+         err_mesg("COMMIT WORK RELEASE failed",0,"");
+}
+
+declare_cur()
+{
+     EXEC SQL DECLARE BL_EXT_ACCT_CODE_CUR CURSOR FOR 
+		      select  account_code,
+			          cashbk_main_acct_seq
+			  from 	BL_EXT_ACCT_CODE
+			  where  cashbk_main_acct_seq is not null
+			  order by 2;
+
+     EXEC SQL DECLARE BOUNCE_DTL_CUR CURSOR FOR 
+		      select  to_char(A.BOUNCED_DATE,'dd/mm/yyyy') DOCDATE, A.DOC_TYPE_CODE ,
+					  A.DOC_NUMBER DOC_NO ,
+					  A.DOC_SRNO,
+					  b.doc_amt  AMOUNT , EXT_ACCT_CODE  ACC_CODE
+				from  bl_cancelled_bounced_trx a, bl_receipt_refund_dtl_VW b
+				where a.doc_type_code = b.doc_type_code
+				and	a.doc_number = b.doc_number
+				and	a.doc_srno = b.doc_srno
+				and	b.RECPT_REFUND_IND       = 'R'
+				and	NVL(b.cancelled_ind,'N') = 'N'
+				and	NVL(A.cancelled_ind,'N') = 'N'
+				and NVL(A.BOUNCED_YN,'N')    = 'Y'
+				and	b.CASH_SLMT_FLAG  not in ('A')
+				and to_char(a.BOUNCED_DATE,'YYYYMM') =  to_char(to_date(:nd_forthe_month,'YYYYMM'),'YYYYMM')
+				and	A.CASH_COUNTER_FACILITY_ID = :nd_facility
+			  order by 1;
+
+	EXEC SQL DECLARE bl_open_balance 
+	          cursor 
+			     for
+	          select NVL((sum(NVL(dd_rcpt_amt,0)) + sum(nvl(DD_CANC_RCPT_AMT,0)) + sum(nvl(MM_CANC_RCPT_AMT,0)) + sum(nvl(YY_CANC_RCPT_AMT,0)) + sum(nvl(PRV_YY_CANC_RCPT_AMT,0))),0) ,
+			         NVL(SUM(NVL(DD_PMNT_AMT,0)),0),
+			         nvl(b.cashbk_main_acct_seq,9)
+			    from bl_summary_tran_by_acct a, 
+					 BL_EXT_ACCT_CODE  b
+			   where a.ext_acct_code       = b.account_code
+			     and OPERATING_FACILITY_ID =:nd_facility
+				 //Modified on 23/11/2005 for correcting amount
+                AND to_char(trx_date,'YYYYMM')  = to_char(to_date(:nd_forthe_month,'yyyymm'),'YYYYMM') 
+			    // AND to_char(trx_date,'YYYYMM')  <= to_char(to_date(:nd_forthe_month,'yyyymm'),'YYYYMM') 
+               group by nvl(b.cashbk_main_acct_seq,9)
+			   order by 3;
+
+
+	EXEC SQL DECLARE bl_year_clos_balance cursor for
+	         select sum(NVL(dd_rcpt_amt,0)) + sum(nvl(DD_CANC_RCPT_AMT,0)) + sum(nvl(MM_CANC_RCPT_AMT,0)) + sum(nvl(YY_CANC_RCPT_AMT,0)) + sum(nvl(PRV_YY_CANC_RCPT_AMT,0)) ,
+					NVL(SUM(NVL(DD_PMNT_AMT,0)),0),
+			        nvl(b.cashbk_main_acct_seq,9)
+			 from bl_summary_tran_by_acct a, BL_EXT_ACCT_CODE  b
+			 where  a.ext_acct_code = b.account_code
+			 and OPERATING_FACILITY_ID =:nd_facility
+			 AND to_char(trx_date,'YYYYMM') <= to_char(to_date(:nd_forthe_month,'YYYYMM'),'YYYYMM')
+             and to_char(trx_date,'YYYY') = to_char(to_date(:nd_forthe_month,'YYYYMM'),'YYYY') 
+            // AND EXT_ACCT_FACILITY_ID = :nd_facility
+			 group by nvl(b.cashbk_main_acct_seq,9)
+			 order by 3;
+
+	EXEC SQL DECLARE account_aggregate CURSOR FOR
+		      select  EXT_ACCT_CODE,
+					  SUM(NVL(B.DOC_AMT,0))
+				from  bl_cancelled_bounced_trx a, bl_receipt_refund_dtl_VW b
+				where a.doc_type_code = b.doc_type_code
+				and	a.doc_number = b.doc_number
+				and	a.doc_srno = b.doc_srno
+				and	b.RECPT_REFUND_IND       = 'R'
+				and	NVL(b.cancelled_ind,'N') = 'N'
+				and	NVL(A.cancelled_ind,'N') = 'N'
+				and NVL(A.BOUNCED_YN,'N')    = 'Y'
+				and	b.CASH_SLMT_FLAG  not in ('A')
+				and to_char(a.BOUNCED_DATE,'YYYYMM') =  to_char(to_date(:nd_forthe_month,'YYYYMM'),'YYYYMM')
+				and	A.CASH_COUNTER_FACILITY_ID = :nd_facility
+				GROUP BY ext_acct_code
+				ORDER BY 1 DESC;
+}
+
+fetch_legend_value()
+{
+	for(i=1;i<=300;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+		EXEC SQL SELECT LTRIM(RTRIM('BLR00037.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		           INTO :l_pk_value
+				   FROM dual;
+
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility,
+						'SM',
+						'SM_LANG_LEGEND',
+						'DFLT_LEGEND_VALUE',
+						:l_pk_value,
+						:l_translated_value,
+						:p_language_id );
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+open_hdr() 
+{
+    EXEC SQL OPEN BL_EXT_ACCT_CODE_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor BL_EXT_ACCT_CODE_CUR",0,"");
+
+    EXEC SQL OPEN BOUNCE_DTL_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor BOUNCE_DTL_CUR",0,"");
+	
+	EXEC SQL OPEN bl_year_clos_balance;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor bl_year_clos_balance",0,"");
+
+	EXEC SQL OPEN bl_open_balance;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor bl_open_balance",0,"");
+
+	EXEC SQL OPEN account_aggregate;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor account_aggregate cursor",0,"");	 
+}
+
+fetch_main_acc()
+{
+   bl_main_acc_code.arr[0] = '\0';
+   bl_main_acc_code.len = 0;
+  
+
+      EXEC SQL FETCH BL_EXT_ACCT_CODE_CUR
+               INTO :bl_main_acc_code,
+					:bl_main_seq;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor BL_EXT_ACCT_CODE_CUR",0,"");
+
+   bl_main_acc_code.arr[bl_main_acc_code.len] = '\0';
+
+   return(LAST_ROW?0:1);
+}
+
+fetch_open_bal()
+{
+   bl_open_amount = 0;
+   bl_seq_num  = 0;
+   bl_dd_pmnt_amt = 0;
+
+      EXEC SQL FETCH bl_open_balance
+               INTO :bl_open_amount,
+					:bl_dd_pmnt_amt,
+					:bl_seq_num;
+       if (OERROR)
+            err_mesg("FETCH failed on cursor bl_open_balance",0,"");
+
+   return(LAST_ROW?0:1);
+}
+
+main_acct_select()
+{
+   while(fetch_main_acc())
+   {
+	 if (bl_main_seq == 1) 
+		strcpy(bl_first_acc_code.arr,bl_main_acc_code.arr);
+	 else if (bl_main_seq == 2) 
+		strcpy(bl_second_acc_code.arr,bl_main_acc_code.arr);
+	 else if (bl_main_seq == 3) 
+		strcpy(bl_third_acc_code.arr,bl_main_acc_code.arr);
+	 else
+		strcpy(bl_fourth_acc_code.arr,bl_main_acc_code.arr);
+   }
+
+   print_head();
+
+	bl_yrclose_bankamt = 0;
+	bl_yr_colln_amt    = 0;
+	bl_yr_bank_amt     = 0;
+	//bl_yr_bank_amt   = bl_yrclose_bankamt;
+	bl_yr_colln_amt1 = 0;
+	bl_yr_colln_amt2 = 0;
+	bl_yr_colln_amt3 = 0;
+	bl_yr_colln_amt4 = 0;
+	bl_yr_colln_amt5 = 0;
+}
+
+fetch_year_close_bal()
+{
+	bl_yrclose_amount = 0;
+   	bl_yrcl_seq_num  = 0;
+
+      EXEC SQL FETCH bl_year_clos_balance
+                INTO :bl_yrclose_amount,
+					 :bl_yrclose_bankamt,
+					 :bl_yrcl_seq_num;
+
+       if (OERROR)
+            err_mesg("FETCH failed on cursor bl_open_balance",0,"");
+
+
+   return(LAST_ROW?0:1);
+}
+
+fetch_hdr()
+{
+bl_trx_date.arr[0]   = '\0';
+bl_doc_type.arr[0]   = '\0';
+bl_doc_type.len      = 0;
+bl_trx_date.len   = 0;
+bl_acct_code.arr[0]  = '\0';
+bl_acct_code.len     = 0;
+
+bl_doc_num	     = 0;
+bl_doc_srno	     = 0;
+bl_doc_amt       = 0;
+
+      EXEC SQL FETCH BOUNCE_DTL_CUR
+               INTO :bl_trx_date,
+					:bl_doc_type,
+					:bl_doc_num ,
+					:bl_doc_srno,
+					:bl_doc_amt,
+					:bl_acct_code;
+       if (OERROR)
+            err_mesg("FETCH failed on cursor BOUNCE_DTL_CUR",0,"");
+
+bl_trx_date.arr[bl_trx_date.len]              = '\0';
+bl_doc_type.arr[bl_doc_type.len]              = '\0';
+bl_acct_code.arr[bl_acct_code.len]            = '\0';
+
+    return(LAST_ROW?0:1);
+}
+
+fetch_account_aggregate()
+{
+	l_aggr_acc_code.arr[0] = '\0';
+
+	EXEC SQL FETCH account_aggregate
+	          INTO 	:l_aggr_acc_code,
+					:l_aggr_acc_amt;
+
+    if (OERROR)
+        err_mesg("FETCH failed on CURSOR account_aggregate",0,"");
+
+	l_aggr_acc_code.arr[l_aggr_acc_code.len] = '\0';
+
+	return(LAST_ROW?0:1);
+}
+print_rec()
+{
+
+	year_balance();
+
+	print_open_balance();
+
+    print_day_details();
+
+	print_column_total();
+
+	print_month_total();      
+
+    print_year_total();
+
+	print_account_aggregate();
+}  
+
+year_balance()
+{
+  char l_msg[200];
+ 
+	while (fetch_year_close_bal())
+	{
+		if (bl_yrcl_seq_num == 1)
+			bl_yr_colln_amt1 = bl_yrclose_amount;
+
+		else if (bl_yrcl_seq_num == 2)
+			bl_yr_colln_amt2 = bl_yrclose_amount;
+
+		else if (bl_yrcl_seq_num == 3)
+			bl_yr_colln_amt3 = bl_yrclose_amount;
+
+		else if (bl_yrcl_seq_num == 4)
+			bl_yr_colln_amt4 = bl_yrclose_amount;
+
+		else
+			bl_yr_colln_amt5 = bl_yrclose_amount;
+
+		bl_yr_colln_amt += bl_yrclose_amount;
+
+		bl_yr_bank_amt += bl_yrclose_bankamt;
+	}
+}
+
+print_open_balance()
+{
+    bl_total_opbal = 0;
+	bl_dd_pmnt_amt = 0;
+
+	while (fetch_open_bal())
+	{
+		if (bl_seq_num == 1)
+			bl_first_opbal = bl_open_amount;
+		else if (bl_seq_num == 2)
+			bl_second_opbal = bl_open_amount;
+		else if (bl_seq_num == 3)
+			bl_third_opbal = bl_open_amount;
+		else if (bl_seq_num == 4)
+			bl_fourth_opbal = bl_open_amount;
+		else
+			bl_other_opbal = bl_open_amount;
+
+		bl_total_opbal     += bl_open_amount;
+		bl_dd_tot_pmnt_amt += bl_dd_pmnt_amt;
+	}
+
+
+  //MODIFIED ON 23/11/2005  
+/*
+	bl_yr_colln_amt  += bl_total_opbal;
+	bl_yr_colln_amt1 += bl_first_opbal;
+	bl_yr_colln_amt2 += bl_second_opbal;
+	bl_yr_colln_amt3 += bl_third_opbal;
+	bl_yr_colln_amt4 += bl_fourth_opbal;
+	bl_yr_colln_amt5 += bl_other_opbal;
+
+   */
+	fprintf(fp, "  %-37.37s",loc_legend[220]);
+	if ( bl_total_opbal != 0)   
+		print_formated(bl_total_opbal);
+	else
+        print_formated(0);
+
+	//Newly added column
+	if (bl_total_opbal != 0)   
+		print_formated(bl_total_opbal);
+	else
+        print_formated(0);
+
+	if ( bl_dd_tot_pmnt_amt != 0)   
+		print_formated(bl_dd_tot_pmnt_amt);
+	else
+        print_formated(0);
+
+	//Newly added column
+	fprintf(fp,"                 ");
+
+	//Newly added column
+	fprintf(fp,"                 ");
+	
+	if ( bl_first_opbal != 0)   
+		print_formated(bl_first_opbal);
+	else
+        print_formated(0);
+
+	if (bl_second_opbal != 0)
+		print_formated(bl_second_opbal);
+	else
+        print_formated(0);
+
+	if (bl_third_opbal != 0)
+       print_formated(bl_third_opbal);
+	else
+        print_formated(0);
+
+	if (bl_fourth_opbal != 0)
+       print_formated(bl_fourth_opbal);
+	else
+        print_formated(0);
+
+	if (bl_other_opbal != 0)
+       print_formated(bl_other_opbal);
+	else
+        print_formated(0);
+
+	bl_yr_bank_amt += bl_dd_tot_pmnt_amt;
+
+	fprintf(fp,"\n");
+ 	lctr++;
+	fprintf(fp,"\n");
+ 	lctr++;
+}
+
+print_day_details()
+{
+  while(fetch_hdr())
+  {
+	fprintf(fp,"%-20.20s %-6s / %-8d / %-3d",
+                    bl_trx_date.arr, 
+					bl_doc_type.arr, 
+                    bl_doc_num,
+					bl_doc_srno);
+	print_formated(bl_doc_amt);
+    
+	l_page_total = bl_doc_amt + l_page_total;
+
+	fprintf(fp,"%17s"," ");
+
+	bl_day_colln_amt += bl_doc_amt;
+
+    if (strcmp(bl_acct_code.arr,bl_first_acc_code.arr) == 0)
+	{	
+		fprintf(fp,"%51s"," ");
+		print_formated(bl_doc_amt);
+        bl_day_colln_amt1 += bl_doc_amt;
+		l_page_total1 += bl_doc_amt;
+	}
+	else if (strcmp(bl_acct_code.arr,bl_second_acc_code.arr) == 0)
+	{  
+		calc_space(2);
+        print_formated(bl_doc_amt);
+		bl_day_colln_amt2 += bl_doc_amt;
+		l_page_total2 += bl_doc_amt;
+	}
+    else
+	if (strcmp(bl_acct_code.arr,bl_third_acc_code.arr) == 0)
+	{  
+		calc_space(3);
+        print_formated(bl_doc_amt);
+		bl_day_colln_amt3 += bl_doc_amt;
+		l_page_total3 += bl_doc_amt;
+	}
+    else if (strcmp(bl_acct_code.arr,bl_fourth_acc_code.arr) == 0)
+    {   
+		calc_space(4);
+		print_formated(bl_doc_amt);
+		bl_day_colln_amt4 += bl_doc_amt;
+		l_page_total4 += bl_doc_amt;
+	}
+    else
+    {
+		calc_space(5);
+		print_formated(bl_doc_amt);
+		bl_day_colln_amt5 += bl_doc_amt;
+        fprintf(fp, " %7s ", bl_acct_code.arr);
+		l_page_total5 += bl_doc_amt;
+	}
+	fprintf(fp,"\n");
+
+ 	lctr++;
+	check_page_end(1,1);
+  }   
+}
+
+print_bank_total()
+{
+	fprintf(fp,"%56s","  ");
+	fprintf(fp,"----------------- \n");
+	fprintf(fp,"  Bank-in Total     %36s", " ");
+	print_formated(bl_bank_total_colln_amt);
+	fprintf(fp,"\n");
+	//fprintf(fp,"\n%39s"," ");
+	//align_head(3);
+	lctr+=3;
+}
+
+
+print_page_openbal()
+{
+	fprintf(fp,"  %-37.37s",loc_legend[220]);
+	//print_formated(bl_day_colln_amt);
+	print_formated(bl_mnth_colln_amt);
+
+	//Monthly balance should be carried forward insted of day total.
+	//l_day_accross_total = bl_day_colln_amt1 + bl_day_colln_amt2 + bl_day_colln_amt3 + bl_day_colln_amt4 + bl_day_colln_amt5;
+	//print_formated(l_day_accross_total); //New column
+    
+	l_month_accross_total = bl_mnth_colln_amt1 + bl_mnth_colln_amt2 + bl_mnth_colln_amt3 + bl_mnth_colln_amt4 + bl_mnth_colln_amt5;
+    print_formated(l_month_accross_total);    //New Column
+
+
+	
+	print_formated(bl_dd_tot_pmnt_amt);
+	//fprintf(fp,"%17s"," ");
+
+	fprintf(fp,"%34s"," ");   //New column
+	print_formated(bl_mnth_colln_amt1);
+	print_formated(bl_mnth_colln_amt2);
+	print_formated(bl_mnth_colln_amt3);   
+	print_formated(bl_mnth_colln_amt4);
+	print_formated(bl_mnth_colln_amt5);
+	fprintf(fp,"\n\n");  
+	lctr+=5;
+}
+
+print_column_total()
+{
+	check_page_end(3,0);
+	fprintf(fp,"                                                        ");
+	
+	if(l_total_cancellation!=0)
+		l_page_total += l_total_cancellation;
+	
+	print_formated(l_page_total);
+	fprintf(fp,"\n");
+
+	fprintf(fp,"%39s"," ");
+	align_head(3);
+	fprintf(fp, " ");
+	fprintf(fp," %-37.37s",loc_legend[230]);
+
+	if(l_total_cancellation!=0)
+		bl_day_colln_amt += l_total_cancellation;
+	print_formated(bl_day_colln_amt);
+
+	//Incorporated to reduce the cancelled doc amount.
+	if(l_total_cancellation1!=0)
+		bl_day_colln_amt1 += l_total_cancellation1;
+	if(l_total_cancellation2!=0)
+		bl_day_colln_amt2 += l_total_cancellation2;
+	if(l_total_cancellation3!=0)
+		bl_day_colln_amt3 += l_total_cancellation3;  
+	if(l_total_cancellation4!=0)
+		bl_day_colln_amt4 += l_total_cancellation4;
+	if(l_total_cancellation5!=0)
+		bl_day_colln_amt5 += l_total_cancellation5;  
+
+	l_day_accross_total = bl_day_colln_amt1 + bl_day_colln_amt2 + bl_day_colln_amt3 + bl_day_colln_amt4 + bl_day_colln_amt5;
+	//l_day_accross_total+= l_day_accross_total;
+	print_formated(l_day_accross_total); //New column
+	
+	//fprintf(fp,"%2s"," ");
+	print_formated(bl_bank_total_colln_amt);
+
+	//fprintf(fp,"%17s"," ");
+
+	fprintf(fp,"%34s"," ");   //New column
+	print_formated(bl_day_colln_amt1);
+	print_formated(bl_day_colln_amt2);
+	print_formated(bl_day_colln_amt3);   
+	print_formated(bl_day_colln_amt4);
+	print_formated(bl_day_colln_amt5);
+	fprintf(fp,"\n%39s"," ");
+	align_head(3);
+	lctr+=3;
+	//check_page_end(3,0);
+}
+
+print_month_total()
+{
+	  check_page_end(3,0);	
+      bl_mnth_colln_amt  = bl_total_opbal + bl_mn_ccolln_amt - (bl_day_colln_amt);
+	  bl_mnth_bank_amt   = bl_dd_tot_pmnt_amt + bl_bank_total_colln_amt;
+	  bl_mnth_colln_amt1 = bl_first_opbal   + bl_mn_ccolln_amt1-(bl_day_colln_amt1);
+      bl_mnth_colln_amt2 = bl_second_opbal  + bl_mn_ccolln_amt2-(bl_day_colln_amt2);
+      bl_mnth_colln_amt3 = bl_third_opbal   + bl_mn_ccolln_amt3-(bl_day_colln_amt3);
+      bl_mnth_colln_amt4 = bl_fourth_opbal  + bl_mn_ccolln_amt4-(bl_day_colln_amt4);
+      bl_mnth_colln_amt5 = bl_other_opbal  + bl_mn_ccolln_amt5-(bl_day_colln_amt5);
+  	  fprintf(fp, " ");
+	               
+	  fprintf(fp," %-37.37s",loc_legend[240]);
+	  if(l_total_cancellation!=0)
+		bl_mnth_colln_amt += l_total_cancellation;
+	  print_formated(bl_mnth_colln_amt);
+	  
+	  if(l_total_cancellation1!=0)	
+		bl_mnth_colln_amt1 += l_total_cancellation1;
+	  if(l_total_cancellation2!=0)
+		bl_mnth_colln_amt2 += l_total_cancellation2;
+	  if(l_total_cancellation3!=0)
+		bl_mnth_colln_amt3 += l_total_cancellation3;  
+	  if(l_total_cancellation4!=0)
+		bl_mnth_colln_amt4 += l_total_cancellation4;
+	  if(l_total_cancellation5!=0)
+		bl_mnth_colln_amt5 += l_total_cancellation5;  
+
+	  l_month_accross_total = bl_mnth_colln_amt1 + bl_mnth_colln_amt2 + bl_mnth_colln_amt3 + bl_mnth_colln_amt4 + bl_mnth_colln_amt5;
+	  print_formated(l_month_accross_total);    //New Column
+	  print_formated(bl_mnth_bank_amt);
+	  fprintf(fp,"                                  ");	//New column
+	  
+	  print_formated(bl_mnth_colln_amt1);
+	  print_formated(bl_mnth_colln_amt2);
+	  print_formated(bl_mnth_colln_amt3);   
+	  print_formated(bl_mnth_colln_amt4);
+	  print_formated(bl_mnth_colln_amt5);   
+      fprintf(fp, " \n");
+	  lctr++;
+	  //check_page_end(3,0);
+}
+
+print_year_total()
+{ 
+	  check_page_end(4,0);
+	  /*bl_yr_colln_amt  += bl_mnth_colln_amt + bl_pmn_ccolln_amt;
+	  bl_yr_bank_amt   += bl_mnth_bank_amt;
+	  bl_yr_colln_amt1 += bl_mnth_colln_amt1 + bl_pmn_ccolln_amt1;
+      bl_yr_colln_amt2 += bl_mnth_colln_amt2 + bl_pmn_ccolln_amt2;
+      bl_yr_colln_amt3 += bl_mnth_colln_amt3 + bl_pmn_ccolln_amt3;
+      bl_yr_colln_amt4 += bl_mnth_colln_amt4 + bl_pmn_ccolln_amt4;
+      bl_yr_colln_amt5 += bl_mnth_colln_amt5 + bl_pmn_ccolln_amt5;*/
+
+	 /*  Modified on 23/11/2005 for correcting Grand total
+	 
+	  bl_yr_colln_amt  += l_page_total +  bl_pmn_ccolln_amt;
+	  //bl_yr_bank_amt   += bl_mnth_bank_amt;
+	  //bl_yr_bank_amt   += bl_bank_total_colln_amt + bl_dd_tot_pmnt_amt;  -- Moved to bank collection printing procedure.
+	  bl_yr_colln_amt1 += bl_pmn_ccolln_amt1-(l_page_total1);
+      bl_yr_colln_amt2 += bl_pmn_ccolln_amt2-(l_page_total2);
+      bl_yr_colln_amt3 +=  bl_pmn_ccolln_amt3-(l_page_total3);
+      bl_yr_colln_amt4 +=  bl_pmn_ccolln_amt4-(l_page_total4);
+      bl_yr_colln_amt5 +=  bl_pmn_ccolln_amt5-(l_page_total5);
+	  
+	  */	  
+	  
+	  bl_yr_colln_amt  = bl_yr_colln_amt-l_day_accross_total;
+	  bl_yr_colln_amt1 = bl_yr_colln_amt1-bl_day_colln_amt1;
+      bl_yr_colln_amt2 = bl_yr_colln_amt2-bl_day_colln_amt2;
+      bl_yr_colln_amt3 = bl_yr_colln_amt3-bl_day_colln_amt3;
+      bl_yr_colln_amt4 = bl_yr_colln_amt4-bl_day_colln_amt4;
+      bl_yr_colln_amt5 = bl_yr_colln_amt5-bl_day_colln_amt5;
+
+
+
+	  fprintf(fp,"%39s"," ");
+	  align_head(3);
+	  fprintf(fp, " ");
+	  fprintf(fp," %-37.37s",loc_legend[260]);
+	  print_formated(bl_yr_colln_amt);
+
+	  if(l_total_cancellation!=0)	
+		bl_yr_colln_amt += l_total_cancellation;	
+
+	  if(l_total_cancellation1!=0)	
+		bl_yr_colln_amt1 += l_total_cancellation1;
+	  if(l_total_cancellation2!=0)
+		bl_yr_colln_amt2 += l_total_cancellation2;
+	  if(l_total_cancellation3!=0)
+		bl_yr_colln_amt3 += l_total_cancellation3;  
+	  if(l_total_cancellation4!=0)
+		bl_yr_colln_amt4 += l_total_cancellation4;
+	  if(l_total_cancellation5!=0)
+		bl_yr_colln_amt5 += l_total_cancellation5;  
+
+	  l_year_accross_total = bl_yr_colln_amt1 + bl_yr_colln_amt2 + bl_yr_colln_amt3 + bl_yr_colln_amt4 + bl_yr_colln_amt5; 	
+	  print_formated(l_year_accross_total);  //New Column
+	  
+	  print_formated(bl_yr_bank_amt);
+	  fprintf(fp,"%34s"," ");	//New column
+		
+	  print_formated(bl_yr_colln_amt1);
+	  print_formated(bl_yr_colln_amt2);
+	  print_formated(bl_yr_colln_amt3);   
+	  print_formated(bl_yr_colln_amt4);
+	  print_formated(bl_yr_colln_amt5);   
+      fprintf(fp, " \n");
+	  fprintf(fp,"%39s"," ");
+	  align_head(3);
+	  lctr+=3;
+	  //check_page_end(1,0);
+}
+   
+ 
+print_account_aggregate()
+{
+	lctr++;
+	check_page_end(2,0);
+	fprintf(fp,"%121.121s : ",loc_legend[270]);
+	print_formated(l_year_accross_total);
+	fprintf(fp,"\n\n");	
+	lctr+=2;
+	check_page_end(3,0);
+	fprintf(fp,"%98s%-s\n"," ",loc_legend[250]);
+	fprintf(fp,"%98s"," ");fill_dash(strlen(loc_legend[250]));
+	fprintf(fp,"\n");
+
+	while(fetch_account_aggregate())
+	{
+		check_page_end(1,0);
+		fprintf(fp,"%98s%-15.15s         : "," ",l_aggr_acc_code.arr);
+		print_formated(l_aggr_acc_amt);
+		fprintf(fp,"\n");
+		lctr++;
+	}
+}
+
+end_of_rep()
+{
+	fprintf(fp,"\n\n %72s   ***  END OF REPORT ***\n\f"," ");
+	fflush(fp);
+}
+
+open_file()
+{
+    strcpy(filename,WORKING_DIR);
+	strcat(filename,"BLR00037.lis");
+
+    if ((fp = fopen(filename,"w")) == NULL)
+    {
+       disp_message(ERR_MESG,"Error in opening file BLR00037.lis");
+       proc_exit();
+    }
+}
+
+print_head()
+{
+	align_head(0);
+	
+	print_page_title();
+	align_head(6);
+	align_head(4); 
+	fprintf(fp,"%-18.18s   %-17.17s  %14.14s  %16.16s  %14.14s  %16.16s  %15.15s",loc_legend[130],loc_legend[140],loc_legend[150],loc_legend[160],loc_legend[150],loc_legend[170],loc_legend[140]) ;
+	align_head(2);
+	align_head(5);
+	fprintf(fp,"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+	align_head(1);
+	
+	fflush(fp);  
+	lctr = 13;
+}
+ 
+print_page_title()
+{
+	double l_report_width;
+	double l_acc_entity_length;
+	double l_start_point;
+	double l_comp_name_end_point;
+	int	   l_page_width;
+
+	l_month_year.arr[0] = '\0';
+	l_month_year.len    = 0;
+
+	l_report_width=220;
+	l_acc_entity_length = strlen(hosp_name.arr);
+
+
+	EXEC SQL select to_char(to_date(:nd_forthe_month,'yyyymm'),'Mon.YYYY') 
+			 INTO l_month_year
+			 FROM DUAL;
+
+	l_month_year.arr[l_month_year.len] = '\0';
+
+	//Code for Line 1
+	l_start_point=ceill((l_report_width/2)-(l_acc_entity_length/2));
+	fprintf(fp,"MDL           : BL");
+	l_start_point=l_start_point-18;
+	print_spaces(l_start_point);
+	fprintf(fp,"%s",hosp_name.arr);
+	l_comp_name_end_point=l_start_point+18+l_acc_entity_length;
+	l_start_point=(l_report_width-(15+strlen(date.arr))-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp,"%-15.15s : %s\n",loc_legend[30],date.arr);
+
+	//Code for Line 2
+	l_start_point=0;
+	l_start_point=ceill((l_report_width/2)-((strlen(loc_legend[1]))/2));
+	fprintf(fp,"OPR           : %s",user_id.arr);
+	l_start_point=l_start_point-(strlen(user_id.arr)+16);
+	print_spaces(l_start_point);
+	fprintf(fp,"%s",loc_legend[1]);
+	l_comp_name_end_point=l_start_point+(strlen(user_id.arr)+16)+strlen(loc_legend[1]);
+	l_start_point=(l_report_width-(17+strlen(date_time.arr))-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp,"%-15.15s : %s\n",loc_legend[40],date_time.arr);
+
+	//Code for Line 3
+	l_start_point=0;
+	l_start_point=ceill((l_report_width/2)-((strlen(l_month_year.arr)+strlen(loc_legend[10]))/2));
+	fprintf(fp,"%-14.14s: BLR00037",loc_legend[20]);
+	l_start_point=l_start_point-24;
+	print_spaces(l_start_point);
+	fprintf(fp,"%s %s",loc_legend[10],l_month_year.arr);
+	l_comp_name_end_point=l_start_point+24+strlen(loc_legend[10])+strlen(l_month_year.arr);
+	l_start_point=(l_report_width-(17+9)-l_comp_name_end_point);
+	print_spaces(l_start_point);
+	fprintf(fp,"%-15.15s : %d\n",loc_legend[50],++pctr);
+	
+	fprintf(fp,"\n");
+}
+
+fill_dash(flg)
+{
+  int i;
+  for (i=1;i<=flg;i++)
+	fprintf(fp,"%s","-");
+}
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+	date.arr[0]		 = '\0';
+    user_id.arr[0]   = '\0';
+	l_currency.arr[0]= '\0';
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+	date.len		 = 0;
+    user_id.len      = 0;
+	l_currency.len	 = 0;
+//COMMENTED ACCOUNTING_NAME  AND ADDED ACC_ENTITY_NAME FOR IN13330  ON 04/08/09  BY RAVIKIRAN S
+    EXEC SQL SELECT ACC_ENTITY_NAME,--ACCOUNTING_NAME, 
+					TO_CHAR(SYSDATE,'DD/MM/RRRR'),
+					TO_CHAR(SYSDATE,'HH24:MI:SS'),
+                    USER,
+					base_currency
+               INTO :hosp_name, 
+					:date,
+					:date_time, 
+					:user_id,
+					:l_currency
+               FROM SY_ACC_ENTITY
+	          WHERE ACC_ENTITY_ID = :nd_facility;
+
+    if (OERROR) 
+		err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+	hosp_name.arr[hosp_name.len]           = '\0';
+	date_time.arr[date_time.len]           = '\0';
+	date.arr[date.len]					   = '\0';
+	user_id.arr[user_id.len]               = '\0';
+	l_currency.arr[l_currency.len]		   = '\0';
+}
+
+align_head(flg)
+{
+	EXEC SQL EXECUTE  
+	BEGIN
+		SELECT  COUNT(DISTINCT account_code) 
+		  INTO  :x_count
+		  FROM  bl_ext_acct_code a
+		 WHERE	cashbk_main_acct_seq IS NOT NULL;
+	END;
+	END-EXEC;
+
+	switch(flg)       
+	{
+
+      case 0 :  
+			if (bl_first_prt_code.arr[0] == '\0')
+			{ 
+				if (bl_first_acc_code.arr[0] !='\0') 
+				{
+					strcpy(bl_first_prt_code.arr,bl_first_acc_code.arr);
+					field_position = 1;
+				}
+				else if (bl_second_acc_code.arr[0] !='\0')
+				{
+					strcpy(bl_first_prt_code.arr,bl_second_acc_code.arr);
+					field_position = 2;
+				}
+				else if (bl_third_acc_code.arr[0] !='\0')
+				{
+					strcpy(bl_first_prt_code.arr,bl_third_acc_code.arr);
+					field_position = 3;
+				}
+				else
+				{
+					strcpy(bl_first_prt_code.arr,bl_fourth_acc_code.arr);
+					field_position = 4;
+				}
+			}
+
+			if (field_position == 4 )
+				  break;
+			else
+			{ 
+				if (bl_second_prt_code.arr[0] == '\0') 
+				{ 
+					if (field_position > 1)
+					{
+						if (field_position == 2 )
+							if (bl_third_acc_code.arr[0] !='\0')
+							{
+								strcpy(bl_second_prt_code.arr,bl_third_acc_code.arr);
+								field_position = 3;
+							}
+							else if (field_position == 3)
+							{ 
+								if (bl_fourth_acc_code.arr[0] !='\0')
+								{ 
+									strcpy(bl_second_prt_code.arr,bl_fourth_acc_code.arr);
+									field_position = 4;
+								}
+	    					}
+					}
+                    else if (bl_second_acc_code.arr[0] != '\0')
+					{
+						strcpy(bl_second_prt_code.arr, bl_second_acc_code.arr);
+						field_position = 2;
+					}
+				}
+            }
+			
+			if (field_position == 4)
+				  break;
+			else if (field_position == 2)
+			{ 
+				if (bl_third_acc_code.arr[0] !='\0')
+				{
+					strcpy(bl_third_prt_code.arr,bl_third_acc_code.arr);
+					field_position = 3;
+				}
+			}
+            else if (field_position == 3)
+			{ 
+				if (bl_fourth_acc_code.arr[0] !='\0')
+				{
+					strcpy(bl_third_prt_code.arr,bl_fourth_acc_code.arr);
+					field_position = 4;
+					break;
+				}
+			}
+
+			if (field_position  == 3)
+				if (bl_fourth_acc_code.arr[0] != '\0')
+					strcpy(bl_fourth_prt_code.arr,bl_fourth_acc_code.arr);
+				break;
+
+	  case 1 :	
+			if (x_count == 0)   
+			{ 
+				fill_dash(33);
+				fprintf(fp, " \n");
+			}
+			else if (x_count == 1)
+			{
+				fill_dash(49);
+				fprintf(fp, " \n");
+			}
+			else if (x_count == 2) 
+			{
+				fill_dash(65);
+				fprintf(fp, " \n");
+			}
+			else if (x_count == 3)
+			{ 
+				fill_dash(81);
+				fprintf(fp, " \n"); 
+			}
+			else
+			{ 
+				fill_dash(97);
+				fprintf(fp, " \n"); 
+			}
+			break;
+	  case 2 :   
+			/*if (x_count == 0)
+				fprintf(fp, "%-32.32s \n","      Others  Acct.Code" );
+			else*/ 
+			
+			if(x_count == 1)
+			{ 
+				//fprintf(fp, "%16s %27s ",bl_first_acc_code.arr,"      Others  Acct.Code" );
+				fprintf(fp, "%16s ",bl_first_acc_code.arr);
+			}
+			else if(x_count == 2) 
+			{
+				fprintf(fp, "%16s %16s ",bl_first_acc_code.arr, bl_second_acc_code.arr);
+			}
+			else if(x_count == 3)
+			{
+				fprintf(fp, "%16s %16s %16s ",bl_first_acc_code.arr, bl_second_acc_code.arr,bl_third_acc_code.arr);
+			}
+			else if(x_count == 4)
+			{
+				fprintf(fp,"%16s %16s %16s %16s ",bl_first_acc_code.arr, bl_second_acc_code.arr,bl_third_acc_code.arr,bl_fourth_acc_code.arr);
+			}
+			fprintf(fp,"%16.16s  %8.8s\n",loc_legend[180],loc_legend[190]);
+			break;
+
+	case 3 : 
+			if (x_count == 0)   
+	         { 
+				fill_dash(118);
+				fprintf(fp, " \n");
+			 }
+			 else if (x_count == 1)
+			 {
+				fill_dash(134);
+				fprintf(fp, " \n");
+			 }
+		     else if (x_count == 2) 
+			 {
+				fill_dash(150);
+				fprintf(fp, " \n");
+			 }
+			 else if (x_count == 3)
+			 { 
+				fill_dash(166);
+				fprintf(fp, " \n"); 
+			 }
+			 else
+			 { 
+				fill_dash(182);
+				fprintf(fp, " \n"); 
+			 }
+			 break;
+	case 4 :
+			
+			fprintf(fp,"%95s%-11.11s                  "," ",loc_legend[120]);
+			for(j=1;j<=x_count;j++)
+			{
+				l_cash_book_acc_desc.arr[0]='\0';
+
+				EXEC SQL SELECT cashbk_main_acct_col_desc
+					       INTO :l_cash_book_acc_desc
+						   FROM bl_ext_acct_code
+						  WHERE cashbk_main_acct_seq = :j
+						    AND cashbk_main_acct_col_desc IS NOT NULL;
+				
+				if(OERROR) 
+					err_mesg("SELECT failed on table bl_ext_acct_code",0,"");
+				
+				l_cash_book_acc_desc.arr[l_cash_book_acc_desc.len]='\0';
+
+				fprintf(fp, "%15.15s  ",l_cash_book_acc_desc.arr);
+			}
+			fprintf(fp,"\n");
+			break;
+
+	case 5 :
+			fprintf(fp,"%46s%8.8s      %12.12s        %8.8s       %-11.11s        %-15.15s "," ",l_currency.arr,l_currency.arr,l_currency.arr,loc_legend[200],loc_legend[210]);
+			for(j=1;j<=x_count;j++)
+			{
+				fprintf(fp, "%9.9s        ",l_currency.arr);
+			}
+			fprintf(fp, "%9.9s\n",l_currency.arr);
+			break;
+	case 6 :
+			fprintf(fp,"%72s<"," ");
+			fill_dash(26-(strlen(loc_legend[60])/2));
+			fprintf(fp,"%s",loc_legend[60]);
+			fill_dash(26-(strlen(loc_legend[60])/2));
+			fprintf(fp,">  <");
+			fill_dash(((((x_count-1)*20)+27)/2)-(strlen(loc_legend[70])/2));
+			fprintf(fp,"%s",loc_legend[70]);
+			fill_dash(((((x_count-1)*20)+27)/2)-(strlen(loc_legend[70])/2));
+			fprintf(fp,">\n");
+	}
+}
+
+
+calc_space(flg)
+{
+  char dgx[200];
+  char x_msg[200];
+
+  switch (flg) 
+  {
+		case 2:
+			if (bl_first_acc_code.arr[0] == '\0')
+			{
+           	   fprintf(fp,"%51s"," ");
+			   fprintf(fp," ");
+			
+			}
+			else
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			break;
+
+		case 3:
+			if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] == '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp," ");
+			}
+			else if ((bl_first_acc_code.arr[0] == '\0') || (bl_second_acc_code.arr[0] == '\0'))
+			{				
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			else
+		  	{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%33s "," ");
+			}
+			break;
+		case 4:
+			if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] == '\0') && (bl_third_acc_code.arr[0] == '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp," ");
+			}
+			else if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] == '\0') && (bl_third_acc_code.arr[0] != '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			else if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] != '\0') && (bl_third_acc_code.arr[0] == '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			else if ((bl_first_acc_code.arr[0] != '\0') && (bl_second_acc_code.arr[0] == '\0') && (bl_third_acc_code.arr[0] == '\0'))
+			{	
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			else if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] != '\0') && (bl_third_acc_code.arr[0] != '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%33s "," ");
+			}
+			else if ((bl_first_acc_code.arr[0] != '\0') && (bl_second_acc_code.arr[0] != '\0') && (bl_third_acc_code.arr[0] == '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%33s "," ");
+			}
+			else if ((bl_first_acc_code.arr[0] == '\0') && (bl_second_acc_code.arr[0] != '\0') && (bl_third_acc_code.arr[0] != '\0'))
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%33s "," ");
+			}
+			else 
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%50s "," ");
+			}
+				break;
+		case 5:
+			if (x_count == 4)
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%67s "," ");  
+			}
+			else if (x_count == 3)
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%50s ", " ");
+			}
+			else if (x_count == 2)
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%33s ", " ");
+			}
+			else
+			{
+				fprintf(fp,"%51s"," ");
+				fprintf(fp,"%16s "," ");
+			}
+			break;
+	}
+
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[15], str_amt[15];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);        
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+        fprintf(fp,"%15sCR",str_amt);
+    }
+    else 
+	{
+        put_val(s_amt,loc_amount);         
+        format_amt(s_amt);
+        sprintf(str_amt,"%15s",s_amt);
+        fprintf(fp,"%15s  ",str_amt);
+    }
+}                        
+
+check_page_end(l_lead_lines, l_print_flag)
+int l_lead_lines;
+int	l_print_flag;
+{
+	if(l_print_flag==1)
+		l_lead_lines=l_lead_lines+10;
+
+	if((lctr+l_lead_lines)>60) 
+	{
+		if(l_print_flag==1)
+		{
+			print_column_total();
+			print_month_total();      
+			print_year_total();
+			fprintf(fp,"%121.121s : ",loc_legend[270]);
+			print_formated(l_year_accross_total);
+			fprintf(fp,"\n");
+		}		
+		l_page_total  = 0;
+		l_page_total1 = 0;
+		l_page_total2 = 0;
+		l_page_total3 = 0;
+		l_page_total4 = 0;
+		l_page_total5 = 0;
+
+		fprintf(fp,"\f");
+		print_head();
+		if(l_print_flag==1)
+			print_page_openbal();
+		lctr = 14;
+	}
+}
+  
+print_spaces(l_length)
+double l_length;
+{
+	for(i=0;i<l_length;i++)
+	{
+		fprintf(fp," ");
+	}
+}

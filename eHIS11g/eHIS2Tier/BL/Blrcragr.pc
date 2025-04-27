@@ -1,0 +1,393 @@
+#define ONLINE_PRINTING 1
+#define ESC 0x1B
+#include <stdio.h>
+#include <string.h>          
+#include "bl.h"           
+
+
+EXEC SQL BEGIN DECLARE SECTION;   
+
+    VARCHAR uid_pwd              [91],
+	    d_session_id             [16],
+		nd_facility_id           [3], 
+	    d_pgm_date               [14],
+        rep_date                 [20],
+        oper_id                  [21],
+        d_curr_pgm_name          [15];
+
+    VARCHAR nd_hosp_name         [61],
+		h_practice_num			 [31],
+		h_ln1_add				 [31],
+		h_ln2_add				 [31],
+		h_ln3_add				 [31],
+		h_zip_code				 [31],
+		h_tel_num				 [31],
+		h_fax_num			     [31],
+	    h_email_id   [31],
+		nd_patient_id            [21],
+	    nd_patient_name          [61],
+        nd_sponsor_id            [11],
+	    nd_sponsor_name          [31],
+	    nd_bill_doc_type_code    [7],
+		nd_ln1_res_add			 [31],
+		nd_ln2_res_add			 [31],
+		nd_ln3_res_add			 [31],
+		nd_ln4_res_add			 [31],
+        nd_res_phone_num		 [19],
+        nd_ln1_off_add			 [31],
+		nd_ln2_off_add			 [31],
+		nd_ln3_off_add			 [31],
+		nd_ln4_off_add			 [31],
+        nd_off_phone_num		 [19],
+		nd_inst_start_date       [11],
+		nd_remarks1				 [61],
+		nd_remarks2				 [61],
+		nd_remarks3				 [61];
+
+double  nd_inst_amt_monthly,
+	    nd_bill_outst_amt;
+
+int     nd_hosp_name_len,
+        nd_bill_doc_num,
+	    nd_credit_agreement_num;
+		
+
+    int d_rfq_line_num,
+        count;
+
+    
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include "winproc.h"
+char string_var[100];
+
+char filename[150];
+FILE *f1;
+
+int page_no,
+    line_no,
+    first_line,
+    g_count;
+
+char file_name[15];
+
+void proc_main(argc,argv)
+int argc;
+char *argv[];
+{
+
+    if(argc != 5) {
+disp_message(ERR_MESG,"BLRCRAGR : Usage BLRCRAGR userid/password session_id pgm_date facility_id \n");
+proc_exit();
+    }
+
+    strcpy(g_pgm_id,"BLRCRAGR");
+	strcpy(filename,"BLRCRAGR.LIS");
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr); 
+
+    strcpy(uid_pwd.arr,argv[1]);
+    uid_pwd.len = strlen(uid_pwd.arr);
+
+    strcpy(d_session_id.arr,argv[2]);
+    d_session_id.len = strlen(d_session_id.arr);
+    
+    strcpy(d_pgm_date.arr,argv[3]);
+    d_pgm_date.len = strlen(d_pgm_date.arr);
+
+    EXEC SQL CONNECT :uid_pwd;
+
+    if(OERROR) 
+    {
+      disp_message(ORA_MESG,"Unable to connect to oracle.\n");
+      sprintf(string_var, "%s\n",sqlca.sqlerrm.sqlerrmc);
+      disp_message(ORA_MESG,string_var);
+      proc_exit();
+    }
+
+	set_meduser_role();	
+    fetch_prog_param();
+
+    strcpy(file_name,"blrcragr.lis");
+
+    if( (f1=fopen(file_name,"w")) == NULL) 
+    {
+      disp_message(ERR_MESG,"Error in opening output file...\n");
+      proc_exit();
+    }
+
+    decl_curs();
+
+    print_agreement();
+  
+    
+    fclose(f1);
+
+ /*print_online(uid_pwd.arr, "BLRCRAGR", "O", "", "BLRCRAGR.LIS", "R"); */
+
+   PrintDocument
+      (
+		uid_pwd.arr,		//char	*PUidPwd;
+		d_session_id.arr,	//char	*PSessionID;
+		nd_facility_id.arr,	//char	*PFacilityID;
+		"BL",				//char	*PModuleID;
+		"BLRCRAGR",			//char	*PDocumentID;
+		filename,			//char	*POnlinePrintFileNames;
+		"O",				//char	*PLocationTypes;
+		"",				//char	*PLocationCodes;
+		1,					//int		PNumOfCopies;
+		1,					//int		PPageFrom;
+		1					//int		PPageTo;
+	);
+
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    return;
+}
+
+fetch_prog_param()
+{
+   	nd_facility_id.arr[0]  = '\0';
+	nd_patient_id.arr[0]          = '\0';
+	nd_bill_doc_type_code.arr[0]  = '\0';
+    nd_sponsor_id.arr[0]          = '\0';
+
+	nd_facility_id.len  = 0;
+	nd_patient_id.len             = 0;   
+	nd_bill_doc_type_code.len     = 0;   
+	nd_sponsor_id.len             = 0;   
+
+   
+	EXEC SQL SELECT operating_facility_id,
+			PARAM1, /*  PATIENT_ID           */
+			PARAM2,         /*  BILL_DOC_TYPE_CODE   */
+			PARAM3,         /*  BILL_DOC_NUM         */
+			PARAM4,         /*  CREDIT_AGREEMENT_NO  */
+            PARAM5         /*  SPONSOR_ID           */
+	 INTO   :nd_facility_id,
+	        :nd_patient_id,
+			:nd_bill_doc_type_code,
+			:nd_bill_doc_num,
+			:nd_credit_agreement_num,
+			:nd_sponsor_id
+	 FROM   SY_PROG_PARAM
+     WHERE  PGM_ID     = :d_curr_pgm_name
+     AND    SESSION_ID = :d_session_id
+     AND    PGM_DATE   = :d_pgm_date;
+
+   if ( OERROR) 
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NO_DATA_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+	nd_facility_id.arr[nd_facility_id.len] = '\0';
+    nd_patient_id.arr[nd_patient_id.len]                  = '\0';
+	nd_bill_doc_type_code.arr[nd_bill_doc_type_code.len]  = '\0';
+    nd_sponsor_id.arr[nd_sponsor_id.len]                  = '\0';
+	strcpy(g_facility_id,nd_facility_id.arr);
+
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :d_session_id
+               AND PGM_DATE   = :d_pgm_date;
+
+   if (OERROR) 
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+}
+
+decl_curs()
+{
+
+EXEC SQL SELECT TRUNC(INST_START_DATE), INST_AMT_MONTHLY, BILL_OUTSTANDING_AMT, REMARKS_1, REMARKS_2, REMARKS_3
+INTO   :nd_inst_start_date, :nd_inst_amt_monthly, :nd_bill_outst_amt, :nd_remarks1, :nd_remarks2, :nd_remarks3
+FROM   BL_CREDIT_AGREEMENT
+WHERE  operating_facility_id = :nd_facility_id AND
+PATIENT_ID          = :nd_patient_id 
+AND    BILL_DOC_TYPE_CODE  = :nd_bill_doc_type_code
+AND    BILL_DOC_NUM        = :nd_bill_doc_num
+AND    CREDIT_AGREEMENT_NO = :nd_credit_agreement_num;
+   
+EXEC SQL SELECT  SHORT_NAME INTO :nd_patient_name FROM MP_PATIENT_MAST
+WHERE   PATIENT_ID = :nd_patient_id;
+
+EXEC SQL SELECT  SHORT_NAME INTO :nd_sponsor_name FROM MP_PATIENT_MAST
+WHERE   PATIENT_ID = :nd_sponsor_id;
+
+EXEC SQL SELECT LN1_RES_ADD, LN2_RES_ADD, LN3_RES_ADD, LN4_RES_ADD,
+       CONTACT_TEL_NUM,
+       LN1_OFF_ADD, LN2_OFF_ADD, LN3_OFF_ADD, LN4_OFF_ADD,
+       OFFICE_TEL_NUM
+INTO   :nd_ln1_res_add, :nd_ln2_res_add, :nd_ln3_res_add, :nd_ln4_res_add,
+       :nd_res_phone_num,
+       :nd_ln1_off_add, :nd_ln2_off_add, :nd_ln3_off_add, :nd_ln4_off_add,
+       :nd_off_phone_num  
+FROM   MP_PAT_OTHER_DTLS
+WHERE  PATIENT_ID = :nd_sponsor_id;
+
+	 nd_hosp_name.len    = 0;
+	 h_practice_num.len    = 0;
+	 h_ln1_add.len		   = 0;
+	 h_ln2_add.len		   = 0;
+	 h_ln3_add.len		   = 0;
+	 h_zip_code.len		   = 0;
+	 h_tel_num.len		   = 0;
+	 h_fax_num.len		   = 0;
+	 h_email_id.len		   = 0;
+
+	 nd_hosp_name.arr [ nd_hosp_name.len ]		   = '\0';
+	 h_practice_num.arr [ h_practice_num.len ]		   = '\0';
+	 h_ln1_add.arr [ h_ln1_add.len ]		   = '\0';
+	 h_ln2_add.arr [ h_ln2_add.len ]		   = '\0';
+	 h_ln3_add.arr [ h_ln3_add.len ]		   = '\0';
+	 h_zip_code.arr [ h_zip_code.len ]		   = '\0';
+	 h_tel_num.arr [ h_tel_num.len ]				   = '\0';
+	 h_fax_num.arr [ h_fax_num.len ]				   = '\0';
+	 h_email_id.arr [ h_email_id.len ]				   = '\0';
+
+
+
+EXEC SQL SELECT accounting_name, PRACTICE_NUM, LN1_ADD, LN2_ADD, LN3_ADD,
+					 TEL_NUM, FAX_NUM, ZIP_CODE, ACC_ENTITY_NAME_LOC_LANG
+		 INTO	:nd_hosp_name, :h_practice_num, :h_ln1_add, :h_ln2_add, :h_ln3_add,
+				:h_tel_num, :h_fax_num, :h_zip_code, :h_email_id
+		 FROM	SY_ACC_ENTITY
+		 WHERE acc_entity_id = :nd_facility_id;
+
+	 nd_hosp_name.arr [ nd_hosp_name.len ]		   = '\0';
+	 h_practice_num.arr [ h_practice_num.len ]		   = '\0';
+	 h_ln1_add.arr [ h_ln1_add.len ]		   = '\0';
+	 h_ln2_add.arr [ h_ln2_add.len ]		   = '\0';
+	 h_ln3_add.arr [ h_ln3_add.len ]		   = '\0';
+     h_tel_num.arr [ h_tel_num.len ]				   = '\0';
+	 h_fax_num.arr [ h_fax_num.len ]				   = '\0';
+	 h_zip_code.arr [ h_zip_code.len ]		   = '\0';
+	 h_email_id.arr [ h_email_id.len ]		   = '\0';
+	 
+
+EXEC SQL SELECT round((61-length(ACC_ENTITY_NAME))/2) INTO :nd_hosp_name_len FROM SY_ACC_ENTITY;
+}
+
+
+print_agreement()
+{
+int spc=0;
+int i=0;
+char s_amt[22];
+char a_amt[22];
+
+
+    fprintf(f1, "\n\n\n\n");
+
+    for (i=0;i<(80-nd_hosp_name.len)/2;i++)
+		fprintf(f1," ");
+    fprintf(f1,"%c(s3B",ESC);
+	fprintf(f1,"%s", nd_hosp_name.arr);
+    fprintf(f1,"%c(s0B",ESC);
+	fprintf(f1,"\n\n\n");
+
+     spc = strlen(h_ln1_add.arr) ; 
+	 if(spc>0) 
+	 {
+	     fprintf(f1,"%c(s12H",ESC);
+	 	 for(i=1;i<(96-spc)/2;i++) fprintf(f1," ");
+		 fprintf(f1,"%s", h_ln1_add.arr); 
+ 		 fprintf(f1,"%c(s10H \n",ESC);
+	 }
+	 spc = strlen(h_ln2_add.arr) ; 
+	 if(spc>0) 
+	 {
+	     fprintf(f1,"%c(s12H",ESC);
+		 for(i=1;i<(96-spc)/2;i++) fprintf(f1," ");
+		 fprintf(f1,"%s", h_ln2_add.arr); 
+		 fprintf(f1,"%c(s10H \n",ESC);
+	 }
+	 spc = strlen(h_ln3_add.arr); 
+	 if(spc>0) 
+	 {
+	    fprintf(f1,"%c(s12H",ESC);
+		for(i=1;i<(96-spc)/2;i++) fprintf(f1," ");
+		fprintf(f1,"%s", h_ln3_add.arr); 
+		fprintf(f1,"%c(s10H \n",ESC);
+	 }
+	 spc = strlen(h_zip_code.arr); 
+	 if(spc>0) 
+	 {
+	    fprintf(f1,"%c(s12H",ESC);
+		for(i=1;i<(96-spc)/2;i++) fprintf(f1," ");
+		fprintf(f1,"%s", h_zip_code.arr); 
+		fprintf(f1,"%c(s10H \n",ESC);
+	 }
+     fprintf(f1,"%c(s12H",ESC);
+ 	 fprintf(f1,"Email Id	 : %s \n",h_email_id.arr);
+	 fprintf(f1,"Phone No    : %s \n",h_tel_num.arr);
+	 fprintf(f1,"Fax No      : %s \n",h_fax_num.arr);
+	 fprintf(f1,"Practice No : %s \n",h_practice_num.arr);
+	 fprintf(f1, " %c(s10H",ESC);
+     fprintf(f1,"\n_________________________________________________");
+     fprintf(f1,"\n\n");
+
+    	
+	fprintf(f1,"                                CREDIT AGREEMENT        NO : %d \n\n\n\n", nd_credit_agreement_num);
+
+    fprintf(f1,"     PATIENT ID          :  %-20s\n\n", nd_patient_id.arr);
+
+    fprintf(f1,"     PATIENT'S NAME      :  %-60s\n\n", nd_patient_name.arr);
+
+    fprintf(f1,"     BILL NUMBER         :  %-7s / %-9d\n\n", nd_bill_doc_type_code.arr, nd_bill_doc_num);
+    
+	
+	sprintf(s_amt, "%15.2f",nd_bill_outst_amt);
+
+	format_amt(s_amt);
+
+	fprintf(f1,"     OUTSTANDING AMOUNT  :  %-17s \n\n", s_amt);
+	
+
+	fprintf(f1,"     SPONSOR PATIENT ID  :  %-11s\n\n",nd_sponsor_id.arr);
+
+    fprintf(f1,"     SPONSOR NAME        :  %-31s\n\n", nd_sponsor_name.arr);
+
+    fprintf(f1,"     RESIDENCE ADDRESS   :  %-31s\n", nd_ln1_res_add.arr);
+    fprintf(f1,"                            %-31s\n", nd_ln2_res_add.arr);
+    fprintf(f1,"                            %-31s\n", nd_ln3_res_add.arr);
+    fprintf(f1,"                            %-31s\n\n", nd_ln4_res_add.arr);
+
+    fprintf(f1,"              TELEPHONE  :  %-19s\n\n", nd_res_phone_num.arr);
+
+    fprintf(f1,"     OFFICE ADDRESS      :  %-31s\n", nd_ln1_off_add.arr);
+    fprintf(f1,"                            %-31s\n", nd_ln2_off_add.arr);
+    fprintf(f1,"                            %-31s\n", nd_ln3_off_add.arr);
+    fprintf(f1,"                            %-31s\n\n", nd_ln4_off_add.arr);
+
+    fprintf(f1,"              TELEPHONE  :  %-19s\n\n\n\n", nd_off_phone_num.arr);
+
+    fprintf(f1,"         I, %-31s, herewith undertake to repay \n", nd_sponsor_name.arr);
+
+	sprintf(a_amt, "%15.2f",nd_inst_amt_monthly);
+
+	format_amt(a_amt);
+
+    fprintf(f1,"     the above mentioned amount in monthly instalments of %-17s \n", a_amt);
+
+	fprintf(f1,"     starting from %-10s.  In the event that I neglect to repay the\n",nd_inst_start_date.arr);
+    fprintf(f1,"     amount, legal steps can be taken against me and I will be held \n");
+    fprintf(f1,"     responsible for all legal costs incurred.\n\n\n");
+
+  if((nd_remarks1.arr != NULL)&&
+    (nd_remarks2.arr != NULL)&&
+	(nd_remarks3.arr != NULL)){
+    fprintf(f1,"     %-61s\n", nd_remarks1.arr);
+    fprintf(f1,"     %-61s\n", nd_remarks2.arr);
+    fprintf(f1,"     %-61s\n\n\n", nd_remarks3.arr);
+	}
+	fprintf(f1,"     SIGNED BY                                         ON   \n\n\n");
+	fprintf(f1,"     ACCEPTED / APPROVED \n\n\n");
+
+	fprintf(f1,"     HOSPITAL REPRESENTATIVE  :                        DATE  :");
+}
+

@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Gen Direct Invoice/Debit/Credit Note</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nInvMgmnt\nGen Direct Invoice/Debit/Credit Note");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Generate Direct Invoice/Debit/Credit Note</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Generate</span> Debit or Credit notes for an invoice that does not have any bills associated.</p>
+<p class="Text">Generate Direct Invoice/Debit/Credit Note function is used to generate a debit or credit note and link it to an invoice. You can associate the charge details for a Payer Service Group and Payer Service Group Line. The recorded details can be viewed through the function ‘View Payment Reference Details’. &#160;You can generate direct debit notes or credit notes only if the invoice is generated and if there are any positive or negative adjustments. The document is generated for the difference amount. The document type details have to be defined in the ‘Document Types by Payers’ function. Through this function, you can edit the amount only for Payer Service Group.</p>
+<h2>Generating Direct Debit Notes or Credit Notes</h2>
+<p class="From">From the Invoice Management &gt; Transaction, double-click on Generate Direct Invoice/Debit /Credit Note function.</p>
+<p class="Text">The Generate Direct Invoice/Debit/Credit Note screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">The name of the logged in facility is displayed, by default. You cannot change the facility name. The facility names associated to the logged in user are listed.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select a Transaction Type from the list. The system-defined values are Invoice, Debit Note and Credit Note. The mandatory fields differ based on the value selected for Transaction Type. <a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/BL_InvMgmnt_GenDirectInvoice_Debit_Credit_Note.htm',400,300);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Refresh]</span> to query the records matching the search criteria.</p>
+</li>
+<li class="p-Number">
+<p class="Number">The <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">invoice details</a> and the <a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/BL_InvMgmnt_GenDirectInvoiceDebitCreditNote_ChargeDetails.htm',400,300);return false;">charge details</a> associated to the selected patient records are displayed.</p>
+<div class="droptext" id="POPUP1004848517" style="display: none;">
+<p><span class="BoldButton">Invoice Details</span></p>
+<p class="Text">The details recorded for the respective patient during invoice generation are displayed. The transaction type, invoice document type and number that is generated, date when the invoice is generated, gross amount, mark up and mark down amount and the net amount for which the invoice is generated are listed. The name of the Customer and Policy details, total gross amount, mark up, mark down amount and net amount is displayed. The check boxes Cancelled, Printed and Direct Invoice/Debit/Credit Note are selected to indicate that the invoice is cancelled or printed or whether it is a direct invoice/debit/credit note. The check boxes are cleared if the invoice is cancelled or not printed or if it is not a direct invoice/debit/credit note. The invoices that are highlighted in &#160;&#160;<img src="../../image519.gif" style="border: none;" alt="image519.gif" width="17" height="12" border="0" /> color with the check box ‘Cancelled’ as selected.</p>
+</div>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the charge details to record the difference amount and generate direct invoice, debit or credit notes. An error message is displayed, if you do not enter the Actual Amount.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Generate]</span> to generate direct invoice, debit or credit notes.</p>
+</li>
+<li class="p-Number">
+<p class="Number">A reference document number is generated based on the document type selected for Invoice through the ‘Document Types by Payers’ function.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Gen Inv-IP-High Cost','../SSInvMgmnt/Gen_Inv-IP-High_Cost.htm','Gen Inv-IP/DC','Gen_Inv-IP_DC.htm','Gen Inv-OP/EM','Gen_Inv-OP_EM.htm','Generate Pre-Invoice-IP/DC','Generate_Pre-Invoice-IP_DC.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a2','POPUP1004848517');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

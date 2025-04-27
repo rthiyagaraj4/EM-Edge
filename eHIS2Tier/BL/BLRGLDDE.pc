@@ -1,0 +1,893 @@
+
+/* Preprocessor Directives  */
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+//#include <sqlca.h>  
+//#include <sqlda.h>   
+#include <bl.h>
+
+
+
+
+/* Macros */
+
+#define NODATAFOUND sqlca.sqlcode==1403
+#define OERROR (sqlca.sqlcode < 0) 
+#define MAX_LINES 55
+
+/* Declarations */
+
+EXEC SQL BEGIN DECLARE SECTION;	
+
+	VARCHAR uid_pwd 	        [95],	        
+	     	nd_sysdate              [31],
+		nd_from_facility_id	[4],		
+		nd_to_facility_id	[4],		
+		nd_from_cash_counter_id	[4],
+		nd_to_cash_counter_id	[4],
+		nd_cash_counter_id	[3],
+		nd_cash_counter_desc	[31],
+		nd_from_doc_date	[31],
+		nd_to_doc_date		[31],	
+		nd_user_id  	        [31],	
+		nd_hospital_name	[61],
+		nd_facility_id		[3] ,		
+		nd_facility_name	[60],				
+		nd_session_id		[20],
+		nd_pgm_date		[30],
+		nd_p_facility_id	[4],
+		nd_prev_facility_id     [3] ,
+		nd_prev_facility_name	[31],	
+		nd_pgm_id		[20];
+
+	
+	char    nd_filename	        [100];
+
+	long  	nd_fmt_string		    ,
+		nd_prev_fmt_string	    ,
+		nd_local_ct		    ,		
+		nd_gcc_ct		    ,		
+		nd_arabs_ct		    ,		
+		nd_other_ct		    ;
+
+        long	nd_fc_local_ct		    ,		
+		nd_fc_gcc_ct		    ,		
+		nd_fc_arabs_ct		    ,		
+		nd_fc_other_ct		    ;	
+
+	long   	nd_gt_local_ct		    ,	
+		nd_gt_gcc_ct		    ,	
+		nd_gt_arabs_ct		    ,	
+		nd_gt_other_ct		    ;
+	
+	double	nd_daily_amt		    ,
+		nd_doc_amount		    ,		
+		nd_local_amt		    ,		
+		nd_gcc_amt		    ,		
+		nd_arabs_amt		    ,		
+		nd_other_amt		    ,
+		nd_temp_amt		    ,
+		nd_perm_amt		    ;
+
+	double	nd_fc_daily_amt		    ,
+		nd_fc_doc_amount	    ,		
+		nd_fc_local_amt		    ,		
+		nd_fc_gcc_amt		    ,		
+		nd_fc_arabs_amt		    ,		
+		nd_fc_other_amt		    ,
+		nd_fc_temp_amt		    ,
+		nd_fc_perm_amt		    ;
+
+	double	nd_gt_daily_amt		    ,
+		nd_gt_doc_amount	    ,		
+		nd_gt_local_amt		    ,
+		nd_gt_gcc_amt		    ,
+		nd_gt_arabs_amt		    ,
+		nd_gt_other_amt		    ,
+		nd_gt_temp_amt		    ,
+		nd_gt_perm_amt		    ;	
+
+	int	doc_check = 0;
+
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h> 
+
+FILE *f1;
+int page = 0;
+int line = 0;
+
+char prev_facility_id    [2];
+
+void proc_main(argc, argv)
+int argc;
+char *argv[];
+{    
+   void prt_line(int l, char spl_symbol[1]);
+   void prt_hdr_initial();
+   void prt_hdr();    
+   void dec_cursor();
+   void open_cursor();
+   void close_cursor();
+   int  fetch_cursor();
+   void sub_hdr_prev_prt();
+  
+   void report_process();
+   void line_check();
+   void init_cc_variables();
+   void init_fc_variables();
+   void init_gt_variables();
+   void sub_hdr_prt();
+   void rec_prt();
+   void fc_rec_prt();
+   void gt_rec_prt();
+
+/* INPUT ARGUMENT CHECK */
+
+       if(argc != 5) 
+     {
+	     disp_message(ORA_MESG, "Usage BLRGLDDE uid/passwd@db Session Pgm-Date Facility");
+	     proc_exit();
+     }
+
+     strcpy(nd_pgm_id.arr, argv[0]);
+     nd_pgm_id.len = strlen(nd_pgm_id.arr);      
+     strcpy(g_pgm_id,nd_pgm_id.arr);
+
+     strcpy(uid_pwd.arr, argv[1]);
+     uid_pwd.len = strlen(uid_pwd.arr);      
+
+     strcpy(nd_session_id.arr, argv[2]);
+     nd_session_id.len = strlen(nd_session_id.arr);      	 
+     strcpy(g_session_id,nd_session_id.arr);
+
+     strcpy(nd_pgm_date.arr, argv[3]);
+     nd_pgm_date.len = strlen(nd_pgm_date.arr);      	 
+     strcpy(g_pgm_date,nd_pgm_date.arr);
+
+     strcpy(nd_p_facility_id.arr, argv[4]);
+     nd_p_facility_id.len = strlen(nd_p_facility_id.arr);      	 
+     strcpy(g_facility_id,nd_p_facility_id.arr);
+   
+/* DB LOGIN */
+
+    EXEC SQL CONNECT :uid_pwd;
+    if (OERROR) 
+    {
+    	disp_message (ORA_MESG, "USERID/PASSWORD failed to Connect");
+        proc_exit();  
+    }	  	
+  
+     set_meduser_role();
+
+/* OUTPUT FILE */
+
+	strcpy(nd_filename,WORKING_DIR);   
+	strcat(nd_filename,argv[0]);
+	strcat(nd_filename,".lis");
+	if((f1 = fopen(nd_filename, "w")) == NULL) 
+	{
+		 disp_message (ERR_MESG, " Error opening output file ....");
+		 proc_exit();
+        } 
+
+	  	  nd_from_facility_id.arr[0]	= '\0';
+		  nd_to_facility_id.arr[0]	= '\0';
+		  nd_from_cash_counter_id.arr[0]= '\0';
+		  nd_to_cash_counter_id.arr[0]	= '\0';
+		  nd_from_doc_date.arr[0]	= '\0';
+		  nd_to_doc_date.arr[0]		= '\0';
+  	  
+		  nd_from_facility_id.len	= 0;
+		  nd_to_facility_id.len 	= 0;
+		  nd_from_cash_counter_id.len 	= 0;
+		  nd_to_cash_counter_id.len 	= 0;
+		  nd_from_doc_date.len 		= 0;
+		  nd_to_doc_date.len 		= 0;
+
+  EXEC SQL SELECT PARAM1,
+		  PARAM2,
+		  PARAM3,
+		  PARAM4,
+		  PARAM5,
+                  PARAM6
+	  INTO    :nd_from_facility_id,
+		  :nd_to_facility_id,
+		  :nd_from_cash_counter_id,
+		  :nd_to_cash_counter_id,
+		  :nd_from_doc_date,
+		  :nd_to_doc_date 
+	  FROM    sy_prog_param
+          WHERE   operating_facility_id = :nd_p_facility_id
+	  AND 	  session_id = :nd_session_id
+	  AND     pgm_date   = :nd_pgm_date
+	  AND     pgm_id     = :nd_pgm_id;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   if (NODATAFOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+    
+     	 
+     nd_from_facility_id.len = strlen(nd_from_facility_id.arr);      	 
+     nd_to_facility_id.len = strlen(nd_to_facility_id.arr);      	 
+     nd_from_cash_counter_id.len = strlen(nd_from_cash_counter_id.arr);      	 
+     nd_to_cash_counter_id.len = strlen(nd_to_cash_counter_id.arr);      	 
+     nd_from_doc_date.len = strlen(nd_from_doc_date.arr);      	 
+     nd_to_doc_date.len = strlen(nd_to_doc_date.arr);      	    	
+
+  EXEC SQL DELETE FROM sy_prog_param 
+          WHERE   operating_facility_id = :nd_p_facility_id
+	  AND 	  session_id = :nd_session_id
+	  AND     pgm_date   = :nd_pgm_date
+	  AND     pgm_id     = :nd_pgm_id;
+
+if (OERROR)
+        err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+
+	
+  nd_sysdate.arr[0] = '\0';
+  nd_sysdate.len = 0;  
+
+  EXEC SQL SELECT to_char(SYSDATE,'DD/MM/YYYY HH24:MI') INTO :nd_sysdate FROM dual;
+  nd_sysdate.arr[nd_sysdate.len]       = '\0';  
+  
+  nd_user_id.arr[0] = '\0';
+  nd_user_id.len = 0;
+  EXEC SQL SELECT USER INTO :nd_user_id FROM dual;
+  nd_user_id.arr[nd_user_id.len]       = '\0';  
+       
+  nd_hospital_name.arr[0] = '\0';
+  nd_hospital_name.len	  = 0;
+  EXEC SQL SELECT accounting_name INTO :nd_hospital_name FROM sy_acc_entity
+           WHERE acc_entity_id = :nd_p_facility_id;
+
+  nd_hospital_name.arr[nd_hospital_name.len]	= '\0';  
+
+
+/* PROCESS */   
+  
+   prt_hdr_initial();  
+   report_process(); 
+  
+/* CLOSE FILE */
+   EXEC SQL COMMIT RELEASE; 
+   fclose(f1);   
+   return;
+   
+}
+
+void line_check()
+{
+   if (line > MAX_LINES)
+   {
+	fprintf(f1,"\f");	
+	prt_hdr();
+	if (doc_check == 0)
+		{sub_hdr_prt();}
+	else
+		{sub_hdr_prev_prt();}	
+   }
+   else
+   {fprintf(f1,"\n");}
+   doc_check=1;
+}       
+
+
+void prt_hdr_initial()
+{     
+   line = 0;    
+   page = page +1;
+   fprintf(f1,"\n");       
+   fprintf(f1,"MDL : BL");
+   prt_line(45," "); 
+   fprintf(f1,"%-60s",nd_hospital_name.arr);
+   prt_line(27," "); 
+   fprintf(f1,"%-20s",nd_sysdate.arr);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"OPR : %-31s",nd_user_id.arr); 
+   prt_line(10," ");    
+   fprintf(f1,"Location wise Health Card Summary for a Period");               
+   prt_line(20," "); 
+   fprintf(f1,"Page :%4d",page);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"REP : BLRGLDDE"); 
+   fprintf(f1,"\n"); 
+   prt_line(132,"-");     
+   fprintf(f1,"\n");    
+   fprintf(f1,"VER : 4.1");
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"		INPUT PARAMETERS:");
+   fprintf(f1,"\n");    
+   fprintf(f1,"		-----------------");    
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+
+   fprintf(f1,"			TRANSACTION DATE FROM : %-30s",nd_from_doc_date.arr);
+   fprintf(f1,"\n");    	
+   fprintf(f1,"			                   TO : %-30s",nd_to_doc_date.arr);
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+
+   if (strcmp(nd_from_facility_id.arr,"~F1") == 0)
+   {  fprintf(f1,"			FACILITY ID      FROM :  /"); }
+   else
+   {  fprintf(f1,"			FACILITY ID      FROM : %-3s",nd_from_facility_id.arr);}
+
+   fprintf(f1,"\n");    
+
+   if (strcmp(nd_to_facility_id.arr,"~F2") == 0)
+   {  fprintf(f1,"				           TO :  /"); }
+   else
+   {  fprintf(f1,"				           TO : %-3s",nd_to_facility_id.arr);}
+
+   fprintf(f1,"\n");    
+   fprintf(f1,"\n");    
+
+
+   if (strcmp(nd_from_cash_counter_id.arr,"~C1") == 0)
+   {  fprintf(f1,"			CASH COUNTER     FROM :  / ");}
+   else
+   {  fprintf(f1,"			CASH COUNTER     FROM : %-3s",nd_from_cash_counter_id.arr);}
+   fprintf(f1,"\n");    
+
+   if (strcmp(nd_to_cash_counter_id.arr,"~C2") == 0)
+   {   fprintf(f1,"			                   TO :  /");}
+   else
+   {fprintf(f1,"			                   TO : %-3s",nd_to_cash_counter_id.arr);}  
+   fprintf(f1, "\n");   
+
+
+   line = MAX_LINES + 1; 
+   
+}
+
+	
+void prt_hdr()
+{     
+   line = 0;    
+   page = page +1;
+   fprintf(f1,"\n");       
+   fprintf(f1,"MDL : BL");
+   prt_line(45," "); 
+   fprintf(f1,"%-60s",nd_hospital_name.arr);
+   prt_line(27," "); 
+   fprintf(f1,"%-16s",nd_sysdate.arr);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"OPR : %-31s",nd_user_id.arr); 
+   prt_line(10," ");    
+   fprintf(f1,"Location wise Health Card Summary for a Period");
+   prt_line(20," "); 
+   fprintf(f1,"Page :%4d",page);           
+   fprintf(f1,"\n"); 
+   fprintf(f1,"REP : BLRGLDDE"); 
+   prt_line(25," ");    
+   fprintf(f1,"      ( FOR THE PERIOD FROM %-11s TO %-11s )",nd_from_doc_date.arr,nd_to_doc_date.arr);
+   prt_line(35," "); 
+   fprintf(f1,"\n"); 
+   prt_line(132,"-");     
+   fprintf(f1,"\n");    
+   fprintf(f1,"               -----Locals------  -------GCC-------  ------Arabs------  -----Others------                ----------Total-----------");
+   fprintf(f1, "\n");   
+   fprintf(f1,"Cash Counter    No        Amount   No        Amount   No        Amount   No        Amount         Total     Temporary     Permanent");
+	       
+   fprintf(f1, "\n");   
+   prt_line(132,"-");  
+   fprintf(f1, "\n");   
+   
+}
+void prt_line(int line_length, char spl_symbol[1])
+{  
+ int i;  
+  for(i=1;i<=line_length;i=i+1)
+	 {fprintf(f1,spl_symbol);}
+}
+
+void dec_cursor()
+{ 
+
+  EXEC SQL DECLARE hcard_cursor CURSOR FOR   
+  SELECT 	Facility_id,
+       		facility_name,	
+	        cash_counter_id,
+  		cash_counter_desc,    
+		fmt_string	 ,
+     	        SUM(nvl(local,0)) 		local_ct ,
+       		SUM(nvl(local_amt,0)) 		local_amt,
+       		SUM(nvl(gcc,0))			gcc_ct   ,
+       		SUM(nvl(gcc_amt,0))		gcc_amt  ,
+       		SUM(nvl(arabs,0))		arabs_ct ,
+       		SUM(nvl(arabs_amt,0))		arabs_amt,
+       		SUM(nvl(other,0)) 		other_ct ,       
+       		SUM(nvl(other_amt,0)) 		other_amt,
+       		SUM(nvl(local_amt,0))+
+       		SUM(nvl(other_amt,0))		total_amt,	
+       		SUM(nvl(temp_amt,0)) 		Temp_amt ,
+       		SUM(nvl(perm1_amt,0)+
+        	    nvl(perm2_amt,0)) 		Perm_amt       
+  FROM	       
+  (SELECT a.operating_facility_id facility_id,
+       d.acc_entity_name    facility_name,
+       e.short_desc	    cash_counter_desc, 
+       a.cash_counter_code  cash_counter_id,       
+       no_of_decimal        fmt_string,       
+       DecodE(b.nationality_code,c.DFLT_NATIONALITY_CODE,Count(a.doc_number)) Local,
+       DecodE(b.nationality_code,c.DFLT_NATIONALITY_CODE,sum(nvl(a.doc_amt,0))) Local_Amt,
+       0	Gcc,
+       0	Gcc_Amt,
+       0	Arabs,
+       0	Arabs_Amt,       
+       DecodE(b.nationality_code,c.DFLT_NATIONALITY_CODE,0,Count(a.doc_number)) Other,
+       DecodE(b.nationality_code,c.DFLT_NATIONALITY_CODE,0,sum(nvl(a.doc_amt,0))) Other_Amt,          
+       Decode(a.hcard_expiry_date_final,NULL,Decode(a.hcard_status_initial,'P',sum(a.doc_amt))) 
+       Perm1_amt,	
+       Decode(a.hcard_expiry_date_final,NULL,0,SUM(nvl(a.doc_amt,0))) 
+       Perm2_amt,	       
+       Decode(a.hcard_expiry_date_final,NULL,Decode(a.hcard_status_initial,'T',sum(nvl(a.doc_amt,0)))) Temp_amt	
+FROM   bl_health_Card_trn  a,
+       mp_patient_mast         b,
+       mp_param_his_vw		   c,
+       sy_acc_entity	   d,
+       bl_cash_counter     e
+WHERE  a.patient_id  		=	b.patient_id
+AND    b.nationality_code	=	c.DFLT_NATIONALITY_CODE(+)
+AND    a.operating_facility_id  =       d.acc_entity_id
+AND    a.operating_facility_id  =       e.operating_facility_id
+AND    a.cash_counter_code      =       e.cash_counter_code
+AND    a.cash_counter_code IS NOT NULL 
+AND    a.operating_facility_id IN (SELECT facility_id 
+				FROM sy_user 
+				WHERE user_id = USER)
+AND    to_char(a.doc_date,'DD/MM/YYYY')    BETWEEN :nd_from_doc_date AND :nd_to_doc_date  
+AND    a.operating_facility_id BETWEEN 
+	RPAD(NVL(DECODE(:nd_from_facility_id,'~F1','',:nd_from_facility_id),'!!') ,2,'!')
+	AND 
+	RPAD(NVL(DECODE(:nd_to_facility_id,'~F2','',:nd_to_facility_id),'~~'),2,'~')	
+	
+AND    a.cash_counter_code BETWEEN 
+	RPAD(NVL(DECODE(:nd_from_cash_counter_id,'~C1','',:nd_from_cash_counter_id),'!!'),2,'!')
+	AND 
+	RPAD(NVL(DECODE(:nd_to_cash_counter_id,'~C2','',:nd_to_cash_counter_id),'~~'),2,'~')
+
+GROUP BY a.operating_facility_id,
+	 d.acc_entity_name,
+	 a.cash_counter_code,
+	 e.short_desc,
+	 no_of_decimal,        
+	 b.nationality_code,
+         c.DFLT_NATIONALITY_CODE,
+         a.hcard_status_initial,
+         a.hcard_expiry_date_final
+)
+GROUP BY facility_id,
+	 facility_name,
+	 cash_counter_id,
+	 cash_counter_desc,
+ 	 fmt_string
+	
+ORDER BY 1,4;
+
+ return;
+ }
+
+void open_cursor()
+{ 
+ EXEC SQL OPEN hcard_cursor;
+  if (OERROR)
+        err_mesg("Open HCard Cursor Failed",0,"");
+
+ 
+ return;
+ }
+int fetch_cursor()
+{ 
+
+		nd_facility_id.arr[0]		=	'\0';
+		nd_facility_name.arr[0]		=	'\0';
+		nd_cash_counter_id.arr[0]	=	'\0';
+		nd_cash_counter_desc.arr[0]	=	'\0';
+		nd_fmt_string			=	0;
+		nd_local_ct			=	0;
+		nd_local_amt 			=	0;
+		nd_gcc_ct 			=	0;
+		nd_gcc_amt			=	0;		
+		nd_arabs_ct			=	0;	
+		nd_arabs_amt			=	0;
+		nd_other_ct			=	0;
+		nd_other_amt			=	0;
+		nd_daily_amt			=	0;
+		nd_temp_amt			=	0;
+		nd_perm_amt			=	0;
+		nd_facility_id.len 		= 	0;
+		nd_facility_name.len 		= 	0;
+		nd_cash_counter_id.len 		= 	0;
+		nd_cash_counter_desc.len 	= 	0;
+  
+  EXEC SQL FETCH hcard_cursor 
+	   INTO :nd_facility_id		,
+		:nd_facility_name	,
+		:nd_cash_counter_id	,
+		:nd_cash_counter_desc	,		
+		:nd_fmt_string		,
+		:nd_local_ct		,
+		:nd_local_amt		,
+		:nd_gcc_ct		,
+		:nd_gcc_amt		,
+		:nd_arabs_ct		,
+		:nd_arabs_amt		,
+		:nd_other_ct		,
+		:nd_other_amt		,	
+		:nd_daily_amt		,
+		:nd_temp_amt		,
+		:nd_perm_amt		;    
+
+    if (NODATAFOUND)
+    return 0;
+
+    nd_facility_id.arr[nd_facility_id.len]		= '\0';
+    nd_cash_counter_id.arr[nd_cash_counter_id.len] 	= '\0';
+    nd_facility_name.arr[nd_facility_name.len]		= '\0';
+    nd_cash_counter_desc.arr[nd_cash_counter_desc.len]  = '\0';
+
+    return 1;
+ }
+
+void close_cursor()
+{ 
+ EXEC SQL CLOSE hcard_cursor;
+ return;
+ }
+
+void init_fc_variables()
+{	
+	 nd_fc_local_ct 	= 0;
+	 nd_fc_local_amt 	= 0;
+	 nd_fc_gcc_ct	 	= 0;
+	 nd_fc_gcc_amt	 	= 0;
+ 	 nd_fc_arabs_ct	 	= 0;
+	 nd_fc_arabs_amt 	= 0;
+	 nd_fc_other_ct 	= 0;
+	 nd_fc_other_amt 	= 0;
+	 nd_fc_daily_amt 	= 0;
+	 nd_fc_temp_amt 	= 0;
+	 nd_fc_perm_amt 	= 0;	  
+}
+void init_gt_variables()
+{	
+	 nd_gt_local_ct 	= 0;
+	 nd_gt_local_amt 	= 0;
+	 nd_gt_gcc_ct	 	= 0;
+	 nd_gt_gcc_amt	 	= 0;
+ 	 nd_gt_arabs_ct	 	= 0;
+	 nd_gt_arabs_amt 	= 0;
+	 nd_gt_other_ct 	= 0;
+	 nd_gt_other_amt 	= 0;
+	 nd_gt_daily_amt 	= 0;
+	 nd_gt_temp_amt 	= 0;
+	 nd_gt_perm_amt 	= 0;	  
+}
+
+void sub_hdr_prt()
+
+{	fprintf(f1,"Facility Id  : %-3s" ,nd_facility_id.arr); 		
+        fprintf(f1," - ");
+	fprintf(f1,"%-60s" ,nd_facility_name.arr); 		
+       	fprintf(f1,"\n");
+	fprintf(f1,"\n");	
+}
+
+void sub_hdr_prev_prt()
+
+{	fprintf(f1,"Facility Id  : %-3s" ,nd_prev_facility_id.arr); 		
+        fprintf(f1," - ");
+	fprintf(f1,"%-60s" ,nd_prev_facility_name.arr); 		
+       	fprintf(f1,"\n");
+	fprintf(f1,"\n");	
+}
+
+print_formated(loc_amount)
+double loc_amount;
+{
+	char s_amt[30], str_amt[30];	
+
+    if(loc_amount < 0)
+	{
+        put_val(s_amt,-loc_amount);
+        format_amt(s_amt);
+	strcat(s_amt,"-");
+        sprintf(str_amt,"%14s",s_amt);        
+        fprintf(f1,"%14s",str_amt);
+        }
+    else 
+	{
+        put_val(s_amt,loc_amount);        
+        format_amt(s_amt);	
+        sprintf(str_amt,"%14s",s_amt);
+        fprintf(f1,"%14s",str_amt);
+        }
+}
+
+
+void rec_prt()
+{
+/*
+    if  (nd_fmt_string == 3 ) 
+     {
+	fprintf(f1,"%-13.13s" 	,nd_cash_counter_desc.arr); 		
+        fprintf(f1,"%5d"  	,nd_local_ct);
+	fprintf(f1,"%14.3f" 	,nd_local_amt);
+        fprintf(f1,"%5d"  	,nd_gcc_ct);
+	fprintf(f1,"%14.3f" 	,nd_gcc_amt);
+        fprintf(f1,"%5d"  	,nd_arabs_ct);
+	fprintf(f1,"%14.3f" 	,nd_arabs_amt);
+        fprintf(f1,"%5d"  	,nd_other_ct);
+	fprintf(f1,"%14.3f" 	,nd_other_amt);
+	fprintf(f1,"%14.3f"  	,nd_daily_amt);
+        fprintf(f1,"%14.3f"  	,nd_temp_amt);
+ 	fprintf(f1,"%14.3f" 	,nd_perm_amt);	
+       }
+     else
+       {
+	fprintf(f1,"%-13.13s" 	,nd_cash_counter_desc.arr); 		
+        fprintf(f1,"%5d"  	,nd_local_ct);
+	fprintf(f1,"%14.2f" 	,nd_local_amt);
+        fprintf(f1,"%5d"  	,nd_gcc_ct);
+	fprintf(f1,"%14.2f" 	,nd_gcc_amt);
+        fprintf(f1,"%5d"  	,nd_arabs_ct);
+	fprintf(f1,"%14.2f" 	,nd_arabs_amt);
+        fprintf(f1,"%5d"  	,nd_other_ct);
+	fprintf(f1,"%14.2f" 	,nd_other_amt);
+	fprintf(f1,"%14.2f"  	,nd_daily_amt);
+        fprintf(f1,"%14.2f"  	,nd_temp_amt);
+	fprintf(f1,"%14.2f" 	,nd_perm_amt);	
+	}	 
+*/
+
+	fprintf(f1,"%-13.13s" 	,nd_cash_counter_desc.arr); 		
+
+        fprintf(f1,"%5d"  	,nd_local_ct);
+	print_formated(nd_local_amt);
+
+        fprintf(f1,"%5d"  	,nd_gcc_ct);
+	print_formated(nd_gcc_amt);
+
+        fprintf(f1,"%5d"  	,nd_arabs_ct);	
+	print_formated(nd_arabs_amt);
+
+        fprintf(f1,"%5d"  	,nd_other_ct);
+	print_formated(nd_other_amt);
+
+	print_formated(nd_daily_amt);
+	print_formated(nd_temp_amt);
+       	print_formated(nd_perm_amt);
+
+	line = line + 1;	
+	line_check();
+}	
+
+void fc_rec_prt()
+{
+    fprintf(f1,"Fac.Total    ");
+   /*
+    if  (nd_prev_fmt_string == 3 ) 
+     {
+	 fprintf(f1,"%5d"  	,nd_fc_local_ct);
+   	 fprintf(f1,"%14.3f" 	,nd_fc_local_amt);
+         fprintf(f1,"%5d"  	,nd_fc_gcc_ct);
+	 fprintf(f1,"%14.3f" 	,nd_fc_gcc_amt);
+         fprintf(f1,"%5d"  	,nd_fc_arabs_ct);
+	 fprintf(f1,"%14.3f" 	,nd_fc_arabs_amt);
+         fprintf(f1,"%5d"  	,nd_fc_other_ct);
+	 fprintf(f1,"%14.3f" 	,nd_fc_other_amt);	 
+	 fprintf(f1,"%14.3f"  	,nd_fc_daily_amt);
+         fprintf(f1,"%14.3f"  	,nd_fc_temp_amt);
+	 fprintf(f1,"%14.3f" 	,nd_fc_perm_amt);		
+
+      }
+
+     else
+     {
+         fprintf(f1,"%5d"  	,nd_fc_local_ct);
+   	 fprintf(f1,"%14.2f" 	,nd_fc_local_amt);
+         fprintf(f1,"%5d"  	,nd_fc_gcc_ct);
+	 fprintf(f1,"%14.2f" 	,nd_fc_gcc_amt);
+         fprintf(f1,"%5d"  	,nd_fc_arabs_ct);
+	 fprintf(f1,"%14.2f" 	,nd_fc_arabs_amt);
+         fprintf(f1,"%5d"  	,nd_fc_other_ct);
+	 fprintf(f1,"%14.2f" 	,nd_fc_other_amt);	 
+	 fprintf(f1,"%14.2f"  	,nd_fc_daily_amt);
+         fprintf(f1,"%14.2f"  	,nd_fc_temp_amt);	
+	 fprintf(f1,"%14.2f" 	,nd_fc_perm_amt);	
+       }
+	*/
+
+         fprintf(f1,"%5d"  	,nd_fc_local_ct);
+	 print_formated(nd_fc_local_amt);
+
+         fprintf(f1,"%5d"  	,nd_fc_gcc_ct);
+	 print_formated(nd_fc_gcc_amt);
+
+         fprintf(f1,"%5d"  	,nd_fc_arabs_ct);
+	 print_formated(nd_fc_arabs_amt);
+
+         fprintf(f1,"%5d"  	,nd_fc_other_ct);
+	 print_formated(nd_fc_other_amt);
+
+	 print_formated(nd_fc_daily_amt);	
+	 print_formated(nd_fc_temp_amt);
+	 print_formated(nd_fc_perm_amt);
+
+	
+	 line = line + 1;
+	 line_check();
+}
+
+void gt_rec_prt()
+{
+ fprintf(f1,"Grand Total  ");
+
+/*  if  (nd_prev_fmt_string == 3 ) 
+    {
+         fprintf(f1,"%5d"  	,nd_gt_local_ct);
+   	 fprintf(f1,"%14.3f" 	,nd_gt_local_amt);
+         fprintf(f1,"%5d"  	,nd_gt_gcc_ct);
+	 fprintf(f1,"%14.3f" 	,nd_gt_gcc_amt);
+         fprintf(f1,"%5d"  	,nd_gt_arabs_ct);
+	 fprintf(f1,"%14.3f" 	,nd_gt_arabs_amt);
+         fprintf(f1,"%5d"  	,nd_gt_other_ct);
+	 fprintf(f1,"%14.3f" 	,nd_gt_other_amt);	 
+	 fprintf(f1,"%14.3f"  	,nd_gt_daily_amt);
+         fprintf(f1,"%14.3f"  	,nd_gt_temp_amt);
+	 fprintf(f1,"%14.3f" 	,nd_gt_perm_amt);	
+      }
+      else
+	{
+         fprintf(f1,"%5d"  	,nd_gt_local_ct);
+   	 fprintf(f1,"%14.2f" 	,nd_gt_local_amt);
+         fprintf(f1,"%5d"  	,nd_gt_gcc_ct);
+	 fprintf(f1,"%14.2f" 	,nd_gt_gcc_amt);
+         fprintf(f1,"%5d"  	,nd_gt_arabs_ct);
+	 fprintf(f1,"%14.2f" 	,nd_gt_arabs_amt);
+         fprintf(f1,"%5d"  	,nd_gt_other_ct);
+	 fprintf(f1,"%14.2f" 	,nd_gt_other_amt);	 
+	 fprintf(f1,"%14.2f"  	,nd_gt_daily_amt);
+         fprintf(f1,"%14.2f"  	,nd_gt_temp_amt);
+	 fprintf(f1,"%14.2f" 	,nd_gt_perm_amt);	
+	}
+*/
+         fprintf(f1,"%5d"  	,nd_gt_local_ct);
+	 print_formated(nd_gt_local_amt);
+
+         fprintf(f1,"%5d"  	,nd_gt_gcc_ct);
+	 print_formated(nd_gt_gcc_amt);
+
+         fprintf(f1,"%5d"  	,nd_gt_arabs_ct);
+	 print_formated(nd_gt_arabs_amt);
+
+         fprintf(f1,"%5d"  	,nd_gt_other_ct);	 
+	 print_formated(nd_gt_other_amt);	 
+	 
+	 print_formated(nd_gt_daily_amt);
+	 print_formated(nd_gt_temp_amt);
+	 print_formated(nd_gt_perm_amt);
+
+}
+
+void report_process()
+{        
+    int fetch_cursor_check;
+	dec_cursor();
+	open_cursor();	    
+	doc_check = 0;
+        fetch_cursor_check = fetch_cursor();
+        
+        strcpy(nd_prev_facility_id.arr,nd_facility_id.arr);  	
+	nd_prev_facility_id.len = strlen(nd_prev_facility_id.arr);
+
+	nd_prev_fmt_string = nd_fmt_string;
+
+	doc_check = 0;
+	line_check();  
+
+        init_fc_variables();
+        init_gt_variables();
+         
+  while(fetch_cursor_check)  {  
+     if (strcmp(nd_prev_facility_id.arr,nd_facility_id.arr) == 0)
+       { rec_prt();}
+  else
+	{
+	 if (line != 0)
+	{ line = line +1;
+	  doc_check=1;
+	  line_check();}
+
+	 fc_rec_prt();
+
+ 	 init_fc_variables();
+	
+	 doc_check = 0; 	 	
+	 line = MAX_LINES + 1;
+	 //line = line + 1;
+	//line_check();
+         
+
+         if ( line > MAX_LINES-3 )
+	 {  line = MAX_LINES + 1;
+	    line_check();}	 	
+	 else
+	 {
+	 if (line != 0 )
+	 { line = line +1;
+	   line_check();
+	   sub_hdr_prt();}	 
+	 }
+	
+         rec_prt();
+	}
+	
+	nd_fc_local_ct	= nd_fc_local_ct + nd_local_ct;
+	nd_fc_local_amt	= nd_fc_local_amt + nd_local_amt;
+	nd_fc_gcc_ct	= nd_fc_gcc_ct + nd_gcc_ct;
+	nd_fc_gcc_amt	= nd_fc_gcc_amt + nd_gcc_amt;
+	nd_fc_arabs_ct	= nd_fc_arabs_ct + nd_arabs_ct;
+	nd_fc_arabs_amt	= nd_fc_arabs_amt + nd_arabs_amt;
+	nd_fc_other_ct	= nd_fc_other_ct + nd_other_ct;
+	nd_fc_other_amt	= nd_fc_other_amt + nd_other_amt;
+	nd_fc_daily_amt = nd_fc_local_amt + nd_fc_gcc_amt + nd_fc_arabs_amt + nd_fc_other_amt;
+	nd_fc_temp_amt	= nd_fc_temp_amt + nd_temp_amt;
+	nd_fc_perm_amt	= nd_fc_perm_amt + nd_perm_amt;	
+	
+	nd_gt_local_ct	= nd_gt_local_ct + nd_local_ct;
+	nd_gt_local_amt	= nd_gt_local_amt + nd_local_amt;
+	nd_gt_gcc_ct	= nd_gt_gcc_ct + nd_gcc_ct;
+	nd_gt_gcc_amt	= nd_gt_gcc_amt + nd_gcc_amt;
+	nd_gt_arabs_ct	= nd_gt_arabs_ct + nd_arabs_ct;
+	nd_gt_arabs_amt	= nd_gt_arabs_amt + nd_arabs_amt;
+	nd_gt_other_ct	= nd_gt_other_ct + nd_other_ct;
+	nd_gt_other_amt	= nd_gt_other_amt + nd_other_amt;
+	nd_gt_daily_amt = nd_gt_local_amt + nd_gt_gcc_amt + nd_gt_arabs_amt + nd_gt_other_amt;
+	nd_gt_temp_amt	= nd_gt_temp_amt + nd_temp_amt;
+	nd_gt_perm_amt	= nd_gt_perm_amt + nd_perm_amt;	
+
+        strcpy(nd_prev_facility_id.arr,nd_facility_id.arr);  	
+	nd_prev_facility_id.len = strlen(nd_prev_facility_id.arr);
+
+	nd_prev_fmt_string = nd_fmt_string;
+
+        fetch_cursor_check = fetch_cursor();	 	
+	
+   } 
+         
+
+	 if ( line > MAX_LINES-3 )
+	 {  line = MAX_LINES + 1;
+	    doc_check = 0;
+	    line_check();}	 	
+	 else
+	 {
+	 if (line != 0 )
+	 { fprintf(f1,"\n");}	 
+	 }	
+
+ 	 fc_rec_prt();
+	
+	 line = line + 1;
+	 line_check();
+
+	 gt_rec_prt();
+	 fprintf(f1,"\n");	
+ 	 fprintf(f1,"\n");
+	 prt_line(58," "); 
+	 fprintf(f1,"*** End Of Report ***");
+         fprintf(f1, "\n");   	 
+	 close_cursor();
+}

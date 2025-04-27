@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>datasource.properties</value>
+				<value>application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="jdbc/OracleDS" />
+	</bean>
+
+	<!--	<bean id="dataSource" class="org.enhydra.jdbc.pool.StandardXAPoolDataSource" destroy-method="shutdown">
+		<property name="dataSource">
+		<bean class="org.enhydra.jdbc.standard.StandardXADataSource" destroy-method="shutdown">
+		<property name="transactionManager" ref="txManager" />
+		<property name="driverName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		</bean>
+		</property>
+		<property name="user" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		</bean>-->
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<!--
+		<property name="mappingJarLocations">
+			<list>
+				<value>dataobjects.jar</value>
+			</list>
+		</property>
+		-->
+		<property name="mappingDirectoryLocations">
+			<list><value>com/iba/ehis/dobj</value></list>
+		</property>
+
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">
+					${hibernate.show_sql}
+				</prop>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+
+				<prop key="jta.UserTransaction">
+					java:comp/UserTransaction
+				</prop>
+				<prop
+					key="hibernate.transaction.manager_lookup_class">
+					org.hibernate.transaction.JOTMTransactionManagerLookup
+				</prop>
+				<prop key="hibernate.transaction.factory_class">
+					org.hibernate.transaction.JTATransactionFactory
+				</prop>
+
+				<!--				<prop key="hibernate.cache.provider_class">org.hibernate.cache.TreeCacheProvider</prop>-->
+				<!--				<prop key="hibernate.cache.use_query_cache">true</prop>-->
+				<!--				<prop key="hibernate.cache.use_second_level_cache">true</prop>-->
+
+				
+				<prop key="hibernate.generate_statistics">true</prop>
+				
+				<!--
+				<prop key="hibernate.cache.use_minimal_puts">true</prop>
+				<prop key="hibernate.cache.use_structured_entries">true</prop>
+				-->
+				
+				<prop key="hibernate.cache.use_query_cache">false</prop>	
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				
+
+
+				<prop key="hibernate.query.factory_class">
+					org.hibernate.hql.classic.ClassicQueryTranslatorFactory
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!--	<bean id="JotmTransactionFactory" class="org.springframework.transaction.jta.JotmFactoryBean" />
+	-->
+	<bean id="txManager"
+		class="org.springframework.transaction.jta.JtaTransactionManager">
+		<!--		<property name="userTransaction">
+			<ref local="JotmTransactionFactory" />
+			</property>
+		-->
+	</bean>
+
+	<bean id="MethodLogger"
+		class="org.springframework.aop.interceptor.DebugInterceptor">
+		<property name="loggerName" value="PERFORMANCE_LOG"></property>
+	</bean>
+
+	<bean id="PerformanceInterceptor"
+		class="org.springframework.aop.interceptor.PerformanceMonitorInterceptor">
+		<property name="loggerName" value="PERFORMANCE_LOG"></property>
+	</bean>
+
+	<bean id="txInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="txManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,timeout_5000</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="record*">PROPAGATION_REQUIRED</prop>
+				<prop key="set*">PROPAGATION_REQUIRED</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
+				<prop key="add*">PROPAGATION_REQUIRED</prop>
+				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean name="hibernateInterceptor" class="org.springframework.orm.hibernate3.HibernateInterceptor">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*Facade,*DAOImpl</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>MethodLogger</value>
+				<value>PerformanceInterceptor</value>
+				<value>hibernateInterceptor</value>
+				<value>txInterceptor</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--<bean id="CacheManager" class="com.iba.framework.cache.pojo.business.CacheManager"> 
+           <constructor-arg  type="java.lang.String" value="jbosscache"/>
+    </bean>-->
+	<!-- 
+		Quartz 
+	-->
+
+	<bean id="simpleTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<!-- see the example of method invoking job above -->
+		<property name="jobDetail" ref="tempCacheCleanup" />
+		<!-- repeat every 10 minutes -->
+		<property name="repeatInterval"
+			value="${tempCacheCleanup.interval}" />
+	</bean>
+
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="permanentCacheCleanup" />
+		<!-- run every night at 10 PM -->
+		<property name="cronExpression" value="0 0 10pm * * ?" />
+	</bean>
+
+	<bean
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+				<ref bean="cronTrigger" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="tempCacheCleanup"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="com.iba.framework.scheduler.jobs.CacheWatchDog" />
+	</bean>
+
+	<bean id="permanentCacheCleanup" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="com.iba.framework.scheduler.jobs.CachePermanentRegionInvalidator" />
+	</bean>
+	
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+			   <value>com.iba.ehis.ds.core.resources.DSMessages</value>
+				<value>com.iba.ehis.ds.core.resources.DSLabels</value>
+			  <value>com.iba.ehis.lc.core.resources.LCMessages</value>
+			   <value>com.iba.ehis.lc.core.resources.LCLabels</value>
+			   <value>com.iba.ehis.core.resources.CommonLabels</value>
+			   <value>com.iba.ehis.core.resources.CommonMessages</value>
+				<!-- OTHER MODULE/FUNCTIONALITY RESOURCE ENTRIES -->
+			</list>
+		</property>
+	</bean>
+
+	<bean name="queryMapFile" class="com.iba.ehis.core.util.QueryGetter">
+		<property name="queryMaps">
+		<list>
+				<value>QueryMap.xml</value>
+				<value>QueryMap_DS.xml</value>
+				<value>QueryMap_LC.xml</value>
+			</list>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<!--
+--------------------------------------------------------------------------------------------------------------
+Date     	  Edit History      Name     			Description
+--------------------------------------------------------------------------------------------------------------
+02-FEB-2018      100           	Aravindh.H          Created
+---------------------------------------------------------------------------------------------------------------
+-->
+<%-- JSP Page specific attributes start --%>
+<%@page import="webbeans.op.CurrencyFormat"%>
+<%@page
+	import="java.sql.*,java.util.*,webbeans.eCommon.*,eCommon.Common.*,eBL.*,com.ehis.util.*,eBL.Common.*,java.io.BufferedOutputStream"%>
+<%@ page
+	import="org.apache.poi.hssf.usermodel.*,org.apache.poi.hssf.util.*"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<body>
+
+	<%!
+	PreparedStatement pst = null;
+	ResultSet rs = null;
+	HSSFWorkbook workbook = null;
+	Statement stmt = null;
+	CallableStatement cstmt = null;
+
+	/**
+	 * This method generates Excel Sheet for any Query/Queries provided by User.
+	 * This also provides support for multiple sheet Generation in Same Excel sheet.
+	 * The Input(sqlList) is provided as (QUERY_KEY, QUERY) pairs.The output will be Query Result/Results in Excel file.
+	 * For multiple queries, QUERY_KEY will be used as Sheet name and its corresponding result will be generated in
+	 * that sheet.So the Result is one Excel file with multiple Sheets.
+	 * 
+	 * @param  con  Connection needs to be provided
+	 * @param  sqlList In this HashMap (SQL_NAME,SQL_QUERY) combination needs to be provided. 
+	 * The SQL_QUERY will be executed and its results are displayed in Excel sheet.
+	 * The SQL_NAME will be the Sheet Name in the Generated Excel file.
+	 * For Example if HashMap contains 10 pairs of (SQL_NAME,SQL_QUERY), 
+	 * then the generated Excel file will have 10 Sheets with provided SQL_NAMES.
+	 *   
+	 */
+
+	public void createExcelFile(Connection con, String facilityId,
+			String locale, String loggedUser, String fromDate, String toDate, String jobId,
+			String episodeType, String custGroupName, String custName) {
+
+		try {
+			
+			if(null != jobId && !jobId.equals("") && jobId.contains("^")) {
+				jobId = jobId.split("\\^")[0].toString();
+			}
+
+			String sysDateQry = "select to_char(sysdate,'dd-Mon-yyyy') dates, to_char(sysdate,'hh24:mi:ss') times from dual";
+			String hospNameQry = "SELECT facility_name FROM sm_facility_param WHERE facility_id = '"+facilityId+"'";
+			String jobIdQryWithoutErr = "SELECT ORAJOBID, DECODE(NVL(STATUS,'I'),'C','Completed','F','Failed','Inprogress') STATUS, USER_ID, " 
+					+ " TO_CHAR(SUBMISSION_DATE, 'dd/MM/yyyy HH24:MI:SS') SUBMISSION_DATE,  PATIENT_ID "
+					+ " PATIENT_ID, TO_CHAR (VISIT_ADM_DATE_TIME, 'dd/MM/yyyy HH24:MI') VISIT_ADM_DATE_TIME, DECODE (EPISODE_TYPE,'O', 'Outpatient','E', 'Emergency') EPISODE_TYPE, "
+					+ " EPISODE_ID, VISIT_ID, LOCN_CODE, LOCN_DESC, BILL_NO, NVL(PAYER_UNBILLED_AMT,0) "
+					+ " FROM BL_BACKGROUND_PROCESS A "
+					+ " WHERE ORAJOBID <> 'XXXXX' AND OPERATING_FACILITY_ID = '"+facilityId+"'"
+					+ " AND TRUNC(SUBMISSION_DATE) BETWEEN  TRUNC(TO_DATE('"+fromDate+"', 'dd/MM/yyyy')) AND TRUNC(TO_DATE ('"+toDate+"', 'dd/MM/yyyy')) " 
+					+ " AND A.ORAJOBID = NVL('"+jobId+"', A.ORAJOBID) AND NVL(STATUS,'N') = 'C' AND ERR_MSG IS NULL AND PATIENT_ID IS NOT NULL ORDER BY A.ORAJOBID";
+					
+			String jobIdQryWithErr = "SELECT ORAJOBID, DECODE(NVL(STATUS,'I'),'C','Completed','F','Failed','Inprogress') STATUS, USER_ID, " 
+					+ " TO_CHAR(SUBMISSION_DATE, 'dd/MM/yyyy HH24:MI:SS') SUBMISSION_DATE,  PATIENT_ID "
+					+ " PATIENT_ID, TO_CHAR (VISIT_ADM_DATE_TIME, 'dd/MM/yyyy HH24:MI') VISIT_ADM_DATE_TIME, DECODE (EPISODE_TYPE,'O', 'Outpatient','E', 'Emergency') EPISODE_TYPE, "
+					+ " EPISODE_ID, VISIT_ID, LOCN_CODE, LOCN_DESC, NVL(PAYER_UNBILLED_AMT,0), ERR_MSG"
+					+ " FROM BL_BACKGROUND_PROCESS A "
+					+ " WHERE ORAJOBID <> 'XXXXX' AND OPERATING_FACILITY_ID = '"+facilityId+"'"
+					+ " AND TRUNC(SUBMISSION_DATE) BETWEEN  TRUNC(TO_DATE('"+fromDate+"', 'dd/MM/yyyy')) AND TRUNC(TO_DATE ('"+toDate+"', 'dd/MM/yyyy')) " 
+					+ " AND A.ORAJOBID = NVL('"+jobId+"', A.ORAJOBID) AND NVL(STATUS,'N') <> 'C' AND ERR_MSG IS NOT NULL AND PATIENT_ID IS NOT NULL ORDER BY A.ORAJOBID";
+					
+			String custQry = "SELECT decode(a.episode_type,'O','Outpatient','E','Emergency','All') epsisode_type, b.long_name cust_name, c.long_desc cust_group_name "
+					+ " FROM BL_BACKGROUND_PROCESS a, ar_customer b, ar_cust_group c WHERE a.OPERATING_FACILITY_ID = '"+facilityId+"' AND a.ORAJOBID = '"+jobId+"'"
+					+ " and a.cust_code = b.cust_code and a.cust_group_code = c.cust_group_code and a.patient_id is null";
+					
+			String facilityName = "", facilityAddr = "", gstin = "", episodeType1 = "", custName1 = "", custGroupName1 = "";
+
+			int rowId = 0, colId = 0, noofdecimal = 0;
+			String currDate = "", currTime = "";
+			double totalCr = 0, totalDr = 0;
+			
+			CurrencyFormat cf = new CurrencyFormat();
+
+			HSSFRow row = null;
+			HSSFCell cell = null;
+
+			stmt = con.createStatement();
+
+			rs = stmt.executeQuery(sysDateQry);
+
+			while (rs.next()) {
+				currDate = rs.getString("dates");
+				currTime = rs.getString("times");
+			}
+
+			rs.close();
+			
+			rs = stmt.executeQuery(hospNameQry);
+			if(rs.next()) {
+				facilityName = rs.getString(1); 
+			}
+			
+			rs = stmt.executeQuery(custQry);
+			while(rs.next()) {
+				episodeType1 = rs.getString(1);
+				custName1 = rs.getString(2);
+				custGroupName1 = rs.getString(3);
+			}
+			
+			String getHospAddrQry = BlRepository.getBlKeyValue("GET_FACILITY_ADDR");
+			
+			cstmt = con.prepareCall(getHospAddrQry);
+			cstmt.setString(1, locale);
+			cstmt.setString(2, facilityId);
+			cstmt.registerOutParameter(3, Types.VARCHAR);
+			cstmt.registerOutParameter(4, Types.VARCHAR);
+
+			cstmt.execute();
+
+			facilityAddr = cstmt.getString(3);
+			gstin = cstmt.getString(4);
+
+			pst = con.prepareStatement("select blcommon.get_decimal_place('"
+					+ facilityId + "') from dual");
+
+			rs = pst.executeQuery();
+			if (rs.next() && rs != null) {
+				noofdecimal = rs.getInt(1);
+			}
+
+			rs.close();
+			
+			//new workbook created
+			workbook = new HSSFWorkbook();
+			HSSFSheet sheet = workbook.createSheet("Sheet1");
+
+			sheet.autoSizeColumn((short) 3);
+
+			//creating new cellstyle
+			HSSFCellStyle styleBold = workbook.createCellStyle();
+			HSSFFont fontBold = workbook.createFont();
+			fontBold.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+			styleBold.setFont(fontBold);
+			
+			HSSFCellStyle styleRight = workbook.createCellStyle();
+			styleRight.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+			
+			HSSFCellStyle styleBoldRight = workbook.createCellStyle();
+			styleBoldRight.setFont(fontBold);
+			styleBoldRight.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+
+			//creating new cellstyle
+			HSSFCellStyle styleAllBorder = workbook.createCellStyle();
+			styleAllBorder.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+			styleAllBorder.setBorderTop(HSSFCellStyle.BORDER_THIN);
+			styleAllBorder.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+			styleAllBorder.setBorderRight(HSSFCellStyle.BORDER_THIN);
+			
+			HSSFCellStyle styleBoldRightAllBorder = workbook.createCellStyle();
+			styleBoldRightAllBorder.setFont(fontBold);
+			styleBoldRightAllBorder.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+			styleBoldRightAllBorder.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+			styleBoldRightAllBorder.setBorderTop(HSSFCellStyle.BORDER_THIN);
+			styleBoldRightAllBorder.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+			styleBoldRightAllBorder.setBorderRight(HSSFCellStyle.BORDER_THIN);
+			
+			HSSFCellStyle styleRightAllBorder = workbook.createCellStyle();
+			styleRightAllBorder.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+			styleRightAllBorder.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+			styleRightAllBorder.setBorderTop(HSSFCellStyle.BORDER_THIN);
+			styleRightAllBorder.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+			styleRightAllBorder.setBorderRight(HSSFCellStyle.BORDER_THIN);
+			
+			HSSFCellStyle styleBoldAllBorder = workbook.createCellStyle();
+			styleBoldAllBorder.setFont(fontBold);
+			styleBoldAllBorder.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+			styleBoldAllBorder.setBorderTop(HSSFCellStyle.BORDER_THIN);
+			styleBoldAllBorder.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+			styleBoldAllBorder.setBorderRight(HSSFCellStyle.BORDER_THIN);
+			
+			HSSFCellStyle styleBoldCenter = workbook.createCellStyle();
+			styleBoldCenter.setFont(fontBold);
+			styleBoldCenter.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+
+			//creating new row
+			row = sheet.createRow(rowId);
+			
+			colId = colId+2;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(facilityName));
+			cell.setCellStyle(styleBoldCenter);
+			sheet.setColumnWidth(colId, 7500);
+			sheet.addMergedRegion(new CellRangeAddress(rowId, rowId, colId,
+					++colId));
+			colId++;
+			
+			colId = colId+1;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Date/Time: ");
+			cell.setCellStyle(styleBold);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(currDate+" "+currTime);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			colId = colId+2;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(facilityAddr));
+			cell.setCellStyle(styleBoldCenter);
+			sheet.setColumnWidth(colId, 7500);
+			sheet.addMergedRegion(new CellRangeAddress(rowId, rowId, colId,
+					++colId));
+			colId++;
+						
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			colId = colId+2;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Auto Bill Generation Job Status ");
+			cell.setCellStyle(styleBoldCenter);
+			sheet.setColumnWidth(colId, 7500);
+			sheet.addMergedRegion(new CellRangeAddress(rowId, rowId, colId,
+					++colId));
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId = rowId+2;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted Date/Time From");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(fromDate));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted Date/Time To");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(toDate));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job ID");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(jobId));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Epsiode Type");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(episodeType1));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Customer Group");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(custGroupName1));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Customer Name");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue(nulltoStr(custName1));
+			cell.setCellStyle(styleAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId = rowId+2;
+			row = sheet.createRow(rowId);
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Without Error");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job ID");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Status");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted User");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted Date/Time");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Patient ID");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Visit Date");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Type");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Epsiode No.");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Visit");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Location");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Description");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Bill Document No");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Payer Amount");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			System.out.println("BLAutoBillGenJobExcelDwld.jsp -> jobIdQryWithoutErr: "+jobIdQryWithoutErr);
+			rs = stmt.executeQuery(jobIdQryWithoutErr);
+			while(rs.next()) {
+				//creating new row
+				colId = 0;//resetting colId to 0
+				rowId++;
+				row = sheet.createRow(rowId);
+				
+				for(int i = 1; i <= 13; i++) {
+					cell = row.createCell(colId);
+					if(i == 13) {
+						cell.setCellValue(cf.formatCurrency(rs.getString(i).trim(), noofdecimal));
+					} else {
+						cell.setCellValue(nulltoStr(rs.getString(i)));
+					}
+					cell.setCellStyle(styleAllBorder);
+					sheet.setColumnWidth(colId, 7500);
+					colId++;
+				}
+			}
+			
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId = rowId+4;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("With Error");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			//creating new row
+			colId = 0;//resetting colId to 0
+			rowId++;
+			row = sheet.createRow(rowId);
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job ID");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Status");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted User");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			cell = row.createCell(colId);
+			cell.setCellValue("Job Submitted Date/Time");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Patient ID");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Visit Date");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Type");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Epsiode No.");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Visit");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Location");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Description");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Payer Amount");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+
+			cell = row.createCell(colId);
+			cell.setCellValue("Error Desc");
+			cell.setCellStyle(styleBoldAllBorder);
+			sheet.setColumnWidth(colId, 7500);
+			colId++;
+			
+			System.out.println("BLAutoBillGenJobExcelDwld.jsp -> jobIdQryWithErr: "+jobIdQryWithErr);
+			rs = stmt.executeQuery(jobIdQryWithErr);
+			while(rs.next()) {
+				//creating new row
+				colId = 0;//resetting colId to 0
+				rowId++;
+				row = sheet.createRow(rowId);
+				
+				for(int i = 1; i <= 13; i++) {
+					cell = row.createCell(colId);
+					if(i == 12) {
+						cell.setCellValue(cf.formatCurrency(rs.getString(i).trim(), noofdecimal));
+					} else {
+						cell.setCellValue(nulltoStr(rs.getString(i)));
+					}
+					cell.setCellStyle(styleAllBorder);
+					sheet.setColumnWidth(colId, 7500);
+					colId++;
+				}
+			}
+			
+		} catch (Exception e) {
+			System.err.println("Error in BLAutoBillGenJobExcelDwld.jsp -> Creating new excel Cells: "+e);
+			e.printStackTrace();
+		} finally {
+			try {
+				if (con != null) {
+					con.close();
+				}
+				if (pst != null) {
+					pst.close();
+				} 
+				if(rs != null) {
+					rs.close();
+				}
+				if(cstmt != null) {
+					cstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/*
+	 * This method returns Empty String("") for null value, otherwise the
+	 * original string will be returned
+	 */
+	private String nulltoStr(String inputString) {
+		if (inputString == null) {
+			return "";
+		} else {
+			return inputString;
+		}
+	}%>
+	<%
+		Connection con = ConnectionManager.getConnection();
+
+		String fromDate = request.getParameter("fromDate");
+		if (fromDate == null) {
+			fromDate = "";
+		}
+		String toDate = request.getParameter("toDate");
+		if (toDate == null) {
+			toDate = "";
+		}
+		String jobId = request.getParameter("jobId");
+		if (jobId == null) {
+			jobId = "";
+		}
+		
+		String episodeType = request.getParameter("episodeType");
+		if (episodeType == null) {
+			episodeType = "";
+		}
+		if("O".equals(episodeType))	{
+			episodeType = "Outpatient";
+		} else if("E".equals(episodeType))	{
+			episodeType = "Emergency";
+		} else if("A".equals(episodeType)) {
+			episodeType = "All";
+		}
+		
+		String custGroupName = request.getParameter("custGroupName");
+		if (custGroupName == null) {
+			custGroupName = "";
+		}
+		
+		String custName = request.getParameter("custName");
+		if (custName == null) {
+			custName = "";
+		}
+
+		String locale = (String) session.getAttribute("LOCALE");
+		String facilityId = (String) session.getAttribute("facility_id");
+		if (facilityId == null) {
+			facilityId = "";
+		}
+		String strLoggedUser = (String) session.getValue("login_user");
+		if (strLoggedUser == null) {
+			strLoggedUser = "";
+		}
+
+		//String outputFileName = fromDate + "-" + toDate + ".xls";
+		String outputFileName = "AutoBillGenJobStatus.xls";
+		createExcelFile(con, facilityId, locale, strLoggedUser, fromDate,
+				toDate, jobId, episodeType, custGroupName, custName);
+
+		response.reset();
+		response.setContentType("application/x-download");
+		response.setHeader("Content-Disposition", "attachment; filename="
+				+ outputFileName);
+
+		// Prepare streams.
+		BufferedOutputStream output = null;
+		try {
+			// Open streams.
+			output = new BufferedOutputStream(response.getOutputStream());
+			workbook.write(output);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out
+					.println("Exception in BLPatientWiseSplAgencyDepositTransExcelDwld: "
+							+ e);
+		} finally {
+			output.flush();
+			output.close();
+			ConnectionManager.returnConnection(con, request);
+		}
+	%>
+</body>
+</html>

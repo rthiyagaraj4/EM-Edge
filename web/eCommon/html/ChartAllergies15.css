@@ -1,0 +1,5944 @@
+/**
+Copyright 1999-2015, Computer Sciences Corporation. All rights reserved.
+ 
+Warning: This computer program is protected by copyright law and international treaties.
+Unauthorized reproduction or distribution of this program, or any portion of it, 
+may result in severe civil and criminal penalties, and will be prosecuted to 
+the maximum extent possible under the law.
+**/
+TABLE.TABTABLE {behavior:url(/eHIS/eCommon/html/TabComponent.htc)}
+
+/*html {
+	direction:rtl;
+}
+*/
+
+A { 
+	text-decoration : none ;
+}
+
+A:link { 
+	COLOR: blue; 
+}
+
+A:visited { 
+	COLOR:blue ; 
+} 
+A:active { 
+	COLOR: blue; 
+}
+
+A.MENUSUBLEVELLINK
+{
+	COLOR:BLUE
+}
+A.MENUHIGHERLEVELLINK
+{
+	COLOR:WHITE
+}
+
+BODY {
+   MARGIN-LEFT: 0;
+   MARGIN-RIGHT: 0;
+   MARGIN-TOP: 0;
+   MARGIN-BOTTOM: 0;
+   /*BACKGROUND-COLOR: #FFFFFF;*/
+   background-color:#FFFFFF;
+   FONT-FAMILY: Verdana,SansSerif,Arial ;
+   FONT-SIZE: 8pt ;
+   COLOR: black ;
+}
+
+BODY.CONTENT {
+	/*BACKGROUND: url("../images/defaultGreen/bodyBG.jpg") repeat-x;*/
+    BACKGROUND-COLOR: #FFFFFF;
+	COLOR: black;
+	margin-bottom : 0;
+	margin-left : 0;
+	margin-right : 0;
+	margin-top : 0;
+}
+
+BODY.FUNCTIONHEADER {
+    COLOR: aqua;
+    TEXT-ALIGN: left;
+}
+
+BODY.HEADER {
+    background-color:#83AAB4;
+}
+
+BODY.COMMONTOOLBAR
+{
+    Margin-LEFT: 0;
+    Margin-RIGHT: 0;
+    Margin-TOP: 0;
+    Margin-BOTTOM: 0;
+    /*BACKGROUND-COLOR: #D5E2E5 ;*/
+    COLOR: black;
+}
+
+BODY.MESSAGE
+{
+    BACKGROUND: url("../images/defaultGreen/footer.jpg") repeat-x;
+	background-position:top;
+	background-color:#D3E2E6;
+    color: black;
+}
+
+TABLE {
+   FONT-SIZE: smaller;
+   PADDING: 0;
+	border-style:none;
+}
+
+TABLE.TAB {
+   BACKGROUND-COLOR:#F0F0F2;
+   FONT-SIZE: smaller;
+   PADDING: 0;
+}
+
+TABLE.BOX {
+
+   border:2px solid black;
+   width:100%;
+   FONT-SIZE: smaller;
+   PADDING: 0;
+}
+
+TABLE.GROUP
+{
+    BORDER-BOTTOM: medium none;
+    BORDER-LEFT: medium none;
+    BORDER-RIGHT: medium none;
+    BORDER-TOP: medium none
+}
+
+TABLE.CENTER {
+   FONT-SIZE: smaller;
+   PADDING: 0;
+	border-right: silver;
+	border-left: silver;
+   VERTICAL-ALIGN: middle ;
+}
+
+THEAD {
+   COLOR: black ;
+   FONT-SIZE:9pt; 
+   FONT-WEIGHT: bolder;
+   TEXT-ALIGN: center;	
+}
+
+TH {
+    background: url("../images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	height:18px;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse; 
+}
+
+TR {
+    /* BACKGROUND-COLOR:#FFFFFF;*/
+}
+
+TR.HEADER
+{
+    background-color:#83AAB4;
+
+}
+
+TR.COMMONTOOLBAR
+{
+  BACKGROUND-COLOR: #A9BFBF;
+  COLOR: green ;
+}
+
+TD.DECEASED
+{
+  font-family: verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: #FD5447;
+  COLOR: yellow;
+}
+
+TD.SUSPENDED
+{
+ font-family: verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: #A49182;
+  COLOR: white;
+}
+
+TD.INACTIVE
+{
+  font-family:  verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: #BD6981;
+  COLOR: red;
+}
+
+TD.PREF_FACILITY
+{
+  font-family: verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: #666600;
+  COLOR: #9999FF;
+}
+
+TD.DEFAULT {
+  font-family:  verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: #FFFFFF;
+  COLOR:green;
+}
+
+
+TD {
+	font-family: verdana ;
+	FONT-SIZE: 10pt ;
+    /*BACKGROUND-COLOR: #FFFFFF;*/
+    COLOR:black;
+}
+
+TD.BODYCOLORFILLED {
+ /* BACKGROUND-COLOR: white;*/
+  COLOR:black;
+}
+
+TD.COLUMNHEADER {
+   /*BACKGROUND-COLOR: #404040;
+   COLOR: white ;
+   FONT-SIZE: 8pt; 
+   font-weight: bolder;
+   PADDING-LEFT:7px;
+   PADDING-RIGHT:7px*/
+    background: url("../images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse; 
+}
+TD.COLUMNHEADERCENTER {
+   /*BACKGROUND-COLOR: #404040;
+   COLOR: white ;
+   FONT-SIZE: 8pt; 
+   font-weight: bolder;
+   TEXT-ALIGN: CENTER;
+   PADDING-LEFT:7px;
+   PADDING-RIGHT:7px
+   */
+	background: url("../images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse;
+}
+TD.COLUMNSUBHEADER {
+   BACKGROUND-COLOR: #B8CFD5;
+   COLOR: white ;
+   FONT-SIZE: 9pt; 
+}
+
+TD.QRY {
+	font-family: verdana ;
+	FONT-SIZE: 10pt ;
+}
+
+
+TD.TAB{
+
+       BACKGROUND-COLOR: #F0F0F2 ;  
+}
+
+
+TD.TABON{
+
+       BACKGROUND-COLOR: #F0F0F2;  
+       FONT-WEIGHT: bolder;
+}
+
+
+TD.HEADER
+{
+    background-color:#83AAB4;
+	color:#FFFFFF;
+}
+
+TD.PATIENTLINECOLOR
+{
+  BACKGROUND-COLOR: navy;
+  COLOR: white ;
+   FONT-WEIGHT: bolder;
+  FONT-SIZE: 9pt ;
+}
+
+TD.PATIENTLINESTATUS
+{
+  BACKGROUND-COLOR: navy;
+  COLOR: red ;
+   FONT-WEIGHT: bolder;
+}
+
+TD.COMMONTOOLBAR {
+	/*BACKGROUND-COLOR: #D5E2E5;*/
+	COLOR: red ;
+}
+
+TD.COMMONTOOLBARFUNCTION
+{
+background: url("../images/defaultGreen/panelTitleBarBg.jpg");
+COLOR: white ;
+FONT-WEIGHT: bolder ;
+}
+
+TD.LABEL
+{
+  COLOR:#444444;
+  /*background-color:#FFFFFF;*/
+  background-color:#FFFFFF;
+  FONT-SIZE: 8pt;
+  TEXT-ALIGN: LEFT;
+  /*TEXT-ALIGN: RIGHT;*/
+  PADDING-LEFT:7px;
+  PADDING-RIGHT:7px
+}
+TD.LABELCENTER
+{
+  COLOR:navy;
+  FONT-SIZE: 8pt;
+  TEXT-ALIGN: CENTER;
+  PADDING-LEFT:7px;
+  PADDING-RIGHT:7px
+}
+TD.LABELLEFT
+{
+  COLOR:navy;
+  FONT-SIZE: 8pt;
+  TEXT-ALIGN: LEFT;
+
+}
+TD.FIELDS
+{
+  /*background-color:#FFFFFF;*/
+  background-color:#FFFFFF;
+  COLOR:#000000;
+  FONT-SIZE: 8pt;
+  TEXT-ALIGN: LEFT
+}
+TD.DATA
+{
+  COLOR:#444444;
+  FONT-SIZE: 8pt;
+  FONT-WEIGHT: bolder ;
+}
+
+
+TD.QUERYDATA
+{
+  /*COLOR:Navy;*/
+  COLOR:#444444;
+  FONT-SIZE: 8pt;
+  FONT-WEIGHT: bolder ;
+
+}
+
+
+TD.BLACK
+{
+ COLOR:Black;
+  FONT-SIZE: 8pt;
+}
+
+TD.EMPTY {
+    BORDER-BOTTOM: medium none;
+    BORDER-LEFT: medium none;
+    BORDER-RIGHT: medium none;
+    BORDER-TOP: medium none;
+	  FONT-WEIGHT: bolder ;
+}
+
+TD.YELLOW 
+{
+	BACKGROUND-COLOR: yellow ;
+	FONT-SIZE: 9pt ;
+	border-style: dashed;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5; 
+}
+
+TD.BLUE 
+{
+	BACKGROUND-COLOR: blue ;
+		FONT-SIZE: 9pt ;
+	}
+
+TD.WHITE {
+	BACKGROUND-COLOR: white ;
+}
+
+TD.GREEN 
+{
+	BACKGROUND-COLOR: green ;
+		FONT-SIZE: 9pt ;
+	
+}
+TD.BROWN 
+{
+	BACKGROUND-COLOR: BROWN ;
+		FONT-SIZE: 9pt ;
+	}
+
+TD.MAGENTA 
+{
+	BACKGROUND-COLOR: MAGENTA ;
+		FONT-SIZE: 9pt ;
+	}
+
+TD.RED 
+{
+	BACKGROUND-COLOR: red ;
+	FONT-SIZE: 9pt ;
+}
+
+TD.PATQRED 
+{
+	BACKGROUND-COLOR: #FA8072 ;
+	FONT-SIZE: 9pt ;
+	border-style: dashed;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5 
+}
+
+TD.LIGHTBLUE 
+{
+	BACKGROUND-COLOR: #00BFFF ;
+	FONT-SIZE: 9pt ;
+	border-style: dashed;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5 
+}
+
+TD.ORANGE 
+{
+	BACKGROUND-COLOR: #FFA500 ;
+	FONT-SIZE: 9pt ;
+	border-style: dashed;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5 
+}
+
+
+TD.QRYEVENNOBORDER
+{
+	 BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	BORDER-STYLE: SOLID;
+}
+
+TD.QRYODDNOBORDER
+{
+	FONT-SIZE: 9pt ;
+	BACKGROUND-COLOR: #FFFFFF;  
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	BORDER-STYLE: SOLID;
+}
+    		
+INPUT.UPPER {
+  text-transform:UPPERCASE ;
+}
+
+P.BOX {
+  border:1px solid black;
+  width:100%
+}
+
+P.CLR {
+  BACKGROUND-COLOR: navy ;
+  COLOR: white;
+  FONT-WEIGHT: bolder ;
+}
+
+TH.BLUECOLOR {
+	font-family: verdana ;
+	COLOR:white;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #83AAB4; 
+}
+
+HR {
+  COLOR: navy ;
+}
+
+
+TEXTAREA {
+	Font-Family : MS Sans Serif;
+	font-size: 14;
+}
+
+.label {							
+  COLOR:navy;
+  FONT-SIZE: 8pt;
+}
+
+INPUT.BUTTON	
+{		
+	height:20px;
+	font-family: verdana ;
+	COLOR:#000000;
+	FONT-SIZE: 8pt ;
+}
+
+
+TD.HEADERCOMMON
+{
+
+    FONT-WEIGHT: 600;
+    FONT-SIZE: 8pt;
+    background: navy ;
+    COLOR: white;
+
+}
+
+TD.QRYEVEN{
+       BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	text-align:LEFT;
+
+       }
+
+TD.QRYODD{
+	FONT-SIZE: 9pt ;
+    BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;
+	text-align:LEFT;
+	
+    }
+
+TD.OAGREEN {
+ font-family: verdana ;
+ FONT-SIZE: 8pt ;
+   BACKGROUND-COLOR: #99CC00;
+ }
+
+TD.OADEFAULT {
+font-family: verdana ;
+FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #D5E2E5;
+  COLOR:black;
+}
+
+TD.OARED {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #F40000;
+  COLOR:#FFFFFF;
+}
+
+TD.OAFULL {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #37159B;
+  COLOR:blue;
+}
+
+
+
+TD.OABROWN {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: BROWN;
+  COLOR:WHITE;
+}
+
+TD.OAYELLOW {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: YELLOW;
+  COLOR:blue;
+}
+
+TD.OAHOLIDAY {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #D909D3;
+  COLOR:black;
+}
+
+
+TD.OABORDER
+{
+    BORDER-BOTTOM: black 1px solid;
+    BORDER-LEFT: black 1px solid;
+    BORDER-RIGHT: black 1px solid;
+    BORDER-TOP: black 1px solid;
+    FONT-SIZE: 8pt ;
+}
+
+TD.OALABEL
+{
+  COLOR:blue;
+  FONT-SIZE: 8pt;
+}
+
+TD.OAQRYEVEN{
+        BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 8pt ;
+	border-style: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+       }
+
+TD.OAQRYODD{
+	FONT-SIZE: 8pt ;
+        BACKGROUND-COLOR: #FFFFFF;  
+	border-style: solid;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+    }
+    
+TD.OAFORCED{
+        BACKGROUND-COLOR:#DDA0DD;  
+        FONT-SIZE: 8pt ;
+	border-style: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+       }
+       
+    
+    A.CAHIGHERLEVELLINK
+    {
+    	COLOR:WHITE
+    }
+    
+    A.CASUBLEVELLINK
+    {
+    	COLOR:BLACK
+    }
+
+A.CASELECTEDLINK
+{
+	COLOR:WHITE
+}
+TD.CAHIGHERLEVELCOLOR 
+{
+	background: url("../images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse;
+}
+
+
+TD.CASUBLEVELCOLOR {
+   	BACKGROUND-COLOR: WHITE;
+   	FONT-SIZE: 7pt ;
+   	 COLOR:black;
+   }
+
+TD.CASELECTEDCOLOR {
+	font-family: verdana ;
+	COLOR:white;
+	FONT-SIZE: 7pt ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+
+TD.CADEFAULT {
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: white;
+	 COLOR:black;
+}
+
+TD.CAGROUPHEADING
+{
+  font-family: verdana ;
+  BACKGROUND-COLOR: #FFFFFF;
+  COLOR:black;
+  FONT-WEIGHT: bolder
+}
+
+TD.ITEMSELECT
+{
+	font-family: verdana ;
+	FONT-SIZE: 9pt ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+DIV.TEMPLATELIST
+{
+position:relative;
+height: 103pt;
+width: 620pt;
+overflow:scroll;
+}
+
+A.ABNORMALPATIENT
+{
+	COLOR: RED; 
+}
+
+TD.ORHIGHERLEVELCOLOR {
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	FONT-WEIGHT: bolder ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+TD.ORSUBLEVELCOLOR {
+   	FONT-SIZE: 7pt ;
+   	 COLOR:red;
+   	 BACKGROUND-COLOR: WHITE;
+   }
+   
+   TD.ORSELECTEDCOLOR {
+   	font-family: verdana ;
+   	COLOR:blue;
+   	FONT-SIZE: 7pt ;
+   	BACKGROUND-COLOR: #83AAB4;
+   }
+
+TD.ORSELECTEDCOLORBOLD {
+	font-family: verdana ;
+	COLOR:white;
+	FONT-WEIGHT: bolder ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+
+TD.ordata
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	FONT-WEIGHT: bolder ;
+   	COLOR:black ;
+   	BACKGROUND-COLOR: #FFFFE0;
+  }
+
+TD.ORSTATUSCOMPLETED
+{
+	BACKGROUND-COLOR: #9ACD32 ;
+
+}
+
+TD.ORSTATUSABNORMAL
+{
+	BACKGROUND-COLOR: #F08080 ;
+
+}
+
+
+TD.ORSTATUSPARTIAL
+{
+	BACKGROUND-COLOR: #F0E68C ;
+
+}
+
+TD.MENUSUBLEVELCOLOR {
+   	BACKGROUND-COLOR: WHITE;
+   	FONT-SIZE: 7pt ;
+   	 COLOR:BLUE;
+   	 cursor:hand;
+   }
+
+TD.MENUSELECTEDCOLOR {
+	FONT-FACE: verdana ;
+	COLOR:white;
+	FONT-SIZE: 7 pt ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+TD.MENUHIGHERLEVELCOLOR {
+	FONT-FACE: verdana ;
+	FONT-SIZE: 7pt ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+TD.BLANK_ROW{
+	BACKGROUND-COLOR: dimgray;
+	FONT-SIZE: 1 pt; 
+}
+TD.ECMENUSELECTEDCOLOR {
+	FONT-FACE: verdana ;
+	COLOR:blue;
+	FONT-SIZE: 7 pt ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+TD.ECMENUHIGHERLEVELCOLOR {
+	FONT-FACE: verdana ;
+	FONT-SIZE: 8pt ;
+	FONT-WEIGHT: bolder ;
+   	COLOR:#000000;
+	BACKGROUND-COLOR: #83AAB4;
+}
+TD.ECMENUSUBLEVELCOLOR {
+   	FONT-SIZE: 7pt ;
+   	 COLOR:red;
+   	 BACKGROUND-COLOR: WHITE;
+   }
+
+INPUT.OTHLANGTEXT	{
+			font-size: 12pt;
+			Font-Family : Tahoma;
+}
+
+TD.OTHLANGLABEL	{
+			font-size: 10pt;
+			Font-Family : Tahoma;
+			COLOR:navy;
+}
+TD.OTHLANGDATA
+{
+ COLOR:Navy;
+  FONT-SIZE: 10pt;
+  	Font-Family : Tahoma;
+}
+
+TD.QRYEVENOTHLANG
+{
+	BACKGROUND-COLOR: #FFFFFF;  
+	font-size: 10pt;
+	Font-Family : Tahoma;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	 BORDER-STYLE: SOLID;
+}
+TD.QRYODDOTHLANG
+{
+	BACKGROUND-COLOR: #FFFFFF;  
+	font-size: 10pt;
+	Font-Family : Tahoma;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	 BORDER-STYLE: SOLID;
+}
+TD.PATIENTLINECOLOROTHLANG
+{
+  BACKGROUND-COLOR: navy;
+  COLOR: white ;
+   FONT-WEIGHT: bolder;
+	font-size: 10pt;
+	Font-Family : Tahoma;
+}
+
+TD.RESUSCITATION
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 10 pt ;
+  BACKGROUND-COLOR: RED;
+}
+
+TD.EMERGENT
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 8 pt ;
+  BACKGROUND-COLOR: 'ORANGE';
+}
+
+TD.OA_EMERGENT
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: 'ORANGE';
+}
+
+TD.URGENT
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 10 pt ;
+  BACKGROUND-COLOR: GREEN;
+}
+
+TD.SEMIURGENT
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 10 pt ;
+  BACKGROUND-COLOR: BLUE;
+}
+
+TD.NONURGENT
+{
+  FONT-FACE: verdana ;
+  FONT-SIZE: 10 pt ;
+  BACKGROUND-COLOR: WHITE;
+}
+TD.BLANKWHITEROW{
+	BACKGROUND-COLOR: white;
+	 FONT-SIZE: 4 pt; 
+}
+
+TD.AEBROUGHTDEAD
+{
+  font-family: verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: BLACK;
+  COLOR: WHITE;
+}
+TD.userdata
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	FONT-WEIGHT: bolder ;
+   	COLOR:black ;
+}
+TD.userdat
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+   	COLOR:black ;
+}
+/**
+
+CA related styles added on 01/08
+*/
+
+A.CAHIGHER {
+	COLOR:WHITE
+}
+
+A.CASUB {
+	COLOR:BLACK
+}
+
+A.CASELECTED {
+	COLOR:WHITE
+}
+
+A.ABNORMAL {
+	COLOR: RED; 
+}
+
+A.ONFIRSTVISIT { 
+	COLOR: LIGHTPINK; 
+	TEXT-DECORATION : NONE ;
+}
+
+
+BODY.FUNCTION{
+    BACKGROUND-COLOR: #83AAB4;
+    COLOR: AQUA;
+    TEXT-ALIGN: LEFT;
+}
+
+
+BODY.COMMON {
+    MARGIN-LEFT: 0;
+    MARGIN-RIGHT: 0;
+    MARGIN-TOP: 0;
+    MARGIN-BOTTOM: 0;
+    /*BACKGROUND-COLOR: #D5E2E5 ;*/
+    COLOR: BLACK;
+}
+
+
+TABLE.ORPOPUPMENU {
+	BORDER:2PX SOLID WHITE;
+   WIDTH:100%;
+   FONT-SIZE: SMALLER;
+   PADDING: 0;
+}
+
+TR.COMMON {
+  BACKGROUND-COLOR: #B8CFD5;
+  COLOR: GREEN ;
+}
+
+TH.BLUE {
+	FONT-FAMILY: VERDANA ;
+	COLOR:WHITE;
+	FONT-SIZE: 8PT ;
+	BACKGROUND-COLOR: #83AAB4; 
+}
+
+TD.PATIENTLINE {
+  BACKGROUND-COLOR: #B8CFD5 ;
+  COLOR: black;
+  FONT-WEIGHT: bolder ;
+}
+
+TD.PATIENTLINEDECEASED {
+  BACKGROUND-COLOR: #FD5447 ;
+  COLOR: white;
+  FONT-WEIGHT: bolder ;
+}
+
+TD.PATIENT {
+  BACKGROUND-COLOR: #83AAB4;
+  COLOR: WHITE ;
+  FONT-WEIGHT: BOLDER;
+  FONT-SIZE: 9PT ;
+}
+
+TD.QUERY {
+  COLOR:#00008B;
+  FONT-SIZE: 8PT;
+  FONT-WEIGHT: BOLDER ;
+}
+
+TD.COMMON {
+  BACKGROUND-COLOR: #83AAB4 ;
+  COLOR: WHITE;
+  FONT-WEIGHT: BOLDER ;
+}
+
+TD.COMMON {
+  BACKGROUND-COLOR: #83AAB4 ;
+  COLOR: WHITE;
+  FONT-WEIGHT: BOLDER ;
+}
+
+TD.CAHIGHER {
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 7PT ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8;
+}
+
+TD.CASUB {
+   	BACKGROUND-COLOR: WHITE;
+   	FONT-SIZE: 7PT ;
+   	 COLOR:BLACK;
+}
+
+TD.CASELECTED {
+	FONT-FAMILY: VERDANA ;
+	COLOR:WHITE;
+	FONT-SIZE: 7PT ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+
+TD.CAGROUP 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #D5E2E5; /*----- Changed from #FFFFFFF -------*/
+  COLOR:BLACK;
+  FONT-WEIGHT: BOLDER
+}
+
+TD.OTHLANGLEVELCOLOR {
+		font-family: Tahoma;
+		FONT-SIZE: 10pt ;
+	   	COLOR:WHITE;
+		BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+
+TD.CATHIRDLEVELCOLOR {
+	FONT-FACE: verdana ;
+	FONT-SIZE: 7pt ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #B8CFD5 ;
+}
+
+TEXTAREA.OTHLANGTEXTAREA	{
+			font-size: 12pt;
+			Font-Family : Tahoma;
+}
+TD.ITEM {
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 9PT ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+TD.ORHIGHER {
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 8PT ;
+	FONT-WEIGHT: BOLDER ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+TD.ORSUB{
+   	FONT-SIZE: 7PT ;
+   	 COLOR:RED;
+   	 BACKGROUND-COLOR: WHITE;
+}
+
+TD.ORSELECTED {
+	FONT-FAMILY: VERDANA ;
+	COLOR:BLUE;
+	FONT-SIZE: 7PT ;
+	BACKGROUND-COLOR: #83AAB4;
+}
+
+TD.OR {
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 8PT ;
+	FONT-WEIGHT: BOLDER ;
+   	COLOR:BLACK ;
+   	BACKGROUND-COLOR: #FFFFE0;
+ }
+TD.CAFOURTHLEVELCOLOR 
+{
+   	BACKGROUND-COLOR: #FFFFFF;
+   	FONT-SIZE: 7pt ;
+   	 COLOR:black;
+}
+TD.CAFIRSTNOSELECT {
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#83AAB4 ;
+	border-width: thin ;
+	border-style: outset;
+	BORDER-LEFT-COLOR: #A6C2C8;
+	BORDER-RIGHT-COLOR: #A6C2C8;
+	BORDER-TOP-COLOR: #A6C2C8;
+	BORDER-BOTTOM-COLOR: #A6C2C8 ;
+}	
+
+TD.CAFIRSTSELECTHORZ {
+	color:#000000;
+	background-color:#B8CFD5;
+	FONT-SIZE: 8pt ;
+	height:25px;
+	background-position:right;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+TD.CASECONDSELECTHORZ {
+	color:#FFFFFF;
+	FONT-SIZE: 8pt ;
+	height:25px;
+	padding-left:5px;
+	padding-right:5px;
+	background-color:#5D8691;
+	background-position:right;
+}
+
+
+TD.CATHIRDSELECTHORZ {
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#D5E2E5;
+	border-width: thin ;
+	border-style: inset;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.CAFIRSTSELECTVERT {
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#83AAB4 ;
+	border-width: thin ;
+	border-style: inset;
+	BORDER-LEFT-COLOR: #83AAB4;
+	BORDER-RIGHT-COLOR: #83AAB4;
+	BORDER-TOP-COLOR: #83AAB4;
+	BORDER-BOTTOM-COLOR: #83AAB4 ;
+}
+
+TD.CASECONDSELECTVERT {
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#B8CFD5 ;
+	border-width: thin ;
+	border-style: inset;
+	BORDER-LEFT-COLOR: #B8CFD5;
+	BORDER-RIGHT-COLOR: #B8CFD5;
+	BORDER-TOP-COLOR: #B8CFD5;
+	BORDER-BOTTOM-COLOR: #B8CFD5 ;
+}
+
+TD.CATHIRDSELECTVERT {
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#D5E2E5;
+	border-width: thin ;
+	border-style: inset;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.eORConsent {
+  BACKGROUND-COLOR: #FFDAB9 ;
+  FONT-SIZE: 9PT ;
+}
+
+TD.ORBROWN {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR: BROWN;
+  COLOR:white;
+}
+
+TD.ORRED {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR: RED;
+  COLOR:white;
+}
+
+TD.ORPANEL {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR: #FFF0F5;
+}
+
+TD.ORCANCEL {
+  BACKGROUND-COLOR: #DB7093 ;
+ FONT-SIZE: 9PT ;
+}
+
+TD.ORTOOLTIP {
+	BACKGROUND-COLOR: #D3D3D3 ;
+	FONT-SIZE: 9PT ;
+	BORDER-STYLE: DASHED;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5 
+}
+
+TD.GRAY {
+	BACKGROUND-COLOR: GRAY ;
+	FONT-SIZE: 9PT ;
+}
+
+FRAMESET.CAFIRSTWORKAREA {
+	border-style: solid; 
+	border-color: #83AAB4;
+	border-width:3
+}
+
+FRAMESET.CASECONDWORKAREA {
+	border-style: solid; 
+	border-color: #B8CFD5;
+	border-width:3
+}
+
+FRAMESET.CATHIRDWORKAREA {
+	border-style: solid; 
+	border-color: #D5E2E5;
+	border-width:3
+}
+
+DIV.TEMPLATE {
+	POSITION:RELATIVE;
+	HEIGHT: 24PX;
+	WIDTH: 620PX;
+	OVERFLOW:SCROLL;
+}
+
+TD.NOTEHEADER {
+  BACKGROUND-COLOR: #D5E2E5;
+  COLOR:BLUE;
+  FONT-WEIGHT: BOLD ;
+}
+
+TD.NOTESUBHEADER {
+  BACKGROUND-COLOR: #F0F0F2;
+  COLOR:#9400D3;
+  FONT-WEIGHT: BOLD ;
+}
+
+TD.ADDENDUMHEADER {
+  BACKGROUND-COLOR: #D5E2E5;
+  COLOR:BLUE;
+  FONT-WEIGHT: BOLD ;
+}
+
+TD.FOREDITOR {
+ 	BACKGROUND-COLOR: LIGHTGREY;
+}
+
+IMG {
+	background-repeat: no-repeat ; 
+}
+
+TD.ORTOOLTIPS
+{
+	BACKGROUND-COLOR: ACTIVEBORDER;
+    COLOR :BLACK;
+    FONT-SIZE: 7.5PT ;
+}
+
+TD.TOOLTIPSELECT
+{
+	FONT-SIZE: 7.5pt ;
+    BACKGROUND-COLOR: #D5E2E5;  
+}
+
+/**
+
+End CA related styles added on 01/08
+*/
+
+TD.OABLOCK {
+font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #6BC0B4;
+  COLOR:blue;
+}
+
+FONT.HYPERLINK {
+	COLOR : BLUE ;
+}
+
+
+
+
+
+
+TH.GROUPING {
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+   	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+TH.TEXTGROUPING {
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+   	COLOR:#F4FF20;
+	BACKGROUND-COLOR: #A6C2C8 ;
+}
+
+
+/*- Bala RR 28/01/2003 Start -*/
+
+TD.DATACHANGE {
+  font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #FECFCF;
+  
+}
+TD.DATACHANGETEXT {
+  font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #FECFCF;
+  
+}
+
+.DUPLICATE {
+  BACKGROUND-COLOR: #FECFCF;
+}
+
+INPUT.NUMBER
+{
+	text-align:right;
+}
+
+FONT.HYPERLINK {
+	COLOR : BLUE ;
+}
+
+A.TABLINK:link {
+	COLOR: white;
+}
+
+A.TABLINK:visited {
+	COLOR:white ;
+}
+
+A.TABLINK:active {
+	COLOR: white;
+}
+
+TD.CLICKED {
+	background: gray;
+	color:white;
+	FONT-SIZE: 9pt ;
+	background-color:#83AAB4 ;
+}
+
+TD.NORMAL {
+	background: gray;
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#A6C2C8 ;
+}
+
+TD.TDCLICKED {
+	background: gray;
+	color:white;
+	FONT-SIZE: 9pt ;
+	background-color:#83AAB4 ;
+	FONT-WEIGHT: bolder;
+}
+
+TD.TDNORMAL {
+	background: gray;
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#A6C2C8 ;
+	FONT-WEIGHT: bolder;
+}
+
+FONT.DATAHIGHLIGHT
+{
+	color:#FF5400 ;
+	font-weight:500 ;
+}
+/*  Added for Common Calender 07/02/2003 Start  */
+
+TD.SENPAT {
+	BACKGROUND-COLOR: #FA8072 ;
+	FONT-SIZE: 9PT ;
+	BORDER-STYLE: DASHED;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5 
+}
+
+.LABELSMALL {							
+  COLOR:navy;
+  FONT-SIZE: 8pt;
+}
+
+.DATASMALL {							
+  COLOR:navy;
+  FONT-SIZE: 8pt;
+  FONT-WEIGHT: bolder ;
+}
+
+TD.QRYEVENSMALL{
+       BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 8pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	text-align:LEFT;
+
+       }
+
+TD.QRYODDSMALL{
+	FONT-SIZE: 8pt ;
+    BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	text-align:LEFT;
+	
+    }
+
+.NODISPLAY{
+	display: none;
+}
+/*- Bala RR 28/01/2003 End -*/
+INPUT.STSMALL{
+	font-size: 10px;
+}
+SELECT.STSMALL{
+	font-size: 10px;
+}
+
+TD.STLIGHTPINK {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR:#FFCCFF;
+  COLOR:black;
+}
+
+TD.BLANK_ROW1{
+FONT-SIZE: 4 pt; 
+}
+
+TD.OASUSPENDED
+{
+font-family: verdana ;
+FONT-SIZE: 10pt ;
+BACKGROUND-COLOR: #FFE3C6;
+COLOR: white;
+}
+TD.OALINK
+{
+font-family: verdana ;
+FONT-SIZE: 10pt ;
+BACKGROUND-COLOR: white;
+COLOR: blue;
+cursor:hand
+}
+.myClass{
+font-weight:normal;
+COLOR: white ;
+FONT-SIZE: 8pt; 
+}
+
+TD.DEFAULTBLANKROW{ 
+BACKGROUND-COLOR: #D5E2E5;
+FONT-SIZE: 4 pt; 
+}
+
+.slotFull{
+	font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #37159B;
+  COLOR:white;
+}
+.slotBlocked{
+	font-family: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #FF0033;
+  COLOR:white;
+}
+
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in; o
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+
+TD.DISPDATE {
+  FONT-FACE: verdana ;
+  FONT-SIZE: 8pt ;
+  COLOR:#000000;
+}
+TD.DISPHOLIDAY {
+  FONT-FACE: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: #CFCFCF;
+  COLOR:black;
+}
+
+A { 
+	 text-decoration : blink;
+}
+TD.OASCH {
+  FONT-FACE: verdana ;
+  FONT-SIZE: 8pt ;
+  BACKGROUND-COLOR: WHITE;
+  COLOR:blue;
+}
+
+TD.DEFAULTBLANKROW2PT{
+BACKGROUND-COLOR: #D5E2E5;
+FONT-SIZE: 2 pt; 
+}
+
+TD.BLANKROW1PT
+{
+	FONT-SIZE: 1 pt; 
+}
+
+TD.BLANKROWSmallPt
+{
+	BACKGROUND-COLOR: #D5E2E5;
+	FONT-SIZE: 0.10 pt;
+}
+
+TD.blankRowDisp
+{
+	FONT-SIZE: 7 pt; 
+}
+
+
+
+TD.Header
+{
+	FONT-SIZE : 8 pt; 
+	height : 7;	
+	FONT : bold;
+}
+
+
+
+TD.HEADFORREF 
+{
+	BACKGROUND-COLOR: #404040;
+	COLOR: white ;
+	FONT-SIZE: 8pt; 
+	FONT-WEIGHT: BOLD;
+}
+
+A:active 
+{ 
+	COLOR: white; 
+}
+
+
+TR.TRNEW
+{
+	BACKGROUND-COLOR:#F0F9FF;
+}
+
+TD.TDLABEL 
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #F0F9FF;
+	COLOR:navy;
+}
+
+TD.TDDATA
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #F0F9FF;
+	COLOR:navy;
+	FONT-WEIGHT: bolder
+}
+
+TD.IPCAHIGHERLEVELCOLOR 
+{
+	font-family: verdana ;
+	FONT-SIZE: 8pt ;
+	COLOR:WHITE;
+	BACKGROUND-COLOR: #A6C2C8 ;
+	FONT-WEIGHT: bolder;
+	cursor:hand;
+}
+
+TD.IPCASELECTEDCOLOR 
+{
+	font-family: verdana ;
+	COLOR:white;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #83AAB4;
+	FONT-WEIGHT: bolder;
+	cursor:hand;
+}		
+
+TD.QRYEVENDISP
+{
+	BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	cursor:hand
+}
+
+TD.QRYODDDISP
+{
+	FONT-SIZE: 9pt ;
+	BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	cursor:hand
+}
+
+TD.SELECT
+{
+	BACKGROUND-COLOR: mediumaquamarine;  
+	FONT-SIZE: 9pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+}
+
+TD.ANBOR 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR: #E2E2E2;
+  COLOR:black;
+}
+
+TD.BLANKROW
+{
+FONT-SIZE: 2 pt; 
+}
+
+TD.ANBORPINK
+{
+	background: PINK ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+
+TD.ANBORBLUE
+{
+	background: BLUE ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+
+ INPUT.IP_RESUSCITATION	{
+ 			background: RED ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			font-Weight: 600 ;
+ 			border-style: ridge;
+ }
+  INPUT.IP_EMERGENT	{
+ 			background: ORANGE ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			font-Weight: 600 ;
+ 			border-style: ridge;
+ } INPUT.IP_URGENT	{
+ 			background: GREEN ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			font-Weight: 600 ;
+ 			border-style: ridge;
+ } INPUT.IP_SEMIURGENT	{
+ 			background: BLUE ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			font-Weight: 600 ;
+ 			border-style: ridge;
+ } INPUT.IP_NONURGENT	{
+ 			background: aqua ;
+ 			color: black ;
+ 			font-size: 8pt;
+ 			font-Weight: 600 ;
+ 			border-style: ridge;
+ }
+INPUT.IP_NONTRIAGE
+{
+	 background: #DDA0DD ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+
+
+
+INPUT.IP_PurpleButton	
+{
+	background:#871F78 ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_PurpleButton	
+{
+	background:#871F78;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_LpurpleButton	
+{
+	background: #DF0174 ;
+	color: black ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_LpurpleButton	
+{
+	background: #DF0174 ;
+	color: black ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_WoodButton	
+{
+	background: peru ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_WoodButton	
+{
+	background: peru ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_LWoodButton	
+{
+	background: burlywood ;
+	color: black ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_LWoodButton	
+{
+	background: burlywood ;
+	color: black ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+
+INPUT.IP_violetButton	
+{
+	background: darkturquoise ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_violetButton	
+{
+	background: darkturquoise ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_selectableReserveBed	
+{
+	background: darkturquoise ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+
+    BORDER-RIGHT: black 4px solid;
+    BORDER-TOP: black 4px solid;
+    BORDER-LEFT: black 4px solid;
+    BORDER-BOTTOM: black 4px solid
+
+}
+
+INPUT.IP_RedButton	
+{
+	background: #FA8072 ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_RedButton	
+{
+	background: #FA8072 ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+INPUT.IP_RedButton_B	
+{
+	background: #FA8072 ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+	background-image:url('../../eIP/images/future.gif');
+	background-repeat: no-repeat;
+	background-position:right;
+}
+INPUT.IP_RedButton_D	
+{
+	background: #FA8072 ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+	background-image:url('../../eIP/images/BillPrepared.gif');
+	background-repeat: no-repeat;
+	background-position:left;
+}
+TD.IP_RedButton_B	
+{
+	background: #FA8072 ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_GreenButton	
+{
+	background: green ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_GreenButton	
+{
+	background: green ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+INPUT.IP_GreenButton_B	
+{
+	background: green ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+	background-image:url('../../eIP/images/future.gif');
+	background-repeat: no-repeat;
+	background-position:right; 
+
+}
+TD.IP_GreenButton_B	
+{
+	background: green ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+INPUT.IP_BrownButton	
+{
+	background: brown ;
+	color: white ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_BrownButton	
+{
+	background: brown ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_YellowButton	
+{
+	background: yellow ;
+	color: black ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_YellowButton	
+{
+	background: yellow ;
+	color: black ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_LGreenButton	
+{
+	background: #90EE90 ;
+	color: black ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_LGreenButton	
+{
+	background: #90EE90 ;
+	color: black ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+INPUT.IP_LPinkButton	
+{
+	background: #FFC0CB ;
+	color: black ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_LPinkButton	
+{
+	background: #FFC0CB ;
+	color: black ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+INPUT.IP_newButton	
+{
+	background:#6699cc;  
+	color: White ;
+	font-size: 8pt;
+	font-Weight: 600 ;
+	border-style: ridge;
+}
+TD.IP_newButton	
+{
+	background: #6699cc ;
+	color: white ;
+	font-size: 8pt; 
+	font-Weight: 600 ;
+}
+
+
+
+
+TD.AE_green{ 
+ 			background: green ;
+ 			color: white ;
+ 			font-size: 8pt;
+			BORDER:1PX SOLID black; 		
+}
+
+TD.AE_LIGHTGREEN
+{
+	background: LIGHTGREEN ;
+	font-size: 8pt;
+	color:black;
+	PADDING: 1;
+	BORDER:1PX SOLID black;
+	
+
+}
+TD.AE_LIGHTGREEN_borderless
+{
+	background: LIGHTGREEN ;
+	font-size: 8pt;
+	color:black;
+	PADDING: 1;
+}
+
+TD.AE_LIGHTPINK
+{
+	background: LIGHTPINK ;
+	color: black ;
+	font-size: 8pt;
+	BORDER:1PX SOLID black;
+
+}
+
+TD.AE_LIGHTPINK_borderless
+{
+	background: LIGHTPINK ;
+	color: black ;
+	font-size: 8pt;
+
+}
+
+TD.AE_RedButton	
+{
+ 			background: #FA8072 ;
+			color:white;
+			FONT-SIZE: 8pt ;
+			BORDER:1PX SOLID black;
+					
+}
+TD.AE_RedButton_borderless	{
+ 			background: #FA8072 ;
+			color:white;
+			FONT-SIZE: 8pt ;
+					
+}
+
+TD.AE_brown	
+{
+ 			background: brown ;
+ 			color: white ;
+ 			font-size: 8pt;
+			BORDER:1PX SOLID black; 		
+}
+
+TD.AE_brown_borderless	
+{
+ 			background: brown ;
+ 			color: white ;
+ 			font-size: 8pt;		
+}
+
+
+
+TD.IP_WHITE
+{
+	 background: #FFFFFF ;
+	color: white ;
+	font-size: 8pt;
+
+}
+
+TD.BLANKROW1
+{
+	FONT-SIZE: 4 pt; 
+}
+
+TD.AE_green_borderless	{
+ 			background: green ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 		
+ }
+
+ TD.IP_RESUSCITATION	{
+ 			background: RED ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			
+ }
+
+  TD.IP_EMERGENT	{
+ 			background: ORANGE ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			
+ } 
+ TD.IP_URGENT	{
+ 			background: GREEN ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 			
+ } 
+ TD.IP_SEMIURGENT	{
+ 			background: BLUE ;
+ 			color: white ;
+ 			font-size: 8pt;
+ 		
+ } 
+ TD.IP_NONURGENT	{
+ 			background: aqua ;
+ 			color: black ;
+ 			font-size: 8pt;
+ 			
+ }
+TD.IP_NONTRIAGE
+{
+	 background: #f0aaf0 ;
+	color: white ;
+	font-size: 8pt;
+
+}
+
+TD.AEDECEASED
+{
+  font-family: verdana ;
+  FONT-SIZE: 10pt ;
+  BACKGROUND-COLOR: BLACK;
+  COLOR: WHITE;
+}
+
+TEXTAREA.COMMENTS 
+{
+	Font-Family : Courier New;
+	font-size: 8pt;
+}
+
+ TD.OR_QRYEVENBORDER
+ {
+	BACKGROUND-COLOR: PURPLE;
+	FONT-SIZE: 0pt ;
+	BORDER-STYLE: SOLID  ;
+ }
+ 
+TD.ORCAHIGHERLEVELCOLOR
+{     
+	font-family: verdana ;
+	COLOR:WHITE;
+	FONT-SIZE: 7pt ;
+	BACKGROUND-COLOR: #A6C2C8 ;
+	BORDER	: 0
+}
+
+TD.OAGREENSMALL 
+{
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 4PT ;
+	 BACKGROUND-COLOR: #99CC00;
+}
+
+TD.OAREDSMALL
+{
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 4PT ;
+	BACKGROUND-COLOR: RED;
+	COLOR:BLUE;
+}
+
+TD.OALABELSMALL
+{
+	COLOR:BLUE;
+	FONT-SIZE: 4PT;
+}
+
+TD.OALABELSMALLWHITE
+{
+	COLOR:BLACK;
+	background-color:WHITE;
+	FONT-SIZE: 8PT;
+}
+
+TD.QRY1 
+{
+	BACKGROUND-COLOR: #7FFF00;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY2
+{
+	BACKGROUND-COLOR: #008000;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY3
+{
+	BACKGROUND-COLOR: #A52A2A;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY4
+{
+	BACKGROUND-COLOR: #FF0000;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY5
+{
+	BACKGROUND-COLOR: #0000CD;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY6 
+{
+	BACKGROUND-COLOR: #808000;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY7 
+{
+	BACKGROUND-COLOR: #CD5C5C;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.ORTOOLTIPS1
+{
+	BACKGROUND-COLOR: ACTIVEBORDER;
+	COLOR :BLACK;
+	FONT-SIZE: 9PT ;
+}
+
+TABLE.ORPOPUPMENUS
+{
+   BORDER:2PX SOLID WHITE;
+   WIDTH:100%;
+   FONT-SIZE: SMALLER;
+   PADDING: 0;
+}
+
+TD.ORMENU
+{
+	BACKGROUND-COLOR: #C0C0C0 ;
+	FONT-SIZE: 9PT ;
+	BORDER-STYLE: DASHED;
+	BORDER-LEFT-COLOR: #FFA500;
+	BORDER-RIGHT-COLOR: #FFA500;
+	BORDER-TOP-COLOR: #FFFACD;
+	BORDER-BOTTOM-COLOR: #FFFACD;
+}
+
+TD.ORMENULAYER
+{
+	  FONT-FAMILY: VERDANA ;
+	  FONT-SIZE: 10PT ;
+	  BACKGROUND-COLOR: #D8BFD8;
+	  COLOR: WHITE;
+ }
+
+TD.ORDISABLED
+{
+	  FONT-FAMILY: VERDANA ;
+	  FONT-SIZE: 10PT ;
+	  BACKGROUND-COLOR: SLATEGRAY;
+	  COLOR: WHITE;
+ }
+
+TD.BLANK_ROW_DISP{
+	FONT-SIZE: 4 pt; 
+}
+
+TD.COMMON_BUTTONS
+{
+	COLOR:navy;
+	FONT-SIZE: 8pt;
+	border-width: thin ;
+  	border-style: inset;
+	BORDER-LEFT-COLOR: #C71585;
+	BORDER-RIGHT-COLOR: #C71585;
+	BORDER-TOP-COLOR: #C71585;
+	BORDER-BOTTOM-COLOR: #C71585 ;
+}
+
+TD.OR_PLACEORDER 
+{
+	color:BLACK;
+	FONT-SIZE: 8pt ;
+	background-color:#83AAB4;
+	border-width: thin ;
+	border-style: double ;
+	BORDER-LEFT-COLOR: RED;
+	BORDER-RIGHT-COLOR: RED;
+	BORDER-TOP-COLOR: RED;
+	BORDER-BOTTOM-COLOR: RED ;
+}
+
+TD.clicked 
+{
+	background: gray;
+	color:white;
+	FONT-SIZE: 9pt ;
+	background-color:#83AAB4 ;
+	hover:disable;
+}
+TD.normal 
+{
+	background: gray;
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#A6C2C8 ;
+}
+A.HIGHER_LEVEL_LINK
+{
+	COLOR:white;	
+	FONT-SIZE: 9pt ;
+}
+A.SUB_LEVEL_LINK
+{
+	COLOR:WHITE;
+	FONT-SIZE: 8pt ;
+}
+TD.Gray 
+{
+	BACKGROUND-COLOR: BUTTONFACE ;
+	FONT-SIZE: 8PT ;
+}
+
+TD.LIGHTYELLOW 
+{
+	BACKGROUND-COLOR: #FFE4E1 ;
+	FONT-SIZE: 8PT ;
+}
+
+TD.TAN 
+{
+	BACKGROUND-COLOR: #D2B48C ;
+	FONT-SIZE: 8PT ;
+}
+		 
+TEXTAREA.RESULTTEXTAREAODD	
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;
+	BACKGROUND-COLOR: #D5E2E5;
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	text-align: left;
+}
+TEXTAREA.RESULTTEXTAREAEVEN	
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;
+	BACKGROUND-COLOR: #F0F0F2;
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	text-align: left;
+}
+
+TEXTAREA.RESULTTEXTAREATAN
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;
+	BACKGROUND-COLOR: #D2B48C;
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	text-align: left;
+}
+
+TEXTAREA.RESULTTEXTAREAYELLOW	
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;
+	BACKGROUND-COLOR: #FFE4E1;
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	text-align: left;
+}
+
+TEXTAREA.RESULTTEXTAREAGRAY	
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;
+	BACKGROUND-COLOR: BUTTONFACE;
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	text-align: left;
+}
+
+A.ORYELLOW 
+{
+	COLOR: YELLOW;
+}
+TD.OR_ORDERABLES
+{
+	font-family: verdana ;
+	FONT-WEIGHT: bolder ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #D3D3D3;
+  	COLOR:black;
+}
+
+A.ORCANCEL 
+{
+	COLOR:#DB7093 ;
+}
+
+A.ORGREEN 
+{
+	COLOR:  #99CC00;
+}
+
+A.LABEL
+{
+	COLOR:BLUE
+}
+
+TD.OR_WHITE
+{
+	BACKGROUND-COLOR: WHITE;
+	FONT-SIZE: 8pt ;
+}
+
+TD.ORCOLUMNHEADING 
+{
+         BACKGROUND-COLOR: #83AAB4;
+         FONT-SIZE: 9PT ;
+         BORDER-COLOR:	BLACK;
+         BORDER-LEFT-COLOR: #D5E2E5;
+         BORDER-RIGHT-COLOR: #D5E2E5;
+         BORDER-TOP-COLOR: #D5E2E5;
+         BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.ORROWHEADING 
+{
+         BACKGROUND-COLOR: #C0C0C0;
+         FONT-SIZE: 9PT ;
+         BORDER-COLOR:	BLACK;
+         BORDER-LEFT-COLOR: #D5E2E5;
+         BORDER-RIGHT-COLOR: #D5E2E5;
+         BORDER-TOP-COLOR: #D5E2E5;
+         BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.ORCHARTHEADING 
+{
+         BACKGROUND-COLOR: #800000;
+         FONT-SIZE: 9PT ;
+         BORDER-COLOR:	BLACK;
+         BORDER-LEFT-COLOR: #D5E2E5;
+         BORDER-RIGHT-COLOR: #D5E2E5;
+         BORDER-TOP-COLOR: #D5E2E5;
+         BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.OR_CAHIGHERLEVELCOLOR 
+{
+	FONT-FACE: verdana ;
+	FONT-SIZE: 7pt ;
+   	COLOR:black;
+	BACKGROUND-COLOR:#FFB6C1 ;
+}
+
+
+TEXTAREA.OR_RESULTTEXTAREAODD	
+{
+	font-size: 8pt ;
+	Font-Family : Courier New;	
+	BORDER-STYLE: none;
+	fontWeight : bold;
+	WRAP : VIRTUAL;
+	TITLE: "Double Click to Zoom";
+}	
+
+TD.GROUPBY 
+{
+        Font-Family : verdana;
+	FONT-SIZE: 7pt ;
+}
+
+TD.linkStyle 
+{
+	background: gray;
+	color:white;
+	FONT-SIZE: 10pt ;
+	background-color:#83AAB4;
+}
+
+TH.OTHLANGLABEL	
+{
+      font-size: 10pt;
+      Font-Family : Tahoma;
+      COLOR:white;
+}
+
+a.showlink 
+{
+  COLOR:blue;
+}
+
+A:HIGHERLEVELLINK:visited
+{
+	COLOR:WHITE
+}
+
+A:HIGHERLEVELLINK:active
+{
+	COLOR:WHITE
+}
+
+A:HIGHERLEVELLINK:link
+{
+	COLOR:WHITE
+}
+
+
+A:CURSORACTIVELINK:active
+{
+	COLOR: blue;
+	CURSOR : wait;
+}
+
+
+
+A:IMAGELINK:LINK
+{
+                COLOR: blue;
+	text-decoration : none ;
+}
+
+A:IMAGELINK:visited 
+{
+	COLOR:blue;
+	text-decoration : none ;
+}
+
+A:IMAGELINK:active
+{
+	COLOR:blue;
+	text-decoration : none ;
+}
+
+TD.QRY8 
+{
+	BACKGROUND-COLOR: #D8BFD8;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY9 
+{
+	BACKGROUND-COLOR: #DDA0DD;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+TD.QRY10 
+{
+	BACKGROUND-COLOR: #F4A460;
+	FONT-SIZE: 9PT ;
+	BORDER-COLOR:	BLACK;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: #D5E2E5;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+
+  
+/*
+	Merged CAMainMenu.css starting here by Ush
+*/
+
+.dtree {
+		font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size: 11px;
+		font-style: normal 
+		font-weight: bold;		
+		color: #000000;
+		white-space: nowrap;
+	}
+.dtree img {
+		color: #000000;
+		border: 0px;
+		vertical-align: middle;
+	}
+.dtree a {
+		color: #000000;
+		text-decoration: none;
+	}
+
+.dtree a.nodeSel {
+		color: #000000;
+		white-space: nowrap;
+		padding: 1px 2px 1px 2px;
+	}
+.dtree a.node:visited
+{
+	color:#000000;
+}
+.dtree a.nodeSel :visited
+{
+	color:#000000;
+}
+.dtree a.node{
+		color: #000000;
+		white-space: nowrap;
+		padding: 1px 2px 1px 2px;
+	}
+
+.dtree a.nodeSel:hover {
+		color: #000000;
+		text-decoration: underline;
+	}
+
+.dtree a.node:hover{
+		color: #000000; 
+		text-decoration: underline;
+	}
+.dtree a.nodeSel {
+		color: #000000;
+	}
+.dtree.clip {
+		color: #000000;
+		overflow: hidden;
+	}
+BODY.CA_COMMON {
+		MARGIN-LEFT: 0;
+		MARGIN-RIGHT: 0;
+		MARGIN-TOP: 0;
+		MARGIN-BOTTOM: 0;
+		BACKGROUND-COLOR: #FFFFFF;
+		COLOR: white;
+	}
+
+INPUT.CA_BUTTON {
+		BACKGROUND-COLOR: #00008B ;
+		COLOR: WHITE ;
+		FONT-SIZE: 8PT;
+		FONT-WEIGHT: 600 ;
+		BORDER-STYLE: RIDGE;
+	}
+
+	A:link {
+		COLOR: #0000FF;
+	}
+
+	A:visited {
+		COLOR: #0000FF;
+	}
+	A:active {
+		COLOR: #0000FF;
+	}
+
+
+/*
+	Merged CAMainMenu.css end here by Ush
+*/
+
+/*
+	Merging of CAStyle.css starts here by Ush
+*/
+TABLE.CATABTABLE1 {behavior:url(/eHIS/eCA/html/CATabComponent1.htc)}
+TABLE.CATABTABLE2 {behavior:url(/eHIS/eCA/html/CATabComponent2.htc)}
+
+TD.CAPLL1CLICKED {
+	background: gray;
+	color:white;
+	FONT-SIZE: 9pt ;
+	background-color:#83AAB4 ;
+}
+
+TD.CAPLL1NORMAL {
+	background: gray;
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#A6C2C8 ;
+}
+TD.CAPLL2CLICKED {
+	background: gray;
+	color:white;
+	FONT-SIZE: 9pt ;
+	background-color:#83AAB4 ;
+}
+
+TD.CAPLL2NORMAL {
+	background: gray;
+	color:white;
+	FONT-SIZE: 8pt ;
+	background-color:#A6C2C8 ;
+}
+
+
+TD.NEWBORN 
+{
+	BACKGROUND-COLOR: #FFC0CB ;
+	FONT-SIZE: 9pt ;
+	border-width: thin ;
+	border-style: outset;
+}
+
+TD.DISCHARGED 
+{
+	BACKGROUND-COLOR: #FFA500 ;
+	FONT-SIZE: 9pt ;
+	border-width: thin ;
+	border-style: outset;
+}
+
+TD.CADECEASED
+{
+	BACKGROUND-COLOR: BLACK ;
+	FONT-SIZE: 9pt ;
+	FONT-WEIGHT: bolder ;
+	border-width: thin ;
+	border-style: outset;
+}
+
+TD.DECEASED1
+{
+	FONT-SIZE: 9pt ;
+	FONT-WEIGHT: bolder ;
+}
+
+TD.CRITICAL
+{
+	BACKGROUND-COLOR: RED;
+	FONT-SIZE: 9pt ;
+}
+
+TD.SEMICRITICAL
+{
+	BACKGROUND-COLOR: YELLOW;
+	FONT-SIZE: 9pt ;
+}
+
+TD.NONCRITICAL
+{
+	BACKGROUND-COLOR: GREEN;
+		FONT-SIZE: 9pt ;
+}
+
+
+/*
+	Merging of CAStyle.css ends here by Ush
+*/
+/*
+	Merging of eCA/html/IeStyle.css  begins here by Ush
+*/
+
+TD.PATIENTLINE1 {
+  BACKGROUND-COLOR: navy ;
+  COLOR: #FFFF00;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE2 {
+  BACKGROUND-COLOR: navy ;
+  COLOR: #FFD700;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE3 {
+  BACKGROUND-COLOR: navy ;
+  COLOR: #FFFFE0;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE4 {
+  BACKGROUND-COLOR: navy ;
+  COLOR: #FFA500;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+
+TD.PATIENTLINE5 {
+  BACKGROUND-COLOR: #FFFF00 ;
+  COLOR:navy ;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE6 {
+  BACKGROUND-COLOR: #FFD700 ;
+  COLOR:navy ;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE7 {
+  BACKGROUND-COLOR: #FFFFE0 ;
+  COLOR: navy;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTLINE8 {
+  BACKGROUND-COLOR: #FFA500 ;
+  COLOR: navy;
+  FONT-SIZE: 9PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.ENCOUNTERLINE1 {
+  BACKGROUND-COLOR: #FFFF00 ;
+  COLOR:navy ;
+  FONT-SIZE: 7PT ;
+  FONT-WEIGHT: BOLD;
+}
+
+TD.PATIENTDECEASED {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 8PT ;
+  BACKGROUND-COLOR: BROWN;
+  COLOR:white;
+}
+
+TD.FUNCTION_DECEASED {
+   BACKGROUND-COLOR: BROWN;
+   COLOR: WHITE ;
+   FONT-SIZE: 7.5PT; 
+   FONT-WEIGHT: BOLD;
+}
+<!-- added by kiran for Charting-->
+TD.CRITICAL
+{
+		FONT-SIZE: 9PT ;
+		background-color:#D2B48C;
+		BORDER-STYLE: SOLID;
+		BORDER-LEFT-COLOR: #D5E2E5;
+		BORDER-RIGHT-COLOR: #D5E2E5;
+		BORDER-TOP-COLOR: #D5E2E5;
+		BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.HIGH 
+{
+		FONT-SIZE: 9PT ;
+		background-color:#FFC0CB;
+		BORDER-STYLE: SOLID;
+		BORDER-LEFT-COLOR: #D5E2E5;
+		BORDER-RIGHT-COLOR: #D5E2E5;
+		BORDER-TOP-COLOR: #D5E2E5;
+		BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.ABNORMAL
+{
+		FONT-SIZE: 9PT ;
+		background-color:#FFF8DC;
+		BORDER-STYLE: SOLID;
+		BORDER-LEFT-COLOR: #D5E2E5;
+		BORDER-RIGHT-COLOR: #D5E2E5;
+		BORDER-TOP-COLOR: #D5E2E5;
+		BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.LOW 
+{
+			FONT-SIZE: 9PT ;
+			background-color:#F0FFFF;
+			BORDER-STYLE: SOLID;
+			BORDER-LEFT-COLOR: #D5E2E5;
+			BORDER-RIGHT-COLOR: #D5E2E5;
+			BORDER-TOP-COLOR: #D5E2E5;
+			BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.CRITICALLOW 
+{
+		FONT-SIZE: 9PT ;
+		background-color:#D8BFD8;
+		BORDER-STYLE: SOLID;
+		BORDER-LEFT-COLOR: #D5E2E5;
+		BORDER-RIGHT-COLOR: #D5E2E5;
+		BORDER-TOP-COLOR: #D5E2E5;
+		BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.CRITICALHIGH 
+{
+			FONT-SIZE: 9PT ;
+			background-color:#F4A460;
+			BORDER-STYLE: SOLID;
+			BORDER-LEFT-COLOR: #D5E2E5;
+			BORDER-RIGHT-COLOR: #D5E2E5;
+			BORDER-TOP-COLOR: #D5E2E5;
+			BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.CAGREEN 
+{
+			FONT-SIZE: 9PT ;
+			BACKGROUND-COLOR: #99CC00;
+			BORDER-STYLE: SOLID;
+			BORDER-LEFT-COLOR: #D5E2E5;
+			BORDER-RIGHT-COLOR: #D5E2E5;
+			BORDER-TOP-COLOR: #D5E2E5;
+			BORDER-BOTTOM-COLOR: #D5E2E5;
+}
+TD.CAQRYEVEN
+{
+     BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	FONT-WEIGHT: BOLD ;
+}
+
+TD.CAQRYODD
+{
+	FONT-SIZE: 9pt ;
+    BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+	FONT-WEIGHT: BOLD ;
+}
+TD.CASUMMARY 
+{
+			FONT-FAMILY: VERDANA ;
+			FONT-SIZE: 8PT ;
+		   	COLOR:WHITE;
+			BACKGROUND-COLOR: #A6C2C8 ;
+		  FONT-WEIGHT: BOLD ;
+}
+TD.CAGREENSMALL 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 9PT ;
+  BACKGROUND-COLOR: #99CC00;
+}
+
+TD.OHCOMPAREBASE 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 9PT ;
+  BACKGROUND-COLOR: #F5BDFF;
+}
+
+TD.OHCOMPAREEVAL1
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 9PT ;
+  BACKGROUND-COLOR: #91FFAB;
+}
+
+TD.OHCOMPAREEVAL2 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 9PT ;
+  BACKGROUND-COLOR: #FFBC70;
+}
+
+TD.CAREDSMALL 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 4PT ;
+  BACKGROUND-COLOR: RED;
+  COLOR:BLUE;
+}
+
+TD.CABROWNSMALL 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 4PT ;
+  BACKGROUND-COLOR: BROWN;
+  COLOR:BLUE;
+}
+
+TD.CAYELLOWSMALL 
+{
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 4PT ;
+  BACKGROUND-COLOR: YELLOW;
+  COLOR:BLUE;
+}
+
+TD.CALABELSMALL
+{
+  COLOR:BLUE;
+  FONT-SIZE: 4PT;
+}
+
+TD.CALABELSMALLWHITE
+{
+ COLOR:BLACK;
+  background-color:WHITE;
+  FONT-SIZE: 8PT;
+}
+
+TD.CAENCOUNTERLINE {
+  BACKGROUND-COLOR: #FFFFF0 ;
+  COLOR: BLACK;
+  FONT-SIZE: 7PT ;
+  FONT-WEIGHT: normal;
+}
+
+
+/*
+	Merging of eCA/html/IeStyle.css ends here by Ush
+*/
+/*
+	Merging of IMStyleSheet.css starts here by Ush
+*/
+
+INPUT.CABUTTON
+{
+    FONT-WEIGHT: 600;
+    FONT-SIZE: 8pt;
+    BACKGROUND: #ffc5b5;
+    COLOR: black;
+    BORDER-TOP-STYLE: ridge;
+    BORDER-RIGHT-STYLE: ridge;
+    BORDER-LEFT-STYLE: ridge;
+    BORDER-BOTTOM-STYLE: ridge
+}
+
+/*
+	merging of IMStyleSheet.css ends here by Ush
+*/
+
+/*
+	merging of CAHomeIeStyle.css Starts here by Ush
+*/
+
+TD.FUNCTION_NAME {
+   BACKGROUND-COLOR: navy;
+   COLOR: WHITE ;
+   FONT-SIZE: 7.5PT; 
+   FONT-WEIGHT: BOLD;
+}
+
+TD.CAQUERYEVEN {
+	 BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 7PT ;
+	border:0px;
+}
+TD.CAQUERYODD {
+    BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 7PT ;
+	border:0px;
+
+}
+
+TD.CAFLOWSHEETLEVEL1{
+
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #A6C2C8;  
+	
+	COLOR:BLACK;
+	FONT-WEIGHT: BOLDER;
+}
+
+TD.CAFLOWSHEETLEVEL2{
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 8pt ;
+	/*BACKGROUND-COLOR: #D5E2E5;*/
+	COLOR:BLACK;
+	FONT-WEIGHT: BOLDER;
+}
+
+TD.CAFLOWSHEETLEVEL3{
+	FONT-FAMILY: VERDANA ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: #B0C4DE;
+	COLOR:BLACK;
+	FONT-WEIGHT: BOLDER;
+}
+
+/*
+	merging of CAHomeIeStyle.css e here by Ush
+*/
+
+
+.apptclass
+{
+	BACKGROUND-COLOR: #A0A0A0;
+}
+
+/* start of RS */
+
+TD.OPTIMAL {
+	BACKGROUND-COLOR: #CCFFCC ;
+	BORDER:1PX SOLID #CCFFCC ;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+	text-align:CENTER;
+}
+TD.BELOWOPTIMAL{
+	BACKGROUND-COLOR: #FFCFCF;
+	BORDER:1PX SOLID #FFCFCF;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+	text-align:CENTER;
+}		
+TD.ABOVEOPTIMAL{
+	BACKGROUND-COLOR: #FFFFBB;
+	BORDER:1PX SOLID #FFFFBB;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+	text-align:CENTER;
+}		
+TD.Month {
+	FONT-FACE: verdana ;
+	FONT-SIZE:7pt ;
+	COLOR:Black;
+}
+TD.Date {
+	BORDER:1PX SOLID #595959;
+	BACKGROUND-COLOR:#595959;
+	FONT-FACE: verdana ;
+	FONT-SIZE:7pt ;
+	font-weight:bolder;
+	COLOR:white;
+}
+/*TD.Day {
+	BORDER:1PX SOLID #595959;
+	BACKGROUND-COLOR:#595959;
+	FONT-FACE: verdana ;
+	FONT-SIZE:7pt ;
+	font-weight:bolder;
+	COLOR:white;
+}*/
+TD.Shift {
+	BACKGROUND-COLOR:#0099CC;
+	BORDER:1PX SOLID #0099CC;
+	FONT-SIZE:7pt ;
+	COLOR:White;
+	FONT-FACE: verdana ;
+}
+TD.EmptyCell{
+	BORDER:1PX SOLID #E8E8E8;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}
+
+TD.EmptyOdd{
+	BORDER:1PX SOLID #E8E8E8;
+	BACKGROUND-COLOR: #D5E2E5;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}
+TD.EmptyEven{
+	BORDER:1PX SOLID #FFFFFF;
+	BACKGROUND-COLOR: #F0F0F2;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}
+
+TD.PositionTotal{
+	BACKGROUND-COLOR: #99CCFF;
+	BORDER:1PX SOLID #99CCFF;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}		
+
+TD.PositionShiftTotal{
+	BACKGROUND-COLOR: #99ddee;
+	BORDER:1PX SOLID #99ddee;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}	
+
+TD.StaffList{
+	BORDER:1PX SOLID #E8E8E8;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}	
+TD.StaffOtherWP{
+	BORDER:1PX SOLID #FF1B77;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}	
+TD.ActiveStaffList{
+	BACKGROUND-COLOR: #99ddee;
+	BORDER:1PX SOLID #99ddee;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}
+TD.LeaveStaff{
+	BORDER:1PX SOLID #595959;
+	FONT-FACE: verdana ;
+	FONT-SIZE:7pt ;
+	COLOR:black;
+}
+
+TD.HOLIDAY{
+	COLOR:navy;
+	BACKGROUND-COLOR: #FFCCCC
+	FONT-SIZE: 7pt;
+}
+
+TD.WORKDAY{
+	COLOR:navy;
+	FONT-SIZE: 7pt;
+}
+
+TD.MASTER_LABEL{
+	COLOR:navy;
+	FONT-SIZE: 7pt;
+}
+TD.position{
+	BORDER:1PX SOLID #E8E8E8;
+	FONT-SIZE: 7pt;
+}		
+
+TD.UNPRODUCTIVE{
+	BACKGROUND-COLOR: #FFCC00;
+	BORDER:1PX SOLID #FFCC00;
+	FONT-SIZE: 7pt;
+	TEXT-ALIGN: center;
+}
+
+TD.ONCALL{
+	BACKGROUND-COLOR: #00CC66;
+	BORDER:1PX SOLID #00CC66;
+	FONT-SIZE: 7pt;
+	TEXT-ALIGN: center;
+}		
+INPUT.TXTONCALL{
+	BACKGROUND-COLOR: #00CC66;
+	font-family:Verdana;
+	FONT-SIZE: 7pt;
+	text-align: center;
+}
+
+INPUT.TXTUNPRODUCTIVE{
+	BACKGROUND-COLOR: #FFCC00;
+	font-family:Verdana;
+	FONT-SIZE: 7pt;
+	text-align: center;
+}	
+
+INPUT.TXTSTAFF{
+	text-align: center;
+	font-family:Verdana;
+	FONT-SIZE: 7pt;
+}
+
+TD.STAFF{
+	BORDER:1PX SOLID #E8E8E8;
+	FONT-SIZE: 7pt;
+}		
+
+TD.REQUIREMENT{
+	BACKGROUND-COLOR: #0033CC;
+	BORDER:1PX SOLID #0033CC;
+	COLOR:white;
+	FONT-SIZE: 7pt;
+	FONT-WEIGHT: bolder;
+}	
+
+TD.SHIFTTOTAL{
+	BACKGROUND-COLOR: #CCCCFF;
+	BORDER:1PX SOLID #CCCCFF;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}	
+
+TD.ALOCATED{
+	BACKGROUND-COLOR: #CCECFF;
+	BORDER:1PX SOLID #CCECFF;
+	FONT-SIZE: 7pt;
+	COLOR:black;
+}
+
+TD.USH {
+	FONT-FACE: verdana ;
+	FONT-SIZE: 8pt ;
+	BACKGROUND-COLOR: WHITE;
+	COLOR:BLACK;
+}
+
+TD.WRKP{
+	COLOR:WHITE;
+	FONT-SIZE: 7pt;
+	FONT-WEIGHT: BOLDER;
+	BACKGROUND-COLOR: #595959;
+	BORDER:1PX SOLID #595959;
+}
+
+TD.WRKPV{
+	COLOR:WHITE;
+	FONT-SIZE: 7pt;
+	FONT-WEIGHT: BOLDER;
+	BACKGROUND-COLOR: #CC99FF;
+}
+
+TD.WRKPL{
+	COLOR:BLACK;
+	FONT-SIZE: 7pt;
+	FONT-WEIGHT: BOLDER;
+}
+
+TD.SSLABEL{
+	/*BACKGROUND-COLOR: #33FF99;*/
+	COLOR:Black;
+	FONT-SIZE: 8pt;
+}
+	
+TD.WRKPChange{
+	FONT-FACE: verdana ;
+	COLOR:WHITE;
+	FONT-SIZE: 7pt;
+	BACKGROUND-COLOR: #993300
+}
+
+TD.ShiftChange{
+	FONT-FACE: verdana ;
+	COLOR:WHITE;
+	FONT-SIZE: 7pt;
+	BACKGROUND-COLOR:#FF9933
+}
+TD.Total{
+	FONT-FACE: verdana ;
+	COLOR:BLACK;
+	FONT-SIZE: 7pt;
+	BACKGROUND-COLOR: #FFFFCC
+}
+
+TD.Total_POS{
+	FONT-FACE: verdana ;
+	COLOR:BLACK;
+	FONT-SIZE: 7pt;
+	BACKGROUND-COLOR: #CCFF99
+}
+
+TD.Total_WP{
+	COLOR:BLACK;
+	FONT-SIZE: 8pt;
+	BACKGROUND-COLOR: #CCFF99
+}
+
+TD.SHIFTS{
+	COLOR:Black;
+	FONT-SIZE: 7pt;
+}
+
+#manage_menu{
+	position:absolute;
+	width:110px;
+	border:1px solid #B44664;
+	background-color: #B44664;
+	font-family:Verdana;
+	line-height:20px;
+	cursor:default;
+	visibility:hidden;
+}
+.manage_menuitem{
+	padding-left:10px;
+	background-color: #B44664;
+	color: white;
+	font-size: 8pt;
+}
+.manage_activeitem{
+	padding-left:10px;
+	padding-right:10px;
+	background-color: #B44664;
+	color: white;
+	font-size: 8pt;
+	font-weight: bolder
+}
+
+.master_menu{
+	position:absolute;
+	width:140px;
+	border:1px solid #B44664;
+	background-color: #B44664;
+	font-family:Verdana;
+	line-height:20px;
+	cursor:default;
+	visibility:hidden;
+}
+.master_menuitem{
+	padding-left:5px;
+	background-color: #B44664;
+	color: white;
+	font-weight: normal;
+	font-size: 8pt;
+}
+.master_menuitem_hdr{
+	padding-left:5px;
+	background-color: #B44664;
+	color: white;
+	font-weight: bolder;
+	font-size: 8pt;
+}
+
+/* end of RS */
+
+/* start of CP*/
+TD.ATCQRYLEVEN
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 9 ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	color:BLACK;
+}
+TD.ATCQRYLODD
+{
+	FONT-SIZE: 9 ;
+	BACKGROUND-COLOR: #D5E2E5;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	color:BLACK;
+}
+
+<!-- Start BuildLibraryQueryResultDetail -->
+TD.ATCLIB
+{
+	BACKGROUND-COLOR:#2A2A2A;
+	FONT-SIZE: 16;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCTERMSET
+{
+	BACKGROUND-COLOR:#555555;
+	FONT-SIZE: 14;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCTERMCODE
+{
+	FONT-SIZE: 12;
+	BACKGROUND-COLOR:#7F7F7F ;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCGOAL
+{
+	FONT-SIZE: 10;
+	BACKGROUND-COLOR:#AAAAAA ;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+
+TD.ATCHEAD
+{
+	FONT-SIZE: 10 ;
+	BACKGROUND-COLOR:#D4D4D4 ;
+	BORDER-STYLE: SOLID;
+	color:BLACK;
+}
+
+TD.ATCDETAIL
+{
+	FONT-SIZE: 10 ;
+	BACKGROUND-COLOR:#FFFFFF;
+	BORDER-STYLE: SOLID;
+	color:BLACK;
+}
+<!-- Sart BuildLibrary_temp1 -->
+TD.ATCTERMSET
+{
+	BACKGROUND-COLOR:navy;
+	FONT-SIZE: 20;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCTERMCODE
+{
+	FONT-SIZE: 17;
+	BACKGROUND-COLOR:#83AAB4 ;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCGOAL
+{
+	FONT-SIZE: 14;
+	BACKGROUND-COLOR:#A6C2C8 ;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+TD.ATCHEAD
+{
+	FONT-SIZE: 11 ;
+	BACKGROUND-COLOR:#F0F0F2 ;
+	BORDER-STYLE: SOLID;
+	color:BLACK;
+}
+TD.ATCDETAIL
+{
+	FONT-SIZE: 9 ;
+	BACKGROUND-COLOR:#D5E2E5;
+	BORDER-STYLE: SOLID;
+	color:BLACK;
+}
+TD.ATCERROR
+{
+	FONT-SIZE: 10 ;
+	BACKGROUND-COLOR:#FE4B81;
+	BORDER-STYLE: SOLID;
+	color:WHITE;
+}
+<!-- Start EvaluateCarePlanActivePlansResult -->
+TD.CLASSHEAD
+{
+	BACKGROUND-COLOR: #950000;
+	FONT-SIZE: 10 ;
+	Font-weight: bolder;
+	COLOR: white;
+}
+TD.CLASSHEADDIAGROW
+{
+	BACKGROUND-COLOR: #F3F3F3;
+	FONT-SIZE: 10 ;
+}
+TD.CLASSINTVNOUTCOMEODD
+{
+	BACKGROUND-COLOR: #F0FFE1;
+	FONT-SIZE: 10 ;
+}
+TD.CLASSINTVNOUTCOMEEVEN
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 10 ;
+}
+TD.CLASSINTVNOUTCOMEODDHYP
+{
+	BACKGROUND-COLOR: #F0FFE1;
+	FONT-SIZE: 10 ;
+	color:BLUE;
+	cursor:hand;
+}
+TD.CLASSINTVNOUTCOMEEVENHYP
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 10 ;
+	color:BLUE;
+	cursor:hand;
+}
+TD.CLASSHEADDIAG
+{
+	BACKGROUND-COLOR: #666699;
+	FONT-SIZE: 10 ;
+	Font-weight: bolder;
+	COLOR: white;
+}
+TD.CLASSVAL
+{
+	BACKGROUND-COLOR:#F0F0F2;
+	BORDER:1PX SOLID #F0F0F2;
+	BACKGROUND-COLOR: #FFC488;
+	FONT-SIZE: 10 ;
+}
+TD.FONTVALS
+{
+	BACKGROUND-COLOR:#FFEEDD;
+	BORDER:1PX SOLID #FFEEDD;
+	FONT-SIZE: 10 ;
+}
+TD.FONTVALHYPERS
+{
+	BACKGROUND-COLOR:#FFEEDD;
+	BORDER:1PX SOLID #FFEEDD;
+	FONT-SIZE: 10 ;
+	color:BLUE;
+	cursor:hand;
+}
+<!-- Start EvaluateCarePlanComponentHistory -->
+TD.Diag
+{
+	BACKGROUND-COLOR:#CACAFF;
+	BORDER:1PX SOLID #CACAFF;
+	font-weight:bolder;
+	font-size:10;
+}
+TD.Goal
+{
+	BACKGROUND-COLOR:#D5E2E5;
+	BORDER:1PX SOLID #D5E2E5; 
+	font-weight:bolder;
+	font-size:10;
+}
+TD.Outcome
+{
+	BACKGROUND-COLOR:#F9F9FF;
+	BORDER:1PX SOLID #F9F9FF;
+	font-weight:bolder;
+	font-size:10;
+}
+TD.List
+{
+	BACKGROUND-COLOR:#FFEFDF;
+	BORDER:1PX SOLID #FFEFDF;
+	font-size:10;
+}
+<!-- Start EvaluateCarePlanDiagAndGoalList -->
+TD.CLASHEAD
+{
+	BACKGROUND-COLOR: #CACAFF;
+	FONT-SIZE: 10 ;
+}
+TD.CLASSHEADVAL
+{
+	BACKGROUND-COLOR: #CACAFF;
+	FONT-SIZE: 10 ;
+	cursor: hand;
+}
+TD.FONTSTYL
+{
+	FONT-SIZE: 10 ;
+}
+TD.FONTVAL
+{
+	FONT-SIZE: 10 ;
+	cursor: hand;
+}
+TD.FONTVALHYPER
+{
+	FONT-SIZE: 10 ;
+	color:BLUE;
+	cursor:hand;
+}
+<!-- Start EvaluateCarePlanIntvnAndOutcomeList -->
+TD.ROWODD
+{
+	BACKGROUND-COLOR: #F0FFF0;
+	FONT-SIZE: 10 ;
+}
+TD.ROWEVEN
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 10 ;
+}
+TD.FONTSTYLEVEN
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 10 ;
+	cursor: hand;
+}
+TD.FONTSTYLODD
+{
+	BACKGROUND-COLOR: #F0FFF0;
+	FONT-SIZE: 10 ;
+	cursor: hand;
+}
+TD.FONTSTYLARREVEN
+{
+	BACKGROUND-COLOR: #FFFFFF;
+	FONT-SIZE: 10 ;
+}
+TD.FONTSTYLARRODD
+{
+	BACKGROUND-COLOR: #F0FFF0;
+	FONT-SIZE: 10 ;
+}
+TD.ITRVNHDR
+{
+	BACKGROUND-COLOR: #919191;
+	FONT-SIZE: 10;
+	COLOR: white;
+}
+<!-- Start EvaluateCarePlanShowVariance -->
+TD.ADHOC
+{
+	BACKGROUND-COLOR: #FFFFCC;
+	FONT-SIZE: 10;
+	Font-weight: normal;
+}
+TD.PLANNED
+{
+	BACKGROUND-COLOR: #EBFFFF;
+	FONT-SIZE: 10 ;
+	Font-weight: normal;
+}
+TD.ADHOCA
+{
+	BACKGROUND-COLOR: #FFFFCC;
+	FONT-SIZE: 9;
+	Font-weight: normal;
+}
+TD.PLANNEDA
+{
+	BACKGROUND-COLOR: #EBFFFF;
+	FONT-SIZE: 9 ;
+	Font-weight: normal;
+}
+TD.PERFORMED
+{
+	BACKGROUND-COLOR: #E7FFE7;
+	FONT-SIZE: 10 ;
+}
+TD.NOTPERFORMED
+{
+	BACKGROUND-COLOR: #FFDBDB;
+	FONT-SIZE: 10 ;
+}
+TD.PENDING
+{
+	BACKGROUND-COLOR: #E6E6E6;
+	FONT-SIZE: 10 ;
+}
+<!-- Start GCPGeneratePlanPreviewDtl -->
+TD.GRPEVEN1
+{
+	BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	border-width:1pt;
+	BORDER-STYLE: solid;
+	border-left-color: #FAD39A;
+	border-right-color: #FAD39A;
+	border-top-color: #F9C880;
+	border-bottom-color: #F9C880;
+	height:18;		
+}
+FONT.ORDERS
+{
+   BACKGROUND-COLOR:#FF9D3B
+}
+TH.PLANSUBHEAD1
+{
+	 BACKGROUND-COLOR: #CCC6CA;
+	 COLOR: black ;
+	 BORDER-WIDTH: thick 
+	 BORDER-LEFT-COLOR: #363636;
+	 BORDER-RIGHT-COLOR: #363636;
+	 border-top-color: #838383;
+	 border-bottom-color: #838383;
+	 FONT-SIZE: 8pt; 
+}
+<!-- Start GCPGeneratePlanProfileDiagLegend -->
+	TD.GPLINKS {
+	  BACKGROUND-COLOR: #FFFFF0 ;
+	  COLOR: BLACK;
+	  FONT-SIZE: 8PT ;
+	  FONT-WEIGHT: normal;
+	}
+	FONT.LINKINSTATUS{
+		COLOR: RED;
+	}
+	FONT.NORMAL{
+		background-color:GREEN;
+	}
+<!-- Start GCPGeneratePlanProfileDiagnosis -->
+	FONT.CRITICAL{
+		background-color:RED;
+	}
+	FONT.HIGH{
+		background-color:#83AAB4;
+	}
+	FONT.LOW{
+		background-color:#F0FFFF;
+	}
+	FONT.CRITICALLOW{
+		background-color:#D8BFD8;
+	}
+	FONT.CRITICALHIGH{
+		background-color:YELLOW;
+	}
+
+	FONT.DELTAFAIL{
+		background-color:#FFE4E1;
+	}
+	TD.PRIORNORM{
+       BACKGROUND-COLOR: #CCFFCC;  
+		FONT-SIZE: 9pt ;
+   }
+   TD.PRIORHIGH{
+		BACKGROUND-COLOR: #FFFFCC;  
+		FONT-SIZE: 9pt ;
+
+   }
+   TD.PRIORCRIC{
+       BACKGROUND-COLOR: #FFCCCC;  
+	   FONT-SIZE: 9pt ;
+		
+
+   }
+	TD.GRPODD{
+		FONT-SIZE: 9pt ;
+		BACKGROUND-COLOR: #FFCCCC;  
+		height:18;
+	
+    }
+	td.errorEvents
+	{
+		background-color: BROWN;
+		border-style: dashed;
+	}
+	TH.PLANSUBHEAD{
+		 BACKGROUND-COLOR: #CCC6CA;
+		 COLOR: black ;
+		 FONT-SIZE: 8pt; 
+   }
+    TH.PLANHEAD{
+		 BACKGROUND-COLOR: #3366FF;
+		 COLOR: white ;
+		 FONT-SIZE: 8pt; 
+   }
+<!-- Start GCPGeneratePlanProfileType -->
+TD.GRPPROFILEEVEN{
+	BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 6pt ;
+<!-- Start GCPGeneratePlanShowLibrary -->
+	TD.GRPDIAGHEAD{
+       BACKGROUND-COLOR: SILVER; 
+	    FONT-SIZE: 8pt ;
+		BORDER-STYLE: none;
+		border-left-color: #9A9A9A;
+		border-right-color: #9A9A9A;
+		border-top-color: #BCBCBC;
+		border-bottom-color: #BCBCBC;
+		height:18;		
+
+   }
+	TD.GRPINTERHEAD{
+       BACKGROUND-COLOR: #D0CCCF;
+	   FONT-WEIGHT: BOLD  
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: NONE;
+		border-left-color: #9A9A9A;
+		border-right-color: #9A9A9A;
+		border-top-color: #BCBCBC;
+		border-bottom-color: #BCBCBC;
+		height:18;		
+
+   }
+	TD.GRPEVEN{
+       BACKGROUND-COLOR: #FFFFFF;  
+		FONT-SIZE: 9pt ;
+		border-left-color: #FAD39A;
+		border-right-color: #FAD39A;
+		border-top-color: #F9C880;
+		border-bottom-color: #F9C880;
+		height:18;		
+
+   }
+
+	TD.GRPOD{
+		FONT-SIZE: 9pt ;
+		BACKGROUND-COLOR: #FFCCCC;  
+		border-left-color: #FF9B9B;
+		border-right-color: #FF9B9B;
+		border-top-color: #FFA6A6;
+		border-bottom-color: #FFA6A6;
+		height:18;
+	
+    }
+	FONT.PRIORNORM{
+       BACKGROUND-COLOR: #CCFFCC;  
+		FONT-SIZE: 9pt ;
+   }
+   FONT.PRIORHIGH{
+		BACKGROUND-COLOR: #FFFFCC;  
+		FONT-SIZE: 9pt ;
+
+   }
+   FONT.PRIORCRIC{
+       BACKGROUND-COLOR: #FFCCCC;  
+	   FONT-SIZE: 9pt ;
+		
+
+   }
+   TD.GRPNONE{
+   BACKGROUND-COLOR: #FFFFFF;  
+   COLOR:navy;
+   FONT-SIZE: 8pt;
+}
+<!-- Start LibraryLookupDetails -->
+TD.FINALQRY
+{
+	BACKGROUND-COLOR: PINK;
+	FONT-SIZE: 9 ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	color:WHITE;
+	
+}
+TD.DRAFTQRY
+{
+	BACKGROUND-COLOR: GREEN;
+	FONT-SIZE: 9 ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	color:WHITE;
+	
+}
+<!-- Start ReviseCarePlanActivePlansResult -->
+TD.LISTS
+{
+	BACKGROUND-COLOR:#F0F0F2;
+	BORDER:1PX SOLID #F0F0F2;
+	FONT-SIZE: 10 ;
+}
+TD.CLASSHEADER	
+{
+	BACKGROUND-COLOR: #919191;
+	FONT-SIZE: 10 ;
+	Font-weight: bolder;
+	COLOR: white;
+}
+<!-- Start ReviseCarePlanRecordChanges -->
+TD.GRPEVENS1
+{
+	BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	border-width:1pt;
+	BORDER-STYLE: solid;
+	border-left-color: #FFF0F0;
+	border-right-color: #FFF0F0;
+	border-top-color: #FFF0F0;
+	border-bottom-color: #FFF0F0;
+	height:18;		
+	}
+<!-- Start ReviseCarePlanViewDetail -->
+TD.ATCTABLE
+{
+	BACKGROUND-COLOR:#FFF0F0;
+	FONT-SIZE: 9;
+	color:BLACK;	
+}
+
+/* end of CP*/
+TD.HEADERTITLE
+{
+	/*background: url("../images/titleBarBG.jpg");*/ 
+	background-color : #276676;
+	text-align:left;
+	height:20px;
+	font-size:7pt;
+	COLOR:#FFFFFF;
+}
+
+                TD.FIRSTSELECTED
+                {
+                    /*background-color : #3399CC;*/
+					background-color:#3399CC;
+                    border-width: thin ;
+                    border-style: inset;
+                    BORDER-LEFT-COLOR: #D5E2E5;
+                    BORDER-RIGHT-COLOR: #D5E2E5;
+                    BORDER-TOP-COLOR: #D5E2E5;
+                    BORDER-BOTTOM-COLOR: #D5E2E5;
+                    FONT-SIZE: 8pt ;
+                }
+                TD.FIRSTNORMAL
+                {
+                    background-color : DARKGRAY;
+                    border-width: thin ;
+                    border-style: inset;
+                    BORDER-LEFT-COLOR: #D5E2E5;
+                    BORDER-RIGHT-COLOR: #D5E2E5;
+                    BORDER-TOP-COLOR: #D5E2E5;
+                    BORDER-BOTTOM-COLOR: #D5E2E5;
+                    FONT-SIZE: 8pt ;
+                }
+
+				TD.SECONDSELECTED{
+					background-color : white;
+					border-width: thin ;
+					border-style: inset;
+					BORDER-LEFT-COLOR: #D5E2E5;
+					BORDER-RIGHT-COLOR: #D5E2E5;
+					BORDER-TOP-COLOR: #D5E2E5;
+					BORDER-BOTTOM-COLOR: #D5E2E5;
+					FONT-SIZE: 8pt ;
+				}
+
+                TD.SECONDNORMAL{
+                    background-color : PALEVIOLETRED;
+                    border-width: thin ;
+                    border-style: inset;
+                    BORDER-LEFT-COLOR: #D5E2E5;
+                    BORDER-RIGHT-COLOR: #D5E2E5;
+                    BORDER-TOP-COLOR: #D5E2E5;
+                    BORDER-BOTTOM-COLOR: #D5E2E5;
+                    FONT-SIZE: 8pt ;
+                }
+
+TD.CACHARTQRYEVEN {
+	FONT-SIZE: 7PT ;
+    BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: THIN;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: white;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: white;
+}
+
+TD.CACHARTQRYODD {
+    BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 7PT ;
+	BORDER-STYLE: THIN;
+	BORDER-LEFT-COLOR: #D5E2E5;
+	BORDER-RIGHT-COLOR: white;
+	BORDER-TOP-COLOR: #D5E2E5;
+	BORDER-BOTTOM-COLOR: white;
+	height:10;	
+}
+	
+TD.CACHARTFOURTHLEVELCOLOR 
+{
+	BACKGROUND-COLOR: #A6C2C8 ;
+	COLOR:WHITE;
+	BORDER-STYLE: SOLID;
+	BORDER-COLOR:	WHITE;
+    BORDER-RIGHT-COLOR: #A6C2C8;
+	BORDER-TOP-COLOR: WHITE;
+	BORDER-BOTTOM-COLOR: #A6C2C8;
+	FONT-WEIGHT: BOLD ;
+}
+
+/* ph */
+
+.th{font-size:11; color:white; }
+.td{font-size:10; color:navy; font-weight:bold;}
+.white1{width:6px;background-color:white}
+.dtd{font-size:11; color:black; font-weight:bold; background-color:white;}
+.number{text-align:right}
+.tdbutton{cursor:hand;color:blue;background-color:#669999;border:1px solid black;font-size:8pt;color:white}
+.hyperlink1{color:blue;cursor:hand;font-size:8pt;}
+.tdvl { font-size:10; text-align:center; color:navy;}
+.dtdvl {font-size:10; text-align:center; color:navy; font-weight:bold;}
+th.blank{background-color:white}
+#header1{background-color:#DADADA;}
+#header2{background-color:#FCEFC7;}
+.line{height:2;background-color:white}
+.compound{text-align:left;background-color:"black";COLOR:white;font-size:8pt;font-weight:bold}
+.inputclass{height:20px;border:1px solid black}
+input
+{
+	height:20px;
+	/*font-family:"verdana";*/
+	font-size:8pt;
+	color:#444444;
+}
+select
+{
+	/*height:20px;*/
+	font-family:"verdana";
+	font-size:8pt;
+	color:#444444;
+}
+.flat { Border:1x SOLID BLACK; font-size:11; font-family:verdana;}
+
+TH.ORDERDESC {
+		BACKGROUND-COLOR: #404040;
+	        COLOR: white ;
+	        FONT-SIZE: 8pt;
+         }
+
+TH.HEADERTITLE {
+		BACKGROUND-COLOR: black;
+		COLOR: white;
+		FONT-SIZE: 8pt; 
+		FONT-FAMILY:"VERDANA";
+	}
+
+TH.HEADERTITLE1 {
+		BACKGROUND-COLOR: #FFD7D7;
+		COLOR: #660000 ;
+		FONT-SIZE: 8pt; 
+	   }
+
+TH.border {
+	        border-left:none ;
+		border-top:none ;
+		border-bottom:none
+	}
+
+
+TD.ATCQRYEVEN{
+		BACKGROUND-COLOR: #FFFFFF;
+		FONT-SIZE: 9 ;
+		BORDER-STYLE: SOLID;
+		border-left-color: #D5E2E5;
+		border-right-color: #D5E2E5;
+		border-top-color: #D5E2E5;
+		border-bottom-color: #D5E2E5;
+		color:BLUE;
+		cursor:hand;
+	}
+
+TD.ATCQRYODD{
+		FONT-SIZE: 9 ;
+		BACKGROUND-COLOR: #FFFFFF;
+		BORDER-STYLE: SOLID;
+		border-left-color: #D5E2E5;
+		border-right-color: #D5E2E5;
+		border-top-color: #D5E2E5;
+		border-bottom-color: #D5E2E5;
+		color:BLUE;
+		cursor:hand;
+	}
+
+
+TD.CURRTEXT{
+		FONT-SIZE: .5pt ;
+		BACKGROUND-COLOR:#FDE6D0;
+		BORDER-BOTTOM: #663300 2px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #663300 1px solid;
+	}
+
+TD.CURRTEXTSL{
+		FONT-SIZE: .3pt ;
+		BACKGROUND-COLOR:#FDE6D0;
+		BORDER-BOTTOM: #663300 2px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #663300 1px solid;
+		height:3;
+	}
+
+TD.SELECTEDRUGS {
+		BACKGROUND-COLOR:#FFFFCC;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		height:12;
+		BORDER-BOTTOM: #FEEECD 0px solid;
+		BORDER-LEFT: #FEEECD 1px solid;
+		BORDER-RIGHT: #FEEECD 1px solid;
+		BORDER-TOP: #FEEECD 1px solid;
+	}
+
+
+TD.SELECTEDRUGS1{
+		BACKGROUND-COLOR:WHITE;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		height:12;
+		BORDER-BOTTOM: #663300 0px solid;
+		BORDER-LEFT: #663300 1px solid;
+		BORDER-RIGHT: #663300 1px solid;
+		BORDER-TOP: #663300 1px solid;
+	   }
+
+
+TD.FOCUSDRUGS{
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		height:12;
+		BACKGROUND-COLOR:#E9F1FE;
+		BORDER-BOTTOM: #CC9966 1px solid;
+		BORDER-LEFT: #CC9966 1px solid;
+	        BORDER-RIGHT: #CC9966 1px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	     }
+
+
+TD.CLICKDRUGS{
+		BORDER-STYLE: solid;
+		BACKGROUND-COLOR:#FFCCFF;
+		BORDER-BOTTOM: #CC9966 1px solid;
+        	BORDER-LEFT: #CC9966 1px solid;
+	        BORDER-RIGHT: #CC9966 1px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	     }
+
+
+TD.ALLERGY{
+		BACKGROUND-COLOR:#CC0000;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 1px solid;
+  		BORDER-LEFT: #663300 1px solid;
+		BORDER-RIGHT:#663300 1px solid;
+		BORDER-TOP: #663300 1px solid;
+		height:10;
+	  }
+
+
+TD.ALLERGY1 {
+		BACKGROUND-COLOR:#F4E9FE;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.ALLERGY2{
+		BACKGROUND-COLOR:#CC0000;
+		FONT-SIZE: 9pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 1px solid;
+         	BORDER-LEFT: #663300 1px solid;
+		BORDER-RIGHT:#663300 1px solid;
+		BORDER-TOP: #663300 1px solid;
+		height:9;
+	}
+
+TD.DOSELIMIT{
+		BACKGROUND-COLOR:#FFCC66;
+		FONT-SIZE: 8pt ;
+		height:15;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 0px solid;
+	        BORDER-RIGHT: #663300 1px solid;
+	        BORDER-TOP: #663300 1px solid;
+        }
+
+
+TD.DOSELIMIT1 {
+		BACKGROUND-COLOR:#FFD2E9;
+		FONT-SIZE: 8pt ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.DOSELIMIT2{
+		BACKGROUND-COLOR:#FFCC66;
+		FONT-SIZE: 9pt ;
+		height:9;
+		BORDER-STYLE: solid;
+	}
+
+TD.CURRENTRX{
+		BACKGROUND-COLOR:#6699FF;
+		FONT-SIZE: 8pt ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+		BORDER-LEFT: #663300 0px solid;
+		BORDER-RIGHT: #663300 0px solid;
+		BORDER-TOP: #CC9966 1px solid;
+	}
+
+
+TD.CURRENTRX1 {
+		BACKGROUND-COLOR:#D7FFD7;
+		FONT-SIZE: 8pt ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.CURRENTRX2{
+		BACKGROUND-COLOR:#6699FF;
+		FONT-SIZE: 9pt ;
+		height:9;
+		BORDER-STYLE: solid;
+	}
+
+TD.TIP{
+		FONT-SIZE: 7pt ;
+		BORDER-STYLE: solid;
+		height:9;
+		BACKGROUND-COLOR:#FEFADE;
+		BORDER-BOTTOM: #CC9966 1px solid;
+		BORDER-LEFT: #CC9966 1px solid;
+	        BORDER-RIGHT: #CC9966 1px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+
+TD.TIP1{
+		FONT-SIZE: 7pt ;
+		BORDER-STYLE: solid;
+		height:9;
+		BACKGROUND-COLOR:#FFFFE1;
+		BORDER-BOTTOM:#663300 1px solid;
+	        BORDER-LEFT: #663300 1px solid;
+	        BORDER-RIGHT: #663300 1px solid;
+	        BORDER-TOP: #663300 1px solid;
+	}
+
+TD.AMENDEDDRUGS{
+		BACKGROUND-COLOR:#FDE6DA;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		height:12;
+		BORDER-BOTTOM: #663300 0px solid;
+		BORDER-LEFT: #663300 1px solid;
+		BORDER-RIGHT: #663300 1px solid;
+		BORDER-TOP: #663300 1px solid;
+	}
+
+
+TD.TIMING {
+
+		font-family: verdana ;
+		FONT-SIZE: 8pt; 
+		BACKGROUND-COLOR: #FFF9DD;
+		COLOR: #660000;
+		height:0.5;
+		text-align:center;
+	  }
+
+
+TD.TDSTYLE{
+		background:#fde6d0;
+		color:black;
+		font-size:10;		  
+	}
+
+
+TD.IVFLUID1{
+		BACKGROUND-COLOR:#FFBFBF;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+	}
+
+
+TD.IVFLUID{
+		BACKGROUND-COLOR:#478F8F;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+		}
+
+
+TD.IVINGREDIENT1{
+		BACKGROUND-COLOR:#FFDFDF;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+	}
+
+TD.IVINGREDIENT{
+		BACKGROUND-COLOR:#92C9C9;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+	}
+
+TD.FORMULARY{
+		BACKGROUND-COLOR:#FF9999;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 0px solid;
+	        BORDER-RIGHT: #663300 1px solid;
+	        BORDER-TOP: #663300 1px solid;
+
+	}
+
+TD.DISCHARGEMED{
+		BACKGROUND-COLOR:#C1FFFF;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+		}
+
+
+TD.TIPS{
+		FONT-SIZE: 7pt ;
+		BORDER-STYLE: solid;
+		height:9;	
+		BACKGROUND-COLOR:#FEFADE; 
+		BORDER-BOTTOM: #CC9966 1px solid;
+	        BORDER-LEFT: #CC9966 1px solid;
+	        BORDER-RIGHT: #CC9966 1px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+
+TD.TAPERDRUGS{
+		BACKGROUND-COLOR:#FFF2F2;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		height:12;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 1px solid;
+	        BORDER-RIGHT: #663300 1px solid;
+	        BORDER-TOP: #663300 1px solid;
+	   }
+
+
+TD.NOSTOCKWARN{
+		BACKGROUND-COLOR:#FEB98B;
+		FONT-SIZE: 8pt ;
+		COLOR: #3300CC ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 0px solid;
+	        BORDER-RIGHT: #663300 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.NOSTOCKALERT{
+		BACKGROUND-COLOR:#FF1111;
+		FONT-SIZE: 8pt ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 0px solid;
+	        BORDER-RIGHT: #663300 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.CANCELLED{
+		BACKGROUND-COLOR:blue;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+	        BORDER-LEFT: #CC9966 0px solid;
+	        BORDER-RIGHT: #CC9966 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+
+TD.DISCONTINUED{   
+		BACKGROUND-COLOR:yellow;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+	        BORDER-LEFT: #CC9966 0px solid;
+	        BORDER-RIGHT: #CC9966 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+
+TD.EMPTY {
+	        BORDER-BOTTOM: medium none;
+	        BORDER-LEFT: medium none;
+	        BORDER-RIGHT: medium none;
+	        BORDER-TOP: medium none;
+		BACKGROUND-COLOR: white;  
+		FONT-WEIGHT: none ;
+	}
+
+
+TD.DISCHARGEMED1{
+			BACKGROUND-COLOR:#FF9DFF;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.YET_TO_BE_DISPENSED{
+			BACKGROUND-COLOR:#8204FF;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.EXPIRED_MEDICATION{
+			BACKGROUND-COLOR:#D9B86C;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.FUTURE_Rx{
+			BACKGROUND-COLOR:#99FFCC;
+			FONT-SIZE: 8pt ;
+			color:black
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.ReturnedMedication{
+			BACKGROUND-COLOR:#FFB66C;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+			
+TD.CANCEL{
+			BACKGROUND-COLOR:#990000;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.DIS-CONTINUED{
+			BACKGROUND-COLOR:#C40062;
+			FONT-SIZE: 8pt ;
+			height:10;
+			color:white;
+			BORDER-STYLE: solid;
+	}
+
+TD.HOLD{
+			BACKGROUND-COLOR:#F0F000;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+			COLOR:black;
+	}
+
+TD.ACTIVE{
+			BACKGROUND-COLOR:#FF5E5E;
+			FONT-SIZE: 8pt ;
+			height:10;
+			color:white;
+			BORDER-STYLE: solid;
+	}
+
+TD.Refill_Rx{
+			BACKGROUND-COLOR:#B6BC8B;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.STANDARD{
+			BACKGROUND-COLOR:#478F8F;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}
+
+TD.NONSTANDARD{
+			BACKGROUND-COLOR:#92C9C9;
+			FONT-SIZE: 8pt ;
+			height:10;
+			BORDER-STYLE: solid;
+	}	
+
+TD.DISPDTL{
+			FONT-SIZE: .5pt ;
+			font-weight: bold;
+			BACKGROUND-COLOR:#993366; 
+			BORDER-BOTTOM: #663300 2px solid;
+			BORDER-LEFT: #CC9966 0px solid;
+			BORDER-RIGHT: #CC9966 0px solid;
+			BORDER-TOP: #663300 2px solid;
+	}
+
+INPUT.DIRDISPBUTTON1{
+			background: #FDE6D0 ;
+			color: blue ;
+			font-size: 6pt;	
+			font-weight:bold;
+			border-style: ridge;
+	}
+
+INPUT.DIRDISPBUTTON2 {
+			background: navy ;
+			color: white ;
+			font-size: 7pt;
+			font-Weight: 600 ;
+			border-style: ridge;
+         }
+
+FRAME.IVWORKAREA {
+			border-style: solid;
+			border-color: #00CA33;
+			border-width:2
+		}
+
+
+FRAME.CATHIRDWORKAREA {
+			border-style: solid;
+			border-color: #0099CC;
+			border-width:4
+		}
+
+FRAME.CATHIRDWORKAREA1 {
+			border-style: solid;
+			border-color: #0099CC;
+			border-width:1
+		}
+
+FRAME.FR_BORDER2 {
+			border-style: solid;
+			border-color: #0099CC;
+			border-width:1
+		}
+
+
+TD.FLUDCOLOR{
+		BACKGROUND-COLOR:#FFDDEE;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+		BORDER-LEFT: #663300 0px solid;
+		BORDER-RIGHT: #663300 1px solid;
+		BORDER-TOP: #663300 1px solid;
+	}
+
+TD.DOSELIMIT3{
+		BACKGROUND-COLOR:#FFCC66;
+		FONT-SIZE: 8pt ;
+		height:12;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #663300 0px solid;
+	        BORDER-LEFT: #663300 0px solid;
+	        BORDER-RIGHT: #663300 1px solid;
+	        BORDER-TOP: #663300 1px solid;
+	}   
+
+TD.NARCONT{
+		BACKGROUND-COLOR:#FFC1849;
+		FONT-SIZE: 8pt ;
+		height:10;
+		BORDER-STYLE: solid;
+	}
+
+
+TD.OUTOFSTOCK{
+		BACKGROUND-COLOR:#FF0000;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+	        BORDER-LEFT: #CC9966 0px solid;
+	        BORDER-RIGHT: #CC9966 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.STOCK{
+		BACKGROUND-COLOR:YELLOW;
+		FONT-SIZE: 8pt ;
+		height:9;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+	        BORDER-LEFT: #CC9966 0px solid;
+	        BORDER-RIGHT: #CC9966 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.INSUFFICIENTSTOCK{
+		BACKGROUND-COLOR:red;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 0px solid;
+		BORDER-LEFT: #CC9966 0px solid;
+		BORDER-RIGHT: #CC9966 0px solid;
+		BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.BATCHTITLE {
+		BACKGROUND-COLOR:#FDE6D5;
+		FONT-SIZE: 8pt ;
+		BORDER-STYLE: solid;
+		BORDER-BOTTOM: #CC9966 1px solid;
+	        BORDER-LEFT: #CC9966 0px solid;
+	        BORDER-RIGHT: #CC9966 0px solid;
+	        BORDER-TOP: #CC9966 1px solid;
+	}
+
+TD.LEGEND{
+		BACKGROUND-COLOR: #D5E2E5;  
+		FONT-SIZE: 8pt ;
+	}
+
+/* end ph */
+
+TD.STLIGHTCREAM {
+  FONT-FAMILY: VERDANA ;
+  FONT-SIZE: 9PT ;
+  BACKGROUND-COLOR:#FFC6AA;
+  COLOR:black;
+}
+
+TD.MRALLERGY
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+    BACKGROUND-COLOR: #FFFFCC
+}
+TD.MRHYPERII
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+    BACKGROUND-COLOR: #CCFFFF
+}
+TD.MRHYPERIII
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+    BACKGROUND-COLOR: #FFCCFF
+}
+TD.MRHYPERIV
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+    BACKGROUND-COLOR: #FFCCCC
+}
+TD.MRHEADER
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+    BACKGROUND-COLOR: #CCCC33
+}
+TD.BUTTON
+{
+    FONT-SIZE: 8pt;
+    FONT-FAMILY: verdana;
+	TEXT-ALIGN:RIGHT;
+}
+TD.ARABIC
+{
+  COLOR:#444444;
+  FONT-SIZE: 8pt;
+  TEXT-ALIGN: RIGHT;
+  PADDING-LEFT:7px;
+  PADDING-RIGHT:7px
+}
+TD.AR_QRYEVEN{
+	BACKGROUND-COLOR: #FFFFFF;  
+	FONT-SIZE: 9pt ;
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;	
+       }
+
+TD.AR_QRYODD{
+	FONT-SIZE: 9pt ;
+	BACKGROUND-COLOR: #FFFFFF;  
+	BORDER-STYLE: SOLID;
+	border-left-color: #D5E2E5;
+	border-right-color: #D5E2E5;
+	border-top-color: #D5E2E5;
+	border-bottom-color: #D5E2E5;
+	height:18;
+    }
+TD.Iconback
+{
+	BACKGROUND-image: url('../../eCA/images/MI_background.jpg');
+}
+TR.IconStrip
+{
+	BACKGROUND-image: url('../../eCA/images/MI_IconStrip.jpg');
+	height:35;
+}
+
+/* For Common Patient Line */
+
+TD.NORMPATLINE
+{
+	BACKGROUND-COLOR: #FFF791;  
+}
+
+TD.DECEASEDPATLINE
+{
+	BACKGROUND-COLOR: #D5D5D5;  
+}
+
+.recodeData
+{
+	background-color: #F6E8E8;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+
+SPAN.legendClassRow1
+{
+	font-family: Verdana;
+	font-size: 10pt;
+	padding-bottom:4px;
+	padding-left:4px;
+	padding-right:4px; 
+}
+
+SPAN.valueClassRow1
+{
+	font-family: Verdana;
+	/* Modified for patient banner changes */
+	font-size: 10pt; 
+	font-weight: bold;
+	padding-bottom:4px;
+}
+
+SPAN.legendClassRow2
+{
+	font-family: Verdana;
+	font-size: 7pt;
+	padding-bottom:4px;
+	padding-left:4px;
+	padding-right:4px; 
+}
+
+SPAN.valueClassRow2
+{
+	font-family: Verdana;
+	font-size: 7pt; 
+	font-weight: bold;
+	padding-bottom:4px;
+}
+
+
+
+
+/*-----------------------------------------*/
+A.imageClass1 
+{
+	width:30px;
+	height:28px;
+	margin:0px;
+	padding:0px;
+	border:0px;
+	border-collapse:collapse;
+}
+A.imageClass2 
+{
+	width:30px;
+	height:28px;
+	margin:0px;
+	padding:0px;
+	border:0px;
+	border-collapse:collapse;
+}
+img
+{
+	border:0;
+}
+
+TD.functionClass
+{
+	BACKGROUND-image: url('../../eCommon/images/defaultGreen/functionTitleBG.jpg');
+	font-family: Verdana;
+	font-size: 9pt; 
+	font-weight: bold;
+	COLOR: #000000;
+	padding-left:10px;
+	border-collapse:collapse;
+	border:0px;
+	margin:0px;
+}
+
+TD.iconBar
+{
+	height:28px;
+	BACKGROUND-image: url('../../eCommon/images/toolBarBG.jpg');
+	padding:0px;
+	border-collapse:collapse;
+	border:0px;
+	margin:0px;
+}
+
+TR.iconBarRow
+{
+	BACKGROUND-COLOR: #E1E3F0;
+	height:28px;
+	padding:0px;
+	border-collapse:collapse;
+	border:0px;
+	margin:0px;
+}
+IMG.imageClass
+{
+	vertical-align: middle;
+	padding:0px;
+	border-collapse:collapse;
+	border:0px;
+	margin:0px;
+}
+
+/*------------------------------------------*/
+
+.TABLECOMMON
+{
+	width:100%;
+	padding:0px;
+	border-collapse:collapse;
+	border:0px;
+	margin:0px;
+}
+
+table
+{
+	background-color:#FFFFFF;
+	border-color:##FFFFFF;
+}
+
+.LABELRIGHT
+{
+	padding-top:2px;
+	padding-bottom:2px;
+	border-collapse:collapse;
+	text-align:right;
+	font-family: Verdana;
+	font-size: 8pt;
+	BACKGROUND-image: url('../../eCommon/images/defaultGreen/functionTitleBG.jpg');
+}
+.PANELTOOLBAR
+{
+	background: url("../images/defaultGreen/panelTitleBarBg.jpg") repeat-x;
+	COLOR: white ;
+	height:21px;
+	background-color:#FFFFFF;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse;
+}
+.WHITEROW
+{	
+	width:100%;
+	padding:0px;
+	border-collapse:collapse;
+	background-color:#FFFFFF;
+	border:0px;
+	margin:0px;
+	font-family: Verdana;
+	font-size: 7pt;
+	padding:2px;
+}
+.PANEL
+{
+	width:100%;
+	border-width: 0px 1px 1px 1px;
+	border-style: solid;
+	border-color: #CCCCCC;
+	
+}
+.RightAlign
+{
+	text-align:right;
+}
+
+.CAPatientTaskToday
+{
+	background-color:#CBEFCB;
+	font-weight:bold;
+	color:#000000;
+}
+.CAPatientTaskDue
+{
+	background-image:url("../images/due.jpg") repeat-y;
+	background-color:#FFFFFF;
+	color:#000000;
+	padding-left:40px;
+	text-align:left;
+}
+.CAPatientTaskOverdue
+{
+	background-image:url("../images/overDue.jpg") repeat-y;
+	background-color:#FFFFFF;
+	color:#000000;
+	padding-left:40px;
+	text-align:left;
+}
+.CAPatientTaskOverPerformed
+{
+	background-image:url("../images/performed.jpg") repeat-y;
+	background-color:#FFFFFF;
+	color:#000000;
+	padding-left:40px;
+	text-align:left;
+}
+.CAPatientTaskOverElapsed
+{
+	background-image:url("../images/elapsed.jpg") repeat-y;;
+	background-color:#FFFFFF;
+	color:#FFFFFF;
+	padding-left:40px;
+	text-align:left;
+}
+.CAPatientTaskOverFuture
+{
+	background-image:url("../images/future.jpg.jpg") repeat-y;
+	background-color:#FFFFFF;
+	color:#000000;
+	padding-left:40px;
+	text-align:left;
+}
+.gridComponentHolder
+{
+	border-collapse: collapse;
+}
+.grid
+{
+	border-left:1px;
+	border-right:1px;
+	border-top:1px;
+	border-bottom:1px;
+	border-color:#666666;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.gridHeader
+{
+	height:20px;
+	background:url(../../eCommon/images/headerBG.jpg) repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:bold;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+}
+.gridHeaderSelected
+{
+	height:20px;
+	background:url(../../eCommon/images/selectedHeaderBG.jpg) repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:bold;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+}
+.gridData
+{
+	background-color: #FFFFFF;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.gridNumericData
+{
+	background-color: #FFFFFF;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:right;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.focusedNumericData
+{
+	background-color: #D0D0D0;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:right;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.selectedNumericData
+{
+	background-color: #666666;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	text-align:right;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.headerSeparator
+{
+	width:2px;
+	background:url(../../eCommon/images/headerSeparator.jpg) no-repeat;
+}
+.columnSeparator
+{
+	background-color:#FFFFFF;
+}
+.columnSeparatorSelected
+{
+	background-color:#666666;
+}
+.columnSeparatorFocused
+{
+	background-color:#D0D0D0;;
+}
+.selectedRow
+{
+	background-color:#666666;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+}
+.focusedRow
+{
+	background-color:#D0D0D0;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+}
+
+.gridFooter
+{
+	width:100%;
+	height:20px;
+	border-left:1px;
+	border-right:1px;
+	border-top:0px;
+	border-bottom:1px;
+	border-color:#666666;
+	border-style:solid;
+	background-color:#DDDDDD;
+	border-collapse: collapse;
+}
+.navigation
+{
+	text-align:right;
+	border-collapse: collapse;
+}
+.legends
+{	
+	text-align:left;
+	border-collapse: collapse;
+}
+img.legendImg
+{
+	text-align:center;
+	vertical-align:middle;
+}
+
+A.paginationLink:link 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	padding-left:1px;
+	padding-right:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	margin:0px;
+	vertical-align:middle;
+}
+A.paginationLink:visited 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	padding-left:1px;
+	padding-right:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	vertical-align:middle;
+}
+A.paginationLink:active 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	padding-left:1px;
+	padding-right:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	vertical-align:middle;
+}
+A.paginationLink:hover 
+{
+	text-decoration: underline;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	padding-left:1px;
+	padding-right:1px;
+	padding-top:0px;
+	padding-bottom:0px;
+	vertical-align:middle;
+}
+A.gridSelectedLink:link 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:0px;
+	margin:0px;
+	vertical-align:middle;
+}
+A.gridSelectedLink:visited 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:0px;
+	margin:0px;
+	vertical-align:middle;
+}
+A.gridSelectedLink:active 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:0px;
+	margin:0px;
+	vertical-align:middle;
+}
+A.gridSelectedLink:hover 
+{
+	text-decoration: underline;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:0px;
+	margin:0px;
+	vertical-align:middle;
+}
+.currentPage
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:bold;
+	padding-left:2px;
+	padding-right:2px;
+	vertical-align:middle;
+}
+A.gridLink:link 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.gridLink:visited 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.gridLink:active 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.gridLink:hover 
+{
+	text-decoration: underline;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	vertical-align:middle;
+}
+.navigationButton
+{
+	vertical-align:middle;
+}
+.gridTitle
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	font-weight:bold;
+	padding-top:0px;
+	padding-bottom:5px;
+	text-align:left;
+	margin:0px;
+	vertical-align:middle;
+}
+.resultDetails
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	padding-top:0px;
+	padding-bottom:5px;
+	margin:0px;
+	text-align:right;
+	vertical-align:middle;
+}
+.topHeader
+{
+	width:100%;
+}
+.gridDataBlue
+{
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #0000FF;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;	
+	background-color: #FFFFFF;	
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.gridDataChart
+{
+	background-color: #FFFFFF;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+} 
+ 
+ .contextMenu
+{
+	border-left:1px;
+	border-right:1px;
+	border-top:1px;
+	border-bottom:1px;
+	border-color:#9C9C9C;
+	border-style:solid;
+	margin:0;
+	background-color: #E7E7E7;
+	border-collapse: collapse;
+	padding-left:20px;
+	padding-right:20px;
+}
+.contextMenuItem
+{
+	height:22px;			
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;			
+	vertical-align:middle;
+	padding-left:20px;
+	padding-right:20px;
+}
+.selectedcontextMenuItem
+{
+	background-color: #D1D1D1;								
+	height:22px;			
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;			
+	vertical-align:middle;
+	padding-left:20px;
+	padding-right:20px;
+}
+.selectedTDData
+{
+	background-color: #5D5D5D;
+	height:18px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+}
+.imgLegend
+{
+	text-align:right;
+	vertical-align:middle;
+}
+.contextMenuItemSeperator
+{
+	height:1px;						
+	color: #B2B2B2;
+	font-weight:normal;							
+	padding-left:10px;
+	padding-right:10px;
+}
+
+A.contextMenuLink:link 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.contextMenuLink:visited 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.contextMenuLink:active 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	vertical-align:middle;
+}
+A.contextMenuLink:hover 
+{
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	vertical-align:middle;
+}
+
+.gridDataSelect
+{
+	background-color: #CDE5FF;
+	font-family: Verdana;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:1px;
+	border-left:1px;
+	border-right:1px;
+	border-style:solid;
+	border-color:#0460B5;
+} 
+.gridDataHover
+{
+	background-color: #A0A0A0;
+	font-family: Verdana;
+	font-size: 8pt;
+	color: #FFFFFF;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:1px;
+	border-left:1px;
+	border-right:1px;
+	border-style:solid;
+	border-color:#DCDCDC;
+} 
+.gridTooltipData
+{
+	background-color: #FEFFE5;
+	font-family: Verdana;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:10px;
+	padding-bottom:10px;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:1px;
+	border-left:1px;
+	border-right:1px;
+	border-style:solid;
+	border-color:#DCDCDC;
+} 
+.Pagination
+{
+	background-color: #FFFFFF;
+	font-family: Verdana;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:center;
+	vertical-align:middle;
+	width:141px;
+	height:19px;
+} 
+
+
+.DateLink
+{
+	background: url("../../eCommon/images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse;
+}
+.TimeLink
+{
+	background: url("../../eCommon/images/headerSeparator.jpg") repeat-y;
+	background-position:right;
+	COLOR: white ;
+	background-color:#83AAB4;
+	border:0px;
+	padding-left:3px;
+	font-family: Verdana;
+	font-size: 7pt;
+	font-weight:normal;
+	border-collapse:collapse;
+}
+.NormalGroup
+{
+	background-color: #FFFFFF;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	FONT-WEIGHT: bold;
+	color: #000000;
+	text-align:left;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+} 
+.ActiveGroup
+{
+	background-color: #FFFFFF;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	FONT-WEIGHT: bold;
+	color: #000000;
+	text-align:left;
+	text-decoration: underline;
+	vertical-align:middle;
+	border-bottom:1px;
+	border-top:0px;
+	border-left:0px;
+	border-right:0px;
+	border-style:solid;
+	border-color:#EEEEEE;
+	cursor:hand;
+} 
+.slideActive
+{
+	height:21px;
+	background:url(../../eCommon/images/Sliding-active.jpg) repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	font-weight:bold;
+	text-align:left;
+	padding-left:5px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.slideInActive
+{
+	height:21px;
+	width:1 px,
+	background:url(../../eCommon/images/Sliding-normal.jpg) repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:5px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.deskTopBorder
+{	
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:0px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.NavigIconsBorder
+{	
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:0px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:0px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.NavigIconsBorderTop
+{	
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:0px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:0px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+DIV.divslideActive
+{
+	 position:absolute;					
+	 width:197px;					 	
+	 height:21px;					
+	background-image:url('../../eCommon/images/Sliding-active.jpg');
+	background-repeat: repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	font-weight:bold;
+	text-align:left;
+	padding-left:5px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+DIV.divslideInActive
+{
+	 position:absolute;					
+	 width:197px;					 	 
+	 height:21px;					
+	background-image:url('../../eCommon/images/Sliding-normal.jpg');
+	background-repeat: repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	padding-left:5px;
+	padding-right:0px;
+	vertical-align:top;
+	border-left:2px;
+	border-right:2px;
+	border-top:2px;
+	border-bottom:2px;
+	border-color:#A2C1C6;
+	border-style:solid;
+	margin:0;
+	border-collapse: collapse;
+}
+.spanData{
+	COLOR:#444444;
+	/*background-color:#FFFFFF;*/
+	background-color:#FFFFFF;
+	FONT-SIZE: 8pt;
+	TEXT-ALIGN: LEFT;
+}
+TD.COLUMNHEADERCENTERICONS2
+{
+	COLOR:#000000 ;
+	background-color:#f2f3f8;
+	padding:3px;	
+	border-left:#8e90d2 2px solid;
+	border-bottom:#8e90d2 1px solid;
+	font-family: Verdana;
+	font-size: 8pt;
+	font-weight:bold;
+	border-collapse:collapse; 
+}
+.borderhighlight2
+{
+	background-repeat: repeat-x;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	color: #000000;
+	font-weight:normal;
+	text-align:left;
+	vertical-align:top;
+	border:1px solid #51448e;
+	margin:0;
+	border-collapse: collapse;
+}
+
+TD.COLUMNHEADERCENTERNEW2 {
+background: #7377c0; /* Old browsers */
+/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzczNzdjMCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM1ODU0YTgiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, #7377c0 0%, #5854a8 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#7377c0), color-stop(100%,#5854a8)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #7377c0 0%,#5854a8 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #7377c0 0%,#5854a8 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #7377c0 0%,#5854a8 100%); /* IE10+ */
+background: linear-gradient(to bottom, #7377c0 0%,#5854a8 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7377c0', endColorstr='#5854a8',GradientType=0 ); /* IE6-8 */
+	font-family: Verdana;
+	font-size: 8pt;
+	color: white;
+	font-weight:bold;
+	vertical-align:middle;
+	text-align:left;
+	border-top:1px solid #8e90d2;
+	border-bottom:1px solid #51448e;
+
+}

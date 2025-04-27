@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Discharge Bill Cum Receipt</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nTransactions\nIP Cashier\nDischarge Bill Cum Receipt");
+addTocInfo("Patient Billing Manager\nTransactions\nIP Cashier\nDischarge Bill Cum Receipt\nProcess_Flow_Diagram___Discharge_Bill_Cum_Receipt");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Discharge Bill Cum Receipt</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Generate</span> discharge bills and receipts for an Inpatient/Daycare patient. You have to confirm the services associated to the patient to generate a bill or receipt. &#160;</p>
+<p class="Text">Discharge Bill Cum Receipt function is used to generate and print discharge bills and receipts for an Inpatient or a Daycare patient discharge in the Facility. This function enables a Cashier to generate a discharge bill for a specific patient encounter in the facility. A discharge bill is raised only after the discharge advice is prepared or after the patient is discharged. Parameter for discharge bill generation is specified through the 'BL Parameter' function. An error message is displayed halting the bill generation process, if the Cashier tries to generate a bill without generating the discharge advice or discharging the patient completely. Cashier has to accept the payment against the bill and specify the details in the discharge bill. A Cashier must have privilege to generate the receipts using this function. A discount report is also printed along with the bill details, if the patient has availed a discount for the services utilized from the facility. Admitting and Treating Practitioner's name is printed in the bill generated. If there are multiple treating practitioners', name of the first treating practitioner is printed in the bill generated. A report is generated on settling the bill amount. The report generated displays the name of the Cashier, receipt type and number generated, mode of payment selected by the patient, cheque or credit card number, amount settled and the total number of receipts generated for various transactions. Separate receipts are generated for payment made using various Settlement Types. For example, if the bill amount is 1,000/- and patient chooses to settle 500/- via Credit Card and 500/- using Cash, two separate receipts are generated to indicate multiple payment modes. A Cashier can generate interim bill, discharge bill or undercharge bill for the unbilled services. Also, Cashier can either generate a Customer bill, Patient bill or both using this function. The bed charge computation rule differs based on the value selected for 'Check Out Basis' in the 'BL Parameter' function. The bed charge is computed until the discharge bill is generated based on the Bed Charge Computation rule. A single bill is generated, if there are multiple payers associated to the patient, listing the coverage amount for each service, agreed to be covered by the payer. It is mandatory to capture additional ID proof details to generate a Payer bill if the respective check boxes are selected in 'BL Parameter' function. You cannot generate a Payer bill, if the details are not captured, but the patient bill can still be printed. The additional details that are captured are printed in the bills. You can print receipts and report in local language. If the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a4">local language</a> is not selected, the report and receipts are printed in English, which is set as the default language.</p>
+<div class="droptext" id="POPUP1004809012" style="display: none;">
+<p class="Text">The details are printed from right to left when you select the local language as 'Arabic'.</p>
+</div>
+<p class="Text">&#160;</p>
+<p class="Text">Two separate bills are generated if a part of the bill amount is settled by the Payer. A Payer and Patient Bill generated through this function displays the drug token number, patient's name, name of the hospital, Policy owner's name (name as recorded in the 'Credit Authorization' field), Service Group, total amount, charge amount, total amount, signature and designation of the logged in user, report print date and time and the card type and number through which the amount is settled. The bill/receipt format that is printed during patient discharge is based on the format defined for the respective Episode Type through the <a href="../../CodeSetup/Bill_Print_Format.htm">Bill Print Format</a> function. &#160;If you re-print the bill through the 'Re-print Bills' function, then 'COPY' is displayed on the bill to indicate that the bill generated is a copy of the original bill. The Surgeon's name is printed against each <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a5">individual service</a> on the report that is generated. The name of the consulting doctor is displayed in the <a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a6">inpatient bill</a> when a detail bill print is selected. You can also view the Encounter ID, Bill Printed Date, Hospital Details, Patient's Name, Admission Date, Service Groups, Print Groups, total charge, Payer and Patient Payable amount, total amount, discount amount, outstanding amount, remaining deposit amount, policy number and name of the authorized person who has generated the bill is displayed. The generated report displays the subtotal of each Print Service separately. For services related to operation theatre, the name of the surgery along with the service panel description is displayed in the bill.</p>
+<div class="droptext" id="POPUP1004827560" style="display: none;">
+<p class="Text">The orders for consultation are either placed through the 'Place Order' or the 'IP Consultation List' functions. The name of the ordering practitioner is displayed in the report for orders placed through these functions. The name of the doctor is also displayed for the direct charges that are placed through the 'Enter Request - IP' or the 'Enter Request - OP' functions. &#160;</p>
+</div>
+<div class="droptext" id="POPUP1004821482" style="display: none;">
+<p class="Text">This is valid only for a detailed bill and it is not printed, if a summarized bill is generated. The name of the Surgeon captured through the 'OT Slate' function in 'Operation Theatre' module for the respective patient encounter is displayed. The attending surgeon's name is displayed, if the Surgeon's name is not captured in OT Slate function.</p>
+</div>
+<p class="Text">&#160;</p>
+<p class="ProcessFlowDiagram"><a href="#Process_Flow_Diagram___Discharge_Bill_Cum_Receipt">Process Flow Diagram</a></p>
+<h2>Discharge Bill Cum Receipt</h2>
+<p class="From">From the Transactions &gt; IP Cashier, double-click Discharge Bill Cum Receipt Function.</p>
+<p class="Text">The Discharge Bill Cum Receipt screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter a Patient ID or select the Patient ID using the <a href="javascript:void(0);" id="a1" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../RFD/Click_for_User_Option.htm',600,400);return false;">User</a> Option.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the details in the mandatory (<span class="Asterisk">*</span>) fields. <a href="javascript:void(0);" id="a2" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../../RFD/BL_Trans_IPCashier_DischargeBillCumReceipt.htm',600,400);return false;"><span class="RFDhyperlink">&lt;Related Field Description&gt;</span></a></p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> to print the bills/receipts or <span class="BoldButton">[Clear Record]</span> to clear the data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">An additional screen '<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a3">Additional ID Proof</a>' pops-upon clicking <span class="BoldButton">[Commit Form]</span> if the Additional ID capture is set as mandatory in 'BL Parameters' function for payer bill generation.</p>
+<div class="droptext" id="POPUP1004809138" style="display: none;">
+<p class="BoldRFD">Enter the following details to generate a Payer bill:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Alternate ID Type</span> - Click <span class="BoldNumberRFD">[List of Values]</span> to select an Alternate ID Type for the patient. The 'Default ID Type' selected in 'BL Parameters' function is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">ID</span> - Enter the ID in alphanumeric format of 30 characters maximum length. The data can be recorded in English or Thai language.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient Name</span> - Enter the patient's name in alphanumeric format of 100 characters maximum length. The data can be recorded in English or Thai language.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Remarks</span> - Enter any additional details in alphanumeric format.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="BoldNumberRFD">[Continue]</span> - Click <span class="BoldNumberRFD">[Continue]</span> to generate a Payer bill.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />You have to login to the Cash Counter to generate discharge bills and receipts.</p>
+<hr style="float: aligncenter;" />
+<p class="Note"><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','BL Parameters','../../Admin/BL_Parameters.htm','Cash Counter Login','Cash_Counter_Login.htm','Cash Counters','../../CodeSetup/Cash_Counters.htm','Cash Counters for Settlement Type','../../CodeSetup/Cash_Counters_for_Settlement_Type.htm','User Privileges and Cash Counter Access','../../Admin/User_Privileges_and_Cash_Counter_Access.htm');return false;" title="Related Topics"><img src="../../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> 
+ &#160;&#160;&#160;&#160; <a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Cash Counter Login','Cash_Counter_Login.htm');return false;" title="See Also"><img src="../../../ss_btn_see_also1.gif" border="0" height="17" width="52" alt="See Also" /></a> </p>
+<hr style="float: aligncenter;" />
+<h3><a name="Process_Flow_Diagram___Discharge_Bill_Cum_Receipt" id="Process_Flow_Diagram___Discharge_Bill_Cum_Receipt">Process Flow Diagram - Discharge Bill Cum Receipt</a></h3>
+<p style="text-align: center;"><img src="../../../image643.gif" style="border: none;" alt="image643.gif" width="217" height="812" border="0" /></p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a4','POPUP1004809012');
+	TextPopupInit('a5','POPUP1004821482');
+	TextPopupInit('a6','POPUP1004827560');
+	TextPopupInit('a3','POPUP1004809138');
+	InitEffects('a3','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a4','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a5','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a6','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

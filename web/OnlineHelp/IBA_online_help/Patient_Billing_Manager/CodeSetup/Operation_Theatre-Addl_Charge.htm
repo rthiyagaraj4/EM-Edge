@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Operation Theatre-Addl Charge</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nCodeSetup\nOperation Theatre-Addl Charge");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Operation Theatre - Addl Charge</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Define</span> surgery templates and associate services to the surgery template to define additional charges. &#160;You can <span class="RedItalic">Query</span> to view the records created. &#160;&#160;&#160;</p>
+<p class="Text">Operation Theatre – Addl Charge function is used to define a Surgery Template and define additional charge for the selected Surgery template in the Operation Theatre. You can also issue a discount on the subsequent surgery when multiple surgeries are performed for the patient in the facility under the same booking.</p>
+<h2>Defining Additional Charges on Operation Theatre</h2>
+<p class="From">From the Masters &gt; select Interfaced Modules Financial Dtls, double-click Operation Theatre - Addl Charge &#160;function.</p>
+<p class="Text">The Operation Theatre – Addl Charge screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the mandatory (<span class="Asterisk">*</span>) details under the following tabs:</p>
+</li>
+</ol>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">Additional Charge Template</a></p>
+<div class="droptext" id="POPUP231867493" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">The Additional Charge Template tab is used to define additional charges for the surgery templates. You can associate multiple OT Services to a Surgery Template and define the additional charges for these templates. You can also define the discount for the multiple services.</p>
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Surgery Format</span> – Enter the Surgery Template code in alphanumeric format of 10 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Long Description</span> - Enter the Long Description in alphanumeric format of 60 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Short Description</span> - Enter the Short Description in alphanumeric format of 30 characters maximum length. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Class</span> – Click on the Billing Class to associate the services to the Surgery Template valid for the Billing Class. The values defined using the function ‘Billing Class’ in the Master gets displayed. Select ‘**’, if the Surgery Template is valid for all the Billing Class in the facility.</p>
+</li>
+</ol>
+<p class="BoldRFD">Dependent Services</p>
+<ol start="5" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Srl No</span> – Enter the Serial Number in numeric format. The serial number indicates the precedence of the services associated to the Surgery Template for the respective Billing Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Type</span> – Select a value from the list. The system-defined values are ‘As per Setup’ and ‘%age of Other Setup’. The services are charged based on the Charge Type selected. Select ‘As per Setup’ to calculate the price based on the charges defined in the Main Surgery. Select ‘%age of Other Setup’ to calculate the price based on the dependant services.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service for Additional Charge</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select and associate a Billing Service for additional charges. The description for the selected Billing Service gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">%Age of</span> – Enter the percentage factor in numeric factor. The additional charges are computed as the product of the Billing Service price and the factor recorded.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Dependant Billing Service Code</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select and associate a dependant Billing Service to compute the additional charges. The description for the selected Billing Service gets displayed. The value in the list is displayed as **MAIN** for the first row. &#160;The description for the selected Billing Service code gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">OT Role Type</span> – Click <span class="BoldNumberRFD">[List of Values]</span> to select an OT Role Type. The values defined in the Operation Theatre module gets displayed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Description</span> – The description for the selected OT Role Type gets displayed.</p>
+</li>
+</ol>
+</div>
+<p class="Text"><a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">Additional Charge Setup by Surgery</a></p>
+<div class="droptext" id="POPUP228642980" style="display: none;">
+<p class="BoldRFD">Enter the following details:</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Facility</span> – The logged in Facility name gets displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Order Catalog for Procedure</span> – Select the Order Catalog to which the main surgery is linked. The description for the selected Order Catalog gets displayed. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billing Service</span> – The Billing Service associated to the Order Catalog gets displayed. You cannot edit the Billing Service.</p>
+</li>
+</ol>
+<p class="BoldRFD">Discount for Multiple Surgery</p>
+<ol start="4">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount 1%</span> - Enter the discount percentage in numeric format. This defines the discount on the highest prices surgery.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount 2%</span> - Enter the discount percentage in numeric format. It indicates the discount for the Billing Service, if the defined Billing service is linked to an Order Catalog, which identifies the second procedure performed for the respective Billing Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount 3%</span> - Enter the discount percentage in numeric format. &#160;It indicates the discount for the Billing Service, if the defined Billing service is linked to an Order Catalog which identifies the third procedure performed for the respective Billing Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount 4%</span> - Enter the discount percentage in numeric format. &#160;It indicates the discount for the Billing Service, if the defined Billing service is linked to an Order Catalog which identifies the fourth procedure performed for the respective Billing Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discount 5%</span> - Enter the discount percentage in numeric format. &#160;It indicates the discount for the Billing Service, if the defined Billing service is linked to an Order Catalog which identifies the fifth procedure performed for the respective Billing Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Apply on</u></span> &#160;- Select the required value from the drop-down list. The list includes Gross amount and Net amount.. By default, the value ‘Gross Amount’ gets displayed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">&#160;If the value ‘Gross amount’ is selected, the details such as Gross Amount, Discount Amount, Discount Percentage and Net amount are applicable in Record additional charges function in OT module.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If the value ‘Net amount’ is selected, the details such as Gross amount, Discount Percentage, Discount amount and Net Amount are applicable in Record additional charges function in OT module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Apply on</u></span> - Select ‘the required Gross amount’ or ‘Net amount’ value from the drop-down list. If the value ‘Gross amount’ is selected, the details such as Gross Amount, Discount Amount, Discount Percentage and Net amount are displayed in Record Additional Charges dialog invoked from Record Surgeon Notes function in OT module. If the value ‘Net amount’ is selected, the details such as Gross amount, Discount Percentage, Discount amount and Net Amount are displayed in Record Additional Charges dialog invoked from Record Surgeon Notes function in OT module. This is applicable only for Indian users</p>
+</li>
+</ol>
+<p class="BulletRFD">&#160;</p>
+<ol start="10">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Discount percentage</u></span> – This field displays the percentage as 0.00</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Discount amount</u></span> – This field displays the discount amount as 0.00</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Net amount</u></span> – This field displays the same value as gross amount.</p>
+</li>
+</ol>
+<p class="BoldRFD"><span style="font-weight: normal;">The dependant services defined under the ‘Additional Charge Format’ gets displayed. You can insert new services under this tab.</span></p>
+</div>
+<ol start="2">
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Commit Form]</span> or press <span class="BoldButton">[F10]</span> to save or <span class="BoldButton">[Clear Record]</span> to clear the entered data.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Execute Query]</span> or press <span class="BoldButton">[F8]</span> to search for the existing records within the facility.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<hr style="float: aligncenter;" />
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP231867493');
+	TextPopupInit('a2','POPUP228642980');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

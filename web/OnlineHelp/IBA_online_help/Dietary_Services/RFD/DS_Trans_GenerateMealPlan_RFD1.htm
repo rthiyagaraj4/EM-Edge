@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>DS_Trans_GenerateMealPlan_RFD1</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Generate Meal Plan</p>
+<p class="BoldRFD"><span style="font-weight: normal;">You can re-generate a meal plan for a patient using this tab.</span></p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Enter the following details to generate a Meal Plan:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Serving Date [From-To]</u></span> – Select the serve date range using calendar. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />The error message ‘Serving ‘To Date’ should not be less than Current Date’ is displayed if the entered Serving To date is less than current date.</p>
+<ol start="2">
+<li class="p-NumberRFD">
+<p class="NumberRFD">The error message ‘Serving Date Range should be maximum 7 days’ is displayed if the entered Serving date range is greater than 7 days in Generate Meal Plan tab.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Diet Category</span> - Select the Diet Category from the list. The system-defined values are Enternal, Normal and Therapeutic Diet. The Meal Plan is generated for the selected Diet Category.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Kitchen</span> - Select a Kitchen from the list. The values defined using the ‘Kitchen/Kitchen Area’ function get listed. The Meal Plan is generated for the selected Kitchen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Meal Type</span> - Select a Meal Type from the list. The values defined using the ‘Meal Type’ function get listed. The Meal Plan is generated for the selected Meal Type associated to the kitchen for the selected date. The values are sorted based on the order of the meal type defined in the Meal type screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Feed Type</u></span> – Select the required Feed Type from drop-down list. The list displays the values defined in the Feed Type master.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Unit</span> - Select a Nursing Unit from the list. Nursing Units are defined in Inpatient and Day Care Management module. The Meal Plans are generated for the selected Nursing Unit.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Meal Class</span> - Select the Meal Class from the list. The values defined using the ‘Meal Class’ function get listed. The generated Meal Plan is applicable for the selected Meal Class. &#160;</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Frequency Based</span> – Select the check box to generate the Frequency Based Meal Plan. Clear the check box if the meal plan is non-frequency based. The check box is selected, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Regenerate Meal Plan</span> – Select the check box, if the selected meal plan is to be re-generated for the selected date. The Meal Plan is re-generated on clicking <span class="BoldNumberRFD">[Run]</span>. You cannot re-generate the Meal Plan, if the check box is cleared.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Diet Type</span> - Select the Diet Type from the list. The values defined using the ‘Diet Type’ function get listed. The Meal Plan is generated for the selected Diet Type. &#160;You can select more than one diet type.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Patient ID</span> – Enter the Patient ID in alphanumeric format of ten characters maximum length or click <span class="BoldNumberRFD">[?]</span> function to select a Patient ID. The Meal Plan is generated for the selected Patient.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />Meal plans are generated for the given criteria, if the values are selected. Meal plan is generated for all Diet Orders, if the Serving Date is selected.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<%@ page import=" ePO.*, ePO.Common.* , eCommon.Common.*,  java.util.*" contentType="text/html;charset=UTF-8"%>
+<%@ include file="../../eCommon/jsp/GetPersistenceBean.jsp"%>
+<%@ include file="../../eCommon/jsp/CommonInclude.jsp"%>
+
+<html>
+<head>
+	
+<%
+	String sStyle =(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute("PREFERRED_STYLE"):"IeStyle.css";
+%>
+	<link rel='StyleSheet' href='../../eCommon/html/<%=sStyle%>' type='text/css' ></link>
+	<script language="JavaScript" src="../../eCommon/js/ValidateControl.js"></script>
+	<script language="JavaScript" src="../../eCommon/js/DateUtils.js"></script>
+	<script language="JavaScript" src="../../eCommon/js/common.js"></script>
+	<script language="JavaScript" src="../../ePO/js/PoCommon.js"></script>
+	<script language="JavaScript" src="../../ePO/js/AmendPurchaseOrder.js"></script>
+	<script language="JavaScript" src="../../eCommon/js/CommonCalendar.js"></script>
+<script src='../../eCommon/js/showModalDialog.js' language='JavaScript'></script>
+
+    <script>
+        function_id			=	"<%= request.getParameter("function_id") %>"
+		menu_id				=	"<%= request.getParameter("menu_id") %>"
+		module_id			=	"<%= request.getParameter("module_id") %>"
+    </script>
+</head>
+<%
+	String master_type			=		"PORDER";
+	String mode				=		CommonRepository.getCommonKeyValue("MODE_MODIFY");
+	String bean_id			=		"amendPurchaseOrderBean";
+	String bean_name		=		"ePO.AmendPurchaseOrderBean";
+
+	AmendPurchaseOrderBean bean		=		(AmendPurchaseOrderBean) getBeanObject(bean_id,bean_name, request  );  
+	bean.clear();
+
+	request.setCharacterEncoding("UTF-8");
+	String locale			=		(String)session.getAttribute("LOCALE");
+	System.out.println("locale in amend qry cr = "+locale);
+
+	ServletContext context  =		getServletConfig().getServletContext();
+
+	if ((context.getInitParameter("LOCAL_EJBS") !=null) && (context.getInitParameter("LOCAL_EJBS").equalsIgnoreCase("FALSE"))) 
+	bean.setLocalEJB(false);
+	bean.setMode(mode.trim());
+	bean.setFunctionId(bean.checkForNull(request.getParameter("function_id")));
+	bean.setMasterType(master_type);
+	String currentdate	       =	com.ehis.util.DateUtils.getCurrentDate("DMY",locale).toString();
+	String minusdate	       =    com.ehis.util.DateUtils.minusDate(currentdate,"DMY",locale,7,"d");
+	
+%>
+<body onload='FocusFirstElement();document.formAmendPOQueryCriteria.submit();'>
+	<form name= "formAmendPOQueryCriteria" action="../../ePO/jsp/AmendPOQueryResult.jsp" method="post" target="AmendPOQueryResult" onReset='FocusFirstElement();'>
+	<table border="0" cellspacing="0" width="100%" align="center">
+	  <tr>
+		<td  class="label"><fmt:message key="ePO.POMode.label" bundle="${po_labels}"/></td>													
+		<td class="fields">
+			<select name="po_mode" id="po_mode">
+				<option value="D" >Direct Order</option>
+				<option value="R" >Order Based on Request</option>
+			</select>
+		</td>
+		
+		<td  class="label"><fmt:message key="ePO.PORaisedBy.label" bundle="${po_labels}"/></td>
+		<td class='fields'><select name="purchase_unit" id="purchase_unit" ><%=bean.getRequestFromPurchaseUnit()%></select></td>
+		<td  class="label"><fmt:message key="ePO.Supplier.label" bundle="${po_labels}"/></td>
+		<td class='fields'><select name="supp_code" id="supp_code" ><%=bean.getRequestToSupp()%> </select></td>	 
+		<td class="label">&nbsp;</td>
+		<td class='fields'>&nbsp;</td>
+	  </tr>
+	  <tr>
+		<td  class="label"><fmt:message key="ePO.PurchaseType.label" bundle="${po_labels}"/></td>
+		<td class='fields'><select name="purchase_type" id="purchase_type" ><%=bean.getPurchase_type_List()%></select></td>
+		<td  class="label"><fmt:message key="ePO.PONo.label" bundle="${po_labels}"/></td>
+		<td class='fields'><input type="text" size="15" maxlength="20" class='NUMBER' name="po_no" id="po_no"  onKeyPress="return CheckForSpecialChars(event);" ></td>
+		<td  class="label" ><fmt:message key="Common.fromdate.label" bundle="${common_labels}"/></td>
+		<td class='fields'><input type="text" name="from_po_date" id="from_po_date" size="10" value="<%=minusdate%>" maxlength="10" onBlur="CheckDate(this);"><img src="../../eCommon/images/CommonCalendar.gif" onClick="return showCalendar('from_po_date');"></img></td>
+		<td class='label'><fmt:message key="Common.todate.label" bundle="${common_labels}"/></td>
+		<td class='fields'>
+		<input type="text" name="to_po_date" id="to_po_date" size="10" maxlength="10"  value="<%=currentdate%>" onBlur="CheckDate(this);">
+		<img src="../../eCommon/images/CommonCalendar.gif" onClick="return showCalendar('to_po_date');"> 
+		</td> 
+		
+	  </tr>
+	  
+	  <tr>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td >&nbsp;&nbsp;</td>
+		<td class='fields'><input type="button" class="button" name="search" id="search" value='<fmt:message key="Common.search.label" bundle="${common_labels}"/>'  onClick="checkValidateQryDate();"></td>
+	  </tr>
+	</table>
+		<input type="hidden" name="bean_id" id="bean_id"			value="<%=bean_id%>">
+		<input type="hidden" name="language_id" id="language_id"		value="<%=locale%>">
+		<input type="hidden" name="bean_name" id="bean_name"		value="<%= bean_name %>">
+		<input type="hidden" name="function_id" id="function_id"		value="<%=bean.getFunctionId()%>">
+		<input type="hidden" name="orderbycolumns" id="orderbycolumns"  value="PO_MASTER_CODE,hdr.po_date,PUR_UNIT_CODE,hdr.po_no,HDR.PO_ORDER_MODE">
+	</form>
+<%	putObjectInBean(bean_id,bean,request);
+%>
+	</body>
+</html>
+

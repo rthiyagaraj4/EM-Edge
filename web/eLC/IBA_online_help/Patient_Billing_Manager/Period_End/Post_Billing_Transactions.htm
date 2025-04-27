@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>Post Billing Transactions</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nPeriod End\nPost Billing Transactions");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<script src="../../ehlpdhtm.js" type="text/javascript" language="JavaScript1.2">
+</script>
+<h1>Post Billing Transactions</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Post</span> the billing transactions to the General Ledger interface. The distribution of the General Ledger Settlement Types and the Receipt Types occur when the billing transactions are posted.</p>
+<p class="Text">Post Billing Transactions function is used to post the unposted billing transactions to the General Ledger distribution account. The receipt for the bills generated in the Cash Counter has to be generated using the function ‘Cash Control Receipt’ or ‘Cash Control Receipt (Advanced)’. Cash Control Receipts are necessary to post the billing transactions. The billing transactions have to be posted to transfer the deferred cash bills to DCP and the credit bills to Accounts Receivable. This is a pre-requisite to send the entries to GL Distribution for Income accounts, Discount accounts and Cash accounts. GL Interface codes mentioned for the Bill Types, based on the transaction type (IP, OP &amp; REF) are also affected by posting the folio transactions. On posting the cashier transactions, GL Interface codes defined for concerned receipt types and settlement types are credited and debited respectively. GL Distributions are created on successful posting of the billing transactions. Several validations are carried out 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a1">before</a> and 
+<a href="javascript:void(0);" id="a3" onmouseover="if (parseInt(navigator.appVersion) >= 4 &amp;&amp; typeof(BSPSPopupOnMouseOver) == 'function') BSPSPopupOnMouseOver(event);" class="BSSCPopup" onclick="BSSCPopup('../RFD/BL_Admin_PostBillingTrans.htm',600,400);return false;">after</a> the billing transactions are posted. While cloing a billing period too 
+<a class="dropspot" href="javascript:TextPopup(this)" style="position: relative;" id="a2">necessary</a> validations are carried-out.</p>
+<div class="droptext" id="POPUP240656174" style="display: none;">
+<p class="BoldRFD" style="font-weight: normal;">During period end of the financial year in the Patient Billing Manager module, system ensures that the following transactions are successfully posted:</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Bills pertaining to the period being closed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Receipts and Refunds pertaining to the period being closed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Cash Control Receipts pertaining to the period being closed.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Outstanding Cash bills pertaining to the period being closed are transferred to DCP.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">Outstanding Credit bills pertaining to the period being closed are transferred to AR.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">DCP originating and allocating transactions pertaining to the period being closed.</p>
+</li>
+</ul>
+<p class="BoldRFD"><span style="font-weight: normal;">All GL distributions created out of the above posting pertaining to the period end are transferred to GL successfully.</span></p>
+</div>
+<div class="droptext" id="POPUP239195432" style="display: none;">
+<p class="BoldRFD">The following validations are carried out before posting the billing transactions:</p>
+<ul>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The folio transactions are not posted for the specified date, unless all the transactions to be posted to the GL Distribution are updated with the Miscellaneous Document type and number generated by the Financial Accounting Cashier for respective date (Cash Control Document Reference).</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The bills and receipt/refund transactions for the specified date are not posted, unless all the transactions to be posted to the GL Distribution are updated with the Miscellaneous Document type and number generated by the Financial Accounting Cashier for respective date, cash counter and shift.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The transaction posted to the GL Distribution has a Miscellaneous Document type and number generated for the concerned dates by the Financial Accounting Cashier.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">If miscellaneous receipt is not generated on a specific date, the bills and receipts generated on the relevant day are posted. If no bills and receipts are posted, the month end transactions cannot be processed and the revenue generated cannot be posted to the General Ledger module.</p>
+</li>
+<li class="p-BulletRFD">
+<p class="BulletRFD">The cash bills/credit bills generated is updated with the miscellaneous receipt reference generated by the financial accounting cashier. The transactions that are purely accounting in nature like transferring bills to DCP/AR, does not have miscellaneous receipt document reference.</p>
+</li>
+</ul>
+</div>
+<h2>Post Billing Transactions</h2>
+<p class="From">From the Period End, double-click Post Billing Transactions.</p>
+<p class="Text">The Post Billing Transactions screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Enter the date in the field or click Calendar function to select a date. The unposted transactions until the date selected is posted to GL Interface. This is a mandatory field.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Run Process]</span> to post the billing transactions.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Clear Record]</span> to clear the data entered.</p>
+</li>
+</ol>
+<p>&#160;</p>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />• Authorized User has to login to the Inpatient Cash Counter to post the unbilled folio.</p>
+<p class="Note">• Authorized User has to generate the Cash Control Receipts for the transactions in the Cash Counter to post the Billing Transactions.</p>
+<p class="Note">• The Settlement Type and the Cash Counter combination have to be defined.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Cash Control Receipt','../Transactions/Cash_Control/Cash_Control_Receipt.htm');return false;" title="Related Topics"><img src="../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+
+
+<script type="text/javascript" language="JavaScript1.2">//<![CDATA[
+	if( typeof( InitEffects ) != 'function' ) InitEffects = new Function();
+	if( typeof( TextPopupInit ) != 'function' ) TextPopupInit = new Function();
+	TextPopupInit('a1','POPUP239195432');
+	TextPopupInit('a2','POPUP240656174');
+	InitEffects('a1','x-on-hover: fontchange(color=#ff0000);');
+	InitEffects('a2','x-on-hover: fontchange(color=#ff0000);');
+//]]></script>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

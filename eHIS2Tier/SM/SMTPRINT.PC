@@ -1,0 +1,1293 @@
+/********************************************************************************
+*       
+*	Name			SMTPRINT.PC
+*
+*	Author			K S Sundar
+*
+*	Purpose			To print the document.
+*
+*   ===============================================================
+*	Input Parameters							Mandatory/Optional
+*   ===============================================================
+*	1.  DB Connect String (User/Password@DBName)M
+*	2.  Workstation ID							M
+*	3.  Facility Id								M
+*	4.  Module Id								M
+*	5.  Document Id								M
+*	6.  Report File Name (with full path)		M
+*	7.  Location Type							M
+*	8.  Location Code							M
+*	9.  Printer ID								M
+*	10. Printer Name							M
+*	11. Queue Name								M
+*	12. Number of copies						O
+*	13. From Page Number						O
+*	14. To Page Number							O
+*    
+*	Agrument separator is ";"
+*
+*   ============================================================================
+*	Modification History  
+*   ============================================================================
+*	Date		Person		Remarks
+*   ============================================================================
+*	Sep 25,2002	K S Sundar	Created.
+*
+*	Apr 23,2003	K S Sundar	1. Debug.H and DebugProc.H removed
+*							2. Debug.C added
+*							3. New Debug.H added
+*							3. Calls related to debug renamed as Trace
+*							4. get_workstation_id procedure is removed.
+*							5. exit(1) when the program is NOT successful
+*							   exit(0) when the program is successful.
+*							6. WORKING_DIR is removed as it is not being used.
+*
+*	Apr 26,2003	K S Sundar	1. get_output_directory procedure is removed as
+*							   no log file is getting created.
+*
+*	Sep 06,2003	K S Sundar	1. File (EXE) details shown in tracing log.
+*
+*	Sep 16,2003	K S Sundar	1. Memory for lpData reinitialized after each page
+*								is printed.
+*							2. Check if memory allocation (realloc function)
+*								is success.
+*							Above changes are done as a result of bug reported from GP
+*							site. When a report of more 200 pages is printed, after printing
+*							210 pages, the program raises "Illegal operation" error and aborted.
+*
+*	Sep 17,2003	K S Sundar	Calls to RegisterError modified to pass the additional
+*							arguments.
+*							PrinterID and QueueName - Two input arguments added
+*							to pass registererror calls.
+*	Nov 13,2003 Nanjayan    1. New function GetReportType()has been added, If 
+*							   version is 2.1 then, for the respective report 
+*							   batch_file_name value is fetched from table
+*							   sy_online_print_id and if value is LOCAL,
+*							   local_print_document is invoked to print the file.
+*							   NOTE:
+*							   =====
+*							   In 4.1 Version sy_online_print_id is view,it don't
+*							   have column batch_file_name.
+*
+*							2. New function local_print_document has been included
+*							   Internally it call eHISPrint.exe(VB Program)when the
+*							   batch_file_name value from sy_online_print_id is LOCAL.
+*
+*   July 17,2008 K. Pramodini get_sleep function is added after the printing to make the process
+*                             sleep for 2 secs. (For MF-SCF-0015)
+*							  Memory allocated dynamically for PRINTER_INFO_2 type variable for windows "Dont Send" error 
+*
+********************************************************************************/
+
+# include <windows.h>
+# include <winspool.h>
+# include <assert.h>
+# include <stdio.h>
+# include <malloc.h>
+# include <stdlib.h>
+# include <conio.h>
+# include <string.h>
+# include <time.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <Debug.h>
+
+# if defined (WIN32)
+	#define IS_WIN32 TRUE
+# else
+	#define IS_WIN32 FALSE
+# endif
+
+# define IS_NT		IS_WIN32 && (BOOL) (GetVersion() < 0x80000000)
+# define IS_WIN32S	IS_WIN32 && (BOOL) (!(IS_NT) && (LOBYTE(LOWORD(GetVersion())) < 4 ))
+# define IS_WIN95	(BOOL) (!(IS_NT) && !(IS_WIN32S)) && IS_WIN32
+# define MAXNUM 750
+
+EXEC SQL BEGIN DECLARE SECTION;
+	varchar  BVUidPwd[132];
+	varchar  BVPrinterID[64];
+	varchar  BVPrinterName[64];
+	varchar  BVQueueName[64];
+	varchar  BVReportFileName[64];
+
+	varchar  BVMachineName[32];
+	varchar	 bv_report_type[16];			// LOCAL or Standard
+	varchar	 BVReportType[50];
+	varchar	 BVSelectStmt[150];
+
+	varchar  BVWorkstationID[31],
+			 BVFacilityID[3],
+			 BVModuleID[3],
+			 BVDocumentID[11],
+			 BVLocationType[2],
+			 BVLocationCode[7],
+
+			 d_sleep_secs[10];				//For storing sleep secs
+
+	int		 BVVersion21YN;
+
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+
+DWORD sleep_sec = 0;
+
+/*
+*	global decalrations;
+*/
+HANDLE			hPrinter;
+/* Commented and memory allocated dynamically for PRINTER_INFO_2 type variable
+PRINTER_INFO_2 	pPrinterInfo[100]; */
+PRINTER_INFO_2 	*pPrinterInfo = NULL;		
+DWORD			cByteNeeded,cByteUsed,dwBytesWritten,dwReq,dwUsd;
+
+FILE *fp;
+
+
+char	gv_machine_name[32];
+char	gv_err_msg[132];
+char	*GVFromPage;
+char	*GVToPage;
+char	*GVNoOfCopies;
+char	*GVDocName;
+char	*GV_Doc_Name;
+char	GV_Sep[5]= "\\";
+int		GVFromPageNumber;
+int		GVToPageNumber;
+int		GVNoOfCopiesNumber;
+int		GVCtr;
+
+char	*GVReportFileName;
+
+char	*gv_ws_no,   *gv_facility_id,  *gv_module_id,  *gv_document_id;
+
+int		print_document();				// Print document.
+
+int		LocalPrintDocument();			// Local Print document.(For Printing Arabic)
+
+int 	GetReportType();				// Get report type either LOCAL or STANDARD
+
+char	err_text[250], err[150];
+
+void    get_sleep();                    // sleep for 2 secs
+/*
+* WinMain
+*/
+int WINAPI WinMain(HINSTANCE  hInstance,HINSTANCE  hPrevInstance,LPSTR  lpCmdLine, int  nShowCmd)
+{
+	/*
+	* Declare local variables.
+	*/
+	struct _stat LVFileStat;
+	int			 LVResult;
+	char		 *LVStrBuf;
+
+	char	LVFunctionName[64];
+	char	sep[3]=";";
+	char	*LVUidPwd;
+	char	*LVPrinterID;
+	char	*LVPrinterName;
+	char	*LVQueueName;
+	char	*LVReportFileName;
+	char	*LVLocationType; 
+	char	*LVLocationCode;
+	char	LV_Str[3] = ".";
+	char	LV_DOCName[40];
+	int		lv_ret_flag;
+	int		LVContinue=1;
+	DWORD	lv_machine_no = 20;
+	char	lv_machine_name[32];
+	char	tmpbuf[500];
+
+	/*
+	* Read command line parameters.
+	*/
+	LVUidPwd=strtok(lpCmdLine,sep);
+	gv_ws_no=strtok(NULL,sep);
+	gv_facility_id=strtok(NULL,sep);
+	gv_module_id=strtok(NULL,sep);
+	gv_document_id=strtok(NULL,sep);
+	LVReportFileName=strtok(NULL,sep);
+	LVLocationType=strtok(NULL,sep);
+	LVLocationCode=strtok(NULL,sep);
+	LVPrinterID=strtok(NULL,sep);
+	LVPrinterName=strtok(NULL,sep);
+	LVQueueName=strtok(NULL,sep);
+	GVNoOfCopies=strtok(NULL,sep);
+	GVFromPage=strtok(NULL,sep);
+	GVToPage=strtok(NULL,sep);
+
+	/*
+	* Exit if any mandatory parameter is missing.
+	*/
+	if (LVUidPwd==NULL       || LVPrinterID==NULL || LVPrinterName==NULL || 
+		LVQueueName==NULL || LVReportFileName==NULL ||
+		gv_ws_no==NULL       || gv_facility_id==NULL  || gv_module_id==NULL        ||
+		gv_document_id==NULL || LVLocationType==NULL     || LVLocationCode==NULL)
+	{
+		strcpy (tmpbuf, "Usage:SMTPRINT;uid/pwd@connect;workstation_id;facility_id;");
+		strcat (tmpbuf, "module_id;document_id;report_file_name;loc_type;loc_code;");
+		strcat (tmpbuf, "printer_id;printer_name;queue_name");
+		MessageBox(hwnd, tmpbuf, "Information", MB_OK | MB_ICONINFORMATION);
+		return 0;
+	} 
+
+	/*
+	* Capture command line parameters.
+	*/
+	BVUidPwd.arr[0] = '\0';
+	BVUidPwd.len =0;
+	strcpy(BVUidPwd.arr,LVUidPwd);
+	BVUidPwd.len = strlen(BVUidPwd.arr);
+
+	BVPrinterID.arr[0] = '\0';
+	BVPrinterID.len =0;
+	strcpy(BVPrinterID.arr,LVPrinterID);
+	BVPrinterID.len = strlen(BVPrinterID.arr);
+
+	BVPrinterName.arr[0] = '\0';
+	BVPrinterName.len =0;
+	strcpy(BVPrinterName.arr,LVPrinterName);
+	BVPrinterName.len = strlen(BVPrinterName.arr);
+
+	BVQueueName.arr[0] = '\0';
+	BVQueueName.len =0;
+	strcpy(BVQueueName.arr,LVQueueName);
+	BVQueueName.len = strlen(BVQueueName.arr);
+
+	BVReportFileName.arr[0] = '\0';
+	BVReportFileName.len =0;
+	strcpy(BVReportFileName.arr,LVReportFileName);
+	BVReportFileName.len = strlen(BVReportFileName.arr);
+
+	BVMachineName.arr[0] = '\0';
+	BVMachineName.len =0;
+
+	strcpy(BVWorkstationID.arr, gv_ws_no);
+	BVWorkstationID.len = strlen (BVWorkstationID.arr);
+	BVWorkstationID.arr[BVWorkstationID.len]='\0';
+
+	strcpy(BVFacilityID.arr, gv_facility_id);
+	BVFacilityID.len = strlen (BVFacilityID.arr);
+
+	strcpy(BVModuleID.arr, gv_module_id);
+	BVModuleID.len = strlen (BVModuleID.arr);
+
+	strcpy(BVDocumentID.arr, gv_document_id);
+	BVDocumentID.len = strlen (BVDocumentID.arr);
+
+	strcpy(BVLocationType.arr, LVLocationType);
+	BVLocationType.len = strlen (BVLocationType.arr);
+
+	strcpy(BVLocationCode.arr, LVLocationCode);
+	BVLocationCode.len = strlen (BVLocationCode.arr);
+
+	if ((GVFromPage!=NULL) && (strcmp(GVFromPage,"0") != 0))
+		GVFromPageNumber = atoi(GVFromPage);
+	else
+		GVFromPageNumber = 1;
+
+	if ((GVToPage!=NULL) && (strcmp(GVToPage,"0") != 0))
+		GVToPageNumber  = atoi(GVToPage);
+	else
+		GVToPageNumber  = 9999;
+
+	if ((GVNoOfCopies!=NULL) && (strcmp(GVNoOfCopies,"0") != 0))
+		GVNoOfCopiesNumber = atoi(GVNoOfCopies);
+	else
+		GVNoOfCopiesNumber = 1;
+
+
+	/*
+	* Create Window
+	*/
+	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc    = NULL;
+	wndclass.cbClsExtra		= 0;
+	wndclass.cbWndExtra		= 0;
+	wndclass.hInstance		= hInstance;
+	wndclass.hIcon			= LoadIcon ( NULL, IDI_APPLICATION );
+	wndclass.hCursor		= LoadCursor ( NULL, IDC_ARROW);
+	wndclass.hbrBackground	= GetStockObject (WHITE_BRUSH);
+	wndclass.lpszMenuName	= NULL;
+	wndclass.lpszClassName	= "Drivers";
+	RegisterClass ( &wndclass );
+
+	hwnd = CreateWindow("Read Printer Details",(LPSTR)NULL,
+                         WS_POPUP | WS_DLGFRAME,170,190,300,100,
+                         (HWND)NULL,(HMENU)NULL,(HANDLE)hInstance,
+						 (LPSTR) lpCmdLine);
+
+	/*
+	* Connect to database
+	*/
+	EXEC SQL CONNECT :BVUidPwd;
+	if(sqlca.sqlcode < 0)
+	{
+		MessageBox(hwnd,"Unable to connect to oracle.","Error",MB_OK|MB_ICONSTOP);
+		exit(1);
+	}
+
+	/*	
+	* Following code for setting meduser role is added by C. Ganesan on 26/10/2002 at 19:00
+	*
+	*/
+	set_meduser_role();
+
+	d_sleep_secs.arr[0] = '\0';
+	d_sleep_secs.len=0;
+    
+	strcpy(d_sleep_secs.arr, "2000");
+
+	d_sleep_secs.len=strlen(d_sleep_secs.arr);
+	d_sleep_secs.arr[d_sleep_secs.len]='\0';
+
+	/*
+	* Enable or disable tracing.
+	*/
+	strcpy(GVProgramID, "SMTPRINT");	
+	strcpy(LVFunctionName, "WinMain()");	
+	EnableOrDisableTracing();
+
+	GVReportFileName=(char *)malloc(80*sizeof(char));
+	strcpy (GVReportFileName,LVReportFileName);
+
+	if (IS_TRACING)
+	{
+		Trace(LVFunctionName,"Begin");
+
+		LVResult = _stat(_pgmptr, &LVFileStat);
+		if (LVResult == 0)
+		{	
+			LVStrBuf = strtok(ctime(&LVFileStat.st_mtime),"\n");	
+			sprintf(GVTraceMsg,"File Name=[%Fs]  TimeStamp=[%s]  Size=[%ld Bytes]", _pgmptr, LVStrBuf , LVFileStat.st_size );
+			Trace(LVFunctionName,GVTraceMsg);
+		}
+
+		sprintf(GVTraceMsg,"BVUidPwd=[%s] BVPrinterID=[%s] BVPrinterName=[%s] BVQueueName=[%s] GVReportFileName=[%s] GVNoOfCopiesNumber=[%d]  GVFromPageNumber=[%d] GVToPageNumber=[%d]",
+			BVUidPwd.arr, BVPrinterID.arr, BVPrinterName.arr,BVQueueName.arr, GVReportFileName, GVNoOfCopiesNumber, GVFromPageNumber, GVToPageNumber);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+
+	/*
+	* Get the machine name.
+	* This will be used to while logging the error in
+	* SY_ONLINE_PRINT_ERROR_LOG table.
+	*/ 
+	if (IS_TRACING) Trace(LVFunctionName,"Getting computer name ...");
+	GetComputerName(lv_machine_name, &lv_machine_no);
+	strcpy(BVMachineName.arr, lv_machine_name);
+	BVMachineName.len = strlen(BVMachineName.arr);
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "Machine name=[%s]", BVMachineName.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Write debug information on workstation identifier.
+	*/ 
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "Workstation number=[%s]", BVWorkstationID.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Check the existence of the report file.
+	*/
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "Checking if [%s] exists ...", GVReportFileName);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+
+	if ((fp = fopen (GVReportFileName, "r")) == NULL)
+	{
+		GetMEDICOMMessage("SY2435",gv_err_msg);
+		sprintf (GVTraceMsg, "APP-SY2435 %s", gv_err_msg);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName,"File not exists");
+			Trace(LVFunctionName,"End");
+		}
+		free(GVReportFileName);
+		exit(1);
+	}
+	if (IS_TRACING) Trace(LVFunctionName,"File exists!!");
+	GetReportType();
+	if (strcmp(BVReportType.arr,"LOCAL")==0 && (BVVersion21YN ==1))
+	{
+	   if (IS_TRACING) 
+		{
+	  		Trace(LVFunctionName,"Calling local_print_document();");
+		}
+		LocalPrintDocument();
+	}
+	else
+	{
+		/*
+		Print the document.
+		*/ 
+		if (IS_TRACING) 
+		{
+			Trace(LVFunctionName,"Calling print_document();");
+		}
+
+		for(GVCtr=1;GVCtr<=GVNoOfCopiesNumber;GVCtr++) 
+			print_document();
+
+	}
+   if (IS_TRACING) 
+   {
+	  	Trace(LVFunctionName,"End");
+   }
+
+	/*
+	* Exit the program
+	* exit(0) is succesful exit.
+	*/
+	exit(0);
+
+} // Winmain
+
+/*
+*
+* Function  local_print_document
+* Author    N K Nanjayan
+* Purpose   To print the document containing Local Language.
+*
+*/
+int LocalPrintDocument()
+{
+	char	*lv_file_name; 
+	char	*lv_err_file_name; 
+	char	*lv_err_str; 
+	char	*lv_printer_name;
+	char	*lv_queue_name;
+	char	lv_cmd[256];
+	char	LVFunctionName[64];
+	char	wordir[20];
+	char	LV_Str[3] = ".";
+	char	LV_DOCName[40];
+	char	*lv_tmpstr, *lv_tmpstr2;
+	DWORD	dw;
+	FILE	*cmdfp;
+	FILE	*errfp;
+	char	cmdfilename[100], WorkingDir[100];
+
+	
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+
+	if (IS_TRACING) 
+	{
+		strcpy(LVFunctionName, "LocalPrintDocument()"); 
+		Trace(LVFunctionName,"Begin");
+	}
+
+    ZeroMemory( &si, sizeof(si) );
+    si.cb = sizeof(si);
+    ZeroMemory( &pi, sizeof(pi) );
+
+	/*
+	* Get the file name.
+	*/
+	lv_file_name=(char *)malloc(201*sizeof(char));
+	strcpy(lv_file_name,"");
+	strcpy(lv_file_name,BVReportFileName.arr);
+	GVDocName	=strtok(lv_file_name,GV_Sep);
+	while(GVDocName !=NULL)
+	{
+	//Get next token:
+	if (strstr(GVDocName,LV_Str) != NULL)
+	{
+		strcpy(LV_DOCName,"");
+		strcat(LV_DOCName,GVDocName);
+		exit;
+	}
+	GVDocName = strtok( NULL, GV_Sep);
+	}
+
+	strcpy(lv_file_name,LV_DOCName);
+	GetPrivateProfileStringA("Reports","Dir","",wordir,sizeof(wordir),"eHIS.ini");
+
+	/*
+	* Get the printer name.
+	*/
+	lv_printer_name=(char *)malloc(100*sizeof(char));
+	strcpy(lv_printer_name,"");
+	strcpy(lv_printer_name,BVPrinterName.arr);
+	
+	BVPrinterName.arr[0]='\0';
+	BVPrinterName.len = strlen(BVPrinterName.arr);
+
+	/*
+	* Get the queue name.
+	*/
+	lv_queue_name=(char *)malloc(100*sizeof(char));
+	strcpy(lv_queue_name,"");
+	strcpy(lv_queue_name,BVQueueName.arr);
+	lv_tmpstr=strtok(lv_queue_name, "\\\\");
+	lv_tmpstr2=strtok(NULL, "\\");
+
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "File=<%s>    Printer=<%s>", lv_file_name, lv_printer_name); 
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	/*
+	* Set the report type.
+	* LOCAL means the report is having local language characters.
+	* Only for LOCAL Language eHISPrint is Called
+	*/
+	strcpy(bv_report_type.arr,"");
+	strcpy(bv_report_type.arr,"LOCAL");
+	bv_report_type.len = strlen(bv_report_type.arr);
+
+	/*
+	* Create CMD file.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"Initializing for eHISPrint.EXE ...");
+    GetPrivateProfileStringA("Reports","Dir","",WorkingDir,sizeof(WorkingDir),"eHIS.ini");
+	sprintf(cmdfilename, "%seHISPRINT.CMD", WorkingDir);
+	cmdfp =	fopen (cmdfilename, "w");
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "eHISPrint.EXE;BVDocumentID[%s];WorkingDir[%s];lv_file_name[%s];lv_printer_name[%s];GVNoOfCopiesNumber[%d];bv_report_type[%s]",BVDocumentID.arr,WorkingDir,lv_file_name,lv_printer_name,GVNoOfCopiesNumber, bv_report_type.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	fprintf(cmdfp,"eHISPrint.EXE;%s;%s;%s;%s;%d;%s",BVDocumentID.arr,WorkingDir,lv_file_name,lv_printer_name,GVNoOfCopiesNumber, bv_report_type.arr);
+	fclose(cmdfp);
+
+	/* Start the child process.  */
+	if (IS_TRACING) Trace(LVFunctionName,"Calling eHISPrint.EXE ...");
+    if( !CreateProcess
+		( 
+			NULL,			// No module name (use command line). 
+			"eHISPrint.EXE",	// Command line. 
+			NULL,			// Process handle not inheritable. 
+			NULL,			// Thread handle not inheritable. 
+			FALSE,			// Set handle inheritance to FALSE. 
+			0,				// No creation flags. 
+			NULL,			// Use parent's environment block. 
+			NULL,			// Use parent's starting directory. 
+			&si,			// Pointer to STARTUPINFO structure.
+			&pi				// Pointer to PROCESS_INFORMATION structure.
+		)
+    ) 
+    {
+        if (IS_TRACING) 
+		{
+			Trace(LVFunctionName, GVTraceMsg);
+		}
+    }
+	else
+	{
+		if (IS_TRACING) Trace(LVFunctionName, "eHISPrint.EXE run successfully!!");
+
+		/* Check for any errors if any */
+		lv_err_file_name=(char *)malloc(201*sizeof(char));
+		sprintf(lv_err_file_name,"%s%s.Err",WorkingDir,BVDocumentID.arr);
+		if ((errfp = fopen (lv_err_file_name, "r")) == NULL)
+		{
+			/* 
+				Error file not available!!
+				That means, there was no error reported from eHISPrint.EXE 
+			*/
+		}
+		else
+		{
+			/*
+				Error file available.
+				Read the contents and Log in MEDICOM.
+			*/
+			lv_err_str=(char *)malloc(700*sizeof(char));
+			fgets(lv_err_str,MAXNUM,errfp);
+			if (IS_TRACING) Trace(LVFunctionName, lv_err_str);
+			fclose(errfp);
+
+			//get_message("SY2437",err);
+			//sprintf(err_text,"APP-SY2437 %s - %s - %s", BV_Rep_File_Name.arr, err, lv_err_str);
+			//LogTheError(1,1);
+		}
+
+	}
+
+	/* Wait until child process exits. */
+    WaitForSingleObject( pi.hProcess, INFINITE );
+
+	/* Close process and thread handles. */
+    CloseHandle( pi.hProcess );
+    CloseHandle( pi.hThread );
+
+
+	/* Read ERR file (if any) and write MEDICOM */
+	// Continue  here.
+
+	if (IS_TRACING) 
+	{
+		Trace(LVFunctionName,"End");
+	}
+
+	get_sleep();   //Function is added for sleeping process for MF-SCF-0015
+
+	return 1;
+
+} /* End of LocalPrintDocument() */
+
+
+/*
+*
+* Function  print_document
+* Author    K S Sundar
+* Purpose   To print the document.
+*
+*/
+int print_document()
+{
+	char LVFunctionName[64];
+	int pageno=0,last_ocur=0;
+	int change, ct_page, frst_char=0, len;
+	int found, char_found, brk_found;
+	int j=0,i=0,no_page=0,no_line=0, first_line;
+	char *str,*lpData;
+	DOC_INFO_1 di;
+	DWORD  dwJob,dwBytesWritten,dwReq,dwUsd;
+	/* Commented and memory allocated dynamically for PRINTER_INFO_2 type variable
+	PRINTER_INFO_2 	pPrinterInfo[100]; */
+    PRINTER_INFO_2 *pInfo2 = NULL;
+	char ch;
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "print_document()");
+		Trace(LVFunctionName,"Begin");
+	}
+
+	/*
+	* Check the existence of the printer.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"OpenPrinter");
+	if(! OpenPrinter(BVPrinterName.arr,&hPrinter,NULL))
+	{
+		GetMEDICOMMessage("SY2437",gv_err_msg);
+		sprintf(GVTraceMsg,"APP-SY2437 %s",gv_err_msg);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		free(BVPrinterName.arr);
+		free(GVReportFileName);
+		return 0;
+	}
+	
+	/*
+	* Get the attributes of the printer.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"GetPrinter 1");
+	if (IS_TRACING) Trace(LVFunctionName,"Before GetPrinter 1"); /* GopiKannan */
+	if(! GetPrinter(hPrinter,2,NULL,0,&dwReq))
+	{
+		if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+		{
+		    GetMEDICOMMessage("SY2437",gv_err_msg);
+	           sprintf(GVTraceMsg,"APP-SY2437 %s",gv_err_msg);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+			return 0;
+		}
+	}
+	
+	/* Code added on 17.07.08 */
+	pInfo2 = (PRINTER_INFO_2 *) malloc(dwReq);
+	if(!(pInfo2))
+		return 0;
+	//Upto here
+
+	/*
+	* Get the attributes of the printer.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"GetPrinter 2");
+	/*if(! GetPrinter(hPrinter,2,(LPBYTE)pInfo2,dwReq,&dwReq)) */
+	
+	if (IS_TRACING) Trace(LVFunctionName,"Before GetPrinter 2"); /* GopiKannan */
+	if(! GetPrinter(hPrinter,2,(LPBYTE)pInfo2,dwReq,&dwUsd)) /* Added by Gopi Kannan for ML-SD-SCF-3322 Printer */
+	{
+		{
+		    GetMEDICOMMessage("SY2437",gv_err_msg);
+	        sprintf(GVTraceMsg,"APP-SY2437 %s",gv_err_msg);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+			return 0;
+		}
+	}
+	
+	if (IS_TRACING) Trace(LVFunctionName,"Outside-1 GetPrinter 2 "); /* GopiKannan */
+	
+	di.pDocName	   = BVReportFileName.arr; 
+    di.pOutputFile = NULL; 
+    di.pDatatype   = NULL; 
+	
+	/*
+	* Check if there is any Printer Error.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"Check for Printer Errors");
+	if(IsPrinterError(hPrinter)==1)
+	{
+		GetMEDICOMMessage("SY2436", gv_err_msg);
+		sprintf(GVTraceMsg,"APP-SY2436 %s - %s",BVPrinterName.arr,gv_err_msg);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 0;
+	}
+
+	/*
+	* Start the printing.
+	*/
+	if (IS_TRACING) Trace(LVFunctionName,"StartDocPrinter");
+	if((dwJob=StartDocPrinter(hPrinter,1,(LPSTR)&di))==0)
+	{	
+		GetLastErrorMessage();
+		sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,GVLastErrorMessage);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 0;
+	}
+
+	if (IS_TRACING) Trace(LVFunctionName,"StartPagePrinter");
+	if (!StartPagePrinter(hPrinter))
+	{ 
+		EndDocPrinter(hPrinter);
+		ClosePrinter(hPrinter);
+		GetMEDICOMMessage("SY2437", gv_err_msg);
+		sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 0;
+	}
+
+	/*
+	* Open file.
+	*/
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg,"Opening file [%s] ...", GVReportFileName);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+	if ((fp = fopen (GVReportFileName, "rb")) == NULL)
+	{
+		GetLastErrorMessage();
+		sprintf(GVTraceMsg,"Unable to open file [%s] : [%s] ",GVReportFileName,GVLastErrorMessage);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 0;
+	}
+
+	/*
+	* Decide the from/to page and number of copies to be printed
+	*/
+	str = (char *) malloc (MAXNUM * sizeof(char));	 
+	lpData = (char *) malloc (MAXNUM * sizeof(char));	 
+	strcpy(lpData,"\0");
+
+	if (IS_TRACING)
+	{ 
+		sprintf(GVTraceMsg, "NumOfCopies=[%d]   FromPage=[%d]    ToPage=[%d]", GVNoOfCopiesNumber, GVFromPageNumber, GVToPageNumber);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+
+
+	for(;fgets(str,MAXNUM,fp);) //Start For1
+	{	
+
+		found=0;
+
+		/*		
+		* Suppress the first empty page.
+		*/
+
+        if ( (first_line == 1) && (str[0] == 12) )
+		{
+			i = 1;
+		}
+		else
+			i = 0;
+		
+		
+
+		for(;str[i];i++)  // Start For2
+		
+  		 if (str[i]==12) //Start If2
+		 {
+
+		    found = 1;
+			pageno = pageno++;
+
+			strncat(lpData,str,i+1);
+
+			if(pageno >= GVFromPageNumber && pageno <= GVToPageNumber)
+		    {
+
+				/*		
+				* In Lexmark Printers, the page is not terminate with PAGE BREAK,
+				* last page is not printing and it goes to waiting mode. 
+				* In HP, no problem for the same
+				* To avoid the Waiting Mode problem in Lexmark, Here we are 
+				* including PAGE BREAK externally.
+				*/
+
+				len = strlen(lpData);
+		
+				if (len > 3)
+				{
+					if (lpData[len-1] != 12) 
+						strcat(lpData,"\f");
+				}
+
+				if(!WritePrinter(hPrinter,lpData,strlen(lpData),&dwBytesWritten))
+				{
+					EndPagePrinter(hPrinter);
+					EndDocPrinter(hPrinter);
+					GetMEDICOMMessage("SY2437", gv_err_msg);
+					sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+					RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+					if (IS_TRACING) Trace(LVFunctionName,"End");
+				    return 0;
+				}
+
+				if(!EndPagePrinter(hPrinter))
+				{
+					EndDocPrinter(hPrinter);
+					GetMEDICOMMessage("SY2437", gv_err_msg);
+					sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+					RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+					if (IS_TRACING) Trace(LVFunctionName,"End");
+				    return 0;
+				}
+
+				if (!StartPagePrinter(hPrinter))
+				{ 
+					EndDocPrinter(hPrinter);
+					GetMEDICOMMessage("SY2437", gv_err_msg);
+					sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+					RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+					if (IS_TRACING) Trace(LVFunctionName,"End");
+				    return 0;
+				}
+
+				if (IS_TRACING)
+				{
+					sprintf(GVTraceMsg, "Page %d printed", pageno);
+					Trace(LVFunctionName, GVTraceMsg);
+				}
+					
+		
+			}//END PAGE COUNT
+			 strcpy(lpData,"\0");
+			 strcpy(lpData,str+(i+1));
+
+			/*
+			* Re-initialize the buffer (lpData).
+			*/
+			free (lpData);
+			if ((lpData = (char *) malloc (MAXNUM * sizeof (char))) == NULL)	 
+			{
+				MessageBox(hwnd, "Unable to allocate memory !!", "Error", MB_OK);
+			    return 0;
+			}
+			strcpy(lpData,"\0");
+
+		  }//END IF2
+
+		if(found==0)
+		{
+
+			/*
+			*	Suppress first page break 
+			*/
+			if ( (first_line == 1) && (str[0] == 12) )
+			{
+			  strcat(lpData, str+1);
+			}
+			else
+			{
+			  strcat(lpData,str);
+			}
+
+			if ((lpData = realloc (lpData, _msize(lpData) +(MAXNUM * sizeof(char)))) == NULL)	 
+			{
+				MessageBox(hwnd, "Unable to allocate memory !!", "Error", MB_OK);
+			    return 0;
+			}
+
+		}
+
+		first_line = 2;
+
+	}//End For1
+
+	pageno++;
+	fclose(fp);
+
+    if(pageno >= GVFromPageNumber && pageno<= GVToPageNumber) //end Page no count
+    {
+	  //strcat(lpData,"\f"); //Commented by Sathya(19/8/98)for Page eject control
+		
+		char_found = 0;
+		brk_found  = 0;
+
+		len = strlen(lpData);
+
+		// In Lexmark Printers, the page is not terminate with PAGE BREAK,
+		// last page is not printing and it goes to waiting mode. 
+		// In HP, no problem for the same
+		// To avoid the Waiting Mode problem in Lexmark, Here we are 
+		// including PAGE BREAK externally.
+
+		for (i=0; lpData[i] != '\0' ; i++)
+		{
+
+            ch = lpData[i];
+
+			if( ((ch>64) && (ch<91)) ||
+                ((ch>47) && (ch<58)) )
+            {
+                char_found = 1;
+            }
+
+            if (ch == 12)
+                brk_found = 1;
+
+            if( (ch == '.') && (lpData[i+1] == 'E') )
+                brk_found = 1;
+
+		}
+
+      if ( (char_found == 1) &&
+	  	   (brk_found  == 0) )
+            strcat(lpData,"\f"); // FOR TESTING
+
+  	  //MessageBox(hwnd, lpData,"Inside Extra Print",MB_OK|MB_ICONSTOP);
+	  
+	  
+		if(!WritePrinter(hPrinter,lpData,strlen(lpData),&dwBytesWritten))
+		{
+			EndPagePrinter(hPrinter);
+			EndDocPrinter(hPrinter);
+			ClosePrinter(hPrinter);
+			free(str );
+			free(lpData);
+			GetMEDICOMMessage("SY2437", gv_err_msg);
+			sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+			return 0;
+		}
+
+
+		if(!EndPagePrinter(hPrinter))
+		{
+			EndPagePrinter(hPrinter);
+			EndDocPrinter(hPrinter);
+			ClosePrinter(hPrinter);
+			free(str);
+			free(lpData);
+			GetMEDICOMMessage("SY2437", gv_err_msg);
+			sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+			return 0;
+		}
+	 
+    }
+
+	if (!EndDocPrinter(hPrinter))
+	{ 
+		ClosePrinter(hPrinter);
+		free(str);
+		free(lpData);
+		GetMEDICOMMessage("SY2437", gv_err_msg);
+		sprintf(GVTraceMsg,"APP-SY2437 %s - %s",BVPrinterName.arr,gv_err_msg);
+		RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, BVReportFileName.arr, BVLocationType.arr, BVLocationCode.arr, BVPrinterID.arr,  BVPrinterName.arr, BVQueueName.arr, LVFunctionName, GVTraceMsg);
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 0;
+	}
+
+	
+	if (IS_TRACING) 
+	{
+		sprintf(GVTraceMsg, "Total number of pages=[%d]", pageno-1);
+		Trace(LVFunctionName,GVTraceMsg);
+		Trace(LVFunctionName,"Close Printer");
+	}
+	ClosePrinter(hPrinter);
+
+	free(BVPrinterName.arr);
+
+	if(str)
+		free(str);
+	if(lpData)
+		free(lpData);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+	get_sleep();   //Function is added for sleeping process for MF-SCF-0015
+
+	return 1;
+
+} // print_document
+
+
+// This is to check the Printer & Job status of the printer
+int IsPrinterError(HANDLE hPrinter)
+{ 
+	JOB_INFO_2  *pJobs;
+	int			cJobs,i;
+	DWORD		dwPrinterStatus;
+	char	err[100];
+	char	LVFunctionName[64];
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "IsPrinterError()");
+		Trace(LVFunctionName,"Begin");
+	}
+
+
+	if(!GetJobs(hPrinter,&pJobs,&cJobs,&dwPrinterStatus))
+	   return 0;
+
+	if(dwPrinterStatus & (PRINTER_STATUS_ERROR |
+					PRINTER_STATUS_PAPER_JAM |
+					PRINTER_STATUS_PAPER_PROBLEM |
+					PRINTER_STATUS_NOT_AVAILABLE |
+					PRINTER_STATUS_NO_TONER |
+					PRINTER_STATUS_OUT_OF_MEMORY |
+					PRINTER_STATUS_USER_INTERVENTION))
+	{
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return 1;
+	}
+
+	// This is to check the jobs status of the printer
+	/*	
+	for( i=0; i<cJobs;i++)
+	{
+
+		if(pJobs[i].Status & JOB_STATUS_PRINTING)
+		{
+			if( pJobs[i].Status & (JOB_STATUS_ERROR | JOB_STATUS_BLOCKED_DEVQ ))
+			{
+				return 1;
+			}
+		}
+	}
+	*/
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+	return 0;
+
+}
+
+
+
+BOOL GetJobs(HANDLE hPrinter, JOB_INFO_2 **ppJobInfo, int *pcJobs, DWORD *pStatus)
+{ 
+
+	DWORD cByteNeeded, nReturned,cByteUsed;
+	JOB_INFO_2 *pJobStorage =  NULL;
+	PRINTER_INFO_2  *pPrinterInfo = NULL;
+
+	char LVFunctionName[64];
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "GetJobs()");
+		Trace(LVFunctionName,"Begin");
+	}
+
+
+	if(!GetPrinter(hPrinter,2,NULL,0,&cByteNeeded))
+	{
+		if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+		  return FALSE;
+	}
+
+	pPrinterInfo = (PRINTER_INFO_2 *) malloc(cByteNeeded);
+	if(!(pPrinterInfo))
+		return FALSE;
+
+	if(!GetPrinter(hPrinter,2,(LPSTR)pPrinterInfo,cByteNeeded,&cByteUsed))
+	{
+		free(pPrinterInfo);
+		pPrinterInfo = NULL;
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return FALSE;
+	}
+
+	if(!EnumJobs(hPrinter,0,pPrinterInfo->cJobs,2,NULL,0,&cByteNeeded,&nReturned))
+	{
+		if(GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+		{
+			free(pPrinterInfo);
+			pPrinterInfo = NULL;
+			if (IS_TRACING) Trace(LVFunctionName,"End");
+			return FALSE;
+		}
+	}
+
+	pJobStorage = (JOB_INFO_2 *)malloc(cByteNeeded);
+	if(!pJobStorage)
+	{
+		free(pPrinterInfo);
+		pPrinterInfo = NULL;
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return FALSE;
+	}
+
+	ZeroMemory(pJobStorage,cByteNeeded);
+	if(!EnumJobs(hPrinter,0,pPrinterInfo->cJobs,2,(LPBYTE)pJobStorage,
+				cByteNeeded,(LPDWORD)&cByteUsed,(LPDWORD)&nReturned))
+	{
+		free(pPrinterInfo);
+		free(pJobStorage);
+		pJobStorage = NULL;
+		pPrinterInfo = NULL;
+		if (IS_TRACING) Trace(LVFunctionName,"End");
+		return FALSE;
+	}
+
+	*pcJobs = pPrinterInfo->cJobs;
+	*pStatus = pPrinterInfo->Status;
+	*ppJobInfo = pJobStorage;
+	free(pPrinterInfo);
+
+	if (IS_TRACING) Trace(LVFunctionName,"End");
+
+	return TRUE;
+
+}
+
+int GetReportType()
+{
+	char	LVFunctionName[64];
+
+	if (IS_TRACING)
+	{
+		strcpy(LVFunctionName, "GetReportType()");
+		Trace(LVFunctionName,"Begin");
+	}
+
+	/*
+	* Initialize Report Type, Version
+	*/
+	BVReportType.arr[0] = '\0';
+	BVReportType.len	=0;
+	strcpy(BVReportType.arr,"STANDARD");
+	BVReportType.len = strlen(BVReportType.arr);
+
+	EXEC SQL EXECUTE
+		BEGIN
+			IF SM_INSTALLATION_TAB_CHECK THEN
+				:BVVersion21YN := 1;
+			ELSE
+				:BVVersion21YN := 1;
+			END IF;
+		END;
+	END-EXEC;
+
+	if (BVVersion21YN ==1)
+	{
+		strcpy(BVSelectStmt.arr,"SELECT NVL(UPPER(batch_file_name),'STANDARD') FROM sy_online_print_id WHERE online_print_name = :v1");
+		BVSelectStmt.len = strlen(BVSelectStmt.arr);
+
+		EXEC SQL PREPARE prepare_statement FROM :BVSelectStmt;
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "SELECT NVL(UPPER(batch_file_name),'STANDARD') FROM sy_online_print_id WHERE online_print_name =[%s]",BVDocumentID.arr);
+		Trace(LVFunctionName,GVTraceMsg);
+	}
+
+		if ORACLE_ERROR
+		{
+			sprintf(GVTraceMsg,"Error at PREPARE Statement : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, "Prepare Statement", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			strcpy(BVReportType.arr,"STANDARD");
+			BVReportType.len = strlen(BVReportType.arr);
+			return 0;
+		}
+
+		EXEC SQL DECLARE cursor1 CURSOR FOR prepare_statement;
+		if ORACLE_ERROR
+		{
+			sprintf(GVTraceMsg,"Error at DECLARE cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, "Declare Cursor", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			strcpy(BVReportType.arr,"STANDARD");
+			BVReportType.len = strlen(BVReportType.arr);
+			return 0;
+		}
+		
+		EXEC SQL OPEN cursor1 USING :BVDocumentID;
+		if ORACLE_ERROR
+		{
+			sprintf(GVTraceMsg,"Error at OPEN cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, "Open Cursor", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			strcpy(BVReportType.arr,"STANDARD");
+			BVReportType.len = strlen(BVReportType.arr);
+			return 0;
+		}
+
+		EXEC SQL FETCH cursor1 INTO :BVReportType;
+		BVReportType.arr[BVReportType.len] = '\0';
+		if (ORACLE_ERROR || ORACLE_NODATAFOUND)
+		{
+			/*
+			* Register error
+			*/
+			if ORACLE_ERROR
+			{
+				sprintf(GVTraceMsg,"Error at FETCH cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+				RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, "Fetch Cursor", GVTraceMsg);
+			}
+		}
+		EXEC SQL CLOSE cursor1;
+		
+		if ORACLE_ERROR
+		{
+			sprintf(GVTraceMsg,"Error at OPEN cursor : [%s]",sqlca.sqlerrm.sqlerrmc);
+			RegisterError(BVFacilityID.arr, BVModuleID.arr, BVWorkstationID.arr, BVDocumentID.arr, "Open Cursor", GVTraceMsg);
+			if (IS_TRACING) Trace(LVFunctionName, "End");
+			BVReportType.len = strlen(BVReportType.arr);
+			return 0;
+		}
+
+	}
+
+	if (IS_TRACING)
+	{
+		sprintf(GVTraceMsg, "LOCAL/STANDARD Report=[%s]  BVVersion21YN=[%d]", BVReportType.arr, BVVersion21YN);
+		Trace(LVFunctionName,GVTraceMsg);
+		Trace(LVFunctionName, "End");
+	}
+	return(0);
+}//GetReportType
+
+void get_sleep()
+{
+ 
+  sleep_sec = (DWORD) atol(d_sleep_secs.arr);
+
+           if (sleep_sec)
+             Sleep(sleep_sec);
+}

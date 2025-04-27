@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>OR_CS_OC_Charting</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Charting</h1>
+<p class="BoldRFD" style="font-weight: normal;">The reporting characteristics of the Order Catalog are defined under ‘Charting’. The screen gets displayed on clicking the tab.</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Department Only</span> - Select the check box, if the Order Catalog is applicable to department. On selecting the check box, the Order Catalog is available only to the practitioners in the Department. If the Department only is not selected then catalog is displayed in new orders.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Complete On Order</span> - Select the check box, if order is to be completed on placing. If selected, the result reporting cannot be performed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Billable</span> - Select the check box, if this Order catalog is to be billed. The check box appears only if the Patient Billing Manager module is enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charge Type Applicable</span> - Select Charge type as 'Single' or 'Multi'. The drop down list appears only if 'Billable' is selected. If charge type is selected as 'Multi', different charge types are applicable for the Order Catalog.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Chart Applicable</span> - Select the check box, if resulting is required for the defined Order Catalog. This field is disabled, if 'Complete on Order' is selected. If chart is applicable, the Chart Result Type and Discrete measure are mandatory. If Chart Applicable is cleared, the fields under Charting Characteristics and Procedure Link are disabled. &#160;The characteristics are inherited from the Order Category associated to the Order Catalog.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Confidential</span> - Select the check box, if the order catalog is confidential. You can select the check box, only if the ‘Chart Applicable’ check box is selected.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Charting Characteristics</p>
+<p class="BoldRFD" style="font-weight: normal;">The basic resulting characteristics are defined for the Order Catalog.</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Authorization Required</span> - Select the check box, if authorization is required for resulting. This field is disabled, if 'Chart Applicable' is cleared. If the check box is selected, on result reporting for the order, the system will post the result for Result Authorization.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nature</span> - Select the Nature of the Order Catalog as Individual (Single order catalog) or Panel (discrete measures defined). Panel is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Chart Result Type</span> - Select the Chart Result Type from the list. The values displayed are Discrete Measure, Result Matrix, Note Type and Charting. If 'Nature' is selected as 'Panel', 'Patient Care Panel' defined in the Application Masters are listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Charting</span> - Select the Chart using <span class="BoldNumberRFD">[?]</span> function. This field is displayed on selecting the Chart Result Type as Charting.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Discrete Measure/Result Matrix/Note/Procedure</span> - Select either Discrete Measure/Result Matrix/Note by clicking [?] function to capture the result features. If the Nature of the Order Catalog is 'Individual', the discrete measures populated in the search result screen are individual components. For nature as 'Panel', discrete measures of type Patient Care Panel are displayed. Discrete measure is populated from Application Masters module. If 'Procedure' is selected, select the Procedure Type and Procedure. This is a mandatory field.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Procedure Link</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Applicable</span> - Select a value from the list. The values are system defined - 'Not applicable', 'Auto-Link' and 'Manual-Link'. If Auto-Link is selected, select the Term Set ID and enter Term Code. If ''Manual Link' is selected, select 'At Resulting' as either ‘Optional’ or ‘Mandatory’. The Order Catalog selected as Manual-Link gets listed in the 'Order Catalog to Procedure link' function. The field is applicable if 'Nature' is selected as 'Individual'.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Non Fully Paying Patient</u></span> – &#160;Select the check box if the order catalog belongs to non-fully paying patient (NFPP) category. By d efault, the check box is selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Fully Paying Patient</u></span> – Select the check box if the order catalog belongs to fully paying patient (FPP) category. When the check box is selected ‘Applicable FPP Category’ drop-down list gets enabled.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span style="text-decoration: underline;"><u>Applicable FPP Category</u></span> – Select the applicable FPP category value from the drop-down list. The list values include Simple, Moderate and Complex. &#160;By default, the value ‘Simple’ is displayed.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" />If both Complete on Order and Chart applicable are selected, Auto Report is generated for the Order Catalog. This is not applicable for of the &#160;Order Categories - Laboratory, Miscellaneous, Monitoring and Trmt/Procedure.</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

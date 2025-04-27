@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 8" />
+<title>IP_Trans_RequestforTransfer</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<p class="BoldRFD">Enter the following details:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Transfer</span> – Select the Reason for Transfer from the list. This field is mandatory. The values in the Reason for Transfer list are defined in the ‘Transfer Type’ function of IP Code Setup.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Preferred Date/Time</span> – The system date/time is displayed as the preferred date/time. This field can be changed. Enter the preferred date and time in dd/mm/yyyy hh: mm format or select the date and time from the calendar function. This field is mandatory. The entered date and time must be greater than or equal to current system date and time.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> – Select the Priority from the list.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Nursing Unit Details</p>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Transfer To</p>
+<ol start="4" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Unit</span> – Select the Nursing Unit to transfer the patient from <span class="BoldNumberRFD">[?]</span> function. Transfer to the same nursing unit is not allowed. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> - Select a Service from list of valid values. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Sub-Service</span> – Select a Sub Service that is associated to the service selected from the list.</p>
+</li>
+</ol>
+<p class="BoldRFD" style="font-weight: normal;">If the user performing the request for transfer has the privilege of confirming such requests, as defined by the selecting the flag ‘Bed Class Change’ against the operator station to which the logged in user is attached to, the change for Bed Class request is confirmed in this transaction itself and the transfer of the patient is completed. If the logged in user does not have the privilege, all such requests are routed to the ‘Confirm Bed Class Change’ function where an authorized user confirms the bed class change after which the request for patient transfer is completed.</p>
+<ol start="7" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Class</span> - The Bed Class associated to the patient is displayed. The value can be changed if the ‘Request for Bed Class Change’ check box is selected. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Type</span> - The Bed Type associated to the patient is displayed. The value can be changed if the ‘Request for Bed Class Change’ check box is selected. The values are displayed based on the bed class selected. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed No</span> – The Bed cannot be specified at this stage.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Room/Cubicle No</span> – The Room/Cubicle number is not displayed as the bed is not selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> – If the Nursing Unit caters to multiple Specialties, a Specialty can be associated by entering the Specialty or using <span class="BoldNumberRFD">[?]</span> function. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Attending Practitioner</span> – The Name of the Practitioner currently attending the patient is displayed. The name of the Practitioner can be changed if required. Enter the name of the Practitioner or select the Practitioner from <span class="BoldNumberRFD">[?]</span> function for the selected Specialty. This is a mandatory field.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Medical Team</span> – The Medical Team (if any) associated to the selected practitioner is displayed. The Medical Team can be changed if required. Select the Medical Team from among the values in the list. The values populated correspond to the selected practitioner.</p>
+</li>
+</ol>
+<p class="Text">&#160;</p>
+<p class="BoldRFD">Reserve Bed Details</p>
+<ol start="14">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reserve Bed</span> - Select the check box to Reserve the Bed</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Reserve Bed</span> - Select the Reason for Reservation from the list.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

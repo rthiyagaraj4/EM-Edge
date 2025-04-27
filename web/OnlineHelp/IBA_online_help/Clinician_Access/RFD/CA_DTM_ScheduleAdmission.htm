@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>CA_DTM_ScheduleAdmission</title>
+<link rel="StyleSheet" href="../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<p class="BoldRFD">Enter the following details to create a Booking:</p>
+<p class="BoldRFD">&#160;</p>
+<ol>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Procedure/Surgery Date Time</span> – Enter the date of procedure/surgery or select the date by clicking the Calendar function. The Procedure/Surgery Date Time must be greater than or equal to the preferred admission date/time and lesser than the expected days of stay (if entered).</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Pre-Op Preparation Days</span> – Enter the number of days for preparation before Operation.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Preferred Admission Date/Time</span> – Enter the preferred date and time for admission in the dd/mm/yyyy hh:mm format or use the Calendar function to select the required date and time. Advance booking is performed within the period specified in IP Parameter ('Max allowable period for advance bed booking [] days') from the current system date and time. This field is mandatory.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Referral ID</span> – Enter the Referral ID of the patient in alphanumeric format of 14 characters or select the referral ID using <span class="BoldNumberRFD">[?]</span> function to get the ‘Referral Search’ screen.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Medical Service Group</span> – Select an option from the available values in the list. Only those medical service groups that are attached to nursing unit types, which are in turn, attached to a single/multiple nursing units are displayed. The selected medical service group indicates the group under which the patient is being booked. This field is mandatory. For the selected medical service group, if the maximum daily bookings or the maximum monthly bookings are specified, the system checks for the set rules during every booking being made. Once the values set are exceeded, the subsequent bookings are not allowed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Booking Ref No</span> – The Booking Reference Number is auto generated or entered manually based on the selected medical service group. If system generates booking reference number for the selected medical service group, you are not allowed to enter the number. Otherwise, the system prompts you to enter the booking reference number by making the field entry mandatory. Enter the Booking Reference Number in alphanumeric format of 12 characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Expected Days of Stay</span> – Enter the expected number of days the patient would be staying in numeric format of three characters maximum length.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Expected Discharge Date Time</span> - The Expected Date and Time the patient would be discharged is displayed depending on the Expected Days of Stay entered.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Priority</span> - Select the booking priority from the list. The listed values are ‘Non-Urgent’ and ‘Urgent’.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Patient Details</p>
+<ol start="10" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD">Enter Patient details.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Contact Details</span> – Click the button to enter the address details of the Patient. If address details are already available for a registered Patient, they are displayed. After entering the contact details, click <span class="BoldNumberRFD">[Close]</span> to close the contact details screen.</p>
+</li>
+</ol>
+<p class="BoldRFD">&#160;</p>
+<p class="BoldRFD">Booking Details</p>
+<ol start="12" type="1">
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Reason for Admission/Booking</span> – Select the reason for admission using <span class="BoldNumberRFD">[?]</span> function. All the reasons for admission defined in the ‘Reason’ function of the Application Masters module are available for selection.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">View Open Bookings</span> – Click the hyperlink to view open bookings of the patient.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Specialty</span> – Enter the specialty in alphanumeric format of 15 characters maximum length or select the specialty using <span class="BoldNumberRFD">[?]</span> function. This is a mandatory field. All the specialties from the “Application Masters” module are displayed. Only those specialties associated to the Nursing Unit(s) belonging to the nursing unit types associated to the selected Medical Service Group is listed.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Admitting Practitioner</span> – Enter the name of the practitioner admitting the patient in alphanumeric format of 30 characters maximum length or select the practitioner using <span class="BoldNumberRFD">[?]</span> function. The listed practitioners in <span class="BoldNumberRFD">[?]</span> function correspond to the selected specialty.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Medical Team</span> - Select the medical team from the list. This field is enabled only if the admitting practitioner is selected. The values displayed correspond to the Medical Team to which the admitting practitioner is associated in ‘Practitioner for Medical Team’ in Application Masters module.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Nursing Unit</span> – Select the Nursing Unit from <span class="BoldNumberRFD">[?]</span> function. The Nursing Unit displayed corresponds to the selected practitioner.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Service</span> – Select the required Service from the list. The primary specialty of the selected Nursing Unit is displayed, by default.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Class</span> – Select the Bed Class from the list</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed Type</span> – Select the Bed Type based on the selected Bed Class.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Bed No</span> – Select the Bed Number from the <span class="BoldNumberRFD">[?]</span> function.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Room/Cubicle No</span> – The Room or Cubicle No. is displayed based on the Bed Number selected.</p>
+</li>
+<li class="p-NumberRFD">
+<p class="NumberRFD"><span class="UnderlineRFD">Override</span> – Select the check box if the selected bed is overridable.</p>
+</li>
+</ol>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

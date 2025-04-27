@@ -1,0 +1,232 @@
+package jsp_servlet._eph._jsp;
+
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import javax.servlet.jsp.*;
+import javax.servlet.jsp.tagext.*;
+import java.util.*;
+import java.sql.*;
+import webbeans.eCommon.*;
+import ePH.*;
+import ePH.Common.*;
+import eCommon.Common.*;
+import java.text.*;
+import java.lang.*;
+import java.util.*;
+import java.lang.*;
+import eCommon.XSSRequestWrapper;
+import java.util.*;
+import com.ehis.util.*;
+
+public final class __drugclassforordertypequerycriteria extends  weblogic.servlet.jsp.JspBase  implements weblogic.servlet.jsp.StaleIndicator {
+
+    private static void _releaseTags(javax.servlet.jsp.PageContext pageContext, javax.servlet.jsp.tagext.JspTag t) {
+        while (t != null) {
+            weblogic.servlet.jsp.DependencyInjectionHelper.preDestroy(pageContext, t);
+            if(t instanceof javax.servlet.jsp.tagext.Tag) {
+                javax.servlet.jsp.tagext.Tag tmp = (javax.servlet.jsp.tagext.Tag)t;
+                t = ((javax.servlet.jsp.tagext.Tag) t).getParent();
+                try {
+                    tmp.release();
+                } catch(java.lang.Exception ignore) {}
+            }
+            else {
+                t = ((javax.servlet.jsp.tagext.SimpleTag)t).getParent();
+            }
+        }
+    }
+
+    public boolean _isStale(){
+        boolean _stale = _staticIsStale((weblogic.servlet.jsp.StaleChecker) getServletConfig().getServletContext());
+        return _stale;
+    }
+
+    public static boolean _staticIsStale(weblogic.servlet.jsp.StaleChecker sci) {
+        if (sci.isResourceStale("/eph/jsp/DrugClassForOrderTypeQueryCriteria.jsp", 1742368840269L ,"10.3.6.0","Asia/Calcutta")) return true;
+        if (sci.isResourceStale("/eCommon/jsp/CommonInclude.jsp", 1727947024020L ,"10.3.6.0","Asia/Calcutta")) return true;
+        return false;
+    }
+
+    private static boolean _WL_ENCODED_BYTES_OK = true;
+    private static final java.lang.String _WL_ORIGINAL_ENCODING = "UTF-8".intern();
+
+    private static byte[] _getBytes(java.lang.String block){
+        try {
+            return block.getBytes(_WL_ORIGINAL_ENCODING);
+        } catch (java.io.UnsupportedEncodingException u){
+            _WL_ENCODED_BYTES_OK = false;
+        }
+        return null;
+    }
+
+    private final static java.lang.String  _wl_block0 =" <!--\nFine Tuning\n-->\n";
+    private final static byte[]  _wl_block0Bytes = _getBytes( _wl_block0 );
+
+    private final static java.lang.String  _wl_block1 ="\n";
+    private final static byte[]  _wl_block1Bytes = _getBytes( _wl_block1 );
+
+    private final static java.lang.String  _wl_block2 ="\n\n";
+    private final static byte[]  _wl_block2Bytes = _getBytes( _wl_block2 );
+
+    private final static java.lang.String  _wl_block3 ="\n<script>\n\t\tvar localeName = \"";
+    private final static byte[]  _wl_block3Bytes = _getBytes( _wl_block3 );
+
+    private final static java.lang.String  _wl_block4 ="\";\n</script>\n<script src=\'../../eCommon/js/showModalDialog.js\' language=\'JavaScript\'></script>\n\n";
+    private final static byte[]  _wl_block4Bytes = _getBytes( _wl_block4 );
+
+    private final static java.lang.String  _wl_block5 =" \n\n";
+    private final static byte[]  _wl_block5Bytes = _getBytes( _wl_block5 );
+
+    private final static java.lang.String  _wl_block6 ="\n<link rel=\'StyleSheet\' href=\'../../eCommon/html/";
+    private final static byte[]  _wl_block6Bytes = _getBytes( _wl_block6 );
+
+    private final static java.lang.String  _wl_block7 ="\'type=\'text/css\'></link>\n\n";
+    private final static byte[]  _wl_block7Bytes = _getBytes( _wl_block7 );
+
+    static private weblogic.jsp.internal.jsp.JspFunctionMapper _jspx_fnmap = weblogic.jsp.internal.jsp.JspFunctionMapper.getInstance();
+
+    public void _jspService(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) 
+    throws javax.servlet.ServletException, java.io.IOException {
+
+        javax.servlet.ServletConfig config = getServletConfig();
+        javax.servlet.ServletContext application = config.getServletContext();
+        javax.servlet.jsp.tagext.JspTag _activeTag = null;
+        java.lang.Object page = this;
+        javax.servlet.jsp.PageContext pageContext = javax.servlet.jsp.JspFactory.getDefaultFactory().getPageContext(this, request, response, null, true , 8192 , true );
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        javax.servlet.jsp.JspWriter out = pageContext.getOut();
+        weblogic.servlet.jsp.ByteWriter _bw = (weblogic.servlet.jsp.ByteWriter)out;
+        _bw.setInitCharacterEncoding(_WL_ORIGINAL_ENCODING, _WL_ENCODED_BYTES_OK);
+        javax.servlet.jsp.JspWriter _originalOut = out;
+        javax.servlet.http.HttpSession session = request.getSession( true );
+        try {;
+            response.setContentType("text/html;charset=UTF-8");
+            _bw.write(_wl_block0Bytes, _wl_block0);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block1Bytes, _wl_block1);
+            _bw.write(_wl_block2Bytes, _wl_block2);
+
+	String localeName=(String)session.getAttribute("LOCALE") ;
+	localeName 		 = (localeName == null )?"en":localeName.toLowerCase();
+
+            _bw.write(_wl_block3Bytes, _wl_block3);
+            out.print( String.valueOf(localeName));
+            _bw.write(_wl_block4Bytes, _wl_block4);
+            _bw.write(_wl_block5Bytes, _wl_block5);
+ request.setCharacterEncoding("UTF-8");
+//added By Himanshu for COMMON-ICN-0182 on 17/10/2023 Start.
+request= new XSSRequestWrapper(request); //MMS-ME-SCF-0097
+response.addHeader("X-XSS-Protection", "1; mode=block"); //MMS-ME-SCF-0080
+response.addHeader("X-Content-Type-Options", "nosniff"); //MMS-ME-SCF-0086
+//end.
+	    String locale			= (String)session.getAttribute("LOCALE");
+	 
+	    String sStyle =(session.getAttribute("PREFERRED_STYLE")!=null)||(session.getAttribute("PREFERRED_STYLE")!="")?(String)session.getAttribute
+		("PREFERRED_STYLE"):"IeStyle.css";
+
+            _bw.write(_wl_block6Bytes, _wl_block6);
+            out.print( String.valueOf(sStyle));
+            _bw.write(_wl_block7Bytes, _wl_block7);
+
+	ecis.utils.CommonQueryPage qrypg = new ecis.utils.CommonQueryPage();
+	StringBuffer strbuff = new StringBuffer();
+	String function_id = request.getParameter( "function_id" );
+
+	try {
+		ArrayList finAr = new ArrayList();
+
+		//=============== populating the first item in the firstitem object
+		ArrayList firstItem = new ArrayList();
+		String OrderType = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.OrderType.label","common_labels");
+		firstItem.add("Text");				//	Type of item
+		firstItem.add(OrderType);	//	label
+		firstItem.add("ORDER_TYPE_CODE");	//	name of field
+		firstItem.add("4");					//	SIZE
+		firstItem.add("4");					//	LENGTH
+		finAr.add(firstItem);				//	add to ArrayList obj finAr
+
+		//================= populating the second item in the firstitem object
+		ArrayList secondItem=new ArrayList();
+		String OrderTypeDescription = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"ePH.OrderTypeDescription.label","ph_labels");
+		secondItem.add("Text");				//	Type of item
+		secondItem.add(OrderTypeDescription);	//	label
+		secondItem.add("ORDER_TYPE_DESC");	//	name of field
+		secondItem.add("35");				//	SIZE
+		secondItem.add("30");				//	LENGTH
+		finAr.add(secondItem);				//	add to ArrayList obj finAr
+
+		//================= populating the third item in the firstitem object
+		ArrayList thirdItem=new ArrayList();
+		
+		String DrugClass = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"ePH.DrugClass.label","ph_labels");
+
+		 String all = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.all.label","common_labels");
+
+        String general = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.general.label","common_labels");
+		
+		String Narcotics = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"ePH.Narcotics.label","ph_labels");
+		
+		String Controlled = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"ePH.Controlled.label","ph_labels");
+		
+		
+
+		String tpn_item_list_values="%,"+all+",G,"+general+",N,"+Narcotics+",C,"+Controlled;
+
+
+		thirdItem.add("List");												//	Type of item
+		thirdItem.add(DrugClass);										//	label
+		thirdItem.add("DRUG_CLASS");										//	name of field
+		thirdItem.add(tpn_item_list_values);	//	static values that need to be displayed as option.Send it along with the value that is inserted.
+		thirdItem.add("7");													//	LENGTH
+		finAr.add(thirdItem);												//	add to ArrayList obj finAr
+
+		ArrayList fourthItem = new ArrayList();
+		fourthItem.add("Hidden");		//	Type of item
+		fourthItem.add("function_id");	//	name of field
+		fourthItem.add(function_id);	//	value of field
+		finAr.add(fourthItem);			//	add to ArrayList obj finAr
+
+		//=====================================================================
+		String orderByCols[] = new String[3];
+		String orderByColVals[] = new String[3];
+
+		orderByCols[0] = OrderType;
+		orderByCols[1] = OrderTypeDescription;
+		orderByCols[2] = DrugClass;
+
+		orderByColVals[0] = "A.ORDER_TYPE_CODE";
+		orderByColVals[1] = "B.LONG_DESC";
+		orderByColVals[2] = "A.DRUG_CLASS";
+
+
+String Sort_order = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.SortOrder.label","common_labels");
+String defaultSelect = com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.defaultSelect.label","common_labels");
+String orderBy=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.orderBy.label","common_labels");
+String QueryCriteria=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.QueryCriteria.label","common_labels");
+String ExecuteQuery=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"Common.ExecuteQuery.label","common_labels");
+String DrugClassforOrderType=com.ehis.util.BundleMessage.getBundleMessage(pageContext,"ePH.DrugClassforOrderType.label","ph_labels");
+    
+strbuff = qrypg.getQueryPage(null, finAr,DrugClassforOrderType, "DrugClassForOrderTypeQueryResult.jsp",Sort_order,QueryCriteria,defaultSelect,orderBy, orderByCols, orderByColVals,ExecuteQuery);
+
+		out.println(strbuff.toString());
+	}
+	catch (Exception e) {
+		out.println( "main " + e );
+	}
+
+            _bw.write(_wl_block1Bytes, _wl_block1);
+        } catch (java.lang.Throwable __ee){
+            if(!(__ee instanceof javax.servlet.jsp.SkipPageException)) {
+                while ((out != null) && (out != _originalOut)) out = pageContext.popBody(); 
+                _releaseTags(pageContext, _activeTag);
+                pageContext.handlePageException(__ee);
+            }
+        }
+    }
+}

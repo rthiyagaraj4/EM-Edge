@@ -1,0 +1,968 @@
+/************************************************************************/
+/* OCS MEDICOM VER 1.0                                                  */
+/************************************************************************/
+/* PROGRAM NAME          : BLRLM003.PC                                  */
+/* AUTHOR                :					                            */
+/* DATE WRITTEN          : 22-MAR-2004                                  */
+/*                                                                      */
+/* CALLED FROM           :                                              */
+/*                                                                      */
+/*  FUNCTION             :                                              */
+/*                                                                      */
+/*  TABLE DETAILS                                                       */
+/*                                                                      */
+/*        S. No.       TABLENAMES             INPUT/OUTPUT              */
+/*                                                                      */
+/*                                                                      */
+/*  PARAMETERS           :            -                                 */
+/*                                                                      */
+/*  SUBROUTINES          :                                              */
+/*                                                                      */
+/*         1.        ERR_MESG            err_mesg                       */
+/*                                                                      */
+/*                                                                      */
+/************************************************************************/
+                             
+#include <stdio.h> 
+#include <string.h>
+#include "gl.h"
+
+#define OERROR (sqlca.sqlcode < 0)
+#define LAST_ROW (sqlca.sqlcode == 1403)
+#define NOT_FOUND (sqlca.sqlerrd[2] == 0)
+#define RESOURCE_BUSY        (sqlca.sqlcode == -54)
+#define DUPLICATE_KEY        (sqlca.sqlcode == -1)
+#define ROW_COUNT            (sqlca.sqlerrd[2])
+#define INIT_MESG "Report Generation In Progress"
+#define ESC     0x1B
+#define REP_WIDTH 175
+#define VER  "VER : 10.03\n"
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+    VARCHAR hosp_name                                  [120],
+            uid_pwd                                    [132],
+            date_time                                  [20],
+            user_id                                    [40],
+            nd_session_id                              [16],
+			nd_temp_date							   [21],
+			nd_loc_date[21],
+			date_convert[21],
+            nd_pgm_date                                [25],
+			p_language_id[3],
+            d_curr_pgm_name                            [15];
+
+   
+
+   VARCHAR	bl_patient_id                 [21],
+            nd_patient_name				  [25],
+			epi_type			               [2],
+			bl_episode_id                 [13],
+			bl_visit_id                   [7],
+			bl_reason_code                [3],
+			nd_blng_grp					  [5],
+			nd_blng_desc                [12],
+			nd_user_id                    [21],
+			nd_user_name                  [81],
+			bl_recal_ind				  [2],
+			nd_clinic_code				  [5],
+			l_pk_value	[100],
+			nd_episode_type			[2],
+        nd_from_patient_id		[21],
+        nd_to_patient_id		[21],
+	    nd_from_date			[17],
+	    nd_to_date				[17],
+		nd_adm_date				[17],
+		nd_exemp_code			[7],
+		nd_exemp_desc			[16],
+		nd_from_date_flag		[2],
+		nd_to_date_flag			[2],
+		nd_from_exemp_code		[17],
+	    nd_to_exemp_code		[17],
+		bl_added_by				[31],
+        nd_facility_id   [3],
+		l_translated_value	        [201],
+		nd_added_name			[31];
+
+   int		prt_ctr = 0,first = 1;
+   int i;
+   char loc_legend[999][201]; 
+   char   rep_title[50],string_var[200];
+      
+  
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+EXEC SQL INCLUDE SQLDA.H;
+#include <winproc.h>
+
+int s_lctr = 0,s_pctr = 0;
+int d_lctr = 0,d_pctr = 0;
+int inp_ctr = 1;
+int op_ctr  = 1;
+int ip_prt = 0;
+int op_prt = 0;
+int pctr = 0;
+
+FILE *f2;
+
+int bill_ctr = 0;
+
+
+char hdr_line1[REP_WIDTH+1],
+     hdr_line2[REP_WIDTH+1],
+     hdr_line3[REP_WIDTH+1],
+     hdr_line4[REP_WIDTH+1];
+
+void proc_main(argc,argv)
+char *argv[];
+int argc;
+{
+    int rec_ctr = 0;
+	
+
+    if (argc < 6)
+    {
+     int i = 0;
+       disp_message(ERR_MESG,"Not enough Parameters for running this program");
+       proc_exit();
+    }
+
+	strcpy(uid_pwd.arr,argv[1]);
+      uid_pwd.len = strlen(uid_pwd.arr);
+ 
+      strcpy(g_pgm_id,"BLRLM003");
+
+
+  if(sql_connect() == -1)
+   {
+      disp_message(ERR_MESG,"Error in connecting to Oracle");
+      if (uid_pwd.len == 0)
+         disp_message(ERR_MESG,"Null oracle uid/pwd");
+      proc_exit();
+   } 
+
+
+	set_meduser_role();
+
+    strcpy(d_curr_pgm_name.arr,g_pgm_id); 
+    d_curr_pgm_name.len = strlen(d_curr_pgm_name.arr);
+	
+	strcpy(p_language_id.arr,l_language_id.arr);
+	 p_language_id.len = l_language_id.len; 
+	 
+
+    strcpy(nd_session_id.arr,argv[2]);
+    nd_session_id.len = strlen(nd_session_id.arr);
+    strcpy(g_session_id,nd_session_id.arr);
+
+    strcpy(nd_pgm_date.arr,argv[3]);
+    nd_pgm_date.len = strlen(nd_pgm_date.arr);
+    strcpy(g_pgm_date,nd_pgm_date.arr);
+
+	strcpy(nd_facility_id.arr, argv[4]);
+	nd_facility_id.len = strlen(nd_facility_id.arr);
+    
+ 	//strcpy(OUTPUT_FILE_NAME, argv[5]);
+   
+    fetch_prog_param();
+		fetch_legend_value();
+
+    //strcpy(rep_title,"List of Visits/Admissions with Exemption");
+	//strcpy(rep_title,"List of Exempted Encounters");
+	strcpy(rep_title,loc_legend[001]);
+       
+    declare_exemp_cur();
+
+    fetch_hosp_name();
+
+    open_file();
+     
+    open_exemp_cursor(); 
+
+	print_rep_header();
+
+	print_head();
+
+	prt_ctr = 0; 
+
+	
+      while(fetch_exemp_cursor())
+        {
+        print_rec();
+        } 
+    print_tot();
+ 
+    close_exemp_cursor();     
+    
+    end_of_rep();
+    
+    fclose(f2);
+
+    EXEC SQL COMMIT WORK RELEASE;
+
+    if (OERROR)
+         err_mesg("COMMIT WORK RELEASE failed",0,"");  
+    
+    return;
+}
+
+fetch_prog_param()
+{
+   nd_from_date.arr[0]			='\0';
+   nd_to_date.arr[0]			='\0';
+   nd_episode_type.arr[0]		='\0';
+   nd_from_date_flag.arr[0]		='\0';
+   nd_to_date_flag.arr[0]		='\0';
+   nd_from_exemp_code.arr[0]	='\0';
+   nd_to_exemp_code.arr[0]		='\0';
+   
+   nd_from_date.len				=0;
+   nd_to_date.len				=0;
+   nd_episode_type.len			=0;
+   nd_from_date_flag.len		=0;
+   nd_to_date_flag.len			=0;
+   nd_from_exemp_code.len		=0;
+   nd_to_exemp_code.len			=0;
+   
+   EXEC SQL SELECT PARAM1,
+		   PARAM2,
+		   PARAM3,
+		   PARAM4,
+		   PARAM5,
+		   PARAM6,
+		   PARAM7
+		    INTO 
+			:nd_episode_type,
+            :nd_from_date,
+            :nd_to_date,
+			:nd_from_date_flag,
+			:nd_to_date_flag,
+			:nd_from_exemp_code,
+			:nd_to_exemp_code
+              FROM SY_PROG_PARAM
+             WHERE OPERATING_FACILITY_ID  = :nd_facility_id 
+			   AND PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+        err_mesg("SELECT failed on table SY_PROG_PARAM",0,"");
+
+   nd_from_date.arr[nd_from_date.len]				='\0';
+   nd_to_date.arr[nd_to_date.len]					='\0';
+   nd_episode_type.arr[nd_episode_type.len]			='\0';
+   nd_from_date_flag.arr[nd_from_date_flag.len]		='\0';
+   nd_to_date_flag.arr[nd_to_date_flag.len]			='\0';
+   nd_from_exemp_code.arr[nd_from_exemp_code.len]				='\0';
+   nd_to_exemp_code.arr[nd_to_exemp_code.len]					='\0';
+   
+   if (NOT_FOUND)
+        err_mesg("No Record found in SY_PROG_PARAM",0,"");
+
+
+
+   
+  
+   EXEC SQL DELETE SY_PROG_PARAM
+             WHERE OPERATING_FACILITY_ID = :nd_facility_id 
+			   AND PGM_ID     = :d_curr_pgm_name
+               AND SESSION_ID = :nd_session_id
+               AND PGM_DATE   = :nd_pgm_date;
+
+   if (OERROR)
+         err_mesg("DELETE failed on table SY_PROG_PARAM",0,"");
+   
+}
+
+declare_exemp_cur()
+{
+    EXEC SQL DECLARE BL_EXEMP_CUR CURSOR FOR
+		SELECT DECODE(:nd_episode_type,'I','I','D','D') EP_TYPE,to_char(A.ADMISSION_DATE_TIME,'DD/MM/YYYY HH24:MI') ADM_DATE,
+						  A.PATIENT_ID,A.EPISODE_ID,0 VISIT_ID, 
+                          B.BLNG_GRP_ID, B.CLASSIFICATION_CODE,
+						  A.ADDED_BY_ID
+                   FROM IP_EPISODE A,BL_EPISODE_FIN_DTLS B, BL_CLASSFCTN_CODE C 
+                   WHERE  A.FACILITY_ID = B.OPERATING_FACILITY_ID
+				   AND   A.PATIENT_ID=B.PATIENT_ID
+				   AND   B.OPERATING_FACILITY_ID = C.OPERATING_FACILITY_ID
+				   AND   B.CLASSIFICATION_CODE = C.CLASSIFICATION_CODE
+				   AND   A.ADMISSION_DATE_TIME BETWEEN TO_DATE(NVL(:nd_from_date,'01/01/1000'),'DD/MM/YYYY')
+		                 AND TO_DATE(NVL(:nd_to_date,'01/01/3000'),'DD/MM/YYYY')
+				   AND   A.EPISODE_ID=B.EPISODE_ID
+				   AND   C.CLASSIFICATION_TYPE = 'SC'
+				   AND   NVL(B.CLASSIFICATION_CODE,'!!!!!!') BETWEEN NVL(:nd_from_exemp_code,'!!!!!!')	AND NVL(:nd_to_exemp_code,'~~~~~~')
+				   AND   NVL(A.EPISODE_STATUS,'X') != '9'
+				   --AND   DECODE(:nd_episode_type,'B','I','I','I')='I' 
+				   AND  :nd_episode_type IN('I','D')  
+				   AND     A.episode_type=:nd_episode_type
+				   UNION
+				   	    SELECT DECODE(:nd_episode_type,'O','O','E','E') EP_TYPE,to_char(A.VISIT_REGN_DATE_TIME,'DD/MM/YYYY HH24:MI') ADM_DATE,
+		                  A.PATIENT_ID,A.EPISODE_ID,A.VISIT_ID, 
+                          B.BLNG_GRP_ID, B.CLASSIFICATION_CODE,
+						  A.ADDED_BY_ID
+                   FROM OP_VISIT A,BL_VISIT_FIN_DTLS B, BL_CLASSFCTN_CODE C
+                   WHERE A.FACILITY_ID = B.OPERATING_FACILITY_ID
+				   AND   A.PATIENT_ID=B.PATIENT_ID
+				   AND   B.OPERATING_FACILITY_ID = C.OPERATING_FACILITY_ID
+				   AND   B.CLASSIFICATION_CODE = C.CLASSIFICATION_CODE
+				   AND  A.VISIT_REGN_DATE_TIME BETWEEN TO_DATE(NVL(:nd_from_date,'01/01/1000'),'DD/MM/YYYY')
+						AND TO_DATE(NVL(:nd_to_date,'01/01/3000'),'DD/MM/YYYY')
+				   AND  A.EPISODE_ID=B.EPISODE_ID
+				   AND  A.VISIT_ID  = B.VISIT_ID
+				   AND  NVL(A.VISIT_STATUS,'X') != '9'
+				   AND  C.CLASSIFICATION_TYPE = 'SC'
+				   AND   NVL(B.CLASSIFICATION_CODE,'!!!!!!') BETWEEN NVL(:nd_from_exemp_code,'!!!!!!')	AND NVL(:nd_to_exemp_code,'~~~~~~')
+				   --AND  DECODE(:nd_episode_type,'B','O','O','O')='O'
+				   AND  :nd_episode_type IN('O','E')
+				   AND   A.episode_type=:nd_episode_type
+				   ORDER BY 2,3,1,4;
+
+/*
+		SELECT 'I' EP_TYPE,to_char(A.ADMISSION_DATE_TIME,'DD/MM/YYYY HH24:MI') ADM_DATE,
+						  A.PATIENT_ID,A.EPISODE_ID,0 VISIT_ID, 
+                          B.BLNG_GRP_ID, A.EXEMPTION_CODE,
+						  A.ADDED_BY_ID
+                   FROM IP_EPISODE A,BL_EPISODE_FIN_DTLS B 
+                   WHERE A.PATIENT_ID=B.PATIENT_ID
+				   AND   A.ADMISSION_DATE_TIME BETWEEN TO_DATE(NVL(:nd_from_date,'01/01/1000 00:00'),'DD/MM/YYYY HH24:MI')
+		                 AND TO_DATE(NVL(:nd_to_date,'01/01/3000 23:59'),'DD/MM/YYYY HH24:MI')
+				   AND   A.EPISODE_ID=B.EPISODE_ID
+				   AND   NVL(A.EXEMPTION_YN,'N')='Y'
+				   AND   NVL(A.EXEMPTION_CODE,'!!!!') BETWEEN NVL(:nd_from_exemp_code,'!!!!!!')	AND NVL(:nd_to_exemp_code,'~~~~~~')
+				   AND   NVL(A.EPISODE_STATUS,'X') != '9'
+				   AND   DECODE(:nd_episode_type,'B','I','I','I')='I' 
+				   UNION
+	    SELECT 'O' EP_TYPE,to_char(A.VISIT_REGN_DATE_TIME,'DD/MM/YYYY HH24:MI') ADM_DATE,
+		                  A.PATIENT_ID,A.EPISODE_ID,A.VISIT_ID, 
+                          B.BLNG_GRP_ID, A.EXEMPTION_CODE,
+						  A.ADDED_BY_ID
+                   FROM OP_VISIT A,BL_VISIT_FIN_DTLS B
+                   WHERE A.PATIENT_ID=B.PATIENT_ID
+				   AND  A.VISIT_REGN_DATE_TIME BETWEEN TO_DATE(NVL(:nd_from_date,'01/01/1000 00:00'),'DD/MM/YYYY HH24:MI')
+						AND TO_DATE(NVL(:nd_to_date,'01/01/3000 23:59'),'DD/MM/YYYY HH24:MI')
+				   AND  A.EPISODE_ID=B.EPISODE_ID
+				   AND  A.VISIT_ID  = B.VISIT_ID
+				   AND  NVL(A.VISIT_STATUS,'X') != '9'
+				   AND  NVL(A.EXEMPTION_YN,'N')='Y'
+				   AND   NVL(A.EXEMPTION_CODE,'!!!!') BETWEEN NVL(:nd_from_exemp_code,'!!!!!!')	AND NVL(:nd_to_exemp_code,'~~~~~~')
+				   AND  DECODE(:nd_episode_type,'B','O','O','O')='O'
+				   ORDER BY 2,3,1,4;
+*/		  
+	
+
+}
+
+
+open_exemp_cursor()
+{
+    EXEC SQL OPEN BL_EXEMP_CUR;
+    if (OERROR)
+         err_mesg("OPEN failed on cursor BL_EXEMP_CUR",0,"");
+}
+
+
+close_exemp_cursor()
+{
+   EXEC SQL CLOSE BL_EXEMP_CUR;
+ 
+}
+
+
+fetch_exemp_cursor()
+{
+  epi_type.arr[0]			= '\0';
+  bl_patient_id.arr[0]		= '\0';
+  bl_episode_id.arr[0]		= '\0';
+  bl_visit_id.arr[0]		= '\0';
+  nd_blng_grp.arr[0]		= '\0';
+  nd_exemp_code.arr[0]		= '\0';
+  nd_adm_date.arr[0]		= '\0';
+  bl_added_by.arr[0]		= '\0';
+
+  epi_type.len			 	= 0;  
+  bl_patient_id.len		 	= 0;  
+  bl_episode_id.len		 	= 0;  
+  bl_visit_id.len		 	= 0;  
+  nd_blng_grp.len		 	= 0;
+  nd_exemp_code.len			= 0;  
+  nd_adm_date.len		 	= 0;  
+  bl_added_by.len		 	= 0;  	
+
+  EXEC SQL FETCH BL_EXEMP_CUR
+		INTO	:epi_type,
+		        :nd_adm_date,
+				:bl_patient_id,
+				:bl_episode_id,
+				:bl_visit_id,	
+				:nd_blng_grp,
+				:nd_exemp_code,
+				:bl_added_by;
+
+
+  if (OERROR)
+         err_mesg("Fetch failed on cursor BL_EXEMP_CUR",0,"");
+				   
+  if (LAST_ROW)
+       return 0;
+  
+  /*sprintf(string_var,"%s %s %s %s",bl_patient_id.arr,bl_episode_id.arr,bl_visit_id.arr,nd_blng_grp.arr);
+  disp_message(ERR_MESG,string_var);*/
+  epi_type.arr[epi_type.len]					= '\0';
+  nd_adm_date.arr[nd_adm_date.len]			= '\0';
+  bl_patient_id.arr[bl_patient_id.len] 		= '\0';
+  bl_episode_id.arr[bl_episode_id.len] 		= '\0';
+  bl_visit_id.arr[bl_visit_id.len] 			= '\0';
+  nd_blng_grp.arr[nd_blng_grp.len] 			= '\0';  
+  nd_exemp_code.arr[nd_exemp_code.len] 		= '\0';
+  bl_added_by.arr[bl_added_by.len] 			= '\0';
+
+
+  return 1;    
+}
+
+
+print_rec()
+{
+   if (d_lctr  > 42)
+     print_head();
+
+   get_patient_name();
+   get_blng_desc();
+   get_exemp_desc();
+   get_user_name();
+
+  if(epi_type.arr[0] == 'O' || epi_type.arr[0] == 'E')
+     {
+
+	  init_date_temp_var();                              
+strcpy(date_convert.arr,nd_adm_date.arr);         
+fun_change_loc_date();  
+  fprintf(f2,"%-17s %-20.20s %-30s %-8s  %3s  %-4s %-15s  %-4s %-15s  %-20s %-30s\n",
+           date_convert.arr,
+	       bl_patient_id.arr,
+		   nd_patient_name.arr,
+		   bl_episode_id.arr,
+           bl_visit_id.arr,
+           nd_blng_grp.arr,
+		   nd_blng_desc.arr,
+	       nd_exemp_code.arr,
+		   nd_exemp_desc.arr,
+		   bl_added_by.arr,
+		   nd_user_name.arr);
+   }
+   if(epi_type.arr[0] == 'I' || epi_type.arr[0] == 'D')
+   {
+
+     	  init_date_temp_var();                              
+strcpy(date_convert.arr,nd_adm_date.arr);         
+fun_change_loc_date(); 
+
+   fprintf(f2,"%-17s %-20.20s %-30s %-8s       %-4s %-15s  %-4s %-15s  %-20s %-30s\n",
+           date_convert.arr,
+	       bl_patient_id.arr,
+		   nd_patient_name.arr,
+		   bl_episode_id.arr,
+           nd_blng_grp.arr,
+    	   nd_blng_desc.arr,
+	       nd_exemp_code.arr,
+		   nd_exemp_desc.arr,
+		   bl_added_by.arr,
+		   nd_user_name.arr);
+
+   }
+  prt_ctr++;   
+  d_lctr++;
+ }
+  
+print_tot()
+{
+   if (d_lctr > 42)
+     print_head();
+   if (prt_ctr > 0)
+   //fprintf(f2," \n\nTotal Number of Visits/Admissions : %-6d \n",prt_ctr);
+     fprintf(f2," \n\n%s : %-6d \n",loc_legend[136],prt_ctr);
+   d_lctr++;
+	       
+}
+
+
+open_file()
+{
+char filename[30];
+
+ 	strcpy(filename,WORKING_DIR);
+	strcat(filename,"BLRLM003.lis");
+
+    if ((f2 = fopen(filename,"w")) == NULL) 
+     {
+       disp_message(ERR_MESG,"Error in opening file BLRLM003.lis");
+       proc_exit();
+      }
+ }
+
+
+print_head()
+{ 
+    fprintf(f2,"");
+    prt_head(f2,&d_pctr);
+    
+	//fprintf(f2,"Visit/Admission   Patient No Name                          Episode Episode Visit  Billing Group/Desc  Exemption Code/Desc   Added by Id          Added by Name\n");
+	   fprintf(f2,"%s   %-20.20s %-30s %s %4s  %s  %s   %s          %s\n",loc_legend[119],loc_legend[120],loc_legend[121],loc_legend[122],loc_legend[123],loc_legend[124],loc_legend[125],loc_legend[126],loc_legend[127]); 
+    //fprintf(f2,"Date                                                       Type    No      No                                                                                 \n");           
+	  fprintf(f2,"%s           %57s %8s                                                                                 \n",loc_legend[128],loc_legend[130],loc_legend[130]);           
+	
+    fprintf(f2,"%s\n",hdr_line4);
+	inp_ctr = 1;
+	op_ctr  = 1;
+	d_lctr = 10;
+  
+}
+
+print_head1()
+{ 
+    prt_head(f2,&d_pctr);
+	
+  
+}
+
+
+prt_head(fp,pctr)
+//FILE *fp;
+int *pctr;
+{
+
+    form_hdr(&pctr);
+
+    fprintf(f2,"%c&l1O",ESC);   /* This will make the orientation as landscape */
+   // fprintf(f2,"%c&k2S",ESC); 
+								/* This makes the font size to increase to 2 */
+
+	fprintf(f2,"%c(s17H",ESC);
+    fprintf(f2,"%s\n",hdr_line1);
+    fprintf(f2,"%s\n",hdr_line2);
+    fprintf(f2,"%s\n",hdr_line3);
+    fprintf(f2,"%s\n",hdr_line4);
+ 
+
+fflush(f2);
+
+}
+
+fetch_hosp_name()
+{
+    hosp_name.arr[0] = '\0';
+    date_time.arr[0] = '\0';
+    user_id.arr[0]   = '\0';
+    hosp_name.len    = 0;
+    date_time.len    = 0;
+    user_id.len      = 0;
+
+    /*EXEC SQL SELECT UPPER(ACC_ENTITY_NAME), TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER
+               INTO :hosp_name, :date_time, :user_id
+               FROM SY_ACC_ENTITY 
+			   WHERE ACC_ENTITY_ID  = :nd_facility_id;*/
+
+      EXEC SQL SELECT UPPER(ACC_ENTITY_NAME), TO_CHAR(SYSDATE,'DD/MM/YYYY HH24:MI'),
+                    USER
+               INTO :hosp_name, :date_time, :user_id
+               FROM SY_ACC_ENTITY_LANG_VW 
+			   WHERE ACC_ENTITY_ID  = :nd_facility_id
+			   AND language_id=:p_language_id;
+
+       if (OERROR) err_mesg("SELECT failed on table SY_ACC_ENTITY",0,"");
+
+hosp_name.arr[hosp_name.len]           = '\0';
+date_time.arr[date_time.len]           = '\0';
+user_id.arr[user_id.len]               = '\0';
+}
+
+
+
+form_hdr(page_no)
+int **page_no;
+{
+
+    static int first = 1;
+    char buf[15];
+    int col;
+    	
+    if(first) {
+        memset(hdr_line1,' ',REP_WIDTH+1);
+        memset(hdr_line2,' ',REP_WIDTH+1);
+		memset(hdr_line4,'-',REP_WIDTH);
+		hdr_line4[REP_WIDTH] = '\0';
+
+        //strncpy(hdr_line1,"MDL : BL",8);
+		  strncpy(hdr_line1,loc_legend[133],strlen(loc_legend[133]));
+        col = (int)(REP_WIDTH-strlen(hosp_name.arr))/2;
+        strncpy(hdr_line1+col,hosp_name.arr,strlen(hosp_name.arr));
+		
+        col = (REP_WIDTH-strlen(date_time.arr));
+         
+	    init_date_temp_var();                              
+        strcpy(date_convert.arr,date_time.arr);         
+        fun_change_loc_date(); 
+
+        strcpy(hdr_line1+col,date_convert.arr);
+    
+        //strncpy(hdr_line2,"OPR :",5);
+		strncpy(hdr_line2,loc_legend[134],strlen(loc_legend[134]));
+        strcpy(hdr_line2+6,user_id.arr);
+
+	first = 0;
+    }
+
+    memset(hdr_line3,' ',REP_WIDTH+1);
+
+    //strncpy(hdr_line3,"REP : BLRLM003",14);
+	  strncpy(hdr_line3,loc_legend[135],strlen(loc_legend[135]));
+    col = (int)(REP_WIDTH-strlen(rep_title))/2;
+    strncpy(hdr_line3+col,rep_title,strlen(rep_title));
+    sprintf(buf,"PAGE : %4d",++*(*page_no));
+    strcpy(hdr_line3+(REP_WIDTH-strlen(buf)),buf);
+
+
+}
+
+
+sql_connect()
+{
+  EXEC SQL CONNECT :uid_pwd;
+
+  if (sqlca.sqlcode < 0)
+      return(-1);
+  return(0);
+}
+
+end_of_rep()
+{
+
+      if (s_lctr > 48)
+         print_head();
+
+	//fprintf(f2,"\n\n                                                     ***  END OF REPORT ***\n");
+	  fprintf(f2,"\n\n                                                     ***  %s ***\n",loc_legend[137]);
+
+}
+
+/*get_user_name()
+{
+ nd_added_name.arr[0] = '\0';
+ nd_added_name.len    = 0;
+
+ EXEC SQL SELECT USERNAME 
+        INTO :nd_added_name
+	    FROM SY_USER
+	    WHERE FACILITY_ID  = :nd_facility_id 
+		AND   USER_ID = :nd_added_by;
+
+ if (OERROR)
+        err_mesg("SELECT failed on table SY_USER",0,"");
+
+ nd_added_name.arr[nd_added_name.len] = '\0';		    
+
+
+ if (NOT_FOUND)
+        err_mesg("No Record found in SY_USER",0,"");
+
+ 
+}
+*/
+get_patient_name()
+{
+
+ nd_patient_name.arr[0] = '\0';
+
+ nd_patient_name.len    = 0;
+
+ /*EXEC SQL SELECT short_name
+		  INTO  :nd_patient_name
+          FROM MP_PATIENT_MAST
+          WHERE PATIENT_ID = :bl_patient_id;*/
+
+   EXEC SQL SELECT decode(:p_language_id,'en', substr(short_name,1,60),substr(SHORT_NAME_LOC_LANG,1,60))
+		  INTO  :nd_patient_name
+          FROM MP_PATIENT_MAST
+          WHERE PATIENT_ID = :bl_patient_id;
+   
+
+
+ if (OERROR)
+       disp_message(ERR_MESG,"SELECT failed on table MP_PATIENT_MAST");
+
+ 
+ nd_patient_name.arr[nd_patient_name.len] = '\0';
+ 
+ return;
+
+}
+
+
+get_user_name()
+{
+ nd_user_name.arr[0] = '\0';
+
+ nd_user_name.len    = 0;
+
+ EXEC SQL SELECT username
+		  INTO  :nd_user_name
+          FROM SY_USER
+          WHERE USER_ID = :bl_added_by
+		  AND FACILITY_ID = :nd_facility_id;
+
+
+ if (OERROR)
+       disp_message(ERR_MESG,"SELECT failed on table SY_USER ");
+
+ 
+ nd_user_name.arr[nd_user_name.len] = '\0';
+ 
+ return;
+
+}
+
+get_blng_desc()
+{
+
+ nd_blng_desc.arr[0] = '\0';
+ nd_blng_desc.len    = 0;
+
+ EXEC SQL SELECT short_desc
+		  INTO  :nd_blng_desc
+          FROM BL_BLNG_GRP_lang_vw
+          WHERE blng_grp_id = :nd_blng_grp
+		  and language_id=:p_language_id;
+
+ if (OERROR)
+       disp_message(ERR_MESG,"SELECT failed on table BL_BLNG_GRP");
+
+ 
+ nd_blng_desc.arr[nd_blng_desc.len] = '\0';
+ 
+ return;
+
+}
+
+
+get_exemp_desc()
+{
+
+ nd_exemp_desc.arr[0] = '\0';
+ nd_exemp_desc.len    = 0;
+
+ EXEC SQL SELECT short_desc
+		  INTO  :nd_exemp_desc
+          FROM BL_CLASSFCTN_CODE_LANG_VW 
+          WHERE OPERATING_FACILITY_ID  = :nd_facility_id
+		  and CLASSIFICATION_CODE = :nd_exemp_code
+		  and language_id=:p_language_id;
+
+ if (OERROR)
+       disp_message(ERR_MESG,"SELECT failed on table BL_EXEMPTION_MST");
+
+ 
+ nd_exemp_desc.arr[nd_exemp_desc.len] = '\0';
+ 
+ return;
+
+}
+
+print_rep_header()
+{
+  char from_pat_id[21],  to_pat_id[21];
+  char from_date[17], to_date[17];
+  char from_exemp[17], to_exemp[17];
+
+  if(strcmp(nd_from_patient_id.arr, "!!!!!!!!!!!!!!!!!!!!") == 0)
+    //strcpy(from_pat_id, "Lowest");
+	strcpy(from_pat_id, loc_legend[105]);
+    else strcpy(from_pat_id, nd_from_patient_id.arr);
+
+  if(strcmp(nd_to_patient_id.arr, "~~~~~~~~~~~~~~~~~~~~") == 0)
+    //strcpy(to_pat_id, "Highest");
+	strcpy(to_pat_id, loc_legend[106]);
+    else
+		strcpy(to_pat_id, nd_to_patient_id.arr);
+
+  
+  if(nd_from_date_flag.arr[0] == 'N')
+    //strcpy(from_date, "Lowest");
+		strcpy(from_date, loc_legend[105]);
+    else 
+		init_date_temp_var();                              
+		strcpy(date_convert.arr,nd_from_date.arr);         
+		fun_change_loc_date(); 
+		strcpy(from_date,date_convert.arr);
+
+  if(nd_to_date_flag.arr[0] == 'N')
+    //strcpy(to_date, "Highest");
+		strcpy(to_date, loc_legend[106]);
+    else 
+		init_date_temp_var();                              
+		strcpy(date_convert.arr, nd_to_date.arr);         
+		fun_change_loc_date(); 
+		strcpy(to_date,date_convert.arr);
+
+  if(nd_from_exemp_code.arr[0] == '\0')
+    //strcpy(from_exemp, "Lowest");
+	strcpy(from_exemp,loc_legend[105]);
+    else strcpy(from_exemp, nd_from_exemp_code.arr);
+
+  if(nd_to_exemp_code.arr[0] == '\0')
+    //strcpy(to_exemp, "Highest");
+	strcpy(to_exemp, loc_legend[106]);
+    else strcpy(to_exemp, nd_to_exemp_code.arr);
+
+  
+  print_head1();
+  fprintf(f2,VER);
+  fprintf(f2,"\n\n");
+  fprintf(f2,"        ");
+  //fprintf(f2,"INPUT PARAMETERS :\n");
+    fprintf(f2,"%s :\n",loc_legend[002]);
+  fprintf(f2,"        ");
+  fprintf(f2,"------------------\n\n");
+  fprintf(f2,"                              ");
+  //fprintf(f2,"EPISODE TYPE                : ");
+    fprintf(f2,"%s                : ",loc_legend[003]); 
+  /*if (nd_episode_type.arr[0] == 'I' || nd_episode_type.arr[0]=='D')
+  fprintf(f2,"Inpatient \n\n");
+  if (nd_episode_type.arr[0] == 'O' || nd_episode_type.arr[0]=='E')
+  fprintf(f2,"Outpatient \n\n");
+  if (nd_episode_type.arr[0] == 'B')
+  fprintf(f2,"Both \n\n");*/
+
+  if (nd_episode_type.arr[0] == 'I')
+   
+     fprintf(f2,"%s \n\n",loc_legend[004]);
+	   else if (nd_episode_type.arr[0] == 'D')
+	   fprintf(f2,"%s \n\n",loc_legend[005]);
+	   else if (nd_episode_type.arr[0] == 'O') 
+	   fprintf(f2,"%s \n\n",loc_legend[007]);
+  else
+      fprintf(f2,"%s \n\n",loc_legend[006]);   
+  
+    fprintf(f2,"                              ");
+  if (nd_episode_type.arr[0] == 'I' || nd_episode_type.arr[0] == 'D')
+  {
+  //fprintf(f2,"ADMISSION DATE       FROM   : %s\n", from_date);
+    fprintf(f2,"%s   : %s\n",loc_legend[102], from_date);
+  fprintf(f2,"                              ");
+  //fprintf(f2,"                     TO     : %s\n", to_date);
+    fprintf(f2,"                     %s     : %s\n",loc_legend[101],to_date);
+  }
+  
+  if (nd_episode_type.arr[0] == 'O' || nd_episode_type.arr[0] == 'E')
+  {
+  //fprintf(f2,"VISIT DATE           FROM   : %s\n", from_date);
+    fprintf(f2,"%s   : %s\n",loc_legend[103], from_date);
+  fprintf(f2,"                              ");
+  //fprintf(f2,"                     TO     : %s\n", to_date);
+    fprintf(f2,"                     %s     : %s\n", loc_legend[101],to_date);
+  }
+
+  if (nd_episode_type.arr[0] == 'B')
+  {
+  fprintf(f2,"ADMISSION/VISIT DATE FROM   : %s\n", from_date);
+  fprintf(f2,"                              ");
+  fprintf(f2,"                     TO     : %s\n", to_date);
+  }
+  fprintf(f2,"\n");
+
+  fprintf(f2,"                              ");
+  //fprintf(f2,"EXEMPTION CODE       FROM   : %s\n", from_exemp);
+    fprintf(f2,"%s   : %s\n",loc_legend[104],from_exemp);
+  fprintf(f2,"                              ");
+  //fprintf(f2,"                     TO     : %s\n", to_exemp);
+    fprintf(f2,"                     %s     : %s\n",loc_legend[101],to_exemp);
+  fprintf(f2,"\n");
+
+ }
+
+fetch_legend_value()
+{
+	for(i=1;i<=900;i++)
+	{
+		l_pk_value.arr[0] = '\0';
+
+	EXEC SQL SELECT LTRIM(RTRIM('BLRLM003.LEGEND_'||LTRIM(RTRIM(TO_CHAR(:i,'009')))))
+		        INTO :l_pk_value
+			   FROM dual;
+			
+		l_pk_value.arr[l_pk_value.len]	= '\0';
+		l_translated_value.arr[0]		= '\0';
+
+		EXEC SQL EXECUTE
+		BEGIN
+			blcommon.get_local_lang_desc(:nd_facility_id,
+										'SM',
+										'SM_LANG_LEGEND',
+										'DFLT_LEGEND_VALUE',
+										:l_pk_value,
+										:l_translated_value,
+										:p_language_id);
+		END;
+		END-EXEC;
+
+		l_translated_value.arr[l_translated_value.len] = '\0';
+		strcpy(loc_legend[i],l_translated_value.arr);
+	}
+}
+
+
+get_local_date()
+{
+
+	
+	EXEC SQL EXECUTE
+
+	DECLARE
+
+	t_date  date;
+	
+	BEGIN
+	
+	  
+       	get_locale_date.CONVERT_TO_LOCALE_DATE(to_date(:nd_temp_date,'DD/MM/YYYY HH24:MI'),:p_language_id,t_date);  
+      
+	   :nd_loc_date := to_char(t_date,'DD/MM/YYYY');
+	
+
+	END;
+
+	END-EXEC;
+        
+		if (OERROR)
+        err_mesg("SELECTING Date failed",0,"");
+
+}
+
+                     
+init_date_temp_var()
+{
+nd_temp_date.arr[0] = '\0';
+nd_loc_date.arr[0]  = '\0';
+date_convert.arr[0] = '\0';
+
+nd_temp_date.len = 0;
+nd_loc_date.len  = 0;
+date_convert.len = 0;
+}
+
+
+
+fun_change_loc_date()
+{
+
+strcpy(nd_temp_date.arr,date_convert.arr);
+nd_temp_date.len = strlen(nd_temp_date.arr);
+
+
+get_local_date();
+
+strcpy(date_convert.arr,nd_loc_date.arr); 
+
+}

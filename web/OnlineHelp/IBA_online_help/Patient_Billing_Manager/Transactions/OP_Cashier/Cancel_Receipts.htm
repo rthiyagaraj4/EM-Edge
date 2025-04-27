@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Cancel Receipts</title>
+<link rel="StyleSheet" href="../../../default.css" type="text/css" />
+<script type="text/javascript" language="JavaScript" src="../../../ehlpdhtm.js"></script><script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Patient Billing Manager\nTransactions\nOP Cashier\nCancel Receipts");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../../EM_OLH.htm");
+
+		autoSync(1);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+
+<h1>Cancel Receipts</h1>
+<p class="Italic">From this function you can <span class="RedItalic">Cancel</span> a relevant receipt generated for an outpatient transaction. The receipts can be either for the payments accepted or for the refunds issued to the outpatients. Cashier has to cancel only the printed receipts. &#160;&#160;&#160;&#160;&#160;</p>
+<p class="Text">Cancel Receipts function is used to cancel the receipts generated for a transaction at the Facility. Cashier can cancel only the printed receipts. The authorized users only can cancel the receipts. The ‘Receipts’ option has to be checked in the function ‘Users for Authorization / Refund / Cash Counters’ in the Administration menu for the cashier to login and cancel the receipts. A cashier can cancel the receipts printed for the transactions on a relevant day. To cancel the previous day’s transaction, check the option ‘Allow Cancel of Previous Days Cashier Txns’ in the ‘BL Parameters’ under the tab ‘Receipts/Refund Controls’. You can cancel the bills associated to the receipts using this function. If there are multiple bills associated to the same receipt, you can select to cancel individual bills. Current receipt is highlighted using <img src="../../../image191.gif" style="border: none;" alt="image191.gif" width="21" height="17" border="0" /> color. Current encounter is highlighted using <img src="../../../image192.gif" style="border: none;" alt="image192.gif" width="21" height="17" border="0" /> color and other payers associated to the current receipt are highlighted using <img src="../../../image193.gif" style="border: none;" alt="image193.gif" width="22" height="17" border="0" /> color.</p>
+<h2>Cancel Receipts</h2>
+<p class="From">From the Transactions &gt; OP Cashier, double-click Cancel Receipts Function.</p>
+<p class="Text">The Cancel Receipts screen gets displayed.</p>
+<ol>
+<li class="p-Number">
+<p class="Number">Click <span class="BoldButton">[Enter Query]</span> and enter the Patient Number; press <span class="BoldButton">[F8]</span> or <span class="BoldButton">[Execute Query]</span> to cancel the receipt for a selected patient. Else, press <span class="BoldButton">[F8]</span> or <span class="BoldButton">[Execute Query]</span> to view the details of all the Outpatients. &#160;</p>
+</li>
+<li class="p-Number">
+<p class="Number">The receipt details generated get displayed on clicking <span class="BoldButton">[Execute Query]</span>.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Select Cancel to cancel the receipts. The Cancellation Authorization screen pops-up to validate the user privilege to cancel the document.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter the User Id, Pin Number and Cancel Reason. Select a value from the list. The reasons defined using the function ‘Reasons for Billing Actions’ with the Receipt Cancellation check box as selected are listed. &#160;</p>
+</li>
+<li class="p-Number">
+<p class="Number">Enter a valid reason for cancellation. During cancel, the updates are just the reverse of that of the receipts updates.</p>
+</li>
+<li class="p-Number">
+<p class="Number">Right-Click on the Bill Number to cancel the respective bill. On right-clicking, the ‘<a href="../OP_Billing/Nullify_Cancel_a_Bill.htm">Nullify/Cancel a Bill</a>’ screen gets displayed with the bill number and the type displayed and the ‘Cancel’ check box as selected. Click <span class="BoldButton">[Commit Form]</span> to cancel the bill. A warning message ‘Do you want to confirm?’ gets displayed. Click <span class="BoldButton">[YES]</span> to cancel or <span class="BoldButton">[NO]</span> to abort the transaction. If the bill is associated to another receipt, an error message gets displayed and you cannot cancel the bill. If the bill is associated to another payer, an error message ‘Bill not valid for modification or cancellation’ is displayed.</p>
+</li>
+</ol>
+<p class="Note"><img src="../../../Note.jpg" style="border: none;" alt="Note.jpg" width="39" height="26" border="0" /> If the bill is already posted, you cannot cancel the bill. A message ‘Cannot Cancel the Posted Bill’ is displayed.</p>
+<hr style="float: aligncenter;" />
+<p><a href="javascript:void(0);" onclick="var e; if (parseInt(navigator.appVersion)>=4){e=event;}  if (parseInt(navigator.appVersion) &gt;=2 &amp;&amp; typeof(PopupMenu_Invoke) == 'function') PopupMenu_Invoke(e,'','Enter OP Receipts/Refunds','Enter_OP_Receipts_Refunds.htm');return false;" title="Related Topics"><img src="../../../ss_btn_related_topics.gif" border="0" height="17" width="82" alt="Related Topics" /></a> </p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p style="font-style: italic; font-family: Arial, sans-serif; font-size: 8pt;">&#160;</p>
+</div>
+<script type="text/javascript" language="JavaScript">//<![CDATA[
+if (parseInt(navigator.appVersion) >= 3 && typeof (WritePopupMenuLayer) == "function")
+  WritePopupMenuLayer();
+//]]></script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>
